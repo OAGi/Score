@@ -1,4 +1,4 @@
-package org.oagi.srt.persistence.dao;
+package org.oagi.srt.common;
 
 import org.chanchan.common.util.ChanChanException;
 

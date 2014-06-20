@@ -1,5 +1,7 @@
 package org.oagi.srt.persistence.dao;
 
+import org.oagi.srt.common.SRTException;
+
 /**
  *
  * @author Yunsu Lee
