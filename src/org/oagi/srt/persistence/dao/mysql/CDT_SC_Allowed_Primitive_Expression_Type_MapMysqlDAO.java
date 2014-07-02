@@ -12,56 +12,46 @@ import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ASCCVO;
-
+import org.oagi.srt.persistence.dto.CDT_SC_Allowed_Primitive_Expression_Type_MapVO;
 
 /**
-*
-* @author Nasif Sikder
-* @version 1.0
-*
-*/
-public class ASCCMysqlDAO extends SRTDAO {
+ *
+ * @author Nasif Sikder
+ * @version 1.0
+ *
+ */
+public class CDT_SC_Allowed_Primitive_Expression_Type_MapMysqlDAO extends SRTDAO {
+	private final String _tableName = "cdt_sc_allowed_primitive_expression_type_map";
+
+	private final String _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
+	= "SELECT CT_SC_Allowed_Primitive_Expression_Type_Map_ID, CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID "
+			+ "FROM " + _tableName;
 	
-	private final String _tableName = "ascc";
+	private final String _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
+	= "SELECT CT_SC_Allowed_Primitive_Expression_Type_Map_ID, CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID "
+			+ "FROM " + _tableName;
 	
-	private final String _FIND_ALL_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+	private final String _INSERT_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
+	= "INSERT INTO " + _tableName + " (CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID) VALUES (?, ?)";
 	
-	private final String _FIND_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+	private final String _UPDATE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
+	= "UPDATE " + _tableName + " SET CDT_SC_Allowed_Primitive = ?, XSD_BuiltIn_Type_ID = ? "
+			+ "WHERE CT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?";
 	
-	private final String _INSERT_ASCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Cardinality_Min, Cardinality_Max, "
-			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition) "
-			+ "VALUES (?, ?, ?, ?, ?, ?)";
-	
-	private final String _UPDATE_ASCC_STATEMENT = 
-			"UPDATE " + _tableName
-			+ " SET Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
-			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, Definition = ? WHERE ASCC_ID = ?";
-	
-	private final String _DELETE_ASCC_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE ASCC_ID = ?";
+	private final String _DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
+	= "DELETE FROM " + _tableName + " WHERE CT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?";
 
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
-		
+		CDT_SC_Allowed_Primitive_Expression_Type_MapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+				(CDT_SC_Allowed_Primitive_Expression_Type_MapVO)obj;
 		try {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
-			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
-			
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			
+			ps = conn.prepareStatement(_INSERT_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
+			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCDTSCAllowedPrimitive());
+			ps.setInt(2, cdt_sc_allowed_primitive_expression_type_mapVO.getXSDBuiltInTypeID());
+
 			ps.executeUpdate();
 
 			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -81,19 +71,17 @@ public class ASCCMysqlDAO extends SRTDAO {
 			tx.close();
 		}
 		return true;
-		
 	}
 
-	@Override
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ASCCVO asccVO = new ASCCVO();
-		
+		CDT_SC_Allowed_Primitive_Expression_Type_MapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+		new CDT_SC_Allowed_Primitive_Expression_Type_MapVO();
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ASCC_STATEMENT;
+			String sql = _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -117,13 +105,9 @@ public class ASCCMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("CDT_SC_Allowed_Primitive"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
 			}
 			tx.commit();
 			conn.close();
@@ -144,33 +128,27 @@ public class ASCCMysqlDAO extends SRTDAO {
 			}
 			tx.close();
 		}
-		return asccVO;
-		
+		return cdt_sc_allowed_primitive_expression_type_mapVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_ASCC_STATEMENT;
+			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ASCCVO asccVO = new ASCCVO();
-				
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
-				
-				list.add(asccVO);
+				CDT_SC_Allowed_Primitive_Expression_Type_MapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+						new CDT_SC_Allowed_Primitive_Expression_Type_MapVO();
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("CDT_SC_Allowed_Primitive"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
 			}
 			tx.commit();
 			conn.close();
@@ -193,25 +171,20 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return list;
-
 	}
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
+		CDT_SC_Allowed_Primitive_Expression_Type_MapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+				(CDT_SC_Allowed_Primitive_Expression_Type_MapVO)obj;
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_UPDATE_ASCC_STATEMENT);
+			ps = conn.prepareStatement(_UPDATE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
 
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			ps.setInt(7, asccVO.getASCCID());
+			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCDTSCAllowedPrimitive());
+			ps.setInt(2, cdt_sc_allowed_primitive_expression_type_mapVO.getXSDBuiltInTypeID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -231,19 +204,18 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-		
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		ASCCVO asccVO = (ASCCVO)obj;
-
+		CDT_SC_Allowed_Primitive_Expression_Type_MapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+				(CDT_SC_Allowed_Primitive_Expression_Type_MapVO)obj;
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_DELETE_ASCC_STATEMENT);
-			ps.setInt(1, asccVO.getASCCID());
+			ps = conn.prepareStatement(_DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
+			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCTSCAllowedPrimitiveExpressionTypeMapID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -263,6 +235,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-	}
 
+	}
+	
 }

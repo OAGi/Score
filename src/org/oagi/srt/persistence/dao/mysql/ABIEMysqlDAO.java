@@ -12,56 +12,60 @@ import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ASCCVO;
-
+import org.oagi.srt.persistence.dto.ABIEVO;
 
 /**
-*
-* @author Nasif Sikder
-* @version 1.0
-*
-*/
-public class ASCCMysqlDAO extends SRTDAO {
-	
-	private final String _tableName = "ascc";
-	
-	private final String _FIND_ALL_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
-	
-	private final String _FIND_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
-	
-	private final String _INSERT_ASCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Cardinality_Min, Cardinality_Max, "
-			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition) "
-			+ "VALUES (?, ?, ?, ?, ?, ?)";
-	
-	private final String _UPDATE_ASCC_STATEMENT = 
-			"UPDATE " + _tableName
-			+ " SET Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
-			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, Definition = ? WHERE ASCC_ID = ?";
-	
-	private final String _DELETE_ASCC_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE ASCC_ID = ?";
+ *
+ * @author Nasif Sikder
+ * @version 1.0
+ *
+ */
+public class ABIEMysqlDAO extends SRTDAO {
 
+	private final String _tableName = "abie";
+	
+	private final String _FIND_ALL_ABIE_STATEMENT =
+			"SELECT ABIE_ID, Based_ACC_ID, isTop_Level, Business_Context_ID, Definition, "
+			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State FROM " + _tableName;
+	
+	private final String _FIND_ABIE_STATEMENT =
+			"SELECT ABIE_ID, Based_ACC_ID, isTop_Level, Business_Context_ID, Definition, "
+			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State FROM " + _tableName;
+	
+	private final String _INSERT_ABIE_STATEMENT = 
+			"INSERT INTO " + _tableName + " (Based_ACC_ID, isTop_Level, Business_Context_ID,"
+			+ " Definition, Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
+	
+	private final String _UPDATE_ABIE_STATEMENT = 
+			"UPDATE " + _tableName
+			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ABIE_ID = ?, Based_ACC_ID = ?,"
+			+ " isTop_Level = ?, Business_Context_ID = ?, Definition = ?, Created_By_User_ID = ?,"
+			+ " Last_Updated_By_User_ID = ?, Creation_Timestamp = ?, State = ? WHERE ABIE_ID = ?";
+	
+	private final String _DELETE_ABIE_STATEMENT = 
+			"DELETE FROM " + _tableName + " WHERE ABIE_ID = ?";
+	
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
-		
+		ABIEVO abieVO = (ABIEVO)obj;
 		try {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
-			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
-			
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			
+			ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT);
+			ps.setInt(1, abieVO.getBasedACCID());
+			ps.setInt(2, abieVO.getIsTopLevel());
+			ps.setInt(3, abieVO.getBusinessContextID());
+			ps.setString(4, abieVO.getDefinition());
+			ps.setInt(5, abieVO.getCreatedByUserID());
+			ps.setInt(6, abieVO.getLastUpdatedByUserID());
+			ps.setTimestamp(7, abieVO.getCreationTimestamp());
+			ps.setTimestamp(8, abieVO.getLastUpdateTimestamp());
+			ps.setInt(9, abieVO.getState());
+
 			ps.executeUpdate();
 
 			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -81,19 +85,17 @@ public class ASCCMysqlDAO extends SRTDAO {
 			tx.close();
 		}
 		return true;
-		
+
 	}
 
-	@Override
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ASCCVO asccVO = new ASCCVO();
-		
+		ABIEVO abieVO = new ABIEVO();
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ASCC_STATEMENT;
+			String sql = _FIND_ABIE_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -117,13 +119,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
+				abieVO.setABIEID(rs.getInt("ABIE_ID"));
+				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
+				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setDefinition(rs.getString("Definition"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				abieVO.setState(rs.getInt("State"));				
 			}
 			tx.commit();
 			conn.close();
@@ -144,33 +149,33 @@ public class ASCCMysqlDAO extends SRTDAO {
 			}
 			tx.close();
 		}
-		return asccVO;
-		
+		return abieVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_ASCC_STATEMENT;
+			String sql = _FIND_ALL_ABIE_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ASCCVO asccVO = new ASCCVO();
-				
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
-				
-				list.add(asccVO);
+				ABIEVO abieVO = new ABIEVO();
+				abieVO.setABIEID(rs.getInt("ABIE_ID"));
+				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
+				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setDefinition(rs.getString("Definition"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				abieVO.setState(rs.getInt("State"));
+				list.add(abieVO);
 			}
 			tx.commit();
 			conn.close();
@@ -193,25 +198,29 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return list;
-
+			
 	}
 
+	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
+		ABIEVO abieVO = (ABIEVO)obj;
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_UPDATE_ASCC_STATEMENT);
+			ps = conn.prepareStatement(_UPDATE_ABIE_STATEMENT);
 
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			ps.setInt(7, asccVO.getASCCID());
+			ps.setInt(1, abieVO.getBasedACCID());
+			ps.setInt(2, abieVO.getIsTopLevel());
+			ps.setInt(3, abieVO.getBusinessContextID());
+			ps.setString(4, abieVO.getDefinition());
+			ps.setInt(5, abieVO.getCreatedByUserID());
+			ps.setInt(6, abieVO.getLastUpdatedByUserID());
+			ps.setTimestamp(7, abieVO.getCreationTimestamp());
+			ps.setTimestamp(8, abieVO.getLastUpdateTimestamp());
+			ps.setInt(9, abieVO.getState());
+			
 			ps.executeUpdate();
 
 			tx.commit();
@@ -231,19 +240,19 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-		
 	}
 
+	
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		ASCCVO asccVO = (ASCCVO)obj;
-
+		ABIEVO abieVO = (ABIEVO)obj;
+		
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_DELETE_ASCC_STATEMENT);
-			ps.setInt(1, asccVO.getASCCID());
+			ps = conn.prepareStatement(_DELETE_ABIE_STATEMENT);
+			ps.setInt(1, abieVO.getABIEID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -263,6 +272,8 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
+
+
 	}
 
 }

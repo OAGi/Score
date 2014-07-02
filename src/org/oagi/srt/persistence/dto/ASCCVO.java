@@ -63,7 +63,7 @@ public class ASCCVO extends SRTObject {
 	}
 	
 	public void setAssocToASCCPID(int assocToASCCPID){
-		AssocToASCCPID = assocToASCCPID; //TYPO in MySQL Table
+		AssocToASCCPID = assocToASCCPID;
 	}
 	
 	public String getDefinition(){

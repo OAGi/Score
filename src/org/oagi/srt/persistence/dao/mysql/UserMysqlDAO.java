@@ -12,56 +12,44 @@ import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ASCCVO;
-
+import org.oagi.srt.persistence.dto.UserVO;
 
 /**
-*
-* @author Nasif Sikder
-* @version 1.0
-*
-*/
-public class ASCCMysqlDAO extends SRTDAO {
+ *
+ * @author Nasif Sikder
+ * @version 1.0
+ *
+ */
+public class UserMysqlDAO extends SRTDAO {
 	
-	private final String _tableName = "ascc";
+	private final String _tableName = "user";
+
+	private final String _FIND_ALL_USER_STATEMENT =
+			"SELECT User_ID, User_Name, Password, Name, Organization FROM " + _tableName;
 	
-	private final String _FIND_ALL_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+	private final String _FIND_USER_STATEMENT = 
+			"SELECT User_ID, User_Name, Password, Name, Organization FROM " + _tableName;
 	
-	private final String _FIND_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+	private final String _INSERT_USER_STATEMENT = "INSERT INTO " + _tableName + 
+			" (User_Name, Password, Name, Organization) VALUES (?, ?, ?, ?)";
 	
-	private final String _INSERT_ASCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Cardinality_Min, Cardinality_Max, "
-			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition) "
-			+ "VALUES (?, ?, ?, ?, ?, ?)";
+	private final String _UPDATE_USER_STATEMENT = "UPDATE " + _tableName + 
+			" SET User_Name = ?, Password = ?, Name = ?, Organization = ? WHERE User_ID = ?";
 	
-	private final String _UPDATE_ASCC_STATEMENT = 
-			"UPDATE " + _tableName
-			+ " SET Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
-			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, Definition = ? WHERE ASCC_ID = ?";
-	
-	private final String _DELETE_ASCC_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE ASCC_ID = ?";
+	private final String _DELETE_USER_STATEMENT = "DELETE FROM " + _tableName + " WHERE User_ID = ?";
 
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
-		
+		UserVO userVO = (UserVO)obj;
 		try {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
-			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
-			
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			
+			ps = conn.prepareStatement(_INSERT_USER_STATEMENT);
+			ps.setString(1, userVO.getUserName());
+			ps.setString(2, userVO.getPassword());
+			ps.setString(3, userVO.getName());
+			ps.setString(4, userVO.getOrganization());
+
 			ps.executeUpdate();
 
 			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -81,19 +69,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 			tx.close();
 		}
 		return true;
-		
 	}
 
-	@Override
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ASCCVO asccVO = new ASCCVO();
-		
+		UserVO userVO = new UserVO();
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ASCC_STATEMENT;
+			String sql = _FIND_USER_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -117,13 +102,12 @@ public class ASCCMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
+				userVO.setUserID(rs.getInt("User_ID"));
+				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setPassword(rs.getString("Password"));
+				userVO.setName(rs.getString("Name"));
+				userVO.setOrganization(rs.getString("Organization"));
+
 			}
 			tx.commit();
 			conn.close();
@@ -144,33 +128,28 @@ public class ASCCMysqlDAO extends SRTDAO {
 			}
 			tx.close();
 		}
-		return asccVO;
-		
+		return userVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_ASCC_STATEMENT;
+			String sql = _FIND_ALL_USER_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ASCCVO asccVO = new ASCCVO();
-				
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
-				
-				list.add(asccVO);
+				UserVO userVO = new UserVO();
+				userVO.setUserID(rs.getInt("User_ID"));
+				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setPassword(rs.getString("Password"));
+				userVO.setName(rs.getString("Name"));
+				userVO.setOrganization(rs.getString("Organization"));
+				list.add(userVO);
 			}
 			tx.commit();
 			conn.close();
@@ -193,25 +172,21 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return list;
-
 	}
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
+		UserVO userVO = (UserVO)obj;
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_UPDATE_ASCC_STATEMENT);
+			ps = conn.prepareStatement(_UPDATE_USER_STATEMENT);
 
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			ps.setInt(7, asccVO.getASCCID());
+			ps.setString(1, userVO.getUserName());
+			ps.setString(2, userVO.getPassword());
+			ps.setString(3, userVO.getName());
+			ps.setString(4, userVO.getOrganization());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -231,19 +206,18 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-		
+
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		ASCCVO asccVO = (ASCCVO)obj;
-
+		UserVO userVO = (UserVO)obj;
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_DELETE_ASCC_STATEMENT);
-			ps.setInt(1, asccVO.getASCCID());
+			ps = conn.prepareStatement(_DELETE_USER_STATEMENT);
+			ps.setInt(1, userVO.getUserID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -263,6 +237,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
+
 	}
 
 }

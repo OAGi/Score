@@ -12,56 +12,51 @@ import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ASCCVO;
-
+import org.oagi.srt.persistence.dto.Context_SchemeVO;
 
 /**
-*
-* @author Nasif Sikder
-* @version 1.0
-*
-*/
-public class ASCCMysqlDAO extends SRTDAO {
+ *
+ * @author Nasif Sikder
+ * @version 1.0
+ *
+ */
+
+public class Context_SchemeMysqlVO extends SRTDAO {
 	
-	private final String _tableName = "ascc";
+	private final String _tableName = "context_scheme";
+
+	private final String _FIND_ALL_CONTEXT_SCHEME_STATEMENT = "SELECT Context_Scheme_ID, Scheme_ID, Scheme_Name, "
+	+ "Description, Scheme_Agency_ID, Scheme_Agency_Name, Scheme_Version, Context_Category_ID FROM " + _tableName;
 	
-	private final String _FIND_ALL_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+	private final String _FIND_CONTEXT_SCHEME_STATEMENT = "SELECT Context_Scheme_ID, Scheme_ID, Scheme_Name, "
+	+ "Description, Scheme_Agency_ID, Scheme_Agency_Name, Scheme_Version, Context_Category_ID FROM " + _tableName;
 	
-	private final String _FIND_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+	private final String _INSERT_CONTEXT_SCHEME_STATEMENT = 
+			"INSERT INTO " + _tableName + " (Scheme_ID, Scheme_Name, Description, Scheme_Agency_ID, "
+					+ "Scheme_Agency_Name, Scheme_Version, Context_Category_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
 	
-	private final String _INSERT_ASCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Cardinality_Min, Cardinality_Max, "
-			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition) "
-			+ "VALUES (?, ?, ?, ?, ?, ?)";
+	private final String _UPDATE_CONTEXT_SCHEME_STATEMENT =
+			"UPDATE " + _tableName + " SET Scheme_ID = ?, Scheme_Name = ?, Description = ?, Scheme_Agency_ID = ?, "
+				+ "Scheme_Agency_Name = ?, Scheme_Version = ?, Context_Category_ID = ? WHERE Context_Scheme_ID = ?";
 	
-	private final String _UPDATE_ASCC_STATEMENT = 
-			"UPDATE " + _tableName
-			+ " SET Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
-			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, Definition = ? WHERE ASCC_ID = ?";
-	
-	private final String _DELETE_ASCC_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE ASCC_ID = ?";
+	private final String _DELETE_CONTEXT_SCHEME_STATEMENT = 
+			"DELETE FROM " + _tableName + " WHERE Context_Scheme_ID = ?";
 
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
-		
+		Context_SchemeVO context_schemeVO = (Context_SchemeVO)obj;
 		try {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
-			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
-			
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			
+			ps = conn.prepareStatement(_INSERT_CONTEXT_SCHEME_STATEMENT);
+			ps.setString(1, context_schemeVO.getSchemeID());
+			ps.setString(2, context_schemeVO.getSchemeName());
+			ps.setString(3, context_schemeVO.getDescription());
+			ps.setString(4, context_schemeVO.getSchemeAgencyID());
+			ps.setString(5, context_schemeVO.getSchemeAgencyName());
+			ps.setString(6, context_schemeVO.getSchemeVersion());
+			ps.setInt(7, context_schemeVO.getContextCategoryID());
+
 			ps.executeUpdate();
 
 			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -81,19 +76,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 			tx.close();
 		}
 		return true;
-		
 	}
 
-	@Override
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ASCCVO asccVO = new ASCCVO();
-		
+		Context_SchemeVO context_schemeVO = new Context_SchemeVO();
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ASCC_STATEMENT;
+			String sql = _FIND_CONTEXT_SCHEME_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -117,13 +109,15 @@ public class ASCCMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
+				context_schemeVO.setContextSchemeID(rs.getInt("Context_Scheme_ID"));
+				context_schemeVO.setSchemeID(rs.getString("Scheme_ID"));
+				context_schemeVO.setSchemeName(rs.getString("Scheme_Name"));
+				context_schemeVO.setDescription(rs.getString("Description"));
+				context_schemeVO.setSchemeAgencyID(rs.getString("Scheme_Agency_ID"));
+				context_schemeVO.setSchemeAgencyName(rs.getString("Scheme_Agency_Name"));
+				context_schemeVO.setSchemeVersion("Scheme_Version");
+				context_schemeVO.setContextCategoryID(rs.getInt("Context_Category_ID"));
+
 			}
 			tx.commit();
 			conn.close();
@@ -144,33 +138,31 @@ public class ASCCMysqlDAO extends SRTDAO {
 			}
 			tx.close();
 		}
-		return asccVO;
-		
+		return context_schemeVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_ASCC_STATEMENT;
+			String sql = _FIND_ALL_CONTEXT_SCHEME_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ASCCVO asccVO = new ASCCVO();
-				
-				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
-				asccVO.setDefinition(rs.getString("Definition"));
-				
-				list.add(asccVO);
+				Context_SchemeVO context_schemeVO = new Context_SchemeVO();
+				context_schemeVO.setContextSchemeID(rs.getInt("Context_Scheme_ID"));
+				context_schemeVO.setSchemeID(rs.getString("Scheme_ID"));
+				context_schemeVO.setSchemeName(rs.getString("Scheme_Name"));
+				context_schemeVO.setDescription(rs.getString("Description"));
+				context_schemeVO.setSchemeAgencyID(rs.getString("Scheme_Agency_ID"));
+				context_schemeVO.setSchemeAgencyName(rs.getString("Scheme_Agency_Name"));
+				context_schemeVO.setSchemeVersion("Scheme_Version");
+				context_schemeVO.setContextCategoryID(rs.getInt("Context_Category_ID"));
+				list.add(context_schemeVO);
 			}
 			tx.commit();
 			conn.close();
@@ -193,25 +185,25 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return list;
-
+		
 	}
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASCCVO asccVO = (ASCCVO)obj;
+		Context_SchemeVO context_schemeVO = (Context_SchemeVO)obj;
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_UPDATE_ASCC_STATEMENT);
+			ps = conn.prepareStatement(_UPDATE_CONTEXT_SCHEME_STATEMENT);
 
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			ps.setInt(7, asccVO.getASCCID());
+			ps.setString(1, context_schemeVO.getSchemeID());
+			ps.setString(2, context_schemeVO.getSchemeName());
+			ps.setString(3, context_schemeVO.getDescription());
+			ps.setString(4, context_schemeVO.getSchemeAgencyID());
+			ps.setString(5, context_schemeVO.getSchemeAgencyName());
+			ps.setString(6, context_schemeVO.getSchemeVersion());
+			ps.setInt(7, context_schemeVO.getContextCategoryID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -231,19 +223,17 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-		
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		ASCCVO asccVO = (ASCCVO)obj;
-
+		Context_SchemeVO context_schemeVO = (Context_SchemeVO)obj;
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_DELETE_ASCC_STATEMENT);
-			ps.setInt(1, asccVO.getASCCID());
+			ps = conn.prepareStatement(_DELETE_CONTEXT_SCHEME_STATEMENT);
+			ps.setInt(1, context_schemeVO.getContextSchemeID());
 			ps.executeUpdate();
 
 			tx.commit();
