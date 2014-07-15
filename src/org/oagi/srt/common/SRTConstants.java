@@ -28,6 +28,11 @@ public class SRTConstants {
 	public static final String SRT_PROPERTIES_FILE_NAME = "srt.properties";
 	public static final String PRODUCT_NAME = "OAGi Semantic Refinement Tool";
 	
+	public static final String NS_CCTS_PREFIX = "ccts";
+	public static final String NS_XSD_PREFIX = "xsd";
+	public static final String NS_CCTS = "urn:un:unece:uncefact:documentation:1.1";
+	public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
+	
 	public static int getDBType() {
 		ServerProperties props = ServerProperties.getInstance();
 		String dbTypeVal = props.getProperty("srt.db.type");
