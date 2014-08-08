@@ -19,10 +19,11 @@ public class DTVO extends SRTObject {
 	private int RevisionType;
 	private String DataTypeTerm;
 	private String Qualifier;
-	private String BasedDTID;
+	private int BasedDTID;
 	private String DEN;
 	private String ContentComponentDEN;
 	private String Definition;
+	private String ContentComponentDefinition;
 	private String RevisionDocumentation;
 	private int RevisionState;
 	private int CreatedByUserId;
@@ -94,11 +95,11 @@ public class DTVO extends SRTObject {
 		Qualifier = qualifier;
 	}
 	
-	public String getBasedDTID() {
+	public int getBasedDTID() {
 		return BasedDTID;
 	}
 	
-	public void setBasedDTID(String basedDTID) {
+	public void setBasedDTID(int basedDTID) {
 		BasedDTID = basedDTID;
 	}
 	
@@ -124,6 +125,14 @@ public class DTVO extends SRTObject {
 	
 	public void setDefinition(String definition) {
 		Definition = definition;
+	}
+	
+	public String getContentComponentDefinition() {
+		return ContentComponentDefinition;
+	}
+
+	public void setContentComponentDefinition(String contentComponentDefinition) {
+		ContentComponentDefinition = contentComponentDefinition;
 	}
 	
 	public String getRevisionDocumentation() {
