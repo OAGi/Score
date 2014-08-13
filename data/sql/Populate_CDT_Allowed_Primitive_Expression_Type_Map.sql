@@ -1,83 +1,360 @@
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('2', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('3', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('3', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('4', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('5', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('6', '21');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('6', '22');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('7', '18');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('8', '17');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('9', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '11');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '10');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '12');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '13');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '14');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '15');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('10', '16');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '9');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '11');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '10');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '12');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '13');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '14');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '15');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('11', '16');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('12', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('12', '18');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('13', '21');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('13', '22');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('14', '18');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('15', '17');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('16', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('17', '20');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('18', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('19', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('19', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('20', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('21', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('22', '18');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('23', '17');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('24', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('25', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('26', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('27', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('27', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('28', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('29', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('30', '21');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('30', '22');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('31', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('32', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('32', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('33', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('34', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('35', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('36', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('36', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('37', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('38', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('39', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('40', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('40', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('41', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('42', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('43', '17');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('44', '21');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('44', '22');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('45', '18');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('46', '17');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('47', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('48', '19');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('48', '10');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('49', '24');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('50', '28');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('50', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('51', '23');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('52', '25');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('53', '21');
-insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) values ('53', '22');
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Binary' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:base64Binary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Binary' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:hexBinary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:normalizedString'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'String'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:string'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Token'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:date'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:time'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gYearMonth'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gYear'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gMonthDay'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gDay'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gMonth'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:dateTime'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:date'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:time'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gYearMonth'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gYear'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gMonthDay'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gDay'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:gMonth'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Duration' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimeDuration'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Duration' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimeDuration'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:duration'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Graphic' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:base64Binary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Graphic' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:hexBinary'));
+
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Identifier' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:normalizedString'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Identifier' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'String'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:string'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Identifier' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Token'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Indicator' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Boolean'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:boolean'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Name' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:normalizedString'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Name' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'String'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:String'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Name' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Token'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ordinal' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Picture' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:base64Binary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Picture' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:hexBinary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'String'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:string'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Sound' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:base64Binary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Sound' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:hexBinary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Text' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:normalizedString'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Text' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'String'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:string'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Text' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Token'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Time' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:time'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:decimal'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:double'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Double'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Float'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:float'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:normalizedString'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'String'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:string'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Token'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:token'));
+
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Video' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:base64Binary'));
+
+Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Video' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'))),
+			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:hexBinary'));
 
 select * from cdt_allowed_primitive_expression_type_map;
+

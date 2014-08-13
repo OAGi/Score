@@ -1,54 +1,184 @@
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('12', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('12', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('12', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('12', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('13', '1', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('14', '7', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('14', '8', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('14', '11', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('15', '10', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('16', '10', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('17', '9', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('18', '1', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('19', '7', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('19', '8', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('19', '11', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('20', '2', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('21', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('21', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('21', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('21', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('22', '7', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('22', '8', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('22', '11', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('23', '6', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('24', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('24', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('24', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('24', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('25', '1', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('26', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('26', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('26', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('26', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('27', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('27', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('27', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('27', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('28', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('28', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('28', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('28', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('28', '8', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('29', '1', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('30', '7', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('30', '8', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('30', '11', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('31', '10', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('32', '3', True) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('32', '4', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('32', '5', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('32', '6', False) ;
-insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) values ('33', '1', True) ;
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Binary' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'String'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Token'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Date' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Date Time' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Duration' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'TimeDuration'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Graphic' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Identifier' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Identifier' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'String'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Identifier' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Token'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Indicator' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Boolean'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False); 
+
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Name' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Name' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'String'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Name' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Token'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Number' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Ordinal' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Picture' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
+
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False);
+ 
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False);
+ 
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False);
+ 
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'String'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Sound' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Text' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Text' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'String'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Text' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Token'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Time' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'TimePoint'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Decimal'), True); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Double'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Float'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Integer'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'String'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Value' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Token'), False); 
+
+Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
+	values ((select DT_ID from dt where Data_Type_Term = 'Video' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
+
 
 select * from cdt_allowed_primitive;
