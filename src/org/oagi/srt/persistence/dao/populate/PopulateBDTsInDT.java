@@ -19,6 +19,8 @@ import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.OAGiNamespaceContext;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
@@ -36,23 +38,22 @@ import java.util.UUID;
 /**
 *
 * @author Nasif Sikder
+* @author Yunsu Lee
 * @version 1.0
 *
-*What's left?
-* There are additional default BDTs and unqualified BDTs that needs to be imported. These are listed in the exceptions section
 */
 
 public class PopulateBDTsInDT {
 	
-	private static boolean printSQL = true;
-	private static boolean insertSQL = false;
-
+	private XPathHandler fields_xsd;
+	private XPathHandler businessDataType_xsd;
 	
-	private Document xmlDocument;
-	private DocumentBuilder builder;
-	private XPath xPath;
+	public PopulateBDTsInDT() throws Exception {
+		fields_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Fields_modified.xsd");
+		businessDataType_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/DataTypes/BusinessDataType_1_modified.xsd");
+	}
 	
-	public static void insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition) throws SRTDAOException{
+	public static void insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition, String id) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
 
@@ -60,190 +61,137 @@ public class PopulateBDTsInDT {
 		qc.add("Data_Type_Term", dataTypeTerm);
 		qc.add("DT_Type", new Integer(0));
 		int basedDTID = ((DTVO)dao.findObject(qc)).getDTID();
-
-		DTVO dtVO = new DTVO();
 		
-		dtVO.setDTGUID("oagis-id-" + UUID.randomUUID().toString().replaceAll("-", ""));
-		dtVO.setDTType(1);
-		dtVO.setVersionNumber("1.0");
-		dtVO.setRevisionType(0);
-		dtVO.setDataTypeTerm(dataTypeTerm);
-		dtVO.setBasedDTID(basedDTID);
-		dtVO.setDEN(typeName + ". Type");
-		dtVO.setContentComponentDEN(typeName + ". Amount");
-		dtVO.setDefinition(definition);
-		dtVO.setContentComponentDefinition(ccDefinition);
-		dtVO.setRevisionState(1);
-		dtVO.setCreatedByUserId(1);
-		dtVO.setLastUpdatedByUserId(1);
-
-		if (insertSQL) dao.insertObject(dtVO);
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("DT_GUID", id);
+		
+		String guid = ((DTVO)dao.findObject(qc1)).getDTGUID();
+		if(guid == null) {
+	
+			DTVO dtVO = new DTVO();
+			
+			dtVO.setDTGUID(id);
+			dtVO.setDTType(1);
+			dtVO.setVersionNumber("1.0");
+			dtVO.setRevisionType(0);
+			dtVO.setDataTypeTerm(dataTypeTerm);
+			dtVO.setBasedDTID(basedDTID);
+			dtVO.setDEN(typeName + ". Type");
+			dtVO.setContentComponentDEN(typeName + ". Content");
+			dtVO.setDefinition(definition);
+			dtVO.setContentComponentDefinition(ccDefinition);
+			dtVO.setRevisionState(1);
+			dtVO.setCreatedByUserId(1);
+			dtVO.setLastUpdatedByUserId(1);
+	
+			dao.insertObject(dtVO);
+		}
 	}
 	
-	public static void insertUnqualified_BDTStatement(String typeName, String dataTypeTerm) throws SRTDAOException{
+	public static void insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
 
 		QueryCondition qc = new QueryCondition();
-		qc.add("Data_Type_Term", dataTypeTerm);
-		qc.add("DT_Type", new Integer(1));
+		qc.add("DT_GUID", defaultGUID);
 		int basedDTID = ((DTVO)dao.findObject(qc)).getDTID();
 		
-		DTVO dtVO = new DTVO();
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("DT_GUID", id);
 		
-		dtVO.setDTGUID("oagis-id-" + UUID.randomUUID().toString().replaceAll("-", ""));
-		dtVO.setDTType(1);
-		dtVO.setVersionNumber("1.0");
-		dtVO.setRevisionType(0);
-		dtVO.setDataTypeTerm(dataTypeTerm);
-		dtVO.setBasedDTID(basedDTID);
-		dtVO.setDEN(typeName + ". Type");
-		dtVO.setContentComponentDEN(typeName + ". Amount");
-		dtVO.setRevisionState(1);
-		dtVO.setCreatedByUserId(1);
-		dtVO.setLastUpdatedByUserId(1);
-		
-		if (insertSQL) dao.insertObject(dtVO);
-	}
-	
-	public PopulateBDTsInDT(String filePath) throws ParserConfigurationException, FileNotFoundException, SAXException, IOException{
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		builderFactory.setNamespaceAware(true);
-		
-		builder = builderFactory.newDocumentBuilder();
-		xmlDocument = builder.parse(new FileInputStream(filePath));
-		xPath = XPathFactory.newInstance().newXPath();
-		xPath.setNamespaceContext(new OAGiNamespaceContext());
-	}
-	
-	private static void setup() throws SRTInitializerException {
-		ServerProperties props = ServerProperties.getInstance();
-		String _propFile = "/" + SRTConstants.SRT_PROPERTIES_FILE_NAME;
-		try {
-			InputStream is = SRTInitializer.class.getResourceAsStream(_propFile);
-			if (is == null) {
-				throw new SRTInitializerException(_propFile + " not found!");
-			}
-			try {
-				props.load(is, true);
-			} catch (IOException e) {
-				throw new SRTInitializerException(_propFile + " cannot be read...");
-			}
-		} catch (Exception e) {
-			System.out.println("[SRTInitializer] Fail to Getting "
-					+ SRTConstants.SRT_PROPERTIES_FILE_NAME + " URL : "
-					+ e.toString());
-		}
-		try {
-			ConnectionPoolManager cpm = ConnectionPoolManager.getInstance();
-			String poolName = cpm.getDefaultPoolName();
-			System.out.println("DefaultPoolName:" + poolName);
-			Connection dbConnection = cpm.getConnection(poolName);
-			dbConnection.close();
-			System.out.println("DB Connection Pool initialized...");
-			cpm.release();
-		} catch (Exception e) {
-			System.out.println("[SRTInitializer] Fail to Creating Connection Pool : "
-					+ e.toString());
-			e.printStackTrace();
-			throw new SRTInitializerException("[SRTInitializer] Fail to Creating Connection Pool : "
-					+ e.toString());
-		}
-	}
-	
-	public NodeList getNodeList(String xPathExpression) throws XPathExpressionException {
-		return (NodeList)xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODESET);
-	}
-	
-	public Node getNode(String xPathExpression) throws XPathExpressionException {
-		return (Node)xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODE);
-	}
-	
-	
-	public static void main(String[] args) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, SRTInitializerException, XPathExpressionException, SRTDAOException{
-		setup();
-		PopulateBDTsInDT fields_xsd = new PopulateBDTsInDT("C:/Users/nfs/Documents/Fields.xsd");
-		PopulateBDTsInDT businessDataType_xsd = new PopulateBDTsInDT("C:/Users/nfs/Documents/BusinessDataType_1.xsd");
-		
-		for (int i = 0; i < Types.typeList.size(); i++){
-			String typeName;
-			String dataTypeTerm;
-			String definition;
-			String ccDefinition;
-			
-			String type = "complex";
-			
-			//Type Name
-			Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + Types.typeList.get(i) + "']/xsd:simpleContent/xsd:extension");
-			if (typeNameNode == null){
-				type = "simple";
-				typeNameNode = fields_xsd.getNode("//xsd:simpleType[@name = '" + Types.typeList.get(i) + "']/xsd:restriction");
-			}
-			Element typeNameElement = (Element)typeNameNode;
-			typeName = typeNameElement.getAttribute("base");			
-			
-			//Data Type Term
-			Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
-			Element dataTypeTermElement = (Element)dataTypeTermNode;
-			dataTypeTerm = dataTypeTermElement.getTextContent();
-			if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
-				dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
-			dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
-							
-			//Definitions
-			Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:Definition");
-			Element definitionElement = (Element)definitionNode;
-			definition = definitionElement.getTextContent();
-			Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
-			if (ccDefinitionNode == null)
-				ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
-			if (ccDefinitionNode == null)
-				ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
-			Element ccDefinitionElement = (Element)ccDefinitionNode;				
-			ccDefinition = ccDefinitionElement.getTextContent();
-			
-			
-			typeName = typeName.replaceAll("Type", "");
-			insertDefault_BDTStatement(typeName, dataTypeTerm, definition, ccDefinition);
-
-			if (printSQL){
-				//Default BDT
-				String insertDefault_BDTStatement = "INSERT INTO dt (DT_GUID, DT_Type, Version_Number, Revision_Type, Data_Type_Term, "
-				+ "Based_DT_ID, DEN, Content_Component_DEN, Definition, Content_Component_Definition, Revision_State, "
-				+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp) VALUES "
-				+ "(CONCAT('oagis-id-', REPLACE(UUID(),'-','')), 1, \"10.0\", 0, \"" + dataTypeTerm 
-				+ "\", (SELECT DT_ID from dt WHERE Data_Type_Term = \"" + dataTypeTerm 	+ "\" AND DT_Type = 0),"
-				+ " CONCAT(\"" + typeName + "\", \". Type\"), CONCAT(\"" + typeName + "\", \". Content\"), \"" 
-				+ definition + "\", \"" + ccDefinition + "\", 1, \"oagis\", \"oagis\", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);\n";
-	
-				System.out.println("-- " + typeNameElement.getAttribute("base"));
-				System.out.println(insertDefault_BDTStatement);
-			}
-			
-			//Unqualified Type Name
-			String unQualifiedTypeName = typeName.substring(0, typeName.length()-7);
-
-			//Unqualified Data Type Term
-			String unQualifiedDataTypeTerm = dataTypeTerm;
-			
-			insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm);
-			
-			if (printSQL){
-				 //Unqualified BDT
-				String insertUnqualified_BDTStatement = "INSERT INTO dt (DT_GUID, DT_Type, Version_Number, Revision_Type, Data_Type_Term, "
-				+ "Based_DT_ID, DEN, Content_Component_DEN, Revision_State, Created_By_User_ID, Last_Updated_By_User_ID,"
-				+ " Creation_Timestamp, Last_Update_Timestamp) VALUES (CONCAT('oagis-id-', REPLACE(UUID(),'-','')), 1, "
-				+ "\"10.0\", 0, \"" + dataTypeTerm + "\", (SELECT DT_ID FROM dt WHERE Data_Type_Term = \"" + dataTypeTerm 
-				+ "\" AND DT_Type = 1), CONCAT(\"" + unQualifiedTypeName + "\", \". Type\"), CONCAT(\"" + unQualifiedTypeName 
-				+ "\", \". Content\"), 1, \"oagis\", \"oagis\", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);\n";
+		String guid = ((DTVO)dao.findObject(qc1)).getDTGUID();
+		if(guid == null) {
 				
-				System.out.println("-- " + unQualifiedTypeName);
-				System.out.println(insertUnqualified_BDTStatement);
-			}
+			DTVO dtVO = new DTVO();
+			
+			dtVO.setDTGUID(id);
+			dtVO.setDTType(1);
+			dtVO.setVersionNumber("1.0");
+			dtVO.setRevisionType(0);
+			dtVO.setDataTypeTerm(dataTypeTerm);
+			dtVO.setBasedDTID(basedDTID);
+			dtVO.setDEN(typeName + ". Type");
+			dtVO.setContentComponentDEN(typeName + ". Content");
+			dtVO.setRevisionState(1);
+			dtVO.setCreatedByUserId(1);
+			dtVO.setLastUpdatedByUserId(1);
+			dao.insertObject(dtVO);
 		}
-
-
 		
 	}
 	
+	private void importDataTypeList(String dataType) throws Exception {
+		String typeName;
+		String dataTypeTerm;
+		
+		String type = "complex";
+		
+		//Type Name
+		Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + dataType + "']/xsd:simpleContent/xsd:extension");
+		if (typeNameNode == null){
+			type = "simple";
+			typeNameNode = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']/xsd:restriction");
+		}
+		Element typeNameElement = (Element)typeNameNode;
+		typeName = typeNameElement.getAttribute("base");	
+		
+		Node aNodeTN = fields_xsd.getNode("//xsd:"+type+"Type[@name = '" + dataType + "']");
+		Element aElementTN = (Element)aNodeTN;
+		
+		System.out.println("### " + dataType + " - " + typeName);
+		
+		//Data Type Term
+		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
+		if(dataTypeTermNode == null && type.equals("simple")) {
+			type = "complex";
+			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
+		} else if(dataTypeTermNode == null && type.equals("complex")) {
+			type = "simple";
+			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
+		}
+		
+		System.out.println("### " + type + " - " + dataTypeTermNode);
+			
+		Element dataTypeTermElement = (Element)dataTypeTermNode;
+		dataTypeTerm = dataTypeTermElement.getTextContent();
+		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
+			dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
+		dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
+						
+		//Definitions
+		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:Definition");
+		Element definitionElement = (Element)definitionNode;
+		Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
+		if (ccDefinitionNode == null)
+			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
+		if (ccDefinitionNode == null)
+			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
+		Element ccDefinitionElement = (Element)ccDefinitionNode;				
+		
+		Node aNodeBDT = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']");
+		Element aElementBDT = (Element)aNodeBDT;
+		
+		typeName = typeName.replaceAll("Type", "");
+		insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+
+		//Unqualified Type Name
+		String unQualifiedTypeName = dataType.replaceAll("Type", "");
+
+		//Unqualified Data Type Term
+		String unQualifiedDataTypeTerm = dataTypeTerm;
+		
+		insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"));
+			
+	}
+	
+	public static void main(String[] args) throws Exception{
+		Utility.dbSetup();
+		PopulateBDTsInDT p = new PopulateBDTsInDT();
+		for (int i = 0; i < Types.dataTypeList.length; i++){
+			p.importDataTypeList(Types.dataTypeList[i]);
+		}
+		for (int i = 0; i < Types.simpleTypeList.length; i++){
+			p.importDataTypeList(Types.simpleTypeList[i]);
+		}
+	}
 }

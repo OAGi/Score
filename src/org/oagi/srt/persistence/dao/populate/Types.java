@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Types {
 	
-	public static ArrayList<String> typeList = new ArrayList<String>(Arrays.asList(
+	public static final String dataTypeList[] = {
 		"AmountType",
 		"BinaryObjectType",
 		"GraphicType",
@@ -25,11 +25,21 @@ public class Types {
 		"TextType",	
 		"TimeType",
 		"ValueType"
-//		"DayDateType",
-//		"MonthDateType",
-//		"MonthDayDateType",
-//		"YearDateType",
-//		"YearMonthDateType"			
-	));
+	};
+	
+	public static final String simpleTypeList[] = {
+		"NormalizedStringType",
+		"TokenType",
+		"StringType",
+		"DayDateType",
+		"MonthDateType",
+		"MonthDayDateType",
+		"YearDateType",
+		"YearMonthDateType",
+		"URIType",
+		"DurationMeasureType",
+		"IntegerNumberType",
+		"PositiveIntegerNumberType"
+	};
 	
 }
