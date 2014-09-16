@@ -16,6 +16,8 @@ public abstract class SRTDAO {
 	public abstract boolean insertObject(SRTObject obj) throws SRTDAOException;
 	
 	public abstract SRTObject findObject(QueryCondition qc)	throws SRTDAOException;
+	
+	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc)	throws SRTDAOException;
 
 	public abstract ArrayList<SRTObject> findObjects() throws SRTDAOException;
 	

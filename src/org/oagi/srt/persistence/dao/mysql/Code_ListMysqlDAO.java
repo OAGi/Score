@@ -49,6 +49,13 @@ public class Code_ListMysqlDAO extends SRTDAO {
 	private final String _DELETE_Code_List_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Code_List_ID = ?";
 	
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();

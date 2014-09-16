@@ -39,6 +39,13 @@ public class Context_CategoryMysqlDAO extends SRTDAO {
 	
 	private final String _DELETE_CONTEXT_CATEGORY_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Context_Category_ID = ?";
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();

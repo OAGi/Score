@@ -264,4 +264,11 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 
 	}
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

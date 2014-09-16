@@ -14,6 +14,7 @@ public class XSD_BuiltIn_TypeVO extends SRTObject {
 	private int XSDBuiltInTypeID;
 	private String Name;
 	private String BuiltInType;
+	private int subtypeOfXSDBuiltinTypeId;
 	
 	public int getXSDBuiltInTypeID() {
 		return XSDBuiltInTypeID;
@@ -38,6 +39,13 @@ public class XSD_BuiltIn_TypeVO extends SRTObject {
 	public void setBuiltInType(String builtInType) {
 		BuiltInType = builtInType;
 	}
-	
+
+	public int getSubtypeOfXSDBuiltinTypeId() {
+		return subtypeOfXSDBuiltinTypeId;
+	}
+
+	public void setSubtypeOfXSDBuiltinTypeId(int subtypeOfXSDBuiltinTypeId) {
+		this.subtypeOfXSDBuiltinTypeId = subtypeOfXSDBuiltinTypeId;
+	}
 
 }

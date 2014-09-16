@@ -39,6 +39,13 @@ public class CDT_PrimitiveMysqlDAO extends SRTDAO{
 	private final String _DELETE_CDT_Primitive_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE CDT_Primitive_ID = ?";
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		CDT_PrimitiveVO cdtprimitiveVO = (CDT_PrimitiveVO) obj; 

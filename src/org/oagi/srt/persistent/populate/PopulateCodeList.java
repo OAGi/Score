@@ -197,7 +197,7 @@ public class PopulateCodeList {
 	    			    		Element tmp3 = (Element)enumeration.item(k);
 	    						codelistvalueVO.setOwnerCodeListID(codelistVO.getCodeListID());
 	    			    		codelistvalueVO.setValue(tmp3.getAttribute("value"));
-	    			    		codelistvalueVO.setName(tmp3.getAttribute("value"));//È®ÀÎ ÇÊ¿ä
+	    			    		codelistvalueVO.setName(tmp3.getAttribute("value"));//È®ï¿½ï¿½ ï¿½Ê¿ï¿½
 	    			    		codelistvalueVO.setUsedIndicator(true);
 	    			    		codelistvalueVO.setLockedIndicator(false);
 		    			    	Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
@@ -290,6 +290,18 @@ public class PopulateCodeList {
 			CodeListValue(filename);
 			System.out.println(filename+" upload is completed..");
 		}
+		
+		String temp[][] = {{"CodeLists_1", "314"}, {"CodeList_ConditionTypeCode_1", "314"}};
+		
+		for(int i = 0; i < temp.length ; i++) {
+			String filename = temp[i][0]+".xsd";
+			int agencyid = Integer.parseInt(temp[i][1]);
+			CodeList(filename, agencyid);
+			CodeListValue(filename);
+			System.out.println(filename+" upload is completed..");
+		}
+		
+		
 
 	}
 }

@@ -34,13 +34,11 @@ import org.xml.sax.SAXException;
 */
 
 public class PopulateAgencyIDList {
-	public static void AgencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
+	public void AgencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = Utility.filepath()+"IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 			
 		setup();
-		
-
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("Agency_ID_List");
@@ -61,7 +59,7 @@ public class PopulateAgencyIDList {
 		}
 		agencyidlistVO.setName("Agency Identification");
 		agencyidlistVO.setListID("3055");
-		agencyidlistVO.setAgencyID(6);//¼öÁ¤ÇØ¾ßÇÔ
+		agencyidlistVO.setAgencyID(6);//ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½
 		agencyidlistVO.setVersionID("D08B");
 		agencyidlistVO.setDefinition("Schema agency:UN/CEFACT   Schema version:3.3		Schema date:15 September 2009	Code list name:Agency Identification Code   	Code list agency: UNECE    Code list version:D08B");		
 		dao.insertObject(agencyidlistVO);
@@ -85,7 +83,7 @@ public class PopulateAgencyIDList {
 		ArrayList<SRTObject> agency_id_fk = dao2.findObjects();
 
 		for(SRTObject dvo : agency_id_fk) {
-			Agency_ID_ListVO svo = (Agency_ID_ListVO) dvo;//Agency_id_list table¿¡¼­ È£Ãâ
+			Agency_ID_ListVO svo = (Agency_ID_ListVO) dvo;//Agency_id_list tableï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
 
 			NodeList enumeration = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration") ;
 			NodeList name = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//ccts:Name") ;
@@ -145,7 +143,9 @@ public class PopulateAgencyIDList {
 	}
 	
 	public static void main (String args[]) throws SRTInitializerException, SRTDAOException, FileNotFoundException, XPathExpressionException, ParserConfigurationException, SAXException, IOException {
-		AgencyIDList();		
+		setup();
+		PopulateAgencyIDList p = new PopulateAgencyIDList();
+		p.AgencyIDList();		
 	}
 
 }

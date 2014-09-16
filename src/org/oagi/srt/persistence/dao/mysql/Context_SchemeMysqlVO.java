@@ -42,6 +42,13 @@ public class Context_SchemeMysqlVO extends SRTDAO {
 	private final String _DELETE_CONTEXT_SCHEME_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Context_Scheme_ID = ?";
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		Context_SchemeVO context_schemeVO = (Context_SchemeVO)obj;

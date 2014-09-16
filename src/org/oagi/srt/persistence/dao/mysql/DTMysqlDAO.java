@@ -166,6 +166,81 @@ public class DTMysqlDAO extends SRTDAO {
 		}
 		return dtVO;
 	}
+	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_DT_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				DTVO dtVO = new DTVO();
+				dtVO.setDTID(rs.getInt("DT_ID"));
+				dtVO.setDTGUID(rs.getString("DT_GUID"));
+				dtVO.setDTType(rs.getInt("DT_Type"));
+				dtVO.setVersionNumber(rs.getString("Version_Number"));
+				dtVO.setPreviousVersionDTID(rs.getInt("Previous_Version_DT_ID"));
+				dtVO.setRevisionType(rs.getInt("Revision_Type"));
+				dtVO.setDataTypeTerm(rs.getString("Data_Type_Term"));
+				dtVO.setQualifier(rs.getString("Qualifier"));
+				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
+				dtVO.setDEN(rs.getString("DEN"));
+				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
+				dtVO.setDefinition(rs.getString("Definition"));
+				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
+				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
+				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				list.add(dtVO);
+			}
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+		return list;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();

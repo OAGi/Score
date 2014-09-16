@@ -25,7 +25,6 @@ public class QueryCondition {
 	private Vector _likeValues;
 	private Vector _likeFields;
 
-	/* Large data(blob, clob) 데이터를 가져올지 여부 */
 	private boolean _queryLargeData = false;
 
 	public boolean isQueryLargeData() {
@@ -42,7 +41,6 @@ public class QueryCondition {
 		_values = new Vector();
 	}
 
-    //bumma where 조건에서 int 값때문에 String -> Object 변경
 	public void add(String field, Object value) {
 		_fields.add(field);
 		_values.add(value);
@@ -52,7 +50,6 @@ public class QueryCondition {
 		return (String)_fields.get(n);
 	}
 
-    //bumma where 조건에서 int 값때문에 String -> Object 변경
 	public Object getValue(int n) {
 		return _values.get(n);
 	}

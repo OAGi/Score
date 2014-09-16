@@ -38,6 +38,13 @@ public class UserMysqlDAO extends SRTDAO {
 	
 	private final String _DELETE_USER_STATEMENT = "DELETE FROM " + _tableName + " WHERE User_ID = ?";
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		UserVO userVO = (UserVO)obj;

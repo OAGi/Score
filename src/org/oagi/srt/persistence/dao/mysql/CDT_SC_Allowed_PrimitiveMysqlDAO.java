@@ -39,6 +39,71 @@ public class CDT_SC_Allowed_PrimitiveMysqlDAO extends SRTDAO {
 	private final String _DELETE_CDT_SC_Allowed_Primitive_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE CDT_SC_Allowed_Primitive_ID = ?";
 
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_ALL_CDT_SC_Allowed_Primitive_STATEMENT;
+			
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				CDT_SC_Allowed_PrimitiveVO cdtscallowedprimitiveVO = new CDT_SC_Allowed_PrimitiveVO();
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				list.add(cdtscallowedprimitiveVO);
+			}
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		CDT_SC_Allowed_PrimitiveVO cdtscallowedprimitiveVO = (CDT_SC_Allowed_PrimitiveVO) obj;

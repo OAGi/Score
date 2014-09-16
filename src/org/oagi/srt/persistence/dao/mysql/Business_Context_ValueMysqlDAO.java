@@ -231,4 +231,10 @@ public class Business_Context_ValueMysqlDAO extends SRTDAO {
 		return true;
 	}
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

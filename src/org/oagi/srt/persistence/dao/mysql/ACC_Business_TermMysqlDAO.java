@@ -227,4 +227,11 @@ public class ACC_Business_TermMysqlDAO extends SRTDAO{
 
 	}
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

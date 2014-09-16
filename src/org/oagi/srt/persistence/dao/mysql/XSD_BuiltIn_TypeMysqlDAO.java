@@ -28,7 +28,7 @@ public class XSD_BuiltIn_TypeMysqlDAO extends SRTDAO {
 			"SELECT XSD_BuiltIn_Type_ID, Name, BuiltIn_Type FROM " + _tableName;
 
 	private final String _FIND_XSD_BuiltIn_Type_STATEMENT = 
-			"SELECT XSD_BuiltIn_Type_ID, Name, BuiltIn_Type FROM " + _tableName;
+			"SELECT XSD_BuiltIn_Type_ID, Name, BuiltIn_Type, Subtype_Of_XSD_Builtin_Type_ID FROM " + _tableName;
 
 	private final String _INSERT_XSD_BuiltIn_Type_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Name, BuiltIn_Type) VALUES (?, ?)";
@@ -40,6 +40,13 @@ public class XSD_BuiltIn_TypeMysqlDAO extends SRTDAO {
 	private final String _DELETE_XSD_BuiltIn_Type_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE XSD_BuiltIn_Type_ID = ?";
 
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		XSD_BuiltIn_TypeVO xsdbuiltintypeVO = (XSD_BuiltIn_TypeVO)obj;
@@ -106,7 +113,8 @@ public class XSD_BuiltIn_TypeMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
 				xsdbuiltintypeVO.setName(rs.getString("Name"));
-				xsdbuiltintypeVO.setBuiltInType("BuiltIn_Type");
+				xsdbuiltintypeVO.setBuiltInType(rs.getString("BuiltIn_Type"));
+				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("Subtype_Of_XSD_Builtin_Type_ID"));
 			}
 			tx.commit();
 			conn.close();
