@@ -11,6 +11,7 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.persistence.dao.mysql.DTMysqlDAO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.startup.SRTInitializer;
 import org.oagi.srt.startup.SRTInitializerException;
@@ -26,7 +27,6 @@ public class DBConnectionTest {
 		QueryCondition qc = new QueryCondition();
 		qc.add("dt_id", new Integer(12));
 		DTVO dtVO = (DTVO)dao.findObject(qc);
-
 		System.out.println("### " + dtVO.getDEN());
 	}
 

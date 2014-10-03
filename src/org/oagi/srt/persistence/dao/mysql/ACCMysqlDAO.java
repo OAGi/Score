@@ -27,23 +27,23 @@ public class ACCMysqlDAO extends SRTDAO {
 	private final String _FIND_ALL_ACC_STATEMENT = 
 			"SELECT ACC_ID, ACC_GUID, Object_Class_Term, "
 					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module FROM " + _tableName;
 
 	private final String _FIND_ACC_STATEMENT = 
 			"SELECT ACC_ID, ACC_GUID, Object_Class_Term, "
 					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module FROM " + _tableName;
 	
 	private final String _INSERT_ACC_STATEMENT = 
 			"INSERT INTO " + _tableName + " (ACC_GUID, Object_Class_Term, "
 					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
 
 	private final String _UPDATE_ACC_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ACC_GUID = ?, Object_Class_Term = ?, "
 			+ "Den = ?, Definition = ?, Based_ACC_ID = ?, Object_Class_Qualifier = ?, OAGIS_Component_Type = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
-			+ "Creation_Timestamp = ?, State =? WHERE ACC_ID = ?";
+			+ "Creation_Timestamp = ?, State =?, Module = ? WHERE ACC_ID = ?";
 
 	private final String _DELETE_ACC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ACC_ID = ?";
@@ -65,7 +65,8 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(8, accVO.getCreatedByUserId());
 			ps.setInt(9, accVO.getLastUpdatedByUserId());
 			ps.setTimestamp(10, accVO.getLastUpdateTimestamp());
-			ps.setInt(12, accVO.getState());
+			ps.setInt(11, accVO.getState());
+			ps.setString(12, accVO.getModule());
 
 			ps.executeUpdate();
 
@@ -116,6 +117,8 @@ public class ACCMysqlDAO extends SRTDAO {
 					}
 				}
 			}
+			
+			//like 로 고치기 해보기
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -131,7 +134,8 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
 				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
-				accVO.setStateD(rs.getInt("State"));
+				accVO.setState(rs.getInt("State"));
+				accVO.setModule(rs.getString("Module"));
 			}
 			tx.commit();
 			conn.close();
@@ -180,7 +184,8 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
 				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
-				accVO.setStateD(rs.getInt("State"));
+				accVO.setState(rs.getInt("State"));
+				accVO.setModule(rs.getString("Module"));
 				list.add(accVO);
 			}
 			tx.commit();
@@ -225,7 +230,8 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(8, accVO.getCreatedByUserId());
 			ps.setInt(9, accVO.getLastUpdatedByUserId());
 			ps.setTimestamp(10, accVO.getLastUpdateTimestamp());
-			ps.setInt(12, accVO.getState());
+			ps.setInt(11, accVO.getState());
+			ps.setString(12, accVO.getModule());
 			ps.executeUpdate();
 
 			tx.commit();

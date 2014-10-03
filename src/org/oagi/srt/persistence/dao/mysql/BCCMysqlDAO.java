@@ -25,21 +25,21 @@ public class BCCMysqlDAO extends SRTDAO{
 	private final String _tableName = "bcc";
 
 	private final String _FIND_ALL_BCC_STATEMENT = 
-			"SELECT BCC_ID, Cardinality_Min, Cardinality_Max, Assoc_To_BCCP_ID, Assoc_From_ACC_ID, "
-					+ "Sequencing_key, Entity_Type FROM " + _tableName;
+			"SELECT BCC_ID, BCC_GUID, Cardinality_Min, Cardinality_Max, Assoc_To_BCCP_ID, Assoc_From_ACC_ID, "
+					+ "Sequencing_key, Entity_Type, DEN FROM " + _tableName;
 
 	private final String _FIND_BCC_STATEMENT = 
-			"SELECT BCC_ID, Cardinality_Min, Cardinality_Max, Assoc_To_BCCP_ID, Assoc_From_ACC_ID, "
-					+ "Sequencing_key, Entity_Type FROM " + _tableName;
+			"SELECT BCC_ID, BCC_GUID, Cardinality_Min, Cardinality_Max, Assoc_To_BCCP_ID, Assoc_From_ACC_ID, "
+					+ "Sequencing_key, Entity_Type, DEN FROM " + _tableName;
 	
 	private final String _INSERT_BCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Cardinality_Min, Cardinality_Max, Assoc_To_BCCP_ID, Assoc_From_ACC_ID, "
-					+ "Sequencing_key, Entity_Type) VALUES (?, ?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (BCC_GUID, Cardinality_Min, Cardinality_Max, Assoc_To_BCCP_ID, Assoc_From_ACC_ID, "
+					+ "Sequencing_key, Entity_Type, DEN) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BCC_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Assoc_To_BCCP_ID = ?, "
-			+ "Assoc_From_ACC_ID = ?, Sequencing_key = ?, Entity_Type = ?";
+			+ " SET BCC_ID = ?, BCC_GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Assoc_To_BCCP_ID = ?, "
+			+ "Assoc_From_ACC_ID = ?, Sequencing_key = ?, Entity_Type = ?, DEN = ?";
 
 	private final String _DELETE_BCC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BCC_ID = ?";
@@ -51,12 +51,14 @@ public class BCCMysqlDAO extends SRTDAO{
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_BCC_STATEMENT);
-			ps.setInt(1, bccVO.getCardinalityMin());
-			ps.setInt(2, bccVO.getCardinalityMax());
-			ps.setInt(3, bccVO.getAssocToBCCPID());
-			ps.setInt(4, bccVO.getAssocFromACCID());
-			ps.setInt(5, bccVO.getSequencingkey());
-			ps.setInt(6, bccVO.getEntityType());
+			ps.setString(1, bccVO.getBCCGUID());
+			ps.setInt(2, bccVO.getCardinalityMin());
+			ps.setInt(3, bccVO.getCardinalityMax());
+			ps.setInt(4, bccVO.getAssocToBCCPID());
+			ps.setInt(5, bccVO.getAssocFromACCID());
+			ps.setInt(6, bccVO.getSequencingkey());
+			ps.setInt(7, bccVO.getEntityType());
+			ps.setString(8, bccVO.getDEN());
 
 			ps.executeUpdate();
 
@@ -110,12 +112,15 @@ public class BCCMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				bccVO.setBCCID(rs.getInt("BCC_ID"));
+				bccVO.setBCCGUID(rs.getString("BCC_GUID"));
 				bccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
 				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
+				bccVO.setDEN(rs.getString("DEN"));
+
 			}
 			tx.commit();
 			conn.close();
@@ -153,12 +158,14 @@ public class BCCMysqlDAO extends SRTDAO{
 			while (rs.next()) {
 				BCCVO bccVO = new BCCVO();
 				bccVO.setBCCID(rs.getInt("BCC_ID"));
+				bccVO.setBCCGUID(rs.getString("BCC_GUID"));
 				bccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
 				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
+				bccVO.setDEN(rs.getString("DEN"));
 				list.add(bccVO);
 			}
 			tx.commit();
@@ -193,12 +200,14 @@ public class BCCMysqlDAO extends SRTDAO{
 
 			ps = conn.prepareStatement(_UPDATE_BCC_STATEMENT);
 			
-			ps.setInt(1, bccVO.getCardinalityMin());
-			ps.setInt(2, bccVO.getCardinalityMax());
-			ps.setInt(3, bccVO.getAssocToBCCPID());
-			ps.setInt(4, bccVO.getAssocFromACCID());
-			ps.setInt(5, bccVO.getSequencingkey());
-			ps.setInt(6, bccVO.getEntityType());
+			ps.setString(1, bccVO.getBCCGUID());
+			ps.setInt(2, bccVO.getCardinalityMin());
+			ps.setInt(3, bccVO.getCardinalityMax());
+			ps.setInt(4, bccVO.getAssocToBCCPID());
+			ps.setInt(5, bccVO.getAssocFromACCID());
+			ps.setInt(6, bccVO.getSequencingkey());
+			ps.setInt(7, bccVO.getEntityType());
+			ps.setString(8, bccVO.getDEN());
 			ps.executeUpdate();
 
 			tx.commit();

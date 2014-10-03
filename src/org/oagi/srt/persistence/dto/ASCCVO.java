@@ -11,11 +11,13 @@ import org.oagi.srt.common.SRTObject;
 */
 public class ASCCVO extends SRTObject {
 	private int ASCCID;
+	private String ASCCGUID;
 	private int CardinalityMin;
 	private int CardinalityMax;
 	private int SequencingKey;
 	private int AssocFromACCID;
 	private int AssocToASCCPID;
+	private String DEN;
 	private String Definition;
 	
 	public int getASCCID(){
@@ -24,6 +26,14 @@ public class ASCCVO extends SRTObject {
 	
 	public void setASCCID(int aSCCID){
 		ASCCID = aSCCID;
+	}
+	
+	public String getASCCGUID(){
+		return ASCCGUID;
+	}
+	
+	public void setASCCGUID(String aSCCGUID){
+		ASCCGUID = aSCCGUID;
 	}
 	
 	public int getCardinalityMin(){
@@ -64,6 +74,14 @@ public class ASCCVO extends SRTObject {
 	
 	public void setAssocToASCCPID(int assocToASCCPID){
 		AssocToASCCPID = assocToASCCPID;
+	}
+	
+	public String getDEN(){
+		return DEN;
+	}
+	
+	public void setDEN(String dEN){
+		DEN = dEN;
 	}
 	
 	public String getDefinition(){

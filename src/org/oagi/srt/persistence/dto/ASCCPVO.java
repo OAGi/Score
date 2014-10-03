@@ -17,12 +17,13 @@ public class ASCCPVO extends SRTObject {
 	private String DEN;
 	private String Definition;
 	private int RoleOfACCID;
-	private int OAGISComponentType;
 	private int CreatedByUserId;
 	private int LastUpdatedByUserId;
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	private int State;
+	private String Module;
+	private boolean ReusableIndicator;
 	
 	public int getASCCPID() {
 		return ASCCPID;
@@ -71,13 +72,6 @@ public class ASCCPVO extends SRTObject {
 	public void setRoleOfACCID(int roleOfACCID) {
 		RoleOfACCID = roleOfACCID;
 	}
-	public int getOAGISComponentType() {
-		return OAGISComponentType;
-	}
-	
-	public void setOAGISComponentType(int oAGISComponentType) {
-		OAGISComponentType = oAGISComponentType;
-	}
 
 	public int getCreatedByUserId() {
 		return CreatedByUserId;
@@ -115,8 +109,24 @@ public class ASCCPVO extends SRTObject {
 		return State;
 	}
 	
-	public void setStateD(int state) {
+	public void setState(int state) {
 		State = state;
+	}
+	
+	public String getModule() {
+		return Module;
+	}
+	
+	public void setModule(String module) {
+		Module = module;
+	}
+	
+	public boolean getReusableIndicator() {
+		return ReusableIndicator;
+	}
+	
+	public void setReusableIndicator(boolean reusableIndicator) {
+		ReusableIndicator = reusableIndicator;
 	}
 	
 }

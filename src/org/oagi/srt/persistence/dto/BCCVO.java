@@ -11,12 +11,14 @@ import org.oagi.srt.common.SRTObject;
 public class BCCVO extends SRTObject {
 
 	private int BCCID;
+	private String BCCGUID;
 	private int CardinalityMin;
 	private int CardinalityMax;
 	private int AssocToBCCPID;
 	private int AssocFromACCID;
 	private int Sequencingkey;
 	private int EntityType;
+	private String DEN;
 	
 	public int getBCCID() {
 		return BCCID;
@@ -26,6 +28,14 @@ public class BCCVO extends SRTObject {
 		BCCID = bccID;
 	}
 
+	public String getBCCGUID() {
+		return BCCGUID;
+	}
+	
+	public void setBCCGUID(String bccGUID) {
+		BCCGUID = bccGUID;
+	}
+	
 	public int getCardinalityMin() {
 		return CardinalityMin;
 	}
@@ -72,5 +82,13 @@ public class BCCVO extends SRTObject {
 	
 	public void setEntityType(int entityType) {
 		EntityType = entityType;
+	}
+	
+	public String getDEN() {
+		return DEN;
+	}
+	
+	public void setDEN(String dEN) {
+		DEN = dEN;
 	}
 }

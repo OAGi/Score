@@ -129,10 +129,13 @@ public class DT_SCMysqlDAO extends SRTDAO {
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
-			if(dtscVO.getBasedDTSCID() == 0)
-				ps.setNull(8, java.sql.Types.INTEGER);
-			else
+
+			if(dtscVO.getBasedDTSCID()!=0){
 				ps.setInt(8, dtscVO.getBasedDTSCID());
+			}
+			else {
+				ps.setNull(8, java.sql.Types.INTEGER);
+			}
 
 			ps.executeUpdate();
 
@@ -280,7 +283,13 @@ public class DT_SCMysqlDAO extends SRTDAO {
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
-			ps.setInt(8, dtscVO.getBasedDTSCID());
+			if(dtscVO.getBasedDTSCID()!=0){
+				ps.setInt(8, dtscVO.getBasedDTSCID());
+			}
+			else {
+				ps.setNull(8, java.sql.Types.INTEGER);
+			}
+
 			ps.executeUpdate();
 
 			tx.commit();

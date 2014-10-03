@@ -26,22 +26,22 @@ public class ASCCMysqlDAO extends SRTDAO {
 	private final String _tableName = "ascc";
 	
 	private final String _FIND_ALL_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+			"SELECT ASCC_ID, ASCC_GUID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
+			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM" + _tableName;
 	
 	private final String _FIND_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition FROM" + _tableName;
+			"SELECT ASCC_ID, ASCC_GUID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
+			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM" + _tableName;
 	
 	private final String _INSERT_ASCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Cardinality_Min, Cardinality_Max, "
-			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, Definition) "
-			+ "VALUES (?, ?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (ASCC_GUID, Cardinality_Min, Cardinality_Max, "
+			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_ASCC_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
-			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, Definition = ? WHERE ASCC_ID = ?";
+			+ " SET ASCC_GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
+			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, DEN = ?, Definition = ? WHERE ASCC_ID = ?";
 	
 	private final String _DELETE_ASCC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASCC_ID = ?";
@@ -55,12 +55,14 @@ public class ASCCMysqlDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
 			
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
+			ps.setString(1, asccVO.getASCCGUID());
+			ps.setInt(2, asccVO.getCardinalityMin());
+			ps.setInt(3, asccVO.getCardinalityMax());
+			ps.setInt(4, asccVO.getSequencingKey());
+			ps.setInt(5, asccVO.getAssocFromACCID());
+			ps.setInt(6, asccVO.getAssocToASCCPID());
+			ps.setString(7, asccVO.getDEN());
+			ps.setString(8, asccVO.getDefinition());
 			
 			ps.executeUpdate();
 
@@ -118,11 +120,13 @@ public class ASCCMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
+				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
 				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
 				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
+				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
 			}
 			tx.commit();
@@ -163,11 +167,13 @@ public class ASCCMysqlDAO extends SRTDAO {
 				ASCCVO asccVO = new ASCCVO();
 				
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
+				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
 				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
 				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
+				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
 				
 				list.add(asccVO);
@@ -205,13 +211,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_ASCC_STATEMENT);
 
-			ps.setInt(1, asccVO.getCardinalityMin());
-			ps.setInt(2, asccVO.getCardinalityMax());
-			ps.setInt(3, asccVO.getSequencingKey());
-			ps.setInt(4, asccVO.getAssocFromACCID());
-			ps.setInt(5, asccVO.getAssocToASCCPID());
-			ps.setString(6, asccVO.getDefinition());
-			ps.setInt(7, asccVO.getASCCID());
+			ps.setString(1, asccVO.getASCCGUID());
+			ps.setInt(2, asccVO.getCardinalityMin());
+			ps.setInt(3, asccVO.getCardinalityMax());
+			ps.setInt(4, asccVO.getSequencingKey());
+			ps.setInt(5, asccVO.getAssocFromACCID());
+			ps.setInt(6, asccVO.getAssocToASCCPID());
+			ps.setString(7, asccVO.getDEN());
+			ps.setString(8, asccVO.getDefinition());
+			ps.setInt(9, asccVO.getASCCID());
+
 			ps.executeUpdate();
 
 			tx.commit();

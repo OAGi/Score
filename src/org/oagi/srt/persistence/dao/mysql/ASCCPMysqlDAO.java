@@ -26,24 +26,24 @@ public class ASCCPMysqlDAO extends SRTDAO {
 
 	private final String _FIND_ALL_ASCCP_STATEMENT = 
 			"SELECT ASCCP_ID, ASCCP_GUID, Property_Term, "
-					+ "Den, Definition, Role_Of_ACC_ID, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State FROM " + _tableName;
+					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator FROM " + _tableName;
 
 	private final String _FIND_ASCCP_STATEMENT = 
 			"SELECT ASCCP_ID, ASCCP_GUID, Property_Term, "
-					+ "Den, Definition, Role_Of_ACC_ID, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State FROM " + _tableName;
+					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator FROM " + _tableName;
 	
 	private final String _INSERT_ASCCP_STATEMENT = 
 			"INSERT INTO " + _tableName + " (ASCCP_GUID, Property_Term, "
-					+ "Den, Definition, Role_Of_ACC_ID, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
+					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)";
 
 	private final String _UPDATE_ASCCP_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ASCCP_GUID = ?, Property_Term = ?, "
-			+ "Den = ?, Definition = ?, Role_Of_ACC_ID = ?, OAGIS_Component_Type = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
-			+ "Creation_Timestamp = ?, State = ? WHERE ASCCP_GUID = ?";
+			+ "Definition = ?, Role_Of_ACC_ID = ?, Den = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
+			+ "Creation_Timestamp = ?, State = ? Module = ?, Reusable_Indicator =? WHERE ASCCP_ID = ?";
 
 	private final String _DELETE_ASCCP_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASCCP_ID = ?";
@@ -57,14 +57,15 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps = conn.prepareStatement(_INSERT_ASCCP_STATEMENT);
 			ps.setString(1, asccpVO.getASCCPGUID());
 			ps.setString(2, asccpVO.getPropertyTerm());
-			ps.setString(3, asccpVO.getDEN());
-			ps.setString(4, asccpVO.getDefinition());
-			ps.setInt(5, asccpVO.getRoleOfACCID());
-			ps.setInt(6, asccpVO.getOAGISComponentType());
-			ps.setInt(7, asccpVO.getCreatedByUserId());
-			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
-			ps.setInt(11, asccpVO.getState());
+			ps.setString(3, asccpVO.getDefinition());
+			ps.setInt(4, asccpVO.getRoleOfACCID());
+			ps.setString(5, asccpVO.getDEN());
+			ps.setInt(6, asccpVO.getCreatedByUserId());
+			ps.setInt(7, asccpVO.getLastUpdatedByUserId());
+			ps.setTimestamp(8, asccpVO.getLastUpdateTimestamp());
+			ps.setInt(9, asccpVO.getState());
+			ps.setString(10, asccpVO.getModule());
+			ps.setBoolean(11, asccpVO.getReusableIndicator());
 
 			ps.executeUpdate();
 
@@ -121,15 +122,16 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
 				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
-				asccpVO.setDEN(rs.getString("DEN"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
-				asccpVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
+				asccpVO.setDEN(rs.getString("DEN"));
 				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
 				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
-				asccpVO.setStateD(rs.getInt("State"));
+				asccpVO.setState(rs.getInt("State"));
+				asccpVO.setModule(rs.getString("Module"));
+				asccpVO.setReusableIndicator(rs.getBoolean("ReusableIndicator"));
 			}
 			tx.commit();
 			conn.close();
@@ -169,15 +171,16 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
 				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
-				asccpVO.setDEN(rs.getString("DEN"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
-				asccpVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
+				asccpVO.setDEN(rs.getString("DEN"));
 				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
 				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
-				asccpVO.setStateD(rs.getInt("State"));
+				asccpVO.setState(rs.getInt("State"));
+				asccpVO.setModule(rs.getString("Module"));
+				asccpVO.setReusableIndicator(rs.getBoolean("ReusableIndicator"));
 				list.add(asccpVO);
 			}
 			tx.commit();
@@ -214,14 +217,15 @@ public class ASCCPMysqlDAO extends SRTDAO {
 
 			ps.setString(1, asccpVO.getASCCPGUID());
 			ps.setString(2, asccpVO.getPropertyTerm());
-			ps.setString(3, asccpVO.getDEN());
-			ps.setString(4, asccpVO.getDefinition());
-			ps.setInt(5, asccpVO.getRoleOfACCID());
-			ps.setInt(6, asccpVO.getOAGISComponentType());
-			ps.setInt(7, asccpVO.getCreatedByUserId());
-			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
-			ps.setInt(11, asccpVO.getState());
+			ps.setString(3, asccpVO.getDefinition());
+			ps.setInt(4, asccpVO.getRoleOfACCID());
+			ps.setString(5, asccpVO.getDEN());
+			ps.setInt(6, asccpVO.getCreatedByUserId());
+			ps.setInt(7, asccpVO.getLastUpdatedByUserId());
+			ps.setTimestamp(8, asccpVO.getLastUpdateTimestamp());
+			ps.setInt(9, asccpVO.getState());
+			ps.setString(10, asccpVO.getModule());
+			ps.setBoolean(11, asccpVO.getReusableIndicator());
 			ps.executeUpdate();
 
 			tx.commit();

@@ -24,6 +24,7 @@ public class ACCVO extends SRTObject {
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	private int State;
+	private String Module;
 	
 	public int getACCID() {
 		return ACCID;
@@ -125,8 +126,15 @@ public class ACCVO extends SRTObject {
 		return State;
 	}
 	
-	public void setStateD(int state) {
+	public void setState(int state) {
 		State = state;
 	}
 	
+	public String getModule() {
+		return Module;
+	}
+	
+	public void setModule(String module) {
+		Module = module;
+	}
 }
