@@ -40,7 +40,7 @@ public class DTMysqlDAO extends SRTDAO {
 			"INSERT INTO " + _tableName + " (DT_GUID, DT_Type, Version_Number, "
 					+ "Revision_Type, Data_Type_Term, Based_DT_ID, DEN, Content_Component_DEN, "
 					+ "Definition, Content_Component_Definition, Revision_State, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, qualifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 
 	private final String _UPDATE_DT_STATEMENT = 
 			"UPDATE " + _tableName
@@ -72,6 +72,7 @@ public class DTMysqlDAO extends SRTDAO {
 			ps.setInt(11, dtVO.getRevisionState());
 			ps.setInt(12, dtVO.getCreatedByUserId());
 			ps.setInt(13, dtVO.getLastUpdatedByUserId());
+			ps.setString(14, dtVO.getQualifier());
 
 			ps.executeUpdate();
 
@@ -98,9 +99,11 @@ public class DTMysqlDAO extends SRTDAO {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		DTVO dtVO = new DTVO();
+		DTVO dtVO = null;
+		Connection conn = null;
+		
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_DT_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -125,6 +128,7 @@ public class DTMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				dtVO = new DTVO();
 				dtVO.setDTID(rs.getInt("DT_ID"));
 				dtVO.setDTGUID(rs.getString("DT_GUID"));
 				dtVO.setDTType(rs.getInt("DT_Type"));
@@ -145,6 +149,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 			}
+			
 			tx.commit();
 			conn.close();
 		} catch (BfPersistenceException e) {
@@ -162,6 +167,10 @@ public class DTMysqlDAO extends SRTDAO {
 					rs.close();
 				} catch (SQLException e) {}
 			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return dtVO;

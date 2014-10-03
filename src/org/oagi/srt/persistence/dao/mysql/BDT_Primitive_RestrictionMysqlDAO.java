@@ -47,8 +47,16 @@ public class BDT_Primitive_RestrictionMysqlDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_BDT_Primitive_Restriction_STATEMENT);
 			ps.setInt(1, bdtprimitiverestrictionVO.getBDTID());
-			ps.setInt(2, bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID());
-			//ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
+			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID() == 0)
+				ps.setNull(2, java.sql.Types.INTEGER);
+			else
+				ps.setInt(2, bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID());
+			
+			if(bdtprimitiverestrictionVO.getCodeListID() == 0)
+				ps.setNull(3, java.sql.Types.INTEGER);
+			else
+				ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
+			
 			ps.setBoolean(3, bdtprimitiverestrictionVO.getisDefault());
 			
 			ps.executeUpdate();

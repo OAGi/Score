@@ -49,8 +49,70 @@ public class DT_SCMysqlDAO extends SRTDAO {
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_DT_SC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				DT_SCVO dtscVO = new DT_SCVO();
+				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
+				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
+				dtscVO.setDefinition(rs.getString("Definition"));
+				dtscVO.setOwnerDTID(rs.getInt("Owner_DT_ID"));
+				dtscVO.setMinCardinality(rs.getInt("Min_Cardinality"));
+				dtscVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
+				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
+				list.add(dtscVO);
+			}
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
 	}
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
@@ -67,7 +129,10 @@ public class DT_SCMysqlDAO extends SRTDAO {
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
-			ps.setInt(8, dtscVO.getBasedDTSCID());
+			if(dtscVO.getBasedDTSCID() == 0)
+				ps.setNull(8, java.sql.Types.INTEGER);
+			else
+				ps.setInt(8, dtscVO.getBasedDTSCID());
 
 			ps.executeUpdate();
 
