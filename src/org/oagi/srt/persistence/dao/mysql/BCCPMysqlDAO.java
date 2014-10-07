@@ -89,7 +89,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		BCCPVO bccpVO = new BCCPVO();
+		BCCPVO bccpVO = null;
 		try {
 			Connection conn = tx.open();
 			String sql = _FIND_BCCP_STATEMENT;
@@ -116,6 +116,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				bccpVO = new BCCPVO();
 				bccpVO.setBCCPID(rs.getInt("BCCP_ID"));
 				bccpVO.setBCCPGUID(rs.getString("BCCP_GUID"));
 				bccpVO.setPropertyTerm(rs.getString("Property_Term"));
