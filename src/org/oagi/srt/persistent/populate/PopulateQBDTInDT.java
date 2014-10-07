@@ -51,39 +51,6 @@ public class PopulateQBDTInDT {
 		return (DTVO)dtDao.findObject(qc);
 	}
 	
-	private String first(String den) {
-		return den.substring(0, den.indexOf(".")).replace("_", " ");
-	}
-	
-	private String createDENFormat(String str) {
-		String pre = str.substring(0, str.indexOf("Type"));
-		return pre + ". Type";
-	}
-	
-	private String firstToUpperCase(String str) {
-		String prefix = str.substring(0, 1);
-		String suffix = str.substring(1);
-		return prefix.toUpperCase() + suffix;
-	}
-	
-	private String spaceSeparator(String str) {
-		StringBuffer sb = new StringBuffer();
-		for(int i = 0; i < str.length(); i++) {
-			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
-				if(i > 0 && i < str.length() && Character.isUpperCase(str.charAt(i - 1)))
-					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)))
-						sb.append(" " + str.charAt(i));
-					else
-						sb.append(str.charAt(i));
-				else 
-					sb.append(" " + str.charAt(i));
-			} else {
-				sb.append(str.charAt(i));
-			}
-		}
-		return sb.toString();
-	}
-	
 	public PopulateQBDTInDT() throws Exception {
 		df = DAOFactory.getDAOFactory();
 		dtDao = df.getDAO("DT");
@@ -187,7 +154,7 @@ public class PopulateQBDTInDT {
 	
 	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
 		for(int i = 0; i < elementsFromXSD.getLength(); i++) {
-			String den = createDENFormat(((Element)elementsFromXSD.item(i)).getAttribute("type"));
+			String den = Utility.createDENFormat(((Element)elementsFromXSD.item(i)).getAttribute("type"));
 			String bccp = ((Element)elementsFromXSD.item(i)).getAttribute("name");
 			String guid = ((Element)elementsFromXSD.item(i)).getAttribute("id");
 			String type = ((Element)elementsFromXSD.item(i)).getAttribute("type");
@@ -260,7 +227,7 @@ public class PopulateQBDTInDT {
 			
 			Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent/xsd:extension");
 			if(typeNameNode != null) {
-				String base = createDENFormat(((Element)typeNameNode).getAttribute("base"));
+				String base = Utility.createDENFormat(((Element)typeNameNode).getAttribute("base"));
 				
 				if(base.endsWith("CodeContentType")) {
 					dVO = getDTVO("Code. Type");
@@ -278,7 +245,7 @@ public class PopulateQBDTInDT {
 			dtVO.setBasedDTID(dVO.getDTID());
 			dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
 			
-			String tmp = spaceSeparator(type);
+			String tmp = Utility.spaceSeparator(type);
 			String qualifier = tmp.substring(0, tmp.indexOf(" "));
 			dtVO.setQualifier(qualifier);
 			
@@ -335,7 +302,7 @@ public class PopulateQBDTInDT {
 			dtVO.setBasedDTID(dVO.getDTID());
 			dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
 			
-			String tmp = spaceSeparator(type);
+			String tmp = Utility.spaceSeparator(type);
 			String qualifier = tmp.substring(0, tmp.indexOf(" "));
 			dtVO.setQualifier(qualifier);
 			
@@ -364,7 +331,7 @@ public class PopulateQBDTInDT {
 		BCCPVO bccpVO = new BCCPVO();
 		bccpVO.setBCCPGUID(guid);
 		
-		String propertyTerm = spaceSeparator(bccp.replaceAll("ID", "Identifier"));
+		String propertyTerm = Utility.spaceSeparator(bccp.replaceAll("ID", "Identifier"));
 		bccpVO.setPropertyTerm(propertyTerm);
 		bccpVO.setRepresentationTerm(dtVO.getDataTypeTerm());
 		bccpVO.setBDTID(dtVO.getDTID());
@@ -438,12 +405,12 @@ public class PopulateQBDTInDT {
 				else if(attrName.endsWith("Value"))	
 					property_term = attrName.substring(0, attrName.indexOf("Value"));
 				else
-					property_term = spaceSeparator(attrName);
+					property_term = Utility.spaceSeparator(attrName);
 				
 				if(property_term.trim().length() == 0)
 					property_term = attrName;
 				
-				property_term = firstToUpperCase(property_term);
+				property_term = Utility.firstToUpperCase(property_term);
 				
 				
 				// Representation Term

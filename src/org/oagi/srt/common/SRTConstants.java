@@ -63,11 +63,9 @@ public class SRTConstants {
 		else if(list.equals("BDT_Primitive_Restriction")){
 			origin_filepath = "OAGIS_10_EnterpriseEdition\\OAGi-BPI-Platform\\org_openapplications_oagis\\10_0\\Model\\Platform\\2_0\\Common\\Components\\";
 		}
-		
 		else if(list.equals("BOD")){
 			origin_filepath = "OAGIS_10_EnterpriseEdition\\OAGi-BPI-Platform\\org_openapplications_oagis\\10_0\\Model\\BODs\\";
 		}
-			
 		return prefix_filepath+origin_filepath;
 	}
 

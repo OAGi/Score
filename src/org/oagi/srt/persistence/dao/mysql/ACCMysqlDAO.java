@@ -93,7 +93,7 @@ public class ACCMysqlDAO extends SRTDAO {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ACCVO accVO = new ACCVO();
+		ACCVO accVO = null;
 		try {
 			Connection conn = tx.open();
 			String sql = _FIND_ACC_STATEMENT;
@@ -118,10 +118,9 @@ public class ACCMysqlDAO extends SRTDAO {
 				}
 			}
 			
-			//like 로 고치기 해보기
-
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				accVO = new ACCVO();
 				accVO.setACCID(rs.getInt("ACC_ID"));
 				accVO.setACCGUID(rs.getString("ACC_GUID"));
 				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
