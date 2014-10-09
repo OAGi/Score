@@ -37,7 +37,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 	private final String _INSERT_ASCCP_STATEMENT = 
 			"INSERT INTO " + _tableName + " (ASCCP_GUID, Property_Term, "
 					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
 
 	private final String _UPDATE_ASCCP_STATEMENT = 
 			"UPDATE " + _tableName
@@ -65,7 +65,6 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setTimestamp(8, asccpVO.getLastUpdateTimestamp());
 			ps.setInt(9, asccpVO.getState());
 			ps.setString(10, asccpVO.getModule());
-			ps.setBoolean(11, asccpVO.getReusableIndicator());
 
 			ps.executeUpdate();
 
@@ -93,8 +92,9 @@ public class ASCCPMysqlDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ASCCPVO asccpVO = null;
+		Connection conn = null;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ASCCP_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -152,7 +152,6 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
-				asccpVO.setReusableIndicator(rs.getBoolean("ReusableIndicator"));
 			}
 			tx.commit();
 			conn.close();
@@ -171,6 +170,10 @@ public class ASCCPMysqlDAO extends SRTDAO {
 					rs.close();
 				} catch (SQLException e) {}
 			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return asccpVO;

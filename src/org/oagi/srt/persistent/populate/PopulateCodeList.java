@@ -14,8 +14,8 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.Code_ListVO;
-import org.oagi.srt.persistence.dto.Code_List_ValueVO;
+import org.oagi.srt.persistence.dto.CodeListVO;
+import org.oagi.srt.persistence.dto.CodeListValueVO;
 import org.oagi.srt.persistence.dto.UserVO;
 import org.oagi.srt.startup.SRTInitializerException;
 import org.w3c.dom.Element;
@@ -37,8 +37,8 @@ public class PopulateCodeList {
 		XPathHandler xh = new XPathHandler(path1);
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("Code_List");
-		Code_ListVO codelistVO = new Code_ListVO();
+		SRTDAO dao = df.getDAO("CodeList");
+		CodeListVO codelistVO = new CodeListVO();
 
 		NodeList result = xh.getNodeList("//xsd:simpleType");
 	    NodeList definition = xh.getNodeList("//xsd:simpleType[xsd:annotation[xsd:documentation]]");	
@@ -143,8 +143,8 @@ public class PopulateCodeList {
 		XPathHandler xh = new XPathHandler(path1);
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("Code_List_Value");
-		Code_List_ValueVO codelistvalueVO = new Code_List_ValueVO();
+		SRTDAO dao = df.getDAO("CodeListValue");
+		CodeListValueVO codelistvalueVO = new CodeListValueVO();
 
 		NodeList result = xh.getNodeList("//xsd:simpleType");
 		NodeList enumeration, typenode;
@@ -157,10 +157,10 @@ public class PopulateCodeList {
 	    	if(tmp.getAttribute("name").endsWith("CodeContentType")) {
 				
 	    		typenode = xh.getNodeList("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:enumeration");
-		    	SRTDAO dao2 = df2.getDAO("Code_List");
+		    	SRTDAO dao2 = df2.getDAO("CodeList");
 			   	QueryCondition qc = new QueryCondition();
 				qc.add("Code_List_GUID", new String(tmp.getAttribute("id")));
-				Code_ListVO codelistVO = (Code_ListVO)dao2.findObject(qc);
+				CodeListVO codelistVO = (CodeListVO)dao2.findObject(qc);
 	    		
 	    		for(int j = 0; j < result.getLength(); j++) {
 		    		Element tmp2 = (Element)result.item(j);

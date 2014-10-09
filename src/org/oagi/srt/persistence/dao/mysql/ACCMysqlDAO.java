@@ -97,8 +97,9 @@ public class ACCMysqlDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ACCVO accVO = null;
+		Connection conn = null;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ACC_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -156,6 +157,10 @@ public class ACCMysqlDAO extends SRTDAO {
 					rs.close();
 				} catch (SQLException e) {}
 			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return accVO;

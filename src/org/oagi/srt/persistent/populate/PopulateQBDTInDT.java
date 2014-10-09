@@ -12,12 +12,12 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BCCPVO;
-import org.oagi.srt.persistence.dto.BDT_Primitive_RestrictionVO;
-import org.oagi.srt.persistence.dto.CDT_Allowed_PrimitiveVO;
-import org.oagi.srt.persistence.dto.CDT_Allowed_Primitive_Expression_Type_MapVO;
-import org.oagi.srt.persistence.dto.Code_ListVO;
+import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
+import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
+import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.DT_SCVO;
+import org.oagi.srt.persistence.dto.DTSCVO;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -55,11 +55,11 @@ public class PopulateQBDTInDT {
 		df = DAOFactory.getDAOFactory();
 		dtDao = df.getDAO("DT");
 		bccpDao = df.getDAO("BCCP");
-		aBDTPrimitiveRestrictionDAO = df.getDAO("BDT_Primitive_Restriction");
-		aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDT_Allowed_Primitive_Expression_Type_Map");
-		aCDTAllowedPrimitiveDAO = df.getDAO("CDT_Allowed_Primitive");
-		aCodeListDAO = df.getDAO("Code_List");
-		aDTSCDAO = df.getDAO("DT_SC");
+		aBDTPrimitiveRestrictionDAO = df.getDAO("BDTPrimitiveRestriction");
+		aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
+		aCDTAllowedPrimitiveDAO = df.getDAO("CDTAllowedPrimitive");
+		aCodeListDAO = df.getDAO("CodeList");
+		aDTSCDAO = df.getDAO("DTSC");
 		
 		fields_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Fields_modified.xsd");
 		meta_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Meta.xsd");
@@ -90,7 +90,7 @@ public class PopulateQBDTInDT {
 						
 						System.out.println("##################################################### Code List: " + base.substring(0, base.indexOf("CodeContentType")));
 						
-						Code_ListVO aCode_ListVO = (Code_ListVO)aCodeListDAO.findObject(qc);
+						CodeListVO aCode_ListVO = (CodeListVO)aCodeListDAO.findObject(qc);
 						
 						insertBDTPrimitiveRestriction(aDTVO, true, aCode_ListVO.getCodeListID());
 					} else {
@@ -129,16 +129,16 @@ public class PopulateQBDTInDT {
 		
 		for(SRTObject aSRTObject3 : al3) {
 			
-			CDT_Allowed_PrimitiveVO aCDTAllowedPrimitiveVO = (CDT_Allowed_PrimitiveVO)aSRTObject3;
+			CDTAllowedPrimitiveVO aCDTAllowedPrimitiveVO = (CDTAllowedPrimitiveVO)aSRTObject3;
 			
 			QueryCondition qc4 = new QueryCondition();
 			qc4.add("cdt_allowed_primitive_id", aCDTAllowedPrimitiveVO.getCDTAllowedPrimitiveID());
 			ArrayList<SRTObject> al4 = aCDTAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc4);
 			
 			for(SRTObject aSRTObject4 : al4) {
-				CDT_Allowed_Primitive_Expression_Type_MapVO aCDTAllowedPrimitiveExpressionTypeMapVO = (CDT_Allowed_Primitive_Expression_Type_MapVO)aSRTObject4;
+				CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMapVO = (CDTAllowedPrimitiveExpressionTypeMapVO)aSRTObject4;
 				// create insert statement
-				BDT_Primitive_RestrictionVO aBDT_Primitive_RestrictionVO = new BDT_Primitive_RestrictionVO();
+				BDTPrimitiveRestrictionVO aBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 				aBDT_Primitive_RestrictionVO.setBDTID(aDTVO.getDTID());
 				if(!isMapBlank)
 					aBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aCDTAllowedPrimitiveExpressionTypeMapVO.getCDTPrimitiveExpressionTypeMapID());
@@ -362,9 +362,9 @@ public class PopulateQBDTInDT {
 		
 		ArrayList<SRTObject> dtsc_vos = aDTSCDAO.findObjects(qc);
 		for(SRTObject sObj : dtsc_vos) {
-			DT_SCVO dtsc_vo = (DT_SCVO)sObj;
+			DTSCVO dtsc_vo = (DTSCVO)sObj;
 			
-			DT_SCVO vo = new DT_SCVO();
+			DTSCVO vo = new DTSCVO();
 			vo.setDTSCGUID(dtsc_vo.getDTSCGUID());
 			vo.setPropertyTerm(dtsc_vo.getPropertyTerm());
 			vo.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
@@ -442,7 +442,7 @@ public class PopulateQBDTInDT {
 					definition = "N/A";
 				}
 					
-				DT_SCVO vo = new DT_SCVO();
+				DTSCVO vo = new DTSCVO();
 				vo.setDTSCGUID(dt_sc_guid);
 				vo.setPropertyTerm(property_term);
 				vo.setRepresentationTerm(representation_term);

@@ -19,7 +19,7 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.XSD_BuiltIn_TypeVO;
+import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 import org.oagi.srt.persistence.validate.data.TableData;
 import org.oagi.srt.startup.SRTInitializer;
 import org.oagi.srt.startup.SRTInitializerException;
@@ -57,7 +57,7 @@ public class XSD_BuiltIn_TypeTest {
 			QueryCondition qc  = new QueryCondition();
 			qc.add("name", TableData.XDT_BUILT_IN_TYPE[i][0]);
 			try {
-				XSD_BuiltIn_TypeVO xVO = (XSD_BuiltIn_TypeVO)dao.findObject(qc);
+				XSDBuiltInTypeVO xVO = (XSDBuiltInTypeVO)dao.findObject(qc);
 				if(xVO.getBuiltInType() == null)
 					fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
 				
@@ -73,7 +73,7 @@ public class XSD_BuiltIn_TypeTest {
 			QueryCondition qc  = new QueryCondition();
 			qc.add("name", TableData.XDT_BUILT_IN_TYPE[i][0]);
 			try {
-				XSD_BuiltIn_TypeVO xVO = (XSD_BuiltIn_TypeVO)dao.findObject(qc);
+				XSDBuiltInTypeVO xVO = (XSDBuiltInTypeVO)dao.findObject(qc);
 				if(xVO.getBuiltInType() == null)
 					fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
 				
@@ -90,13 +90,13 @@ public class XSD_BuiltIn_TypeTest {
 			QueryCondition qc  = new QueryCondition();
 			qc.add("name", TableData.XDT_BUILT_IN_TYPE[i][0]);
 			try {
-				XSD_BuiltIn_TypeVO xVO = (XSD_BuiltIn_TypeVO)dao.findObject(qc);
+				XSDBuiltInTypeVO xVO = (XSDBuiltInTypeVO)dao.findObject(qc);
 				if(xVO.getBuiltInType() == null)
 					fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
 				
 				QueryCondition qc1  = new QueryCondition();
 				qc1.add("XSD_BuiltIn_Type_ID", xVO.getSubtypeOfXSDBuiltinTypeId());
-				XSD_BuiltIn_TypeVO xVO1 = (XSD_BuiltIn_TypeVO)dao.findObject(qc1);
+				XSDBuiltInTypeVO xVO1 = (XSDBuiltInTypeVO)dao.findObject(qc1);
 				
 				assertEquals(TableData.XDT_BUILT_IN_TYPE[i][2], xVO1.getBuiltInType());
 			} catch (SRTDAOException e) {

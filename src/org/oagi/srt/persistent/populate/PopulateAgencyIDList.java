@@ -14,8 +14,8 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.Agency_ID_ListVO;
-import org.oagi.srt.persistence.dto.Agency_ID_List_ValueVO;
+import org.oagi.srt.persistence.dto.AgencyIDListVO;
+import org.oagi.srt.persistence.dto.AgencyIDListValueVO;
 import org.oagi.srt.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -33,8 +33,8 @@ public class PopulateAgencyIDList {
 		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("Agency_ID_List");
-		Agency_ID_ListVO agencyidlistVO = new Agency_ID_ListVO();
+		SRTDAO dao = df.getDAO("AgencyIDList");
+		AgencyIDListVO agencyidlistVO = new AgencyIDListVO();
 		NodeList result = xh.getNodeList("//xsd:simpleType");
 		for(int i = 0; i < result.getLength(); i++) {
 		    Element tmp = (Element)result.item(i);
@@ -60,15 +60,15 @@ public class PopulateAgencyIDList {
 		XPathHandler xh = new XPathHandler(path1);
 
 		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("Agency_ID_List_Value");
-		Agency_ID_List_ValueVO agencyidlistvalueVO = new Agency_ID_List_ValueVO();
+		SRTDAO dao = df.getDAO("AgencyIDListValue");
+		AgencyIDListValueVO agencyidlistvalueVO = new AgencyIDListValueVO();
 		
 		DAOFactory df2 = DAOFactory.getDAOFactory();
-		SRTDAO dao2 = df2.getDAO("Agency_ID_List");
+		SRTDAO dao2 = df2.getDAO("AgencyIDList");
 		ArrayList<SRTObject> agency_id_fk = dao2.findObjects();
 
 		for(SRTObject dvo : agency_id_fk) {
-			Agency_ID_ListVO svo = (Agency_ID_ListVO) dvo;
+			AgencyIDListVO svo = (AgencyIDListVO) dvo;
 			NodeList enumeration = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration") ;
 			NodeList name = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//ccts:Name") ;
 			NodeList definition = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//ccts:Definition") ;
