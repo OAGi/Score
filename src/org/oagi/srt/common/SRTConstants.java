@@ -46,6 +46,9 @@ public class SRTConstants {
 		return Integer.parseInt(dbTypeVal);
 	}
 	
+	public static final String BOD_FILE_PATH_01 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/BODs/";
+	public static final String BOD_FILE_PATH_02 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/BODs/";
+	
 	
 	public static String filepath(String list) {
 		String prefix_filepath = "C:\\Users\\jnl18\\Documents\\";

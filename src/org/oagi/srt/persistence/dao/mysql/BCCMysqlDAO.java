@@ -47,9 +47,10 @@ public class BCCMysqlDAO extends SRTDAO{
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BCCVO bccVO = (BCCVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BCC_STATEMENT);
 			ps.setString(1, bccVO.getBCCGUID());
 			ps.setInt(2, bccVO.getCardinalityMin());
@@ -80,6 +81,15 @@ public class BCCMysqlDAO extends SRTDAO{
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return true;

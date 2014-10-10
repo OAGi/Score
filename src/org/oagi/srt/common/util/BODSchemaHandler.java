@@ -61,11 +61,15 @@ public class BODSchemaHandler {
 		return (XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS);
 	}
 	
-	public boolean isComplex(String type) {
-		if(model.getTypeDefinition(type, SRTConstants.OAGI_NS) instanceof XSComplexTypeDecl)
-			return true;
-		else
+	public boolean isComplexWithoutSimpleContent(String type) {
+		if(model.getTypeDefinition(type, SRTConstants.OAGI_NS) instanceof XSComplexTypeDecl) {
+			if(((XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS)).getSimpleType() == null)
+				return true;
+			else
+				return false;
+		} else {
 			return false;
+		}
 	}
 
 	public ArrayList<BODElementVO> processParticle(XSParticle theXSParticle, int order) {
@@ -129,7 +133,7 @@ public class BODSchemaHandler {
 	public static void main(String args[]) throws Exception {
 
 		try {
-			File f = new File("C:/Work/Project/OAG/Development/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/BODs/AcknowledgeField.xsd");
+			File f = new File(SRTConstants.BOD_FILE_PATH_01 + "AcknowledgeField.xsd");
 			BODSchemaHandler bs = new BODSchemaHandler(f.getAbsolutePath());
 			System.out.println(bs.getAnnotation(bs.getGlobalElementDeclaration()));
 			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getBaseType().getName() + " - " + bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getFId());
@@ -143,7 +147,8 @@ public class BODSchemaHandler {
 				System.out.println("### " + e.getId());
 			}
 
-			System.out.println(bs.isComplex("AcknowledgeFieldDataAreaType"));
+			System.out.println(bs.isComplexWithoutSimpleContent("AcknowledgeFieldDataAreaType"));
+			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getSimpleType());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -49,10 +49,10 @@ public class ASCCMysqlDAO extends SRTDAO {
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASCCVO asccVO = (ASCCVO)obj;
-		
+		Connection conn = null;
+		PreparedStatement ps = null;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
 			
 			ps.setString(1, asccVO.getASCCGUID());
@@ -83,6 +83,15 @@ public class ASCCMysqlDAO extends SRTDAO {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return true;

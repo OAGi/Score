@@ -12,6 +12,7 @@ import org.apache.xerces.impl.xs.XSElementDecl;
 import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSParticle;
 import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.BODElementVO;
 import org.oagi.srt.common.util.BODSchemaHandler;
 import org.oagi.srt.common.util.Utility;
@@ -44,9 +45,9 @@ public class PopulateAccAsccpBccAscc {
 	private BODSchemaHandler bodSchemaHandler;
 	private String bodPath;
 
-	private File f1 = new File("C:/Work/Project/OAG/Development/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/BODs/");
-	private File f2 = new File("C:/Work/Project/OAG/Development/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/BODs/");
-
+	private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
+	private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);	
+	
 	public PopulateAccAsccpBccAscc() throws SRTDAOException {
 		df = DAOFactory.getDAOFactory();
 		accDao = df.getDAO("ACC");
@@ -76,11 +77,13 @@ public class PopulateAccAsccpBccAscc {
 		bodSchemaHandler = new BODSchemaHandler(bodPath);
 		XSElementDecl element = bodSchemaHandler.getGlobalElementDeclaration();
 		XSComplexTypeDecl complexType = bodSchemaHandler.getComplexTypeDefinition(element);
-		insertASCCP(element, complexType);
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if(bodSchemaHandler.isComplexWithoutSimpleContent(complexType.getTypeName())) {
+			insertASCCP(element, complexType);
+			try {
+				Thread.sleep(150);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -123,7 +126,7 @@ public class PopulateAccAsccpBccAscc {
 
 		}
 		try {
-			Thread.sleep(100);
+			Thread.sleep(150);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -202,7 +205,7 @@ public class PopulateAccAsccpBccAscc {
 		
 		int assocToBCCPID;
 		QueryCondition qc = new QueryCondition();
-		qc.add("bccp_guid", xtd.getFId());
+		qc.add("bccp_guid", (bccGuid == null) ? "1" : bccGuid); // TODO responseCode does not have id
 		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc);
 		if(bccpVO == null) {
 			bccpVO = insertBCCP(xtd.getName(), xtd.getFId());
@@ -235,10 +238,19 @@ public class PopulateAccAsccpBccAscc {
 		String bccpGuid = Utility.generateGUID();
 		String propertyTerm = Utility.spaceSeparator(name).replace("ID", "Identifier");
 
+		System.out.println("### BCCP: " + name + " " + id);
+		if(id == null) {
+			id = "oagis-id-89be97039be04d6f9cfda107d75926b4"; // TODO check why dt is null and change this line
+		}
 		QueryCondition qc = new QueryCondition();
 		qc.add("dt_guid", id);
 		qc.add("dt_type", 1);
 		DTVO dtVO = (DTVO)dtDao.findObject(qc);
+		if(dtVO == null) {
+			QueryCondition qc1 = new QueryCondition();
+			qc1.add("dt_guid", "oagis-id-89be97039be04d6f9cfda107d75926b4"); // TODO check why dt is null and change this line
+			dtVO = (DTVO)dtDao.findObject(qc1);
+		}
 
 		int bdtId = dtVO.getDTID();
 		String representationTerm = dtVO.getDataTypeTerm();
@@ -316,7 +328,7 @@ public class PopulateAccAsccpBccAscc {
 			ArrayList<BODElementVO> al = bodSchemaHandler.processParticle(particle, 1);
 
 			for(BODElementVO bodVO : al) {
-				if(bodSchemaHandler.isComplex(bodVO.getTypeName())) {
+				if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
 					QueryCondition qc2 = new QueryCondition();
 					qc2.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
 					ACCVO accVO = (ACCVO)accDao.findObject(qc2);
@@ -334,14 +346,14 @@ public class PopulateAccAsccpBccAscc {
 				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1);
 				
 				if(asccpVO != null) {
-					System.out.println("####################### match to ascc - " + bodVO.getName());
+					System.out.println("####################### match to ascc - " + bodVO.getName()); // TODO how to differentiate between particles in type and from extension?
 					insertASCC(bodVO, complexType, asccpVO);
 				} else if(bccpVO != null) {
 					System.out.println("####################### match to bccp - " + bodVO.getName());
 					insertBCC(bodVO, complexType, bccpVO);
 				} else {
 					System.out.println("####################### no match case - " + bodVO.getName());
-					if(bodSchemaHandler.isComplex(bodVO.getTypeName())) {
+					if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
 						insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
 						QueryCondition qc3 = new QueryCondition();
 						qc3.add("asccp_guid", bodVO.getId());
@@ -350,7 +362,7 @@ public class PopulateAccAsccpBccAscc {
 					}
 				}
 				try {
-					Thread.sleep(100);
+					Thread.sleep(150);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -361,7 +373,7 @@ public class PopulateAccAsccpBccAscc {
 		for( int i = 0; i < xol.getLength(); i++) {
 			XSAttributeUseImpl xui = (XSAttributeUseImpl)xol.get(i);
 			XSAttributeDecl xad = (XSAttributeDecl)xui.getAttrDeclaration();
-			if(xad.getName().equals("releaseID") && xad.getName().equals("versionID") && xad.getName().equals("systemEnvironmentCode")) {
+			if(!xad.getName().equals("releaseID") && !xad.getName().equals("versionID") && !xad.getName().equals("systemEnvironmentCode")) {
 				System.out.println("####################### attribute: " + complexType.getName() + " | " + xad.getName());
 				insertBCCWithAttr(xad, complexType);
 			}

@@ -51,9 +51,10 @@ public class ASCCPMysqlDAO extends SRTDAO {
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASCCPVO asccpVO = (ASCCPVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASCCP_STATEMENT);
 			ps.setString(1, asccpVO.getASCCPGUID());
 			ps.setString(2, asccpVO.getPropertyTerm());
@@ -82,6 +83,15 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return true;
