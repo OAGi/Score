@@ -60,7 +60,10 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setString(3, bccpVO.getRepresentationTerm());
 			ps.setInt(4, bccpVO.getBDTID());
 			ps.setString(5, bccpVO.getDEN());
-			ps.setString(6, bccpVO.getDefinition());
+			if(bccpVO.getDefinition() == null)
+				ps.setString(6, "");
+			else
+				ps.setString(6, bccpVO.getDefinition());
 			ps.setInt(7, bccpVO.getCreatedByUserId());
 			ps.setInt(8, bccpVO.getLastUpdatedByUserId());
 

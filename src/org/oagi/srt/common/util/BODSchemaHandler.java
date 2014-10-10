@@ -1,7 +1,10 @@
 package org.oagi.srt.common.util;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
+import org.apache.xerces.impl.xs.XSAttributeDecl;
 import org.apache.xerces.impl.xs.XSComplexTypeDecl;
 import org.apache.xerces.impl.xs.XSElementDecl;
 import org.apache.xerces.impl.xs.XSParticleDecl;
@@ -33,7 +36,7 @@ public class BODSchemaHandler {
 			DOMConfiguration config = schemaLoader.getConfig();
 			config.setParameter("validate", Boolean.TRUE);
 			model = schemaLoader.loadURI(schemaPath);
-			rootName = schemaPath.substring(schemaPath.lastIndexOf("/") + 1, schemaPath.lastIndexOf("."));
+			rootName = schemaPath.substring(schemaPath.lastIndexOf(File.separator) + 1, schemaPath.lastIndexOf("."));
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -57,6 +60,13 @@ public class BODSchemaHandler {
 	public XSComplexTypeDecl getComplexTypeDefinition(String type) {
 		return (XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS);
 	}
+	
+	public boolean isComplex(String type) {
+		if(model.getTypeDefinition(type, SRTConstants.OAGI_NS) instanceof XSComplexTypeDecl)
+			return true;
+		else
+			return false;
+	}
 
 	public ArrayList<BODElementVO> processParticle(XSParticle theXSParticle, int order) {
 		ArrayList<BODElementVO> al = new ArrayList<BODElementVO>();
@@ -74,6 +84,7 @@ public class BODSchemaHandler {
 			XSElementDecl e = (XSElementDecl)xsTerm;
 			bodVO.setTypeName(e.getTypeDefinition().getName());
 			bodVO.setId(e.getFId());
+			bodVO.setElement(e);
 			al.add(bodVO);
 			return al;
 
@@ -81,9 +92,13 @@ public class BODSchemaHandler {
 			XSModelGroup xsGroup = (XSModelGroup) xsTerm;
 			XSObjectList xsParticleList = xsGroup.getParticles();
 			for (int i = 0; i < xsParticleList.getLength(); i ++) {
-				al.addAll(processParticle((XSParticleDecl)xsParticleList.item(i), i + 1));
+				ArrayList<BODElementVO> al2 = processParticle((XSParticleDecl)xsParticleList.item(i), i + 1);
+				if(al2 != null && al2.size() > 0)
+					al.addAll(al2);
 			}
 			return al;
+		default:
+			System.out.println("### default: " + xsTerm);
 		}
 		return null;
 	}
@@ -114,7 +129,8 @@ public class BODSchemaHandler {
 	public static void main(String args[]) throws Exception {
 
 		try {
-			BODSchemaHandler bs = new BODSchemaHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/BODs/AcknowledgeField.xsd");
+			File f = new File("C:/Work/Project/OAG/Development/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/BODs/AcknowledgeField.xsd");
+			BODSchemaHandler bs = new BODSchemaHandler(f.getAbsolutePath());
 			System.out.println(bs.getAnnotation(bs.getGlobalElementDeclaration()));
 			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getBaseType().getName() + " - " + bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getFId());
 
@@ -127,6 +143,7 @@ public class BODSchemaHandler {
 				System.out.println("### " + e.getId());
 			}
 
+			System.out.println(bs.isComplex("AcknowledgeFieldDataAreaType"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
