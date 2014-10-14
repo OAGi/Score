@@ -16,6 +16,38 @@ public class Utility {
 		return "oagis-id-" + UUID.randomUUID().toString().replaceAll("-", "");
 	}
 
+	public static String first(String den) {
+		return den.substring(0, den.indexOf(".")).replace("_", " ");
+	}
+	
+	public static String createDENFormat(String str) {
+		String pre = str.substring(0, str.indexOf("Type"));
+		return pre + ". Type";
+	}
+	
+	public static String firstToUpperCase(String str) {
+		String prefix = str.substring(0, 1);
+		String suffix = str.substring(1);
+		return prefix.toUpperCase() + suffix;
+	}
+	
+	public static String spaceSeparator(String str) {
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i < str.length(); i++) {
+			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
+				if(i > 0 && i < str.length() && Character.isUpperCase(str.charAt(i - 1)))
+					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)))
+						sb.append(" " + str.charAt(i));
+					else
+						sb.append(str.charAt(i));
+				else 
+					sb.append(" " + str.charAt(i));
+			} else {
+				sb.append(str.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
 	
 	public static void dbSetup() throws Exception {
 		ServerProperties props = ServerProperties.getInstance();

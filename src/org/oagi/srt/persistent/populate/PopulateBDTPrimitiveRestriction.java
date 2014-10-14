@@ -7,9 +7,9 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dto.BDT_Primitive_RestrictionVO;
-import org.oagi.srt.persistence.dto.CDT_Allowed_PrimitiveVO;
-import org.oagi.srt.persistence.dto.CDT_Allowed_Primitive_Expression_Type_MapVO;
+import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
+import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
+import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
 import org.oagi.srt.persistence.dto.DTVO;
 
 /**
@@ -25,9 +25,9 @@ public class PopulateBDTPrimitiveRestriction {
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
-		SRTDAO aBDTPrimitiveRestrictionDAO = df.getDAO("BDT_Primitive_Restriction");
-		SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDT_Allowed_Primitive_Expression_Type_Map");
-		SRTDAO aCDTAllowedPrimitiveDAO = df.getDAO("CDT_Allowed_Primitive");
+		SRTDAO aBDTPrimitiveRestrictionDAO = df.getDAO("BDTPrimitiveRestriction");
+		SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
+		SRTDAO aCDTAllowedPrimitiveDAO = df.getDAO("CDTAllowedPrimitive");
 
 		QueryCondition qc = new QueryCondition();
 		qc.add("DT_Type", new Integer(1));
@@ -51,16 +51,16 @@ public class PopulateBDTPrimitiveRestriction {
 			
 			for(SRTObject aSRTObject3 : al3) {
 				
-				CDT_Allowed_PrimitiveVO aCDTAllowedPrimitiveVO = (CDT_Allowed_PrimitiveVO)aSRTObject3;
+				CDTAllowedPrimitiveVO aCDTAllowedPrimitiveVO = (CDTAllowedPrimitiveVO)aSRTObject3;
 				
 				QueryCondition qc4 = new QueryCondition();
 				qc4.add("cdt_allowed_primitive_id", aCDTAllowedPrimitiveVO.getCDTAllowedPrimitiveID());
 				ArrayList<SRTObject> al4 = aCDTAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc4);
 				
 				for(SRTObject aSRTObject4 : al4) {
-					CDT_Allowed_Primitive_Expression_Type_MapVO aCDTAllowedPrimitiveExpressionTypeMapVO = (CDT_Allowed_Primitive_Expression_Type_MapVO)aSRTObject4;
+					CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMapVO = (CDTAllowedPrimitiveExpressionTypeMapVO)aSRTObject4;
 					// create insert statement
-					BDT_Primitive_RestrictionVO aBDT_Primitive_RestrictionVO = new BDT_Primitive_RestrictionVO();
+					BDTPrimitiveRestrictionVO aBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 					aBDT_Primitive_RestrictionVO.setBDTID(aDTVO.getDTID());
 					aBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aCDTAllowedPrimitiveExpressionTypeMapVO.getCDTPrimitiveExpressionTypeMapID());
 					aBDT_Primitive_RestrictionVO.setisDefault(true);;

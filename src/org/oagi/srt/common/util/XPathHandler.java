@@ -45,16 +45,13 @@ public class XPathHandler {
 	public Node getNode(String xPathExpression) throws XPathExpressionException {
 		return (Node)xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODE);
 	}
+	
 	public static void main(String args[]) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
 	
-		XPathHandler xh = new XPathHandler("C:\\Users\\jnl18\\Documents\\OAG\\Jaehun\\CodeLists_1.xsd");
+		XPathHandler xh = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/BODs/LoadPayable.xsd");
 		
 		try {
-			NodeList result = xh.getNodeList("//xsd:simpleType");
-			for(int i = 0; i < result.getLength(); i++) {
-			    Element e = (Element)result.item(i);
-			    //System.out.println(e.getAttribute("name"));
-			}
+			System.out.println("### " + ((Element)xh.getNode("//xsd:complexType[@name = 'LoadPayableDataAreaType' and count(xsd:simpleContent) = 0] ")).getAttribute("name"));
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}

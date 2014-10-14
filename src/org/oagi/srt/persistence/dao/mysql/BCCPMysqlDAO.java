@@ -51,16 +51,20 @@ public class BCCPMysqlDAO extends SRTDAO {
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BCCPVO bccpVO = (BCCPVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BCCP_STATEMENT);
 			ps.setString(1, bccpVO.getBCCPGUID());
 			ps.setString(2, bccpVO.getPropertyTerm());
 			ps.setString(3, bccpVO.getRepresentationTerm());
 			ps.setInt(4, bccpVO.getBDTID());
 			ps.setString(5, bccpVO.getDEN());
-			ps.setString(6, bccpVO.getDefinition());
+			if(bccpVO.getDefinition() == null)
+				ps.setString(6, "");
+			else
+				ps.setString(6, bccpVO.getDefinition());
 			ps.setInt(7, bccpVO.getCreatedByUserId());
 			ps.setInt(8, bccpVO.getLastUpdatedByUserId());
 
@@ -80,6 +84,15 @@ public class BCCPMysqlDAO extends SRTDAO {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return true;
@@ -89,9 +102,10 @@ public class BCCPMysqlDAO extends SRTDAO {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		BCCPVO bccpVO = new BCCPVO();
+		BCCPVO bccpVO = null;
+		Connection conn = null;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_BCCP_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -116,6 +130,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				bccpVO = new BCCPVO();
 				bccpVO.setBCCPID(rs.getInt("BCCP_ID"));
 				bccpVO.setBCCPGUID(rs.getString("BCCP_GUID"));
 				bccpVO.setPropertyTerm(rs.getString("Property_Term"));
@@ -145,6 +160,10 @@ public class BCCPMysqlDAO extends SRTDAO {
 					rs.close();
 				} catch (SQLException e) {}
 			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return bccpVO;

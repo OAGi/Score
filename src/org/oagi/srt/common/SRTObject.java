@@ -10,9 +10,9 @@ import org.chanchan.common.system.BfObject;
  * @version 1.1
  */
 public class SRTObject extends BfObject {
-	protected String _createdBy = "";
+	protected int _createdBy;
 	protected Timestamp _createdOn;
-	protected String _modifiedBy = "";
+	protected int _modifiedBy;
 	protected Timestamp _modifiedOn;
 
 	private HashMap _extension;
@@ -25,11 +25,11 @@ public class SRTObject extends BfObject {
 		super(obid);
 	}
 
-	public String getCreatedBy() {
+	public int getCreatedBy() {
 		return _createdBy;
 	}
 
-	public void setCreatedBy(String creator) {
+	public void setCreatedBy(int creator) {
 		_createdBy = creator;
 	}
 
@@ -41,11 +41,11 @@ public class SRTObject extends BfObject {
 		_createdOn = time;
 	}
 
-	public String getModifiedBy() {
+	public int getModifiedBy() {
 		return _modifiedBy;
 	}
 
-	public void setModifiedBy(String modifier) {
+	public void setModifiedBy(int modifier) {
 		_modifiedBy = modifier;
 	}
 
