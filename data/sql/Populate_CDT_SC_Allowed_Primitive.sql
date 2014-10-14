@@ -53,6 +53,8 @@ INSERT INTO cdt_sc_allowed_primitive (CDT_SC_ID, CDT_Primitive_ID, isDefault) SE
 
 INSERT INTO cdt_sc_allowed_primitive (CDT_SC_ID, CDT_Primitive_ID, isDefault) SELECT (SELECT DT_SC_ID FROM dt_sc WHERE Property_Term = 'Time Zone'), (SELECT CDT_Primitive_ID FROM cdt_primitive WHERE Name = 'Token'), 1;
 
+INSERT INTO cdt_sc_allowed_primitive (CDT_SC_ID, CDT_Primitive_ID, isDefault) SELECT (SELECT DT_SC_ID FROM dt_sc WHERE Property_Term = 'Daylight Saving'), (SELECT CDT_Primitive_ID FROM cdt_primitive WHERE Name = 'Boolean'), 1;
+
 INSERT INTO cdt_sc_allowed_primitive (CDT_SC_ID, CDT_Primitive_ID, isDefault) SELECT (SELECT DT_SC_ID FROM dt_sc WHERE Property_Term = 'Scheme'), (SELECT CDT_Primitive_ID FROM cdt_primitive WHERE Name = 'NormalizedString'), 0;
 
 INSERT INTO cdt_sc_allowed_primitive (CDT_SC_ID, CDT_Primitive_ID, isDefault) SELECT (SELECT DT_SC_ID FROM dt_sc WHERE Property_Term = 'Scheme'), (SELECT CDT_Primitive_ID FROM cdt_primitive WHERE Name = 'String'), 0;
