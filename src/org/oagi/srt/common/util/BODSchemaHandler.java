@@ -138,17 +138,17 @@ public class BODSchemaHandler {
 			System.out.println(bs.getAnnotation(bs.getGlobalElementDeclaration()));
 			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getBaseType().getName() + " - " + bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getFId());
 
-			XSComplexTypeDecl x = bs.getComplexTypeDefinition("AcknowledgeFieldDataAreaType");
+			XSComplexTypeDecl x = bs.getComplexTypeDefinition("AcknowledgeFieldType");
 			ArrayList<BODElementVO> al = bs.processParticle(x.getParticle(), 1);
 			for(BODElementVO e : al) {
 				System.out.println("### " + e.getName());
-				System.out.println("### " + e.getMaxOccur());
-				System.out.println("### " + e.getMinOccur());
-				System.out.println("### " + e.getId());
+				//System.out.println("### " + e.getMaxOccur());
+				//System.out.println("### " + e.getMinOccur());
+				//System.out.println("### " + e.getId());
 			}
-
-			System.out.println(bs.isComplexWithoutSimpleContent("AcknowledgeFieldDataAreaType"));
-			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getSimpleType());
+//
+//			System.out.println(bs.isComplexWithoutSimpleContent("AcknowledgeFieldDataAreaType"));
+//			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getSimpleType());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
