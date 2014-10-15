@@ -183,15 +183,16 @@ public class PopulateCodeList {
 	    			    		Element tmp3 = (Element)enumeration.item(k);
 	    						codelistvalueVO.setOwnerCodeListID(codelistVO.getCodeListID());
 	    			    		codelistvalueVO.setValue(tmp3.getAttribute("value"));
-	    						String tmpvalue = Utility.spaceSeparator(codelistvalueVO.getValue());
-	    						boolean re = testDictionary(tmpvalue);
-	    						if(re == true) {
-		    						codelistvalueVO.setName(codelistvalueVO.getValue());
-	    						}
-	    						else {
-	    							codelistvalueVO.setName(null);
-	    						}
-	    						
+//	    						String tmpvalue = Utility.spaceSeparator(codelistvalueVO.getValue());
+//	    						boolean re = testDictionary(tmpvalue);
+//	    						if(re == true) {
+//		    						codelistvalueVO.setName(codelistvalueVO.getValue());
+//	    						}
+//	    						else {
+//	    							codelistvalueVO.setName(null);
+//	    						}
+	    			    		
+	    			    		codelistvalueVO.setName(codelistvalueVO.getValue());
 	    			    		codelistvalueVO.setUsedIndicator(true);
 	    			    		codelistvalueVO.setLockedIndicator(false);
 		    			    	Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
