@@ -150,7 +150,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 				}
 			}
 			
-			System.out.println("##### SQL: " + sql);
+			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
 			if (rs.next()) {

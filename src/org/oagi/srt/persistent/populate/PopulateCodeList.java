@@ -2,6 +2,7 @@ package org.oagi.srt.persistent.populate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Timestamp;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,6 +23,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import edu.mit.jwi.Dictionary;
+import edu.mit.jwi.IDictionary;
+import edu.mit.jwi.item.POS;
 
 /**
 *
@@ -103,8 +108,8 @@ public class PopulateCodeList {
 				    	break;
 		    		}
 		    		
-	    			codelistVO.setDefinition("NONE");
-			    	codelistVO.setDefinitionSource("NONE");				    	
+	    			codelistVO.setDefinition(null);
+			    	codelistVO.setDefinitionSource(null);				    	
 
 		    	}
 		    	
@@ -125,7 +130,7 @@ public class PopulateCodeList {
 		    	dao.insertObject(codelistVO);
 		    }
 		}
-		System.out.println("###END#####");
+		//System.out.println("###END#####");
 	}
 	
 	public int getUserID(String userName) throws SRTDAOException{
@@ -178,7 +183,15 @@ public class PopulateCodeList {
 	    			    		Element tmp3 = (Element)enumeration.item(k);
 	    						codelistvalueVO.setOwnerCodeListID(codelistVO.getCodeListID());
 	    			    		codelistvalueVO.setValue(tmp3.getAttribute("value"));
-	    			    		codelistvalueVO.setName(tmp3.getAttribute("value"));//It will be edited
+	    						String tmpvalue = Utility.spaceSeparator(codelistvalueVO.getValue());
+	    						boolean re = testDictionary(tmpvalue);
+	    						if(re == true) {
+		    						codelistvalueVO.setName(codelistvalueVO.getValue());
+	    						}
+	    						else {
+	    							codelistvalueVO.setName(null);
+	    						}
+	    						
 	    			    		codelistvalueVO.setUsedIndicator(true);
 	    			    		codelistvalueVO.setLockedIndicator(false);
 		    			    	Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
@@ -200,8 +213,34 @@ public class PopulateCodeList {
 		    	}
 	    	}
 		}
-		System.out.println(codelistvalueVO.getValue());
-		System.out.println("###END#####");
+		//System.out.println(codelistvalueVO.getValue());
+		//System.out.println("###END#####");
+	}
+	
+	public static boolean testDictionary (String test) throws IOException {
+		
+		String wnhome = "file:///C:/Program Files (x86)/WordNet/2.1/dict/";
+		URL url = new URL(wnhome);
+		IDictionary dict = new Dictionary(url) ;
+		dict.open () ;
+		if(test.indexOf(" ") > 0) {
+			String substring = test.substring(0,test.indexOf(" "));
+			test = substring;
+		}
+		//IIndexWord idxWord = dict.getIndexWord(test, POS.NOUN );
+		if(dict.getIndexWord(test, POS.NOUN)!= null || dict.getIndexWord(test, POS.ADJECTIVE)!= null || dict.getIndexWord(test, POS.ADVERB)!= null || dict.getIndexWord(test, POS.VERB)!= null)
+		{
+			//IWordID wordID = (IWordID) idxWord.getWordIDs().get(0);
+			//IWord word = dict.getWord(wordID);
+			//System.out.println("Id = " + wordID );
+			//System.out.println(" Lemma = " + word.getLemma());
+			//System.out.println(" Gloss = " + word.getSynset().getGloss());
+			return true;
+		}
+		else {
+			return false;
+		}
+
 	}
 
 	public static void main (String args[]) throws Exception {
