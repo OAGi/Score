@@ -203,8 +203,8 @@ public class PopulateCodeList {
 					    		}
 				    			
 				    			else {
-				    				codelistvalueVO.setDefinition("");
-				    				codelistvalueVO.setDefinitionSource("");
+				    				codelistvalueVO.setDefinition(null);
+				    				codelistvalueVO.setDefinitionSource(null);
 				    			}
 				    		dao.insertObject(codelistvalueVO);
 	    			    	}

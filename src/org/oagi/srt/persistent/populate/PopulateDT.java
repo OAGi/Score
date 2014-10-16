@@ -65,11 +65,11 @@ public class PopulateDT {
 			    dtVO.setDefinition(definition.getTextContent());
 		    }
 		    else {
-		    	dtVO.setDefinition("");
+		    	dtVO.setDefinition(null);
 		    }
 		    
-		    dtVO.setContentComponentDefinition("");
-		    dtVO.setRevisionDocumentation("");
+		    dtVO.setContentComponentDefinition(null);
+		    dtVO.setRevisionDocumentation(null);
 		    dtVO.setRevisionState(1);
 		    
 		    int id = getUserID("oagis");

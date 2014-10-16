@@ -67,7 +67,7 @@ public class PopulateSCInDTSCFromMetaXSD {
 			    	dt_scVO.setDefinition(definition.getTextContent());
 			    }
 			    else {
-			    	dt_scVO.setDefinition("");
+			    	dt_scVO.setDefinition(null);
 			    }
 			    dt_scVO.setMinCardinality((getMinCardinality(tmp.getAttribute("use"))));
 			    dt_scVO.setMaxCardinality((getMaxCardinality(tmp.getAttribute("use"))));
