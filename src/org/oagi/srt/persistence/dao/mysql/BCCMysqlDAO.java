@@ -99,7 +99,7 @@ public class BCCMysqlDAO extends SRTDAO{
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		BCCVO bccVO = new BCCVO();
+		BCCVO bccVO = null;
 		try {
 			Connection conn = tx.open();
 			String sql = _FIND_BCC_STATEMENT;
@@ -126,6 +126,7 @@ public class BCCMysqlDAO extends SRTDAO{
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				bccVO = new BCCVO();
 				bccVO.setBCCID(rs.getInt("BCC_ID"));
 				bccVO.setBCCGUID(rs.getString("BCC_GUID"));
 				bccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));

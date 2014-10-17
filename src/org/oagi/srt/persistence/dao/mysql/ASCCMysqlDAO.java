@@ -27,11 +27,11 @@ public class ASCCMysqlDAO extends SRTDAO {
 	
 	private final String _FIND_ALL_ASCC_STATEMENT = 
 			"SELECT ASCC_ID, ASCC_GUID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM" + _tableName;
+			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM " + _tableName;
 	
 	private final String _FIND_ASCC_STATEMENT = 
 			"SELECT ASCC_ID, ASCC_GUID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM" + _tableName;
+			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM " + _tableName;
 	
 	private final String _INSERT_ASCC_STATEMENT = 
 			"INSERT INTO " + _tableName + " (ASCC_GUID, Cardinality_Min, Cardinality_Max, "
@@ -103,7 +103,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ASCCVO asccVO = new ASCCVO();
+		ASCCVO asccVO = null;
 		
 		try {
 			Connection conn = tx.open();
@@ -117,6 +117,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			System.out.println("### sql: " + sql);
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
@@ -131,13 +132,14 @@ public class ASCCMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				asccVO = new ASCCVO();
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
 				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
 				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
 			}

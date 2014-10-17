@@ -6,6 +6,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
+import org.oagi.srt.common.util.BODSchemaHandler;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
@@ -159,53 +160,57 @@ public class PopulateQBDTInDT {
 			String guid = ((Element)elementsFromXSD.item(i)).getAttribute("id");
 			String type = ((Element)elementsFromXSD.item(i)).getAttribute("type");
 			
-			Node documentationFromXSD = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation");
+			Node simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
+			if(simpleContent != null) {
 			
-			System.out.println("### bccp: " + bccp);
-			
-			String definition = "";
-			if(documentationFromXSD != null) {
-				definition = ((Element)documentationFromXSD).getTextContent();
-			}
-			
-			QueryCondition qc = new QueryCondition();
-			qc.add("den", den);
-			qc.add("dt_type", 1);
-			
-			DTVO dtVO = (DTVO)dtDao.findObject(qc);
-			if(dtVO == null) {
-				System.out.println("### NULL " + bccp + " - " + den);
+				Node documentationFromXSD = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation");
 				
-				// TODO check these exceptions
-				if(bccp.equals("FinalAgentInstructionCode") || bccp.equals("FirstAgentPaymentMethodCode") || bccp.equals("EndTime") || bccp.equals("StartTime") || bccp.equals("CompositeID"))
-					continue;
+				System.out.println("### bccp: " + bccp);
 				
-				Node typeNode = xHandler.getNode("//xsd:complexType[@name = '" + type + "']");
-				if(typeNode == null) {
-					typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+				String definition = "";
+				if(documentationFromXSD != null) {
+					definition = ((Element)documentationFromXSD).getTextContent();
 				}
 				
-				DTVO dVO = addToDT(((Element)typeNode).getAttribute("id"), type);
-				if(dVO == null) 
-					continue;
+				QueryCondition qc = new QueryCondition();
+				qc.add("den", den);
+				qc.add("dt_type", 1);
 				
-				addToDTSC(xHandler, type, dVO);
-				
-				// add to BDTPrimitiveRestriction
-				insertBDTPrimitiveRestriction(dVO, type);
-				
-				// add to BCCP
-				addToBCCP(guid, bccp, dVO, definition);
-			} else {
-				// add to BCCP
-				addToBCCP(guid, bccp, dtVO, definition);
+				DTVO dtVO = (DTVO)dtDao.findObject(qc);
+				if(dtVO == null) {
+					System.out.println("### NULL " + bccp + " - " + den);
+					
+					// TODO check these exceptions
+					if(bccp.equals("FinalAgentInstructionCode") || bccp.equals("FirstAgentPaymentMethodCode") || bccp.equals("EndTime") || bccp.equals("StartTime") || bccp.equals("CompositeID"))
+						continue;
+					
+					Node typeNode = xHandler.getNode("//xsd:complexType[@name = '" + type + "']");
+					if(typeNode == null) {
+						typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+					}
+					
+					DTVO dVO = addToDT(((Element)typeNode).getAttribute("id"), type);
+					if(dVO == null) 
+						continue;
+					
+					addToDTSC(xHandler, type, dVO);
+					
+					// add to BDTPrimitiveRestriction
+					insertBDTPrimitiveRestriction(dVO, type);
+					
+					// add to BCCP
+					addToBCCP(guid, bccp, dVO, definition);
+				} else {
+					// add to BCCP
+					addToBCCP(guid, bccp, dtVO, definition);
+				}
+				try {
+					Thread.sleep(400);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println("### i " + i);
 			}
-			try {
-				Thread.sleep(400);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			System.out.println("### i " + i);
 		}
 	}
 	

@@ -64,11 +64,13 @@ public class PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			insertASCCP(file);
+			//if(file.getName().equals("AcknowledgeField.xsd"))
+				insertASCCP(file);
 		}
 
 		for (File file : listOfF2) {
-			insertASCCP(file);
+			//if(file.getName().equals("AcknowledgeField.xsd"))
+				insertASCCP(file);
 		}
 	} 
 	
@@ -134,69 +136,86 @@ public class PopulateAccAsccpBccAscc {
 
 	private void insertASCC(BODElementVO bodVO, XSComplexTypeDecl complexType, ASCCPVO asccpVO) throws Exception {
 
-		String asccGuid = bodVO.getId();
-		int cardinalityMin = bodVO.getMinOccur();
-		int cardinalityMax = bodVO.getMaxOccur();
-		int sequenceKey = bodVO.getOrder();
-
 		String parentGuid = complexType.getFId();
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", parentGuid);
 		ACCVO accVO = (ACCVO)accDao.findObject(qc);
 		accVO = (ACCVO)accDao.findObject(qc);
 		int assocFromACCId = accVO.getACCID();
-		int assocToASCCPId =  asccpVO.getASCCPID();
-		String den = Utility.first(accVO.getDEN()) + ". " + asccpVO.getDEN();
-
-		String definition = bodSchemaHandler.getAnnotation(bodVO.getElement());
-
-		ASCCVO asscVO = new ASCCVO();
-		asscVO.setASCCGUID(asccGuid);
-		asscVO.setCardinalityMin(cardinalityMin);
-		asscVO.setCardinalityMax(cardinalityMax);
-		asscVO.setSequencingKey(sequenceKey);
-		asscVO.setAssocFromACCID(assocFromACCId);
-		asscVO.setAssocToASCCPID(assocToASCCPId);
-		asscVO.setDEN(den);
-		asscVO.setDefinition(definition);
-
-		asccDao.insertObject(asscVO);
+		
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("ascc_guid", bodVO.getId());
+		qc1.add("assco_to_asccp_id", asccpVO.getASCCPID());
+		qc1.add("assoc_from_acc_id", assocFromACCId);
+		if(asccDao.findObject(qc1) == null) {
+		
+			String asccGuid = bodVO.getId();
+			int cardinalityMin = bodVO.getMinOccur();
+			int cardinalityMax = bodVO.getMaxOccur();
+			int sequenceKey = bodVO.getOrder();
+	
+			int assocToASCCPId =  asccpVO.getASCCPID();
+			String den = Utility.first(accVO.getDEN()) + ". " + asccpVO.getDEN();
+	
+			String definition = bodSchemaHandler.getAnnotation(bodVO.getElement());
+	
+			ASCCVO asscVO = new ASCCVO();
+			asscVO.setASCCGUID(asccGuid);
+			asscVO.setCardinalityMin(cardinalityMin);
+			asscVO.setCardinalityMax(cardinalityMax);
+			asscVO.setSequencingKey(sequenceKey);
+			asscVO.setAssocFromACCID(assocFromACCId);
+			asscVO.setAssocToASCCPID(assocToASCCPId);
+			asscVO.setDEN(den);
+			asscVO.setDefinition(definition);
+	
+			asccDao.insertObject(asscVO);
+		}
 	}
 
 	private void insertBCC(BODElementVO bodVO, XSComplexTypeDecl complexType, BCCPVO bccpVO) throws Exception {
+		
 		String bccGuid = bodVO.getId();
-		int cardinalityMin = bodVO.getMinOccur();
-		int cardinalityMax = bodVO.getMaxOccur();
-		int sequenceKey = bodVO.getOrder();
-
 		int assocToBCCPID = bccpVO.getBCCPID();
-
+		
 		String parentGuid = complexType.getFId();
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", parentGuid);
 		ACCVO accVO = (ACCVO)accDao.findObject(qc);
 		accVO = (ACCVO)accDao.findObject(qc);
 		int assocFromACCId = accVO.getACCID();
-
-		int entityType = 1; 
-		String den = Utility.first(accVO.getDEN()) + ". " + bccpVO.getDEN();
-
-		BCCVO aBCCVO = new BCCVO();
-		aBCCVO.setBCCGUID(bccGuid);
-		aBCCVO.setCardinalityMin(cardinalityMin);
-		aBCCVO.setCardinalityMax(cardinalityMax);
-		aBCCVO.setAssocToBCCPID(assocToBCCPID);
-		aBCCVO.setAssocFromACCID(assocFromACCId);
-		aBCCVO.setSequencingkey(sequenceKey);
-		aBCCVO.setEntityType(entityType);
-		aBCCVO.setDEN(den);
-
-		bccDao.insertObject(aBCCVO);
+		
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("bcc_guid", bccGuid);
+		qc1.add("assoc_to_bccp_id", assocToBCCPID);
+		qc1.add("assoc_from_acc_id", assocFromACCId);
+		if(bccDao.findObject(qc1) == null) {
+		
+			int cardinalityMin = bodVO.getMinOccur();
+			int cardinalityMax = bodVO.getMaxOccur();
+			int sequenceKey = bodVO.getOrder();
+	
+			int entityType = 1; 
+			String den = Utility.first(accVO.getDEN()) + ". " + bccpVO.getDEN();
+	
+			BCCVO aBCCVO = new BCCVO();
+			aBCCVO.setBCCGUID(bccGuid);
+			aBCCVO.setCardinalityMin(cardinalityMin);
+			aBCCVO.setCardinalityMax(cardinalityMax);
+			aBCCVO.setAssocToBCCPID(assocToBCCPID);
+			aBCCVO.setAssocFromACCID(assocFromACCId);
+			aBCCVO.setSequencingkey(sequenceKey);
+			aBCCVO.setEntityType(entityType);
+			aBCCVO.setDEN(den);
+	
+			bccDao.insertObject(aBCCVO);
+		}
 
 	}
 
 	private void insertBCCWithAttr(XSAttributeDecl xad, XSComplexTypeDecl complexType) throws Exception {
 		String bccGuid = xad.getFId();
+		
 		int cardinalityMin = (xad.getFUse() == null) ? 0 : (xad.getFUse().equals("optional") || xad.getFUse().equals("prohibited")) ? 0 : (xad.getFUse().equals("required")) ? 1 : 0;
 		int cardinalityMax = (xad.getFUse() == null) ? 1 : (xad.getFUse().equals("optional") || xad.getFUse().equals("required")) ? 1 : (xad.getFUse().equals("prohibited")) ? 0 : 0;
 		int sequenceKey = 0;
@@ -205,33 +224,39 @@ public class PopulateAccAsccpBccAscc {
 		
 		int assocToBCCPID;
 		QueryCondition qc = new QueryCondition();
-		qc.add("bccp_guid", (bccGuid == null) ? "1" : bccGuid); // TODO responseCode does not have id
+		qc.add("property_term", Utility.spaceSeparator(xad.getName()));
 		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc);
 		if(bccpVO == null) {
-			bccpVO = insertBCCP(xtd.getName(), xtd.getFId());
+			bccpVO = insertBCCP(xad.getName(), xtd.getFId());
 		}
 		assocToBCCPID =  bccpVO.getBCCPID();
+		
+		QueryCondition qc2 = new QueryCondition();
+		qc2.add("bcc_guid", bccGuid);
+		qc2.add("assoc_to_bccp_id", assocToBCCPID);
+		if(!xad.getName().equals("responseCode") && bccDao.findObject(qc2) == null) {
 
-		String parentGuid = complexType.getFId();
-		QueryCondition qc1 = new QueryCondition();
-		qc1.add("acc_guid", parentGuid);
-		ACCVO accVO = (ACCVO)accDao.findObject(qc1);
-		int assocFromACCId = accVO.getACCID();
-
-		int entityType = 0; 
-		String den = Utility.first(accVO.getDEN()) + ". " + bccpVO.getDEN();
-
-		BCCVO aBCCVO = new BCCVO();
-		aBCCVO.setBCCGUID(bccGuid);
-		aBCCVO.setCardinalityMin(cardinalityMin);
-		aBCCVO.setCardinalityMax(cardinalityMax);
-		aBCCVO.setAssocToBCCPID(assocToBCCPID);
-		aBCCVO.setAssocFromACCID(assocFromACCId);
-		aBCCVO.setSequencingkey(sequenceKey);
-		aBCCVO.setEntityType(entityType);
-		aBCCVO.setDEN(den);
-
-		bccDao.insertObject(aBCCVO);
+			String parentGuid = complexType.getFId();
+			QueryCondition qc1 = new QueryCondition();
+			qc1.add("acc_guid", parentGuid);
+			ACCVO accVO = (ACCVO)accDao.findObject(qc1);
+			int assocFromACCId = accVO.getACCID();
+	
+			int entityType = 0; 
+			String den = Utility.first(accVO.getDEN()) + ". " + bccpVO.getDEN();
+	
+			BCCVO aBCCVO = new BCCVO();
+			aBCCVO.setBCCGUID(bccGuid);
+			aBCCVO.setCardinalityMin(cardinalityMin);
+			aBCCVO.setCardinalityMax(cardinalityMax);
+			aBCCVO.setAssocToBCCPID(assocToBCCPID);
+			aBCCVO.setAssocFromACCID(assocFromACCId);
+			aBCCVO.setSequencingkey(sequenceKey);
+			aBCCVO.setEntityType(entityType);
+			aBCCVO.setDEN(den);
+	
+			bccDao.insertObject(aBCCVO);
+		}
 	}
 
 	private BCCPVO insertBCCP(String name, String id) throws Exception {
@@ -274,7 +299,9 @@ public class PopulateAccAsccpBccAscc {
 
 
 
-	private void insertACC(XSComplexTypeDecl complexType, String fullFilePath) throws Exception {
+	private ArrayList<String> insertACC(XSComplexTypeDecl complexType, String fullFilePath) throws Exception {
+		
+		ArrayList<String> elements = new ArrayList<String>();
 		System.out.println("### acc type: " + complexType.getName());
 
 		String accGuid = complexType.getFId();
@@ -292,9 +319,16 @@ public class PopulateAccAsccpBccAscc {
 			qc.add("acc_guid", baseType.getFId());
 			ACCVO accVO = (ACCVO)accDao.findObject(qc);
 			if(accVO == null) {
-				insertACC(baseType, fullFilePath);
+				elements = insertACC(baseType, fullFilePath);
 			} else {
 				basedAccId = accVO.getACCID();
+				XSParticle particle = bodSchemaHandler.getComplexTypeDefinition(base).getParticle();
+				if(particle != null) {
+					ArrayList<BODElementVO> al = bodSchemaHandler.processParticle(particle, 1);
+					for(BODElementVO bodVO : al) {
+						elements.add(bodVO.getName());
+					}
+				}
 			}
 		}
 
@@ -326,45 +360,49 @@ public class PopulateAccAsccpBccAscc {
 		XSParticle particle = complexType.getParticle();
 		if(particle != null) {
 			ArrayList<BODElementVO> al = bodSchemaHandler.processParticle(particle, 1);
-
+			
 			for(BODElementVO bodVO : al) {
-				if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
-					QueryCondition qc2 = new QueryCondition();
-					qc2.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
-					ACCVO accVO = (ACCVO)accDao.findObject(qc2);
-					if(accVO == null) {
-						insertACC(bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()), fullFilePath);
-					} 
-				}
-				
-				QueryCondition qc = new QueryCondition();
-				qc.add("asccp_guid", bodVO.getId());
-				ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc);
-
-				QueryCondition qc1 = new QueryCondition();
-				qc1.add("bccp_guid", bodVO.getId());
-				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1);
-				
-				if(asccpVO != null) {
-					System.out.println("####################### match to ascc - " + bodVO.getName()); // TODO how to differentiate between particles in type and from extension?
-					insertASCC(bodVO, complexType, asccpVO);
-				} else if(bccpVO != null) {
-					System.out.println("####################### match to bccp - " + bodVO.getName());
-					insertBCC(bodVO, complexType, bccpVO);
-				} else {
-					System.out.println("####################### no match case - " + bodVO.getName());
+				if(!elements.contains(bodVO.getName())) {
+					elements.add(bodVO.getName());
+					
 					if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
-						insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
-						QueryCondition qc3 = new QueryCondition();
-						qc3.add("asccp_guid", bodVO.getId());
-						ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3);
-						insertASCC(bodVO, complexType, asccpVO1);
+						QueryCondition qc2 = new QueryCondition();
+						qc2.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
+						ACCVO accVO = (ACCVO)accDao.findObject(qc2);
+						if(accVO == null) {
+							insertACC(bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()), fullFilePath);
+						} 
 					}
-				}
-				try {
-					Thread.sleep(150);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+					
+					QueryCondition qc = new QueryCondition();
+					qc.add("asccp_guid", bodVO.getId());
+					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc);
+	
+					QueryCondition qc1 = new QueryCondition();
+					qc1.add("bccp_guid", bodVO.getId());
+					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1);
+					
+					if(asccpVO != null) {
+						System.out.println("####################### match to ascc - " + bodVO.getName()); // TODO how to differentiate between particles in type and from extension?
+						insertASCC(bodVO, complexType, asccpVO);
+					} else if(bccpVO != null) {
+						System.out.println("####################### match to bccp - " + bodVO.getName());
+						insertBCC(bodVO, complexType, bccpVO);
+					} else {
+						System.out.println("####################### no match case - " + bodVO.getName());
+						if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
+							insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
+							QueryCondition qc3 = new QueryCondition();
+							qc3.add("asccp_guid", bodVO.getId());
+							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3);
+							insertASCC(bodVO, complexType, asccpVO1);
+						}
+					}
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -378,6 +416,8 @@ public class PopulateAccAsccpBccAscc {
 				insertBCCWithAttr(xad, complexType);
 			}
 		}
+		
+		return elements;
 	}
 
 	private File[] getBODs(File f) {
