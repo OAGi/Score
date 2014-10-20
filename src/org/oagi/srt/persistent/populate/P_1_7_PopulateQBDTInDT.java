@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 *
 */
 
-public class PopulateQBDTInDT {
+public class P_1_7_PopulateQBDTInDT {
 	
 	private XPathHandler fields_xsd;
 	private XPathHandler meta_xsd;
@@ -52,7 +52,7 @@ public class PopulateQBDTInDT {
 		return (DTVO)dtDao.findObject(qc);
 	}
 	
-	public PopulateQBDTInDT() throws Exception {
+	public P_1_7_PopulateQBDTInDT() throws Exception {
 		df = DAOFactory.getDAOFactory();
 		dtDao = df.getDAO("DT");
 		bccpDao = df.getDAO("BCCP");
@@ -465,7 +465,7 @@ public class PopulateQBDTInDT {
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
 		
-		PopulateQBDTInDT q = new PopulateQBDTInDT();
+		P_1_7_PopulateQBDTInDT q = new P_1_7_PopulateQBDTInDT();
 		//System.out.println(q.spaceSeparator("TotalAmountType"));
 		q.populate();
 		

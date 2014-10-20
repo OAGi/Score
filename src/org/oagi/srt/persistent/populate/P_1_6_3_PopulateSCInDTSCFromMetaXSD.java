@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 * @version 1.0
 *
 */
-public class PopulateSCInDTSCFromMetaXSD {
+public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 	public void scindt_sc(String fileinput) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = SRTConstants.filepath("DT_SC")+ fileinput;
 		XPathHandler xh = new XPathHandler(path1);
@@ -136,7 +136,7 @@ public class PopulateSCInDTSCFromMetaXSD {
 	
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
-		PopulateSCInDTSCFromMetaXSD scindt_sc = new PopulateSCInDTSCFromMetaXSD();
+		P_1_6_3_PopulateSCInDTSCFromMetaXSD scindt_sc = new P_1_6_3_PopulateSCInDTSCFromMetaXSD();
 		String filename = "Meta" + ".xsd";
 		scindt_sc.scindt_sc(filename);
 

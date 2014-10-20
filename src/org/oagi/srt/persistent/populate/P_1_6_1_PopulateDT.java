@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 *
 */
 
-public class PopulateDT {
+public class P_1_6_1_PopulateDT {
 	public void dt(String fileinput) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = SRTConstants.filepath("DT")+ fileinput;
 		XPathHandler xh = new XPathHandler(path1);
@@ -124,7 +124,7 @@ public class PopulateDT {
 	
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
-		PopulateDT dt = new PopulateDT();
+		P_1_6_1_PopulateDT dt = new P_1_6_1_PopulateDT();
 		String filename = "Meta" + ".xsd";
 		dt.dt(filename);
 

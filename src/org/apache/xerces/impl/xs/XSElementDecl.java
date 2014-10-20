@@ -52,6 +52,8 @@ public class XSElementDecl implements XSElementDeclaration {
 
     public String fId = null;
     
+    public String fRef = null;
+    
     // name of the element
     public String fName = null;
     // target namespace of the element
@@ -211,6 +213,10 @@ public class XSElementDecl implements XSElementDeclaration {
     
     public String getFId() {
         return fId;
+    }
+    
+    public String getFRef() {
+        return fRef;
     }
 
     /**

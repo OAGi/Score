@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
 *
 */
 
-public class PopulateAgencyIDList {
+public class P_1_3_PopulateAgencyIDList {
 	public void agencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
 		XPathHandler xh = new XPathHandler(path1);
@@ -93,7 +93,7 @@ public class PopulateAgencyIDList {
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
 
-		PopulateAgencyIDList agencyidlist = new PopulateAgencyIDList();
+		P_1_3_PopulateAgencyIDList agencyidlist = new P_1_3_PopulateAgencyIDList();
 		agencyidlist.agencyIDList();
 		agencyidlist.agencyIDListValue();
 	}

@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 * @version 1.0
 *
 */
-public class PopulateBDTPrimitiveRestrictionFromMetaXSD {
+public class P_1_6_2_PopulateBDTPrimitiveRestrictionFromMetaXSD {
 	public void bdt_primitive_restriction(String fileinput) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -100,7 +100,7 @@ public class PopulateBDTPrimitiveRestrictionFromMetaXSD {
 
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
-		PopulateBDTPrimitiveRestrictionFromMetaXSD bdt_primitive_restriction = new PopulateBDTPrimitiveRestrictionFromMetaXSD();
+		P_1_6_2_PopulateBDTPrimitiveRestrictionFromMetaXSD bdt_primitive_restriction = new P_1_6_2_PopulateBDTPrimitiveRestrictionFromMetaXSD();
 		String filename = "Meta" + ".xsd";
 		bdt_primitive_restriction.bdt_primitive_restriction(filename);
 	}

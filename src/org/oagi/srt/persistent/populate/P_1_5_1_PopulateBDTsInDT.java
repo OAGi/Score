@@ -43,12 +43,12 @@ import java.util.UUID;
 *
 */
 
-public class PopulateBDTsInDT {
+public class P_1_5_1_PopulateBDTsInDT {
 	
 	private XPathHandler fields_xsd;
 	private XPathHandler businessDataType_xsd;
 	
-	public PopulateBDTsInDT() throws Exception {
+	public P_1_5_1_PopulateBDTsInDT() throws Exception {
 		fields_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Fields_modified.xsd");
 		businessDataType_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/DataTypes/BusinessDataType_1_modified.xsd");
 	}
@@ -64,9 +64,11 @@ public class PopulateBDTsInDT {
 		
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("DT_GUID", id);
+		System.out.println("### id: " + id);
+		System.out.println("### basedDTID: " + basedDTID);
+		System.out.println("### dataTypeTerm: " + dataTypeTerm);
 		
-		String guid = ((DTVO)dao.findObject(qc1)).getDTGUID();
-		if(guid == null) {
+		if(dao.findObject(qc1) == null) {
 	
 			DTVO dtVO = new DTVO();
 			
@@ -99,8 +101,7 @@ public class PopulateBDTsInDT {
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("DT_GUID", id);
 		
-		String guid = ((DTVO)dao.findObject(qc1)).getDTGUID();
-		if(guid == null) {
+		if(dao.findObject(qc1) == null) {
 				
 			DTVO dtVO = new DTVO();
 			
@@ -156,7 +157,7 @@ public class PopulateBDTsInDT {
 		dataTypeTerm = dataTypeTermElement.getTextContent();
 		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
 			dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
-		dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
+		//dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
 						
 		//Definitions
 		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:Definition");
@@ -186,7 +187,7 @@ public class PopulateBDTsInDT {
 	
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
-		PopulateBDTsInDT p = new PopulateBDTsInDT();
+		P_1_5_1_PopulateBDTsInDT p = new P_1_5_1_PopulateBDTsInDT();
 		for (int i = 0; i < Types.dataTypeList.length; i++){
 			p.importDataTypeList(Types.dataTypeList[i]);
 		}

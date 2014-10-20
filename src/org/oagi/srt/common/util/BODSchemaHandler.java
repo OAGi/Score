@@ -89,6 +89,7 @@ public class BODSchemaHandler {
 			bodVO.setTypeName(e.getTypeDefinition().getName());
 			bodVO.setId(e.getFId());
 			bodVO.setElement(e);
+			bodVO.setRef(e.getFRef());
 			al.add(bodVO);
 			return al;
 

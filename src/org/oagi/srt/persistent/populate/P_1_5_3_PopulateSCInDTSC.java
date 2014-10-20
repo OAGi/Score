@@ -43,12 +43,12 @@ import java.util.UUID;
 *
 */
 
-public class PopulateSCInDTSC {
+public class P_1_5_3_PopulateSCInDTSC {
 	
 	private XPathHandler fields_xsd;
 	private XPathHandler businessDataType_xsd;
 	
-	public PopulateSCInDTSC() throws Exception {
+	public P_1_5_3_PopulateSCInDTSC() throws Exception {
 		fields_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Fields_modified.xsd");
 		businessDataType_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/DataTypes/BusinessDataType_1_modified.xsd");
 	}
@@ -89,7 +89,7 @@ public class PopulateSCInDTSC {
 		dataTypeTerm = dataTypeTermElement.getTextContent();
 		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
 			dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
-		dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
+		//dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
 						
 		//Definitions
 		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:Definition");
@@ -199,7 +199,7 @@ public class PopulateSCInDTSC {
 	
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
-		PopulateSCInDTSC p = new PopulateSCInDTSC();
+		P_1_5_3_PopulateSCInDTSC p = new P_1_5_3_PopulateSCInDTSC();
 		for (int i = 0; i < Types.dataTypeList.length; i++){
 			p.importDataTypeList(Types.dataTypeList[i]);
 		}

@@ -16,7 +16,7 @@ import org.oagi.srt.persistence.dto.DTVO;
  * @version 1.0
  * @author Yunsu Lee
  */
-public class PopulateBDTPrimitiveRestriction {
+public class P_1_5_2_PopulateBDTPrimitiveRestriction {
 	
 	//TODO MUST fix the value in 'isDefault' field
 

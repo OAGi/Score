@@ -33,7 +33,7 @@ import org.oagi.srt.persistence.dto.DTVO;
  *
  */
 
-public class PopulateAccAsccpBccAscc {
+public class P_1_8_PopulateAccAsccpBccAscc {
 
 	private DAOFactory df;
 	private SRTDAO accDao;
@@ -48,7 +48,7 @@ public class PopulateAccAsccpBccAscc {
 	private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
 	private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);	
 	
-	public PopulateAccAsccpBccAscc() throws SRTDAOException {
+	public P_1_8_PopulateAccAsccpBccAscc() throws SRTDAOException {
 		df = DAOFactory.getDAOFactory();
 		accDao = df.getDAO("ACC");
 		asccDao = df.getDAO("ASCC");
@@ -149,7 +149,7 @@ public class PopulateAccAsccpBccAscc {
 		qc1.add("assoc_from_acc_id", assocFromACCId);
 		if(asccDao.findObject(qc1) == null) {
 		
-			String asccGuid = bodVO.getId();
+			String asccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
 			int cardinalityMin = bodVO.getMinOccur();
 			int cardinalityMax = bodVO.getMaxOccur();
 			int sequenceKey = bodVO.getOrder();
@@ -432,7 +432,7 @@ public class PopulateAccAsccpBccAscc {
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
 
-		PopulateAccAsccpBccAscc q = new PopulateAccAsccpBccAscc();
+		P_1_8_PopulateAccAsccpBccAscc q = new P_1_8_PopulateAccAsccpBccAscc();
 		q.populate();
 	}
 }

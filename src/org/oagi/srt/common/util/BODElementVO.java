@@ -2,10 +2,15 @@ package org.oagi.srt.common.util;
 
 import org.apache.xerces.impl.xs.XSElementDecl;
 
+/**
+ * @author yslee
+ *
+ */
 public class BODElementVO {
 
 	private String name;
 	private String id;
+	private String ref;
 	private int maxOccur;
 	private int minOccur;
 	private int order;
@@ -66,5 +71,13 @@ public class BODElementVO {
 	
 	public void setMinOccur(int minOccur) {
 		this.minOccur = minOccur;
+	}
+
+	public String getRef() {
+		return ref;
+	}
+
+	public void setRef(String ref) {
+		this.ref = ref;
 	}
 }

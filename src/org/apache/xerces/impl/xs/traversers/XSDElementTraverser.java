@@ -270,6 +270,7 @@ class XSDElementTraverser extends XSDAbstractTraverser {
         QName   subGroupAtt  = (QName)   attrValues[XSAttributeChecker.ATTIDX_SUBSGROUP];
         QName   typeAtt      = (QName)   attrValues[XSAttributeChecker.ATTIDX_TYPE];
         String   idAtt      = (String)   attrValues[XSAttributeChecker.ATTIDX_ID];
+        String   refAtt      = (String)   attrValues[XSAttributeChecker.ATTIDX_REF];
         
         // Step 1: get declaration information
         
@@ -285,6 +286,9 @@ class XSDElementTraverser extends XSDAbstractTraverser {
         
         if (idAtt != null)
             element.fId = fSymbolTable.addSymbol(idAtt);
+        
+        if (refAtt != null)
+            element.fRef = fSymbolTable.addSymbol(refAtt);
         
         // get 'target namespace'
         if (isGlobal) {

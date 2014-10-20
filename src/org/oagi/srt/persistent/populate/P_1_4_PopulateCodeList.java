@@ -24,9 +24,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import edu.mit.jwi.Dictionary;
-import edu.mit.jwi.IDictionary;
-import edu.mit.jwi.item.POS;
+//import edu.mit.jwi.Dictionary;
+//import edu.mit.jwi.IDictionary;
+//import edu.mit.jwi.item.POS;
 
 /**
 *
@@ -35,7 +35,7 @@ import edu.mit.jwi.item.POS;
 *
 */
 
-public class PopulateCodeList {
+public class P_1_4_PopulateCodeList {
 
 	public void codeList(String fileinput, int agencyid) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = SRTConstants.filepath("CodeList")+ fileinput;
@@ -218,35 +218,35 @@ public class PopulateCodeList {
 		//System.out.println("###END#####");
 	}
 	
-	public static boolean testDictionary (String test) throws IOException {
-		
-		String wnhome = "file:///C:/Program Files (x86)/WordNet/2.1/dict/";
-		URL url = new URL(wnhome);
-		IDictionary dict = new Dictionary(url) ;
-		dict.open () ;
-		if(test.indexOf(" ") > 0) {
-			String substring = test.substring(0,test.indexOf(" "));
-			test = substring;
-		}
-		//IIndexWord idxWord = dict.getIndexWord(test, POS.NOUN );
-		if(dict.getIndexWord(test, POS.NOUN)!= null || dict.getIndexWord(test, POS.ADJECTIVE)!= null || dict.getIndexWord(test, POS.ADVERB)!= null || dict.getIndexWord(test, POS.VERB)!= null)
-		{
-			//IWordID wordID = (IWordID) idxWord.getWordIDs().get(0);
-			//IWord word = dict.getWord(wordID);
-			//System.out.println("Id = " + wordID );
-			//System.out.println(" Lemma = " + word.getLemma());
-			//System.out.println(" Gloss = " + word.getSynset().getGloss());
-			return true;
-		}
-		else {
-			return false;
-		}
-
-	}
+//	public static boolean testDictionary (String test) throws IOException {
+//
+//		String wnhome = "file:///C:/Program Files (x86)/WordNet/2.1/dict/";
+//		URL url = new URL(wnhome);
+//		IDictionary dict = new Dictionary(url) ;
+//		dict.open () ;
+//		if(test.indexOf(" ") > 0) {
+//			String substring = test.substring(0,test.indexOf(" "));
+//			test = substring;
+//		}
+//		//IIndexWord idxWord = dict.getIndexWord(test, POS.NOUN );
+//		if(dict.getIndexWord(test, POS.NOUN)!= null || dict.getIndexWord(test, POS.ADJECTIVE)!= null || dict.getIndexWord(test, POS.ADVERB)!= null || dict.getIndexWord(test, POS.VERB)!= null)
+//		{
+//			//IWordID wordID = (IWordID) idxWord.getWordIDs().get(0);
+//			//IWord word = dict.getWord(wordID);
+//			//System.out.println("Id = " + wordID );
+//			//System.out.println(" Lemma = " + word.getLemma());
+//			//System.out.println(" Gloss = " + word.getSynset().getGloss());
+//			return true;
+//		}
+//		else {
+//			return false;
+//		}
+//
+//	}
 
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
-		PopulateCodeList codelist = new PopulateCodeList();
+		P_1_4_PopulateCodeList codelist = new P_1_4_PopulateCodeList();
 		String tt[][] = {{"CodeLists_1","314"}, {"CodeList_ConditionTypeCode_1","314"}, {"CodeList_ConstraintTypeCode_1","314"}, 
 				{"CodeList_DateFormatCode_1","314"}, {"CodeList_DateTimeFormatCode_1","314"}, {"CodeList_TimeFormatCode_1","314"},
 				{"CodeList_CharacterSetCode_IANA_20070514", "379"}, {"CodeList_MIMEMediaTypeCode_IANA_7_04","379"}, 
