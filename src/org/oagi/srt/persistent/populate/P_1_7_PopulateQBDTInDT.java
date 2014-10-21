@@ -161,7 +161,8 @@ public class P_1_7_PopulateQBDTInDT {
 			String type = ((Element)elementsFromXSD.item(i)).getAttribute("type");
 			
 			Node simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
-			if(simpleContent != null) {
+			Node simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+			if(simpleContent != null || simpleType != null) {
 			
 				Node documentationFromXSD = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation");
 				
@@ -205,7 +206,7 @@ public class P_1_7_PopulateQBDTInDT {
 					addToBCCP(guid, bccp, dtVO, definition);
 				}
 				try {
-					Thread.sleep(400);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

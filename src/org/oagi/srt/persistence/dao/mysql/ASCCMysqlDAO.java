@@ -117,7 +117,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			System.out.println("### sql: " + sql);
+			//System.out.println("### sql: " + sql);
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {

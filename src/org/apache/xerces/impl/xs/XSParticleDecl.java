@@ -52,6 +52,9 @@ public class XSParticleDecl implements XSParticle {
     // for PARTICLE_WILDCARD: the wildcard decl
     // for PARTICLE_MODELGROUP: the model group
     public XSTerm fValue = null;
+    
+    public String fRef = null;
+    public String fId = null;
 
     // minimum occurrence of this particle
     public int fMinOccurs = 1;
@@ -70,6 +73,14 @@ public class XSParticleDecl implements XSParticle {
         particle.fValue = fValue;
         particle.fAnnotations = fAnnotations;
         return particle;
+    }
+    
+    public String getFRef() {
+    	return fRef;
+    }
+    
+    public String getFId() {
+    	return fId;
     }
     
     /**

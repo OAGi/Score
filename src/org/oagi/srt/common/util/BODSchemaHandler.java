@@ -75,7 +75,6 @@ public class BODSchemaHandler {
 	public ArrayList<BODElementVO> processParticle(XSParticle theXSParticle, int order) {
 		ArrayList<BODElementVO> al = new ArrayList<BODElementVO>();
 		XSTerm xsTerm = theXSParticle.getTerm();
-		
 		switch (xsTerm.getType()) {
 		
 		case XSConstants.ELEMENT_DECLARATION:
@@ -89,8 +88,10 @@ public class BODSchemaHandler {
 			bodVO.setTypeName(e.getTypeDefinition().getName());
 			bodVO.setId(e.getFId());
 			bodVO.setElement(e);
-			bodVO.setRef(e.getFRef());
+			bodVO.setRef((theXSParticle.getFRef() != null) ? theXSParticle.getFId() : null);
+			
 			al.add(bodVO);
+			
 			return al;
 
 		case XSConstants.MODEL_GROUP:

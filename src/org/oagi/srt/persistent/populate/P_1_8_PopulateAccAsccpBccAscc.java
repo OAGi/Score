@@ -144,7 +144,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		int assocFromACCId = accVO.getACCID();
 		
 		QueryCondition qc1 = new QueryCondition();
-		qc1.add("ascc_guid", bodVO.getId());
+		qc1.add("ascc_guid", (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId());
 		qc1.add("assco_to_asccp_id", asccpVO.getASCCPID());
 		qc1.add("assoc_from_acc_id", assocFromACCId);
 		if(asccDao.findObject(qc1) == null) {
@@ -175,7 +175,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 	private void insertBCC(BODElementVO bodVO, XSComplexTypeDecl complexType, BCCPVO bccpVO) throws Exception {
 		
-		String bccGuid = bodVO.getId();
+		//String bccGuid = bodVO.getId();
+		String bccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
 		int assocToBCCPID = bccpVO.getBCCPID();
 		
 		String parentGuid = complexType.getFId();
@@ -224,7 +225,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		
 		int assocToBCCPID;
 		QueryCondition qc = new QueryCondition();
-		qc.add("property_term", Utility.spaceSeparator(xad.getName()));
+		qc.add("property_term", Utility.spaceSeparator(xad.getName()).replace("ID", "Identifier"));
 		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc);
 		if(bccpVO == null) {
 			bccpVO = insertBCCP(xad.getName(), xtd.getFId());
@@ -287,7 +288,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		bccpVO.setBDTID(bdtId);
 		bccpVO.setRepresentationTerm(representationTerm);
 		bccpVO.setDEN(den);
-		bccpVO.setCreatedBy(1);
+		bccpVO.setCreatedByUserId(1);
 		bccpVO.setLastUpdatedByUserId(1);
 
 		bccpDao.insertObject(bccpVO);
@@ -411,10 +412,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		for( int i = 0; i < xol.getLength(); i++) {
 			XSAttributeUseImpl xui = (XSAttributeUseImpl)xol.get(i);
 			XSAttributeDecl xad = (XSAttributeDecl)xui.getAttrDeclaration();
-			if(!xad.getName().equals("releaseID") && !xad.getName().equals("versionID") && !xad.getName().equals("systemEnvironmentCode")) {
-				System.out.println("####################### attribute: " + complexType.getName() + " | " + xad.getName());
+			//if(!xad.getName().equals("releaseID") && !xad.getName().equals("versionID") && !xad.getName().equals("systemEnvironmentCode")) {
+				//System.out.println("####################### attribute: " + complexType.getName() + " | " + xad.getName());
 				insertBCCWithAttr(xad, complexType);
-			}
+			//}
 		}
 		
 		return elements;

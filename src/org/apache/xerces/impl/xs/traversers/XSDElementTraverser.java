@@ -159,6 +159,13 @@ class XSDElementTraverser extends XSDAbstractTraverser {
         QName refAtt = (QName) attrValues[XSAttributeChecker.ATTIDX_REF];
         XInt  minAtt = (XInt)  attrValues[XSAttributeChecker.ATTIDX_MINOCCURS];
         XInt  maxAtt = (XInt)  attrValues[XSAttributeChecker.ATTIDX_MAXOCCURS];
+        String  idAtt = (String)  attrValues[XSAttributeChecker.ATTIDX_ID];
+        
+        if(refAtt != null)
+        	particle.fRef = refAtt.localpart;
+        
+        if(idAtt != null)
+        	particle.fId = idAtt;
         
         XSElementDecl element = null;
         XSAnnotationImpl annotation = null;
