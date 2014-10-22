@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.BODSchemaHandler;
 import org.oagi.srt.common.util.Utility;
@@ -62,8 +63,8 @@ public class P_1_7_PopulateQBDTInDT {
 		aCodeListDAO = df.getDAO("CodeList");
 		aDTSCDAO = df.getDAO("DTSC");
 		
-		fields_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Fields_modified.xsd");
-		meta_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Meta.xsd");
+		fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+		meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 	}
 	
 	private void populate() throws XPathExpressionException, SRTDAOException {

@@ -391,13 +391,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 						insertBCC(bodVO, complexType, bccpVO);
 					} else {
 						System.out.println("####################### no match case - " + bodVO.getName());
-						if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
-							insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
+						//if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
+							//insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
+							insertASCCP(bodVO.getElement(), complexType);
 							QueryCondition qc3 = new QueryCondition();
 							qc3.add("asccp_guid", bodVO.getId());
 							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3);
 							insertASCC(bodVO, complexType, asccpVO1);
-						}
+						//}
 					}
 					try {
 						Thread.sleep(200);

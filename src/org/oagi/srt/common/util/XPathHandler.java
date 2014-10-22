@@ -16,6 +16,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.oagi.srt.common.SRTConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,7 +49,7 @@ public class XPathHandler {
 	
 	public static void main(String args[]) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
 	
-		XPathHandler xh = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/BODs/LoadPayable.xsd");
+		XPathHandler xh = new XPathHandler(SRTConstants.BOD_FILE_PATH_02 + "LoadPayable.xsd");
 		
 		try {
 			System.out.println("### " + ((Element)xh.getNode("//xsd:complexType[@name = 'LoadPayableDataAreaType' and count(xsd:simpleContent) = 0] ")).getAttribute("name"));

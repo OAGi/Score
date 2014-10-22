@@ -22,11 +22,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
-*
-* @author Jaehun Lee
-* @version 1.0
-*
-*/
+ *
+ * @author Jaehun Lee
+ * @version 1.0
+ *
+ */
 
 public class P_1_3_PopulateAgencyIDList {
 	public void agencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
@@ -37,13 +37,13 @@ public class P_1_3_PopulateAgencyIDList {
 		AgencyIDListVO agencyidlistVO = new AgencyIDListVO();
 		NodeList result = xh.getNodeList("//xsd:simpleType");
 		for(int i = 0; i < result.getLength(); i++) {
-		    Element tmp = (Element)result.item(i);
-		    if(tmp.getAttribute("name").endsWith("IdentificationContentType")){
-		    	agencyidlistVO.setAgencyIDListGUID(tmp.getAttribute("id"));
-		    }
-		    if(tmp.getAttribute("name").endsWith("EnumerationType")){
+			Element tmp = (Element)result.item(i);
+			if(tmp.getAttribute("name").endsWith("IdentificationContentType")){
+				agencyidlistVO.setAgencyIDListGUID(tmp.getAttribute("id"));
+			}
+			if(tmp.getAttribute("name").endsWith("EnumerationType")){
 				agencyidlistVO.setEnumerationTypeGUID(tmp.getAttribute("id"));
-		    }	
+			}	
 		}
 		agencyidlistVO.setName("Agency Identification");
 		agencyidlistVO.setListID("3055");
@@ -54,7 +54,7 @@ public class P_1_3_PopulateAgencyIDList {
 		System.out.println("###END#####");
 
 	}
-	
+
 	public void agencyIDListValue() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
 		XPathHandler xh = new XPathHandler(path1);
@@ -62,7 +62,7 @@ public class P_1_3_PopulateAgencyIDList {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("AgencyIDListValue");
 		AgencyIDListValueVO agencyidlistvalueVO = new AgencyIDListValueVO();
-		
+
 		DAOFactory df2 = DAOFactory.getDAOFactory();
 		SRTDAO dao2 = df2.getDAO("AgencyIDList");
 		ArrayList<SRTObject> agency_id_fk = dao2.findObjects();
@@ -70,26 +70,28 @@ public class P_1_3_PopulateAgencyIDList {
 		for(SRTObject dvo : agency_id_fk) {
 			AgencyIDListVO svo = (AgencyIDListVO) dvo;
 			NodeList enumeration = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration") ;
-			NodeList name = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//ccts:Name") ;
-			NodeList definition = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//ccts:Definition") ;
+			NodeList name = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//*[local-name()=\"ccts_Name\"]") ;
+			NodeList definition = xh.getNodeList("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//*[local-name()=\"ccts_Definition\"]") ;
+
+			System.out.println("###" + svo.getEnumerationTypeGUID());
 			for(int i = 0; i < enumeration.getLength(); i++) {
-			    Element enum_element = (Element)enumeration.item(i);
-			    agencyidlistvalueVO.setValue(enum_element.getAttribute("value"));		    
-			    
-			    Element name_element = (Element)name.item(i);
-			    agencyidlistvalueVO.setName(name_element.getTextContent());
-			    
-			    Element definition_element = (Element)definition.item(i);
-			    agencyidlistvalueVO.setDefinition(definition_element.getTextContent());
-			    
-			    agencyidlistvalueVO.setOwnerAgencyIDListID(svo.getAgencyIDListID());
-		       dao.insertObject(agencyidlistvalueVO);
+				Element enum_element = (Element)enumeration.item(i);
+				agencyidlistvalueVO.setValue(enum_element.getAttribute("value"));		    
+
+				Element name_element = (Element)name.item(i);
+				agencyidlistvalueVO.setName(name_element.getTextContent());
+
+				Element definition_element = (Element)definition.item(i);
+				agencyidlistvalueVO.setDefinition(definition_element.getTextContent());
+
+				agencyidlistvalueVO.setOwnerAgencyIDListID(svo.getAgencyIDListID());
+				dao.insertObject(agencyidlistvalueVO);
 			}
 		}
 		System.out.println("###END#####");
 
 	}
-	
+
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
 

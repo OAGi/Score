@@ -46,9 +46,11 @@ public class ASCCBCCInvestigator {
 		
 		for(String s1 : al1) {
 			if(!al2.contains(s1)) {
-				r1.add(s1);
+				if(!r1.contains(s1))
+					r1.add(s1);
 			} else {
-				r2.add(s1);
+				if(!r2.contains(s1))
+					r2.add(s1);
 			}
 		}
 		
@@ -59,9 +61,11 @@ public class ASCCBCCInvestigator {
 		
 		for(String s1 : al2) {
 			if(!al1.contains(s1)) {
-				r3.add(s1);
+				if(!r3.contains(s1))
+					r3.add(s1);
 			} else {
-				r4.add(s1);
+				if(!r4.contains(s1))
+					r4.add(s1);
 			}
 		}
 		
@@ -70,7 +74,7 @@ public class ASCCBCCInvestigator {
 		System.out.println(r3.size());
 		System.out.println(r4.size());
 		
-		for(String s : r1)
+		for(String s : r3)
 			System.out.println(s);
 	}
 }

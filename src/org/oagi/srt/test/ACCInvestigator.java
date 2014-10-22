@@ -39,6 +39,7 @@ public class ACCInvestigator {
 			}
 		}
 		
+		System.out.println(r.size());
 		for(String s : r)
 			System.out.println(s);
 	}

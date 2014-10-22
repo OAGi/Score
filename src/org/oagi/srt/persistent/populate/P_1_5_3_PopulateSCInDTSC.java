@@ -49,8 +49,8 @@ public class P_1_5_3_PopulateSCInDTSC {
 	private XPathHandler businessDataType_xsd;
 	
 	public P_1_5_3_PopulateSCInDTSC() throws Exception {
-		fields_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/Fields_modified.xsd");
-		businessDataType_xsd = new XPathHandler("/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/DataTypes/BusinessDataType_1_modified.xsd");
+		fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+		businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 	}
 	
 	private void importDataTypeList(String dataType) throws Exception {
@@ -74,13 +74,13 @@ public class P_1_5_3_PopulateSCInDTSC {
 		//System.out.println("### " + dataType + " - " + typeName);
 		
 		//Data Type Term
-		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
+		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 		if(dataTypeTermNode == null && type.equals("simple")) {
 			type = "complex";
-			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
+			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 		} else if(dataTypeTermNode == null && type.equals("complex")) {
 			type = "simple";
-			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:DictionaryEntryName");
+			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 		}
 		
 		//System.out.println("### " + type + " - " + dataTypeTermNode);
@@ -92,13 +92,13 @@ public class P_1_5_3_PopulateSCInDTSC {
 		//dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
 						
 		//Definitions
-		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/ccts:Definition");
+		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
 		Element definitionElement = (Element)definitionNode;
-		Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
+		Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
 		if (ccDefinitionNode == null)
-			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
+			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
 		if (ccDefinitionNode == null)
-			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation/ccts:ContentComponentValueDomain/ccts:Definition");
+			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
 		Element ccDefinitionElement = (Element)ccDefinitionNode;				
 		
 		
@@ -152,7 +152,7 @@ public class P_1_5_3_PopulateSCInDTSC {
 					System.out.println("##### based_dT_sc_id = " + based_dT_sc_id);
 					System.out.println("##### owner_dt_iD = " + dt_vo.getBasedDTID());
 					
-					Node propertyTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/ccts:PropertyTermName");
+					Node propertyTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_PropertyTermName\"]");
 					if(propertyTermName != null) {
 						property_term = ((Element)propertyTermName).getTextContent();
 					} else {
@@ -160,7 +160,7 @@ public class P_1_5_3_PopulateSCInDTSC {
 					}
 						
 					
-					Node representationTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/ccts:RepresentationTermName");
+					Node representationTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_RepresentationTermName\"]");
 					if(representationTermName != null) {
 						representation_term = ((Element)representationTermName).getTextContent();
 					} else {

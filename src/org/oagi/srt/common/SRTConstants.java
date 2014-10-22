@@ -46,31 +46,34 @@ public class SRTConstants {
 		return Integer.parseInt(dbTypeVal);
 	}
 	
-	public static final String BOD_FILE_PATH_01 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/BODs/";
-	public static final String BOD_FILE_PATH_02 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/BODs/";
+	public static final String BOD_FILE_PATH_01 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
+	public static final String BOD_FILE_PATH_02 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
 	
+	public static final String FILEDS_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified.xsd";
+	public static final String META_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
+	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/BusinessDataType_1_modified.xsd";
 	
 	public static String filepath(String list) {
 		String prefix_filepath = "/Users/yslee/Work/Project/OAG/Development/";
 		//String prefix_filepath = "C:/Users/jnl18/Documents/";
-		String origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/";
+		String origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/";
 		if(list.equals("AgencyID")){
-			origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/IdentifierScheme/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/IdentifierScheme/";
 		}
 		else if(list.equals("CodeList")){
-			origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/CodeLists/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/CodeLists/";
 		}
 		else if(list.equals("DT")){
-			origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/";
 		}
 		else if(list.equals("DT_SC")){
-			origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/";
 		}
 		else if(list.equals("BDT_Primitive_Restriction")){
-			origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/Platform/2_0/Common/Components/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/";
 		}
 		else if(list.equals("BOD")){
-			origin_filepath = "OAGIS_10_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_0/Model/BODs/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
 		}
 		return prefix_filepath+origin_filepath;
 	}

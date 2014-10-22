@@ -12,7 +12,7 @@ Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault)
 
 
 Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Binary' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
+	values ((select DT_ID from dt where Data_Type_Term = 'Binary Object' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'Binary'), True); 
 
 Insert into cdt_allowed_primitive (CDT_ID, CDT_Primitive_ID, isDefault) 
 	values ((select DT_ID from dt where Data_Type_Term = 'Code' and DT_Type = 0), (select CDT_Primitive_ID from cdt_primitive where name = 'NormalizedString'), False); 

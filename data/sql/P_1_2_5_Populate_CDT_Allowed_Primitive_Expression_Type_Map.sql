@@ -19,11 +19,11 @@ Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID,
 			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:integer'));
 
 Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
-	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Binary' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'binary'))),
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Binary Object' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'binary'))),
 			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:base64Binary'));
 
 Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 
-	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Binary' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'binary'))),
+	values ((select CDT_Allowed_Primitive_ID from CDT_Allowed_Primitive where CDT_ID = (select DT_ID from dt where Data_Type_Term = 'Binary Object' and DT_Type = 0) AND (CDT_Primitive_ID = (select CDT_Primitive_ID from cdt_primitive where name = 'binary'))),
 			(select XSD_BuiltIn_Type_ID from xsd_builtin_type where BuiltIn_Type = 'xsd:hexBinary'));
 
 Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) 

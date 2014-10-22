@@ -70,8 +70,8 @@ public class ASCCPBCCPInvestigator {
 		System.out.println(r3.size());
 		System.out.println(r4.size());
 		
-		System.out.println(r1.size());
-		for(String s : r1)
+//		System.out.println(r1.size());
+		for(String s : r3)
 			System.out.println(s);
 	}
 }
