@@ -260,6 +260,7 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             // ---------------------------------------------------------------
             // First, handle any ANNOTATION declaration and get next child
             // ---------------------------------------------------------------
+        	
             child = DOMUtil.getFirstChildElement(complexTypeDecl);
             if(child != null) {
                 if (DOMUtil.getLocalName(child).equals(SchemaSymbols.ELT_ANNOTATION)) {
@@ -288,6 +289,7 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             // Process the content of the complex type definition
             // ---------------------------------------------------------------
             if (child==null) {
+            	
                 //
                 // EMPTY complexType with complexContent
                 //
@@ -300,6 +302,7 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             }
             else if (DOMUtil.getLocalName(child).equals
                     (SchemaSymbols.ELT_SIMPLECONTENT)) {
+            	
                 //
                 // SIMPLE CONTENT
                 //
@@ -314,6 +317,9 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             }
             else if (DOMUtil.getLocalName(child).equals
                     (SchemaSymbols.ELT_COMPLEXCONTENT)) {
+            	
+            	fComplexTypeDecl.setIsComplexContent(true);
+            	
                 traverseComplexContent(child, mixedAtt.booleanValue(),
                         schemaDoc, grammar);
                 Element elemTmp = DOMUtil.getNextSiblingElement(child);
@@ -898,6 +904,7 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             else if (baseType.getContentType() == XSComplexTypeDecl.CONTENTTYPE_EMPTY) {
             }
             else {
+            	System.out.println("!!!3 " + fParticle.fType);
                 //
                 // Check if the contentType of the base is consistent with the new type
                 // cos-ct-extends.1.4.3.2
@@ -921,6 +928,7 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
                         ((XSModelGroupImpl)fParticle.fValue).fCompositor == XSModelGroupImpl.MODELGROUP_ALL ||
                         ((XSParticleDecl)baseType.getParticle()).fType == XSParticleDecl.PARTICLE_MODELGROUP &&
                         ((XSModelGroupImpl)(((XSParticleDecl)baseType.getParticle())).fValue).fCompositor == XSModelGroupImpl.MODELGROUP_ALL) {
+                	
                     fAttrChecker.returnAttrArray(complexContentAttrValues, schemaDoc);
                     fAttrChecker.returnAttrArray(derivationTypeAttrValues, schemaDoc);
                     throw new ComplexTypeRecoverableError("cos-all-limited.1.2",

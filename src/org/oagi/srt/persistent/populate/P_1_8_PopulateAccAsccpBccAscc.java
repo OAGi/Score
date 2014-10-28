@@ -366,7 +366,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 				if(!elements.contains(bodVO.getName())) {
 					elements.add(bodVO.getName());
 					
-					if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
+					if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) { 
 						QueryCondition qc2 = new QueryCondition();
 						qc2.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
 						ACCVO accVO = (ACCVO)accDao.findObject(qc2);
@@ -384,7 +384,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1);
 					
 					if(asccpVO != null) {
-						System.out.println("####################### match to ascc - " + bodVO.getName()); // TODO how to differentiate between particles in type and from extension?
+						System.out.println("####################### match to ascc - " + bodVO.getName()); 
 						insertASCC(bodVO, complexType, asccpVO);
 					} else if(bccpVO != null) {
 						System.out.println("####################### match to bccp - " + bodVO.getName());
@@ -393,12 +393,13 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 						System.out.println("####################### no match case - " + bodVO.getName());
 						//if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
 							//insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
-							insertASCCP(bodVO.getElement(), complexType);
+						if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
+							insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()));
 							QueryCondition qc3 = new QueryCondition();
 							qc3.add("asccp_guid", bodVO.getId());
 							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3);
 							insertASCC(bodVO, complexType, asccpVO1);
-						//}
+						}
 					}
 					try {
 						Thread.sleep(200);

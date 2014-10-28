@@ -49,6 +49,8 @@ public class XSComplexTypeDecl implements XSComplexTypeDefinition, TypeInfo {
 	
     // name of the complexType
     String fName = null;
+    
+    boolean isComplexContent = false;
 
     // target namespace of the complexType
     String fTargetNamespace = null;
@@ -123,6 +125,14 @@ public class XSComplexTypeDecl implements XSComplexTypeDefinition, TypeInfo {
         fXSSimpleType = simpleType;
         fParticle = particle;
         fAnnotations = annotations;
+   }
+    
+   public void setIsComplexContent(boolean complexContent) {
+	   isComplexContent = complexContent;
+   }
+   
+   public boolean isComplexContent() {
+	   return isComplexContent;
    }
    
    public void setFId(String id) {

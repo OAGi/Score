@@ -63,10 +63,11 @@ public class BODSchemaHandler {
 	
 	public boolean isComplexWithoutSimpleContent(String type) {
 		if(model.getTypeDefinition(type, SRTConstants.OAGI_NS) instanceof XSComplexTypeDecl) {
-			if(((XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS)).getSimpleType() == null)
+			if(((XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS)).getSimpleType() == null) {
 				return true;
-			else
-				return false;
+			} else {
+				return ((XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS)).isComplexContent();
+			}
 		} else {
 			return false;
 		}
@@ -135,12 +136,13 @@ public class BODSchemaHandler {
 	public static void main(String args[]) throws Exception {
 
 		try {
-			File f = new File(SRTConstants.BOD_FILE_PATH_01 + "AcknowledgeField.xsd");
+			File f = new File(SRTConstants.BOD_FILE_PATH_02 + "AcknowledgeAllocateResource.xsd");
 			BODSchemaHandler bs = new BODSchemaHandler(f.getAbsolutePath());
 			System.out.println(bs.getAnnotation(bs.getGlobalElementDeclaration()));
 			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getBaseType().getName() + " - " + bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getFId());
 
-			XSComplexTypeDecl x = bs.getComplexTypeDefinition("AcknowledgeFieldType");
+			XSComplexTypeDecl x = bs.getComplexTypeDefinition("ActualBaseType");
+			//System.out.println("###11 " + bs.isComplexWithoutSimpleContent("AcknowledgeAllocateResourceType"));
 			ArrayList<BODElementVO> al = bs.processParticle(x.getParticle(), 1);
 			for(BODElementVO e : al) {
 				System.out.println("### " + e.getName());

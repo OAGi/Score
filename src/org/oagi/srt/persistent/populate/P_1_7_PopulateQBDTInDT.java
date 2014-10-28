@@ -149,7 +149,7 @@ public class P_1_7_PopulateQBDTInDT {
 				
 				aBDT_Primitive_RestrictionVO.setisDefault(true);;
 				
-				aBDTPrimitiveRestrictionDAO.insertObject(aBDT_Primitive_RestrictionVO);
+				//aBDTPrimitiveRestrictionDAO.insertObject(aBDT_Primitive_RestrictionVO);
 			}
 		}
 	}
@@ -265,7 +265,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
 			
-			dtDao.insertObject(dtVO);
+			//dtDao.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", guid);
@@ -322,7 +322,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
 			
-			dtDao.insertObject(dtVO);
+			//dtDao.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", tN.getAttribute("id"));
@@ -381,7 +381,7 @@ public class P_1_7_PopulateQBDTInDT {
 			vo.setMaxCardinality(dtsc_vo.getMaxCardinality());
 			vo.setBasedDTSCID(dtsc_vo.getDTSCID());
 			
-			aDTSCDAO.insertObject(vo);	
+			//aDTSCDAO.insertObject(vo);	
 		}
 		
 		// new SC
@@ -459,7 +459,7 @@ public class P_1_7_PopulateQBDTInDT {
 				vo.setMinCardinality(min_cardinality);
 				vo.setMaxCardinality(max_cardinality);
 				
-				aDTSCDAO.insertObject(vo);		
+				//aDTSCDAO.insertObject(vo);		
 			}
 		}
 	}
