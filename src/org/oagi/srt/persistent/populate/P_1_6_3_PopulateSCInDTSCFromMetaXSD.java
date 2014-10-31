@@ -39,48 +39,49 @@ public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 		NodeList ref = xh.getNodeList("//xsd:complexType");
 		for(int j = 0; j < ref.getLength(); j++) {
 			Element ref_tmp = (Element)ref.item(j);
-			int ownerDTID = getBasedDTID(ref_tmp.getAttribute("id"));
-			NodeList result = xh.getNodeList("//xsd:complexType[@id = '" + ref_tmp.getAttribute("id") + "']//xsd:attribute");
-			for(int i = 0; i < result.getLength(); i++) {
-			    Element tmp = (Element)result.item(i);
-			   
-			    dt_scVO.setDTSCGUID(tmp.getAttribute("id"));
-			    String PropertyTerm = tmp.getAttribute("name").substring(0,1).toUpperCase()+tmp.getAttribute("name").substring(1);
-			    if(tmp.getAttribute("name").indexOf("Code") > 0) {
-			    	PropertyTerm = PropertyTerm.substring(0, tmp.getAttribute("name").indexOf("Code"));
-			    }
-			    dt_scVO.setPropertyTerm(PropertyTerm);
-			    
-			    if(tmp.getAttribute("name").equals("expressionLanguage")){
-			    	dt_scVO.setRepresentationTerm("Text");
-			    }
-			    else if(tmp.getAttribute("name").equals("actionCode")){
-			    	dt_scVO.setRepresentationTerm("Code");
-			    }
-			    else {
-			    	
-			    }
-			    
-			    Node definition = xh.getNode("//xsd:complexType//xsd:attribute[@id = '" + dt_scVO.getDTSCGUID() + "']//xsd:annotation//xsd:documentation") ;
-			    Element definition_element = (Element)definition;
-			    if(definition_element != null) {
-			    	dt_scVO.setDefinition(definition.getTextContent());
-			    }
-			    else {
-			    	dt_scVO.setDefinition(null);
-			    }
-			    dt_scVO.setMinCardinality((getMinCardinality(tmp.getAttribute("use"))));
-			    dt_scVO.setMaxCardinality((getMaxCardinality(tmp.getAttribute("use"))));
-			    dt_scVO.setBasedDTSCID(0); //Blank 
-			    dt_scVO.setOwnerDTID(ownerDTID); 
-	
-			    if(tmp.getAttribute("name").equals("languageCode")){
-			    	dt_scVO.setMaxCardinality(0);
-			    	dt_scVO.setBasedDTSCID(getBasedDTSCID("Language"));
-			    }
-			    
-			    dao.insertObject(dt_scVO);
-			    }
+		    if(ref_tmp.getAttribute("name").equals("ExpressionType") || ref_tmp.getAttribute("name").equals("ActionExpressionType") || ref_tmp.getAttribute("name").equals("ResponseExpressionType") ) {
+				int ownerDTID = getBasedDTID(ref_tmp.getAttribute("id"));
+				NodeList result = xh.getNodeList("//xsd:complexType[@id = '" + ref_tmp.getAttribute("id") + "']//xsd:attribute");
+				for(int i = 0; i < result.getLength(); i++) {
+				    Element tmp = (Element)result.item(i);
+				   
+				    dt_scVO.setDTSCGUID(tmp.getAttribute("id"));
+				    String PropertyTerm = tmp.getAttribute("name").substring(0,1).toUpperCase()+tmp.getAttribute("name").substring(1);
+				    if(tmp.getAttribute("name").indexOf("Code") > 0) {
+				    	PropertyTerm = PropertyTerm.substring(0, tmp.getAttribute("name").indexOf("Code"));
+				    }
+				    dt_scVO.setPropertyTerm(PropertyTerm);
+				    
+				    if(tmp.getAttribute("name").equals("expressionLanguage")){
+				    	dt_scVO.setRepresentationTerm("Text");
+				    }
+				    else if(tmp.getAttribute("name").equals("actionCode")){
+				    	dt_scVO.setRepresentationTerm("Code");
+				    }
+				    else {
+				    	
+				    }
+				    
+				    Node definition = xh.getNode("//xsd:complexType//xsd:attribute[@id = '" + dt_scVO.getDTSCGUID() + "']//xsd:annotation//xsd:documentation") ;
+				    Element definition_element = (Element)definition;
+				    if(definition_element != null) {
+				    	dt_scVO.setDefinition(definition.getTextContent());
+				    }
+				    else {
+				    	dt_scVO.setDefinition(null);
+				    }
+				    dt_scVO.setMinCardinality((getMinCardinality(tmp.getAttribute("use"))));
+				    dt_scVO.setMaxCardinality((getMaxCardinality(tmp.getAttribute("use"))));
+				    dt_scVO.setBasedDTSCID(0); //Blank 
+				    dt_scVO.setOwnerDTID(ownerDTID); 
+		
+				    if(tmp.getAttribute("name").equals("languageCode")){
+				    	dt_scVO.setMaxCardinality(0);
+				    	dt_scVO.setBasedDTSCID(getBasedDTSCID("Language"));
+				    }
+				    dao.insertObject(dt_scVO);
+				    }
+		    }
 		}
 		System.out.println("###END#####");
 	}

@@ -44,40 +44,42 @@ public class P_1_6_1_PopulateDT {
 	
 		for(int i = 0; i < result.getLength(); i++) {
 		    Element tmp = (Element)result.item(i);
-		    dtVO.setDTGUID(tmp.getAttribute("id"));
-		    dtVO.setDTType(1);
-		    dtVO.setVersionNumber("1.0");
-		    //dtVO.setPreviousVersionDTID();//Leave BLANK
-		    dtVO.setRevisionType(0);
-		    dtVO.setBasedDTID(getBasedDTIDwDen("Text", "Text_0F0ZL2. Type"));
-		    dtVO.setDataTypeTerm(getDataTypeTerm(dtVO.getBasedDTID()));
-		    //dtVO.setQualifier("");//Leave BLANK
-		    String tmpDEN = tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("Type"))+".Type";
-		    if(tmpDEN.contains("ID")){
-		    	tmpDEN = tmpDEN.replace("ID", "Identifier");
+		    if(tmp.getAttribute("name").equals("ExpressionType") || tmp.getAttribute("name").equals("ActionExpressionType") || tmp.getAttribute("name").equals("ResponseExpressionType") ) {
+			    dtVO.setDTGUID(tmp.getAttribute("id"));
+			    dtVO.setDTType(1);
+			    dtVO.setVersionNumber("1.0");
+			    //dtVO.setPreviousVersionDTID();//Leave BLANK
+			    dtVO.setRevisionType(0);
+			    dtVO.setBasedDTID(getBasedDTIDwDen("Text", "Text_0F0ZL2. Type"));
+			    dtVO.setDataTypeTerm(getDataTypeTerm(dtVO.getBasedDTID()));
+			    //dtVO.setQualifier("");//Leave BLANK
+			    String tmpDEN = tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("Type"))+".Type";
+			    if(tmpDEN.contains("ID")){
+			    	tmpDEN = tmpDEN.replace("ID", "Identifier");
+			    }
+			    dtVO.setDEN(tmpDEN);
+			    dtVO.setContentComponentDEN(tmpDEN + ".Content");
+			    
+			    Node definition = xh.getNode("//xsd:complexType[@id = '" + dtVO.getDTGUID() + "']//xsd:annotation//xsd:documentation") ;
+			    Element definition_element = (Element)definition;
+			    if(definition_element != null) {
+				    dtVO.setDefinition(definition.getTextContent());
+			    }
+			    else {
+			    	dtVO.setDefinition(null);
+			    }
+			    
+			    dtVO.setContentComponentDefinition(null);
+			    dtVO.setRevisionDocumentation(null);
+			    dtVO.setRevisionState(1);
+			    
+			    int id = getUserID("oagis");
+				dtVO.setCreatedByUserId(id);
+				dtVO.setLastUpdatedByUserId(id);
+				dtVO.setLastUpdateTimestamp(current_stamp);
+			    dao.insertObject(dtVO);
 		    }
-		    dtVO.setDEN(tmpDEN);
-		    dtVO.setContentComponentDEN(tmpDEN + ".Content");
-		    
-		    Node definition = xh.getNode("//xsd:complexType[@id = '" + dtVO.getDTGUID() + "']//xsd:annotation//xsd:documentation") ;
-		    Element definition_element = (Element)definition;
-		    if(definition_element != null) {
-			    dtVO.setDefinition(definition.getTextContent());
-		    }
-		    else {
-		    	dtVO.setDefinition(null);
-		    }
-		    
-		    dtVO.setContentComponentDefinition(null);
-		    dtVO.setRevisionDocumentation(null);
-		    dtVO.setRevisionState(1);
-		    
-		    int id = getUserID("oagis");
-			dtVO.setCreatedByUserId(id);
-			dtVO.setLastUpdatedByUserId(id);
-			dtVO.setLastUpdateTimestamp(current_stamp);
-		    dao.insertObject(dtVO);
-		    }
+	    }
 		System.out.println("###END#####");
 	}
 	
