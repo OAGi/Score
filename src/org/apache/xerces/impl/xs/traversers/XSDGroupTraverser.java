@@ -17,6 +17,8 @@
 
 package org.apache.xerces.impl.xs.traversers;
 
+import java.util.ArrayList;
+
 import org.apache.xerces.impl.xs.SchemaGrammar;
 import org.apache.xerces.impl.xs.SchemaSymbols;
 import org.apache.xerces.impl.xs.XSAnnotationImpl;
@@ -30,6 +32,7 @@ import org.apache.xerces.util.DOMUtil;
 import org.apache.xerces.util.XMLSymbols;
 import org.apache.xerces.xni.QName;
 import org.apache.xerces.xs.XSObjectList;
+import org.oagi.srt.common.util.BODElementVO;
 import org.w3c.dom.Element;
 
 /**
@@ -75,6 +78,7 @@ class  XSDGroupTraverser extends XSDAbstractParticleTraverser {
             // get global decl
             // index is a particle index.
             group = (XSGroupDecl)fSchemaHandler.getGlobalDecl(schemaDoc, XSDHandler.GROUP_TYPE, refAttr, elmNode);
+            // TODO check here
         }
         
         XSAnnotationImpl annotation = null;
@@ -139,10 +143,107 @@ class  XSDGroupTraverser extends XSDAbstractParticleTraverser {
         
     } // traverseLocal
     
+    // TODO OAG
+    XSParticleDecl traverseLocal(Element elmNode,
+            XSDocumentInfo schemaDoc,
+            SchemaGrammar grammar, String groupRef, String groupId, String groupName) {
+        
+        // General Attribute Checking for elmNode declared locally
+        Object[] attrValues = fAttrChecker.checkAttributes(elmNode, false,
+                schemaDoc);
+        QName refAttr = (QName) attrValues[XSAttributeChecker.ATTIDX_REF];
+        XInt  minAttr = (XInt)  attrValues[XSAttributeChecker.ATTIDX_MINOCCURS];
+        XInt  maxAttr = (XInt)  attrValues[XSAttributeChecker.ATTIDX_MAXOCCURS];
+        
+        XSGroupDecl group = null;
+        
+        // ref should be here.
+        if (refAttr == null) {
+            reportSchemaError("s4s-att-must-appear", new Object[]{"group (local)", "ref"}, elmNode);
+        } else {
+            // get global decl
+            // index is a particle index.
+        	
+            group = (XSGroupDecl)fSchemaHandler.getGlobalDecl(schemaDoc, XSDHandler.GROUP_TYPE, refAttr, elmNode, groupRef, groupId, groupName);
+            // TODO check here
+        }
+        
+        XSAnnotationImpl annotation = null;
+        // no children other than "annotation?" are allowed
+        Element child = DOMUtil.getFirstChildElement(elmNode);
+        if (child != null && DOMUtil.getLocalName(child).equals(SchemaSymbols.ELT_ANNOTATION)) {
+            annotation = traverseAnnotationDecl(child, attrValues, false, schemaDoc);
+            child = DOMUtil.getNextSiblingElement(child);
+        } 
+        else {
+            String text = DOMUtil.getSyntheticAnnotation(elmNode);
+            if (text != null) {
+                annotation = traverseSyntheticAnnotation(elmNode, text, attrValues, false, schemaDoc);
+            }
+        }
+        
+        if (child != null) {
+            reportSchemaError("s4s-elt-must-match.1", new Object[]{"group (local)", "(annotation?)", DOMUtil.getLocalName(elmNode)}, elmNode);
+        }
+        
+        int minOccurs = minAttr.intValue();
+        int maxOccurs = maxAttr.intValue();
+        
+        XSParticleDecl particle = null;
+        
+        // not empty group, not empty particle
+        if (group != null && group.fModelGroup != null &&
+                !(minOccurs == 0 && maxOccurs == 0)) {
+            // create a particle to contain this model group
+            if (fSchemaHandler.fDeclPool != null) {
+                particle = fSchemaHandler.fDeclPool.getParticleDecl();
+            } else {        
+                particle = new XSParticleDecl();
+            }
+            
+            XSParticleDecl[] xspds = group.fModelGroup.fParticles;
+			for (int i = 0; i < xspds.length; i ++) {
+				if(xspds[i].getFGroupRef() == null) {
+					xspds[i].fGroupRef = groupRef;
+				}
+			}
+            
+            
+            particle.fType = XSParticleDecl.PARTICLE_MODELGROUP;
+            particle.fValue = group.fModelGroup;
+            particle.fMinOccurs = minOccurs;
+            particle.fMaxOccurs = maxOccurs;
+            
+            if (group.fModelGroup.fCompositor == XSModelGroupImpl.MODELGROUP_ALL) {
+                Long defaultVals = (Long)attrValues[XSAttributeChecker.ATTIDX_FROMDEFAULT];
+                particle = checkOccurrences(particle, SchemaSymbols.ELT_GROUP,
+                        (Element)elmNode.getParentNode(), GROUP_REF_WITH_ALL,
+                        defaultVals.longValue());
+            }
+            if (refAttr != null) {
+                XSObjectList annotations;
+                if (annotation != null) {
+                    annotations = new XSObjectListImpl();
+                    ((XSObjectListImpl) annotations).addXSObject(annotation);
+                } else {
+                    annotations = XSObjectListImpl.EMPTY_LIST;
+                }
+                particle.fAnnotations = annotations;
+            } else {
+                particle.fAnnotations = group.fAnnotations;
+            }
+        }
+        
+        fAttrChecker.returnAttrArray(attrValues, schemaDoc);
+        
+        return particle;
+        
+    } // traverseLocal
+    
     XSGroupDecl traverseGlobal(Element elmNode,
             XSDocumentInfo schemaDoc,
-            SchemaGrammar grammar) {
-        
+            SchemaGrammar grammar, String groupRef, String groupId, String groupName) {
+    	
         // General Attribute Checking for elmNode declared globally
         Object[] attrValues = fAttrChecker.checkAttributes(elmNode, true,
                 schemaDoc);
@@ -189,7 +290,10 @@ class  XSDGroupTraverser extends XSDAbstractParticleTraverser {
             } else if (childName.equals(SchemaSymbols.ELT_CHOICE)) {
                 particle = traverseChoice(l_elmChild, schemaDoc, grammar, CHILD_OF_GROUP, group);
             } else if (childName.equals(SchemaSymbols.ELT_SEQUENCE)) {
-                particle = traverseSequence(l_elmChild, schemaDoc, grammar, CHILD_OF_GROUP, group);
+            	// TODO OAG
+                //particle = traverseSequence(l_elmChild, schemaDoc, grammar, CHILD_OF_GROUP, group);
+            	
+            	particle = traverseSequence(l_elmChild, schemaDoc, grammar, CHILD_OF_GROUP, group, true, elmNode.getAttribute("id"), groupRef, groupId, groupName);  
             } else {
                 reportSchemaError("s4s-elt-must-match.1",
                         new Object[]{"group (global)", "(annotation?, (all | choice | sequence))", DOMUtil.getLocalName(l_elmChild)},

@@ -52,4 +52,9 @@ public interface XSParticle extends XSObject {
     
     public String getFRef();
     public String getFId();
+    public boolean isGroup();
+    public String getFGroupId();
+    public String getFGroupRef();
+    public String getFGroupParent();
+    public String getFGroupName();
 }

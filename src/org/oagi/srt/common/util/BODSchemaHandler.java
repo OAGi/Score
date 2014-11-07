@@ -90,6 +90,11 @@ public class BODSchemaHandler {
 			bodVO.setId(e.getFId());
 			bodVO.setElement(e);
 			bodVO.setRef((theXSParticle.getFRef() != null) ? theXSParticle.getFId() : null);
+			bodVO.setGroup(theXSParticle.isGroup());
+			bodVO.setGroupId(theXSParticle.getFGroupId());
+			bodVO.setGroupRef(theXSParticle.getFGroupRef());
+			bodVO.setGroupParentf(theXSParticle.getFGroupParent());
+			bodVO.setGroupNamef(theXSParticle.getFGroupName());
 			
 			al.add(bodVO);
 			
@@ -138,18 +143,19 @@ public class BODSchemaHandler {
 		try {
 			File f = new File(SRTConstants.BOD_FILE_PATH_02 + "AcknowledgeAllocateResource.xsd");
 			BODSchemaHandler bs = new BODSchemaHandler(f.getAbsolutePath());
-			System.out.println(bs.getAnnotation(bs.getGlobalElementDeclaration()));
-			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getBaseType().getName() + " - " + bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getFId());
+			//System.out.println(bs.getAnnotation(bs.getGlobalElementDeclaration()));
+			//System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getBaseType().getName() + " - " + bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getFId());
 
-			XSComplexTypeDecl x = bs.getComplexTypeDefinition("ActualBaseType");
+			XSComplexTypeDecl x = bs.getComplexTypeDefinition("DummyType");
 			//System.out.println("###11 " + bs.isComplexWithoutSimpleContent("AcknowledgeAllocateResourceType"));
 			ArrayList<BODElementVO> al = bs.processParticle(x.getParticle(), 1);
 			for(BODElementVO e : al) {
-				System.out.println("### " + e.getName());
+				System.out.println("### type: " + e.getOrder() + " | name: " + e.getName() + " | id: " + e.getId() + " | ref: " + e.getRef() + " | group?: " + e.isGroup() + " | groupid: " + e.getGroupId() + " | groupref: " + e.getGroupRef() + " | grouparent: " + e.getGroupParent());
 				//System.out.println("### " + e.getMaxOccur());
 				//System.out.println("### " + e.getMinOccur());
 				//System.out.println("### " + e.getId());
 			}
+			
 //
 //			System.out.println(bs.isComplexWithoutSimpleContent("AcknowledgeFieldDataAreaType"));
 //			System.out.println(bs.getComplexTypeDefinition(bs.getGlobalElementDeclaration()).getSimpleType());

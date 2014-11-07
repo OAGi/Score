@@ -16,6 +16,11 @@ public class BODElementVO {
 	private int order;
 	private String typeName;
 	private XSElementDecl element;
+	private boolean isGroup;
+	private String groupId;
+	private String groupRef;
+	private String groupParent;
+	private String groupName;
 	
 	public int getOrder() {
 		return order;
@@ -79,5 +84,45 @@ public class BODElementVO {
 
 	public void setRef(String ref) {
 		this.ref = ref;
+	}
+
+	public boolean isGroup() {
+		return isGroup;
+	}
+
+	public void setGroup(boolean isGroup) {
+		this.isGroup = isGroup;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	
+	public String getGroupRef() {
+		return groupRef;
+	}
+
+	public void setGroupRef(String groupRef) {
+		this.groupRef = groupRef;
+	}
+	
+	public String getGroupParent() {
+		return groupParent;
+	}
+
+	public void setGroupParentf(String groupParent) {
+		this.groupParent = groupParent;
+	}
+	
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupNamef(String groupName) {
+		this.groupName = groupName;
 	}
 }

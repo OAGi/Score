@@ -37,6 +37,7 @@ import org.apache.xerces.util.DOMUtil;
 import org.apache.xerces.xni.QName;
 import org.apache.xerces.xs.XSAttributeUse;
 import org.apache.xerces.xs.XSConstants;
+import org.apache.xerces.xs.XSObject;
 import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.w3c.dom.Element;
@@ -297,8 +298,12 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
                 // set the base to the anyType
                 fBaseType = SchemaGrammar.fAnyType;
                 fDerivedBy = XSConstants.DERIVATION_RESTRICTION;
+                
                 processComplexContent(child, mixedAtt.booleanValue(), false,
                         schemaDoc, grammar);
+                
+                
+                
             }
             else if (DOMUtil.getLocalName(child).equals
                     (SchemaSymbols.ELT_SIMPLECONTENT)) {
@@ -340,8 +345,10 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
                 // set the base to the anyType
                 fBaseType = SchemaGrammar.fAnyType;
                 fDerivedBy = XSConstants.DERIVATION_RESTRICTION;
+                
                 processComplexContent(child, mixedAtt.booleanValue(), false,
                         schemaDoc, grammar);
+                
             }
             
         }
@@ -904,7 +911,6 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             else if (baseType.getContentType() == XSComplexTypeDecl.CONTENTTYPE_EMPTY) {
             }
             else {
-            	System.out.println("!!!3 " + fParticle.fType);
                 //
                 // Check if the contentType of the base is consistent with the new type
                 // cos-ct-extends.1.4.3.2
@@ -1044,19 +1050,31 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
             String childName = DOMUtil.getLocalName(complexContentChild);
             
             if (childName.equals(SchemaSymbols.ELT_GROUP)) {
-                
+            	
+                //System.out.println("---------------------------- " + complexContentChild.getAttribute("id"));
+                //System.out.println("---------------------------- " + complexContentChild.getAttribute("ref"));
                 particle = fSchemaHandler.fGroupTraverser.traverseLocal(complexContentChild,
-                        schemaDoc, grammar);
+                        schemaDoc, grammar, complexContentChild.getAttribute("id"), null, complexContentChild.getAttribute("ref")); 
+                
+                // TODO check here
+
+                
                 attrNode = DOMUtil.getNextSiblingElement(complexContentChild);
+                
             }
             else if (childName.equals(SchemaSymbols.ELT_SEQUENCE)) {
+            	
                 particle = traverseSequence(complexContentChild,schemaDoc,grammar,
-                        NOT_ALL_CONTEXT,fComplexTypeDecl);
+                        NOT_ALL_CONTEXT, fComplexTypeDecl, true, null, null, null, null);
+                
+             // TODO check here
+                
                 if (particle != null) {
                     XSModelGroupImpl group = (XSModelGroupImpl)particle.fValue;
                     if (group.fParticleCount == 0)
                         emptyParticle = true;
                 }
+                
                 attrNode = DOMUtil.getNextSiblingElement(complexContentChild);
             }
             else if (childName.equals(SchemaSymbols.ELT_CHOICE)) {
@@ -1142,8 +1160,6 @@ class  XSDComplexTypeTraverser extends XSDAbstractParticleTraverser {
                 fAttrGrp.removeProhibitedAttrs();
             }
         }
-        
-        
         
     } // end processComplexContent
     

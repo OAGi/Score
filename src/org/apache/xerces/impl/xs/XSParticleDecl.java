@@ -53,8 +53,13 @@ public class XSParticleDecl implements XSParticle {
     // for PARTICLE_MODELGROUP: the model group
     public XSTerm fValue = null;
     
+    public boolean fIsGroup = false;
     public String fRef = null;
     public String fId = null;
+    public String fGroupId = null;
+    public String fGroupRef = null;
+    public String fGroupParent = null;
+    public String fGroupName = null;
 
     // minimum occurrence of this particle
     public int fMinOccurs = 1;
@@ -77,6 +82,26 @@ public class XSParticleDecl implements XSParticle {
     
     public String getFRef() {
     	return fRef;
+    }
+    
+    public boolean isGroup() {
+    	return fIsGroup;
+    }
+    
+    public String getFGroupId() {
+    	return fGroupId;
+    }
+    
+    public String getFGroupRef() {
+    	return fGroupRef;
+    }
+    
+    public String getFGroupParent() {
+    	return fGroupParent;
+    }
+    
+    public String getFGroupName() {
+    	return fGroupName;
     }
     
     public String getFId() {

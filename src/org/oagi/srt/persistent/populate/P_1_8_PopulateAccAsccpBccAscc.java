@@ -13,6 +13,7 @@ import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSParticle;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.BODElementVO;
 import org.oagi.srt.common.util.BODSchemaHandler;
 import org.oagi.srt.common.util.Utility;
@@ -64,12 +65,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			//if(file.getName().equals("AcknowledgeField.xsd"))
+			//if(file.getName().equals("AcknowledgeAllocateResource.xsd"))
 				insertASCCP(file);
 		}
 
 		for (File file : listOfF2) {
-			//if(file.getName().equals("AcknowledgeField.xsd"))
+			//if(file.getName().equals("AcknowledgeAllocateResource.xsd"))
 				insertASCCP(file);
 		}
 	} 
@@ -133,20 +134,56 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			e.printStackTrace();
 		}
 	}
+	
+	private void insertASCCPUnderGroup(BODElementVO bodVO) throws Exception {
+		
+		String name = bodVO.getElement().getName();
+		System.out.println("### asccp name: " + name);
 
-	private void insertASCC(BODElementVO bodVO, XSComplexTypeDecl complexType, ASCCPVO asccpVO) throws Exception {
+		String asccpGuid = bodVO.getElement().getFId();
+		String propertyTerm = Utility.spaceSeparator(name);
+		String definition = bodSchemaHandler.getAnnotation(bodVO.getElement());
 
-		String parentGuid = complexType.getFId();
+		QueryCondition qc = new QueryCondition();
+		qc.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
+		ACCVO accVO = (ACCVO)accDao.findObject(qc);
+		int roleOfAccId = accVO.getACCID();
+
+		String den = propertyTerm + ". " + Utility.first(accVO.getDEN());
+		int state = 4;
+		String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
+
+		ASCCPVO accpVO = new ASCCPVO();
+		accpVO.setASCCPGUID(asccpGuid);
+		accpVO.setPropertyTerm(propertyTerm);
+		accpVO.setDefinition(definition);
+		accpVO.setRoleOfACCID(roleOfAccId);
+		accpVO.setDEN(den);
+		accpVO.setState(state);
+		accpVO.setModule(module);
+		accpVO.setCreatedByUserId(1);
+		accpVO.setLastUpdatedByUserId(1);
+
+		asccpDao.insertObject(accpVO);
+
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void insertASCC(BODElementVO bodVO, String parentGuid, ASCCPVO asccpVO) throws Exception {
+
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", parentGuid);
 		ACCVO accVO = (ACCVO)accDao.findObject(qc);
-		accVO = (ACCVO)accDao.findObject(qc);
 		int assocFromACCId = accVO.getACCID();
 		
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("ascc_guid", (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId());
-		qc1.add("assco_to_asccp_id", asccpVO.getASCCPID());
-		qc1.add("assoc_from_acc_id", assocFromACCId);
+		//qc1.add("assco_to_asccp_id", asccpVO.getASCCPID());
+		//qc1.add("assoc_from_acc_id", assocFromACCId);
 		if(asccDao.findObject(qc1) == null) {
 		
 			String asccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
@@ -170,16 +207,77 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asscVO.setDefinition(definition);
 	
 			asccDao.insertObject(asscVO);
+			
+//			
+//			
+//			// TODO think about this
+//			if(bodVO.getGroupId() != null) {
+//				QueryCondition qc2 = new QueryCondition();
+//				qc2.add("ascc_guid", bodVO.getGroupRef());
+//				if(asccDao.findObject(qc2) == null) {
+//					ASCCVO asscVO1 = new ASCCVO();
+//					asscVO1.setASCCGUID(bodVO.getGroupRef());
+//					asscVO1.setCardinalityMin(1);
+//					asscVO1.setCardinalityMax(1);
+//					asscVO1.setSequencingKey(sequenceKey); // TODO check this
+//					
+//					ACCVO accVO1 = getACC(bodVO.getGroupId());
+//					ASCCPVO asccVO1 = getACC(bodVO.getGroupId());
+//					if(accVO1 != null) {
+//						assocFromACCId = accVO1.getACCID();
+//						assocToASCCPId
+//					} else {
+//						assocFromACCId = insertACCWithGroup();
+//					}
+//					
+//					if(bodVO.getGroupParent() == null) {
+//						ACCVO accVO1 = getACC(bodVO.getGroupId());
+//						if(accVO1 != null) {
+//							assocFromACCId = accVO1.getACCID();
+//						} else {
+//							assocFromACCId = insertACCWithGroup();
+//						}
+//					}
+//					
+//					asscVO1.setAssocFromACCID(assocFromACCId);
+//					asscVO1.setAssocToASCCPID(assocToASCCPId);
+//					asscVO1.setDEN(den);
+//					asscVO1.setDefinition(definition);
+//			
+//					asccDao.insertObject(asscVO);
+//				}
+//				
+//			}
+
+			
+			
 		}
 	}
-
-	private void insertBCC(BODElementVO bodVO, XSComplexTypeDecl complexType, BCCPVO bccpVO) throws Exception {
+	
+	private ACCVO getACC(String guid) throws SRTDAOException {
+		QueryCondition qc = new QueryCondition();
+		qc.add("acc_guid", guid);
+		return (ACCVO)accDao.findObject(qc);
+	}
+	
+	private ASCCPVO getASCCP(String guid) throws SRTDAOException {
+		QueryCondition qc = new QueryCondition();
+		qc.add("asccp_guid", guid);
+		return (ASCCPVO)asccpDao.findObject(qc);
+	}
+	
+	private ASCCVO getASCC(String guid) throws SRTDAOException {
+		QueryCondition qc = new QueryCondition();
+		qc.add("ascc_guid", guid);
+		return (ASCCVO)asccDao.findObject(qc);
+	}
+	
+	private void insertBCC(BODElementVO bodVO, String parentGuid, BCCPVO bccpVO) throws Exception {
 		
 		//String bccGuid = bodVO.getId();
 		String bccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
 		int assocToBCCPID = bccpVO.getBCCPID();
 		
-		String parentGuid = complexType.getFId();
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", parentGuid);
 		ACCVO accVO = (ACCVO)accDao.findObject(qc);
@@ -297,9 +395,104 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		qc1.add("bccp_guid", bccpGuid);
 		return (BCCPVO)bccpDao.findObject(qc1);
 	}
-
-
-
+	 
+	private void insertForGroup(BODElementVO bodVO, String fullFilePath, String complexTypeId) throws SRTDAOException {
+		//System.out.println("------------------------" + bodVO.getId() + " | " + bodVO.getName() + " | " + bodVO.getGroupId() + " | " + bodVO.getGroupName());
+		
+		System.out.println("### type: " + bodVO.getOrder() + " | name: " + bodVO.getName() + " | id: " + bodVO.getId() + " | ref: " + bodVO.getRef() + " | group?: " + bodVO.isGroup() + " | groupid: " + bodVO.getGroupId() + " | groupref: " + bodVO.getGroupRef() + " | grouparent: " + bodVO.getGroupParent());
+		
+		
+		String objectClassName = Utility.spaceSeparator(bodVO.getGroupName().substring(0, (bodVO.getGroupName().indexOf("Type") > 0) ? bodVO.getGroupName().indexOf("Type") : bodVO.getGroupName().length()));
+		String den = objectClassName + ". Details";
+		int oagisComponentType = 1;
+		if(Utility.first(den).endsWith("Base"))
+			oagisComponentType = 0;
+		else if(Utility.first(den).endsWith("Extension") || Utility.first(den).equals("Open User Area") || Utility.first(den).equals("Any User Area") || Utility.first(den).equals("All Extension"))
+			oagisComponentType = 2;
+		else if(Utility.first(den).endsWith("Group"))
+			oagisComponentType = 3;
+		String module = fullFilePath.substring(fullFilePath.lastIndexOf(File.separator) + 1, fullFilePath.lastIndexOf("."));
+		
+		insertACCForGroup(bodVO, objectClassName, den, oagisComponentType, module);
+		
+		insertASCCPForGroup(bodVO, complexTypeId, den, module);
+		
+		inserASCCForGroup(bodVO, complexTypeId);
+	}
+	
+	private void insertACCForGroup(BODElementVO bodVO, String objectClassName, String accDen, int oagisComponentType, String module) throws SRTDAOException {
+		if(getACC(bodVO.getGroupId()) == null) {
+			ACCVO aACCVO = new ACCVO();
+			aACCVO.setACCGUID(bodVO.getGroupId());
+			aACCVO.setObjectClassTerm(objectClassName);
+			aACCVO.setDEN(accDen);
+			aACCVO.setDefinition("Group");
+			aACCVO.setOAGISComponentType(oagisComponentType);
+			aACCVO.setBasedACCID(-1);
+			aACCVO.setCreatedByUserId(1);
+			aACCVO.setLastUpdatedByUserId(1);
+			aACCVO.setState(4);
+			aACCVO.setModule(module);
+	
+			accDao.insertObject(aACCVO);
+		}
+	}
+	
+	private void insertASCCPForGroup(BODElementVO bodVO, String complexTypeId, String accDen, String module) throws SRTDAOException {
+		if(getASCCP(bodVO.getGroupId()) == null) {
+			String propertyTerm = Utility.spaceSeparator(bodVO.getGroupName());
+	
+			ASCCPVO asccpVO = new ASCCPVO();
+			asccpVO.setASCCPGUID(bodVO.getGroupId());
+			asccpVO.setPropertyTerm(propertyTerm);
+			asccpVO.setDefinition("Group");
+			
+			int roleOfACCID = -1;
+			if (bodVO.getGroupParent() != null) {
+				roleOfACCID = getACC(bodVO.getGroupParent()).getACCID();
+			} else {
+				roleOfACCID = getACC(complexTypeId).getACCID(); 
+			}
+			
+			asccpVO.setRoleOfACCID(roleOfACCID);
+			asccpVO.setDEN(propertyTerm + ". " + Utility.first(accDen));
+			asccpVO.setState(4);
+			asccpVO.setModule(module);
+			asccpVO.setCreatedByUserId(1);
+			asccpVO.setLastUpdatedByUserId(1);
+	
+			asccpDao.insertObject(asccpVO);
+		}
+	}
+	
+	private void inserASCCForGroup(BODElementVO bodVO, String complexTypeId) throws SRTDAOException {
+		if(getASCC(bodVO.getGroupRef()) == null) {
+			ACCVO accVO = accVO = getACC(bodVO.getGroupId());
+			ASCCPVO asccpVO1 = getASCCP(bodVO.getGroupId());
+			int assocToASCCPId =  asccpVO1.getASCCPID();
+	
+			ASCCVO asscVO = new ASCCVO();
+			asscVO.setASCCGUID(bodVO.getGroupRef());
+			asscVO.setCardinalityMin(1);
+			asscVO.setCardinalityMax(1);
+			
+			int accId = 0;
+			if(bodVO.getGroupParent() == null) {
+				accId = getACC(complexTypeId).getACCID();
+			} else {
+				accId = getACC(bodVO.getGroupParent()).getACCID();
+			}
+			
+			asscVO.setAssocFromACCID(accId);
+			asscVO.setSequencingKey(asccDao.getASCCCount(accId) + 1); // TODO check this
+			asscVO.setAssocToASCCPID(assocToASCCPId);
+			asscVO.setDEN(Utility.first(accVO.getDEN()) + ". " + asccpVO1.getDEN());
+			asscVO.setDefinition("Group");
+	
+			asccDao.insertObject(asscVO);
+		}
+	}
+	
 	private ArrayList<String> insertACC(XSComplexTypeDecl complexType, String fullFilePath) throws Exception {
 		
 		ArrayList<String> elements = new ArrayList<String>();
@@ -321,6 +514,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			ACCVO accVO = (ACCVO)accDao.findObject(qc);
 			if(accVO == null) {
 				elements = insertACC(baseType, fullFilePath);
+				accVO = (ACCVO)accDao.findObject(qc);
+				basedAccId = accVO.getACCID();
 			} else {
 				basedAccId = accVO.getACCID();
 				XSParticle particle = bodSchemaHandler.getComplexTypeDefinition(base).getParticle();
@@ -361,6 +556,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		XSParticle particle = complexType.getParticle();
 		if(particle != null) {
 			ArrayList<BODElementVO> al = bodSchemaHandler.processParticle(particle, 1);
+			String tempGroupId = "";
 			
 			for(BODElementVO bodVO : al) {
 				if(!elements.contains(bodVO.getName())) {
@@ -375,6 +571,18 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 						} 
 					}
 					
+					
+					// insert ACC with group id, if group parent == null, then complexType is based ACC, else parent is based ACC
+					// insert ASCCP with group id, from ACC group
+					// insert ASCC with group ref, from ACC is parent or CT, to ASCCP is group id 
+					
+					if(bodVO.getGroupId() != null && !tempGroupId.equals(bodVO.getGroupId())) {
+						System.out.println("--- eleID: " + bodVO.getElement().getFId() + " | name: " + bodVO.getName() + " | id: " + bodVO.getId() + " | ref: " + bodVO.getRef() + " | group?: " + bodVO.isGroup() + " | groupid: " + bodVO.getGroupId() + " | groupref: " + bodVO.getGroupRef() + " | grouparent: " + bodVO.getGroupParent());
+						
+						tempGroupId = bodVO.getGroupId();
+						insertForGroup(bodVO, fullFilePath, complexType.getFId());
+					}
+					
 					QueryCondition qc = new QueryCondition();
 					qc.add("asccp_guid", bodVO.getId());
 					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc);
@@ -385,20 +593,28 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					
 					if(asccpVO != null) {
 						System.out.println("####################### match to ascc - " + bodVO.getName()); 
-						insertASCC(bodVO, complexType, asccpVO);
+						insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO);
 					} else if(bccpVO != null) {
 						System.out.println("####################### match to bccp - " + bodVO.getName());
-						insertBCC(bodVO, complexType, bccpVO);
+						insertBCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), bccpVO);
 					} else {
 						System.out.println("####################### no match case - " + bodVO.getName());
 						//if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
 							//insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
 						if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
-							insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()));
+							if(bodVO.getGroupId() == null) {
+								insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()));
+							} else {
+								
+								String propertyTerm = Utility.spaceSeparator(bodVO.getGroupName());
+								den = propertyTerm + ". " + Utility.first(den);
+								insertASCCPUnderGroup(bodVO);
+							}
+							
 							QueryCondition qc3 = new QueryCondition();
 							qc3.add("asccp_guid", bodVO.getId());
 							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3);
-							insertASCC(bodVO, complexType, asccpVO1);
+							insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO1);
 						}
 					}
 					try {
