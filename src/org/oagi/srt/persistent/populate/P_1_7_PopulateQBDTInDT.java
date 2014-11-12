@@ -1,7 +1,10 @@
 package org.oagi.srt.persistent.populate;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.oagi.srt.common.QueryCondition;
@@ -15,14 +18,21 @@ import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BCCPVO;
 import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
+import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
 import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
 import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
+import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
 import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
+import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
 *
@@ -76,6 +86,124 @@ public class P_1_7_PopulateQBDTInDT {
 		
 		System.out.println("### elementsFromFieldsXSD.getLength() " + elementsFromFieldsXSD.getLength());
 	}
+	
+	
+	private void insertCDTSCAllowedPrimitive(NodeList elementsFromXSD, XPathHandler xHandler) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
+
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTSCAllowedPrimitive");
+		CDTSCAllowedPrimitiveVO cdt_sc_allowedVO = new CDTSCAllowedPrimitiveVO();
+
+		for (int j = 0; j < elementsFromXSD.getLength(); j++) {
+			Element ref_tmp = (Element) elementsFromXSD.item(j);
+			NodeList result = xHandler.getNodeList("//xsd:complexType[@id = '"+ ref_tmp.getAttribute("id") + "']//xsd:attribute");
+			for (int i = 0; i < result.getLength(); i++) {
+				Element tmp = (Element) result.item(i);
+				cdt_sc_allowedVO.setCDTSCID(getDTSCID(tmp.getAttribute("id")));
+				ArrayList<SRTObject> cdtallowedprimitivelist = new ArrayList<SRTObject>();
+				cdtallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID(getRepresentationTerm(tmp.getAttribute("id"))));
+				for(SRTObject dvo : cdtallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					cdt_sc_allowedVO.setCDTPrimitiveID(svo.getCDTPrimitiveID());
+					cdt_sc_allowedVO.setisDefault(svo.getisDefault());
+					//dao.insertObject(cdt_sc_allowedVO);
+				}
+			}
+		}
+		System.out.println("###END#####");
+	}
+	
+	private void insertCDTSCAllowedPrimitiveExpressionTypeMap(NodeList elementsFromXSD, XPathHandler xHandler) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
+
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
+		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+
+		NodeList ref = xHandler.getNodeList("//xsd:complexType");
+		for (int j = 0; j < ref.getLength(); j++) {
+			Element ref_tmp = (Element) ref.item(j);
+			NodeList result = xHandler.getNodeList("//xsd:complexType[@id = '"+ ref_tmp.getAttribute("id") + "']//xsd:attribute");
+			for (int i = 0; i < result.getLength(); i++) {
+				Element tmp = (Element) result.item(i);
+				
+				ArrayList<SRTObject> cdtscallowedprimitivelist = new ArrayList<SRTObject>();
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(svo.getCDTSCAllowedPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Binary")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:base64Binary"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:hexBinary"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Boolean")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:boolean"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Decimal")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:decimal"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Double")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:double"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:float"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Float")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:float"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Integer")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:integer"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("NormalizedString")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:normalizedString"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("String")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:string"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("TimeDuration")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:token"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:duration"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("TimePoint")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:token"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:dateTime"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:date"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:time"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gYearMonth"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gYear"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gMonthDay"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gDay"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gMonth"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Token")){
+						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:token"));
+						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+					}
+				}
+			}
+		}
+
+		System.out.println("###END#####");
+	}
+	
 	
 	private void insertBDTPrimitiveRestriction(DTVO aDTVO, String type) throws SRTDAOException, XPathExpressionException {
 		if(aDTVO.getDataTypeTerm().equals("Code")) {
@@ -149,7 +277,7 @@ public class P_1_7_PopulateQBDTInDT {
 				
 				aBDT_Primitive_RestrictionVO.setisDefault(true);;
 				
-				//aBDTPrimitiveRestrictionDAO.insertObject(aBDT_Primitive_RestrictionVO);
+				aBDTPrimitiveRestrictionDAO.insertObject(aBDT_Primitive_RestrictionVO);
 			}
 		}
 	}
@@ -215,7 +343,133 @@ public class P_1_7_PopulateQBDTInDT {
 			}
 		}
 	}
-	
+	private void insertBDT_SC_Primitive_Restriction(DTSCVO dtscvo, int dtsc, int mode, String name, String type)  throws XPathExpressionException, SRTDAOException {
+		BDTSCPrimitiveRestrictionVO bdtscprimitiverestionvo = new BDTSCPrimitiveRestrictionVO();
+		bdtscprimitiverestionvo.setBDTSCID(dtscvo.getDTSCID());
+		
+		ArrayList<SRTObject> cdtscallowedprimitivelist = new ArrayList<SRTObject>();
+		// if (SC = inherit from the base BDT)
+		if(mode == 1) {
+			cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(dtsc);
+			for(SRTObject dvo : cdtscallowedprimitivelist){
+				CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+				bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTSCAllowedPrimitiveID());
+				bdtscprimitiverestionvo.setisDefault(svo.getisDefault());
+			}			
+		}
+			
+		else if (mode == 0) { // else if (new SC)
+			if(type.equalsIgnoreCase("Number_B98233")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Number"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("Integer"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}		
+			}
+			
+			else if(type.equalsIgnoreCase("CodeType_1E7368") || type.equalsIgnoreCase("CodeContentType") || name.equalsIgnoreCase("countryCode")) {
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Code"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("Token"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(type.equalsIgnoreCase("StringType")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Text"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("String"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(type.equalsIgnoreCase("NormalizedStringType")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Text"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("String"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(name.equalsIgnoreCase("listID") || name.equalsIgnoreCase("listVersionID") || name.equalsIgnoreCase("unitCodeListVersionID")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Identifier"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("NormalizedString"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(type.equalsIgnoreCase("DateTimeType")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Date Time"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("Token"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(type.equalsIgnoreCase("IndicatorType")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Indicator"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("Token"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}	
+			else if(type.equalsIgnoreCase("ValueType_E7171E")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Value"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("NormalizedString"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(name.equalsIgnoreCase("name")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Name"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					if(getPrimitiveName(svo.getCDTPrimitiveID()).equalsIgnoreCase("NormalizedString"))
+						bdtscprimitiverestionvo.setisDefault(true);
+					else 
+						bdtscprimitiverestionvo.setisDefault(false);
+				}	
+			}
+			else if(type.contains("CodeContentType") || name.equalsIgnoreCase("listAgencyID")){
+				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Code"));
+				for(SRTObject dvo : cdtscallowedprimitivelist){
+					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
+					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
+					bdtscprimitiverestionvo.setisDefault(false);
+				}
+			}
+		}		
+	}
+		
 	private DTVO addToDT(String guid, String type) throws XPathExpressionException, SRTDAOException {
 		
 		
@@ -265,7 +519,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
 			
-			//dtDao.insertObject(dtVO);
+			dtDao.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", guid);
@@ -322,7 +576,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
 			
-			//dtDao.insertObject(dtVO);
+			dtDao.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", tN.getAttribute("id"));
@@ -381,7 +635,9 @@ public class P_1_7_PopulateQBDTInDT {
 			vo.setMaxCardinality(dtsc_vo.getMaxCardinality());
 			vo.setBasedDTSCID(dtsc_vo.getDTSCID());
 			
-			//aDTSCDAO.insertObject(vo);	
+			aDTSCDAO.insertObject(vo);	
+			
+			insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 1, "", "");
 		}
 		
 		// new SC
@@ -459,10 +715,106 @@ public class P_1_7_PopulateQBDTInDT {
 				vo.setMinCardinality(min_cardinality);
 				vo.setMaxCardinality(max_cardinality);
 				
-				//aDTSCDAO.insertObject(vo);		
+				aDTSCDAO.insertObject(vo);	
+				
+				insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
 			}
 		}
 	}
+	
+
+	public int getDTSCID(String DTSCGUID) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("DTSC");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("DT_SC_GUID", new String(DTSCGUID));
+		DTSCVO dtscVO = (DTSCVO)dao.findObject(qc);
+		int id = dtscVO.getDTSCID();
+		return id;
+	}
+	
+	public int getDTID(String DataTypeTerm) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("DT");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("DT_GUID", new String(DataTypeTerm));
+		qc.add("DT_Type", 0);
+		DTVO dtVO = (DTVO)dao.findObject(qc);		
+		int id = dtVO.getDTID();
+		return id;
+	}
+	
+	public int getCDTSCID(int DTSCID) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTSCAllowedPrimitive");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("CDT_SC_ID", DTSCID);
+		CDTSCAllowedPrimitiveVO cdtVO = (CDTSCAllowedPrimitiveVO)dao.findObject(qc);
+		int id = cdtVO.getCDTSCID();
+		return id;
+	}
+	
+	public String getRepresentationTerm(String DTSCGUID) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("DTSC");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("DT_SC_GUID", new String(DTSCGUID));
+		DTSCVO dtscVO = (DTSCVO)dao.findObject(qc);
+		String term = dtscVO.getRepresentationTerm();
+		return term;
+	}
+	
+	public String getPrimitiveName(int CDTPrimitiveID) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTPrimitive");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("CDT_Primitive_ID", CDTPrimitiveID);
+		CDTPrimitiveVO cdtprimitiveVO = (CDTPrimitiveVO)dao.findObject(qc);
+		String name = cdtprimitiveVO.getName();
+		return name;
+	}
+	
+	
+	public int getCDTPrimitiveID(String Name) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTPrimitive");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("Name", new String(Name));
+		CDTPrimitiveVO cdtPrimitiveVO = (CDTPrimitiveVO)dao.findObject(qc);
+		int id = cdtPrimitiveVO.getCDTPrimitiveID();
+		return id;
+	}
+	
+	public ArrayList<SRTObject> getCdt_Allowed_Primitive_ID(int cdt_id) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTAllowedPrimitive");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("CDT_ID", cdt_id);
+		ArrayList<SRTObject> cdtallowedprimitiveidlist = new ArrayList<SRTObject>();
+		cdtallowedprimitiveidlist = dao.findObjects(qc);
+		return cdtallowedprimitiveidlist;
+	}
+	
+	public ArrayList<SRTObject> getCdt_SC_Allowed_Primitive_ID(int cdt_sc_id) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("CDTSCAllowedPrimitive");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("CDT_SC_ID", cdt_sc_id);
+		ArrayList<SRTObject> cdtscallowedprimitiveidlist = new ArrayList<SRTObject>();
+		cdtscallowedprimitiveidlist = dao.findObjects(qc);
+		return cdtscallowedprimitiveidlist;
+	}
+	
+	public int getXSDBuiltInTypeID(String BuiltIntype) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("XSDBuiltInType");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("BuiltIn_Type", new String(BuiltIntype));
+		XSDBuiltInTypeVO xsdBuiltInTypeVO = (XSDBuiltInTypeVO)dao.findObject(qc);
+		int id = xsdBuiltInTypeVO.getXSDBuiltInTypeID();
+		return id;
+	}
+	
 	
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
