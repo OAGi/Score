@@ -16,6 +16,7 @@ public class BDTSCPrimitiveRestrictionVO extends SRTObject {
 	private int CDTSCAllowedPrimitiveExpressionTypeMapID;
 	private int CodeListID;
 	private boolean isDefault;
+	private int AgencyIDListID;
 	
 	public int getBDTSCPrimitiveRestrictionID() {
 		return BDTSCPrimitiveRestrictionID;
@@ -55,6 +56,14 @@ public class BDTSCPrimitiveRestrictionVO extends SRTObject {
 	
 	public void setisDefault(boolean isdefault) {
 		isDefault = isdefault;
+	}
+	
+	public int getAgencyIDListID() {
+		return AgencyIDListID;
+	}
+	
+	public void setAgencyIDListID(int agencyIDListID) {
+		AgencyIDListID = agencyIDListID;
 	}
 	
 }
