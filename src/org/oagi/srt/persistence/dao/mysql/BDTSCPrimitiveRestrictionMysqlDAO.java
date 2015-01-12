@@ -24,17 +24,17 @@ public class BDTSCPrimitiveRestrictionMysqlDAO extends SRTDAO {
 	private final String _tableName = "bdt_sc_primitive_restriction";
 
 	private final String _FIND_ALL_BDT_SC_Primitive_Restriction_STATEMENT = 
-			"SELECT BDT_SC_Primitive_Restriction_ID, BDT_SC_ID, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault, AgencyIDListID FROM " + _tableName;
+			"SELECT BDT_SC_Primitive_Restriction_ID, BDT_SC_ID, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault, Agency_ID_List_ID FROM " + _tableName;
 
 	private final String _FIND_BDT_SC_Primitive_Restriction_STATEMENT = 
-			"SELECT BDT_SC_Primitive_Restriction_ID, BDT_SC_ID, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault, AgencyIDListID FROM " + _tableName;
+			"SELECT BDT_SC_Primitive_Restriction_ID, BDT_SC_ID, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault, Agency_ID_List_ID FROM " + _tableName;
 
 	private final String _INSERT_BDT_SC_Primitive_Restriction_STATEMENT = 
-			"INSERT INTO " + _tableName + " (BDT_SC_ID, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault, AgencyIDListID) VALUES (?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (BDT_SC_ID, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault, Agency_ID_List_ID) VALUES (?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BDT_SC_Primitive_Restriction_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET BDT_SC_Primitive_Restriction_ID = ?, BDT_SC_ID = ?, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?, Code_List_ID = ?, isDefault = ?, AgencyIDListID = ? WHERE BDT_SC_Primitive_Restriction_ID = ?";
+			+ " SET BDT_SC_Primitive_Restriction_ID = ?, BDT_SC_ID = ?, CDT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?, Code_List_ID = ?, isDefault = ?, Agency_ID_List_ID = ? WHERE BDT_SC_Primitive_Restriction_ID = ?";
 
 	private final String _DELETE_BDT_SC_Primitive_Restriction_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BDT_SC_Primitive_Restriction_ID = ?";
@@ -56,6 +56,11 @@ public class BDTSCPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			else
 				ps.setInt(3, bdtscprimitiverestrictionVO.getCodeListID());
 			ps.setBoolean(4, bdtscprimitiverestrictionVO.getisDefault());
+			
+			if(bdtscprimitiverestrictionVO.getAgencyIDListID() == 0)
+				ps.setNull(5, java.sql.Types.INTEGER);
+			else
+				ps.setInt(5, bdtscprimitiverestrictionVO.getAgencyIDListID());
 
 			ps.executeUpdate();
 

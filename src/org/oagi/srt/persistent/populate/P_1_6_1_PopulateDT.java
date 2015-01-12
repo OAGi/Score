@@ -77,6 +77,7 @@ public class P_1_6_1_PopulateDT {
 				dtVO.setCreatedByUserId(id);
 				dtVO.setLastUpdatedByUserId(id);
 				dtVO.setLastUpdateTimestamp(current_stamp);
+				dtVO.setRevisionDocumentation("");
 			    dao.insertObject(dtVO);
 		    }
 	    }

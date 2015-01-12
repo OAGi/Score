@@ -38,7 +38,7 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 	
 	private final String _UPDATE_Agency_ID_List_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " Agency_ID_List_ID = ?, Agency_ID_List_GUID = ?,"
+			+ " SET Agency_ID_List_GUID = ?,"
 			+ " Enumeration_Type_GUID = ?, Name = ?, List_ID = ?, Agency_ID = ?,"
 			+ " Version_ID = ?, Definition = ? WHERE Agency_ID_List_ID = ?";
 	
@@ -57,7 +57,8 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 			ps.setString(2, agencyidlistVO.getEnumerationTypeGUID());
 			ps.setString(3, agencyidlistVO.getName());
 			ps.setString(4, agencyidlistVO.getListID());
-			ps.setInt(5, agencyidlistVO.getAgencyID());
+			//ps.setInt(5, agencyidlistVO.getAgencyID());
+			ps.setNull(5, java.sql.Types.INTEGER);
 			ps.setString(6, agencyidlistVO.getVersionID());
 			ps.setString(7, agencyidlistVO.getDefinition());
 			ps.executeUpdate();
@@ -204,6 +205,7 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 			ps.setInt(5, agencyidlistVO.getAgencyID());
 			ps.setString(6, agencyidlistVO.getVersionID());
 			ps.setString(7, agencyidlistVO.getDefinition());
+			ps.setInt(8, agencyidlistVO.getAgencyIDListID());
 			ps.executeUpdate();
 
 			tx.commit();

@@ -49,6 +49,7 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 					System.out.println("###1 " + aDTSCVO.getPropertyTerm());
 					bVO.setCodeListID(((CodeListVO)aCodeListDAO.findObject(qc)).getCodeListID());
 					bVO.setisDefault(true);
+					bVO.setAgencyIDListID(0);
 					
 					aBDTPrimitiveRestrictionDAO.insertObject(bVO);
 				} else {

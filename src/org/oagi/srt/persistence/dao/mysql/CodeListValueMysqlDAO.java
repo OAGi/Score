@@ -24,17 +24,17 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 	private final String _tableName = "code_list_value";
 
 	private final String _FIND_ALL_Code_List_Value_STATEMENT = 
-			"SELECT Code_List_Value_ID, Owner_Code_List_ID, Value, Name, Definition, Definition_Source, Used_Indicator, Locked_Indicator FROM " + _tableName;
+			"SELECT Code_List_Value_ID, Code_List_ID, Value, Name, Definition, Definition_Source, Used_Indicator, Locked_Indicator FROM " + _tableName;
 
 	private final String _FIND_Code_List_Value_STATEMENT = 
-			"SELECT Code_List_Value_ID, Owner_Code_List_ID, Value, Name, Definition, Definition_Source, Used_Indicator, Locked_Indicator FROM " + _tableName;
+			"SELECT Code_List_Value_ID, Code_List_ID, Value, Name, Definition, Definition_Source, Used_Indicator, Locked_Indicator FROM " + _tableName;
 
 	private final String _INSERT_Code_List_Value_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Owner_Code_List_ID, Value, Name, Definition, Definition_Source, Used_Indicator, Locked_Indicator) VALUES (?, ?, ?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (Code_List_ID, Value, Name, Definition, Definition_Source, Used_Indicator, Locked_Indicator) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_Code_List_Value_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Owner_Code_List_ID = ?, Value = ?, Name = ?, Definition = ?, Definition_Source = ?, Used_Indicator = ?, Locked_Indicator = ? WHERE Code_List_Value_ID = ?";
+			+ " SET Code_List_ID = ?, Value = ?, Name = ?, Definition = ?, Definition_Source = ?, Used_Indicator = ?, Locked_Indicator = ? WHERE Code_List_Value_ID = ?";
 
 	private final String _DELETE_Code_List_Value_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Code_List_Value_ID = ?";
@@ -116,7 +116,7 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				codelistvalueVO.setCodeListValueID(rs.getInt("Code_List_Value_ID"));
-				codelistvalueVO.setOwnerCodeListID(rs.getInt("Owner_Code_List_ID"));
+				codelistvalueVO.setOwnerCodeListID(rs.getInt("Code_List_ID"));
 				codelistvalueVO.setValue(rs.getString("Value"));
 				codelistvalueVO.setName(rs.getString("Name"));
 				codelistvalueVO.setDefinition(rs.getString("Definition"));
@@ -160,7 +160,7 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CodeListValueVO codelistvalueVO = new CodeListValueVO();
 				codelistvalueVO.setCodeListValueID(rs.getInt("Code_Value_ID"));
-				codelistvalueVO.setOwnerCodeListID(rs.getInt("Owner_Code_List_ID"));
+				codelistvalueVO.setOwnerCodeListID(rs.getInt("Code_List_ID"));
 				codelistvalueVO.setValue(rs.getString("Value"));
 				codelistvalueVO.setName(rs.getString("Name"));
 				codelistvalueVO.setDefinition(rs.getString("Definition"));

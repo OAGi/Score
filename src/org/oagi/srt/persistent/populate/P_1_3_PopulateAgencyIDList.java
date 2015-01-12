@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
@@ -16,6 +17,7 @@ import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.AgencyIDListVO;
 import org.oagi.srt.persistence.dto.AgencyIDListValueVO;
+import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -47,10 +49,25 @@ public class P_1_3_PopulateAgencyIDList {
 		}
 		agencyidlistVO.setName("Agency Identification");
 		agencyidlistVO.setListID("3055");
-		agencyidlistVO.setAgencyID(6);
+		//agencyidlistVO.setAgencyID(6);
 		agencyidlistVO.setVersionID("D08B");
 		agencyidlistVO.setDefinition("Schema agency:UN/CEFACT   Schema version:3.3		Schema date:15 September 2009	Code list name:Agency Identification Code   	Code list agency: UNECE    Code list version:D08B");		
 		dao.insertObject(agencyidlistVO);
+		System.out.println("###END#####");
+
+	}
+	
+	public void updateAgencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("AgencyIDListValue");
+		QueryCondition qc = new QueryCondition();
+		qc.add("value", 6);
+		AgencyIDListValueVO aAgencyIDListValueVO = ((AgencyIDListValueVO)dao.findObject(qc));
+		
+		SRTDAO dao1 = df.getDAO("AgencyIDList");
+		AgencyIDListVO aAgencyIDListVO = (AgencyIDListVO)(dao1.findObjects().get(0));
+		aAgencyIDListVO.setAgencyID(aAgencyIDListValueVO.getAgencyIDListValueID());
+		dao1.updateObject(aAgencyIDListVO);
 		System.out.println("###END#####");
 
 	}
@@ -88,7 +105,7 @@ public class P_1_3_PopulateAgencyIDList {
 				dao.insertObject(agencyidlistvalueVO);
 			}
 		}
-		System.out.println("###END#####");
+		System.out.println("###END1#####");
 
 	}
 
@@ -98,5 +115,6 @@ public class P_1_3_PopulateAgencyIDList {
 		P_1_3_PopulateAgencyIDList agencyidlist = new P_1_3_PopulateAgencyIDList();
 		agencyidlist.agencyIDList();
 		agencyidlist.agencyIDListValue();
+		agencyidlist.updateAgencyIDList();
 	}
 }

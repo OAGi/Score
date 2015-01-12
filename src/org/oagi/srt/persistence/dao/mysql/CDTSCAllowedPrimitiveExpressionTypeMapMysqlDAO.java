@@ -24,11 +24,11 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 	private final String _tableName = "cdt_sc_allowed_primitive_expression_type_map";
 
 	private final String _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "SELECT CT_SC_Allowed_Primitive_Expression_Type_Map_ID, CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID "
+	= "SELECT CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID "
 			+ "FROM " + _tableName;
 	
 	private final String _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "SELECT CT_SC_Allowed_Primitive_Expression_Type_Map_ID, CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID "
+	= "SELECT CDT_SC_Allowed_Primitive_Expression_Type_Map_ID, CDT_SC_Allowed_Primitive, XSD_BuiltIn_Type_ID "
 			+ "FROM " + _tableName;
 	
 	private final String _INSERT_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
@@ -36,10 +36,10 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 	
 	private final String _UPDATE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
 	= "UPDATE " + _tableName + " SET CDT_SC_Allowed_Primitive = ?, XSD_BuiltIn_Type_ID = ? "
-			+ "WHERE CT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?";
+			+ "WHERE CDT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?";
 	
 	private final String _DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "DELETE FROM " + _tableName + " WHERE CT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?";
+	= "DELETE FROM " + _tableName + " WHERE CDT_SC_Allowed_Primitive_Expression_Type_Map_ID = ?";
 
 
 	@Override
@@ -78,7 +78,7 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
 						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
 				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("CDT_SC_Allowed_Primitive"));
 				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
 				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);

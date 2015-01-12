@@ -85,6 +85,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 			dtVO.setRevisionState(1);
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
+			dtVO.setRevisionDocumentation("");
 	
 			dao.insertObject(dtVO);
 		}
@@ -116,6 +117,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 			dtVO.setRevisionState(1);
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
+			dtVO.setRevisionDocumentation("");
 			dao.insertObject(dtVO);
 		}
 		

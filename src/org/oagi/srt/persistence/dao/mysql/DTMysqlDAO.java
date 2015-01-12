@@ -40,7 +40,7 @@ public class DTMysqlDAO extends SRTDAO {
 			"INSERT INTO " + _tableName + " (DT_GUID, DT_Type, Version_Number, "
 					+ "Revision_Type, Data_Type_Term, Based_DT_ID, DEN, Content_Component_DEN, "
 					+ "Definition, Content_Component_Definition, Revision_State, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, qualifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, qualifier, Revision_Documentation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
 
 	private final String _UPDATE_DT_STATEMENT = 
 			"UPDATE " + _tableName
@@ -73,6 +73,7 @@ public class DTMysqlDAO extends SRTDAO {
 			ps.setInt(12, dtVO.getCreatedByUserId());
 			ps.setInt(13, dtVO.getLastUpdatedByUserId());
 			ps.setString(14, dtVO.getQualifier());
+			ps.setString(15, dtVO.getRevisionDocumentation());
 
 			ps.executeUpdate();
 

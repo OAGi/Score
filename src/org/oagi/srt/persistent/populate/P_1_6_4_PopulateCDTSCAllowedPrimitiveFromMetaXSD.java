@@ -41,6 +41,13 @@ public class P_1_6_4_PopulateCDTSCAllowedPrimitiveFromMetaXSD {
 			for (int i = 0; i < result.getLength(); i++) {
 				Element tmp = (Element) result.item(i);
 				cdt_sc_allowedVO.setCDTSCID(getDTSCID(tmp.getAttribute("id")));
+				
+				
+				System.out.println("##################" + tmp.getAttribute("id"));
+				System.out.println("##################" + getDTSCID(tmp.getAttribute("id")));
+				
+				
+				
 				if (tmp.getAttribute("name").equals("actionCode") || tmp.getAttribute("name").equals("expressionLanguage")) {
 					cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("NormalizedString"));
 					cdt_sc_allowedVO.setisDefault(false);
