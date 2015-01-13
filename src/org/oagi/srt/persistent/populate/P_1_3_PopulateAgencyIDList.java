@@ -94,13 +94,10 @@ public class P_1_3_PopulateAgencyIDList {
 			for(int i = 0; i < enumeration.getLength(); i++) {
 				Element enum_element = (Element)enumeration.item(i);
 				agencyidlistvalueVO.setValue(enum_element.getAttribute("value"));		    
-
 				Element name_element = (Element)name.item(i);
 				agencyidlistvalueVO.setName(name_element.getTextContent());
-
 				Element definition_element = (Element)definition.item(i);
 				agencyidlistvalueVO.setDefinition(definition_element.getTextContent());
-
 				agencyidlistvalueVO.setOwnerAgencyIDListID(svo.getAgencyIDListID());
 				dao.insertObject(agencyidlistvalueVO);
 			}

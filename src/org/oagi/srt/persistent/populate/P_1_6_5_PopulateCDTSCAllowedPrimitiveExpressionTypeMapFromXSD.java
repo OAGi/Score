@@ -41,25 +41,28 @@ public class P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD {
 		NodeList ref = xh.getNodeList("//xsd:complexType");
 		for (int j = 0; j < ref.getLength(); j++) {
 			Element ref_tmp = (Element) ref.item(j);
-			NodeList result = xh.getNodeList("//xsd:complexType[@id = '"+ ref_tmp.getAttribute("id") + "']//xsd:attribute");
-			for (int i = 0; i < result.getLength(); i++) {
-				Element tmp = (Element) result.item(i);
-				if (tmp.getAttribute("name").equals("actionCode") || tmp.getAttribute("name").equals("expressionLanguage")) {
-					if(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString"))!=0) {
-						cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString")));
-						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("normalized string"));
+		    if(ref_tmp.getAttribute("name").equals("ExpressionType") || ref_tmp.getAttribute("name").equals("ActionExpressionType") || ref_tmp.getAttribute("name").equals("ResponseExpressionType") ) {
+
+				NodeList result = xh.getNodeList("//xsd:complexType[@id = '"+ ref_tmp.getAttribute("id") + "']//xsd:attribute");
+				for (int i = 0; i < result.getLength(); i++) {
+					Element tmp = (Element) result.item(i);
+					if (tmp.getAttribute("name").equals("actionCode") || tmp.getAttribute("name").equals("expressionLanguage")) {
+						if(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString"))!=0) {
+							cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString")));
+							cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("normalized string"));
+						}
+						else if(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("String"))!=0) {
+							cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString")));
+							cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("string"));
+						}
+						else if(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("Token"))!=0) {
+							cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString")));
+							cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("token"));
+						}
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
-					else if(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("String"))!=0) {
-						cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString")));
-						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("string"));
-					}
-					else if(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("Token"))!=0) {
-						cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(getCDTSCAllowedPrimitiveID(getCDTSCID(getDTSCID(tmp.getAttribute("id"))),getCDTPrimitiveID("NormalizedString")));
-						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("token"));
-					}
-					dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 				}
-			}
+		    }
 		}
 		System.out.println("###END#####");
 	}

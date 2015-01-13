@@ -47,6 +47,7 @@ public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 				   
 				    dt_scVO.setDTSCGUID(tmp.getAttribute("id"));
 				    String PropertyTerm = tmp.getAttribute("name").substring(0,1).toUpperCase()+tmp.getAttribute("name").substring(1);
+
 				    if(tmp.getAttribute("name").indexOf("Code") > 0) {
 				    	PropertyTerm = PropertyTerm.substring(0, tmp.getAttribute("name").indexOf("Code"));
 				    }
@@ -61,7 +62,6 @@ public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 				    else {
 				    	
 				    }
-				    
 				    Node definition = xh.getNode("//xsd:complexType//xsd:attribute[@id = '" + dt_scVO.getDTSCGUID() + "']//xsd:annotation//xsd:documentation") ;
 				    Element definition_element = (Element)definition;
 				    if(definition_element != null) {

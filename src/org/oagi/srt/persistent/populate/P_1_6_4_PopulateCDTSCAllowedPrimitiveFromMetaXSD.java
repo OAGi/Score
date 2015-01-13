@@ -37,31 +37,27 @@ public class P_1_6_4_PopulateCDTSCAllowedPrimitiveFromMetaXSD {
 		NodeList ref = xh.getNodeList("//xsd:complexType");
 		for (int j = 0; j < ref.getLength(); j++) {
 			Element ref_tmp = (Element) ref.item(j);
-			NodeList result = xh.getNodeList("//xsd:complexType[@id = '"+ ref_tmp.getAttribute("id") + "']//xsd:attribute");
-			for (int i = 0; i < result.getLength(); i++) {
-				Element tmp = (Element) result.item(i);
-				cdt_sc_allowedVO.setCDTSCID(getDTSCID(tmp.getAttribute("id")));
-				
-				
-				System.out.println("##################" + tmp.getAttribute("id"));
-				System.out.println("##################" + getDTSCID(tmp.getAttribute("id")));
-				
-				
-				
-				if (tmp.getAttribute("name").equals("actionCode") || tmp.getAttribute("name").equals("expressionLanguage")) {
-					cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("NormalizedString"));
-					cdt_sc_allowedVO.setisDefault(false);
-					dao.insertObject(cdt_sc_allowedVO);
+		    if(ref_tmp.getAttribute("name").equals("ExpressionType") || ref_tmp.getAttribute("name").equals("ActionExpressionType") || ref_tmp.getAttribute("name").equals("ResponseExpressionType") ) {
+				NodeList result = xh.getNodeList("//xsd:complexType[@id = '"+ ref_tmp.getAttribute("id") + "']//xsd:attribute");
+				for (int i = 0; i < result.getLength(); i++) {
+					Element tmp = (Element) result.item(i);
+					cdt_sc_allowedVO.setCDTSCID(getDTSCID(tmp.getAttribute("id")));
 					
-					cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("String"));
-					cdt_sc_allowedVO.setisDefault(false);
-					dao.insertObject(cdt_sc_allowedVO);
-					
-					cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("Token"));
-					cdt_sc_allowedVO.setisDefault(true);
-					dao.insertObject(cdt_sc_allowedVO);
+					if (tmp.getAttribute("name").equals("actionCode") || tmp.getAttribute("name").equals("expressionLanguage")) {
+						cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("NormalizedString"));
+						cdt_sc_allowedVO.setisDefault(false);
+						dao.insertObject(cdt_sc_allowedVO);
+						
+						cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("String"));
+						cdt_sc_allowedVO.setisDefault(false);
+						dao.insertObject(cdt_sc_allowedVO);
+						
+						cdt_sc_allowedVO.setCDTPrimitiveID(getCDTPrimitiveID("Token"));
+						cdt_sc_allowedVO.setisDefault(true);
+						dao.insertObject(cdt_sc_allowedVO);
+					}
 				}
-			}
+		    }
 		}
 		System.out.println("###END#####");
 	}
