@@ -84,12 +84,16 @@ public class P_1_7_PopulateQBDTInDT {
 		
 		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd);
 		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd);
+		insertCDTSCAllowedPrimitive(elementsFromFieldsXSD, fields_xsd);
+		insertCDTSCAllowedPrimitive(elementsFromMetaXSD, meta_xsd);
+		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromFieldsXSD, fields_xsd);
+		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromMetaXSD, meta_xsd);
 		
 		System.out.println("### elementsFromFieldsXSD.getLength() " + elementsFromFieldsXSD.getLength());
 	}
 	
 	
-	private void insertCDTSCAllowedPrimitive(NodeList elementsFromXSD, XPathHandler xHandler) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
+	private void insertCDTSCAllowedPrimitive(NodeList elementsFromXSD, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
 
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("CDTSCAllowedPrimitive");
@@ -107,14 +111,14 @@ public class P_1_7_PopulateQBDTInDT {
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					cdt_sc_allowedVO.setCDTPrimitiveID(svo.getCDTPrimitiveID());
 					cdt_sc_allowedVO.setisDefault(svo.getisDefault());
-					//dao.insertObject(cdt_sc_allowedVO);
+					dao.insertObject(cdt_sc_allowedVO);
 				}
 			}
 		}
 		System.out.println("###END#####");
 	}
 	
-	private void insertCDTSCAllowedPrimitiveExpressionTypeMap(NodeList elementsFromXSD, XPathHandler xHandler) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
+	private void insertCDTSCAllowedPrimitiveExpressionTypeMap(NodeList elementsFromXSD, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
 
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
@@ -134,69 +138,69 @@ public class P_1_7_PopulateQBDTInDT {
 					cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(svo.getCDTSCAllowedPrimitiveID());
 					if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Binary")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:base64Binary"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:hexBinary"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Boolean")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:boolean"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Decimal")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:decimal"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Double")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:double"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:float"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Float")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:float"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Integer")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:integer"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("NormalizedString")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:normalizedString"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("String")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:string"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("TimeDuration")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:token"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:duration"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("TimePoint")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:token"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:dateTime"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:date"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:time"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gYearMonth"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gYear"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gMonthDay"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gDay"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:gMonth"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 					else if(getPrimitiveName(svo.getCDTPrimitiveID()).equals("Token")){
 						cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(getXSDBuiltInTypeID("xsd:token"));
-						//dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
+						dao.insertObject(cdt_sc_allowed_primitive_expression_type_mapVO);
 					}
 				}
 			}
@@ -346,7 +350,7 @@ public class P_1_7_PopulateQBDTInDT {
 	}
 	private void insertBDT_SC_Primitive_Restriction(DTSCVO dtscvo, int dtsc, int mode, String name, String type)  throws XPathExpressionException, SRTDAOException {
 		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("BDTSCPrimitiveExpressionTypeMap");
+		SRTDAO dao = df.getDAO("BDTSCPrimitiveRestriction");
 		
 		BDTSCPrimitiveRestrictionVO bdtscprimitiverestionvo = new BDTSCPrimitiveRestrictionVO();
 		bdtscprimitiverestionvo.setBDTSCID(dtscvo.getDTSCID());
@@ -359,13 +363,13 @@ public class P_1_7_PopulateQBDTInDT {
 				CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 				bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTSCAllowedPrimitiveID());
 				bdtscprimitiverestionvo.setisDefault(svo.getisDefault());
-				//dao.insertObject(bdtscprimitiverestionvo);
+				dao.insertObject(bdtscprimitiverestionvo);
 			}			
 		}
 			
 		else if (mode == 0) { // else if (new SC)
 			if(type.equalsIgnoreCase("Number_B98233")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Number"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Number"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -373,12 +377,12 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}		
 			}
 			
 			else if(type.equalsIgnoreCase("CodeType_1E7368") || type.equalsIgnoreCase("CodeContentType") || name.equalsIgnoreCase("countryCode")) {
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Code"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Code"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -386,11 +390,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(type.equalsIgnoreCase("StringType")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Text"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Text"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -398,11 +402,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(type.equalsIgnoreCase("NormalizedStringType")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Text"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Text"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -410,11 +414,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(name.equalsIgnoreCase("listID") || name.equalsIgnoreCase("listVersionID") || name.equalsIgnoreCase("unitCodeListVersionID")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Identifier"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Identifier"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -422,11 +426,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(type.equalsIgnoreCase("DateTimeType")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Date Time"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Date Time"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -434,11 +438,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(type.equalsIgnoreCase("IndicatorType")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Indicator"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Indicator"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -446,11 +450,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}	
 			else if(type.equalsIgnoreCase("ValueType_E7171E")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Value"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Value"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -458,11 +462,11 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(name.equalsIgnoreCase("name")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Name"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Name"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
@@ -470,27 +474,27 @@ public class P_1_7_PopulateQBDTInDT {
 						bdtscprimitiverestionvo.setisDefault(true);
 					else 
 						bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}	
 			}
 			else if(type.contains("CodeContentType") || name.equalsIgnoreCase("listAgencyID")){
-				cdtscallowedprimitivelist = getCdt_Allowed_Primitive_ID(getDTID("Code"));
+				cdtscallowedprimitivelist = getCdt_SC_Allowed_Primitive_ID(getDTID("Code"));
 				for(SRTObject dvo : cdtscallowedprimitivelist){
 					CDTSCAllowedPrimitiveVO svo = (CDTSCAllowedPrimitiveVO) dvo;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(svo.getCDTPrimitiveID());
 					bdtscprimitiverestionvo.setisDefault(false);
-					//dao.insertObject(bdtscprimitiverestionvo);
+					dao.insertObject(bdtscprimitiverestionvo);
 				}
 			}
 			else if(type.contains("CodeContentType")) {//need to check
 				bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(getCodeListID(type.substring(0, type.indexOf("CodeContentType"))));
 				bdtscprimitiverestionvo.setisDefault(true);
-				//dao.insertObject(bdtscprimitiverestionvo);
+				dao.insertObject(bdtscprimitiverestionvo);
 			}
 			else if (name.contains("listAgencyID")){
 				bdtscprimitiverestionvo.setAgencyIDListID(getAgencyListID("oagis-id-f1df540ef0db48318f3a423b3057955f"));
 				bdtscprimitiverestionvo.setisDefault(true);
-				//dao.insertObject(bdtscprimitiverestionvo);
+				dao.insertObject(bdtscprimitiverestionvo);
 			}
 		}		
 	}
@@ -543,6 +547,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setRevisionState(1);
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
+			dtVO.setRevisionDocumentation("");
 			
 			dtDao.insertObject(dtVO);
 			
@@ -600,7 +605,8 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setRevisionState(1);
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
-			
+			dtVO.setRevisionDocumentation("");
+
 			dtDao.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();
@@ -782,7 +788,7 @@ public class P_1_7_PopulateQBDTInDT {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
     	QueryCondition qc = new QueryCondition();
-		qc.add("DT_GUID", new String(DataTypeTerm));
+		qc.add("Data_Type_Term", new String(DataTypeTerm));
 		qc.add("DT_Type", 0);
 		DTVO dtVO = (DTVO)dao.findObject(qc);		
 		int id = dtVO.getDTID();
@@ -868,6 +874,7 @@ public class P_1_7_PopulateQBDTInDT {
 		//System.out.println(q.spaceSeparator("TotalAmountType"));
 		q.populate();
 		
+
 		//System.out.println(q.spaceSeparator("ISBN"));
 		
 		
