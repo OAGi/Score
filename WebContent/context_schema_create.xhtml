@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Ajax">
+					<p:menuitem value="Save" actionListener="#{sideMenu1.save}"
+						update="messages" icon="ui-icon-disk" />
+					<p:menuitem value="Update" actionListener="#{sideMenu1.update}"
+						update="messages" icon="ui-icon-arrowrefresh-1-w" />
+				</p:submenu>
+				<p:submenu style="width: 180px !important;" label="Non-Ajax">
+					<p:menuitem value="Delete" actionListener="#{sideMenu1.delete}"
+						update="messages" ajax="false" icon="ui-icon-close" />
+				</p:submenu>
+				<p:submenu style="width: 180px !important;" label="Navigations">
+					<p:menuitem value="External" url="http://www.primefaces.org"
+						icon="ui-icon-home" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+
+	<ui:define name="content">
+		<h:form>
+			<p:panel header="Validate">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" columns="4" cellpadding="5">
+					<h:outputLabel for="name" value="Name:" style="font-weight:bold" />
+					<p:inputText id="name" value="#{validationView.text}"
+						required="true" label="Name" />
+					<p:message for="name" />
+					<h:outputText value="#{validationView.text}" />
+
+					<h:outputLabel for="number" value="Number:"
+						style="font-weight:bold" />
+					<p:inputText id="number" value="#{validationView.integer}"
+						label="Number">
+						<f:validateDoubleRange minimum="5" maximum="8" />
+					</p:inputText>
+					<p:message for="number" />
+					<h:outputText value="#{validationView.integer}" />
+
+					<h:outputLabel for="dd" value="Double:" style="font-weight:bold" />
+					<p:inputText id="dd" value="#{validationView.doubleNumber}"
+						converterMessage="Cannot convert to double.">
+						<f:validateDoubleRange minimum="5.5" maximum="8.5" />
+					</p:inputText>
+					<p:message for="dd" />
+					<h:outputText value="#{validationView.doubleNumber}" />
+
+					<h:outputLabel for="money" value="Currency ($):"
+						style="font-weight:bold" />
+					<p:inputText id="money" value="#{validationView.money}"
+						label="Currency">
+						<f:convertNumber type="currency" currencySymbol="$" />
+					</p:inputText>
+					<p:message for="money" />
+					<h:outputText value="#{validationView.money}">
+						<f:convertNumber type="currency" currencySymbol="$" />
+					</h:outputText>
+
+					<h:outputLabel for="regex" value="Regex (^[a-zA-Z]+$):"
+						style="font-weight:bold" />
+					<p:inputText id="regex" value="#{validationView.regexText}"
+						validatorMessage="Value does not match pattern.">
+						<f:validateRegex pattern="^[a-zA-Z]+$" />
+					</p:inputText>
+					<p:message for="regex" />
+					<h:outputText value="#{validationView.regexText}" />
+
+					<h:outputLabel for="date" value="Date" style="font-weight:bold" />
+					<p:inputText id="date" value="#{validationView.date}" label="Date">
+						<f:convertDateTime pattern="MM/dd/yyyy" />
+					</p:inputText>
+					<p:message for="date" />
+					<h:outputText value="#{validationView.date}">
+						<f:convertDateTime pattern="MM/dd/yyyy" />
+					</h:outputText>
+
+					<h:outputLabel for="desc" value="Description"
+						style="font-weight:bold" />
+					<p:inputTextarea id="desc" value="#{validationView.description}"
+						required="true" label="Description">
+						<f:validateLength minimum="3" maximum="10" />
+					</p:inputTextarea>
+					<p:message for="desc" />
+					<h:outputText value="#{validationView.description}" />
+				</h:panelGrid>
+
+				<p:commandButton value="Non-Ajax" ajax="false" icon="ui-icon-check"
+					validateClient="true" style="margin-right:10px" />
+				<p:commandButton value="Ajax" update="grid" icon="ui-icon-check"
+					validateClient="true" style="margin-right:10px" />
+				<p:commandButton value="Partial" update="grid" process="name number"
+					validateClient="true" icon="ui-icon-check"
+					style="margin-right:10px" />
+				<p:commandButton value="Disabled" ajax="false" icon="ui-icon-check" />
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

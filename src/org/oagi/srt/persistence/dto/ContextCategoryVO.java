@@ -10,6 +10,7 @@ import org.oagi.srt.common.SRTObject;
 public class ContextCategoryVO extends SRTObject {
 
 	private int ContextCategoryID;
+	private String ContextCategoryGUID;
 	private String Name;
 	private String Description;
 	
@@ -21,6 +22,14 @@ public class ContextCategoryVO extends SRTObject {
 		ContextCategoryID = contextCategoryID;
 	}
 	
+	public String getContextCategoryGUID() {
+		return ContextCategoryGUID;
+	}
+
+	public void setContextCategoryGUID(String contextCategoryGUID) {
+		ContextCategoryGUID = contextCategoryGUID;
+	}
+
 	public String getName(){
 		return Name;
 	}

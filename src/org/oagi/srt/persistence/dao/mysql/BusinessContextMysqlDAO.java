@@ -26,19 +26,19 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 	private final String _tableName = "business_context";
 	
 	private final String _FIND_ALL_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT BusinessContext_ID, Name FROM" + _tableName;
+			"SELECT Business_Context_ID, Name FROM" + _tableName;
 	
 	private final String _FIND_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT BusinessContext_ID, Name FROM" + _tableName;
+			"SELECT Business_Context_ID, Name FROM" + _tableName;
 	
 	private final String _INSERT_BUSINESS_CONTEXT_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Name) VALUES (?)";
 	
 	private final String _UPDATE_BUSINESS_CONTEXT_STATEMENT =
-			"UPDATE " + _tableName + " SET Name = ? WHERE BusinessContext_ID = ?";
+			"UPDATE " + _tableName + " SET Name = ? WHERE Business_Context_ID = ?";
 	
 	private final String _DELETE_BUSINESS_CONTEXT_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE BusinessContext_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE Business_Context_ID = ?";
 	
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
@@ -102,7 +102,7 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				business_contextVO.setBusinessContextID(rs.getInt("BusinessContext_ID"));
+				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				business_contextVO.setName(rs.getString("Name"));
 			}
 			tx.commit();
@@ -140,7 +140,7 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()){
 				BusinessContextVO business_contextVO =  new BusinessContextVO();
-				business_contextVO.setBusinessContextID(rs.getInt("BusinessContext_ID"));
+				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				business_contextVO.setName(rs.getString("Name"));
 				list.add(business_contextVO);
 			}
