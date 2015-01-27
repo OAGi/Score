@@ -2,24 +2,33 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:p="http://primefaces.org/ui"
-	template="/WEB-INF/template.xhtml">
-    
-    <ui:define name="content">
-        <!-- highlight area start-->
-        <div class="ContentSideSections overHidden">
-            <div class="Content66 floatLeft overHidden TextShadow">
-                <span class="defaultSmallTopic mediumFont dispTable">Introduction</span>
-            </div>
-        </div>
-        <!-- highlight area end-->
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+	
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
 
-        <!-- pfnextgen start-->
-        <div class="ContentSideSections overHidden PFNextGen">
-            <div class="Content66 floatLeft overHidden TextShadow">
-                <span class="defaultText dispTable">The next generation of smart manufacturing systems will be developed by composing advanced manufacturing components and information technology (IT) services introducing new technologies. These new technologies can lead to dramatic improvements in the ability to monitor, control, and optimize all aspects of manufacturing.  Currently, the composition is not possible due to a lack of reference architecture (RA) and a solution stack (SS) that includes the new manufacturing components and IT services.  This is technically hard because the reference architecture, in order to enable composition, requires functional composition models of large, evolving, and heterogeneous domains of factories and production networks.  Also, the solution stack needs capability models of heterogeneous, proprietary manufacturing components and IT services.  Facing this challenge, the industry has been developing methodologies using coarse, ambiguous functional composition models.  Also, they are using natural-language descriptions of manufacturing components, leading to non-scalable, proprietary integration solutions. The major outcome of this effort is a RA and SS for smart manufacturing systems.  The RA and SS will enable easy composition of solutions for the large, evolving, and heterogeneous systems in factories and production networks. The major impact is an industry-wide adoption of standard reference architecture and solution stack, built using the NIST-developed RA and SS. Both manufacturers who seek to increase efficiencies and cut costs in their operations, and technology providers who seek to advance composability and functionality of their products will care about the reference architecture and solution stack.  These organizations will be able to rapidly configure their new smart manufacturing systems allowing greater productivities of the factory and production networks.</span>
-            </div>
-        </div>
-        <!-- pfnextgen end-->
-    </ui:define>
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Ajax">
+					<p:menuitem value="Save" actionListener="#{sideMenu1.save}"
+						update="messages" icon="ui-icon-disk" />
+					<p:menuitem value="Update" actionListener="#{sideMenu1.update}"
+						update="messages" icon="ui-icon-arrowrefresh-1-w" />
+				</p:submenu>
+				<p:submenu style="width: 180px !important;" label="Non-Ajax">
+					<p:menuitem value="Delete" actionListener="#{sideMenu1.delete}"
+						update="messages" ajax="false" icon="ui-icon-close" />
+				</p:submenu>
+				<p:submenu style="width: 180px !important;" label="Navigations">
+					<p:menuitem value="External" url="http://www.primefaces.org"
+						icon="ui-icon-home" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+
+	<ui:define name="content">
+    	<span class="defaultText dispTable">The next generation of smart manufacturing systems will be developed by composing advanced manufacturing components and information technology (IT) services introducing new technologies. These new technologies can lead to dramatic improvements in the ability to monitor, control, and optimize all aspects of manufacturing.  Currently, the composition is not possible due to a lack of reference architecture (RA) and a solution stack (SS) that includes the new manufacturing components and IT services.  This is technically hard because the reference architecture, in order to enable composition, requires functional composition models of large, evolving, and heterogeneous domains of factories and production networks.  Also, the solution stack needs capability models of heterogeneous, proprietary manufacturing components and IT services.  Facing this challenge, the industry has been developing methodologies using coarse, ambiguous functional composition models.  Also, they are using natural-language descriptions of manufacturing components, leading to non-scalable, proprietary integration solutions. The major outcome of this effort is a RA and SS for smart manufacturing systems.  The RA and SS will enable easy composition of solutions for the large, evolving, and heterogeneous systems in factories and production networks. The major impact is an industry-wide adoption of standard reference architecture and solution stack, built using the NIST-developed RA and SS. Both manufacturers who seek to increase efficiencies and cut costs in their operations, and technology providers who seek to advance composability and functionality of their products will care about the reference architecture and solution stack.  These organizations will be able to rapidly configure their new smart manufacturing systems allowing greater productivities of the factory and production networks.</span>
+	</ui:define>
 </ui:composition>

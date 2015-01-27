@@ -32,8 +32,9 @@
 	overflow: visible !important;
 }
 
-.ui-menu-list {
-    min-width:320px;
+ul.ui-menu-child {
+    white-space: nowrap;
+    width: auto !important;
 }
 
 </style>
@@ -44,7 +45,9 @@
 		<p:layoutUnit position="north" size="50" style="border:0; margin:0; padding:0;">
 			<p:layout>
 				<p:layoutUnit position="west" size="200" resizable="false" closable="false" style="border:0; margin:0; padding:0;text-align:center">
- 					<p:graphicImage name="images/oagi.png" width="200" height="50" style="border:0; margin:0; padding:0;"/>
+					<h:outputLink value="index.xhtml">
+ 						<p:graphicImage name="images/oagi.png" width="200" height="50" style="border:0; margin:0; padding:0;"/>
+ 					</h:outputLink>
 				</p:layoutUnit>
 				<p:layoutUnit position="center" style="border:0; margin:0; padding:0;">
 					<!-- Header Menu-->
@@ -53,59 +56,59 @@
 						<p:menubar>
 						
 							<p:submenu label="#{str['BIEs']}" icon="ui-icon-document">
-								<p:menuitem value="#{str['Create_top-level_ABIE']}" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="#{str['Create_top-level_ABIE']}" url="#" />
 								<p:separator />
-								<p:menuitem value="#{str['Edit_top-level_ABIE']}" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="#{str['Edit_top-level_ABIE']}" url="#" />
 								<p:separator />
-								<p:menuitem value="#{str['Copy_top-level_ABIE']}" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="#{str['Copy_top-level_ABIE']}" url="#" />
 							</p:submenu>
 
 							<p:submenu label="Business Context" icon="ui-icon-star">
-								<p:menuitem value="Create business context" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Create business context" url="#" />
 								<p:separator />
-								<p:menuitem value="Update business context" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Update business context" url="#" />
 								<p:separator />
-								<p:menuitem value="Delete business context" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Delete business context" url="#" />
 							</p:submenu>
 
 							<p:submenu label="Context Category" icon="ui-icon-calculator">
-								<p:menuitem value="Create context category" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Context category List" url="context_category_list.xhtml" />
 								<p:separator />
-								<p:menuitem value="Update context category" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Create context category" url="context_category_create.xhtml" />
 								<p:separator />
-								<p:menuitem value="Delete context category" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Search context category" url="context_category_search.xhtml" />
 							</p:submenu>
 
 							<p:submenu label="Context Scheme" icon="ui-icon-suitcase">
-								<p:menuitem value="Create new context scheme" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Create new context scheme" url="#" />
 								<p:separator />
-								<p:menuitem value="Manage context scheme value" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Manage context scheme value" url="#" />
 								<p:separator />
-								<p:menuitem value="Delete a context scheme" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Delete a context scheme" url="#" />
 							</p:submenu>
 							
 							<p:submenu label="Code List" icon="ui-icon-flag">
-								<p:menuitem value="Create new blank BIE code list" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Create new blank BIE code list" url="#" />
 								<p:separator />
-								<p:menuitem value="Create new BIE code list by restriction" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Create new BIE code list by restriction" url="#" />
 								<p:separator />
-								<p:menuitem value="Save working BIE code list" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Save working BIE code list" url="#" />
 								<p:separator />
-								<p:menuitem value="Edit a BIE code list" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Edit a BIE code list" url="#" />
 							</p:submenu>
 							
 							<p:submenu label="Help" icon="ui-icon-help">
-								<p:menuitem value="Ask to Serm" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Ask to Serm" url="#" />
 								<p:separator />
-								<p:menuitem value="Ask to Mike" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Ask to Mike" url="#" />
 							</p:submenu>
 							
 							<p:submenu label="Admin" icon="ui-icon-person">
-								<p:menuitem value="Config Menu String" icon="ui-icon-grip-dotted-vertical" url="menu_string_configuration.xhtml" />
+								<p:menuitem value="Config Menu String" url="menu_string_configuration.xhtml" />
 								<p:separator />
-								<p:menuitem value="User List" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="User List" url="#" />
 								<p:separator />
-								<p:menuitem value="Anything else?" icon="ui-icon-grip-dotted-vertical" url="#" />
+								<p:menuitem value="Anything else?" url="#" />
 							</p:submenu>
 
 

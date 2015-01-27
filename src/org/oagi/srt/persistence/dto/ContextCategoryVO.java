@@ -9,41 +9,41 @@ import org.oagi.srt.common.SRTObject;
  */
 public class ContextCategoryVO extends SRTObject {
 
-	private int ContextCategoryID;
-	private String ContextCategoryGUID;
-	private String Name;
-	private String Description;
+	private int contextCategoryID;
+	private String contextCategoryGUID;
+	private String name;
+	private String description;
 	
 	public int getContextCategoryID(){
-		return ContextCategoryID;
+		return contextCategoryID;
 	}
 	
 	public void setContextCategoryID(int contextCategoryID){
-		ContextCategoryID = contextCategoryID;
+		this.contextCategoryID = contextCategoryID;
 	}
 	
 	public String getContextCategoryGUID() {
-		return ContextCategoryGUID;
+		return contextCategoryGUID;
 	}
 
 	public void setContextCategoryGUID(String contextCategoryGUID) {
-		ContextCategoryGUID = contextCategoryGUID;
+		this.contextCategoryGUID = contextCategoryGUID;
 	}
 
 	public String getName(){
-		return Name;
+		return name;
 	}
 	
 	public void setName(String name){
-		Name = name;
+		this.name = name;
 	}
 	
 	public String getDescription(){
-		return Description;
+		return description;
 	}
 	
 	public void setDescription(String description){
-		Description = description;
+		this.description = description;
 	}
 
 }
