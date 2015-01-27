@@ -2,8 +2,10 @@ package org.oagi.srt.persistent.populate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
@@ -14,7 +16,7 @@ import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
 import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.startup.SRTInitializerException;
+import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;

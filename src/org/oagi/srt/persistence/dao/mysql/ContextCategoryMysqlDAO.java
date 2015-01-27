@@ -26,7 +26,7 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 	private final String _tableName = "context_category";
 	
 	private final String _FIND_ALL_CONTEXT_CATEGORY_STATEMENT = 
-			"SELECT Context_Category_ID, Context_Category_GUID, Name, Description FROM " + _tableName;
+			"SELECT Context_Category_ID, Context_Category_GUID, Name, Description FROM " + _tableName + " order by Context_Category_ID desc";
 	
 	private final String _FIND_CONTEXT_CATEGORY_STATEMENT = 
 			"SELECT Context_Category_ID, Context_Category_GUID, Name, Description FROM " + _tableName;
@@ -146,7 +146,7 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ContextCategoryVO context_categoryVO = new ContextCategoryVO();
 				context_categoryVO.setContextCategoryID(rs.getInt("Context_Category_ID"));
-				context_categoryVO.setContextCategoryGUID(rs.getString("Context_Category_IGUD"));
+				context_categoryVO.setContextCategoryGUID(rs.getString("Context_Category_GUID"));
 				context_categoryVO.setName(rs.getString("Name"));
 				context_categoryVO.setDescription(rs.getString("Description"));	
 				list.add(context_categoryVO);

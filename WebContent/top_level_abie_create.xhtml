@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Context Category">
+					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+
+	<ui:define name="content">
+<h:form>
+                 
+    <p:growl id="growl" sticky="true" showDetail="true"/>
+ 
+    <p:wizard flowListener="#{topLevelABIEHandler.onFlowProcess}">
+        <p:tab id="select_tl_acc" title="Select top-level ACC">
+            <p:panel header="Personal Details">
+                <p:messages />
+                <h:panelGrid columns="2" columnClasses="label, value">
+<!--                     <h:outputText value="Firstname: *" />
+                    <p:inputText value="#{userWizard.user.firstname}" required="true" label="Firstname"/>
+ 
+                    <h:outputText value="Lastname: *" />
+                    <p:inputText value="#{userWizard.user.lastname}" required="true" label="Lastname"/>
+ 
+                    <h:outputText value="Age: " />
+                    <p:inputText value="#{userWizard.user.age}" />
+ 
+                    <h:outputText value="Skip to last: " />
+                    <h:selectBooleanCheckbox value="#{userWizard.skip}" /> -->
+                </h:panelGrid>
+            </p:panel>
+        </p:tab>
+ 
+        <p:tab id="select_bc" title="Select Business Context">
+            <p:panel header="Select Existing Business Context">
+                <p:messages />
+                <h:panelGrid columns="2" columnClasses="label, value">
+
+                </h:panelGrid>
+            </p:panel>
+            <p:panel header="Create New Business Context">
+                <p:messages />
+                <h:panelGrid columns="2" columnClasses="label, value">
+
+                </h:panelGrid>
+            </p:panel>
+        </p:tab>
+ 
+        <p:tab id="create_u_bie" title="Create uncommitted BIE">
+            <p:panel header="Create uncommitted BIE">
+                <p:messages />
+                <h:panelGrid columns="2" columnClasses="label, value">
+
+                </h:panelGrid>
+            </p:panel>
+        </p:tab>
+ 
+        <p:tab id="confirm" title="Confirmation">
+            <p:panel header="Confirmation">
+                <h:panelGrid id="confirmation" columns="3" columnClasses="grid,grid,grid">
+  
+                </h:panelGrid>
+ 
+                <p:commandButton value="Submit" actionListener="#{topLevelABIEHandler.save}" update="growl" process="@this"/>
+            </p:panel>
+        </p:tab>
+    </p:wizard>
+ 
+</h:form>
+	</ui:define>
+</ui:composition>

@@ -25,7 +25,7 @@ public class SRTConstants {
 	public static final int DB_TYPE_SQLITE = 10;
 	public static final int DB_TYPE_CUBRID = 11;
 	
-	public static final String SRT_PROPERTIES_FILE_NAME = "srt.properties";
+	public static final String SRT_PROPERTIES_FILE_NAME = "/srt.properties";
 	public static final String PRODUCT_NAME = "OAGi Semantic Refinement Tool";
 	
 	public static final String NS_CCTS_PREFIX = "ccts";

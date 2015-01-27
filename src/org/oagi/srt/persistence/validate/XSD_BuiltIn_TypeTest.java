@@ -21,8 +21,8 @@ import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 import org.oagi.srt.persistence.validate.data.TableData;
-import org.oagi.srt.startup.SRTInitializer;
-import org.oagi.srt.startup.SRTInitializerException;
+import org.oagi.srt.web.startup.SRTInitializer;
+import org.oagi.srt.web.startup.SRTInitializerException;
 
 /**
 *

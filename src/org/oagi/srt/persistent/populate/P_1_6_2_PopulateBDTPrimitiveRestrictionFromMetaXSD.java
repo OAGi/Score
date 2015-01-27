@@ -3,8 +3,10 @@ package org.oagi.srt.persistent.populate;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
@@ -15,7 +17,7 @@ import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
 import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
-import org.oagi.srt.startup.SRTInitializerException;
+import org.oagi.srt.web.startup.SRTInitializerException;
 import org.xml.sax.SAXException;
 
 /**

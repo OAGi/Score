@@ -40,11 +40,9 @@
 					<h:outputText value="#{contextCategoryHandler.description}" />
 					
 					<p:commandButton value="Create" update="grid" icon="ui-icon-check"
-					validateClient="true" style="margin-right:10px" />
-					<p:commandButton value="Cancel" ajax="false" icon="ui-icon-check" />
+					validateClient="true" style="margin-right:10px" actionListener="#{contextCategoryHandler.createContextCategory}" action="context_category_list.xhtml?faces-redirect=true" />
+					<p:button href="context_category_list.xhtml" value="Cancel" icon="ui-icon-check"/>
 				</h:panelGrid>
-
-				
 			</p:panel>
 		</h:form>
 	</ui:define>

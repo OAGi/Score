@@ -29,7 +29,7 @@ import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
 import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
-import org.oagi.srt.startup.SRTInitializerException;
+import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

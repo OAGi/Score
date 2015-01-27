@@ -1,4 +1,4 @@
-package org.oagi.srt.startup;
+package org.oagi.srt.web.startup;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -54,7 +54,6 @@ public class SRTInitializer {
         _logger.info("########################################");
         _logger.info("# Initialize System Resource Start     ");
 
-        // Initializing Step-1 : ServerProperties ¼³Á¤...
         _logger.info("----------------------------------------");
         _logger.info("# Initializing ServerProperties");
         ServerProperties props = ServerProperties.getInstance();
@@ -78,7 +77,7 @@ public class SRTInitializer {
             		+ SRTConstants.SRT_PROPERTIES_FILE_NAME + " URL : "
                         + e.toString());
         }
-        // Initializing Step-2 : DBConnectionPool ¼³Á¤...
+        // Initializing Step-2 : DBConnectionPool ï¿½ï¿½ï¿½ï¿½...
         _logger.info("----------------------------------------");
         _logger.info("# Initializing DBConnectionPool");
         try {

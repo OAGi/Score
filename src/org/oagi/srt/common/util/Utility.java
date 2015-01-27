@@ -8,8 +8,8 @@ import java.util.UUID;
 import org.chanchan.common.persistence.db.ConnectionPoolManager;
 import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.startup.SRTInitializer;
-import org.oagi.srt.startup.SRTInitializerException;
+import org.oagi.srt.web.startup.SRTInitializer;
+import org.oagi.srt.web.startup.SRTInitializerException;
 
 public class Utility {
 	public static String generateGUID(){

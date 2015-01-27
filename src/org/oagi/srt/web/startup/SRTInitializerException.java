@@ -1,4 +1,4 @@
-package org.oagi.srt.startup;
+package org.oagi.srt.web.startup;
 
 import org.oagi.srt.common.SRTException;
 
