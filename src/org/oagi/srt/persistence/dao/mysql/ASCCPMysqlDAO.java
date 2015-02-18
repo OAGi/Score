@@ -27,7 +27,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 	private final String _FIND_ALL_ASCCP_STATEMENT = 
 			"SELECT ASCCP_ID, ASCCP_GUID, Property_Term, "
 					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator FROM " + _tableName + " order by Property_Term asc";
 
 	private final String _FIND_ASCCP_STATEMENT = 
 			"SELECT ASCCP_ID, ASCCP_GUID, Property_Term, "
@@ -188,6 +188,102 @@ public class ASCCPMysqlDAO extends SRTDAO {
 		}
 		return asccpVO;
 	}
+	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
+		
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = tx.open();
+			String sql = _FIND_ASCCP_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			sql += " order by Property_Term asc";
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				ASCCPVO asccpVO = new ASCCPVO();
+				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
+				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
+				asccpVO.setDefinition(rs.getString("Definition"));
+				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
+				asccpVO.setDEN(rs.getString("DEN"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccpVO.setState(rs.getInt("State"));
+				asccpVO.setModule(rs.getString("Module"));
+				list.add(asccpVO);
+			}
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
+			tx.close();
+		}
+		return list;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -214,7 +310,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
-				asccpVO.setReusableIndicator(rs.getBoolean("ReusableIndicator"));
+				asccpVO.setReusableIndicator(rs.getBoolean("Reusable_Indicator"));
 				list.add(asccpVO);
 			}
 			tx.commit();
@@ -313,10 +409,4 @@ public class ASCCPMysqlDAO extends SRTDAO {
 
 	}
 
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

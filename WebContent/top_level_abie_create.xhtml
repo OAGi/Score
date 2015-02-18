@@ -20,31 +20,69 @@
 
 
 	<ui:define name="content">
-<h:form>
+<h:form id="form">
                  
     <p:growl id="growl" sticky="true" showDetail="true"/>
  
     <p:wizard flowListener="#{topLevelABIEHandler.onFlowProcess}">
-        <p:tab id="select_tl_acc" title="Select top-level ACC">
-            <p:panel header="Personal Details">
-                <p:messages />
-                <h:panelGrid columns="2" columnClasses="label, value">
-<!--                     <h:outputText value="Firstname: *" />
-                    <p:inputText value="#{userWizard.user.firstname}" required="true" label="Firstname"/>
- 
-                    <h:outputText value="Lastname: *" />
-                    <p:inputText value="#{userWizard.user.lastname}" required="true" label="Lastname"/>
- 
-                    <h:outputText value="Age: " />
-                    <p:inputText value="#{userWizard.user.age}" />
- 
-                    <h:outputText value="Skip to last: " />
-                    <h:selectBooleanCheckbox value="#{userWizard.skip}" /> -->
-                </h:panelGrid>
-            </p:panel>
+        <p:tab id="select_tl_acc" title="Select top-level Concept">
+			<p:growl id="messages1" />
+			<p:panel header="Search Contents">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" columns="5" cellpadding="5">
+					<h:outputLabel for="propertyTerm" value="ASCCP Property Term:" style="font-weight:bold" />
+					<p:autoComplete id="propertyTerm" value="#{topLevelABIEHandler.propertyTerm}" completeMethod="#{topLevelABIEHandler.completeInput}" />
+					<p:commandButton value="Search" ajax="true" actionListener="#{topLevelABIEHandler.search}" update="tbl" icon="ui-icon-search" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Top-level Concept List">
+				<p:dataTable id="tbl" var="aSCCPVO" value="#{topLevelABIEHandler.asccpVOs}"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="20" style="width:900px; margin-bottom:20px" selection="#{topLevelABIEHandler.selected}" rowKey="#{aSCCPVO.ASCCPID}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onRowSelect}" />
+        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onRowUnselect}" />
+					<p:column style="width:350px">
+						<f:facet name="header">
+							<h:outputText value="ASCCP Property Term" />
+						</f:facet>
+						<h:outputText value="#{aSCCPVO.propertyTerm}" />
+					</p:column>
+	
+					<p:column style="width:300px">
+						<f:facet name="header">
+							<h:outputText value="Module" />
+						</f:facet>
+						<h:outputText value="#{aSCCPVO.module}" />
+					</p:column>
+					
+					<p:column style="width:180px">
+						<f:facet name="header">
+							<h:outputText value="Last Updated Time" />
+						</f:facet>
+						<h:outputText value="#{aSCCPVO.lastUpdateTimestamp}" />
+					</p:column>
+				
+				</p:dataTable>
+			</p:panel>
         </p:tab>
  
         <p:tab id="select_bc" title="Select Business Context">
+       		<p:panel header="Selected Top-level Concept">
+                <p:dataTable var="aSCCPVO" value="#{topLevelABIEHandler.selected}" style="width:900px; margin-bottom:20px">
+				    <p:column headerText="ASCCP Property Term">
+				        <h:outputText value="#{aSCCPVO.propertyTerm}" />
+				    </p:column>
+				 
+				    <p:column headerText="Module">
+				        <h:outputText value="#{aSCCPVO.module}" />
+				    </p:column>
+				 
+				    <p:column headerText="Last Updated Time">
+				        <h:outputText value="#{aSCCPVO.lastUpdateTimestamp}" />
+				    </p:column>
+				</p:dataTable>
+            </p:panel>
             <p:panel header="Select Existing Business Context">
                 <p:messages />
                 <h:panelGrid columns="2" columnClasses="label, value">

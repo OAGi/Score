@@ -1,5 +1,6 @@
 package org.oagi.srt.persistence.dto;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import org.oagi.srt.common.SRTObject;
@@ -9,7 +10,9 @@ import org.oagi.srt.common.SRTObject;
  * @version 1.0
  * @author Jaehun Lee
  */
-public class ASCCPVO extends SRTObject {
+public class ASCCPVO extends SRTObject implements Serializable {
+	
+	private static final long serialVersionUID = -3150693005373031742L;
 
 	private int ASCCPID;
 	private String ASCCPGUID;

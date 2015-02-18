@@ -25,7 +25,6 @@ public class ContextCategoryHandler {
 	@PostConstruct
 	private void init() {
 		try {
-			//Utility.dbSetup(); // TODO use Context Initializer
 			df = DAOFactory.getDAOFactory();
 			dao = df.getDAO("ContextCategory");
 		} catch (Exception e) {
