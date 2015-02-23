@@ -20,6 +20,8 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ASCCPVO;
+import org.oagi.srt.persistence.dto.BusinessContextVO;
+import org.oagi.srt.persistence.dto.BusinessContextValueVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
@@ -34,7 +36,8 @@ public class BusinessContextHandler implements Serializable {
 	private static final long serialVersionUID = 8706516047982751653L;
 	
 	private DAOFactory df;
-	private SRTDAO dao;
+	private SRTDAO daoBC;
+	private SRTDAO daoBCV;
 	private SRTDAO daoCC;
 	private SRTDAO daoCS;
 	private SRTDAO daoCV;
@@ -46,10 +49,12 @@ public class BusinessContextHandler implements Serializable {
 	private void init() {
 		try {
 			df = DAOFactory.getDAOFactory();
-			dao = df.getDAO("BusinessContext");
+			daoBC = df.getDAO("BusinessContext");
+			daoBCV = df.getDAO("BusinessContextValue");
 			daoCC = df.getDAO("ContextCategory");
 			daoCS = df.getDAO("ContextScheme");
 			daoCV = df.getDAO("ContextSchemeValue");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -61,6 +66,7 @@ public class BusinessContextHandler implements Serializable {
 	private List<SRTObject> contextCategories = new ArrayList<SRTObject>();
 	private List<SRTObject> contextSchemes = new ArrayList<SRTObject>();
 	private List<SRTObject> contextValues = new ArrayList<SRTObject>();
+	private String cValues;
 	
 	public void chooseCV() {
 		Map<String, Object> options = new HashMap<String, Object>();
@@ -72,8 +78,22 @@ public class BusinessContextHandler implements Serializable {
     }
 	
 	public void closeDialog() {
-		System.out.println("######## close!!!");
-        RequestContext.getCurrentInstance().closeDialog(null);
+        RequestContext.getCurrentInstance().closeDialog(this);
+    }
+	
+	public void onCCChosen(SelectEvent event) {
+		BusinessContextHandler bh = (BusinessContextHandler) event.getObject();
+		cValues = "";
+		this.selected = bh.getSelected();
+		this.selected1 = bh.getSelected1();
+		this.selected2 = bh.getSelected2();
+		for(ContextSchemeValueVO cVO : this.selected2) {
+			cValues += (cVO.getValue() != null) ? cVO.getValue() + ", " : "";
+		}
+		cValues = cValues.substring(0, cValues.lastIndexOf(","));
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Context Values are added", "Context Values are added");
+         
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
      
     public void onCSChosen(SelectEvent event) {
@@ -112,16 +132,28 @@ public class BusinessContextHandler implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 
-	public void createContextCategory() {
+	public void createBusinessContext() {
 		try {
-			ContextCategoryVO ccVO = new ContextCategoryVO();
-			ccVO.setName(this.name);
-			ccVO.setContextCategoryGUID(Utility.generateGUID());
-			daoCC.insertObject(ccVO);
+			BusinessContextVO bcVO = new BusinessContextVO();
+			bcVO.setName(this.name);
+			String guid = Utility.generateGUID();
+			bcVO.setBusinessContextGUID(guid);
+			daoBC.insertObject(bcVO);
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("Business_Context_GUID", guid);
+			BusinessContextVO bvVO1 = (BusinessContextVO)daoBC.findObject(qc);
+			
+			for(ContextSchemeValueVO cVO : this.selected2) {
+				BusinessContextValueVO bcvVO = new BusinessContextValueVO();
+				bcvVO.setBusinessContextID(bvVO1.getBusinessContextID());
+				bcvVO.setContextSchemeValueID(cVO.getContextSchemeValueID());
+				daoBCV.insertObject(bcvVO);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public List<String> completeInput(String query) {
@@ -216,34 +248,12 @@ public class BusinessContextHandler implements Serializable {
         } else {
         }
     }
- 
-    public void onRowUnselect2(UnselectEvent event) {
-        FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((ContextCategoryVO) event.getObject()).getContextCategoryID()));
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
     
-    public void onRowSelect2(SelectEvent event) {
-        FacesMessage msg = new FacesMessage(((ContextCategoryVO) event.getObject()).getName(), String.valueOf(((ContextCategoryVO) event.getObject()).getContextCategoryID()));
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-        
-        if(event.getObject() instanceof ContextCategoryVO) {
-        	selected1 = (ContextSchemeVO) event.getObject();
-        	QueryCondition qc = new QueryCondition();
-        	qc.add("Owner_Context_Scheme_ID", selected1.getContextSchemeID());
-        	try {
-        		contextValues = daoCV.findObjects(qc);
-			} catch (SRTDAOException e) {
-				e.printStackTrace();
-			}
-        } else {
-        }
-    }
- 
     public void onRowUnselect1(UnselectEvent event) {
         FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((ContextCategoryVO) event.getObject()).getContextCategoryID()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
-
+ 
 	public List<SRTObject> getContextSchemes() {
 		return contextSchemes;
 	}
@@ -258,5 +268,13 @@ public class BusinessContextHandler implements Serializable {
 
 	public void setContextValues(List<SRTObject> contextValues) {
 		this.contextValues = contextValues;
+	}
+
+	public String getcValues() {
+		return cValues;
+	}
+
+	public void setcValues(String cValues) {
+		this.cValues = cValues;
 	}
 }

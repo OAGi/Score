@@ -9,23 +9,31 @@ import org.oagi.srt.common.SRTObject;
  */
 public class BusinessContextVO extends SRTObject {
 
-	private int BusinessContextID;
-	private String Name;
+	private int businessContextID;
+	private String businessContextGUID;
+	private String name;
 	
 	public int getBusinessContextID(){
-		return BusinessContextID;
+		return businessContextID;
 	}
 	
 	public void setBusinessContextID(int businessContextID){
-		BusinessContextID = businessContextID;
+		this.businessContextID = businessContextID;
 	}
 	
 	public String getName(){
-		return Name;
+		return name;
 	}
 	
 	public void setName(String name){
-		Name = name;
+		this.name = name;
 	}
-	
+
+	public String getBusinessContextGUID() {
+		return businessContextGUID;
+	}
+
+	public void setBusinessContextGUID(String businessContextGUID) {
+		this.businessContextGUID = businessContextGUID;
+	}
 }
