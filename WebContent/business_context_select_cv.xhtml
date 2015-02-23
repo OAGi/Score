@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Business Context Value</title>
+                <style type="text/css">
+            .ui-widget {
+                font-size: 90%;
+            }
+        </style>
+    </h:head>
+     
+    <h:body>
+        <h:form id="form">
+        	<p:growl id="messages1" />
+			<p:panel header="Search and Select Context Value">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" columns="5" cellpadding="5">
+					<h:outputLabel for="ccName" value="Context Category:" style="font-weight:bold" />
+					<p:autoComplete id="ccName" value="#{businessContextHandler.ccName}" completeMethod="#{businessContextHandler.completeInput}" />
+					<p:commandButton value="Search" ajax="true" actionListener="#{businessContextHandler.search}" update="tbl" icon="ui-icon-search" />
+				</h:panelGrid>
+	            <p:dataTable id="tbl" var="contextCategoryVO" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="5" style="width:550px; margin-bottom:20px"
+	            	value="#{businessContextHandler.contextCategories}" selection="#{businessContextHandler.selected}" rowKey="#{contextCategoryVO.contextCategoryID}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{businessContextHandler.onRowSelect}" update=":form:tbl1, :form:tbl2" />
+        			<p:ajax event="rowUnselect" listener="#{businessContextHandler.onRowUnselect}" />
+	                <p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{contextCategoryVO.name}" />
+					</p:column>
+	
+					<p:column style="width:300px">
+						<f:facet name="header">
+							<h:outputText value="Description" />
+						</f:facet>
+						<h:outputText value="#{contextCategoryVO.description}" />
+					</p:column>
+	            </p:dataTable>
+	            <h:panelGrid id="grid1" columns="5" cellpadding="5">
+					<h:outputLabel value="Context Scheme:" style="font-weight:bold" />
+				</h:panelGrid>
+	            <p:dataTable id="tbl1" var="contextSchemeVO" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="5" style="width:550px; margin-bottom:20px"
+	            	value="#{businessContextHandler.contextSchemes}" selection="#{businessContextHandler.selected1}" rowKey="#{contextSchemeVO.contextSchemeID}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{businessContextHandler.onRowSelect1}" update=":form:tbl2" />
+        			<p:ajax event="rowUnselect" listener="#{businessContextHandler.onRowUnselect1}" />
+	                <p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.schemeName}" />
+					</p:column>
+	
+					<p:column style="width:280px">
+						<f:facet name="header">
+							<h:outputText value="Description" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.description}" />
+					</p:column>
+					
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="AgencyName" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.schemeAgencyName}" />
+					</p:column>
+	            </p:dataTable>
+	            <h:panelGrid id="grid2" columns="5" cellpadding="5">
+					<h:outputLabel value="Context Value:" style="font-weight:bold" />
+				</h:panelGrid>
+	            <p:dataTable id="tbl2" var="contextSchemeValueVO" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="5" style="width:550px; margin-bottom:20px"
+	            	value="#{businessContextHandler.contextValues}" selection="#{businessContextHandler.selected2}" rowKey="#{contextSchemeValueVO.contextSchemeValueID}" selectionMode="multiple">
+	                <p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Value" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeValueVO.value}" />
+					</p:column>
+	
+					<p:column style="width:300px">
+						<f:facet name="header">
+							<h:outputText value="Meaning" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeValueVO.meaning}" />
+					</p:column>
+	            </p:dataTable>
+	            <p:commandButton process="tbl2" ajax="true" icon="ui-icon-search" value="Add" actionListener="#{businessContextHandler.closeDialog}" />
+	        </p:panel>
+        </h:form>
+    </h:body>
+     
+</html>

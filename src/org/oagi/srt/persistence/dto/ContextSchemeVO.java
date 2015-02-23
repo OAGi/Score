@@ -1,5 +1,7 @@
 package org.oagi.srt.persistence.dto;
 
+import java.io.Serializable;
+
 import org.oagi.srt.common.SRTObject;
 
 /**
@@ -7,64 +9,66 @@ import org.oagi.srt.common.SRTObject;
  * @version 1.0
  * @author Nasif Sikder
  */
-public class ContextSchemeVO extends SRTObject {
+public class ContextSchemeVO extends SRTObject implements Serializable {
 
-	private int ContextSchemeID;
-	private String SchemeID;
-	private String SchemeName;
-	private String Description;
-	private String SchemeAgencyID;
-	private String SchemeAgencyName;
-	private String SchemeVersion;
-	private int ContextCategoryID;
+	private static final long serialVersionUID = -3353563030747879464L;
+	
+	private int contextSchemeID;
+	private String schemeID;
+	private String schemeName;
+	private String description;
+	private String schemeAgencyID;
+	private String schemeAgencyName;
+	private String schemeVersion;
+	private int contextCategoryID;
 	
 	public int getContextSchemeID() {
-		return ContextSchemeID;
+		return contextSchemeID;
 	}
 	public void setContextSchemeID(int contextSchemeID) {
-		ContextSchemeID = contextSchemeID;
+		this.contextSchemeID = contextSchemeID;
 	}
 	public String getSchemeID() {
-		return SchemeID;
+		return schemeID;
 	}
 	public void setSchemeID(String schemeID) {
-		SchemeID = schemeID;
+		this.schemeID = schemeID;
 	}
 	public String getSchemeName() {
-		return SchemeName;
+		return schemeName;
 	}
 	public void setSchemeName(String schemeName) {
-		SchemeName = schemeName;
+		this.schemeName = schemeName;
 	}
 	public String getDescription() {
-		return Description;
+		return description;
 	}
 	public void setDescription(String description) {
-		Description = description;
+		this.description = description;
 	}
 	public String getSchemeAgencyID() {
-		return SchemeAgencyID;
+		return schemeAgencyID;
 	}
 	public void setSchemeAgencyID(String schemeAgencyID) {
-		SchemeAgencyID = schemeAgencyID;
+		this.schemeAgencyID = schemeAgencyID;
 	}
 	public String getSchemeAgencyName() {
-		return SchemeAgencyName;
+		return schemeAgencyName;
 	}
 	public void setSchemeAgencyName(String schemeAgencyName) {
-		SchemeAgencyName = schemeAgencyName;
+		this.schemeAgencyName = schemeAgencyName;
 	}
 	public String getSchemeVersion() {
-		return SchemeVersion;
+		return schemeVersion;
 	}
 	public void setSchemeVersion(String schemeVersion) {
-		SchemeVersion = schemeVersion;
+		this.schemeVersion = schemeVersion;
 	}
 	public int getContextCategoryID() {
-		return ContextCategoryID;
+		return contextCategoryID;
 	}
 	public void setContextCategoryID(int contextCategoryID) {
-		ContextCategoryID = contextCategoryID;
+		this.contextCategoryID = contextCategoryID;
 	}
 	
 }
