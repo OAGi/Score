@@ -70,6 +70,7 @@ public class BusinessContextHandler implements Serializable {
 	private List<SRTObject> businessContexts = new ArrayList<SRTObject>();
 	private List<SRTObject> contextValues = new ArrayList<SRTObject>();
 	private List<BusinessContextValues> bcValues = new ArrayList<BusinessContextValues>();
+	private List<BusinessContextValues> bcDetails = new ArrayList<BusinessContextValues>();
 	
 	private String cValues;
 	
@@ -127,6 +128,7 @@ public class BusinessContextHandler implements Serializable {
 	
 	public void onCCChosen(SelectEvent event) {
 		BusinessContextHandler bh = (BusinessContextHandler) event.getObject();
+		//bcValues = new ArrayList<BusinessContextValues>();
 		
 		BusinessContextValues bcv = new BusinessContextValues();
 		bcv.setCcVO(bh.getSelected());
@@ -354,7 +356,7 @@ public class BusinessContextHandler implements Serializable {
 	}
 
 	public BusinessContextVO getBcDetail() {
-		bcValues = new ArrayList<BusinessContextValues>();
+		bcDetails = new ArrayList<BusinessContextValues>();
 		if(bcDetail != null) {
 			bcId = bcDetail.getBusinessContextID();
 			QueryCondition qc = new QueryCondition();
@@ -383,7 +385,7 @@ public class BusinessContextHandler implements Serializable {
 					ContextCategoryVO ccVO = (ContextCategoryVO)daoCC.findObject(qc);
 					bcv.setCcVO(ccVO);
 					
-					bcValues.add(bcv);
+					bcDetails.add(bcv);
 				}
 			} catch (SRTDAOException e) {
 				e.printStackTrace();
@@ -394,6 +396,14 @@ public class BusinessContextHandler implements Serializable {
 
 	public void setBcDetail(BusinessContextVO bcDetail) {
 		this.bcDetail = bcDetail;
+	}
+
+	public List<BusinessContextValues> getBcDetails() {
+		return bcDetails;
+	}
+
+	public void setBcDetails(List<BusinessContextValues> bcDetails) {
+		this.bcDetails = bcDetails;
 	}
 	
 }

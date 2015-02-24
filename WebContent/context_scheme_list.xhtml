@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Context Category">
+					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form>
+			<p:growl id="messages1" />
+			<p:panel header="Search Context Scheme">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" columns="5" cellpadding="5">
+					<h:outputLabel for="name" value="Name:" style="font-weight:bold" />
+					<p:autoComplete id="name" value="#{contextSchemeHandler.name}" completeMethod="#{contextSchemeHandler.completeInput}" />
+					<h:outputLabel for="description" value="Description:" style="font-weight:bold" />
+					<p:autoComplete id="description" value="#{contextSchemeHandler.description}" completeMethod="#{contextSchemeHandler.completeDescription}" />
+					<p:commandButton value="Search" ajax="true" actionListener="#{contextSchemeHandler.search}" update="messages1" icon="ui-icon-search" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Context Scheme List">
+				<p:dataTable id="tbl" var="contextSchemeVO" value="#{contextSchemeHandler.contextSchemes}"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="10" style="width:1100px; margin-bottom:20px">
+	
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.schemeName}" />
+					</p:column>
+	
+					<p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Description" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.description}" />
+					</p:column>
+					
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Agency ID" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.schemeAgencyID}" />
+					</p:column>
+	
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Agency Name" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.schemeAgencyName}" />
+					</p:column>
+					
+					<p:column style="width:50px">
+						<f:facet name="header">
+							<h:outputText value="Version" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.schemeVersion}" />
+					</p:column>
+					
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Context Category" />
+						</f:facet>
+						<h:outputText value="#{contextSchemeVO.contextCategoryID}" />
+					</p:column>
+					
+					<p:column style="width:150px">
+						<f:facet name="header">
+							<h:outputText value="Action" />
+						</f:facet>
+						<p:splitButton value="Detail" actionListener="#{contextSchemeHandler.detail}" icon="ui-icon-disk">
+							<p:menuitem value="Edit" actionListener="#{contextSchemeHandler.edit}" icon="ui-icon-arrowrefresh-1-w" />
+					        <p:menuitem value="Delete" actionListener="#{contextSchemeHandler.delete}" icon="ui-icon-arrowrefresh-1-w" />
+					        <p:separator />
+					        <p:menuitem value="Cancel" url="context_category_list.xhtml" icon="ui-icon-extlink" />
+					    </p:splitButton>
+					</p:column>
+					
+				</p:dataTable>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

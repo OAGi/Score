@@ -15,12 +15,14 @@ public class ContextSchemeVO extends SRTObject implements Serializable {
 	
 	private int contextSchemeID;
 	private String schemeID;
+	private String schemeGUID;
 	private String schemeName;
 	private String description;
 	private String schemeAgencyID;
 	private String schemeAgencyName;
 	private String schemeVersion;
 	private int contextCategoryID;
+	private String contextCategoryStr;
 	
 	public int getContextSchemeID() {
 		return contextSchemeID;
@@ -69,6 +71,18 @@ public class ContextSchemeVO extends SRTObject implements Serializable {
 	}
 	public void setContextCategoryID(int contextCategoryID) {
 		this.contextCategoryID = contextCategoryID;
+	}
+	public String getSchemeGUID() {
+		return schemeGUID;
+	}
+	public void setSchemeGUID(String schemeGUID) {
+		this.schemeGUID = schemeGUID;
+	}
+	public String getContextCategoryStr() {
+		return contextCategoryStr;
+	}
+	public void setContextCategoryStr(String contextCategoryStr) {
+		this.contextCategoryStr = contextCategoryStr;
 	}
 	
 }
