@@ -44,6 +44,7 @@ public class BusinessContextHandler implements Serializable {
 	private ContextCategoryVO selected;
 	private ContextSchemeVO selected1;
 	private List<ContextSchemeValueVO> selected2;
+	private BusinessContextVO bcDetail;
 
 	@PostConstruct
 	private void init() {
@@ -62,10 +63,14 @@ public class BusinessContextHandler implements Serializable {
 
 	private String name;
 	private String ccName;
+	private int bcId;
 
 	private List<SRTObject> contextCategories = new ArrayList<SRTObject>();
 	private List<SRTObject> contextSchemes = new ArrayList<SRTObject>();
+	private List<SRTObject> businessContexts = new ArrayList<SRTObject>();
 	private List<SRTObject> contextValues = new ArrayList<SRTObject>();
+	private List<BusinessContextValues> bcValues = new ArrayList<BusinessContextValues>();
+	
 	private String cValues;
 	
 	public void chooseCV() {
@@ -81,16 +86,63 @@ public class BusinessContextHandler implements Serializable {
         RequestContext.getCurrentInstance().closeDialog(this);
     }
 	
+	public class BusinessContextValues {
+		private ContextCategoryVO ccVO;
+		private ContextSchemeVO csVO;
+		private List<ContextSchemeValueVO> csList;
+		private String csValues;
+		private ContextSchemeValueVO csvVO;
+		
+		public ContextCategoryVO getCcVO() {
+			return ccVO;
+		}
+		public void setCcVO(ContextCategoryVO ccVO) {
+			this.ccVO = ccVO;
+		}
+		public ContextSchemeVO getCsVO() {
+			return csVO;
+		}
+		public void setCsVO(ContextSchemeVO csVO) {
+			this.csVO = csVO;
+		}
+		public List<ContextSchemeValueVO> getCsList() {
+			return csList;
+		}
+		public void setCsList(List<ContextSchemeValueVO> csList) {
+			this.csList = csList;
+		}
+		public String getCsValues() {
+			return csValues;
+		}
+		public void setCsValues(String csValues) {
+			this.csValues = csValues;
+		} 
+		public ContextSchemeValueVO getCsvVO() {
+			return csvVO;
+		}
+		public void setCsvVO(ContextSchemeValueVO csvVO) {
+			this.csvVO = csvVO;
+		}
+	}
+	
 	public void onCCChosen(SelectEvent event) {
 		BusinessContextHandler bh = (BusinessContextHandler) event.getObject();
+		
+		BusinessContextValues bcv = new BusinessContextValues();
+		bcv.setCcVO(bh.getSelected());
+		bcv.setCsVO(bh.getSelected1());
+		bcv.setCsList(bh.getSelected2());
 		cValues = "";
-		this.selected = bh.getSelected();
-		this.selected1 = bh.getSelected1();
-		this.selected2 = bh.getSelected2();
-		for(ContextSchemeValueVO cVO : this.selected2) {
+//		this.selected = bh.getSelected();
+//		this.selected1 = bh.getSelected1();
+//		this.selected2 = bh.getSelected2();
+		for(ContextSchemeValueVO cVO : bh.getSelected2()) {
 			cValues += (cVO.getValue() != null) ? cVO.getValue() + ", " : "";
 		}
 		cValues = cValues.substring(0, cValues.lastIndexOf(","));
+		bcv.setCsValues(cValues);
+		bcValues.add(bcv);
+		
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Context Values are added", "Context Values are added");
          
         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -144,11 +196,13 @@ public class BusinessContextHandler implements Serializable {
 			qc.add("Business_Context_GUID", guid);
 			BusinessContextVO bvVO1 = (BusinessContextVO)daoBC.findObject(qc);
 			
-			for(ContextSchemeValueVO cVO : this.selected2) {
-				BusinessContextValueVO bcvVO = new BusinessContextValueVO();
-				bcvVO.setBusinessContextID(bvVO1.getBusinessContextID());
-				bcvVO.setContextSchemeValueID(cVO.getContextSchemeValueID());
-				daoBCV.insertObject(bcvVO);
+			for(BusinessContextValues bcv : bcValues) {
+				for(ContextSchemeValueVO cVO : bcv.getCsList()) {
+					BusinessContextValueVO bcvVO = new BusinessContextValueVO();
+					bcvVO.setBusinessContextID(bvVO1.getBusinessContextID());
+					bcvVO.setContextSchemeValueID(cVO.getContextSchemeValueID());
+					daoBCV.insertObject(bcvVO);
+				}
 			}
 			
 		} catch (Exception e) {
@@ -277,4 +331,69 @@ public class BusinessContextHandler implements Serializable {
 	public void setcValues(String cValues) {
 		this.cValues = cValues;
 	}
+
+	public List<BusinessContextValues> getBcValues() {
+		return bcValues;
+	}
+
+	public void setBcValues(List<BusinessContextValues> bcValues) {
+		this.bcValues = bcValues;
+	}
+
+	public List<SRTObject> getBusinessContexts() {
+		try {
+			businessContexts = daoBC.findObjects();
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		return businessContexts;
+	}
+
+	public void setBusinessContexts(List<SRTObject> businessContexts) {
+		this.businessContexts = businessContexts;
+	}
+
+	public BusinessContextVO getBcDetail() {
+		bcValues = new ArrayList<BusinessContextValues>();
+		if(bcDetail != null) {
+			bcId = bcDetail.getBusinessContextID();
+			QueryCondition qc = new QueryCondition();
+			qc.add("Business_Context_ID", bcDetail.getBusinessContextID());
+			try {
+				BusinessContextVO bcVO = (BusinessContextVO)daoBC.findObject(qc);
+				qc = new QueryCondition();
+				qc.add("Business_Context_ID", bcDetail.getBusinessContextID());
+				
+				List<SRTObject> bcvVOList = daoBCV.findObjects(qc);
+				for(SRTObject sVO : bcvVOList) {
+					BusinessContextValues bcv = new BusinessContextValues();
+					BusinessContextValueVO bcvVO = (BusinessContextValueVO)sVO;
+					qc = new QueryCondition();
+					qc.add("Context_Scheme_Value_ID", bcvVO.getContextSchemeValueID());
+					ContextSchemeValueVO  csvVO = (ContextSchemeValueVO)daoCV.findObject(qc);
+					bcv.setCsvVO(csvVO);
+					
+					qc = new QueryCondition();
+					qc.add("Context_Scheme_ID", csvVO.getOwnerContextSchemeID());
+					ContextSchemeVO csVO = (ContextSchemeVO)daoCS.findObject(qc);
+					bcv.setCsVO(csVO);
+					
+					qc = new QueryCondition();
+					qc.add("Context_Category_ID", csVO.getContextCategoryID());
+					ContextCategoryVO ccVO = (ContextCategoryVO)daoCC.findObject(qc);
+					bcv.setCcVO(ccVO);
+					
+					bcValues.add(bcv);
+				}
+			} catch (SRTDAOException e) {
+				e.printStackTrace();
+			}
+		}
+		return bcDetail;
+	}
+
+	public void setBcDetail(BusinessContextVO bcDetail) {
+		this.bcDetail = bcDetail;
+	}
+	
 }

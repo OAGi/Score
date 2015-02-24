@@ -7,17 +7,14 @@
 	<ui:define name="side_menu">
 		<h:form>
 			<p:growl id="messages" showDetail="false" />
-
 			<p:menu>
 				<p:submenu style="width: 180px !important;" label="Context Category">
-					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
-					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
-					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
+					<p:menuitem value="Create" url="business_context_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="List" url="business_context_list.xhtml" icon="ui-icon-search" />
 				</p:submenu>
 			</p:menu>
 		</h:form>
 	</ui:define>
-
 
 	<ui:define name="content">
 		<h:form id="form">
@@ -47,28 +44,28 @@
 					</p:row>		
 					<p:row>
 						<p:column colspan="2"> 					
-							<p:dataTable id="tbl" var="ch" value="#{businessContextHandler}"
+							<p:dataTable id="tbl" var="businessContextValues" value="#{businessContextHandler.bcValues}"
 								style="width:600px; margin-bottom:20px">
 								
 								<p:column style="width:200px">
 									<f:facet name="header">
 										<h:outputText value="Context Category" />
 									</f:facet>
-									<h:outputText value="#{ch.selected.name}" />
+									<h:outputText value="#{businessContextValues.ccVO.name}" />
 								</p:column>
 				
 								<p:column style="width:200px">
 									<f:facet name="header">
 										<h:outputText value="Context Scheme Name" />
 									</f:facet>
-									<h:outputText value="#{ch.selected1.schemeName}" />
+									<h:outputText value="#{businessContextValues.csVO.schemeName}" />
 								</p:column>
 				
 								<p:column style="width:200px">
 									<f:facet name="header">
 										<h:outputText value="Context Scheme Value" />
 									</f:facet>
-									<h:outputText value="#{ch.cValues}" />
+									<h:outputText value="#{businessContextValues.csValues}" />
 								</p:column>
 							</p:dataTable>
 						</p:column>
@@ -76,7 +73,7 @@
 					<p:row>
         				<p:column>
 							<p:commandButton value="Create" update="grid" icon="ui-icon-check"
-							validateClient="true" style="margin-right:10px" actionListener="#{businessContextHandler.createBusinessContext}" action="context_category_list.xhtml?faces-redirect=true" />
+							validateClient="true" style="margin-right:10px" actionListener="#{businessContextHandler.createBusinessContext}" action="business_context_list.xhtml?faces-redirect=true" />
 						</p:column> 
 						<p:column> 
 							<p:button href="business_context_create.xhtml" value="Cancel" icon="ui-icon-check"/>
