@@ -1,5 +1,7 @@
 package org.oagi.srt.persistence.dto;
 
+import java.sql.Timestamp;
+
 import org.oagi.srt.common.SRTObject;
 
 /**
@@ -14,10 +16,17 @@ public class ASBIEVO extends SRTObject {
 	private int AssocFromABIEID;
 	private int AssocToASBIEPID;
 	private int BasedASCC;
-	private String AssocDescription;
-	private String PropertyDescription;
 	private int CardinalityMin;
 	private int CardinalityMax;
+	
+	private String asbieGuid;
+	private String definition;
+	private int nillable;
+	private String remark;
+	private int createdByUserId;
+	private int lastUpdatedByUserId;
+	private Timestamp creationTimestamp;
+	private Timestamp lastUpdateTimestamp;
 
 	public int getASBIEID() {
 		return ASBIEID;
@@ -53,22 +62,6 @@ public class ASBIEVO extends SRTObject {
 		BasedASCC = basedASCC;
 	}
 	
-	public String getAssocDescription() {
-		return AssocDescription;
-	}
-	
-	public void setAssocDescription(String assocDescription) {
-		AssocDescription = assocDescription;
-	}
-	
-	public String getPropertyDescription() {
-		return PropertyDescription;
-	}
-	
-	public void setPropertyDescription(String propertyDescription) {
-		PropertyDescription = propertyDescription;
-	}
-	
 	public int getCardinalityMin() {
 		return CardinalityMin;
 	}
@@ -84,6 +77,69 @@ public class ASBIEVO extends SRTObject {
 	public void setCardinalityMax(int cardinalityMax) {
 		CardinalityMax = cardinalityMax;
 	}
-	
+
+	public String getAsbieGuid() {
+		return asbieGuid;
+	}
+
+	public void setAsbieGuid(String asbieGuid) {
+		this.asbieGuid = asbieGuid;
+	}
+
+	public String getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(String definition) {
+		this.definition = definition;
+	}
+
+	public int getNillable() {
+		return nillable;
+	}
+
+	public void setNillable(int nillable) {
+		this.nillable = nillable;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public int getCreatedByUserId() {
+		return createdByUserId;
+	}
+
+	public void setCreatedByUserId(int createdByUserId) {
+		this.createdByUserId = createdByUserId;
+	}
+
+	public int getLastUpdatedByUserId() {
+		return lastUpdatedByUserId;
+	}
+
+	public void setLastUpdatedByUserId(int lastUpdatedByUserId) {
+		this.lastUpdatedByUserId = lastUpdatedByUserId;
+	}
+
+	public Timestamp getCreationTimestamp() {
+		return creationTimestamp;
+	}
+
+	public void setCreationTimestamp(Timestamp creationTimestamp) {
+		this.creationTimestamp = creationTimestamp;
+	}
+
+	public Timestamp getLastUpdateTimestamp() {
+		return lastUpdateTimestamp;
+	}
+
+	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
+		this.lastUpdateTimestamp = lastUpdateTimestamp;
+	}
 	
 }

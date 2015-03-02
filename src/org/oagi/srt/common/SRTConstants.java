@@ -35,6 +35,12 @@ public class SRTConstants {
 	
 	public static final String OAGI_NS = "http://www.openapplications.org/oagis/10";
 	
+	public static final String TAB_TOP_LEVEL_ABIE_SELECT_BC = "select_bc";
+	public static final String TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE = "create_u_bie";
+	
+	public static final int TOP_LEVEL_ABIE_STATE_EDITING = 2;
+	public static final int TOP_LEVEL_ABIE_STATE_PUBLISHED = 4;
+	
 	public static int getDBType() {
 		ServerProperties props = ServerProperties.getInstance();
 		String dbTypeVal = props.getProperty("srt.db.type");

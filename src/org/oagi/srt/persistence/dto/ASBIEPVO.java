@@ -20,6 +20,9 @@ public class ASBIEPVO extends SRTObject {
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	
+	private String remark;
+	private String businessTerm;
+	
 	public int getASBIEPID() {
 		return ASBIEPID;
 	}
@@ -73,5 +76,17 @@ public class ASBIEPVO extends SRTObject {
 	}
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
 		LastUpdateTimestamp = lastUpdateTimestamp;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getBusinessTerm() {
+		return businessTerm;
+	}
+	public void setBusinessTerm(String businessTerm) {
+		this.businessTerm = businessTerm;
 	}
 }

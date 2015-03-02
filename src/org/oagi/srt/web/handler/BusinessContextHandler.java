@@ -345,6 +345,7 @@ public class BusinessContextHandler implements Serializable {
 	public List<SRTObject> getBusinessContexts() {
 		try {
 			businessContexts = daoBC.findObjects();
+			//bcDetail = null;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}

@@ -12,6 +12,7 @@ import org.oagi.srt.common.SRTObject;
 public class ABIEVO extends SRTObject {
 
 	private int ABIEID;
+	private String abieGUID;
 	private int BasedACCID;
 	private int IsTopLevel;
 	private int BusinessContextID;
@@ -21,6 +22,11 @@ public class ABIEVO extends SRTObject {
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	private int State;
+	private String clientID;
+	private String version;
+	private String status;
+	private String remark;
+	private String businessTerm;
 	
 	public int getABIEID(){
 		return ABIEID;
@@ -100,6 +106,54 @@ public class ABIEVO extends SRTObject {
 	
 	public void setState(int state){
 		State = state;
-	}	
+	}
 
+	public String getAbieGUID() {
+		return abieGUID;
+	}
+
+	public void setAbieGUID(String abieGUID) {
+		this.abieGUID = abieGUID;
+	}
+
+	public String getClientID() {
+		return clientID;
+	}
+
+	public void setClientID(String clientID) {
+		this.clientID = clientID;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getBusinessTerm() {
+		return businessTerm;
+	}
+
+	public void setBusinessTerm(String businessTerm) {
+		this.businessTerm = businessTerm;
+	}	
+	
 }

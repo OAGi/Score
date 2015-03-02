@@ -186,7 +186,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
 				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assoc_To_ASCCP_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
 				
@@ -291,8 +291,73 @@ public class ASCCMysqlDAO extends SRTDAO {
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_ASCC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			//System.out.println("### sql: " + sql);
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				ASCCVO asccVO = new ASCCVO();
+				
+				asccVO.setASCCID(rs.getInt("ASCC_ID"));
+				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setDEN(rs.getString("DEN"));
+				asccVO.setDefinition(rs.getString("Definition"));
+				
+				list.add(asccVO);
+			}
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
 	}
 
 }

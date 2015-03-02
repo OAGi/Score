@@ -20,7 +20,7 @@
 
 
 	<ui:define name="content">
-<h:form id="form">
+	<h:form id="form">
                  
     <p:growl id="growl" sticky="true" showDetail="true"/>
  
@@ -84,7 +84,10 @@
 				</p:dataTable>
             </p:panel>
             <p:panel header="Select Existing Business Context" collapsed="true" toggleable="true" toggleSpeed="500">
-                <p:messages />
+            	<h:panelGrid columns="2" columnClasses="label, value" cellpadding="10" cellspacing="2">
+            		<h:outputLabel value="Seletced: " style="font-weight:bold; color:red;" />
+            		<h:outputLabel id="selectedBC" value="#{topLevelABIEHandler.bCSelected.name}" style="font-weight:bold; color:blue;" />
+            	</h:panelGrid>
                 <h:panelGrid columns="1" columnClasses="label, value">
 					<p:dataTable id="tbl1" var="BusinessContextVO" value="#{businessContextHandler.businessContexts}"
 						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
@@ -99,7 +102,7 @@
 						
 					</p:dataTable>
 					<p:commandButton process="tbl1" update=":form:bcDetailid" icon="ui-icon-search" value="Detail" oncomplete="PF('bcDetail').show()" />
-					<p:dialog header="Business Context Detail" widgetVar="bcDetail" showEffect="fade" hideEffect="fade" closable="true" resizable="true" draggable="true" width="800" height="300">
+					<p:dialog header="Business Context Detail" widgetVar="bcDetail" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="300">
 		        		<p:outputPanel id="bcDetailid">
 							<h:panelGrid id="grid1" cellpadding="5">
 								<p:row>
@@ -146,13 +149,22 @@
 										</p:dataTable>
 									</p:column>
 								</p:row>
+								<p:row>
+									<p:commandButton value="Select" icon="ui-icon-check"
+										style="margin-right:10px" actionListener="#{topLevelABIEHandler.onBCSelect(businessContextHandler.bcDetail)}" oncomplete="PF('bcDetail').hide()" update=":form:selectedBC :form:selectedBC1" />
+									<p:commandButton value="Close" icon="ui-icon-check"
+										style="margin-right:10px" oncomplete="PF('bcDetail').hide()" />
+								</p:row>
 							</h:panelGrid>
 						</p:outputPanel>
 				    </p:dialog>
                 </h:panelGrid>
             </p:panel>
             <p:panel header="Create New Business Context" collapsed="true" toggleable="true" toggleSpeed="500">
-                <p:messages autoUpdate="true" />
+                <h:panelGrid columns="2" columnClasses="label, value" cellpadding="10" cellspacing="2">
+            		<h:outputLabel value="Seletced: " style="font-weight:bold; color:red;" />
+            		<h:outputLabel id="selectedBC1" value="#{topLevelABIEHandler.bCSelected.name}" style="font-weight:bold; color:blue;" />
+            	</h:panelGrid>
 
 				<h:panelGrid id="grid2" cellpadding="5">
 					<p:row>
