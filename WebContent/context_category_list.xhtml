@@ -19,11 +19,10 @@
 	</ui:define>
 
 	<ui:define name="content">
-		<h:form>
-			<p:growl id="messages1" />
+		<h:form id="form">
+			<p:growl id="messages1" showDetail="true"/>
 			<p:panel header="Search Context Category">
 				<p:messages autoUpdate="true" />
-
 				<h:panelGrid id="grid" columns="5" cellpadding="5">
 					<h:outputLabel for="name" value="Name:" style="font-weight:bold" />
 					<p:autoComplete id="name" value="#{contextCategoryHandler.name}" completeMethod="#{contextCategoryHandler.completeInput}" />
@@ -33,44 +32,63 @@
 				</h:panelGrid>
 			</p:panel>
 			<p:panel header="Context Category List">
-				<p:dataTable id="tbl" var="contextCategoryVO" value="#{contextCategoryHandler.contextCategories}"
-					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:1100px; margin-bottom:20px">
-	
-					<p:column style="width:350px">
+				<p:dataTable id="tbl" var="contextCategoryVO" value="#{contextCategoryHandler.contextCategories}" editable="true" selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategoryVO.contextCategoryGUID}" 
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}" paginator="true" rows="10" style="width:1100px; margin-bottom:20px" >
+					<f:facet name="header">
+					</f:facet>
+			       	<p:ajax event="rowEdit" listener="#{contextCategoryHandler.onRowEdit}" update=":form:messages1" />
+       				<p:ajax event="rowEditCancel" listener="#{contextCategoryHandler.onRowCancel}" update=":form:messages1" />
+					<p:column selectionMode="single" style="width:350px">
 						<f:facet name="header">
 							<h:outputText value="GUID" />
 						</f:facet>
 						<h:outputText value="#{contextCategoryVO.contextCategoryGUID}" />
 					</p:column>
-	
+					
 					<p:column style="width:200px">
 						<f:facet name="header">
 							<h:outputText value="Name" />
 						</f:facet>
-						<h:outputText value="#{contextCategoryVO.name}" />
+						<p:cellEditor>
+							<f:facet name="output"><h:outputText value="#{contextCategoryVO.name}" /></f:facet>
+							<f:facet name="input"><p:inputText id="modelInput" value="#{contextCategoryVO.name}" style="width:100%" /></f:facet>
+						</p:cellEditor>
 					</p:column>
-	
+					
 					<p:column style="width:300px">
 						<f:facet name="header">
 							<h:outputText value="Description" />
 						</f:facet>
-						<h:outputText value="#{contextCategoryVO.description}" />
+						<p:cellEditor>
+							<f:facet name="output"><h:outputText value="#{contextCategoryVO.description}" /></f:facet>
+							<f:facet name="input"><p:inputText value="#{contextCategoryVO.description}" style="width:100%" label="Description"/></f:facet>
+						</p:cellEditor>
 					</p:column>
 					
-					<p:column style="width:150px">
-						<f:facet name="header">
-							<h:outputText value="Action" />
-						</f:facet>
-						<p:splitButton value="Detail" actionListener="#{contextCategoryHandler.detail}" icon="ui-icon-disk">
-							<p:menuitem value="Edit" actionListener="#{contextCategoryHandler.edit}" icon="ui-icon-arrowrefresh-1-w" />
-					        <p:menuitem value="Delete" actionListener="#{contextCategoryHandler.delete}" icon="ui-icon-arrowrefresh-1-w" />
-					        <p:separator />
-					        <p:menuitem value="Cancel" url="context_category_list.xhtml" icon="ui-icon-extlink" />
-					    </p:splitButton>
-					</p:column>
-					
+			        <p:column style="width:32px">
+        		    	<p:rowEditor />
+       				</p:column>
+       
+					<f:facet name="footer">
+						<p:commandButton process="tbl" update=":form:contextCategoryDetail" icon="ui-icon-disk" value="Detail" oncomplete="PF('contextCategoryDialog').show()" />
+						<p:commandButton process="tbl" update=":form:tbl" icon="ui-icon-arrowrefresh-1-w" value="Delete" action="#{contextCategoryHandler.delete(contextCategoryHandler.selectedCategory.contextCategoryID)}" />
+					</f:facet>				
 				</p:dataTable>
+				
+				<p:dialog header="Context Category Info" widgetVar="contextCategoryDialog" showEffect="fade" hideEffect="fade" resizable="false" closable="true" closeOnEscape="true">
+			        <p:outputPanel id="contextCategoryDetail" style="text-align:center;">
+			            <p:panelGrid  columns="2" rendered="#{not empty contextCategoryHandler.selectedCategory}" columnClasses="label,value">
+			                <h:outputText value="ID:" />
+			                <h:outputText value="#{contextCategoryHandler.selectedCategory.contextCategoryID}" />
+			                <h:outputText value="GUID:" />
+			                <h:outputText value="#{contextCategoryHandler.selectedCategory.contextCategoryGUID}" />
+			                <h:outputText value="Name" />
+			                <h:outputText value="#{contextCategoryHandler.selectedCategory.name}" />
+			                <h:outputText value="Description" />
+			                <h:outputText value="#{contextCategoryHandler.selectedCategory.description}" />
+			            </p:panelGrid>
+			        </p:outputPanel>
+			    </p:dialog>
 			</p:panel>
 		</h:form>
 	</ui:define>

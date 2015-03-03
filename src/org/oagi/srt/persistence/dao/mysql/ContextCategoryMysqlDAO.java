@@ -269,6 +269,7 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 			ps.setString(1, context_categoryVO.getContextCategoryGUID());
 			ps.setString(2, context_categoryVO.getName());
 			ps.setString(3, context_categoryVO.getDescription());
+			ps.setInt(4, context_categoryVO.getContextCategoryID());
 			ps.executeUpdate();
 
 			tx.commit();

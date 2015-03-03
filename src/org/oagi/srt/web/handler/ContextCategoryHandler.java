@@ -1,7 +1,9 @@
 package org.oagi.srt.web.handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -15,6 +17,8 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.RowEditEvent;
 
 @ManagedBean
 public class ContextCategoryHandler {
@@ -34,8 +38,13 @@ public class ContextCategoryHandler {
 
 	private String name;
 	private String description;
+	private String GUID;
+	private int id;
 
 	private List<SRTObject> contextCategories;
+	private SRTObject selectedCategory;
+	
+	private ContextCategoryVO contextCategory;
 
 	public String getName() {
 		return name;
@@ -44,7 +53,24 @@ public class ContextCategoryHandler {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getGUID() {
+		return GUID;
+	}
 
+	public void setGUID(String GUID) {
+		this.GUID = GUID;
+	}
+	
+
+	public int getid() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	public String getDescription() {
 		return description;
 	}
@@ -67,17 +93,22 @@ public class ContextCategoryHandler {
 	public void setContextCategories(List<SRTObject> contextCategories) {
 		this.contextCategories = contextCategories;
 	}
-
-	public void detail(ActionEvent actionEvent) {
-		addMessage("Coming soon!!!");
-	}
-
+	
 	public void edit(ActionEvent actionEvent) {
+		
 		addMessage("Coming soon!!!");
 	}
 
-	public void delete(ActionEvent actionEvent) {
-		addMessage("Coming soon!!!");
+	public void delete(int id) {
+		addMessage(id+" has been deleted from the list");
+		try {
+			ContextCategoryVO ccVO = new ContextCategoryVO();
+			ccVO.setContextCategoryID(id);
+			dao.deleteObject(ccVO);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void search() {
@@ -101,7 +132,7 @@ public class ContextCategoryHandler {
 		}
 
 	}
-
+	
 	public List<String> completeInput(String query) {
 		List<String> results = new ArrayList<String>();
 
@@ -136,4 +167,43 @@ public class ContextCategoryHandler {
 
 		return results;
 	}
+
+	public ContextCategoryVO getContextCategory() {
+		return contextCategory;
+	}
+
+	public void setContextCategory(ContextCategoryVO contextCategory) {
+		this.contextCategory = contextCategory;
+	}
+	
+    public SRTObject getselectedCategory() {
+        return selectedCategory;
+    }
+ 
+    public void setselectedCategory(SRTObject selectedCategory) {
+        this.selectedCategory = selectedCategory;
+    }
+	
+    public void onRowEdit(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("Context Category Edited  "+ ((ContextCategoryVO) event.getObject()).getName());
+        System.out.println(((ContextCategoryVO) event.getObject()).getName());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+
+        ContextCategoryVO ccVO = new ContextCategoryVO();
+		ccVO.setName(((ContextCategoryVO) event.getObject()).getName());
+		ccVO.setDescription(((ContextCategoryVO) event.getObject()).getDescription());
+		ccVO.setContextCategoryGUID(((ContextCategoryVO) event.getObject()).getContextCategoryGUID());
+		ccVO.setContextCategoryID(((ContextCategoryVO) event.getObject()).getContextCategoryID());
+		try {
+			dao.updateObject(ccVO);
+		} catch (SRTDAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+    }
+     
+    public void onRowCancel(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("Edit Cancelled", ((SRTObject) event.getObject()).getObid());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 }
