@@ -25,12 +25,12 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 	private final String _tableName = "asbiep";
 
 	private final String _FIND_ALL_ASBIEP_STATEMENT = 
-			"SELECT * FROM ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
-			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp" + _tableName;
+			"SELECT ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
+			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
 	
 	private final String _FIND_ASBIEP_STATEMENT = 
-			"SELECT * FROM ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
-			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp" + _tableName;
+			"SELECT ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
+			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
 	
 	private final String _INSERT_ASBIEP_STATEMENT = "INSERT INTO " + _tableName + " "
 			+ "(ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID, "

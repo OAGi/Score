@@ -221,9 +221,11 @@
  
         <p:tab id="create_u_bie" title="Create uncommitted BIE">
             <p:panel header="Create uncommitted BIE">
-                <p:messages />
+                <p:messages id="chartMsg" />
                 <h:panelGrid columns="2" columnClasses="label, value">
-
+					<p:chart id="chart" type="bar" model="#{topLevelABIEHandler.barModel}" style="width:600px;height:400px">
+			            <p:ajax event="itemSelect" listener="#{topLevelABIEHandler.itemSelect}" update=":form:chartMsg" />
+			        </p:chart>
                 </h:panelGrid>
             </p:panel>
         </p:tab>

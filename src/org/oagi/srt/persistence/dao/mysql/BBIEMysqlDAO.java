@@ -26,23 +26,23 @@ public class BBIEMysqlDAO extends SRTDAO{
 
 	private final String _FIND_ALL_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, fixed_value, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
 					+ " FROM " + _tableName;
 
 	private final String _FIND_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, fixed_value, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
 					+ " FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, fixed_value, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp)"
-					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
 	private final String _UPDATE_BBIE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET BBIE_ID = ?, Based_BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, isNillable = ?, Fixed_Value = ?, Assoc_From_ABIE_ID = ?, "
-			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, default = ?, fixed_value = ?, remark = ?, "
+			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, default = ?, remark = ?, "
 			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP";
 
 	private final String _DELETE_BBIE_STATEMENT = 
@@ -64,13 +64,21 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(7, bbieVO.getAssocToBBIEPID());
 			ps.setString(8, bbieVO.getDefinition());
 			ps.setString(9, bbieVO.getBbieGuid());
-			ps.setInt(10, bbieVO.getBdtPrimitiveRestrictionId());
-			ps.setInt(11, bbieVO.getCodeListId());
+			
+			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+				ps.setNull(10, java.sql.Types.INTEGER);
+			else
+				ps.setInt(10, bbieVO.getBdtPrimitiveRestrictionId());
+			
+			if(bbieVO.getCodeListId() == 0)
+				ps.setNull(11, java.sql.Types.INTEGER);
+			else
+				ps.setInt(11, bbieVO.getCodeListId());
+			
 			ps.setString(12, bbieVO.getDefaultText());
-			ps.setString(13, bbieVO.getFixedValue());
-			ps.setString(14, bbieVO.getRemark());
-			ps.setInt(15, bbieVO.getCreatedByUserId());
-			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
+			ps.setString(13, bbieVO.getRemark());
+			ps.setInt(14, bbieVO.getCreatedByUserId());
+			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 
 			ps.executeUpdate();
 			ps.close();
@@ -132,7 +140,6 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("Bdt_Primitive_Restriction_Id"));
 				bbieVO.setCodeListId(rs.getInt("code_list_id"));
 				bbieVO.setDefaultText(rs.getString("default"));
-				bbieVO.setFixedValue(rs.getString("fixed_value"));
 				bbieVO.setRemark(rs.getString("remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
@@ -185,7 +192,6 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("Bdt_Primitive_Restriction_Id"));
 				bbieVO.setCodeListId(rs.getInt("code_list_id"));
 				bbieVO.setDefaultText(rs.getString("default"));
-				bbieVO.setFixedValue(rs.getString("fixed_value"));
 				bbieVO.setRemark(rs.getString("remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
@@ -235,10 +241,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(10, bbieVO.getBdtPrimitiveRestrictionId());
 			ps.setInt(11, bbieVO.getCodeListId());
 			ps.setString(12, bbieVO.getDefaultText());
-			ps.setString(13, bbieVO.getFixedValue());
-			ps.setString(14, bbieVO.getRemark());
-			ps.setInt(15, bbieVO.getCreatedByUserId());
-			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
+			ps.setString(13, bbieVO.getRemark());
+			ps.setInt(14, bbieVO.getCreatedByUserId());
+			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -340,7 +345,6 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("Bdt_Primitive_Restriction_Id"));
 				bbieVO.setCodeListId(rs.getInt("code_list_id"));
 				bbieVO.setDefaultText(rs.getString("default"));
-				bbieVO.setFixedValue(rs.getString("fixed_value"));
 				bbieVO.setRemark(rs.getString("remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));

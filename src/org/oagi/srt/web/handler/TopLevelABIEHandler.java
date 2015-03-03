@@ -31,8 +31,13 @@ import org.oagi.srt.persistence.dto.BusinessContextVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.ChartSeries;
 
 @ManagedBean
 @ViewScoped
@@ -52,6 +57,15 @@ public class TopLevelABIEHandler implements Serializable {
 	private SRTDAO bbiepDao;
 	private SRTDAO bbieDao;
 	private SRTDAO bbiescDao;
+	
+	private int abieCount = 0;
+	private int bbiescCount = 0;
+	private int asbiepCount = 0;
+	private int asbieCount = 0;
+	private int bbiepCount = 0;
+	private int bbieCount = 0;
+	
+	private BarChartModel barModel;
 	
 	private String propertyTerm;
 	private List<SRTObject> asccpVOs;
@@ -86,6 +100,97 @@ public class TopLevelABIEHandler implements Serializable {
 			e.printStackTrace();
 		}
 	}
+	
+	public BarChartModel getBarModel() {
+        return barModel;
+    }
+	
+	private void createBarModel() {
+        barModel = initBarModel();
+         
+        barModel.setTitle("Number of items created");
+        barModel.setLegendPosition("ne");
+         
+        Axis xAxis = barModel.getAxis(AxisType.X);
+        xAxis.setLabel("Tables");
+         
+        Axis yAxis = barModel.getAxis(AxisType.Y);
+        yAxis.setLabel("");
+        yAxis.setMin(0);
+        yAxis.setMax(30);
+        yAxis.setTickInterval("5");
+    }
+	
+	
+	private BarChartModel initBarModel() {
+        BarChartModel model = new BarChartModel();
+ 
+        ChartSeries tabie = new ChartSeries();
+        tabie.setLabel("ABIE");
+        tabie.set("", abieCount);
+        
+        ChartSeries tasbiep = new ChartSeries();
+        tasbiep.setLabel("ASBIEP");
+        tasbiep.set("", asbiepCount);
+        
+        ChartSeries tasbie = new ChartSeries();
+        tasbie.setLabel("ASBIE");
+        tasbie.set("", asbieCount);
+        
+        ChartSeries tbbie = new ChartSeries();
+        tbbie.setLabel("BBIE");
+        tbbie.set("", bbieCount);
+        
+        ChartSeries tbbiep = new ChartSeries();
+        tbbiep.setLabel("BBIEP");
+        tbbiep.set("", bbiepCount);
+
+        ChartSeries tbbiesc = new ChartSeries();
+        tbbiesc.setLabel("BBIE_SC");
+        tbbiesc.set("", bbiescCount);
+ 
+        model.addSeries(tabie);
+        model.addSeries(tasbiep);
+        model.addSeries(tasbie);
+        
+        model.addSeries(tbbie);
+        model.addSeries(tbbiep);
+        model.addSeries(tbbiesc);
+         
+        return model;
+    }
+	
+	public void itemSelect(ItemSelectEvent event) {
+		String str = "";
+		switch (event.getSeriesIndex()) {
+			case 0:
+				str = "ABIE: " +  abieCount;
+				break;
+			case 1:
+				str = "ASBIEP: " +  asbiepCount;
+				break;
+			case 2:
+				str = "ASBIE: " +  asbieCount;
+				break;
+			case 3:
+				str = "BBIE: " +  bbieCount;
+				break;
+			case 4:
+				str = "BBIEP: " +  bbiepCount;
+				break;
+			case 5:
+				str = "BBIE_SC: " +  bbiescCount;
+				break;
+			default:
+				str = "";
+				break;
+		}
+			
+        FacesMessage msg = new FacesMessage(str,
+                        "Item Index: " + event.getItemIndex() + ", Series Index:" + event.getSeriesIndex());
+         
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 	
 	private boolean skip;
 
@@ -133,7 +238,8 @@ public class TopLevelABIEHandler implements Serializable {
 			
 			createBIEs(selected.getRoleOfACCID(), abieId);
 			
-		}
+			createBarModel();
+		} 
 		
 		return event.getNewStep();
 	}
@@ -167,6 +273,18 @@ public class TopLevelABIEHandler implements Serializable {
 		return id;
 	}
 	
+	private int getBBIEPID(String key, String value) {
+		QueryCondition qc = new QueryCondition();
+		qc.add(key, value);
+		int id = -1;
+		try {
+			id = ((BBIEPVO)bbiepDao.findObject(qc)).getBBIEPID();
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		return id;
+	}
+	
 	private ABIEVO createABIE(int acc, int bc, int topLevel) {
 		ABIEVO abieVO = new ABIEVO();
 		String abieGuid = Utility.generateGUID();
@@ -179,6 +297,7 @@ public class TopLevelABIEHandler implements Serializable {
 		abieVO.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
 		try {
 			abieDao.insertObject(abieVO);
+			abieCount++;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -194,6 +313,7 @@ public class TopLevelABIEHandler implements Serializable {
 		asbiepVO.setLastUpdatedByUserID(8); // TODO get from UserID
 		try {
 			asbiepDao.insertObject(asbiepVO);
+			asbiepCount++;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -211,6 +331,7 @@ public class TopLevelABIEHandler implements Serializable {
 		asbieVO.setLastUpdatedByUserId(8); // TODO get from UserID
 		try {
 			asbieDao.insertObject(asbieVO);
+			asbieCount++;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -252,6 +373,7 @@ public class TopLevelABIEHandler implements Serializable {
 		
 		try {
 			bbiepDao.insertObject(bbiepVO);
+			bbiepCount++;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -261,6 +383,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private BBIEVO createBBIE(int bcc, int abie, int bbiep) {
 		BBIEVO bbieVO = new BBIEVO();
 		bbieVO.setBbieGuid(Utility.generateGUID());
+		bbieVO.setBasedBCCID(bcc);
 		bbieVO.setAssocFromABIEID(abie);
 		bbieVO.setAssocToBBIEPID(bbiep);
 		bbieVO.setisNillable(0);
@@ -268,6 +391,7 @@ public class TopLevelABIEHandler implements Serializable {
 		bbieVO.setLastUpdatedByUserId(8); // TODO get from UserID
 		try {
 			bbieDao.insertObject(bbieVO);
+			bbieCount++;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -281,6 +405,7 @@ public class TopLevelABIEHandler implements Serializable {
 		
 		try {
 			bbiescDao.insertObject(bbiescVO);
+			bbiescCount++;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -293,7 +418,6 @@ public class TopLevelABIEHandler implements Serializable {
 		try {
 			List<SRTObject> list = bccDao.findObjects(qc);
 			
-			System.out.println("################ gACC: " + gACC + " | " + list);
 			if(list != null) {
 				for(SRTObject obj : list) {
 					BCCVO bccVO = (BCCVO) obj;
@@ -302,7 +426,13 @@ public class TopLevelABIEHandler implements Serializable {
 					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc);
 					
 					BBIEPVO bbiepVP = createBBIEP(bccpVO.getBCCPID(), gABIE);
-					BBIEVO bbieVO = createBBIE(bccVO.getBCCID(), gABIE, bbiepVP.getBBIEPID());
+					
+					
+					
+					int bbiepID = getBBIEPID("bbiep_guid", bbiepVP.getBBIEPGUID());
+					
+					System.out.println("################ bccVO.getBCCID(): " + bccVO.getBCCID() + " | " + gABIE + " | " + bbiepID);
+					BBIEVO bbieVO = createBBIE(bccVO.getBCCID(), gABIE, bbiepID);
 					
 				}
 			}
