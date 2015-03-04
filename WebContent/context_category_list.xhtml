@@ -19,7 +19,7 @@
 	</ui:define>
 
 	<ui:define name="content">
-		<h:form id="form">
+		<h:form id="listForm">
 			<p:growl id="messages1" showDetail="true"/>
 			<p:panel header="Search Context Category">
 				<p:messages autoUpdate="true" />
@@ -36,8 +36,8 @@
 				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}" paginator="true" rows="10" style="width:1100px; margin-bottom:20px" >
 					<f:facet name="header">
 					</f:facet>
-			       	<p:ajax event="rowEdit" listener="#{contextCategoryHandler.onRowEdit}" update=":form:messages1" />
-       				<p:ajax event="rowEditCancel" listener="#{contextCategoryHandler.onRowCancel}" update=":form:messages1" />
+			       	<p:ajax event="rowEdit" listener="#{contextCategoryHandler.onRowEdit}" update=":listForm:messages1" />
+       				<p:ajax event="rowEditCancel" listener="#{contextCategoryHandler.onRowCancel}" update=":listForm:messages1" />
 					<p:column selectionMode="single" style="width:350px">
 						<f:facet name="header">
 							<h:outputText value="GUID" />
@@ -51,11 +51,11 @@
 						</f:facet>
 						<p:cellEditor>
 							<f:facet name="output"><h:outputText value="#{contextCategoryVO.name}" /></f:facet>
-							<f:facet name="input"><p:inputText id="modelInput" value="#{contextCategoryVO.name}" style="width:100%" /></f:facet>
+							<f:facet name="input"><p:inputText value="#{contextCategoryVO.name}" style="width:100%" /></f:facet>
 						</p:cellEditor>
 					</p:column>
 					
-					<p:column style="width:300px">
+					<p:column style="width:300px">	
 						<f:facet name="header">
 							<h:outputText value="Description" />
 						</f:facet>
@@ -64,14 +64,12 @@
 							<f:facet name="input"><p:inputText value="#{contextCategoryVO.description}" style="width:100%" label="Description"/></f:facet>
 						</p:cellEditor>
 					</p:column>
-					
 			        <p:column style="width:32px">
         		    	<p:rowEditor />
        				</p:column>
-       
 					<f:facet name="footer">
-						<p:commandButton process="tbl" update=":form:contextCategoryDetail" icon="ui-icon-disk" value="Detail" oncomplete="PF('contextCategoryDialog').show()" />
-						<p:commandButton process="tbl" update=":form:tbl" icon="ui-icon-arrowrefresh-1-w" value="Delete" action="#{contextCategoryHandler.delete(contextCategoryHandler.selectedCategory.contextCategoryID)}" />
+						<p:commandButton process="tbl" update=":listForm:contextCategoryDetail" icon="ui-icon-disk" value="Detail" oncomplete="PF('contextCategoryDialog').show()" />
+						<p:commandButton process="tbl" update=":listForm:tbl" icon="ui-icon-arrowrefresh-1-w" value="Delete" action="#{contextCategoryHandler.delete(contextCategoryHandler.selectedCategory.contextCategoryID)}" />
 					</f:facet>				
 				</p:dataTable>
 				

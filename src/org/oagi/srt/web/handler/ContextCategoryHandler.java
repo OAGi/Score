@@ -1,9 +1,7 @@
 package org.oagi.srt.web.handler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -11,13 +9,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 
 @ManagedBean
@@ -28,9 +26,10 @@ public class ContextCategoryHandler {
 
 	@PostConstruct
 	private void init() {
-		try {
+		try {	
 			df = DAOFactory.getDAOFactory();
 			dao = df.getDAO("ContextCategory");
+			contextCategories = dao.findObjects();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -80,13 +79,6 @@ public class ContextCategoryHandler {
 	}
 
 	public List<SRTObject> getContextCategories() {
-
-		try {
-			contextCategories = dao.findObjects();
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-
 		return contextCategories;
 	}
 
@@ -101,6 +93,7 @@ public class ContextCategoryHandler {
 
 	public void delete(int id) {
 		addMessage(id+" has been deleted from the list");
+		
 		try {
 			ContextCategoryVO ccVO = new ContextCategoryVO();
 			ccVO.setContextCategoryID(id);
@@ -108,6 +101,8 @@ public class ContextCategoryHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		init();
 		
 	}
 
@@ -187,6 +182,7 @@ public class ContextCategoryHandler {
     public void onRowEdit(RowEditEvent event) {
         FacesMessage msg = new FacesMessage("Context Category Edited  "+ ((ContextCategoryVO) event.getObject()).getName());
         System.out.println(((ContextCategoryVO) event.getObject()).getName());
+        System.out.println(((ContextCategoryVO) event.getObject()).getDescription());
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
         ContextCategoryVO ccVO = new ContextCategoryVO();
