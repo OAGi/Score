@@ -54,6 +54,7 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			ps.executeUpdate();
 			ps.close();
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
@@ -179,6 +180,7 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			ps.executeUpdate();
 
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
@@ -210,6 +212,7 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			ps.executeUpdate();
 
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);

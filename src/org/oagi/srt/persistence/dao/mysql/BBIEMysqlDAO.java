@@ -26,12 +26,12 @@ public class BBIEMysqlDAO extends SRTDAO{
 
 	private final String _FIND_ALL_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
 					+ " FROM " + _tableName;
 
 	private final String _FIND_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
 					+ " FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_STATEMENT = 
@@ -42,7 +42,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 	private final String _UPDATE_BBIE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET BBIE_ID = ?, Based_BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, isNillable = ?, Fixed_Value = ?, Assoc_From_ABIE_ID = ?, "
-			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, default = ?, remark = ?, "
+			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, bbie.default = ?, remark = ?, "
 			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP";
 
 	private final String _DELETE_BBIE_STATEMENT = 
@@ -51,9 +51,10 @@ public class BBIEMysqlDAO extends SRTDAO{
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BBIEVO bbieVO = (BBIEVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT);
 			ps.setInt(1, bbieVO.getBasedBCCID());
 			ps.setInt(2, bbieVO.getCardinalityMin());
@@ -91,6 +92,15 @@ public class BBIEMysqlDAO extends SRTDAO{
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return true;
@@ -247,6 +257,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.executeUpdate();
 
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
@@ -278,6 +289,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.executeUpdate();
 
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);

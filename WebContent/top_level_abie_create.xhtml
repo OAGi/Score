@@ -220,7 +220,49 @@
         </p:tab>
  
         <p:tab id="create_u_bie" title="Create uncommitted BIE">
-            <p:panel header="Create uncommitted BIE">
+        	<p:panel header="Create uncommitted BIE">
+		        <p:treeTable value="#{topLevelABIEHandler.root}" var="aBIEView">
+			        <f:facet name="header">
+			            #{topLevelABIEHandler.selected.module}
+			        </f:facet>
+			        <p:column headerText="Children">
+			            <h:outputText value="#{aBIEView.name}" style="color:#{aBIEView.color};"/>
+			        </p:column>
+			        <p:column headerText="Min">
+			            <h:outputText value="#{aBIEView.min}" />
+			        </p:column>
+			        <p:column headerText="Max">
+			            <h:outputText value="#{aBIEView.max}" />
+			        </p:column>
+			        <p:column headerText="Primitive">
+			            <h:outputText value="#{aBIEView.primitive}" />
+			        </p:column>
+			        <p:column headerText="Fixed Value">
+			            <h:outputText value="#{aBIEView.fixedValue}" />
+			        </p:column>
+			        <p:column style="width:24px">
+			            <p:commandLink update=":form:documentPanel" oncomplete="PF('documentDialog').show()" title="View Detail" styleClass="ui-icon ui-icon-search">
+			                <f:setPropertyActionListener value="#{document}" target="#{topLevelABIEHandler.selectedDocument}" />
+			            </p:commandLink>
+			        </p:column>
+			    </p:treeTable>
+			 
+			    <p:dialog id="dialog" header="Document Detail" showEffect="fade" widgetVar="documentDialog" modal="false" resizable="false">
+			        <p:outputPanel id="documentPanel">
+			            <p:panelGrid  columns="2" columnClasses="label,value" rendered="#{not empty topLevelABIEHandler.selectedDocument}">
+			                <h:outputLabel for="children" value="Children" />
+			                <h:outputText id="children" value="#{topLevelABIEHandler.selectedDocument.name}" style="font-weight:bold" />
+			 
+			                <h:outputLabel for="min" value="Min" />
+			                <h:outputText id="min" value="#{topLevelABIEHandler.selectedDocument.size}" style="font-weight:bold" />
+			 
+			                <h:outputLabel for="max" value="Max " />
+			                <h:outputText id="max" value="#{topLevelABIEHandler.selectedDocument.type}" style="font-weight:bold" />
+			            </p:panelGrid>
+			        </p:outputPanel>
+			    </p:dialog>
+			   </p:panel>
+            <p:panel header="Number of Uncommitted BIEs">
                 <p:messages id="chartMsg" />
                 <h:panelGrid columns="2" columnClasses="label, value">
 					<p:chart id="chart" type="bar" model="#{topLevelABIEHandler.barModel}" style="width:600px;height:400px">

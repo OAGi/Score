@@ -47,9 +47,10 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT);
 			ps.setString(1, asbiepVO.getASBIEPGUID());
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
@@ -70,6 +71,15 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			try {
+				if(conn != null && !conn.isClosed())
+					conn.close();
+			} catch (SQLException e) {}
 			tx.close();
 		}
 		return true;
@@ -206,6 +216,7 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.executeUpdate();
 
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
@@ -238,6 +249,7 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.executeUpdate();
 
 			tx.commit();
+			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);
