@@ -48,6 +48,12 @@ public class ACCMysqlDAO extends SRTDAO {
 	private final String _DELETE_ACC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ACC_ID = ?";
 
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ACCVO accVO = (ACCVO)obj;
@@ -175,6 +181,80 @@ public class ACCMysqlDAO extends SRTDAO {
 		}
 		return accVO;
 	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ACCVO accVO = null;
+		//Connection conn = null;
+		try {
+			//conn = tx.open();
+			String sql = _FIND_ACC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				accVO = new ACCVO();
+				accVO.setACCID(rs.getInt("ACC_ID"));
+				accVO.setACCGUID(rs.getString("ACC_GUID"));
+				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
+				accVO.setDEN(rs.getString("DEN"));
+				accVO.setDefinition(rs.getString("Definition"));
+				accVO.setBasedACCID(rs.getInt("Based_ACC_ID"));
+				accVO.setObjectClassQualifier(rs.getString("Object_Class_Qualifier"));
+				accVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
+				accVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
+				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				accVO.setState(rs.getInt("State"));
+				accVO.setModule(rs.getString("Module"));
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			//try {
+			//	if(conn != null && !conn.isClosed())
+			//		conn.close();
+			//} catch (SQLException e) {}
+			tx.close();
+		}
+		return accVO;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -209,6 +289,58 @@ public class ACCMysqlDAO extends SRTDAO {
 			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_ALL_ACC_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				ACCVO accVO = new ACCVO();
+				accVO.setACCID(rs.getInt("ACC_ID"));
+				accVO.setACCGUID(rs.getString("ACC_GUID"));
+				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
+				accVO.setDEN(rs.getString("DEN"));
+				accVO.setDefinition(rs.getString("Definition"));
+				accVO.setBasedACCID(rs.getInt("Based_ACC_ID"));
+				accVO.setObjectClassQualifier(rs.getString("Object_Class_Qualifier"));
+				accVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
+				accVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
+				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				accVO.setState(rs.getInt("State"));
+				accVO.setModule(rs.getString("Module"));
+				list.add(accVO);
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
@@ -304,6 +436,13 @@ public class ACCMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;

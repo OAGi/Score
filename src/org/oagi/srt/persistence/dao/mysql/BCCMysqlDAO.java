@@ -44,6 +44,12 @@ public class BCCMysqlDAO extends SRTDAO{
 	private final String _DELETE_BCC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BCC_ID = ?";
 
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BCCVO bccVO = (BCCVO)obj;
@@ -159,6 +165,71 @@ public class BCCMysqlDAO extends SRTDAO{
 		}
 		return bccVO;
 	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		BCCVO bccVO = null;
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_BCC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				bccVO = new BCCVO();
+				bccVO.setBCCID(rs.getInt("BCC_ID"));
+				bccVO.setBCCGUID(rs.getString("BCC_GUID"));
+				bccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
+				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
+				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setEntityType(rs.getInt("Entity_Type"));
+				bccVO.setDEN(rs.getString("DEN"));
+
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+		return bccVO;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -188,6 +259,53 @@ public class BCCMysqlDAO extends SRTDAO{
 			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_ALL_BCC_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BCCVO bccVO = new BCCVO();
+				bccVO.setBCCID(rs.getInt("BCC_ID"));
+				bccVO.setBCCGUID(rs.getString("BCC_GUID"));
+				bccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
+				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
+				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setEntityType(rs.getInt("Entity_Type"));
+				bccVO.setDEN(rs.getString("DEN"));
+				list.add(bccVO);
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
@@ -327,6 +445,74 @@ public class BCCMysqlDAO extends SRTDAO{
 			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_BCC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BCCVO bccVO = new BCCVO();
+				bccVO.setBCCID(rs.getInt("BCC_ID"));
+				bccVO.setBCCGUID(rs.getString("BCC_GUID"));
+				bccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
+				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
+				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setEntityType(rs.getInt("Entity_Type"));
+				bccVO.setDEN(rs.getString("DEN"));
+				list.add(bccVO);
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {

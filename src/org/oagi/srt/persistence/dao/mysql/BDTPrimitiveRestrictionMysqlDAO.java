@@ -39,6 +39,12 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 	private final String _DELETE_BDT_Primitive_Restriction_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BDT_Primitive_Restriction_ID = ?";
 
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = (BDTPrimitiveRestrictionVO) obj;
@@ -247,6 +253,27 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;

@@ -42,20 +42,20 @@ public class SRTInitializer {
     }
 
     private SRTInitializer() {
-        _logger.info("SRTInitializer...");
+        System.out.println("SRTInitializer...");
     }
 
     public void init(ServletContext context) throws SRTInitializerException {
         if (_started) {
-            _logger.info("SRTInitializer called TWICE! Return without doing anything...");
+            System.out.println("SRTInitializer called TWICE! Return without doing anything...");
             return;
         }
-        _logger.info("");
-        _logger.info("########################################");
-        _logger.info("# Initialize System Resource Start     ");
+        System.out.println("");
+        System.out.println("########################################");
+        System.out.println("# Initialize System Resource Start     ");
 
-        _logger.info("----------------------------------------");
-        _logger.info("# Initializing ServerProperties");
+        System.out.println("----------------------------------------");
+        System.out.println("# Initializing ServerProperties");
         ServerProperties props = ServerProperties.getInstance();
         try {
     		InputStream is = SRTInitializer.class.getResourceAsStream(_propFile);
@@ -73,17 +73,17 @@ public class SRTInitializer {
     		}
 
         } catch (Exception e) {
-            _logger.info("[SRTInitializer] Fail to Getting "
+            System.out.println("[SRTInitializer] Fail to Getting "
             		+ SRTConstants.SRT_PROPERTIES_FILE_NAME + " URL : "
                         + e.toString());
         }
         // Initializing Step-2 : DBConnectionPool ����...
-        _logger.info("----------------------------------------");
-        _logger.info("# Initializing DBConnectionPool");
+        System.out.println("----------------------------------------");
+        System.out.println("# Initializing DBConnectionPool");
         try {
 			ConnectionPoolManager cpm = ConnectionPoolManager.getInstance();
 			String poolName = cpm.getDefaultPoolName();
-			_logger.info("DefaultPoolName:" + poolName);
+			System.out.println("DefaultPoolName:" + poolName);
 			Connection dbConnection = cpm.getConnection(poolName);
 			dbConnection.close();
 			_logger.debug("DB Connection Pool initialized...");
@@ -95,24 +95,24 @@ public class SRTInitializer {
 					+ e.toString());
 		}
 
-        _logger.info("----------------------------------------");
-        _logger.info("# Initialize System Resource End     ");
-        _logger.info("########################################");
-        _logger.info("");
+        System.out.println("----------------------------------------");
+        System.out.println("# Initialize System Resource End     ");
+        System.out.println("########################################");
+        System.out.println("");
         _started = true;
     }
 
     public void release() throws SRTInitializerException {
     	_started = false;
 
-        _logger.info("----------------------------------------");
-        _logger.info("destroy Connection Pool");
+        System.out.println("----------------------------------------");
+        System.out.println("destroy Connection Pool");
         try {
             ConnectionPoolManager cpm = ConnectionPoolManager.getInstance();
             cpm.forceRelease();
             // DBConnectionManager.release();
         } catch (Exception e) {
-            _logger.info("[SRTInitializer] Fail to Destroyting Connection Pool : "
+            System.out.println("[SRTInitializer] Fail to Destroyting Connection Pool : "
                         + e.getMessage());
         }
     }

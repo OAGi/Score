@@ -67,7 +67,7 @@ public class BusinessContextHandler implements Serializable {
 
 	private List<SRTObject> contextCategories = new ArrayList<SRTObject>();
 	private List<SRTObject> contextSchemes = new ArrayList<SRTObject>();
-	private List<SRTObject> businessContexts = new ArrayList<SRTObject>();
+	private List<SRTObject> businessContexts = null;
 	private List<SRTObject> contextValues = new ArrayList<SRTObject>();
 	private List<BusinessContextValues> bcValues = new ArrayList<BusinessContextValues>();
 	private List<BusinessContextValues> bcDetails = new ArrayList<BusinessContextValues>();
@@ -344,7 +344,8 @@ public class BusinessContextHandler implements Serializable {
 
 	public List<SRTObject> getBusinessContexts() {
 		try {
-			businessContexts = daoBC.findObjects();
+			if(businessContexts == null)
+				businessContexts = daoBC.findObjects();
 			//bcDetail = null;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();

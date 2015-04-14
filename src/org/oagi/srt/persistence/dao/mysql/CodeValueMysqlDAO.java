@@ -40,6 +40,12 @@ public class CodeValueMysqlDAO extends SRTDAO {
 			"DELETE FROM " + _tableName + " WHERE Code_Value_ID = ?";
 
 	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
@@ -250,6 +256,27 @@ public class CodeValueMysqlDAO extends SRTDAO {
 
 		return true;
 
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -38,6 +38,12 @@ public class ASCCPBusinessTermMysqlDAO extends SRTDAO{
 	private final String _DELETE_ASCCP_BUSINESS_TERM_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE idASCCP_Business_Term = ?";
 
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASCCPBusinessTermVO asccp_business_termVO = (ASCCPBusinessTermVO)obj;
@@ -226,6 +232,27 @@ public class ASCCPBusinessTermMysqlDAO extends SRTDAO{
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;

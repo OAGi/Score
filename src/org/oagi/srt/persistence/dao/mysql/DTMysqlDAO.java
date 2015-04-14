@@ -49,6 +49,12 @@ public class DTMysqlDAO extends SRTDAO {
 			+ "Definition = ?, Content_Component_Definition = ?, Revision_Documentation = ?, Revision_State = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
 			+ "Creation_Timestamp = ? WHERE DT_ID = ?";
 
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 	private final String _DELETE_DT_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE DT_ID = ?";
 
@@ -406,5 +412,26 @@ public class DTMysqlDAO extends SRTDAO {
 
 		return true;
 
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

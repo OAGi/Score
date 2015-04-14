@@ -3,6 +3,7 @@ package org.oagi.srt.common.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.util.Random;
 import java.util.UUID;
 
 import org.chanchan.common.persistence.db.ConnectionPoolManager;
@@ -29,6 +30,11 @@ public class Utility {
 		String prefix = str.substring(0, 1);
 		String suffix = str.substring(1);
 		return prefix.toUpperCase() + suffix;
+	}
+	
+	public static int getRandomID(int c) {
+		Random r = new Random();
+		return c + r.nextInt(Integer.MAX_VALUE - c);
 	}
 	
 	public static String spaceSeparator(String str) {

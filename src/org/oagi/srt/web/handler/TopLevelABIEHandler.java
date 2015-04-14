@@ -1,6 +1,10 @@
 package org.oagi.srt.web.handler;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +16,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.chanchan.common.persistence.db.BfPersistenceException;
+import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
@@ -80,6 +86,13 @@ public class TopLevelABIEHandler implements Serializable {
 	
 	private ASCCPVO selected;
 	private BusinessContextVO bCSelected;
+	
+	private int maxABIEId;
+	private int maxASBIEPId;
+	private int maxBIEPID;
+	private int maxBIEID;
+	
+	private Connection conn = null;
 
 	@PostConstruct
 	private void init() {
@@ -100,6 +113,11 @@ public class TopLevelABIEHandler implements Serializable {
 			bbiescDao = df.getDAO("BBIE_SC");
 			dtscDao = df.getDAO("DTSC");
 			
+			maxABIEId = asbieDao.findMaxId();
+			maxASBIEPId = asbiepDao.findMaxId();
+			maxBIEPID = bbiepDao.findMaxId();
+			maxBIEID = bbieDao.findMaxId();
+			
 			try {
 				asccpVOs = dao.findObjects();
 			} catch (SRTDAOException e) {
@@ -117,7 +135,26 @@ public class TopLevelABIEHandler implements Serializable {
 	
 	private int barCount = 20;
 	
+	private int getMax() {
+		int max = 0;
+		if(abieCount > max)
+			max = abieCount;
+		if(bbiescCount > max)
+			max = bbiescCount;
+		if(asbiepCount > max)
+			max = asbiepCount;
+		if(asbieCount > max)
+			max = asbieCount;
+		if(bbiepCount > max)
+			max = bbiepCount;
+		if(bbieCount > max)
+			max = bbieCount;
+		return max;
+	}
+	
 	private void createBarModel() {
+		barCount = getMax();
+				
         barModel = initBarModel();
          
         barModel.setTitle("Number of items created");
@@ -129,8 +166,8 @@ public class TopLevelABIEHandler implements Serializable {
         Axis yAxis = barModel.getAxis(AxisType.Y);
         yAxis.setLabel("");
         yAxis.setMin(0);
-        yAxis.setMax(barCount);
-        yAxis.setTickInterval("10");
+        yAxis.setMax(barCount + barCount/10);
+        yAxis.setTickInterval(String.valueOf(barCount/10));
     }
 	
 	
@@ -243,25 +280,40 @@ public class TopLevelABIEHandler implements Serializable {
 		} else if(event.getNewStep().equals(SRTConstants.TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE)) {
 			// TODO if go back from the confirmation page? avoid that situation
 			
-			ABIEVO abieVO = createABIE(selected.getRoleOfACCID(), bCSelected.getBusinessContextID(), 1);
-			int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
-			root = new DefaultTreeNode(new ABIEView(selected.getPropertyTerm(), abieVO.getAbieGUID()), null);
-			createASBIEP(abieId, selected.getASCCPID());
-			
-			createBIEs(selected.getRoleOfACCID(), abieId, root);
-			
-			createBarModel();
+			DBAgent tx = new DBAgent();
+			try {
+				conn = tx.open();
+				ABIEVO abieVO = createABIE(selected.getRoleOfACCID(), bCSelected.getBusinessContextID(), 1);
+				// int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
+				int abieId = abieVO.getABIEID();
+				root = new DefaultTreeNode(new ABIEView(selected.getPropertyTerm(), abieVO.getAbieGUID()), null);
+				createASBIEP(abieId, selected.getASCCPID());
+				
+				createBIEs(selected.getRoleOfACCID(), abieId, root);
+				
+				createBarModel();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if(conn != null)
+						conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		} 
 		
 		return event.getNewStep();
 	}
 	
 	private void createBIEs(int acc, int abie, TreeNode tNode) {
-		barCount++;
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_id", acc);
+		ACCVO accVO = null;
 		try {
-			ACCVO accVO = (ACCVO)accDao.findObject(qc);
+			accVO = (ACCVO)accDao.findObject(qc, conn);
 			if(accVO.getBasedACCID() > 0) {
 				createASBIEP(abie, accVO.getBasedACCID());
 				createBIEs(accVO.getBasedACCID(), abie, tNode);
@@ -332,12 +384,15 @@ public class TopLevelABIEHandler implements Serializable {
 		abieVO.setCreatedByUserID(8); // TODO get from UserID
 		abieVO.setLastUpdatedByUserID(8); // TODO get from UserID
 		abieVO.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
-		try {
-			abieDao.insertObject(abieVO);
-			abieCount++;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+		abieVO.setABIEID(Utility.getRandomID(maxABIEId));
+//		try {
+//			abieDao.insertObject(abieVO);
+//			abieCount++;
+//		} catch (SRTDAOException e) {
+//			e.printStackTrace();
+//		}
+		
+		abieCount++;
 		return abieVO;
 	}
 	
@@ -348,12 +403,15 @@ public class TopLevelABIEHandler implements Serializable {
 		asbiepVO.setRoleOfABIEID(abie);
 		asbiepVO.setCreatedByUserID(8); // TODO get from UserID
 		asbiepVO.setLastUpdatedByUserID(8); // TODO get from UserID
-		try {
-			asbiepDao.insertObject(asbiepVO);
-			asbiepCount++;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+		asbiepVO.setASBIEPID(Utility.getRandomID(maxASBIEPId));
+//		try {
+//			asbiepDao.insertObject(asbiepVO);
+//			asbiepCount++;
+//		} catch (SRTDAOException e) {
+//			e.printStackTrace();
+//		}
+		
+		asbiepCount++;
 		
 		return asbiepVO;
 	}
@@ -366,13 +424,13 @@ public class TopLevelABIEHandler implements Serializable {
 		asbieVO.setBasedASCC(ascc);
 		asbieVO.setCreatedByUserId(8); // TODO get from UserID
 		asbieVO.setLastUpdatedByUserId(8); // TODO get from UserID
-		try {
-			asbieDao.insertObject(asbieVO);
-			asbieCount++;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		
+//		try {
+//			asbieDao.insertObject(asbieVO);
+//			asbieCount++;
+//		} catch (SRTDAOException e) {
+//			e.printStackTrace();
+//		}
+		asbieCount++;
 		return asbieVO;
 	}
 	
@@ -380,26 +438,47 @@ public class TopLevelABIEHandler implements Serializable {
 		QueryCondition qc = new QueryCondition();
 		qc.add("assoc_from_acc_id", gACC);
 		try {
-			for(SRTObject obj : asccDao.findObjects(qc)) {
+			List<SRTObject> objs = asccDao.findObjects(qc, conn);
+			for(SRTObject obj : objs) {
+//				try {
+//					Thread.sleep(50);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
 				ASCCVO asccVO = (ASCCVO) obj;
-				qc = new QueryCondition();
-				qc.add("asccp_id", asccVO.getAssocToASCCPID());
-				
-				ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc);
-				ABIEVO abieVO = createABIE(asccpVO.getRoleOfACCID(), bCSelected.getBusinessContextID(), 0);
-				int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
-				ASBIEPVO asbiepVO = createASBIEP(abieId, asccpVO.getASCCPID());
-				int asbiepId = getASBIEPID("asbiep_guid", asbiepVO.getASBIEPGUID());
-				
-				ASBIEVO asbieVO = createASBIE(asccVO.getASCCID(), gABIE, asbiepId);
-				ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getAbieGUID());
-				av.setColor("blue");
-				av.setMin(asbieVO.getCardinalityMin());
-				av.setMax(asbieVO.getCardinalityMax());
-				TreeNode tNode2 = new DefaultTreeNode(av, tNode);
-				
-				createBIEs(asccpVO.getRoleOfACCID(), abieId, tNode2);
+				//if(asccVO.getDefinition() == null || !asccVO.getDefinition().equalsIgnoreCase("Group")) {
+					qc = new QueryCondition();
+					qc.add("asccp_id", asccVO.getAssocToASCCPID());
+					
+					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc, conn);
+					ABIEVO abieVO = createABIE(asccpVO.getRoleOfACCID(), bCSelected.getBusinessContextID(), 0);
+					//int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
+					int abieId = abieVO.getABIEID();
+					
+					ASBIEPVO asbiepVO = createASBIEP(abieId, asccpVO.getASCCPID());
+					//int asbiepId = getASBIEPID("asbiep_guid", asbiepVO.getASBIEPGUID());
+					int asbiepId = asbiepVO.getASBIEPID();
+					
+					ASBIEVO asbieVO = createASBIE(asccVO.getASCCID(), gABIE, asbiepId);
+					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getAbieGUID());
+					av.setColor("blue");
+					av.setMin(asbieVO.getCardinalityMin());
+					av.setMax(asbieVO.getCardinalityMax());
+					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
+					
+					if(!asccpVO.getPropertyTerm().contains("Group")) { //.equalsIgnoreCase("References Group") && !asccpVO.getPropertyTerm().equalsIgnoreCase("Free Form Text Group")) // TODO check why freeformtext repeated
+						createBIEs(asccpVO.getRoleOfACCID(), abieId, tNode2);
+					} else {
+						QueryCondition qc1 = new QueryCondition();
+						qc1.add("acc_guid", asccpVO.getASCCPGUID());
+						ACCVO accVO = (ACCVO)accDao.findObject(qc1, conn);
+						createBasicChildBIEs(accVO.getACCID(), abieId, tNode2);
+					}
+				//} else {
+					
+				//}
 			}
+			
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -412,13 +491,16 @@ public class TopLevelABIEHandler implements Serializable {
 		bbiepVO.setBasedBCCPID(bccp);
 		bbiepVO.setCreatedByUserID(8); // TODO get from UserID
 		bbiepVO.setLastUpdatedbyUserID(8); // TODO get from UserID
+		bbiepVO.setBBIEPID(Utility.getRandomID(maxBIEPID));
 		
-		try {
-			bbiepDao.insertObject(bbiepVO);
-			bbiepCount++;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			bbiepDao.insertObject(bbiepVO);
+//			bbiepCount++;
+//		} catch (SRTDAOException e) {
+//			e.printStackTrace();
+//		}
+		
+		bbiepCount++;
 		return bbiepVO;
 	}
 	
@@ -431,12 +513,16 @@ public class TopLevelABIEHandler implements Serializable {
 		bbieVO.setisNillable(0);
 		bbieVO.setCreatedByUserId(8); // TODO get from UserID
 		bbieVO.setLastUpdatedByUserId(8); // TODO get from UserID
-		try {
-			bbieDao.insertObject(bbieVO);
-			bbieCount++;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+		bbieVO.setBBIEID(Utility.getRandomID(maxBIEID));
+		
+//		try {
+//			bbieDao.insertObject(bbieVO);
+//			bbieCount++;
+//		} catch (SRTDAOException e) {
+//			e.printStackTrace();
+//		}
+		
+		bbieCount++;
 		return bbieVO;
 	}
 	
@@ -464,18 +550,19 @@ public class TopLevelABIEHandler implements Serializable {
 		QueryCondition qc = new QueryCondition();
 		qc.add("assoc_from_acc_id", gACC);
 		try {
-			List<SRTObject> list = bccDao.findObjects(qc);
+			List<SRTObject> list = bccDao.findObjects(qc, conn);
 			
 			if(list != null) {
 				for(SRTObject obj : list) {
 					BCCVO bccVO = (BCCVO) obj;
 					qc = new QueryCondition();
 					qc.add("bccp_id", bccVO.getAssocToBCCPID());
-					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc);
+					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 					
-					BBIEPVO bbiepVP = createBBIEP(bccpVO.getBCCPID(), gABIE);
+					BBIEPVO bbiepVO = createBBIEP(bccpVO.getBCCPID(), gABIE);
 					
-					int bbiepID = getBBIEPID("bbiep_guid", bbiepVP.getBBIEPGUID());
+					//int bbiepID = getBBIEPID("bbiep_guid", bbiepVO.getBBIEPGUID());
+					int bbiepID = bbiepVO.getBBIEPID();
 					
 					BBIEVO bbieVO = createBBIE(bccVO.getBCCID(), gABIE, bbiepID);
 					
@@ -485,8 +572,9 @@ public class TopLevelABIEHandler implements Serializable {
 					av.setMax(bbieVO.getCardinalityMax());
 					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 					
-					int bbieID = getBBIEID("bbie_guid", bbieVO.getBbieGuid());
-					createBBIESC(bbieID, bccpVO.getBDTID());
+					//int bbieID = getBBIEID("bbie_guid", bbieVO.getBbieGuid());
+					int bbieID = bbieVO.getBBIEID();
+					// createBBIESC(bbieID, bccpVO.getBDTID());
 					
 				}
 			}

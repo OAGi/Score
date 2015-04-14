@@ -24,35 +24,35 @@ public final class ContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     	
     	initLog();
-    	_logger.info("");
-        _logger.info("*********************************************");
-        _logger.info("   Starting......");
-        _logger.info("       "
+    	System.out.println("");
+        System.out.println("*********************************************");
+        System.out.println("   Starting......");
+        System.out.println("       "
         		+ SRTConstants.PRODUCT_NAME);
-        _logger.info("*********************************************");
-        _logger.info("");
+        System.out.println("*********************************************");
+        System.out.println("");
         try {
             SRTInitializer initializer = SRTInitializer.getInstance();
             initializer.init(servletContextEvent.getServletContext());
-            _logger.info(SRTConstants.PRODUCT_NAME + " " + " Engine started..");
+            System.out.println(SRTConstants.PRODUCT_NAME + " " + " Engine started..");
         } catch (SRTInitializerException e) {
             System.err.println(e);
         }
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        _logger.info("");
-        _logger.info("*********************************************");
-        _logger.info("   Stopping......");
-        _logger.info("       "
+        System.out.println("");
+        System.out.println("*********************************************");
+        System.out.println("   Stopping......");
+        System.out.println("       "
         		+ SRTConstants.PRODUCT_NAME + " ");
-        _logger.info("*********************************************");
-        _logger.info("");
+        System.out.println("*********************************************");
+        System.out.println("");
 
         try {
             SRTInitializer initializer = SRTInitializer.getInstance();
             initializer.release();
-            _logger.info(SRTConstants.PRODUCT_NAME + " " + " Engine stopped..");
+            System.out.println(SRTConstants.PRODUCT_NAME + " " + " Engine stopped..");
         } catch (SRTInitializerException e) {
             System.err.println(e);
         }

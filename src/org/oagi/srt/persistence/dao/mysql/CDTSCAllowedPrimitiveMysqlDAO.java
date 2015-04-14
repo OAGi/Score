@@ -41,6 +41,12 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 
 
 	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -300,6 +306,27 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 
 		return true;
 
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

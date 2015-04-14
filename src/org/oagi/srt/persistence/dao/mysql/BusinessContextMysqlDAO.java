@@ -40,6 +40,12 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 	private final String _DELETE_BUSINESS_CONTEXT_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Business_Context_ID = ?";
 	
+
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -233,6 +239,27 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;

@@ -45,6 +45,11 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 	private final String _DELETE_Agency_ID_List_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Agency_ID_List_ID = ?";
 	
+	@Override
+	public int findMaxId() throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -263,6 +268,27 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;

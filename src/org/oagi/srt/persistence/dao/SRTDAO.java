@@ -24,13 +24,19 @@ public abstract class SRTDAO {
 	
 	public abstract SRTObject findObject(QueryCondition qc)	throws SRTDAOException;
 	
+	public abstract SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException;
+	
 	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc)	throws SRTDAOException;
+	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException;
 
 	public abstract ArrayList<SRTObject> findObjects() throws SRTDAOException;
+	public abstract ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException;
 	
 	public abstract boolean updateObject(SRTObject obj) throws SRTDAOException;
 
 	public abstract boolean deleteObject(SRTObject obj) throws SRTDAOException;
+	
+	public abstract int findMaxId() throws SRTDAOException;
 	
 	public int getASCCCount(int accId) throws SRTDAOException {
 		DBAgent tx = new DBAgent();

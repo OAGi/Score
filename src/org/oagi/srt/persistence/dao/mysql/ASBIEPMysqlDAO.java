@@ -28,6 +28,9 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			"SELECT ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
 			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
 	
+	private final String _FIND_MAX_ID_STATEMENT =
+			"SELECT max(ASBIEP_ID) as max FROM " + _tableName;
+	
 	private final String _FIND_ASBIEP_STATEMENT = 
 			"SELECT ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
 			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
@@ -37,6 +40,11 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			+ "Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 	
+	private final String _INSERT_ASBIEP_WITH_ID_STATEMENT = "INSERT INTO " + _tableName + " "
+			+ "(ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID, "
+			+ "Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp, ASBIEP_ID) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+	
 	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
 			" SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ASBIEP_GUID = ?, Based_ASCCP_ID = ?,"
 			+ " Role_Of_ABIE_ID = ?, Definition = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
@@ -44,6 +52,40 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 	
 	private final String _DELETE_ASBIEP_STATEMENT = "DELETE FROM " + _tableName + " WHERE ASBIEP_ID = ?";
 
+	public int findMaxId() throws SRTDAOException {
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int max = 1;
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_MAX_ID_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next())
+				max = rs.getInt("max");
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+		return max;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
@@ -51,13 +93,20 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		try {
 			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT);
+			
+			if(asbiepVO.getASBIEPID() == -1)
+				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT);
+			else
+				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT);
+			
 			ps.setString(1, asbiepVO.getASBIEPGUID());
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
 			ps.setString(4, asbiepVO.getDefinition());
 			ps.setInt(5, asbiepVO.getCreatedByUserID());
 			ps.setInt(6, asbiepVO.getLastUpdatedByUserID());
+			if(asbiepVO.getASBIEPID() != -1)
+				ps.setInt(7, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
 
@@ -272,6 +321,27 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;

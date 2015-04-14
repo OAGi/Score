@@ -29,6 +29,9 @@ public class ABIEMysqlDAO extends SRTDAO {
 			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
 			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term FROM " + _tableName;
 	
+	private final String _FIND_MAX_ID_STATEMENT =
+			"SELECT max(abie_id) as max FROM " + _tableName;
+	
 	private final String _FIND_ABIE_STATEMENT =
 			"SELECT ABIE_ID, Based_ACC_ID, isTop_Level, Business_Context_ID, Definition, "
 			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
@@ -39,6 +42,11 @@ public class ABIEMysqlDAO extends SRTDAO {
 			+ " Definition, Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
 			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ? ,? , ?)";
 	
+	private final String _INSERT_ABIE_WITH_ID_STATEMENT = 
+			"INSERT INTO " + _tableName + " (Based_ACC_ID, isTop_Level, Business_Context_ID,"
+			+ " Definition, Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term, ABIE_ID) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
+	
 	private final String _UPDATE_ABIE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, Based_ACC_ID = ?,"
@@ -48,6 +56,39 @@ public class ABIEMysqlDAO extends SRTDAO {
 	private final String _DELETE_ABIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ABIE_ID = ?";
 	
+	public int findMaxId() throws SRTDAOException {
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int max = 1;
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_MAX_ID_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next())
+				max = rs.getInt("max");
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+		return max;
+	}
 	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -56,7 +97,11 @@ public class ABIEMysqlDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		try {
 			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT);
+			if(abieVO.getABIEID() == -1)
+				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT);
+			else
+				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT);
+			
 			ps.setInt(1, abieVO.getBasedACCID());
 			ps.setInt(2, abieVO.getIsTopLevel());
 			ps.setInt(3, abieVO.getBusinessContextID());
@@ -70,6 +115,8 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps.setString(11, abieVO.getStatus());
 			ps.setString(12, abieVO.getRemark());
 			ps.setString(13, abieVO.getBusinessTerm());
+			if(abieVO.getABIEID() != -1)
+				ps.setInt(14, abieVO.getABIEID());
 
 			ps.executeUpdate();
 
@@ -305,6 +352,27 @@ public class ABIEMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SRTObject findObject(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
