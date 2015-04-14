@@ -121,6 +121,74 @@ public class DTSCMysqlDAO extends SRTDAO {
 		return list;
 	}
 	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_DT_SC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				DTSCVO dtscVO = new DTSCVO();
+				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
+				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
+				dtscVO.setDefinition(rs.getString("Definition"));
+				dtscVO.setOwnerDTID(rs.getInt("Owner_DT_ID"));
+				dtscVO.setMinCardinality(rs.getInt("Min_Cardinality"));
+				dtscVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
+				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
+				list.add(dtscVO);
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		DTSCVO dtscVO = (DTSCVO)obj;
@@ -225,6 +293,69 @@ public class DTSCMysqlDAO extends SRTDAO {
 		}
 		return dtscVO;
 	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		DTSCVO dtscVO = new DTSCVO();
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_DT_SC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
+				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
+				dtscVO.setDefinition(rs.getString("Definition"));
+				dtscVO.setOwnerDTID(rs.getInt("Owner_DT_ID"));
+				dtscVO.setMinCardinality(rs.getInt("Min_Cardinality"));
+				dtscVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
+				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+		return dtscVO;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -254,6 +385,53 @@ public class DTSCMysqlDAO extends SRTDAO {
 			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			//Connection conn = tx.open();
+			String sql = _FIND_ALL_DT_SC_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				DTSCVO dtscVO = new DTSCVO();
+				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
+				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
+				dtscVO.setDefinition(rs.getString("Definition"));
+				dtscVO.setOwnerDTID(rs.getInt("Owner_DT_ID"));
+				dtscVO.setMinCardinality(rs.getInt("Min_Cardinality"));
+				dtscVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
+				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
+				list.add(dtscVO);
+			}
+			//tx.commit();
+			//conn.close();
+		//} catch (BfPersistenceException e) {
+		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
@@ -347,27 +525,6 @@ public class DTSCMysqlDAO extends SRTDAO {
 
 		return true;
 
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

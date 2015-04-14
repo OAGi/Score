@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -39,6 +40,7 @@ import org.oagi.srt.persistence.dto.BCCVO;
 import org.oagi.srt.persistence.dto.BusinessContextVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
+import org.oagi.srt.persistence.dto.DTVO;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.ItemSelectEvent;
@@ -71,6 +73,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private SRTDAO bbieDao;
 	private SRTDAO bbiescDao;
 	private SRTDAO dtscDao;
+	private SRTDAO dtDao;
 	
 	private int abieCount = 0;
 	private int bbiescCount = 0;
@@ -91,6 +94,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private int maxASBIEPId;
 	private int maxBIEPID;
 	private int maxBIEID;
+	private int maxBBIESCID;
 	
 	private Connection conn = null;
 
@@ -112,11 +116,13 @@ public class TopLevelABIEHandler implements Serializable {
 			bbieDao = df.getDAO("BBIE");
 			bbiescDao = df.getDAO("BBIE_SC");
 			dtscDao = df.getDAO("DTSC");
+			dtDao = df.getDAO("DT");
 			
 			maxABIEId = asbieDao.findMaxId();
 			maxASBIEPId = asbiepDao.findMaxId();
 			maxBIEPID = bbiepDao.findMaxId();
 			maxBIEID = bbieDao.findMaxId();
+			maxBBIESCID = bbiescDao.findMaxId();
 			
 			try {
 				asccpVOs = dao.findObjects();
@@ -526,19 +532,31 @@ public class TopLevelABIEHandler implements Serializable {
 		return bbieVO;
 	}
 	
-	private void createBBIESC(int bbie, int bdt) {
+	private void createBBIESC(int bbie, int bdt, TreeNode tNode) {
 		QueryCondition qc = new QueryCondition();
 		qc.add("owner_dt_id", bdt);
 		try {
-			List<SRTObject> list = dtscDao.findObjects(qc);
+			List<SRTObject> list = dtscDao.findObjects(qc, conn);
+			HashMap<String, String> hm = new HashMap<String, String>();
 			for(SRTObject obj : list) {
 				DTSCVO dtsc = (DTSCVO) obj;
 				BBIE_SCVO bbiescVO = new BBIE_SCVO();
 				bbiescVO.setBBIEID(bbie);
 				bbiescVO.setDTSCID(dtsc.getDTSCID()); 
+				bbiescVO.setBBIESCID(Utility.getRandomID(maxBBIESCID));
 				
-				bbiescDao.insertObject(bbiescVO);
+				//bbiescDao.insertObject(bbiescVO);
 				bbiescCount++;
+				hm.put(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
+				
+			}
+			
+			for(String key : hm.keySet()) {
+				ABIEView av = new ABIEView(key, hm.get(key));
+				av.setColor("orange");
+				//av.setMin(bbiescVO.getMinCardinality()); // TODO this is temporary treatment to avoid duplicate list. should check dt_sc table to eliminate the duplicates
+				//av.setMax(bbiescVO.getMaxCardinality());
+				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
 			}
 		} catch (SRTDAOException e1) {
 			e1.printStackTrace();
@@ -574,7 +592,7 @@ public class TopLevelABIEHandler implements Serializable {
 					
 					//int bbieID = getBBIEID("bbie_guid", bbieVO.getBbieGuid());
 					int bbieID = bbieVO.getBBIEID();
-					// createBBIESC(bbieID, bccpVO.getBDTID());
+					createBBIESC(bbieID, bccpVO.getBDTID(), tNode2);
 					
 				}
 			}
