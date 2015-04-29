@@ -10,6 +10,7 @@ import org.oagi.srt.common.SRTObject;
 public class ContextSchemeValueVO extends SRTObject {
 
 	private int contextSchemeValueID;
+	private String contextSchemeValueGUID;
 	private String value;
 	private String meaning;
 	private int ownerContextSchemeID;
@@ -45,5 +46,12 @@ public class ContextSchemeValueVO extends SRTObject {
 	public void setOwnerContextSchemeID(int ownerContextSchemeID){
 		this.ownerContextSchemeID = ownerContextSchemeID;
 	}
-	
+
+	public String getContextSchemeValueGUID() {
+		return contextSchemeValueGUID;
+	}
+
+	public void setContextSchemeValueGUID(String contextSchemeValueGUID) {
+		this.contextSchemeValueGUID = contextSchemeValueGUID;
+	}
 }

@@ -28,7 +28,29 @@
 	</ui:define>
 
 
-	<ui:define name="content">
-    	<span class="defaultText dispTable">The next generation of smart manufacturing systems will be developed by composing advanced manufacturing components and information technology (IT) services introducing new technologies. These new technologies can lead to dramatic improvements in the ability to monitor, control, and optimize all aspects of manufacturing.  Currently, the composition is not possible due to a lack of reference architecture (RA) and a solution stack (SS) that includes the new manufacturing components and IT services.  This is technically hard because the reference architecture, in order to enable composition, requires functional composition models of large, evolving, and heterogeneous domains of factories and production networks.  Also, the solution stack needs capability models of heterogeneous, proprietary manufacturing components and IT services.  Facing this challenge, the industry has been developing methodologies using coarse, ambiguous functional composition models.  Also, they are using natural-language descriptions of manufacturing components, leading to non-scalable, proprietary integration solutions. The major outcome of this effort is a RA and SS for smart manufacturing systems.  The RA and SS will enable easy composition of solutions for the large, evolving, and heterogeneous systems in factories and production networks. The major impact is an industry-wide adoption of standard reference architecture and solution stack, built using the NIST-developed RA and SS. Both manufacturers who seek to increase efficiencies and cut costs in their operations, and technology providers who seek to advance composability and functionality of their products will care about the reference architecture and solution stack.  These organizations will be able to rapidly configure their new smart manufacturing systems allowing greater productivities of the factory and production networks.</span>
+	<ui:define name="content"> 
+    	<span class="defaultText dispTable">
+    	
+    	<H2><font color="#0066CC">Objective</font></H2>
+		<font color="#006633"><b>To advance semantic precision of interface definitions exposing OAGIS</b></font>
+
+		<H2><font color="#0066CC">Scope</font></H2>
+			<li><font color="#006666"><b>Develop a meta-model for holding OAGIS data model</b></font></li>
+			<ul>
+				<li><font color="#202020">Allow for import of OAGIS developer schemas</font></li>
+				<li><font color="#202020">Allow for precise content contextualization</font></li>
+			</ul>
+			<li><font color="#006666"><b>Implement a prototype, open source tool, which in addition to above requirements</b></font></li>
+			<ul>
+				<li><font color="#202020">Allow for export of OAGIS contextualized standalone schema</font></li>
+				<li><font color="#202020">Allow for import of OAGIS contextualized standalone schema</font></li>
+			</ul>
+		<H2><font color="#0066CC">Future scope</font></H2>
+			<li><font color="#202020">Round trip export of OAGIS developer schemas</font></li>
+			<li><font color="#202020">OWL/RDF model</font></li>
+			<li><font color="#202020">OAGIS semantic content life-cycle management</font></li>
+		<br/><br/>
+		<p:graphicImage name="images/oag_main.png" width="800" height="450" style="border:0; margin:0; padding:0;"/>
+    	</span>
 	</ui:define>
 </ui:composition>

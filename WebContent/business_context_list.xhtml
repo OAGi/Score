@@ -35,7 +35,7 @@
 				<p:commandButton process="tbl" update=":form:bcDetailid" icon="ui-icon-search" value="Detail" oncomplete="PF('bcDetail').show()" />
 				 
 			</p:panel>
-			<p:dialog header="Business Context Detail" widgetVar="bcDetail" showEffect="fade" hideEffect="fade" closable="true" resizable="true" draggable="true" width="800" height="300">
+			<p:dialog header="Business Context Detail" widgetVar="bcDetail" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="300">
         		<p:outputPanel id="bcDetailid">
 					<h:panelGrid id="grid" cellpadding="5">
 						<p:row>
@@ -86,7 +86,7 @@
 	        				<p:column>
 							</p:column> 
 							<p:column> 
-								<p:button value="Close" icon="ui-icon-check" oncomplete="PF('bcDetail').hide()"/>
+								<p:commandButton value="Close" icon="ui-icon-check" oncomplete="PF('bcDetail').hide()"/>
 							</p:column>
 						</p:row>
 					</h:panelGrid>

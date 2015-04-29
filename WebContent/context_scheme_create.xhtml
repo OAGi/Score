@@ -19,7 +19,7 @@
 
 
 	<ui:define name="content">
-		<h:form>
+		<h:form id="form">
 			<p:panel header="Create Context Scheme">
 				<p:messages autoUpdate="true" />
 
@@ -65,11 +65,87 @@
 		            <p:message for="contextCategory" />
 					<h:outputText value="#{contextSchemeHandler.contextCategoryNameDesc}" />
 					
-					<p:commandButton value="Create" update="grid" icon="ui-icon-check"
-					validateClient="true" style="margin-right:10px" actionListener="#{contextSchemeHandler.createContextScheme}" action="context_scheme_list.xhtml?faces-redirect=true" />
-					<p:button href="context_category_list.xhtml" value="Cancel" icon="ui-icon-check"/>
+				</h:panelGrid>
+				<p:separator />
+				<h:panelGrid id="grid1" cellpadding="5">
+					<p:row>
+						<p:column> 
+							<h:outputLabel for="desc" value="Scheme Value: " style="font-weight:bold; color: red" />
+							<h:outputLabel for="desc" value="(Click 'Add' button to add new Scheme Value) " style="font-weight:bold; color: blue" />
+						</p:column>
+						<p:column>
+							<p:commandButton process="tbl" update=":form:addSVid" icon="ui-icon-search" value="Add" oncomplete="PF('addSV').show()" />	
+						</p:column> 
+					</p:row>		
+					<p:row>
+						<p:column colspan="2"> 					
+							<p:dataTable id="tbl" var="contextSchemeValueVO" value="#{contextSchemeHandler.csValues}"
+								style="width:600px; margin-bottom:20px">
+								
+								<p:column style="width:100px">
+									<f:facet name="header">
+										<h:outputText value="Value" />
+									</f:facet>
+									<h:outputText value="#{contextSchemeValueVO.value}" />
+								</p:column>
+				
+								<p:column style="width:300px">
+									<f:facet name="header">
+										<h:outputText value="Meaning" />
+									</f:facet>
+									<h:outputText value="#{contextSchemeValueVO.meaning}" />
+								</p:column>
+								
+								<p:column style="width:90px">
+									<f:facet name="header">
+										<h:outputText value="Delete" />
+									</f:facet>
+									<p:commandButton value="Delete" update="tbl" icon="ui-icon-check"
+										validateClient="true" style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValueVO.contextSchemeValueGUID)}" />
+								</p:column>
+				
+							</p:dataTable>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column> 
+							<p:commandButton value="Create" update="grid" icon="ui-icon-check"
+								validateClient="true" style="margin-right:10px" actionListener="#{contextSchemeHandler.createContextScheme}" action="context_scheme_list.xhtml?faces-redirect=true" />
+							<p:button href="context_category_list.xhtml" value="Cancel" icon="ui-icon-check"/>
+						</p:column>
+						<p:column>
+						</p:column>
+					</p:row>
 				</h:panelGrid>
 			</p:panel>
+			
+			<p:dialog header="Add Scheme value" widgetVar="addSV" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="250">
+        		<p:outputPanel id="addSVid">
+        			<h:panelGrid id="grid7" cellpadding="5">
+						<p:row>
+	        				<p:column style="width:400px"> 
+								<h:outputLabel value="Add new Scheme Value" style="font-weight:bold; color:red" />
+							</p:column> 
+						</p:row>
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="2" cellpadding="5">
+						<h:outputText value="Value: " style="font-weight:bold; color:blue" />
+						<p:inputText id="value" value="#{contextSchemeHandler.value}" label="Name" />
+						
+						<h:outputText value="Meaning: " style="font-weight:bold; color:blue" />
+						<p:inputText id="meaning" value="#{contextSchemeHandler.meaning}" label="Meaning" style="width: 400px !important;"/>
+
+					</h:panelGrid>
+					<p:separator />
+			        <h:panelGrid id="grid8" cellpadding="5">
+			        </h:panelGrid>
+			        <h:panelGrid id="grid9" columns="2" cellpadding="5">
+			        	<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('addSV').hide()"/>
+			        	<p:commandButton value="Save" update=":form:tbl" actionListener="#{contextSchemeHandler.addSchemeValue()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('addSV').hide()"/>
+			        </h:panelGrid>
+				</p:outputPanel>
+		    </p:dialog>
 		</h:form>
 	</ui:define>
 </ui:composition>

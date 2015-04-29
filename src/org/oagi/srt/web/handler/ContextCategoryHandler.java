@@ -62,7 +62,7 @@ public class ContextCategoryHandler {
 	}
 	
 
-	public int getid() {
+	public int getId() {
 		return id;
 	}
 
@@ -89,21 +89,6 @@ public class ContextCategoryHandler {
 	public void edit(ActionEvent actionEvent) {
 		
 		addMessage("Coming soon!!!");
-	}
-
-	public void delete(int id) {
-		addMessage(id+" has been deleted from the list");
-		
-		try {
-			ContextCategoryVO ccVO = new ContextCategoryVO();
-			ccVO.setContextCategoryID(id);
-			dao.deleteObject(ccVO);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		init();
-		
 	}
 
 	public void search() {
@@ -178,11 +163,47 @@ public class ContextCategoryHandler {
     public void setselectedCategory(SRTObject selectedCategory) {
         this.selectedCategory = selectedCategory;
     }
+    
+    public void onEdit(SRTObject obj) {
+    	ContextCategoryVO cVO = (ContextCategoryVO) obj;
+    	this.id = cVO.getContextCategoryID();
+    	this.GUID = cVO.getContextCategoryGUID();
+    	this.name = cVO.getName();
+    	this.description = cVO.getDescription();
+    }
+    
+    public void save() {
+    	ContextCategoryVO ccVO = new ContextCategoryVO();
+		ccVO.setName(this.name);
+		ccVO.setDescription(this.description);
+		ccVO.setContextCategoryGUID(this.GUID);
+		ccVO.setContextCategoryID(this.id);
+		
+		try {
+			dao.updateObject(ccVO);
+			contextCategories = dao.findObjects();
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		this.selectedCategory = ccVO;
+    }
+    
+    public void delete(int id) {
+    	ContextCategoryVO ccVO = new ContextCategoryVO();
+		ccVO.setContextCategoryID(id);
+		
+		System.out.println("!!!" + id);
+		
+		try {
+			dao.deleteObject(ccVO);
+			contextCategories = dao.findObjects();
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+    }
 	
     public void onRowEdit(RowEditEvent event) {
         FacesMessage msg = new FacesMessage("Context Category Edited  "+ ((ContextCategoryVO) event.getObject()).getName());
-        System.out.println(((ContextCategoryVO) event.getObject()).getName());
-        System.out.println(((ContextCategoryVO) event.getObject()).getDescription());
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
         ContextCategoryVO ccVO = new ContextCategoryVO();

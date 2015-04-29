@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
@@ -19,12 +20,18 @@ import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.ContextSchemeVO;
+import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
+import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 
 @ManagedBean
+@ViewScoped
 public class ContextSchemeHandler {
 
 	private DAOFactory df;
 	private SRTDAO daoCS;
+	private SRTDAO daoCSV;
 	private SRTDAO daoCC;
 
 	@PostConstruct
@@ -32,12 +39,17 @@ public class ContextSchemeHandler {
 		try {
 			df = DAOFactory.getDAOFactory();
 			daoCS = df.getDAO("ContextScheme");
+			daoCSV = df.getDAO("ContextSchemeValue");
 			daoCC = df.getDAO("ContextCategory");
+			System.out.println("### Called");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private String value;
+	private String meaning;
 	private String name;
 	private String description;
 	private String schemeAgencyID;
@@ -45,6 +57,8 @@ public class ContextSchemeHandler {
 	private String schemeVersion;
 	private int contextCategoryID;
 	private String contextCategoryNameDesc; 
+	
+	private List<ContextSchemeValueVO> csValues = new ArrayList<ContextSchemeValueVO>();
 	//private List<SRTObject> contextCategories;
 	private Map<String,String> contextCategories = new HashMap<String, String>();
 	private List<SRTObject> contextSchemes;
@@ -67,6 +81,26 @@ public class ContextSchemeHandler {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getValue() {
+		return value;
+	}
+	
+	public void setCsValues(List<ContextSchemeValueVO> csValues) {
+		this.csValues = csValues;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getMeaning() {
+		return meaning;
+	}
+
+	public void setMeaning(String meaning) {
+		this.meaning = meaning;
 	}
 
 	public Map<String, String> getContextCategories() {
@@ -112,15 +146,26 @@ public class ContextSchemeHandler {
 	public void createContextScheme() {
 		try {
 			ContextSchemeVO ccVO = new ContextSchemeVO();
+			String guid = Utility.generateGUID();
 			ccVO.setSchemeName(name);
 			ccVO.setDescription(description);
-			ccVO.setSchemeGUID(Utility.generateGUID());
+			ccVO.setSchemeGUID(guid);
 			ccVO.setSchemeID(Utility.generateGUID());
 			ccVO.setSchemeAgencyID(schemeAgencyID);
 			ccVO.setSchemeAgencyName(schemeAgencyName);
 			ccVO.setSchemeVersion(schemeVersion);
 			ccVO.setContextCategoryID(Integer.valueOf(contextCategoryNameDesc));
 			daoCS.insertObject(ccVO);
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("context_scheme_guid", guid);
+			ContextSchemeVO cVO = (ContextSchemeVO)daoCS.findObject(qc);
+			
+			for(ContextSchemeValueVO vo : csValues) {
+				vo.setOwnerContextSchemeID(cVO.getContextSchemeID());
+				daoCSV.insertObject(vo);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -142,6 +187,33 @@ public class ContextSchemeHandler {
 			e.printStackTrace();
 		}
 		return results;
+	}
+	
+	public void addSchemeValue() {
+		ContextSchemeValueVO csVO = new ContextSchemeValueVO();
+		csVO.setValue(getValue());
+		csVO.setMeaning(getMeaning());
+		csVO.setContextSchemeValueGUID(Utility.generateGUID());
+		setValue("");
+		setMeaning("");
+		setCsValues(csVO);
+	}
+	
+	public void deleteCSV(String guid) {
+		List<ContextSchemeValueVO> temp = new ArrayList<ContextSchemeValueVO>();
+		for(ContextSchemeValueVO vo : csValues) {
+			if(!vo.getContextSchemeValueGUID().equals(guid))
+				temp.add(vo);
+		}
+		csValues = temp;
+	}
+	
+	public void setCsValues(ContextSchemeValueVO csVO) {
+		csValues.add(csVO);
+	}
+	
+	public List<ContextSchemeValueVO> getCsValues() {
+		return csValues;
 	}
 
 	public List<String> completeDescription(String query) {
