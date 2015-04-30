@@ -81,7 +81,6 @@ public class P_1_7_PopulateQBDTInDT {
 	private void populate() throws XPathExpressionException, SRTDAOException {
 		NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
 		NodeList elementsFromMetaXSD = meta_xsd.getNodeList("/xsd:schema/xsd:element");
-		
 		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd);
 		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd);
 		insertCDTSCAllowedPrimitive(elementsFromFieldsXSD, fields_xsd);
@@ -89,7 +88,7 @@ public class P_1_7_PopulateQBDTInDT {
 		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromFieldsXSD, fields_xsd);
 		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromMetaXSD, meta_xsd);
 		
-		System.out.println("### elementsFromFieldsXSD.getLength() " + elementsFromFieldsXSD.getLength());
+		//System.out.println("### elementsFromFieldsXSD.getLength() " + elementsFromFieldsXSD.getLength());
 	}
 	
 	
@@ -115,7 +114,7 @@ public class P_1_7_PopulateQBDTInDT {
 				}
 			}
 		}
-		System.out.println("###END#####");
+		//System.out.println("###END#####");
 	}
 	
 	private void insertCDTSCAllowedPrimitiveExpressionTypeMap(NodeList elementsFromXSD, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
@@ -206,7 +205,7 @@ public class P_1_7_PopulateQBDTInDT {
 			}
 		}
 
-		System.out.println("###END#####");
+		//System.out.println("###END#####");
 	}
 	
 	
@@ -223,13 +222,13 @@ public class P_1_7_PopulateQBDTInDT {
 						QueryCondition qc = new QueryCondition();
 						qc.addLikeClause("name", "%" + base.substring(0, base.indexOf("CodeContentType")) + "%");
 						
-						System.out.println("##################################################### Code List: " + base.substring(0, base.indexOf("CodeContentType")));
+						//System.out.println("##################################################### Code List: " + base.substring(0, base.indexOf("CodeContentType")));
 						
 						CodeListVO aCode_ListVO = (CodeListVO)aCodeListDAO.findObject(qc);
 						
 						insertBDTPrimitiveRestriction(aDTVO, true, aCode_ListVO.getCodeListID());
 					} else {
-						System.out.println("##################################################### Code Special Case: " + base);
+						//System.out.println("##################################################### Code Special Case: " + base);
 					}
 				}
 			} 
@@ -293,14 +292,14 @@ public class P_1_7_PopulateQBDTInDT {
 			String bccp = ((Element)elementsFromXSD.item(i)).getAttribute("name");
 			String guid = ((Element)elementsFromXSD.item(i)).getAttribute("id");
 			String type = ((Element)elementsFromXSD.item(i)).getAttribute("type");
-			
+			//System.out.println("$$$$$DEN:  "+den+"   name = "+"    id = "+guid+"   type="+type);
 			Node simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
 			Node simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
 			if(simpleContent != null || simpleType != null) {
 			
 				Node documentationFromXSD = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation");
 				
-				System.out.println("### bccp: " + bccp);
+				//System.out.println("### bccp: " + bccp);
 				
 				String definition = "";
 				if(documentationFromXSD != null) {
@@ -313,7 +312,7 @@ public class P_1_7_PopulateQBDTInDT {
 				
 				DTVO dtVO = (DTVO)dtDao.findObject(qc);
 				if(dtVO == null) {
-					System.out.println("### NULL " + bccp + " - " + den);
+					//System.out.println("### NULL " + bccp + " - " + den);
 					
 					// TODO check these exceptions
 					if(bccp.equals("FinalAgentInstructionCode") || bccp.equals("FirstAgentPaymentMethodCode") || bccp.equals("EndTime") || bccp.equals("StartTime") || bccp.equals("CompositeID"))
@@ -328,8 +327,19 @@ public class P_1_7_PopulateQBDTInDT {
 					if(dVO == null) 
 						continue;
 					
-					addToDTSC(xHandler, type, dVO);
+					//System.out.println("typeNode id = "+((Element)typeNode).getAttribute("id")+"   type = "+type+ "     dVO ="+dVO);
 					
+					boolean check_duplication = false;
+					for(int j = 0; j < i-1; j++) {
+						if(type.equals(((Element)elementsFromXSD.item(j)).getAttribute("type"))) {
+							check_duplication = true;
+							break;
+						}
+					}
+					
+					if(check_duplication == false)
+						addToDTSC(xHandler, type, dVO);
+
 					// add to BDTPrimitiveRestriction
 					insertBDTPrimitiveRestriction(dVO, type);
 					
@@ -344,7 +354,7 @@ public class P_1_7_PopulateQBDTInDT {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("### i " + i);
+				//System.out.println("### i " + i);
 			}
 		}
 	}
@@ -587,7 +597,7 @@ public class P_1_7_PopulateQBDTInDT {
 			} else {
 				// TODO fix this
 				dVO = getDTVO("Text. Type");
-				System.out.println("####################### " + type);
+				//System.out.println("####################### " + type);
 			}
 			
 			dtVO.setBasedDTID(dVO.getDTID());
@@ -627,7 +637,7 @@ public class P_1_7_PopulateQBDTInDT {
 		bccpVO.setPropertyTerm(propertyTerm);
 		bccpVO.setRepresentationTerm(dtVO.getDataTypeTerm());
 		bccpVO.setBDTID(dtVO.getDTID());
-		bccpVO.setDEN(propertyTerm + ". " + dtVO.getDataTypeTerm());
+		bccpVO.setDEN(Utility.firstToUpperCase(propertyTerm) + ". " + dtVO.getDataTypeTerm());
 		bccpVO.setDefinition(definition);
 		bccpVO.setCreatedByUserId(1);
 		bccpVO.setLastUpdatedByUserId(1);
@@ -673,15 +683,16 @@ public class P_1_7_PopulateQBDTInDT {
 		
 		// new SC
 		NodeList attributeList = xHandler.getNodeList("//xsd:complexType[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
+		
 		if(attributeList == null || attributeList.getLength() == 0) {
-			//System.out.println("##### " + "//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
+			//System.out.println("##### " + "//xsd:"+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
 		} else {
 			
 			for(int i = 0; i < attributeList.getLength(); i++) {
 				Node attribute = attributeList.item(i);
 				Element attrElement = (Element)attribute;
 				dt_sc_guid = attrElement.getAttribute("id");
-				
+				//System.out.println(typeName+"   %%%%%%  "+i+"+######"+dt_sc_guid+"!!!!!");
 				if(attrElement.getAttribute("use") == null || attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
 					min_cardinality = 0;
 				else if(attrElement.getAttribute("use").equalsIgnoreCase("required"))
@@ -747,6 +758,7 @@ public class P_1_7_PopulateQBDTInDT {
 				vo.setMaxCardinality(max_cardinality);
 				
 				aDTSCDAO.insertObject(vo);	
+				System.out.println("######"+vo.getDTSCGUID()+"!!!!!"+vo.getPropertyTerm()+"@@@@@"+vo.getRepresentationTerm());
 				
 				insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
 			}
@@ -874,6 +886,7 @@ public class P_1_7_PopulateQBDTInDT {
 		//System.out.println(q.spaceSeparator("TotalAmountType"));
 		q.populate();
 		
+		System.out.println("###END###");
 
 		//System.out.println(q.spaceSeparator("ISBN"));
 		

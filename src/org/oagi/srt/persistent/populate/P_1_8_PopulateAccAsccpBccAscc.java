@@ -378,7 +378,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		int bdtId = dtVO.getDTID();
 		String representationTerm = dtVO.getDataTypeTerm();
-		String den = propertyTerm + ". " + representationTerm;
+		String den = Utility.firstToUpperCase(propertyTerm) + ". " + representationTerm;
 
 		BCCPVO bccpVO = new BCCPVO();
 		bccpVO.setBCCPGUID(bccpGuid);
@@ -396,6 +396,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		return (BCCPVO)bccpDao.findObject(qc1);
 	}
 	 
+	
 	private void insertForGroup(BODElementVO bodVO, String fullFilePath, String complexTypeId) throws SRTDAOException {
 		//System.out.println("------------------------" + bodVO.getId() + " | " + bodVO.getName() + " | " + bodVO.getGroupId() + " | " + bodVO.getGroupName());
 		

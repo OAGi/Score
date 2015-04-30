@@ -91,7 +91,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 		}
 	}
 	
-	public static void insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws SRTDAOException{
+	public void insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
 
@@ -120,7 +120,6 @@ public class P_1_5_1_PopulateBDTsInDT {
 			dtVO.setRevisionDocumentation("");
 			dao.insertObject(dtVO);
 		}
-		
 	}
 	
 	private void importDataTypeList(String dataType) throws Exception {
