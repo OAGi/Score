@@ -37,8 +37,8 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 					+ "Scheme_Agency_Name, Scheme_Version, Context_Category_ID, Context_Scheme_GUID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_CONTEXT_SCHEME_STATEMENT =
-			"UPDATE " + _tableName + " SET Scheme_ID = ?, Scheme_Name = ?, Description = ?, Scheme_Agency_ID = ?, "
-				+ "Scheme_Agency_Name = ?, Scheme_Version = ?, Context_Category_ID = ?, Context_Scheme_GUID = ? WHERE Context_Scheme_ID = ?";
+			"UPDATE " + _tableName + " SET Scheme_Name = ?, Description = ?, Scheme_Agency_ID = ?, "
+				+ "Scheme_Agency_Name = ?, Scheme_Version = ?, Context_Category_ID = ? WHERE Context_Scheme_ID = ?";
 	
 	private final String _DELETE_CONTEXT_SCHEME_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Context_Scheme_ID = ?";
@@ -295,14 +295,13 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_SCHEME_STATEMENT);
 
-			ps.setString(1, context_schemeVO.getSchemeID());
-			ps.setString(2, context_schemeVO.getSchemeName());
-			ps.setString(3, context_schemeVO.getDescription());
-			ps.setString(4, context_schemeVO.getSchemeAgencyID());
-			ps.setString(5, context_schemeVO.getSchemeAgencyName());
-			ps.setString(6, context_schemeVO.getSchemeVersion());
-			ps.setInt(7, context_schemeVO.getContextCategoryID());
-			ps.setString(8, context_schemeVO.getSchemeGUID());
+			ps.setString(1, context_schemeVO.getSchemeName());
+			ps.setString(2, context_schemeVO.getDescription());
+			ps.setString(3, context_schemeVO.getSchemeAgencyID());
+			ps.setString(4, context_schemeVO.getSchemeAgencyName());
+			ps.setString(5, context_schemeVO.getSchemeVersion());
+			ps.setInt(6, context_schemeVO.getContextCategoryID());
+			ps.setInt(7, context_schemeVO.getContextSchemeID());
 			ps.executeUpdate();
 
 			tx.commit();

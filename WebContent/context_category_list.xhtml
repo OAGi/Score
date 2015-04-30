@@ -96,7 +96,7 @@
 			        <h:panelGrid cellpadding="5">
 			        </h:panelGrid>
 			        <h:panelGrid columns="2" cellpadding="5">
-			        	<p:commandButton value="Cancel" update=":listForm:tbl1" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
+			        	<p:commandButton value="Cancel" update=":listForm:tbl1" actionListener="#{contextCategoryHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
 			        	<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextCategoryHandler.delete(contextCategoryHandler.selectedCategory.contextCategoryID)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
 			        </h:panelGrid>
 				</p:outputPanel>
@@ -129,7 +129,7 @@
 			        <h:panelGrid id="grid3" cellpadding="5">
 			        </h:panelGrid>
 			        <h:panelGrid id="grid4" columns="2" cellpadding="5">
-			        	<p:commandButton value="Close" update=":listForm:tbl1" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide()"/>
+			        	<p:commandButton value="Close" update=":listForm:tbl1" actionListener="#{contextCategoryHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide()"/>
 			        	<p:commandButton value="Edit" actionListener="#{contextCategoryHandler.onEdit(contextCategoryHandler.selectedCategory)}" update=":listForm:ccEditid" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide(); PF('ccEdit').show();"/>
 			        </h:panelGrid>
 				</p:outputPanel>

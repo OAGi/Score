@@ -84,5 +84,6 @@ public class SRTConstants {
 		return prefix_filepath+origin_filepath;
 	}
 
-
+	public static final String FOREIGNKEY_ERROR_MSG = "a foreign key constraint fails";
+	public static final String CANNOT_DELETE_CONTEXT_CATEGORTY = "Fail to delete. The context category is referenced by the following context schemes: ";
 }

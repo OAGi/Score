@@ -8,14 +8,17 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.servlet.http.HttpServletResponse;
 
 import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
+import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.primefaces.event.RowEditEvent;
 
 @ManagedBean
@@ -23,12 +26,14 @@ public class ContextCategoryHandler {
 
 	private DAOFactory df;
 	private SRTDAO dao;
+	private SRTDAO daoCS;
 
 	@PostConstruct
 	private void init() {
 		try {	
 			df = DAOFactory.getDAOFactory();
 			dao = df.getDAO("ContextCategory");
+			daoCS = df.getDAO("ContextScheme");
 			contextCategories = dao.findObjects();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -185,21 +190,48 @@ public class ContextCategoryHandler {
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
-		this.selectedCategory = ccVO;
+		this.selectedCategory = null;
+    }
+    
+    public void cancel() {
+    	this.selectedCategory = null;
     }
     
     public void delete(int id) {
     	ContextCategoryVO ccVO = new ContextCategoryVO();
 		ccVO.setContextCategoryID(id);
 		
-		System.out.println("!!!" + id);
-		
 		try {
 			dao.deleteObject(ccVO);
 			contextCategories = dao.findObjects();
 		} catch (SRTDAOException e) {
-			e.printStackTrace();
+			if(e.getLocalizedMessage().contains(SRTConstants.FOREIGNKEY_ERROR_MSG)) {
+				QueryCondition qc = new QueryCondition();
+				qc.add("context_category_id", id);
+				String msg = "";
+				try {
+					List<SRTObject> list = daoCS.findObjects(qc);
+					msg = partResult(list);
+				} catch (SRTDAOException e1) {
+					e1.printStackTrace();
+				}
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_CATEGORTY + msg,  null);
+				FacesContext.getCurrentInstance().addMessage(null, message);
+				this.selectedCategory = null;
+			} else {
+				e.printStackTrace();
+			}
 		}
+    }
+    
+    private String partResult(List<SRTObject> list) {
+    	StringBuffer sb = new StringBuffer();
+    	for(SRTObject obj : list) {
+    		ContextSchemeVO vo = (ContextSchemeVO)obj;
+    		sb.append(vo.getSchemeName() + ", ");
+    	}
+    	String res = sb.toString();
+    	return res.substring(0, res.lastIndexOf(","));
     }
 	
     public void onRowEdit(RowEditEvent event) {

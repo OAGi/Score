@@ -27,10 +27,10 @@ public class ContextSchemeValueMysqlDAO extends SRTDAO {
 	private final String _tableName = "context_scheme_value";
 
 	private final String _FIND_ALL_CONTEXT_SCHEME_VALUE_STATEMENT =
-			"SELECT Context_Scheme_Value_ID, Value, Meaning, Owner_Context_Scheme_ID FROM " + _tableName;
+			"SELECT Context_Scheme_Value_ID, Value, Meaning, Owner_Context_Scheme_ID, context_scheme_value_guid FROM " + _tableName;
 	
 	private final String _FIND_CONTEXT_SCHEME_VALUE_STATEMENT = 
-			"SELECT Context_Scheme_Value_ID, Value, Meaning, Owner_Context_Scheme_ID FROM " + _tableName;
+			"SELECT Context_Scheme_Value_ID, Value, Meaning, Owner_Context_Scheme_ID, context_scheme_value_guid FROM " + _tableName;
 	
 	private final String _INSERT_CONTEXT_SCHEME_VALUE_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Value, Meaning, Owner_Context_Scheme_ID, context_scheme_value_guid) VALUES (?, ?, ?, ?)";
@@ -106,6 +106,7 @@ public class ContextSchemeValueMysqlDAO extends SRTDAO {
 				context_scheme_valueVO.setValue(rs.getString("Value"));
 				context_scheme_valueVO.setMeaning(rs.getString("Meaning"));
 				context_scheme_valueVO.setOwnerContextSchemeID(rs.getInt("Owner_Context_Scheme_ID"));
+				context_scheme_valueVO.setContextSchemeValueGUID(rs.getString("Context_Scheme_Value_GUID"));
 				list.add(context_scheme_valueVO);
 			}
 			tx.commit();
@@ -197,6 +198,7 @@ public class ContextSchemeValueMysqlDAO extends SRTDAO {
 				context_scheme_valueVO.setValue(rs.getString("Value"));
 				context_scheme_valueVO.setMeaning(rs.getString("Meaning"));
 				context_scheme_valueVO.setOwnerContextSchemeID(rs.getInt("Owner_Context_Scheme_ID"));
+				context_scheme_valueVO.setContextSchemeValueGUID(rs.getString("Context_Scheme_Value_GUID"));
 			}
 			tx.commit();
 			conn.close();
@@ -237,6 +239,7 @@ public class ContextSchemeValueMysqlDAO extends SRTDAO {
 				context_scheme_valueVO.setValue(rs.getString("Value"));
 				context_scheme_valueVO.setMeaning(rs.getString("Meaning"));
 				context_scheme_valueVO.setOwnerContextSchemeID(rs.getInt("Owner_Context_Scheme_ID"));
+				context_scheme_valueVO.setContextSchemeValueGUID(rs.getString("Context_Scheme_Value_GUID"));
 				list.add(context_scheme_valueVO);
 			}
 			tx.commit();

@@ -56,16 +56,84 @@ public class ContextSchemeHandler {
 	private String schemeAgencyName;
 	private String schemeVersion;
 	private int contextCategoryID;
+	private int id;
 	private String contextCategoryNameDesc; 
+	private SRTObject selectedScheme;
+	private String schemeName;
+	private String guid;
+	private String schemeId;
 	
-	private List<ContextSchemeValueVO> csValues = new ArrayList<ContextSchemeValueVO>();
+	private List<SRTObject> csValues = new ArrayList<SRTObject>();
+	private List<SRTObject> selectedCSValues = new ArrayList<SRTObject>();
 	//private List<SRTObject> contextCategories;
 	private Map<String,String> contextCategories = new HashMap<String, String>();
 	private List<SRTObject> contextSchemes;
 	
+	public List<SRTObject> getSelectedCSValues() {
+		if(selectedScheme != null) {
+			QueryCondition qc = new QueryCondition();
+			qc.add("owner_context_scheme_id", ((ContextSchemeVO)selectedScheme).getContextSchemeID());
+			try {
+				selectedCSValues = daoCSV.findObjects(qc);
+			} catch (SRTDAOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return selectedCSValues;
+	}
+
+	public void setSelectedCSValues(List<SRTObject> selectedCSValues) {
+		this.selectedCSValues = selectedCSValues;
+	}
+
+	public void cancel() {
+    	this.selectedScheme = null;
+    }
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getSchemeName() {
+		return schemeName;
+	}
+
+	public void setSchemeName(String schemeName) {
+		this.schemeName = schemeName;
+	}
+
+	public String getGuid() {
+		return guid;
+	}
+
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
+
+	public String getSchemeId() {
+		return schemeId;
+	}
+
+	public void setSchemeId(String schemeId) {
+		this.schemeId = schemeId;
+	}
+
 	public void onContextCategoryChange() {
 		System.out.println("######### " + contextCategoryNameDesc);
     }
+	
+	public SRTObject getSelectedScheme() {
+		return selectedScheme;
+	}
+
+	public void setSelectedScheme(SRTObject selectedScheme) {
+		this.selectedScheme = selectedScheme;
+	}
 
 	public String getName() {
 		return name;
@@ -87,7 +155,7 @@ public class ContextSchemeHandler {
 		return value;
 	}
 	
-	public void setCsValues(List<ContextSchemeValueVO> csValues) {
+	public void setCsValues(List<SRTObject> csValues) {
 		this.csValues = csValues;
 	}
 
@@ -102,6 +170,55 @@ public class ContextSchemeHandler {
 	public void setMeaning(String meaning) {
 		this.meaning = meaning;
 	}
+	
+	public void onEdit(SRTObject obj) {
+    	ContextSchemeVO cVO = (ContextSchemeVO) obj;
+    	description = cVO.getDescription();
+    	schemeAgencyID = cVO.getSchemeAgencyID();
+    	schemeAgencyName = cVO.getSchemeAgencyName();
+    	schemeVersion = cVO.getSchemeVersion();
+    	contextCategoryID = cVO.getContextCategoryID();
+    	id = cVO.getContextSchemeID();
+    	schemeName = cVO.getSchemeName();
+    	guid = cVO.getSchemeGUID();
+    	schemeId = cVO.getSchemeID();
+    	
+		csValues = selectedCSValues;
+    }
+	
+	public void save() {
+		ContextSchemeVO ccVO = new ContextSchemeVO();
+		ccVO.setDescription(description);
+		ccVO.setSchemeAgencyID(schemeAgencyID);
+		ccVO.setSchemeAgencyName(schemeAgencyName);
+		ccVO.setSchemeVersion(schemeVersion);
+		ccVO.setContextCategoryID(contextCategoryID);
+		ccVO.setContextSchemeID(id);
+		ccVO.setSchemeName(schemeName);
+		ccVO.setSchemeGUID(guid);
+		ccVO.setSchemeID(schemeId);
+		
+		try {
+			daoCS.updateObject(ccVO);
+			contextSchemes = daoCS.findObjects();
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("owner_context_scheme_id", ccVO.getContextSchemeID());
+			for(SRTObject obj : daoCSV.findObjects(qc)) {
+				daoCSV.deleteObject(((ContextSchemeValueVO)obj));
+			}
+			
+			for(SRTObject obj : csValues) {
+				ContextSchemeValueVO vo = (ContextSchemeValueVO) obj;
+				vo.setOwnerContextSchemeID(ccVO.getContextSchemeID());
+				daoCSV.insertObject(vo);
+			}
+			
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		this.selectedScheme = ccVO;
+    }
 
 	public Map<String, String> getContextCategories() {
 
@@ -120,18 +237,6 @@ public class ContextSchemeHandler {
 
 	public void setContextCategories(Map<String, String> contextCategories) {
 		this.contextCategories = contextCategories;
-	}
-
-	public void detail(ActionEvent actionEvent) {
-		addMessage("Coming soon!!!");
-	}
-
-	public void edit(ActionEvent actionEvent) {
-		addMessage("Coming soon!!!");
-	}
-
-	public void delete(ActionEvent actionEvent) {
-		addMessage("Coming soon!!!");
 	}
 
 	public void search() {
@@ -161,7 +266,8 @@ public class ContextSchemeHandler {
 			qc.add("context_scheme_guid", guid);
 			ContextSchemeVO cVO = (ContextSchemeVO)daoCS.findObject(qc);
 			
-			for(ContextSchemeValueVO vo : csValues) {
+			for(SRTObject obj : csValues) {
+				ContextSchemeValueVO vo = (ContextSchemeValueVO) obj;
 				vo.setOwnerContextSchemeID(cVO.getContextSchemeID());
 				daoCSV.insertObject(vo);
 			}
@@ -178,9 +284,9 @@ public class ContextSchemeHandler {
 		try {
 			contextSchemes = daoCS.findObjects();
 			for(SRTObject obj : contextSchemes) {
-				ContextCategoryVO ccVO = (ContextCategoryVO)obj;
-				if(ccVO.getName().contains(query)) {
-					results.add(ccVO.getName());
+				ContextSchemeVO ccVO = (ContextSchemeVO)obj;
+				if(ccVO.getSchemeName().contains(query)) {
+					results.add(ccVO.getSchemeName());
 				}
 			}
 		} catch (SRTDAOException e) {
@@ -200,19 +306,35 @@ public class ContextSchemeHandler {
 	}
 	
 	public void deleteCSV(String guid) {
-		List<ContextSchemeValueVO> temp = new ArrayList<ContextSchemeValueVO>();
-		for(ContextSchemeValueVO vo : csValues) {
+		List<SRTObject> temp = new ArrayList<SRTObject>();
+		for(SRTObject obj : csValues) {
+			ContextSchemeValueVO vo = (ContextSchemeValueVO)obj;
 			if(!vo.getContextSchemeValueGUID().equals(guid))
 				temp.add(vo);
 		}
-		csValues = temp;
+		setValue("");
+		setMeaning("");
+		this.csValues = temp;
 	}
 	
-	public void setCsValues(ContextSchemeValueVO csVO) {
+	public void delete(int id) {
+    	ContextSchemeVO ccVO = new ContextSchemeVO();
+		ccVO.setContextSchemeID(id);
+		setValue("");
+		setMeaning("");
+		try {
+			daoCS.deleteObject(ccVO);
+			contextSchemes = daoCS.findObjects();
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+    }
+	
+	public void setCsValues(SRTObject csVO) {
 		csValues.add(csVO);
 	}
 	
-	public List<ContextSchemeValueVO> getCsValues() {
+	public List<SRTObject> getCsValues() {
 		return csValues;
 	}
 
