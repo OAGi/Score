@@ -71,7 +71,7 @@
 				<p:commandButton process="tbl1" update=":listForm:ccDetailid" icon="ui-icon-search" value="Detail" oncomplete="PF('ccDetail').show()" />
 				<p:commandButton process="tbl1" update=":listForm:ccDeleteid" icon="ui-icon-delete" value="Delete" oncomplete="PF('ccDelete').show()" />
 			</p:panel>
-			<p:dialog header="Delete Context Scheme" widgetVar="ccDelete" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="300">
+			<p:dialog header="Delete Context Scheme" widgetVar="ccDelete" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="500">
         		<p:outputPanel id="ccDeleteid">
         			<h:panelGrid cellpadding="5">
 						<p:row>
@@ -100,6 +100,32 @@
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.contextCategoryID}" />
 						
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid id="grid12" cellpadding="5">
+						<p:row>
+	        				<p:column style="width:400px"> 
+								<h:outputLabel value="Context Scheme Values" style="font-weight:bold; color:red" />
+							</p:column> 
+						</p:row>
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellpadding="5">
+						<p:dataTable id="tbl22" var="contextSchemeValueVO" value="#{contextSchemeHandler.selectedCSValues}"
+							style="width:600px; margin-bottom:20px">
+							<p:column style="width:100px">
+								<f:facet name="header">
+									<h:outputText value="Value" />
+								</f:facet>
+								<h:outputText value="#{contextSchemeValueVO.value}" />
+							</p:column>
+			
+							<p:column style="width:300px">
+								<f:facet name="header">
+									<h:outputText value="Meaning" />
+								</f:facet>
+								<h:outputText value="#{contextSchemeValueVO.meaning}" />
+							</p:column>
+						</p:dataTable>
 					</h:panelGrid>
 					<p:separator />
 			        <h:panelGrid cellpadding="5">
@@ -242,7 +268,7 @@
 									<h:outputText value="Delete" />
 								</f:facet>
 								<p:commandButton value="Delete" update=":listForm:tbl3" icon="ui-icon-check"
-									style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValueVO.contextSchemeValueGUID)}" />
+									style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValueVO.contextSchemeValueGUID, contextSchemeValueVO.contextSchemeValueID)}" />
 							</p:column>
 			
 						</p:dataTable>

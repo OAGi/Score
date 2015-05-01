@@ -190,7 +190,7 @@ public class ContextCategoryHandler {
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
-		this.selectedCategory = null;
+		//this.selectedCategory = null;
     }
     
     public void cancel() {

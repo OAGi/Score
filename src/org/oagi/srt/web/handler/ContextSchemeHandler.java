@@ -13,11 +13,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.persistence.dto.BusinessContextVO;
+import org.oagi.srt.persistence.dto.BusinessContextValueVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
@@ -33,6 +36,8 @@ public class ContextSchemeHandler {
 	private SRTDAO daoCS;
 	private SRTDAO daoCSV;
 	private SRTDAO daoCC;
+	private SRTDAO daoBCV;
+	private SRTDAO daoBC;
 
 	@PostConstruct
 	private void init() {
@@ -41,6 +46,8 @@ public class ContextSchemeHandler {
 			daoCS = df.getDAO("ContextScheme");
 			daoCSV = df.getDAO("ContextSchemeValue");
 			daoCC = df.getDAO("ContextCategory");
+			daoBCV = df.getDAO("BusinessContextValue");
+			daoBC = df.getDAO("BusinessContext");
 			System.out.println("### Called");
 			
 		} catch (Exception e) {
@@ -204,14 +211,39 @@ public class ContextSchemeHandler {
 			
 			QueryCondition qc = new QueryCondition();
 			qc.add("owner_context_scheme_id", ccVO.getContextSchemeID());
-			for(SRTObject obj : daoCSV.findObjects(qc)) {
-				daoCSV.deleteObject(((ContextSchemeValueVO)obj));
+			List<SRTObject> lists = daoCSV.findObjects(qc);
+			
+			HashMap<Integer, String> hm = new HashMap<Integer, String>();
+	    	
+			for(SRTObject obj : lists) {
+				ContextSchemeValueVO vo = (ContextSchemeValueVO) obj;
+				boolean deleted = true;
+				for(SRTObject obj1 : csValues) {
+					ContextSchemeValueVO vo1 = (ContextSchemeValueVO) obj1;
+					if(vo.getContextSchemeValueGUID().equals(vo1.getContextSchemeValueGUID())) {
+						deleted = false;
+						break;
+					}
+				}
+				if(deleted) {
+					daoCSV.deleteObject(vo);
+				}
 			}
 			
 			for(SRTObject obj : csValues) {
 				ContextSchemeValueVO vo = (ContextSchemeValueVO) obj;
-				vo.setOwnerContextSchemeID(ccVO.getContextSchemeID());
-				daoCSV.insertObject(vo);
+				boolean newItem = true;
+				for(SRTObject obj1 : lists) {
+					ContextSchemeValueVO vo1 = (ContextSchemeValueVO) obj1;
+					if(vo.getContextSchemeValueGUID().equals(vo1.getContextSchemeValueGUID())) {
+						newItem = false;
+						break;
+					}
+				}
+				if(newItem) {
+					vo.setOwnerContextSchemeID(ccVO.getContextSchemeID());
+					daoCSV.insertObject(vo);
+				}
 			}
 			
 		} catch (SRTDAOException e) {
@@ -219,6 +251,32 @@ public class ContextSchemeHandler {
 		}
 		this.selectedScheme = ccVO;
     }
+	
+	public void deleteCSV(String guid, int id) {
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("context_scheme_value_id", id);
+		String msg = "";
+		try {
+			List<SRTObject> list = daoBCV.findObjects(qc1);
+			if(list.size() > 0) {
+				msg = partResult(list);
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_SCHEME + msg,  null);
+				FacesContext.getCurrentInstance().addMessage(null, message);
+			} else {
+				List<SRTObject> temp = new ArrayList<SRTObject>();
+				for(SRTObject obj : csValues) {
+					ContextSchemeValueVO vo = (ContextSchemeValueVO)obj;
+					if(!vo.getContextSchemeValueGUID().equals(guid))
+						temp.add(vo);
+				}
+				setValue("");
+				setMeaning("");
+				this.csValues = temp;
+			}
+		} catch (SRTDAOException e1) {
+			e1.printStackTrace();
+		}
+	}
 
 	public Map<String, String> getContextCategories() {
 
@@ -305,29 +363,64 @@ public class ContextSchemeHandler {
 		setCsValues(csVO);
 	}
 	
-	public void deleteCSV(String guid) {
-		List<SRTObject> temp = new ArrayList<SRTObject>();
-		for(SRTObject obj : csValues) {
-			ContextSchemeValueVO vo = (ContextSchemeValueVO)obj;
-			if(!vo.getContextSchemeValueGUID().equals(guid))
-				temp.add(vo);
-		}
-		setValue("");
-		setMeaning("");
-		this.csValues = temp;
-	}
-	
 	public void delete(int id) {
     	ContextSchemeVO ccVO = new ContextSchemeVO();
 		ccVO.setContextSchemeID(id);
 		setValue("");
 		setMeaning("");
 		try {
+			QueryCondition qc = new QueryCondition();
+			qc.add("owner_context_scheme_id", ccVO.getContextSchemeID());
+			
+			List<SRTObject> lists = daoCSV.findObjects(qc);
+			for(SRTObject obj : lists) {
+				QueryCondition qc1 = new QueryCondition();
+				qc1.add("context_scheme_value_id", ((ContextSchemeValueVO)obj).getContextSchemeValueID());
+				String msg = "";
+				try {
+					List<SRTObject> list = daoBCV.findObjects(qc1);
+					if(list.size() > 0) {
+						msg = partResult(list);
+						FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_SCHEME + msg,  null);
+						FacesContext.getCurrentInstance().addMessage(null, message);
+						this.selectedScheme = null;
+						return;
+					}
+				} catch (SRTDAOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
+			for(SRTObject obj : lists) {
+				daoCSV.deleteObject(((ContextSchemeValueVO)obj));
+			}
+			
 			daoCS.deleteObject(ccVO);
 			contextSchemes = daoCS.findObjects();
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
+    }
+	
+	private String partResult(List<SRTObject> list) {
+    	StringBuffer sb = new StringBuffer();
+    	HashMap<Integer, String> hm = new HashMap<Integer, String>();
+    	for(SRTObject obj : list) {
+    		BusinessContextValueVO vo = (BusinessContextValueVO)obj;
+    		hm.put(vo.getBusinessContextID(), null);
+    	}
+    	
+    	for(Integer i : hm.keySet()) {
+    		QueryCondition qc = new QueryCondition();
+    		qc.add("business_context_id", i);
+    		try {
+				sb.append(((BusinessContextVO)daoBC.findObject(qc)).getName() + ", ");
+			} catch (SRTDAOException e) {
+				e.printStackTrace();
+			}
+    	}
+    	String res = sb.toString();
+    	return res.substring(0, res.lastIndexOf(","));
     }
 	
 	public void setCsValues(SRTObject csVO) {
