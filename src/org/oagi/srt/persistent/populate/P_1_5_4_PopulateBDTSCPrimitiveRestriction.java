@@ -90,5 +90,7 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 			}
 			
 		}
+		
+		System.out.println("#End");
 	}
 }

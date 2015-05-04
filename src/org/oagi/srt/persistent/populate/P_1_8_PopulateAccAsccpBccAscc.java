@@ -2,6 +2,7 @@ package org.oagi.srt.persistent.populate;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
@@ -11,6 +12,7 @@ import org.apache.xerces.impl.xs.XSComplexTypeDecl;
 import org.apache.xerces.impl.xs.XSElementDecl;
 import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSParticle;
+import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
@@ -82,11 +84,11 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		XSComplexTypeDecl complexType = bodSchemaHandler.getComplexTypeDefinition(element);
 		if(bodSchemaHandler.isComplexWithoutSimpleContent(complexType.getTypeName())) {
 			insertASCCP(element, complexType);
-			try {
-				Thread.sleep(150);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(150);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 
@@ -103,10 +105,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			int roleOfAccId;
 			QueryCondition qc = new QueryCondition();
 			qc.add("acc_guid", complexType.getFId());
-			ACCVO accVO = (ACCVO)accDao.findObject(qc);
+			ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
 			if(accVO == null) {
 				insertACC(complexType, bodPath);
-				accVO = (ACCVO)accDao.findObject(qc);
+				accVO = (ACCVO)accDao.findObject(qc, conn);
 			} 
 			roleOfAccId = accVO.getACCID();
 
@@ -128,11 +130,11 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccpDao.insertObject(accpVO);
 
 		}
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(150);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	private void insertASCCPUnderGroup(BODElementVO bodVO) throws Exception {
@@ -146,7 +148,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
-		ACCVO accVO = (ACCVO)accDao.findObject(qc);
+		ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
 		int roleOfAccId = accVO.getACCID();
 
 		String den = propertyTerm + ". " + Utility.first(accVO.getDEN());
@@ -166,25 +168,25 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		asccpDao.insertObject(accpVO);
 
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(150);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	private void insertASCC(BODElementVO bodVO, String parentGuid, ASCCPVO asccpVO) throws Exception {
 
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", parentGuid);
-		ACCVO accVO = (ACCVO)accDao.findObject(qc);
+		ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
 		int assocFromACCId = accVO.getACCID();
 		
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("ascc_guid", (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId());
 		//qc1.add("assco_to_asccp_id", asccpVO.getASCCPID());
 		//qc1.add("assoc_from_acc_id", assocFromACCId);
-		if(asccDao.findObject(qc1) == null) {
+		if(asccDao.findObject(qc1, conn) == null) {
 		
 			String asccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
 			int cardinalityMin = bodVO.getMinOccur();
@@ -257,19 +259,19 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private ACCVO getACC(String guid) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", guid);
-		return (ACCVO)accDao.findObject(qc);
+		return (ACCVO)accDao.findObject(qc, conn);
 	}
 	
 	private ASCCPVO getASCCP(String guid) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("asccp_guid", guid);
-		return (ASCCPVO)asccpDao.findObject(qc);
+		return (ASCCPVO)asccpDao.findObject(qc, conn);
 	}
 	
 	private ASCCVO getASCC(String guid) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("ascc_guid", guid);
-		return (ASCCVO)asccDao.findObject(qc);
+		return (ASCCVO)asccDao.findObject(qc, conn);
 	}
 	
 	private void insertBCC(BODElementVO bodVO, String parentGuid, BCCPVO bccpVO) throws Exception {
@@ -280,15 +282,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", parentGuid);
-		ACCVO accVO = (ACCVO)accDao.findObject(qc);
-		accVO = (ACCVO)accDao.findObject(qc);
+		ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
 		int assocFromACCId = accVO.getACCID();
 		
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("bcc_guid", bccGuid);
 		qc1.add("assoc_to_bccp_id", assocToBCCPID);
 		qc1.add("assoc_from_acc_id", assocFromACCId);
-		if(bccDao.findObject(qc1) == null) {
+		if(bccDao.findObject(qc1, conn) == null) {
 		
 			int cardinalityMin = bodVO.getMinOccur();
 			int cardinalityMax = bodVO.getMaxOccur();
@@ -324,7 +325,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		int assocToBCCPID;
 		QueryCondition qc = new QueryCondition();
 		qc.add("property_term", Utility.spaceSeparator(xad.getName()).replace("ID", "Identifier"));
-		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc);
+		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 		if(bccpVO == null) {
 			bccpVO = insertBCCP(xad.getName(), xtd.getFId());
 		}
@@ -333,12 +334,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		QueryCondition qc2 = new QueryCondition();
 		qc2.add("bcc_guid", bccGuid);
 		qc2.add("assoc_to_bccp_id", assocToBCCPID);
-		if(!xad.getName().equals("responseCode") && bccDao.findObject(qc2) == null) {
+		if(!xad.getName().equals("responseCode") && bccDao.findObject(qc2, conn) == null) {
 
 			String parentGuid = complexType.getFId();
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("acc_guid", parentGuid);
-			ACCVO accVO = (ACCVO)accDao.findObject(qc1);
+			ACCVO accVO = (ACCVO)accDao.findObject(qc1, conn);
 			int assocFromACCId = accVO.getACCID();
 	
 			int entityType = 0; 
@@ -393,7 +394,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("bccp_guid", bccpGuid);
-		return (BCCPVO)bccpDao.findObject(qc1);
+		return (BCCPVO)bccpDao.findObject(qc1, conn);
 	}
 	 
 	
@@ -512,10 +513,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 			QueryCondition qc = new QueryCondition();
 			qc.add("acc_guid", baseType.getFId());
-			ACCVO accVO = (ACCVO)accDao.findObject(qc);
+			ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
 			if(accVO == null) {
 				elements = insertACC(baseType, fullFilePath);
-				accVO = (ACCVO)accDao.findObject(qc);
+				accVO = (ACCVO)accDao.findObject(qc, conn);
 				basedAccId = accVO.getACCID();
 			} else {
 				basedAccId = accVO.getACCID();
@@ -566,7 +567,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) { 
 						QueryCondition qc2 = new QueryCondition();
 						qc2.add("acc_guid", bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId());
-						ACCVO accVO = (ACCVO)accDao.findObject(qc2);
+						ACCVO accVO = (ACCVO)accDao.findObject(qc2, conn);
 						if(accVO == null) {
 							insertACC(bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()), fullFilePath);
 						} 
@@ -586,11 +587,11 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					
 					QueryCondition qc = new QueryCondition();
 					qc.add("asccp_guid", bodVO.getId());
-					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc);
+					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc, conn);
 	
 					QueryCondition qc1 = new QueryCondition();
 					qc1.add("bccp_guid", bodVO.getId());
-					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1);
+					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1, conn);
 					
 					if(asccpVO != null) {
 						System.out.println("####################### match to ascc - " + bodVO.getName()); 
@@ -614,15 +615,15 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 							
 							QueryCondition qc3 = new QueryCondition();
 							qc3.add("asccp_guid", bodVO.getId());
-							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3);
+							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3, conn);
 							insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO1);
 						}
 					}
-					try {
-						Thread.sleep(200);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+//					try {
+//						Thread.sleep(200);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
 				}
 			}
 		}
@@ -648,11 +649,20 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			}
 		});
 	}
+	
+	private static Connection conn = null;
 
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
 
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+		
 		P_1_8_PopulateAccAsccpBccAscc q = new P_1_8_PopulateAccAsccpBccAscc();
 		q.populate();
+		
+		tx.close();
+		conn.close();
+		System.out.println("###END#####");
 	}
 }

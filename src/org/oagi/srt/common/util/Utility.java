@@ -41,13 +41,15 @@ public class Utility {
 		StringBuffer sb = new StringBuffer();
 		for(int i = 0; i < str.length(); i++) {
 			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
-				if(i > 0 && i < str.length() && Character.isUpperCase(str.charAt(i - 1)))
-					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)))
+				if(Character.isUpperCase(str.charAt(i - 1)))
+					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)) && (str.charAt(i) != 'D' && str.charAt(i-1) != 'I'))
 						sb.append(" " + str.charAt(i));
 					else
 						sb.append(str.charAt(i));
 				else 
 					sb.append(" " + str.charAt(i));
+			} else if(Character.isLowerCase(str.charAt(i)) && i == 0) {
+				sb.append(String.valueOf(str.charAt(i)).toUpperCase());
 			} else {
 				sb.append(str.charAt(i));
 			}
@@ -89,5 +91,10 @@ public class Utility {
 					+ e.toString());
 		}
 	
+	}
+	
+	public static void main(String args[]) {
+		String str = "IDs";
+		System.out.println(spaceSeparator(str));
 	}
 }

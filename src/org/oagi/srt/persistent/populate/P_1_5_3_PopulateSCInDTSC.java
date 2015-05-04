@@ -135,6 +135,10 @@ public class P_1_5_3_PopulateSCInDTSC {
 				qc.add("data_type_term", dataTypeTerm);
 				qc.add("den", typeName1 + ". Type");
 				qc.add("dt_type", 1);
+				
+				System.out.println(dataTypeTerm + " " + typeName1);
+				
+				
 				DTVO dt_vo = ((DTVO)dao.findObject(qc));
 				owner_dT_iD = dt_vo.getDTID();
 				
@@ -152,7 +156,7 @@ public class P_1_5_3_PopulateSCInDTSC {
 					System.out.println("##### based_dT_sc_id = " + based_dT_sc_id);
 					System.out.println("##### owner_dt_iD = " + dt_vo.getBasedDTID());
 					
-					Node propertyTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_PropertyTermName\"]");
+					Node propertyTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_PropertyTermName\"]");
 					if(propertyTermName != null) {
 						property_term = ((Element)propertyTermName).getTextContent();
 					} else {
@@ -160,7 +164,7 @@ public class P_1_5_3_PopulateSCInDTSC {
 					}
 						
 					
-					Node representationTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_RepresentationTermName\"]");
+					Node representationTermName = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_RepresentationTermName\"]");
 					if(representationTermName != null) {
 						representation_term = ((Element)representationTermName).getTextContent();
 					} else {

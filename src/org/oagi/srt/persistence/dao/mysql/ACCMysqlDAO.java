@@ -183,7 +183,7 @@ public class ACCMysqlDAO extends SRTDAO {
 	}
 	
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
-		DBAgent tx = new DBAgent();
+		//DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ACCVO accVO = null;
@@ -251,7 +251,7 @@ public class ACCMysqlDAO extends SRTDAO {
 			//	if(conn != null && !conn.isClosed())
 			//		conn.close();
 			//} catch (SQLException e) {}
-			tx.close();
+			//tx.close();
 		}
 		return accVO;
 	}

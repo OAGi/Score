@@ -26,7 +26,7 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 	private final String _tableName = "business_context";
 	
 	private final String _FIND_ALL_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT Business_Context_ID, Business_Context_GUID, Name FROM " + _tableName;
+			"SELECT Business_Context_ID, Business_Context_GUID, Name FROM " + _tableName + " order by business_context_id desc";
 	
 	private final String _FIND_BUSINESS_CONTEXT_STATEMENT = 
 			"SELECT Business_Context_ID, Business_Context_GUID, Name FROM " + _tableName;

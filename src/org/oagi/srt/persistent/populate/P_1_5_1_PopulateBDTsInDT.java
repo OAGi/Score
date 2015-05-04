@@ -1,7 +1,10 @@
 package org.oagi.srt.persistent.populate;
 
+import java.sql.Connection;
+
 import javax.xml.xpath.XPathExpressionException;
 
+import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
@@ -53,7 +56,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 		QueryCondition qc = new QueryCondition();
 		qc.add("Data_Type_Term", dataTypeTerm);
 		qc.add("DT_Type", new Integer(0));
-		int basedDTID = ((DTVO)dao.findObject(qc)).getDTID();
+		int basedDTID = ((DTVO)dao.findObject(qc, conn)).getDTID();
 		
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("DT_GUID", id);
@@ -61,7 +64,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 		System.out.println("### basedDTID: " + basedDTID);
 		System.out.println("### dataTypeTerm: " + dataTypeTerm);
 		
-		if(dao.findObject(qc1) == null) {
+		if(dao.findObject(qc1, conn) == null) {
 	
 			DTVO dtVO = new DTVO();
 			
@@ -105,7 +108,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 					duplicate_check = true;
 			}
 			
-			if(dao.findObject(qc1) == null && duplicate_check == false) {
+			if(dao.findObject(qc1, conn) == null && duplicate_check == false) {
 				System.out.println("Should be Added!:   "+i+"###############"+DEN);
 								
 				//Data Type Term
@@ -137,12 +140,12 @@ public class P_1_5_1_PopulateBDTsInDT {
 
 		QueryCondition qc = new QueryCondition();
 		qc.add("DT_GUID", defaultGUID);
-		int basedDTID = ((DTVO)dao.findObject(qc)).getDTID();
+		int basedDTID = ((DTVO)dao.findObject(qc, conn)).getDTID();
 		
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("DT_GUID", id);
 		
-		if(dao.findObject(qc1) == null) {
+		if(dao.findObject(qc1, conn) == null) {
 				
 			DTVO dtVO = new DTVO();
 			
@@ -226,11 +229,16 @@ public class P_1_5_1_PopulateBDTsInDT {
 			
 	}
 	
+	private static Connection conn = null;
+	
 	public static void main(String[] args) throws Exception {
 		Utility.dbSetup();
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+			
 		P_1_5_1_PopulateBDTsInDT p = new P_1_5_1_PopulateBDTsInDT();
 		for (int i = 0; i < Types.dataTypeList.length; i++){
-			//p.importDataTypeList(Types.dataTypeList[i]);
+			p.importDataTypeList(Types.dataTypeList[i]);
 			populateAdditionalDefault_BDTStatement(fields_xsd, Types.dataTypeList[i]);
 			populateAdditionalDefault_BDTStatement(businessDataType_xsd, Types.dataTypeList[i]);
 			populateAdditionalDefault_BDTStatement(meta_xsd, Types.dataTypeList[i]);
@@ -242,7 +250,7 @@ public class P_1_5_1_PopulateBDTsInDT {
 
 		}
 		for (int i = 0; i < Types.simpleTypeList.length; i++){
-			//p.importDataTypeList(Types.simpleTypeList[i]);
+			p.importDataTypeList(Types.simpleTypeList[i]);
 			populateAdditionalDefault_BDTStatement(fields_xsd, Types.simpleTypeList[i]);
 			populateAdditionalDefault_BDTStatement(businessDataType_xsd, Types.simpleTypeList[i]);
 			populateAdditionalDefault_BDTStatement(meta_xsd, Types.simpleTypeList[i]);
@@ -252,6 +260,9 @@ public class P_1_5_1_PopulateBDTsInDT {
 			populateAdditionalDefault_BDTStatement(nouns_table_xsd, Types.simpleTypeList[i]);
 			populateAdditionalDefault_BDTStatement(nouns_uomgroup_xsd, Types.simpleTypeList[i]);
 		}
+		
+		tx.close();
+		conn.close();
 		System.out.println("END");
 		
 	}

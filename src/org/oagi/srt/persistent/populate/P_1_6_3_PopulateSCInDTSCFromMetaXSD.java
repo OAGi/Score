@@ -36,10 +36,10 @@ public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 		SRTDAO dao = df.getDAO("DTSC");
 		DTSCVO dt_scVO = new DTSCVO();
 
-		NodeList ref = xh.getNodeList("//xsd:complexType");
+		NodeList ref = xh.getNodeList("//xsd:complexType[@name = 'ExpressionType' or @name = 'ActionExpressionType' or @name = 'ResponseExpressionType']");
 		for(int j = 0; j < ref.getLength(); j++) {
 			Element ref_tmp = (Element)ref.item(j);
-		    if(ref_tmp.getAttribute("name").equals("ExpressionType") || ref_tmp.getAttribute("name").equals("ActionExpressionType") || ref_tmp.getAttribute("name").equals("ResponseExpressionType") ) {
+		    //if(ref_tmp.getAttribute("name").equals("ExpressionType") || ref_tmp.getAttribute("name").equals("ActionExpressionType") || ref_tmp.getAttribute("name").equals("ResponseExpressionType") ) {
 				int ownerDTID = getBasedDTID(ref_tmp.getAttribute("id"));
 				NodeList result = xh.getNodeList("//xsd:complexType[@id = '" + ref_tmp.getAttribute("id") + "']//xsd:attribute");
 				for(int i = 0; i < result.getLength(); i++) {
@@ -51,7 +51,7 @@ public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 				    if(tmp.getAttribute("name").indexOf("Code") > 0) {
 				    	PropertyTerm = PropertyTerm.substring(0, tmp.getAttribute("name").indexOf("Code"));
 				    }
-				    dt_scVO.setPropertyTerm(PropertyTerm);
+				    dt_scVO.setPropertyTerm(Utility.spaceSeparator(PropertyTerm));
 				    
 				    if(tmp.getAttribute("name").equals("expressionLanguage")){
 				    	dt_scVO.setRepresentationTerm("Text");
@@ -81,7 +81,7 @@ public class P_1_6_3_PopulateSCInDTSCFromMetaXSD {
 				    }
 				    dao.insertObject(dt_scVO);
 				    }
-		    }
+		    //}
 		}
 		System.out.println("###END#####");
 	}

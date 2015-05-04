@@ -187,6 +187,7 @@ public class ContextCategoryHandler {
 		try {
 			dao.updateObject(ccVO);
 			contextCategories = dao.findObjects();
+			this.selectedCategory = ccVO;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}

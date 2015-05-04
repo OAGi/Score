@@ -38,9 +38,12 @@ import org.oagi.srt.persistence.dto.BBIE_SCVO;
 import org.oagi.srt.persistence.dto.BCCPVO;
 import org.oagi.srt.persistence.dto.BCCVO;
 import org.oagi.srt.persistence.dto.BusinessContextVO;
+import org.oagi.srt.persistence.dto.BusinessContextValueVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
+import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
 import org.oagi.srt.persistence.dto.DTVO;
+import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.ItemSelectEvent;
@@ -74,6 +77,8 @@ public class TopLevelABIEHandler implements Serializable {
 	private SRTDAO bbiescDao;
 	private SRTDAO dtscDao;
 	private SRTDAO dtDao;
+	private SRTDAO daoBC;
+	private SRTDAO daoBCV;
 	
 	private int abieCount = 0;
 	private int bbiescCount = 0;
@@ -117,6 +122,8 @@ public class TopLevelABIEHandler implements Serializable {
 			bbiescDao = df.getDAO("BBIE_SC");
 			dtscDao = df.getDAO("DTSC");
 			dtDao = df.getDAO("DT");
+			daoBC = df.getDAO("BusinessContext");
+			daoBCV = df.getDAO("BusinessContextValue");
 			
 			maxABIEId = asbieDao.findMaxId();
 			maxASBIEPId = asbiepDao.findMaxId();
@@ -470,15 +477,16 @@ public class TopLevelABIEHandler implements Serializable {
 					av.setColor("blue");
 					av.setMin(asbieVO.getCardinalityMin());
 					av.setMax(asbieVO.getCardinalityMax());
-					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
+					
 					
 					if(!asccpVO.getPropertyTerm().contains("Group")) { //.equalsIgnoreCase("References Group") && !asccpVO.getPropertyTerm().equalsIgnoreCase("Free Form Text Group")) // TODO check why freeformtext repeated
+						TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 						createBIEs(asccpVO.getRoleOfACCID(), abieId, tNode2);
 					} else {
 						QueryCondition qc1 = new QueryCondition();
 						qc1.add("acc_guid", asccpVO.getASCCPGUID());
 						ACCVO accVO = (ACCVO)accDao.findObject(qc1, conn);
-						createBasicChildBIEs(accVO.getACCID(), abieId, tNode2);
+						createBasicChildBIEs(accVO.getACCID(), abieId, tNode);
 					}
 				//} else {
 					
@@ -547,17 +555,23 @@ public class TopLevelABIEHandler implements Serializable {
 				
 				//bbiescDao.insertObject(bbiescVO);
 				bbiescCount++;
-				hm.put(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
+				
+				
+				ABIEView av = new ABIEView(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
+				av.setColor("orange");
+				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
+				
+				//hm.put(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
 				
 			}
 			
-			for(String key : hm.keySet()) {
-				ABIEView av = new ABIEView(key, hm.get(key));
-				av.setColor("orange");
-				//av.setMin(bbiescVO.getMinCardinality()); // TODO this is temporary treatment to avoid duplicate list. should check dt_sc table to eliminate the duplicates
-				//av.setMax(bbiescVO.getMaxCardinality());
-				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
-			}
+//			for(String key : hm.keySet()) {
+//				ABIEView av = new ABIEView(key, hm.get(key));
+//				av.setColor("orange");
+//				//av.setMin(bbiescVO.getMinCardinality()); // TODO this is temporary treatment to avoid duplicate list. should check dt_sc table to eliminate the duplicates
+//				//av.setMax(bbiescVO.getMaxCardinality());
+//				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
+//			}
 		} catch (SRTDAOException e1) {
 			e1.printStackTrace();
 		}
@@ -656,6 +670,35 @@ public class TopLevelABIEHandler implements Serializable {
 		bCSelected = bcVO;
 		FacesMessage msg = new FacesMessage(bCSelected.getName(), bCSelected.getName());
         FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+	
+	public void onBCSelect(BusinessContextHandler bcH) {
+		try {
+			BusinessContextVO bcVO = new BusinessContextVO();
+			bcVO.setName(bcH.getName());
+			String guid = Utility.generateGUID();
+			bcVO.setBusinessContextGUID(guid);
+			daoBC.insertObject(bcVO);
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("Business_Context_GUID", guid);
+			BusinessContextVO bvVO1 = (BusinessContextVO)daoBC.findObject(qc);
+			
+			for(BusinessContextValues bcv : bcH.getBcValues()) {
+				for(ContextSchemeValueVO cVO : bcv.getCsList()) {
+					BusinessContextValueVO bcvVO = new BusinessContextValueVO();
+					bcvVO.setBusinessContextID(bvVO1.getBusinessContextID());
+					bcvVO.setContextSchemeValueID(cVO.getContextSchemeValueID());
+					daoBCV.insertObject(bcvVO);
+				}
+			}
+			
+			bCSelected = bcVO;
+			FacesMessage msg = new FacesMessage(bCSelected.getName(), bCSelected.getName());
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
  
     public void onRowUnselect(UnselectEvent event) {
