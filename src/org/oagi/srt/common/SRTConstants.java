@@ -25,7 +25,7 @@ public class SRTConstants {
 	public static final int DB_TYPE_SQLITE = 10;
 	public static final int DB_TYPE_CUBRID = 11;
 	
-	public static final String SRT_PROPERTIES_FILE_NAME = "/srt.properties";
+	public static final String SRT_PROPERTIES_FILE_NAME = "srt.properties";
 	public static final String PRODUCT_NAME = "OAGi Semantic Refinement Tool";
 	
 	public static final String NS_CCTS_PREFIX = "ccts";
@@ -52,16 +52,21 @@ public class SRTConstants {
 		return Integer.parseInt(dbTypeVal);
 	}
 	
-	public static final String BOD_FILE_PATH_01 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
-	public static final String BOD_FILE_PATH_02 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
+	public static final String BOD_FILE_PATH_01 = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
+	public static final String BOD_FILE_PATH_02 = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
 	
-	public static final String FILEDS_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified.xsd";
-	public static final String META_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
-	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/BusinessDataType_1_modified.xsd";
-	
+	public static final String FILEDS_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified.xsd";
+	public static final String META_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
+	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/BusinessDataType_1_modified.xsd";
+	public static final String COMPONENTS_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Components.xsd";
+	public static final String NOUNS_BOD_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/BOD.xsd";
+	public static final String NOUNS_FIELD_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/Field.xsd";
+	public static final String NOUNS_TABLE_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/Table.xsd";
+	public static final String NOUNS_UOMGROUP_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/UOMGroup.xsd";
+		
 	public static String filepath(String list) {
-		String prefix_filepath = "/Users/yslee/Work/Project/OAG/Development/";
-		//String prefix_filepath = "C:/Users/jnl18/Documents/";
+		//String prefix_filepath = "/Users/yslee/Work/Project/OAG/Development/";
+		String prefix_filepath = "C:/Users/jnl18/Documents/";
 		String origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/";
 		if(list.equals("AgencyID")){
 			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/IdentifierScheme/";
@@ -79,8 +84,12 @@ public class SRTConstants {
 			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/";
 		}
 		else if(list.equals("BOD")){
-			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";	
 		}
+		else if(list.equals("Nouns")){
+			origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/";	
+		}
+		
 		return prefix_filepath+origin_filepath;
 	}
 

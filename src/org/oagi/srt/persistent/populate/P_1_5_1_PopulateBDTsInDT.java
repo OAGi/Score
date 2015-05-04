@@ -1,39 +1,19 @@
 package org.oagi.srt.persistent.populate;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
-import org.chanchan.common.persistence.db.ConnectionPoolManager;
-import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.persistence.dto.AgencyIDListVO;
 import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.web.startup.SRTInitializer;
-import org.oagi.srt.web.startup.SRTInitializerException;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import java.util.UUID;
 
 /**
 *
@@ -45,12 +25,25 @@ import java.util.UUID;
 
 public class P_1_5_1_PopulateBDTsInDT {
 	
-	private XPathHandler fields_xsd;
-	private XPathHandler businessDataType_xsd;
+	private static XPathHandler fields_xsd;
+	private static XPathHandler businessDataType_xsd;
+	private static XPathHandler meta_xsd;
+	private static XPathHandler components_xsd;
+	private static XPathHandler nouns_bod_xsd;
+	private static XPathHandler nouns_field_xsd;
+	private static XPathHandler nouns_table_xsd;
+	private static XPathHandler nouns_uomgroup_xsd;
+
 	
 	public P_1_5_1_PopulateBDTsInDT() throws Exception {
 		fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
 		businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+		components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
+		nouns_bod_xsd = new XPathHandler(SRTConstants.NOUNS_BOD_XSD_FILE_PATH);
+		nouns_field_xsd = new XPathHandler(SRTConstants.NOUNS_FIELD_XSD_FILE_PATH);
+		nouns_table_xsd = new XPathHandler(SRTConstants.NOUNS_TABLE_XSD_FILE_PATH);
+		nouns_uomgroup_xsd = new XPathHandler(SRTConstants.NOUNS_UOMGROUP_XSD_FILE_PATH);
 	}
 	
 	public static void insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition, String id) throws SRTDAOException{
@@ -88,6 +81,53 @@ public class P_1_5_1_PopulateBDTsInDT {
 			dtVO.setRevisionDocumentation("");
 	
 			dao.insertObject(dtVO);
+		}
+	}
+	
+	public static void populateAdditionalDefault_BDTStatement(XPathHandler filename, String dataType) throws SRTDAOException, XPathExpressionException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("DT");
+		NodeList xsd_node = filename.getNodeList("//xsd:attribute");
+		for(int i = 0; i < xsd_node.getLength(); i++) {
+			Element tmp = (Element)xsd_node.item(i);
+			String typeName = tmp.getAttribute("type").replaceAll("Type", "");
+			String DEN = tmp.getAttribute("type").replaceAll("Type", "")+ ". Type";
+			
+			QueryCondition qc1 = new QueryCondition();
+			qc1.add("DEN", DEN);
+			//distinct-values(typeName);
+			
+			boolean duplicate_check = false;
+			for(int j = 0; j < i; j++) {
+				Element tmp2 = (Element)xsd_node.item(j);
+				String tmp_typeName = tmp2.getAttribute("type").replaceAll("Type", "")+ ". Type";
+				if(DEN.equals(tmp_typeName))
+					duplicate_check = true;
+			}
+			
+			if(dao.findObject(qc1) == null && duplicate_check == false) {
+				System.out.println("Should be Added!:   "+i+"###############"+DEN);
+								
+				//Data Type Term
+				Node dataTypeTermNode = filename.getNode("//xsd:attribute[@type = '" + tmp.getAttribute("type") + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
+				if(dataTypeTermNode == null)
+					System.out.println("#####null;;");
+				else {
+					Element dataTypeTermElement = (Element)dataTypeTermNode;
+					String dataTypeTerm = dataTypeTermElement.getTextContent();
+					//if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
+						dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.indexOf("."));
+					System.out.println("!!!!DatatypeTerm:   "+dataTypeTerm);
+					//Definitions
+					Node definitionNode = filename.getNode("//xsd:attribute[@type = '" + tmp.getAttribute("type") + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+					Element definitionElement = (Element)definitionNode;
+					
+					Node aNodeBDT = filename.getNode("//xsd:attribute[@type = '" + tmp.getAttribute("type")+ "']");
+					Element aElementBDT = (Element)aNodeBDT;
+					//System.out.println("@@@ typeName = " + typeName + "  dataTypeTerm == " + dataTypeTerm + "  definitionElement = " + definitionElement.getTextContent() + "  definitionElement = " + definitionElement.getTextContent() + "  id" + aElementBDT.getAttribute("id") + "...");
+					insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), definitionElement.getTextContent(), aElementBDT.getAttribute("id"));
+				}
+			}
 		}
 	}
 	
@@ -186,14 +226,33 @@ public class P_1_5_1_PopulateBDTsInDT {
 			
 	}
 	
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Exception {
 		Utility.dbSetup();
 		P_1_5_1_PopulateBDTsInDT p = new P_1_5_1_PopulateBDTsInDT();
 		for (int i = 0; i < Types.dataTypeList.length; i++){
-			p.importDataTypeList(Types.dataTypeList[i]);
+			//p.importDataTypeList(Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(fields_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(businessDataType_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(meta_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(components_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_bod_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_field_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_table_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_uomgroup_xsd, Types.dataTypeList[i]);
+
 		}
 		for (int i = 0; i < Types.simpleTypeList.length; i++){
-			p.importDataTypeList(Types.simpleTypeList[i]);
+			//p.importDataTypeList(Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(fields_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(businessDataType_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(meta_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(components_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_bod_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_field_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_table_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_uomgroup_xsd, Types.simpleTypeList[i]);
 		}
+		System.out.println("END");
+		
 	}
 }
