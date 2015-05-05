@@ -105,6 +105,13 @@ public class P_1_3_PopulateAgencyIDList {
 		System.out.println("###END1#####");
 
 	}
+	
+	public void run() throws Exception {
+		P_1_3_PopulateAgencyIDList agencyidlist = new P_1_3_PopulateAgencyIDList();
+		agencyidlist.agencyIDList();
+		agencyidlist.agencyIDListValue();
+		agencyidlist.updateAgencyIDList();
+	}
 
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();

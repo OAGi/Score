@@ -2,11 +2,13 @@ package org.oagi.srt.persistent.populate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
@@ -47,6 +49,8 @@ public class P_1_7_PopulateQBDTInDT {
 	private XPathHandler fields_xsd;
 	private XPathHandler meta_xsd;
 	
+	private static Connection conn = null;
+	
 	DAOFactory df;
 	SRTDAO dtDao;
 	SRTDAO bccpDao;
@@ -61,7 +65,7 @@ public class P_1_7_PopulateQBDTInDT {
 		QueryCondition qc = new QueryCondition();
 		qc.add("den", den);
 		qc.add("dt_type", 1);
-		return (DTVO)dtDao.findObject(qc);
+		return (DTVO)dtDao.findObject(qc, conn);
 	}
 	
 	public P_1_7_PopulateQBDTInDT() throws Exception {
@@ -241,15 +245,15 @@ public class P_1_7_PopulateQBDTInDT {
 			
 		QueryCondition qc1 = new QueryCondition();
 		qc1.add("dt_id", aDTVO.getBasedDTID());
-		DTVO parentDT = (DTVO)dtDao.findObject(qc1);
+		DTVO parentDT = (DTVO)dtDao.findObject(qc1, conn);
 		if(parentDT.getDTType() == 1) {
 			QueryCondition qc11 = new QueryCondition();
 			qc11.add("dt_id", parentDT.getBasedDTID());
-			DTVO aDTVO11 = (DTVO)dtDao.findObject(qc11);
+			DTVO aDTVO11 = (DTVO)dtDao.findObject(qc11, conn);
 			if(aDTVO11.getDTType() == 1) {
 				QueryCondition qc12 = new QueryCondition();
 				qc12.add("dt_id", parentDT.getBasedDTID());
-				DTVO aDTVO12 = (DTVO)dtDao.findObject(qc12);
+				DTVO aDTVO12 = (DTVO)dtDao.findObject(qc12, conn);
 				aDTVO.setBasedDTID(aDTVO12.getBasedDTID());
 			} else {
 				aDTVO.setBasedDTID(aDTVO11.getBasedDTID());
@@ -310,13 +314,13 @@ public class P_1_7_PopulateQBDTInDT {
 				qc.add("den", den);
 				qc.add("dt_type", 1);
 				
-				DTVO dtVO = (DTVO)dtDao.findObject(qc);
+				DTVO dtVO = (DTVO)dtDao.findObject(qc, conn);
 				if(dtVO == null) {
 					//System.out.println("### NULL " + bccp + " - " + den);
 					
 					// TODO check these exceptions
-					if(bccp.equals("FinalAgentInstructionCode") || bccp.equals("FirstAgentPaymentMethodCode") || bccp.equals("EndTime") || bccp.equals("StartTime") || bccp.equals("CompositeID"))
-						continue;
+					//if(bccp.equals("FinalAgentInstructionCode") || bccp.equals("FirstAgentPaymentMethodCode") || bccp.equals("EndTime") || bccp.equals("StartTime") || bccp.equals("CompositeID"))
+					//	continue;
 					
 					Node typeNode = xHandler.getNode("//xsd:complexType[@name = '" + type + "']");
 					if(typeNode == null) {
@@ -329,16 +333,19 @@ public class P_1_7_PopulateQBDTInDT {
 					
 					//System.out.println("typeNode id = "+((Element)typeNode).getAttribute("id")+"   type = "+type+ "     dVO ="+dVO);
 					
-					boolean check_duplication = false;
-					for(int j = 0; j < i-1; j++) {
-						if(type.equals(((Element)elementsFromXSD.item(j)).getAttribute("type"))) {
-							check_duplication = true;
-							break;
-						}
-					}
+//					boolean check_duplication = false;
+//					for(int j = 0; j < i-1; j++) {
+//						if(type.equals(((Element)elementsFromXSD.item(j)).getAttribute("type"))) {
+//							check_duplication = true;
+//							break;
+//						}
+//					}
+//					
+//					if(check_duplication == false)
+//						addToDTSC(xHandler, type, dVO);
 					
-					if(check_duplication == false)
-						addToDTSC(xHandler, type, dVO);
+					
+					addToDTSC(xHandler, type, dVO);
 
 					// add to BDTPrimitiveRestriction
 					insertBDTPrimitiveRestriction(dVO, type);
@@ -349,11 +356,11 @@ public class P_1_7_PopulateQBDTInDT {
 					// add to BCCP
 					addToBCCP(guid, bccp, dtVO, definition);
 				}
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					Thread.sleep(200);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
 				//System.out.println("### i " + i);
 			}
 		}
@@ -515,7 +522,7 @@ public class P_1_7_PopulateQBDTInDT {
 		QueryCondition qc = new QueryCondition();
 		qc.add("dt_guid", guid);
 		
-		DTVO dVO = (DTVO)dtDao.findObject(qc);
+		DTVO dVO = (DTVO)dtDao.findObject(qc, conn);
 		if(dVO == null) {
 		
 			DTVO dtVO = new DTVO();
@@ -527,11 +534,12 @@ public class P_1_7_PopulateQBDTInDT {
 			
 			Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent/xsd:extension");
 			if(typeNameNode != null) {
-				String base = Utility.createDENFormat(((Element)typeNameNode).getAttribute("base"));
 				
+				String base = ((Element)typeNameNode).getAttribute("base");
 				if(base.endsWith("CodeContentType")) {
 					dVO = getDTVO("Code. Type");
 				} else {
+					base = Utility.createDENFormat(((Element)typeNameNode).getAttribute("base"));
 					dVO = getDTVO(base);
 				}
 				
@@ -564,7 +572,7 @@ public class P_1_7_PopulateQBDTInDT {
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", guid);
 			
-			return (DTVO)dtDao.findObject(qc1);
+			return (DTVO)dtDao.findObject(qc1, conn);
 		} else {
 			return dVO;
 		}
@@ -578,10 +586,11 @@ public class P_1_7_PopulateQBDTInDT {
 		}
 		Element tN = (Element)typeNode;
 		
+		System.out.println("######## type" + type);
 		QueryCondition qc = new QueryCondition();
 		qc.add("dt_guid", tN.getAttribute("id"));
 		
-		DTVO dVO1 = (DTVO)dtDao.findObject(qc);
+		DTVO dVO1 = (DTVO)dtDao.findObject(qc, conn);
 		if(dVO1 == null) {
 			
 			DTVO dVO = new DTVO();
@@ -622,7 +631,7 @@ public class P_1_7_PopulateQBDTInDT {
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", tN.getAttribute("id"));
 			
-			return (DTVO)dtDao.findObject(qc1);
+			return (DTVO)dtDao.findObject(qc1, conn);
 		} else {
 			return dVO1;
 		}
@@ -676,9 +685,40 @@ public class P_1_7_PopulateQBDTInDT {
 			vo.setMaxCardinality(dtsc_vo.getMaxCardinality());
 			vo.setBasedDTSCID(dtsc_vo.getDTSCID());
 			
-			aDTSCDAO.insertObject(vo);	
 			
-			insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 1, "", "");
+			if(!checkDuplicate(vo)) {
+				aDTSCDAO.insertObject(vo);	
+				insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 1, "", "");
+			}
+		}
+		
+		
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("dt_id", qbdtVO.getBasedDTID());
+		DTVO dtVO = (DTVO)dtDao.findObject(qc1);
+		if(dtVO.getBasedDTID() > 0) {
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("owner_dt_iD", dtVO.getBasedDTID());
+			
+			ArrayList<SRTObject> dtsc_vos2 = aDTSCDAO.findObjects(qc2);
+			for(SRTObject sObj : dtsc_vos2) {
+				DTSCVO dtsc_vo = (DTSCVO)sObj;
+				
+				DTSCVO vo = new DTSCVO();
+				vo.setDTSCGUID(dtsc_vo.getDTSCGUID());
+				vo.setPropertyTerm(dtsc_vo.getPropertyTerm());
+				vo.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
+				vo.setOwnerDTID(qbdtVO.getDTID());
+				
+				vo.setMinCardinality(dtsc_vo.getMinCardinality());
+				vo.setMaxCardinality(dtsc_vo.getMaxCardinality());
+				vo.setBasedDTSCID(dtsc_vo.getDTSCID());
+				
+				if(!checkDuplicate(vo)) {
+					aDTSCDAO.insertObject(vo);	
+					insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 1, "", "");
+				}
+			}
 		}
 		
 		// new SC
@@ -749,7 +789,7 @@ public class P_1_7_PopulateQBDTInDT {
 					
 				DTSCVO vo = new DTSCVO();
 				vo.setDTSCGUID(dt_sc_guid);
-				vo.setPropertyTerm(property_term);
+				vo.setPropertyTerm(Utility.spaceSeparator(property_term));
 				vo.setRepresentationTerm(representation_term);
 				vo.setDefinition(definition);
 				vo.setOwnerDTID(owner_dT_iD);
@@ -757,12 +797,22 @@ public class P_1_7_PopulateQBDTInDT {
 				vo.setMinCardinality(min_cardinality);
 				vo.setMaxCardinality(max_cardinality);
 				
-				aDTSCDAO.insertObject(vo);	
-				System.out.println("######"+vo.getDTSCGUID()+"!!!!!"+vo.getPropertyTerm()+"@@@@@"+vo.getRepresentationTerm());
+				//System.out.println("######"+vo.getDTSCGUID()+"!!!!!"+vo.getPropertyTerm()+"@@@@@"+vo.getRepresentationTerm());
 				
-				insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
+				if(!checkDuplicate(vo)) {
+					aDTSCDAO.insertObject(vo);	
+					insertBDT_SC_Primitive_Restriction(vo, vo.getOwnerDTID(), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
+				}
 			}
 		}
+	}
+	
+	private boolean checkDuplicate(DTSCVO dtVO) throws SRTDAOException {
+		QueryCondition qc = new QueryCondition();
+		qc.add("dt_sc_guid", dtVO.getDTSCGUID());
+		qc.add("property_term", dtVO.getPropertyTerm());
+		qc.add("owner_dt_id", dtVO.getOwnerDTID());
+		return (((DTSCVO)aDTSCDAO.findObject(qc)).getDTSCID() > 0) ? true : false;
 	}
 	
 
@@ -879,12 +929,29 @@ public class P_1_7_PopulateQBDTInDT {
 	}
 	
 	
+	public void run() throws Exception {
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+		
+		populate();
+		
+		tx.close();
+		conn.close();
+		System.out.println("###END###");
+	}
+	
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
+		
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
 		
 		P_1_7_PopulateQBDTInDT q = new P_1_7_PopulateQBDTInDT();
 		//System.out.println(q.spaceSeparator("TotalAmountType"));
 		q.populate();
+		
+		tx.close();
+		conn.close();
 		
 		System.out.println("###END###");
 

@@ -59,7 +59,7 @@ public class Utility {
 	
 	public static void dbSetup() throws Exception {
 		ServerProperties props = ServerProperties.getInstance();
-		String _propFile = "/" + SRTConstants.SRT_PROPERTIES_FILE_NAME;
+		String _propFile = SRTConstants.SRT_PROPERTIES_FILE_NAME;
 		try {
 			InputStream is = SRTInitializer.class.getResourceAsStream(_propFile);
 			if (is == null) {

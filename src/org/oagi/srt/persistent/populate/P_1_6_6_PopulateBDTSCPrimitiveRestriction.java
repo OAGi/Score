@@ -258,6 +258,11 @@ public class P_1_6_6_PopulateBDTSCPrimitiveRestriction {
 		return id;
 	}
 	
+	public void run() throws Exception {
+		String filename = "Meta" + ".xsd";
+		scindt_sc(filename);
+	}
+	
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
 		P_1_6_6_PopulateBDTSCPrimitiveRestriction scindt_sc = new P_1_6_6_PopulateBDTSCPrimitiveRestriction();

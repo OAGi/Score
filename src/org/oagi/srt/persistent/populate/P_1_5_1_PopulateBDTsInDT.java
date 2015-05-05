@@ -231,6 +231,39 @@ public class P_1_5_1_PopulateBDTsInDT {
 	
 	private static Connection conn = null;
 	
+	public void run() throws Exception {
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+			
+		for (int i = 0; i < Types.dataTypeList.length; i++){
+			importDataTypeList(Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(fields_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(businessDataType_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(meta_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(components_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_bod_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_field_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_table_xsd, Types.dataTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_uomgroup_xsd, Types.dataTypeList[i]);
+
+		}
+		for (int i = 0; i < Types.simpleTypeList.length; i++){
+			importDataTypeList(Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(fields_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(businessDataType_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(meta_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(components_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_bod_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_field_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_table_xsd, Types.simpleTypeList[i]);
+			populateAdditionalDefault_BDTStatement(nouns_uomgroup_xsd, Types.simpleTypeList[i]);
+		}
+		
+		tx.close();
+		conn.close();
+		System.out.println("END");
+	}
+	
 	public static void main(String[] args) throws Exception {
 		Utility.dbSetup();
 		DBAgent tx = new DBAgent();

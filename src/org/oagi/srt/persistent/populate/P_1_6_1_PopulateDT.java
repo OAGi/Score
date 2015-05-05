@@ -125,6 +125,11 @@ public class P_1_6_1_PopulateDT {
 		return DataTypeTerm;
 	}
 	
+	public void run() throws Exception {
+		String filename = "Meta" + ".xsd";
+		dt(filename);
+	}
+	
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
 		P_1_6_1_PopulateDT dt = new P_1_6_1_PopulateDT();

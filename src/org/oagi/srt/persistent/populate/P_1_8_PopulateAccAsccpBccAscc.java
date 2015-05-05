@@ -372,6 +372,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		qc.add("dt_type", 1);
 		DTVO dtVO = (DTVO)dtDao.findObject(qc);
 		if(dtVO == null) {
+			System.out.println("### DT is null: " + name + " " + id);
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("dt_guid", "oagis-id-89be97039be04d6f9cfda107d75926b4"); // TODO check why dt is null and change this line
 			dtVO = (DTVO)dtDao.findObject(qc1);
@@ -586,6 +587,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					}
 					
 					QueryCondition qc = new QueryCondition();
+					System.out.println("#######################XX bodVO.getName() " + bodVO.getName()); 
 					qc.add("asccp_guid", bodVO.getId());
 					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc, conn);
 	
@@ -651,6 +653,18 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	}
 	
 	private static Connection conn = null;
+	
+	public void run() throws Exception{
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+		
+		P_1_8_PopulateAccAsccpBccAscc q = new P_1_8_PopulateAccAsccpBccAscc();
+		q.populate();
+		
+		tx.close();
+		conn.close();
+		System.out.println("###END#####");
+	}
 
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();

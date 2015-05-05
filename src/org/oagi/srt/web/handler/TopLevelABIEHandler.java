@@ -554,24 +554,25 @@ public class TopLevelABIEHandler implements Serializable {
 				bbiescVO.setBBIESCID(Utility.getRandomID(maxBBIESCID));
 				
 				//bbiescDao.insertObject(bbiescVO);
-				bbiescCount++;
+				//bbiescCount++;
 				
 				
-				ABIEView av = new ABIEView(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
-				av.setColor("orange");
-				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
+//				ABIEView av = new ABIEView(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
+//				av.setColor("orange");
+//				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
 				
-				//hm.put(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
+				hm.put(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
 				
 			}
 			
-//			for(String key : hm.keySet()) {
-//				ABIEView av = new ABIEView(key, hm.get(key));
-//				av.setColor("orange");
-//				//av.setMin(bbiescVO.getMinCardinality()); // TODO this is temporary treatment to avoid duplicate list. should check dt_sc table to eliminate the duplicates
-//				//av.setMax(bbiescVO.getMaxCardinality());
-//				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
-//			}
+			for(String key : hm.keySet()) {
+				bbiescCount++;
+				ABIEView av = new ABIEView(key, hm.get(key));
+				av.setColor("orange");
+				//av.setMin(bbiescVO.getMinCardinality()); // TODO this is temporary treatment to avoid duplicate list. should check dt_sc table to eliminate the duplicates
+				//av.setMax(bbiescVO.getMaxCardinality());
+				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
+			}
 		} catch (SRTDAOException e1) {
 			e1.printStackTrace();
 		}

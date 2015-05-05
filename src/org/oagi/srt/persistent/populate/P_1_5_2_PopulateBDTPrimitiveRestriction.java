@@ -19,9 +19,8 @@ import org.oagi.srt.persistence.dto.DTVO;
 public class P_1_5_2_PopulateBDTPrimitiveRestriction {
 	
 	//TODO MUST fix the value in 'isDefault' field
-
-	public static void main(String args[]) throws Exception {
-		Utility.dbSetup();
+	
+	public void run() throws Exception {
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
@@ -69,5 +68,11 @@ public class P_1_5_2_PopulateBDTPrimitiveRestriction {
 				}
 			}
 		}
+	}
+
+	public static void main(String args[]) throws Exception {
+		Utility.dbSetup();
+		P_1_5_2_PopulateBDTPrimitiveRestriction p = new P_1_5_2_PopulateBDTPrimitiveRestriction();
+		p.run();
 	}
 }

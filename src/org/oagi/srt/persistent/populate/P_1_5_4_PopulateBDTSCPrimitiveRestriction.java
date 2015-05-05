@@ -24,10 +24,7 @@ import org.oagi.srt.persistence.dto.DTSCVO;
 public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 	
 	//TODO MUST fix the value in 'isDefault' field
-
-	public static void main(String args[]) throws Exception {
-		Utility.dbSetup();
-		
+	public void run() throws Exception {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DTSC");
 		SRTDAO aBDTPrimitiveRestrictionDAO = df.getDAO("BDTSCPrimitiveRestriction");
@@ -92,5 +89,12 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 		}
 		
 		System.out.println("#End");
+	}
+
+	public static void main(String args[]) throws Exception {
+		Utility.dbSetup();
+		P_1_5_4_PopulateBDTSCPrimitiveRestriction p = new P_1_5_4_PopulateBDTSCPrimitiveRestriction();
+		p.run();
+		
 	}
 }

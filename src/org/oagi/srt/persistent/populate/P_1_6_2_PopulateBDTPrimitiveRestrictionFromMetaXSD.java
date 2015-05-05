@@ -99,6 +99,11 @@ public class P_1_6_2_PopulateBDTPrimitiveRestrictionFromMetaXSD {
 		return cdtallowedprimitiveexpressiontypemapidlist;
 		
 	}
+	
+	public void run() throws Exception {
+		String filename = "Meta" + ".xsd";
+		bdt_primitive_restriction(filename);
+	}
 
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
