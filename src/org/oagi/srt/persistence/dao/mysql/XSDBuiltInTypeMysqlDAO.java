@@ -84,7 +84,7 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 		}
 		return true;
 	}
-
+	
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
@@ -140,6 +140,58 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 				} catch (SQLException e) {}
 			}
 			tx.close();
+		}
+		return xsdbuiltintypeVO;
+	}
+
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		XSDBuiltInTypeVO xsdbuiltintypeVO = new XSDBuiltInTypeVO();
+		
+		try {
+			String sql = _FIND_XSD_BuiltIn_Type_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				xsdbuiltintypeVO.setName(rs.getString("Name"));
+				xsdbuiltintypeVO.setBuiltInType(rs.getString("BuiltIn_Type"));
+				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("Subtype_Of_XSD_Builtin_Type_ID"));
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
 		}
 		return xsdbuiltintypeVO;
 	}
@@ -247,13 +299,6 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 
 		return true;
 
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

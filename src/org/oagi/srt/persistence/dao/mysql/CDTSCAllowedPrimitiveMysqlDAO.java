@@ -110,6 +110,62 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 		return list;
 	}
 	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String sql = _FIND_ALL_CDT_SC_Allowed_Primitive_STATEMENT;
+			
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				CDTSCAllowedPrimitiveVO cdtscallowedprimitiveVO = new CDTSCAllowedPrimitiveVO();
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				list.add(cdtscallowedprimitiveVO);
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+
+		return list;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		CDTSCAllowedPrimitiveVO cdtscallowedprimitiveVO = (CDTSCAllowedPrimitiveVO) obj;
@@ -197,6 +253,58 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 				} catch (SQLException e) {}
 			}
 			tx.close();
+		}
+		return cdtscallowedprimitiveVO;
+	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		CDTSCAllowedPrimitiveVO cdtscallowedprimitiveVO = new CDTSCAllowedPrimitiveVO();
+		
+		try {
+			String sql = _FIND_CDT_SC_Allowed_Primitive_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
 		}
 		return cdtscallowedprimitiveVO;
 	}
@@ -306,20 +414,6 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 
 		return true;
 
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -198,6 +198,91 @@ public class CodeListMysqlDAO extends SRTDAO {
 		}
 		return codelistVO;
 	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		CodeListVO codelistVO = new CodeListVO();
+		try {
+			String sql = _FIND_Code_List_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			//System.out.println("##### SQL: " + sql);
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
+				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setName(rs.getString("Name"));
+				codelistVO.setListID(rs.getString("List_ID"));
+				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
+				codelistVO.setVersionID(rs.getString("Version_ID"));
+				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
+				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
+				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return codelistVO;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -331,13 +416,6 @@ public class CodeListMysqlDAO extends SRTDAO {
 		return true;
 
 
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

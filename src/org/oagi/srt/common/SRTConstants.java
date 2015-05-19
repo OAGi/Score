@@ -59,10 +59,8 @@ public class SRTConstants {
 	public static final String META_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
 	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/BusinessDataType_1_modified.xsd";
 	public static final String COMPONENTS_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Components.xsd";
-	public static final String NOUNS_BOD_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/BOD.xsd";
-	public static final String NOUNS_FIELD_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/Field.xsd";
-	public static final String NOUNS_TABLE_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/Table.xsd";
-	public static final String NOUNS_UOMGROUP_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Nouns/UOMGroup.xsd";
+	public static final String NOUNS_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/";
+	public static final String XBT_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
 		
 	public static String filepath(String list) {
 		String prefix_filepath = "/Users/yslee/Work/Project/OAG/Development/";

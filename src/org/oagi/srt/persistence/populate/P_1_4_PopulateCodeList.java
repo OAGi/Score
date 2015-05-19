@@ -1,13 +1,14 @@
-package org.oagi.srt.persistent.populate;
+package org.oagi.srt.persistence.populate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
+import java.sql.Connection;
 import java.sql.Timestamp;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
@@ -24,10 +25,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-//import edu.mit.jwi.Dictionary;
-//import edu.mit.jwi.IDictionary;
-//import edu.mit.jwi.item.POS;
-
 /**
 *
 * @author Jaehun Lee
@@ -36,9 +33,11 @@ import org.xml.sax.SAXException;
 */
 
 public class P_1_4_PopulateCodeList {
+	
+	private static Connection conn = null;
 
 	public void codeList(String fileinput, int agencyid) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("CodeList")+ fileinput;
+		String path1 = SRTConstants.filepath("CodeList") + fileinput;
 		XPathHandler xh = new XPathHandler(path1);
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -59,16 +58,13 @@ public class P_1_4_PopulateCodeList {
 		    	
 		    	for(int j = 0; j < result.getLength(); j++) {
 		    		Element tmp2 = (Element)result.item(j);
-		    		
 
 	    			if(tmp2.getAttribute("name").endsWith("EnumerationType")) {
-	    				if(tmp2.getAttribute("name").substring(0, tmp2.getAttribute("name").lastIndexOf("EnumerationType")).equals(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")))
-		    				) {
+	    				if(tmp2.getAttribute("name").substring(0, tmp2.getAttribute("name").lastIndexOf("EnumerationType")).equals(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")))) {
 		    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
 		    				break;
 		    			}
-		    		}
-	    			else {
+		    		} else {
 	    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
 	    			}
 		    			
@@ -80,15 +76,13 @@ public class P_1_4_PopulateCodeList {
 		    	
 		    	if(tmp.getAttribute("name").startsWith("oacl")) {
 		    		codelistVO.setVersionID("1");
-		    	}
-		    	else if(tmp.getAttribute("name").equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
+		    	} else if(tmp.getAttribute("name").equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
 		    		codelistVO.setVersionID("5");
-		    	}
-		    	else {
+		    	} else {
 			    	for(int j = 0; j < tmp.getAttribute("name").length(); j++) {
 				    	if(tmp.getAttribute("name").charAt(j)>47 && tmp.getAttribute("name").charAt(j)<58) {
-				    		for(int k = j+1 ; k < tmp.getAttribute("name").length(); k++){
-				    			if(tmp.getAttribute("name").charAt(k) == '_'){
+				    		for(int k = j+1 ; k < tmp.getAttribute("name").length(); k++) {
+				    			if(tmp.getAttribute("name").charAt(k) == '_') {
 						    		codelistVO.setVersionID(tmp.getAttribute("name").substring(j, k));
 						    		break;
 				    			}
@@ -107,10 +101,8 @@ public class P_1_4_PopulateCodeList {
 				    	codelistVO.setDefinitionSource(definition_element2.getAttribute("source"));
 				    	break;
 		    		}
-		    		
 	    			codelistVO.setDefinition(null);
 			    	codelistVO.setDefinitionSource(null);				    	
-
 		    	}
 		    	
 		    	codelistVO.setBasedCodeListID(1);//Empty
@@ -130,7 +122,6 @@ public class P_1_4_PopulateCodeList {
 		    	dao.insertObject(codelistVO);
 		    }
 		}
-		//System.out.println("###END#####");
 	}
 	
 	public int getUserID(String userName) throws SRTDAOException{
@@ -138,7 +129,7 @@ public class P_1_4_PopulateCodeList {
 		SRTDAO dao = df.getDAO("User");
     	QueryCondition qc = new QueryCondition();
 		qc.add("User_Name", new String(userName));
-		UserVO userVO = (UserVO)dao.findObject(qc);
+		UserVO userVO = (UserVO)dao.findObject(qc, conn);
 		int id = userVO.getUserID();
 		return id;
 	}
@@ -155,7 +146,6 @@ public class P_1_4_PopulateCodeList {
 		NodeList enumeration, typenode;
 		
 		DAOFactory df2 = DAOFactory.getDAOFactory();
-		
 		for(int i = 0; i < result.getLength(); i++) {
 		    Element tmp = (Element)result.item(i);
 		    
@@ -165,7 +155,7 @@ public class P_1_4_PopulateCodeList {
 		    	SRTDAO dao2 = df2.getDAO("CodeList");
 			   	QueryCondition qc = new QueryCondition();
 				qc.add("Code_List_GUID", new String(tmp.getAttribute("id")));
-				CodeListVO codelistVO = (CodeListVO)dao2.findObject(qc);
+				CodeListVO codelistVO = (CodeListVO)dao2.findObject(qc, conn);
 	    		
 	    		for(int j = 0; j < result.getLength(); j++) {
 		    		Element tmp2 = (Element)result.item(j);
@@ -214,38 +204,14 @@ public class P_1_4_PopulateCodeList {
 		    	}
 	    	}
 		}
-		//System.out.println(codelistvalueVO.getValue());
-		//System.out.println("###END#####");
 	}
 	
-//	public static boolean testDictionary (String test) throws IOException {
-//
-//		String wnhome = "file:///C:/Program Files (x86)/WordNet/2.1/dict/";
-//		URL url = new URL(wnhome);
-//		IDictionary dict = new Dictionary(url) ;
-//		dict.open () ;
-//		if(test.indexOf(" ") > 0) {
-//			String substring = test.substring(0,test.indexOf(" "));
-//			test = substring;
-//		}
-//		//IIndexWord idxWord = dict.getIndexWord(test, POS.NOUN );
-//		if(dict.getIndexWord(test, POS.NOUN)!= null || dict.getIndexWord(test, POS.ADJECTIVE)!= null || dict.getIndexWord(test, POS.ADVERB)!= null || dict.getIndexWord(test, POS.VERB)!= null)
-//		{
-//			//IWordID wordID = (IWordID) idxWord.getWordIDs().get(0);
-//			//IWord word = dict.getWord(wordID);
-//			//System.out.println("Id = " + wordID );
-//			//System.out.println(" Lemma = " + word.getLemma());
-//			//System.out.println(" Gloss = " + word.getSynset().getGloss());
-//			return true;
-//		}
-//		else {
-//			return false;
-//		}
-//
-//	}
-	
 	public void run() throws Exception {
-		P_1_4_PopulateCodeList codelist = new P_1_4_PopulateCodeList();
+		System.out.println("### 1.4 Start");	
+		
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+
 		String tt[][] = {{"CodeLists_1","314"}, {"CodeList_ConditionTypeCode_1","314"}, {"CodeList_ConstraintTypeCode_1","314"}, 
 				{"CodeList_DateFormatCode_1","314"}, {"CodeList_DateTimeFormatCode_1","314"}, {"CodeList_TimeFormatCode_1","314"},
 				{"CodeList_CharacterSetCode_IANA_20070514", "379"}, {"CodeList_MIMEMediaTypeCode_IANA_7_04","379"}, 
@@ -253,10 +219,13 @@ public class P_1_4_PopulateCodeList {
 				{"CodeList_UnitCode_UNECE_7_04", "6"}};
 		for(int i = 0; i< tt.length; i++) {
 			String filename = tt[i][0] + ".xsd";
-			codelist.codeList(filename, Integer.parseInt(tt[i][1]));
-			codelist.codeListValue(filename);
-			System.out.println(filename+" upload is completed..");			
+			codeList(filename, Integer.parseInt(tt[i][1]));
+			codeListValue(filename);
 		}
+		
+		tx.close();
+		conn.close();
+		System.out.println("### 1.4 End");		
 	}
 
 	public static void main (String args[]) throws Exception {

@@ -61,7 +61,7 @@ insert into xsd_builtin_type (name, builtin_type, Subtype_Of_XSD_BuiltIn_Type_ID
 	Select 'non negative integer', 'xsd:nonNegativeInteger', xsd_builtin_type_id from xsd_builtin_type where name = 'integer';
 	
 insert into xsd_builtin_type (name, builtin_type, Subtype_Of_XSD_BuiltIn_Type_ID) 
-	Select 'positive integer', 'xsd:positiveeInteger', xsd_builtin_type_id from xsd_builtin_type where name = 'non negative integer';
+	Select 'positive integer', 'xsd:positiveInteger', xsd_builtin_type_id from xsd_builtin_type where name = 'non negative integer';
 
 insert into xsd_builtin_type (name, builtin_type, Subtype_Of_XSD_BuiltIn_Type_ID) 
 	Select 'double', 'xsd:double', xsd_builtin_type_id from xsd_builtin_type where name = 'any simple type';

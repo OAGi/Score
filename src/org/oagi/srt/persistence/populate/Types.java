@@ -1,4 +1,4 @@
-package org.oagi.srt.persistent.populate;
+package org.oagi.srt.persistence.populate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +39,8 @@ public class Types {
 		"URIType",
 		"DurationMeasureType",
 		"IntegerNumberType",
-		"PositiveIntegerNumberType"
+		"PositiveIntegerNumberType",
+		"DayOfWeekHourMinuteUTCType"
 	};
 	
 }

@@ -112,6 +112,62 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		return list;
 	}
 	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+			
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("CDT_SC_Allowed_Primitive"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+
+		return list;
+	}
+	
 	public boolean insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
@@ -201,6 +257,57 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		}
 		return cdt_sc_allowed_primitive_expression_type_mapVO;
 	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+		new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+		try {
+			String sql = _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("CDT_SC_Allowed_Primitive"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return cdt_sc_allowed_primitive_expression_type_mapVO;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -239,6 +346,41 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 				} catch (SQLException e) {}
 			}
 			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("CDT_SC_Allowed_Primitive"));
+				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
 		}
 
 		return list;
@@ -309,25 +451,4 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 
 	}
 
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }

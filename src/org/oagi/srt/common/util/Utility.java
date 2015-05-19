@@ -26,6 +26,12 @@ public class Utility {
 		return pre + ". Type";
 	}
 	
+	public static String denToTypeName(String den) {
+		String part1 = den.substring(0, den.indexOf("_"));
+		String part2 = den.substring(den.indexOf("_"), den.indexOf("."));
+		return part1 + "Type" + part2;
+	}
+	
 	public static String firstToUpperCase(String str) {
 		String prefix = str.substring(0, 1);
 		String suffix = str.substring(1);
@@ -94,7 +100,7 @@ public class Utility {
 	}
 	
 	public static void main(String args[]) {
-		String str = "IDs";
-		System.out.println(spaceSeparator(str));
+		String str = "Amount_0723C8. Type";
+		System.out.println(denToTypeName(str));
 	}
 }
