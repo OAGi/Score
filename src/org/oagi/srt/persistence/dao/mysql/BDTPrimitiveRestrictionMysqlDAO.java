@@ -141,6 +141,59 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 		}
 		return bdtprimitiverestrictionVO;
 	}
+	
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
+		
+		try {
+			String sql = _FIND_BDT_Primitive_Restriction_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return bdtprimitiverestrictionVO;
+	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
@@ -180,6 +233,157 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 				} catch (SQLException e) {}
 			}
 			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_ALL_BDT_Primitive_Restriction_STATEMENT;
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				list.add(bdtprimitiverestrictionVO);
+			}
+			tx.commit();
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String sql = _FIND_ALL_BDT_Primitive_Restriction_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				list.add(bdtprimitiverestrictionVO);
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+
+		return list;
+	}
+	
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String sql = _FIND_ALL_BDT_Primitive_Restriction_STATEMENT;
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				list.add(bdtprimitiverestrictionVO);
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
 		}
 
 		return list;
@@ -249,34 +453,6 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 
 		return true;
 
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

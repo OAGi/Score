@@ -22,15 +22,12 @@ public class RunAll {
 		P_1_5_4_PopulateBDTSCPrimitiveRestriction p6 = new P_1_5_4_PopulateBDTSCPrimitiveRestriction();
 		p6.run();
 		
-		P_1_6_1_PopulateDT p7 = new P_1_6_1_PopulateDT();
+		P_1_6_1_and_2_PopulateDTFromMetaXSD p7 = new P_1_6_1_and_2_PopulateDTFromMetaXSD();
 		p7.run();
-//		
-//		P_1_6_2_PopulateBDTPrimitiveRestrictionFromMetaXSD p8 = new P_1_6_2_PopulateBDTPrimitiveRestrictionFromMetaXSD();
-//		p8.run();
-//		
-//		P_1_6_3_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_PopulateSCInDTSCFromMetaXSD();
-//		p9.run();
-//		
+
+		P_1_6_3_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_PopulateSCInDTSCFromMetaXSD();
+		p9.run();
+		
 //		P_1_6_4_PopulateCDTSCAllowedPrimitiveFromMetaXSD p10 = new P_1_6_4_PopulateCDTSCAllowedPrimitiveFromMetaXSD();
 //		p10.run();
 //		
