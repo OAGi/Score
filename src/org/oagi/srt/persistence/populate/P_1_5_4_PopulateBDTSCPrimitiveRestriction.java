@@ -50,9 +50,9 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 			DTSCVO aDTSCVO = (DTSCVO)aSRTObject;
 			if(aDTSCVO.getBasedDTSCID() != 0) {
 				
-				QueryCondition qc00 = new QueryCondition();
-				qc00.add("dt_id", aDTSCVO.getOwnerDTID());
-				DTVO dtVO = (DTVO)aDTDAO.findObject(qc00, conn);
+//				QueryCondition qc00 = new QueryCondition();
+//				qc00.add("dt_id", aDTSCVO.getOwnerDTID());
+//				DTVO dtVO = (DTVO)aDTDAO.findObject(qc00, conn);
 				
 				if(aDTSCVO.getRepresentationTerm().contains("Code")) { // && dtVO.getDataTypeTerm().contains("Code")) {
 					BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
