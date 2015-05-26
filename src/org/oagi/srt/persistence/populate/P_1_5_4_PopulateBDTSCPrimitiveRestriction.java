@@ -5,8 +5,10 @@ import java.util.ArrayList;
 
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
@@ -20,6 +22,9 @@ import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
 import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @version 1.0
@@ -44,6 +49,8 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 		SRTDAO aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
 		SRTDAO aXBTDAO = df.getDAO("XSDBuiltInType");
 		SRTDAO aDTDAO = df.getDAO("DT");
+		
+		XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 
 		ArrayList<SRTObject> al =  dao.findObjects(conn);
 		for(SRTObject aSRTObject : al) {
@@ -54,12 +61,16 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 //				qc00.add("dt_id", aDTSCVO.getOwnerDTID());
 //				DTVO dtVO = (DTVO)aDTDAO.findObject(qc00, conn);
 				
-				if(aDTSCVO.getRepresentationTerm().contains("Code")) { // && dtVO.getDataTypeTerm().contains("Code")) {
+				Node result = xh.getNode("//xsd:attribute[@id='" + aDTSCVO.getDTSCGUID() + "']");
+				Element ele = (Element)result;
+				QueryCondition qc_00 = new QueryCondition();
+				qc_00.add("name", ele.getAttribute("type").replaceAll("ContentType", ""));
+				int codeListId = ((CodeListVO)aCodeListDAO.findObject(qc_00, conn)).getCodeListID();
+				
+				if(aDTSCVO.getRepresentationTerm().contains("Code") && codeListId > 0) { // && dtVO.getDataTypeTerm().contains("Code")) {
 					BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
 					bVO.setBDTSCID(aDTSCVO.getDTSCID());
-					QueryCondition qc = new QueryCondition();
-					qc.addLikeClause("name", "%" + aDTSCVO.getPropertyTerm().replaceAll(" ", "") + "%");
-					bVO.setCodeListID(((CodeListVO)aCodeListDAO.findObject(qc, conn)).getCodeListID());
+					bVO.setCodeListID(codeListId);
 					bVO.setisDefault(true);
 					bVO.setAgencyIDListID(0);
 					
@@ -100,8 +111,6 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 					bVO1.setisDefault(true); // TODO get the default value correctly
 					
 					aBDTSCPrimitiveRestrictionDAO.insertObject(bVO1);
-					
-					
 				} else {
 					QueryCondition qc = new QueryCondition();
 					qc.add("cdt_sc_id", aDTSCVO.getBasedDTSCID());

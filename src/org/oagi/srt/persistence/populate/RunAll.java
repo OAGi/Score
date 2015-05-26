@@ -25,7 +25,7 @@ public class RunAll {
 		P_1_6_1_and_2_PopulateDTFromMetaXSD p7 = new P_1_6_1_and_2_PopulateDTFromMetaXSD();
 		p7.run();
 
-		P_1_6_3_and_4_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_and_4_PopulateSCInDTSCFromMetaXSD();
+		P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD();
 		p9.run();
 		
 //		P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD p11 = new P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD();
