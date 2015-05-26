@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 * @version 1.0
 *
 */
-public class P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD {
+public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 	
 	private static Connection conn = null;
 	
@@ -219,7 +219,7 @@ public class P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD {
 	
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
-		P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD scindt_sc = new P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD();
+		P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD scindt_sc = new P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD();
 		scindt_sc.run();
 	}
 }

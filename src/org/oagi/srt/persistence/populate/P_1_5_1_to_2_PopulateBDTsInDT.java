@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 *
 */
 
-public class P_1_5_1_and_2_PopulateBDTsInDT {
+public class P_1_5_1_to_2_PopulateBDTsInDT {
 	
 	private int userId;
 	
@@ -384,7 +384,7 @@ public class P_1_5_1_and_2_PopulateBDTsInDT {
 	
 	public static void main(String[] args) throws Exception {
 		Utility.dbSetup();
-		P_1_5_1_and_2_PopulateBDTsInDT p = new P_1_5_1_and_2_PopulateBDTsInDT();
+		P_1_5_1_to_2_PopulateBDTsInDT p = new P_1_5_1_to_2_PopulateBDTsInDT();
 		p.run();
 	}
 }

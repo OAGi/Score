@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 *
 */
 
-public class P_1_6_1_and_2_PopulateDTFromMetaXSD {
+public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 	
 	private static Connection conn = null;
 	
@@ -137,7 +137,7 @@ public class P_1_6_1_and_2_PopulateDTFromMetaXSD {
 	
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
-		P_1_6_1_and_2_PopulateDTFromMetaXSD dt = new P_1_6_1_and_2_PopulateDTFromMetaXSD();
+		P_1_6_1_to_2_PopulateDTFromMetaXSD dt = new P_1_6_1_to_2_PopulateDTFromMetaXSD();
 		dt.run();
 	}
 }

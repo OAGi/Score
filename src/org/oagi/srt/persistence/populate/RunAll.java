@@ -13,7 +13,7 @@ public class RunAll {
 		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
 		p2.run();
 		
-		P_1_5_1_and_2_PopulateBDTsInDT p3 = new P_1_5_1_and_2_PopulateBDTsInDT();
+		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
 		p3.run();
 		
 		P_1_5_3_PopulateSCInDTSC p5 = new P_1_5_3_PopulateSCInDTSC();
@@ -22,10 +22,10 @@ public class RunAll {
 		P_1_5_4_PopulateBDTSCPrimitiveRestriction p6 = new P_1_5_4_PopulateBDTSCPrimitiveRestriction();
 		p6.run();
 		
-		P_1_6_1_and_2_PopulateDTFromMetaXSD p7 = new P_1_6_1_and_2_PopulateDTFromMetaXSD();
+		P_1_6_1_to_2_PopulateDTFromMetaXSD p7 = new P_1_6_1_to_2_PopulateDTFromMetaXSD();
 		p7.run();
 
-		P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_and_4_and_5_PopulateSCInDTSCFromMetaXSD();
+		P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD();
 		p9.run();
 		
 //		P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD p11 = new P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD();
