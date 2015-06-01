@@ -205,7 +205,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 	}
 	
 	public void run() throws Exception {
-		System.out.println("### 1.6.3-4 Start");
+		System.out.println("### 1.6.3-6 Start");
 		
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
@@ -214,7 +214,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		
 		tx.close();
 		conn.close();
-		System.out.println("### 1.6.3-4 End");
+		System.out.println("### 1.6.3-6 End");
 	}
 	
 	public static void main (String args[]) throws Exception {

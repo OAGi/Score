@@ -337,7 +337,53 @@ public class CodeListMysqlDAO extends SRTDAO {
 		return list;
 			
 	}
+	
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String sql = _FIND_ALL_Code_List_STATEMENT;
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				CodeListVO codelistVO = new CodeListVO();
+				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
+				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setName(rs.getString("Name"));
+				codelistVO.setListID(rs.getString("List_ID"));
+				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
+				codelistVO.setVersionID(rs.getString("Version_ID"));
+				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
+				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
+				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				list.add(codelistVO);
+			}
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+
+		return list;
+			
+	}
 	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -420,13 +466,6 @@ public class CodeListMysqlDAO extends SRTDAO {
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
