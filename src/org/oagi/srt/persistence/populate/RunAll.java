@@ -28,6 +28,12 @@ public class RunAll {
 		P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD();
 		p9.run();
 		
+//		P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD p11 = new P_1_6_5_PopulateCDTSCAllowedPrimitiveExpressionTypeMapFromXSD();
+//		p11.run();
+//		
+//		P_1_6_6_PopulateBDTSCPrimitiveRestriction p12 = new P_1_6_6_PopulateBDTSCPrimitiveRestriction();
+//		p12.run();
+//		
 //		P_1_7_PopulateQBDTInDT p13 = new P_1_7_PopulateQBDTInDT();
 //		p13.run();
 //		

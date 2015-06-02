@@ -30,7 +30,7 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			"SELECT BDT_Primitive_Restriction_ID, BDT_ID, CDT_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault FROM " + _tableName;
 
 	private final String _INSERT_BDT_Primitive_Restriction_STATEMENT = 
-			"INSERT INTO " + _tableName + " (BDT_ID, CDT_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault) VALUES (?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (BDT_ID, CDT_Primitive_Expression_Type_Map_ID, isDefault) VALUES (?, ?, ?)";
 
 	private final String _UPDATE_BDT_Primitive_Restriction_STATEMENT = 
 			"UPDATE " + _tableName
@@ -53,7 +53,6 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_BDT_Primitive_Restriction_STATEMENT);
 			ps.setInt(1, bdtprimitiverestrictionVO.getBDTID());
-			
 			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID() == 0)
 				ps.setNull(2, java.sql.Types.INTEGER);
 			else
@@ -64,7 +63,7 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			else
 				ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
 			
-			ps.setBoolean(4, bdtprimitiverestrictionVO.getisDefault());
+			ps.setBoolean(3, bdtprimitiverestrictionVO.getisDefault());
 			
 			ps.executeUpdate();
 
