@@ -57,10 +57,12 @@ public class BDTSCPrimitiveRestrictionMysqlDAO extends SRTDAO {
 				ps.setNull(2, java.sql.Types.INTEGER);
 			else
 				ps.setInt(2, bdtscprimitiverestrictionVO.getCDTSCAllowedPrimitiveExpressionTypeMapID());
+			
 			if(bdtscprimitiverestrictionVO.getCodeListID() == 0)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bdtscprimitiverestrictionVO.getCodeListID());
+			
 			ps.setBoolean(4, bdtscprimitiverestrictionVO.getisDefault());
 			
 			if(bdtscprimitiverestrictionVO.getAgencyIDListID() == 0)
