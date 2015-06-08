@@ -114,8 +114,6 @@ public class P_1_3_PopulateAgencyIDList {
 		Utility.dbSetup();
 
 		P_1_3_PopulateAgencyIDList agencyidlist = new P_1_3_PopulateAgencyIDList();
-		agencyidlist.agencyIDList();
-		agencyidlist.agencyIDListValue();
-		agencyidlist.updateAgencyIDList();
+		agencyidlist.run();
 	}
 }

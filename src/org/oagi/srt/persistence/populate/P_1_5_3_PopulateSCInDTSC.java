@@ -26,8 +26,14 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
+import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
+import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
+import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
+import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 import org.oagi.srt.web.startup.SRTInitializer;
 import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Document;
@@ -36,6 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -130,7 +137,8 @@ public class P_1_5_3_PopulateSCInDTSC {
 				for(SRTObject dtscObject: dtscVOs) {
 					DTSCVO dtscVO = (DTSCVO)dtscObject;
 					DTSCVO vo = new DTSCVO();
-					vo.setDTSCGUID(dtscVO.getDTSCGUID());
+					
+					vo.setDTSCGUID(Utility.generateGUID());  // set new GUID
 					vo.setPropertyTerm(dtscVO.getPropertyTerm());
 					vo.setRepresentationTerm(dtscVO.getRepresentationTerm());
 					vo.setOwnerDTID(dtVO.getDTID());

@@ -95,7 +95,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private void insertASCCP(XSElementDecl element, XSComplexTypeDecl complexType) throws Exception {
 
 		String name = element.getName();
-		System.out.println("### asccp name: " + name);
+		//System.out.println("### asccp name: " + name);
 
 		if(complexType != null) {
 			String asccpGuid = element.getFId();
@@ -140,7 +140,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private void insertASCCPUnderGroup(BODElementVO bodVO) throws Exception {
 		
 		String name = bodVO.getElement().getName();
-		System.out.println("### asccp name: " + name);
+		//System.out.println("### asccp name: " + name);
 
 		String asccpGuid = bodVO.getElement().getFId();
 		String propertyTerm = Utility.spaceSeparator(name);
@@ -363,7 +363,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		String bccpGuid = Utility.generateGUID();
 		String propertyTerm = Utility.spaceSeparator(name).replace("ID", "Identifier");
 
-		System.out.println("### BCCP: " + name + " " + id);
+		//System.out.println("### BCCP: " + name + " " + id);
 		if(id == null) {
 			id = "oagis-id-89be97039be04d6f9cfda107d75926b4"; // TODO check why dt is null and change this line
 		}
@@ -402,7 +402,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private void insertForGroup(BODElementVO bodVO, String fullFilePath, String complexTypeId) throws SRTDAOException {
 		//System.out.println("------------------------" + bodVO.getId() + " | " + bodVO.getName() + " | " + bodVO.getGroupId() + " | " + bodVO.getGroupName());
 		
-		System.out.println("### type: " + bodVO.getOrder() + " | name: " + bodVO.getName() + " | id: " + bodVO.getId() + " | ref: " + bodVO.getRef() + " | group?: " + bodVO.isGroup() + " | groupid: " + bodVO.getGroupId() + " | groupref: " + bodVO.getGroupRef() + " | grouparent: " + bodVO.getGroupParent());
+		//System.out.println("### type: " + bodVO.getOrder() + " | name: " + bodVO.getName() + " | id: " + bodVO.getId() + " | ref: " + bodVO.getRef() + " | group?: " + bodVO.isGroup() + " | groupid: " + bodVO.getGroupId() + " | groupref: " + bodVO.getGroupRef() + " | grouparent: " + bodVO.getGroupParent());
 		
 		
 		String objectClassName = Utility.spaceSeparator(bodVO.getGroupName().substring(0, (bodVO.getGroupName().indexOf("Type") > 0) ? bodVO.getGroupName().indexOf("Type") : bodVO.getGroupName().length()));
@@ -499,7 +499,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private ArrayList<String> insertACC(XSComplexTypeDecl complexType, String fullFilePath) throws Exception {
 		
 		ArrayList<String> elements = new ArrayList<String>();
-		System.out.println("### acc type: " + complexType.getName());
+		//System.out.println("### acc type: " + complexType.getName());
 
 		String accGuid = complexType.getFId();
 		String objectClassName = Utility.spaceSeparator(complexType.getName().substring(0, complexType.getName().indexOf("Type")));
@@ -508,7 +508,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		int basedAccId = -1;
 		String base = complexType.getBaseType().getName();
-		System.out.println("### base type: " + base + " - " + complexType.getBaseType().getTypeCategory());
+		//System.out.println("### base type: " + base + " - " + complexType.getBaseType().getTypeCategory());
 		if(base != null && !base.equals("anyType") && complexType.getBaseType().getTypeCategory() != 16) {
 			XSComplexTypeDecl baseType = bodSchemaHandler.getComplexTypeDefinition(base);
 
@@ -580,14 +580,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					// insert ASCC with group ref, from ACC is parent or CT, to ASCCP is group id 
 					
 					if(bodVO.getGroupId() != null && !tempGroupId.equals(bodVO.getGroupId())) {
-						System.out.println("--- eleID: " + bodVO.getElement().getFId() + " | name: " + bodVO.getName() + " | id: " + bodVO.getId() + " | ref: " + bodVO.getRef() + " | group?: " + bodVO.isGroup() + " | groupid: " + bodVO.getGroupId() + " | groupref: " + bodVO.getGroupRef() + " | grouparent: " + bodVO.getGroupParent());
+						//System.out.println("--- eleID: " + bodVO.getElement().getFId() + " | name: " + bodVO.getName() + " | id: " + bodVO.getId() + " | ref: " + bodVO.getRef() + " | group?: " + bodVO.isGroup() + " | groupid: " + bodVO.getGroupId() + " | groupref: " + bodVO.getGroupRef() + " | grouparent: " + bodVO.getGroupParent());
 						
 						tempGroupId = bodVO.getGroupId();
 						insertForGroup(bodVO, fullFilePath, complexType.getFId());
 					}
 					
 					QueryCondition qc = new QueryCondition();
-					System.out.println("#######################XX bodVO.getName() " + bodVO.getName()); 
+					//System.out.println("#######################XX bodVO.getName() " + bodVO.getName()); 
 					qc.add("asccp_guid", bodVO.getId());
 					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc, conn);
 	
@@ -596,13 +596,13 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc1, conn);
 					
 					if(asccpVO != null) {
-						System.out.println("####################### match to ascc - " + bodVO.getName()); 
+						//System.out.println("####################### match to ascc - " + bodVO.getName()); 
 						insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO);
 					} else if(bccpVO != null) {
-						System.out.println("####################### match to bccp - " + bodVO.getName());
+						//System.out.println("####################### match to bccp - " + bodVO.getName());
 						insertBCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), bccpVO);
 					} else {
-						System.out.println("####################### no match case - " + bodVO.getName());
+						//System.out.println("####################### no match case - " + bodVO.getName());
 						//if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
 							//insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getElement()));
 						if(bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
@@ -655,6 +655,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private static Connection conn = null;
 	
 	public void run() throws Exception{
+		System.out.println("### 1.8 Start");
+		
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
 		
@@ -663,20 +665,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		
 		tx.close();
 		conn.close();
-		System.out.println("###END#####");
+		
+		System.out.println("### 1.8 End");
 	}
 
 	public static void main(String[] args) throws Exception{
 		Utility.dbSetup();
 
-		DBAgent tx = new DBAgent();
-		conn = tx.open();
-		
 		P_1_8_PopulateAccAsccpBccAscc q = new P_1_8_PopulateAccAsccpBccAscc();
-		q.populate();
-		
-		tx.close();
-		conn.close();
-		System.out.println("###END#####");
+		q.run();
 	}
 }

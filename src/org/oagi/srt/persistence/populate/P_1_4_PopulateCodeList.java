@@ -231,17 +231,7 @@ public class P_1_4_PopulateCodeList {
 	public static void main (String args[]) throws Exception {
 		Utility.dbSetup();
 		P_1_4_PopulateCodeList codelist = new P_1_4_PopulateCodeList();
-		String tt[][] = {{"CodeLists_1","314"}, {"CodeList_ConditionTypeCode_1","314"}, {"CodeList_ConstraintTypeCode_1","314"}, 
-				{"CodeList_DateFormatCode_1","314"}, {"CodeList_DateTimeFormatCode_1","314"}, {"CodeList_TimeFormatCode_1","314"},
-				{"CodeList_CharacterSetCode_IANA_20070514", "379"}, {"CodeList_MIMEMediaTypeCode_IANA_7_04","379"}, 
-				{"CodeList_CurrencyCode_ISO_7_04","5"}, {"CodeList_LanguageCode_ISO_7_04", "5"}, {"CodeList_TimeZoneCode_1", "5"},
-				{"CodeList_UnitCode_UNECE_7_04", "6"}};
-		for(int i = 0; i< tt.length; i++) {
-			String filename = tt[i][0] + ".xsd";
-			codelist.codeList(filename, Integer.parseInt(tt[i][1]));
-			codelist.codeListValue(filename);
-			System.out.println(filename+" upload is completed..");			
-		}
+		codelist.run();
 
 	}
 }

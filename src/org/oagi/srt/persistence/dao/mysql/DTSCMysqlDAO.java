@@ -298,7 +298,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		DTSCVO dtscVO = new DTSCVO();
+		DTSCVO dtscVO = null;
 		try {
 			//Connection conn = tx.open();
 			String sql = _FIND_DT_SC_STATEMENT;
@@ -325,6 +325,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				dtscVO = new DTSCVO();
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
 				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
@@ -467,12 +468,13 @@ public class DTSCMysqlDAO extends SRTDAO {
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
-			if(dtscVO.getBasedDTSCID()!=0){
+			if(dtscVO.getBasedDTSCID() != 0){
 				ps.setInt(8, dtscVO.getBasedDTSCID());
 			}
 			else {
 				ps.setNull(8, java.sql.Types.INTEGER);
 			}
+			ps.setInt(9, dtscVO.getDTSCID());
 
 			ps.executeUpdate();
 
