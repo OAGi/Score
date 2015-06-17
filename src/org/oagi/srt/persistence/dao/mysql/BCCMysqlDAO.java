@@ -68,7 +68,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			
 			ps.setInt(4, bccVO.getAssocToBCCPID());
 			ps.setInt(5, bccVO.getAssocFromACCID());
-			ps.setInt(6, bccVO.getSequencingkey());
+			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
 			ps.setString(8, bccVO.getDEN());
 
@@ -139,7 +139,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setSequencingKey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
 				bccVO.setDEN(rs.getString("DEN"));
 
@@ -204,7 +204,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setSequencingKey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
 				bccVO.setDEN(rs.getString("DEN"));
 
@@ -250,7 +250,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setSequencingKey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
 				bccVO.setDEN(rs.getString("DEN"));
 				list.add(bccVO);
@@ -297,7 +297,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setSequencingKey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
 				bccVO.setDEN(rs.getString("DEN"));
 				list.add(bccVO);
@@ -339,7 +339,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setInt(3, bccVO.getCardinalityMax());
 			ps.setInt(4, bccVO.getAssocToBCCPID());
 			ps.setInt(5, bccVO.getAssocFromACCID());
-			ps.setInt(6, bccVO.getSequencingkey());
+			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
 			ps.setString(8, bccVO.getDEN());
 			ps.executeUpdate();
@@ -436,7 +436,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setSequencingKey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
 				bccVO.setDEN(rs.getString("DEN"));
 				list.add(bccVO);
@@ -504,7 +504,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bccVO.setAssocToBCCPID(rs.getInt("Assoc_To_BCCP_ID"));
 				bccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				bccVO.setSequencingkey(rs.getInt("Sequencing_key"));
+				bccVO.setSequencingKey(rs.getInt("Sequencing_key"));
 				bccVO.setEntityType(rs.getInt("Entity_Type"));
 				bccVO.setDEN(rs.getString("DEN"));
 				list.add(bccVO);

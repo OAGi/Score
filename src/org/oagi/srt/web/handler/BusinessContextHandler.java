@@ -25,6 +25,7 @@ import org.oagi.srt.persistence.dto.BusinessContextValueVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
+import org.oagi.srt.persistence.dto.UserVO;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -41,10 +42,12 @@ public class BusinessContextHandler implements Serializable {
 	private SRTDAO daoCC;
 	private SRTDAO daoCS;
 	private SRTDAO daoCV;
+	private SRTDAO daoUser;
 	private ContextCategoryVO selected;
 	private ContextSchemeVO selected1;
 	private List<ContextSchemeValueVO> selected2;
 	private BusinessContextVO bcDetail;
+	private int userId;
 
 	@PostConstruct
 	private void init() {
@@ -55,6 +58,11 @@ public class BusinessContextHandler implements Serializable {
 			daoCC = df.getDAO("ContextCategory");
 			daoCS = df.getDAO("ContextScheme");
 			daoCV = df.getDAO("ContextSchemeValue");
+			daoUser = df.getDAO("User");
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("user_name", "oagis");
+			userId = ((UserVO)daoUser.findObject(qc)).getUserID();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -192,6 +200,8 @@ public class BusinessContextHandler implements Serializable {
 			bcVO.setName(this.name);
 			String guid = Utility.generateGUID();
 			bcVO.setBusinessContextGUID(guid);
+			bcVO.setCreatedByUserId(userId);
+			bcVO.setLastUpdatedByUserId(userId);
 			daoBC.insertObject(bcVO);
 			
 			QueryCondition qc = new QueryCondition();
@@ -378,7 +388,7 @@ public class BusinessContextHandler implements Serializable {
 					bcv.setCsvVO(csvVO);
 					
 					qc = new QueryCondition();
-					qc.add("Context_Scheme_ID", csvVO.getOwnerContextSchemeID());
+					qc.add("Classification_Context_Scheme_ID", csvVO.getOwnerContextSchemeID());
 					ContextSchemeVO csVO = (ContextSchemeVO)daoCS.findObject(qc);
 					bcv.setCsVO(csVO);
 					

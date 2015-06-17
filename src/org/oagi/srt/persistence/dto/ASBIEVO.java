@@ -27,6 +27,15 @@ public class ASBIEVO extends SRTObject {
 	private int lastUpdatedByUserId;
 	private Timestamp creationTimestamp;
 	private Timestamp lastUpdateTimestamp;
+	private double sequencingKey;
+
+	public double getSequencingKey() {
+		return sequencingKey;
+	}
+
+	public void setSequencingKey(double sequencingKey) {
+		this.sequencingKey = sequencingKey;
+	}
 
 	public int getASBIEID() {
 		return ASBIEID;

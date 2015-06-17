@@ -24,6 +24,7 @@ import org.oagi.srt.persistence.dto.BusinessContextValueVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
+import org.oagi.srt.persistence.dto.UserVO;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -38,6 +39,7 @@ public class ContextSchemeHandler {
 	private SRTDAO daoCC;
 	private SRTDAO daoBCV;
 	private SRTDAO daoBC;
+	private SRTDAO daoUser;
 
 	@PostConstruct
 	private void init() {
@@ -48,7 +50,11 @@ public class ContextSchemeHandler {
 			daoCC = df.getDAO("ContextCategory");
 			daoBCV = df.getDAO("BusinessContextValue");
 			daoBC = df.getDAO("BusinessContext");
-			System.out.println("### Called");
+			daoUser = df.getDAO("User");
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("user_name", "oagis");
+			userId = ((UserVO)daoUser.findObject(qc)).getUserID();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -69,6 +75,7 @@ public class ContextSchemeHandler {
 	private String schemeName;
 	private String guid;
 	private String schemeId;
+	private int userId;
 	
 	private List<SRTObject> csValues = new ArrayList<SRTObject>();
 	private List<SRTObject> selectedCSValues = new ArrayList<SRTObject>();
@@ -189,6 +196,7 @@ public class ContextSchemeHandler {
     	schemeName = cVO.getSchemeName();
     	guid = cVO.getSchemeGUID();
     	schemeId = cVO.getSchemeID();
+    	userId = cVO.getCreatedByUserId();
     	
 		csValues = selectedCSValues;
     }
@@ -204,6 +212,8 @@ public class ContextSchemeHandler {
 		ccVO.setSchemeName(schemeName);
 		ccVO.setSchemeGUID(guid);
 		ccVO.setSchemeID(schemeId);
+		ccVO.setCreatedByUserId(userId);
+		ccVO.setLastUpdatedByUserId(userId);
 		
 		try {
 			daoCS.updateObject(ccVO);
@@ -318,10 +328,12 @@ public class ContextSchemeHandler {
 			ccVO.setSchemeAgencyName(schemeAgencyName);
 			ccVO.setSchemeVersion(schemeVersion);
 			ccVO.setContextCategoryID(Integer.valueOf(contextCategoryNameDesc));
+			ccVO.setCreatedByUserId(userId);
+			ccVO.setLastUpdatedByUserId(userId);
 			daoCS.insertObject(ccVO);
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("context_scheme_guid", guid);
+			qc.add("classification_context_scheme_guid", guid);
 			ContextSchemeVO cVO = (ContextSchemeVO)daoCS.findObject(qc);
 			
 			for(SRTObject obj : csValues) {

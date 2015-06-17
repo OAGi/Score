@@ -119,6 +119,7 @@ public class P_1_4_PopulateCodeList {
 				codelistVO.setCreatedByUserID(id);
 				codelistVO.setLastUpdatedByUserID(id);
 				codelistVO.setLastUpdateTimestamp(current_stamp);
+				codelistVO.setState("");
 		    	dao.insertObject(codelistVO);
 		    }
 		}

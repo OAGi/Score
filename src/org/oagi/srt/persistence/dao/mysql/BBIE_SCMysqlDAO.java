@@ -72,7 +72,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 			else
 				ps.setInt(5, bbie_scVO.getDTSCPrimitiveRestrictionID());
 			
-			if(bbie_scVO.getBBIESCID() == -1)
+			if(bbie_scVO.getBBIESCID() != -1)
 				ps.setInt(6, bbie_scVO.getBBIESCID());
 			
 			ps.executeUpdate();

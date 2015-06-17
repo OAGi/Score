@@ -26,24 +26,24 @@ public class BBIEMysqlDAO extends SRTDAO{
 
 	private final String _FIND_ALL_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_number"
 					+ " FROM " + _tableName;
 
 	private final String _FIND_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp"
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_number"
 					+ " FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Based_BCC_ID, Cardinality_Min, Cardinality_Max, isNillable, Fixed_Value, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, "
-					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp)"
-					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_number)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 
 	private final String _UPDATE_BBIE_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET BBIE_ID = ?, Based_BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, isNillable = ?, Fixed_Value = ?, Assoc_From_ABIE_ID = ?, "
+			+ " SET Based_BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, isNillable = ?, Fixed_Value = ?, Assoc_From_ABIE_ID = ?, "
 			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, bbie.default = ?, remark = ?, "
-			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP";
+			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_number = ? where bbie_id = ?";
 
 	private final String _DELETE_BBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BBIE_ID = ?";
@@ -71,6 +71,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(7, bbieVO.getAssocToBBIEPID());
 			ps.setString(8, bbieVO.getDefinition());
 			ps.setString(9, bbieVO.getBbieGuid());
+			ps.setDouble(10, bbieVO.getSequencing_number());
 			
 			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
 				ps.setNull(10, java.sql.Types.INTEGER);
@@ -159,6 +160,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setRemark(rs.getString("remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				bbieVO.setSequencing_number(rs.getDouble("sequencing_number"));
 			}
 			tx.commit();
 			conn.close();
@@ -211,6 +213,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setRemark(rs.getString("remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				bbieVO.setSequencing_number(rs.getDouble("sequencing_number"));
 				list.add(bbieVO);
 			}
 			tx.commit();
@@ -260,6 +263,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setString(13, bbieVO.getRemark());
 			ps.setInt(14, bbieVO.getCreatedByUserId());
 			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
+			ps.setDouble(16, bbieVO.getSequencing_number());
+			ps.setInt(17,  bbieVO.getBBIEID());
+			
 			ps.executeUpdate();
 
 			tx.commit();
@@ -366,6 +372,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setRemark(rs.getString("remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				bbieVO.setSequencing_number(rs.getDouble("sequencing_number"));
 				list.add(bbieVO);
 			}
 			tx.commit();

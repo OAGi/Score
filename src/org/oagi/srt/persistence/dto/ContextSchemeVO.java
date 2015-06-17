@@ -23,7 +23,21 @@ public class ContextSchemeVO extends SRTObject implements Serializable {
 	private String schemeVersion;
 	private int contextCategoryID;
 	private String contextCategoryStr;
+	private int createdByUserId;
+	private int lastUpdatedByUserId;
 	
+	public int getLastUpdatedByUserId() {
+		return lastUpdatedByUserId;
+	}
+	public void setLastUpdatedByUserId(int lastUpdatedByUserId) {
+		this.lastUpdatedByUserId = lastUpdatedByUserId;
+	}
+	public int getCreatedByUserId() {
+		return createdByUserId;
+	}
+	public void setCreatedByUserId(int createdByUserId) {
+		this.createdByUserId = createdByUserId;
+	}
 	public int getContextSchemeID() {
 		return contextSchemeID;
 	}

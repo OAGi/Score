@@ -28,7 +28,16 @@ public class CodeListVO extends SRTObject {
 	private int LastUpdatedByUserID;
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
+	private String State;
 	
+	public String getState() {
+		return State;
+	}
+
+	public void setState(String state) {
+		State = state;
+	}
+
 	public int getCodeListID(){
 		return CodeListID;
 	}

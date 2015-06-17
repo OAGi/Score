@@ -26,16 +26,16 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 	private final String _tableName = "business_context";
 	
 	private final String _FIND_ALL_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT Business_Context_ID, Business_Context_GUID, Name FROM " + _tableName + " order by business_context_id desc";
+			"SELECT Business_Context_ID, Business_Context_GUID, Name, created_by_user_id, last_updated_by_user_id FROM " + _tableName + " order by business_context_id desc";
 	
 	private final String _FIND_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT Business_Context_ID, Business_Context_GUID, Name FROM " + _tableName;
+			"SELECT Business_Context_ID, Business_Context_GUID, Name, created_by_user_id, last_updated_by_user_id FROM " + _tableName;
 	
 	private final String _INSERT_BUSINESS_CONTEXT_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Name, Business_Context_GUID) VALUES (?, ?)";
+			"INSERT INTO " + _tableName + " (Name, Business_Context_GUID, created_by_user_id, last_updated_by_user_id) VALUES (?, ?, ?, ?)";
 	
 	private final String _UPDATE_BUSINESS_CONTEXT_STATEMENT =
-			"UPDATE " + _tableName + " SET Name = ? WHERE Business_Context_ID = ?";
+			"UPDATE " + _tableName + " SET Name = ?, created_by_user_id = ?, last_updated_by_user_id = ? WHERE Business_Context_ID = ?";
 	
 	private final String _DELETE_BUSINESS_CONTEXT_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Business_Context_ID = ?";
@@ -56,6 +56,8 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			ps = conn.prepareStatement(_INSERT_BUSINESS_CONTEXT_STATEMENT);
 			ps.setString(1, business_contextVO.getName());
 			ps.setString(2, business_contextVO.getBusinessContextGUID());
+			ps.setInt(3,  business_contextVO.getCreatedByUserId());
+			ps.setInt(4, business_contextVO.getLastUpdatedByUserId());
 			
 			ps.executeUpdate();
 			ps.close();
@@ -108,6 +110,8 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				business_contextVO.setName(rs.getString("Name"));
 				business_contextVO.setBusinessContextGUID(rs.getString("Business_Context_GUID"));
+				business_contextVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
+				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -147,6 +151,8 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				business_contextVO.setName(rs.getString("Name"));
 				business_contextVO.setBusinessContextGUID(rs.getString("Business_Context_GUID"));
+				business_contextVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
+				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
 				list.add(business_contextVO);
 			}
 			tx.commit();
@@ -183,6 +189,8 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_BUSINESS_CONTEXT_STATEMENT);
 
 			ps.setString(1, business_contextVO.getName());
+			ps.setInt(2,  business_contextVO.getCreatedByUserId());
+			ps.setInt(3, business_contextVO.getLastUpdatedByUserId());
 			ps.executeUpdate();
 
 			tx.commit();

@@ -12,6 +12,8 @@ public class BusinessContextVO extends SRTObject {
 	private int businessContextID;
 	private String businessContextGUID;
 	private String name;
+	private int createdByUserId;
+	private int lastUpdatedByUserId;
 	
 	public int getBusinessContextID(){
 		return businessContextID;
@@ -35,5 +37,21 @@ public class BusinessContextVO extends SRTObject {
 
 	public void setBusinessContextGUID(String businessContextGUID) {
 		this.businessContextGUID = businessContextGUID;
+	}
+
+	public int getCreatedByUserId() {
+		return createdByUserId;
+	}
+
+	public void setCreatedByUserId(int createdByUserId) {
+		this.createdByUserId = createdByUserId;
+	}
+
+	public int getLastUpdatedByUserId() {
+		return lastUpdatedByUserId;
+	}
+
+	public void setLastUpdatedByUserId(int lastUpdatedByUserId) {
+		this.lastUpdatedByUserId = lastUpdatedByUserId;
 	}
 }

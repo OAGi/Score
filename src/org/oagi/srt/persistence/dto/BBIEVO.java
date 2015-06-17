@@ -31,7 +31,16 @@ public class BBIEVO extends SRTObject {
 	private int lastUpdatedByUserId;
 	private Timestamp creationTimestamp;
 	private Timestamp lastUpdateTimestamp;
+	private double sequencing_number;
 	
+	public double getSequencing_number() {
+		return sequencing_number;
+	}
+
+	public void setSequencing_number(double sequencing_number) {
+		this.sequencing_number = sequencing_number;
+	}
+
 	public int getBBIEID() {
 		return BBIEID;
 	}

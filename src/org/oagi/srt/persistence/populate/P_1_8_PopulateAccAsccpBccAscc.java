@@ -304,7 +304,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setCardinalityMax(cardinalityMax);
 			aBCCVO.setAssocToBCCPID(assocToBCCPID);
 			aBCCVO.setAssocFromACCID(assocFromACCId);
-			aBCCVO.setSequencingkey(sequenceKey);
+			aBCCVO.setSequencingKey(sequenceKey);
 			aBCCVO.setEntityType(entityType);
 			aBCCVO.setDEN(den);
 	
@@ -351,7 +351,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setCardinalityMax(cardinalityMax);
 			aBCCVO.setAssocToBCCPID(assocToBCCPID);
 			aBCCVO.setAssocFromACCID(assocFromACCId);
-			aBCCVO.setSequencingkey(sequenceKey);
+			aBCCVO.setSequencingKey(sequenceKey);
 			aBCCVO.setEntityType(entityType);
 			aBCCVO.setDEN(den);
 	
@@ -418,7 +418,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		
 		insertACCForGroup(bodVO, objectClassName, den, oagisComponentType, module);
 		
-		insertASCCPForGroup(bodVO, complexTypeId, den, module);
+		QueryCondition qc = new QueryCondition();
+		qc.add("acc_guid", bodVO.getGroupId());
+		int groupAccId= ((ACCVO)accDao.findObject(qc, conn)).getACCID();
+		insertASCCPForGroup(bodVO, groupAccId, den, module);
 		
 		inserASCCForGroup(bodVO, complexTypeId);
 	}
@@ -441,7 +444,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		}
 	}
 	
-	private void insertASCCPForGroup(BODElementVO bodVO, String complexTypeId, String accDen, String module) throws SRTDAOException {
+	private void insertASCCPForGroup(BODElementVO bodVO, int groupAccId, String accDen, String module) throws SRTDAOException {
 		if(getASCCP(bodVO.getGroupId()) == null) {
 			String propertyTerm = Utility.spaceSeparator(bodVO.getGroupName());
 	
@@ -450,14 +453,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccpVO.setPropertyTerm(propertyTerm);
 			asccpVO.setDefinition("Group");
 			
-			int roleOfACCID = -1;
-			if (bodVO.getGroupParent() != null) {
-				roleOfACCID = getACC(bodVO.getGroupParent()).getACCID();
-			} else {
-				roleOfACCID = getACC(complexTypeId).getACCID(); 
-			}
+//			int roleOfACCID = -1;
+//			if (bodVO.getGroupParent() != null) {
+//				roleOfACCID = getACC(bodVO.getGroupParent()).getACCID();
+//			} else {
+//				roleOfACCID = getACC(complexTypeId).getACCID(); 
+//			}
 			
-			asccpVO.setRoleOfACCID(roleOfACCID);
+			asccpVO.setRoleOfACCID(groupAccId);
 			asccpVO.setDEN(propertyTerm + ". " + Utility.first(accDen));
 			asccpVO.setState(4);
 			asccpVO.setModule(module);

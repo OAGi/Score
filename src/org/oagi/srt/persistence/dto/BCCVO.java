@@ -16,7 +16,7 @@ public class BCCVO extends SRTObject {
 	private int CardinalityMax;
 	private int AssocToBCCPID;
 	private int AssocFromACCID;
-	private int Sequencingkey;
+	private int sequencingKey;
 	private int EntityType;
 	private String DEN;
 	
@@ -68,12 +68,12 @@ public class BCCVO extends SRTObject {
 		AssocFromACCID = assocFromACCID;
 	}
 	
-	public int getSequencingkey() {
-		return Sequencingkey;
+	public int getSequencingKey() {
+		return sequencingKey;
 	}
 	
-	public void setSequencingkey(int sequencingkey) {
-		Sequencingkey = sequencingkey;
+	public void setSequencingKey(int sequencingKey) {
+		this.sequencingKey = sequencingKey;
 	}
 	
 	public int getEntityType() {

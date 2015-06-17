@@ -28,23 +28,23 @@ public class CodeListMysqlDAO extends SRTDAO {
 	private final String _FIND_ALL_Code_List_STATEMENT =
 			"SELECT Code_List_ID, Code_List_GUID, Enumeration_Type_GUID, Name, List_ID, "
 			+ "Agency_ID, Version_ID, Definition, Definition_Source, Based_Code_List_ID, Extensible_Indicator,  Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp FROM " + _tableName;
+			+ "Last_Update_Timestamp, State FROM " + _tableName;
 	
 	private final String _FIND_Code_List_STATEMENT =
 			"SELECT Code_List_ID, Code_List_GUID, Enumeration_Type_GUID, Name, List_ID, "
 			+ "Agency_ID, Version_ID, Definition, Definition_Source, Based_Code_List_ID, Extensible_Indicator,  Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp FROM " + _tableName;
+			+ "Last_Update_Timestamp, State FROM " + _tableName;
 	
 	private final String _INSERT_Code_List_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Code_List_GUID, Enumeration_Type_GUID, Name, List_ID,"
 			+ " Agency_ID, Version_ID, Definition, Definition_Source, Based_Code_List_ID, Extensible_Indicator,  Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp,  "
-			+ "Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)";
+			+ "Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
 	
 	private final String _UPDATE_Code_List_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, Code_List_GUID = ?,"
 			+ " Enumeration_Type_GUID = ?, Name = ?, List_ID = ?, Agency_ID = ?, Version_ID = ?, Definition = ?, Definition_Source = ?, Based_Code_List_ID = ?, Extensible_Indicator = ?, Created_By_User_ID = ?,"
-			+ " Last_Updated_By_User_ID = ?, Creation_Timestamp = ? WHERE Code_List_ID = ?";
+			+ " Last_Updated_By_User_ID = ?, Creation_Timestamp = ?, State = ? WHERE Code_List_ID = ?";
 	
 	private final String _DELETE_Code_List_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Code_List_ID = ?";
@@ -84,6 +84,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 			ps.setInt(11, codelistVO.getCreatedByUserID());
 			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
 			ps.setTimestamp(13, codelistVO.getLastUpdateTimestamp());
+			ps.setString(14, codelistVO.getState());
 
 			ps.executeUpdate();
 
@@ -175,6 +176,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				codelistVO.setState(rs.getString("State"));
 
 			}
 			tx.commit();
@@ -265,7 +267,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
-
+				codelistVO.setState(rs.getString("State"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -312,6 +314,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				codelistVO.setState(rs.getString("State"));
 				list.add(codelistVO);
 			}
 			tx.commit();
@@ -364,6 +367,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				codelistVO.setState(rs.getString("State"));
 				list.add(codelistVO);
 			}
 		} catch (SQLException e) {
@@ -408,6 +412,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
 			ps.setTimestamp(13, codelistVO.getCreationTimestamp());
 			ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
+			ps.setString(15, codelistVO.getState());
 			
 			ps.executeUpdate();
 
