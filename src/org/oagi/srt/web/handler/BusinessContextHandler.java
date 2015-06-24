@@ -32,46 +32,17 @@ import org.primefaces.event.UnselectEvent;
 
 @ManagedBean
 @ViewScoped
-public class BusinessContextHandler implements Serializable {
+public class BusinessContextHandler extends UIHandler implements Serializable {
 
 	private static final long serialVersionUID = 8706516047982751653L;
 	
-	private DAOFactory df;
-	private SRTDAO daoBC;
-	private SRTDAO daoBCV;
-	private SRTDAO daoCC;
-	private SRTDAO daoCS;
-	private SRTDAO daoCV;
-	private SRTDAO daoUser;
-	private ContextCategoryVO selected;
-	private ContextSchemeVO selected1;
-	private List<ContextSchemeValueVO> selected2;
-	private BusinessContextVO bcDetail;
-	private int userId;
-
-	@PostConstruct
-	private void init() {
-		try {
-			df = DAOFactory.getDAOFactory();
-			daoBC = df.getDAO("BusinessContext");
-			daoBCV = df.getDAO("BusinessContextValue");
-			daoCC = df.getDAO("ContextCategory");
-			daoCS = df.getDAO("ContextScheme");
-			daoCV = df.getDAO("ContextSchemeValue");
-			daoUser = df.getDAO("User");
-			
-			QueryCondition qc = new QueryCondition();
-			qc.add("user_name", "oagis");
-			userId = ((UserVO)daoUser.findObject(qc)).getUserID();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	private String name;
 	private String ccName;
 	private int bcId;
+	protected BusinessContextVO bcDetail;
+	protected ContextCategoryVO selected;
+	protected ContextSchemeVO selected1;
+	protected List<ContextSchemeValueVO> selected2;
 
 	private List<SRTObject> contextCategories = new ArrayList<SRTObject>();
 	private List<SRTObject> contextSchemes = new ArrayList<SRTObject>();
@@ -89,10 +60,6 @@ public class BusinessContextHandler implements Serializable {
         options.put("resizable", true);
         options.put("contentHeight", 800);
         RequestContext.getCurrentInstance().openDialog("business_context_select_cv", options, null);
-    }
-	
-	public void closeDialog() {
-        RequestContext.getCurrentInstance().closeDialog(this);
     }
 	
 	public class BusinessContextValues {

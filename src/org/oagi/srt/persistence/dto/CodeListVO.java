@@ -13,149 +13,158 @@ import org.oagi.srt.common.SRTObject;
 
 public class CodeListVO extends SRTObject {
 	
-	private int CodeListID;
-	private String CodeListGUID;
-	private String EnumerationTypeGUID;
-	private String Name;
-	private String ListID;
-	private int AgencyID;
-	private String VersionID;
-	private String Definition;
-	private String DefinitionSource;
-	private int BasedCodeListID;
-	private boolean ExtensibleIndicator;
-	private int CreatedByUserID;
-	private int LastUpdatedByUserID;
-	private Timestamp CreationTimestamp;
-	private Timestamp LastUpdateTimestamp;
-	private String State;
+	private int codeListID;
+	private String codeListGUID;
+	private String enumerationTypeGUID;
+	private String name;
+	private String listID;
+	private int agencyID;
+	private String versionID;
+	private String definition;
+	private String definitionSource;
+	private int basedCodeListID;
+	private boolean extensibleIndicator;
+	private int createdByUserID;
+	private int lastUpdatedByUserID;
+	private Timestamp creationTimestamp;
+	private Timestamp lastUpdateTimestamp;
+	private String state;
+	private String remark;
 	
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	public String getState() {
-		return State;
+		return state;
 	}
 
 	public void setState(String state) {
-		State = state;
+		this.state = state;
 	}
 
 	public int getCodeListID(){
-		return CodeListID;
+		return codeListID;
 	}
 	
 	public void setCodeListID(int codeListID){
-		CodeListID = codeListID;
+		this.codeListID = codeListID;
 	}
 	
 	public String getCodeListGUID(){
-		return CodeListGUID;
+		return codeListGUID;
 	}
 	
 	public void setCodeListGUID(String codeListGUID){
-		CodeListGUID = codeListGUID;
+		this.codeListGUID = codeListGUID;
 	}
 	
 	public String getEnumerationTypeGUID(){
-		return EnumerationTypeGUID;
+		return enumerationTypeGUID;
 	}
 	
 	public void setEnumerationTypeGUID(String enumerationTypeGUID){
-		EnumerationTypeGUID = enumerationTypeGUID;
+		this.enumerationTypeGUID = enumerationTypeGUID;
 	}
 	
 	public String getName(){
-		return Name;
+		return name;
 	}
 	
 	public void setName(String name){
-		Name = name;
+		this.name = name;
 	}
 	
 	public String getListID(){
-		return ListID;
+		return listID;
 	}
 	
 	public void setListID(String listID){
-		ListID = listID;
+		this.listID = listID;
 	}
 	
 	public int getAgencyID(){
-		return AgencyID;
+		return agencyID;
 	}
 	
 	public void setAgencyID(int agencyID){
-		AgencyID = agencyID;
+		this.agencyID = agencyID;
 	}
 	
 	public String getVersionID(){
-		return VersionID;
+		return versionID;
 	}
 	
 	public void setVersionID(String versionID){
-		VersionID = versionID;
+		this.versionID = versionID;
 	}
 	
 	public String getDefinition(){
-		return Definition;
+		return definition;
 	}
 	
 	public void setDefinition(String definition){
-		Definition = definition;
+		this.definition = definition;
 	}
 	
 	public String getDefinitionSource(){
-		return DefinitionSource;
+		return definitionSource;
 	}
 	
 	public void setDefinitionSource(String definitionSource){
-		DefinitionSource = definitionSource;
+		this.definitionSource = definitionSource;
 	}
 	
 	public int getBasedCodeListID(){
-		return BasedCodeListID;
+		return basedCodeListID;
 	}
 	
 	public void setBasedCodeListID(int basedCodeListID){
-		BasedCodeListID = basedCodeListID;
+		this.basedCodeListID = basedCodeListID;
 	}
 	
 	public boolean getExtensibleIndicator(){
-		return ExtensibleIndicator;
+		return extensibleIndicator;
 	}
 	
 	public void setExtensibleIndicator(boolean extensibleIndicator){
-		ExtensibleIndicator = extensibleIndicator;
+		this.extensibleIndicator = extensibleIndicator;
 	}
 		
 	public int getCreatedByUserID(){
-		return CreatedByUserID;
+		return createdByUserID;
 	}
 	
 	public void setCreatedByUserID(int createdByUserID){
-		CreatedByUserID = createdByUserID;
+		this.createdByUserID = createdByUserID;
 	}
 	
 	public int getLastUpdatedByUserID(){
-		return LastUpdatedByUserID;
+		return lastUpdatedByUserID;
 	}
 	
 	public void setLastUpdatedByUserID(int lastUpdatedByUserID){
-		LastUpdatedByUserID = lastUpdatedByUserID;
+		this.lastUpdatedByUserID = lastUpdatedByUserID;
 	}
 	
 	public Timestamp getCreationTimestamp(){
-		return CreationTimestamp;
+		return creationTimestamp;
 	}
 	
 	public void setCreationTimestamp(Timestamp creationTimestamp){
-		CreationTimestamp = creationTimestamp;
+		this.creationTimestamp = creationTimestamp;
 	}
 	
 	public Timestamp getLastUpdateTimestamp(){
-		return LastUpdateTimestamp;
+		return lastUpdateTimestamp;
 	}
 	
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp){
-		LastUpdateTimestamp = lastUpdateTimestamp;
+		this.lastUpdateTimestamp = lastUpdateTimestamp;
 	}
 	
 

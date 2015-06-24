@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Context Category">
+					<p:menuitem value="List" url="context_scheme_list.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Create" url="context_scheme_create.xhtml" icon="ui-icon-create" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:panel header="Create a new BIE code list without a base">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" columns="6" cellpadding="5">
+					<h:outputLabel for="name" rows="10" value="Name:" style="font-weight:bold" />
+					<p:inputText id="name" value="#{codeListHandler.codeListVO.name}"
+						required="true" label="Name" />
+					
+					<h:outputLabel for="definition" rows="10" value="Definition:" style="font-weight:bold" />
+					<p:inputText id="definition" value="#{codeListHandler.codeListVO.definition}"
+						required="true" label="Definition" />
+					
+					<h:outputLabel for="definitionSource" rows="10" value="Definition Source:" style="font-weight:bold" />
+					<p:inputText id="definitionSource" value="#{codeListHandler.codeListVO.definitionSource}"
+						required="true" label="Definition Source" />
+
+					<h:outputLabel for="listId" rows="10" value="List Id:" style="font-weight:bold" />
+					<p:inputText id="listId" value="#{codeListHandler.codeListVO.listID}"
+						required="true" label="List Id" />
+					
+					<h:outputLabel for="agencyId" rows="10" value="Agency Id:" style="font-weight:bold" />
+					<p:inputText id="agencyId" value="#{codeListHandler.codeListVO.agencyID}"
+						required="true" label="Agency Id" />
+					
+					<h:outputLabel for="version" rows="10" value="Version:" style="font-weight:bold" />
+					<p:inputText id="version" value="#{codeListHandler.codeListVO.versionID}"
+						required="true" label="Version" />
+						
+					<h:outputLabel for="remark" rows="10" value="Remark:" style="font-weight:bold" />
+					<p:inputText id="remark" value="#{codeListHandler.codeListVO.remark}"
+						required="true" label="Remark" />
+					
+				</h:panelGrid>
+				<h:panelGrid columns="2" cellpadding="5">
+					<h:outputText value="Extensible? " />
+        			<p:selectBooleanCheckbox value="#{codeListHandler.extensible}" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Code">
+				<h:panelGrid id="grid2" columns="1" cellpadding="5">
+					<p:dataTable id="tbl" var="newCodeListsWOBase" value="#{codeListHandler.newCodeListsWOBase}"
+						style="width:600px; margin-bottom:20px">
+						
+						<p:column style="width:200px">
+							<f:facet name="header">
+								<h:outputText value="Code" />
+							</f:facet>
+							<h:outputText value="-" />
+						</p:column>
+		
+						<p:column style="width:200px">
+							<f:facet name="header">
+								<h:outputText value="Short Name" />
+							</f:facet>
+							<h:outputText value="-" />
+						</p:column>
+		
+						<p:column style="width:200px">
+							<f:facet name="header">
+								<h:outputText value="Definition" />
+							</f:facet>
+							<h:outputText value="-" />
+						</p:column>
+						
+						<p:column style="width:200px">
+							<f:facet name="header">
+								<h:outputText value="Definition Source" />
+							</f:facet>
+							<h:outputText value="-" />
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+				<h:panelGrid id="grid3" columns="3" cellpadding="5">
+					<p:commandButton process="tbl" style="width:100px" update="" icon="ui-icon-search" value="Save" oncomplete="" />
+					
+					<p:commandButton process="tbl" style="width:100px" update="" icon="ui-icon-search" value="Publish" oncomplete="" />
+					
+					<p:commandButton process="tbl" style="width:100px" update="" icon="ui-icon-search" value="Close" oncomplete="" />
+				</h:panelGrid>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

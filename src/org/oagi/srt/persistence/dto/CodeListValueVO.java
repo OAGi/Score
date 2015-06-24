@@ -19,7 +19,16 @@ public class CodeListValueVO extends SRTObject {
 	private String DefinitionSource;
 	private boolean UsedIndicator;
 	private boolean LockedIndicator;
+	private boolean extensionIndicator;
 	
+	public boolean isExtensionIndicator() {
+		return extensionIndicator;
+	}
+
+	public void setExtensionIndicator(boolean extensionIndicator) {
+		this.extensionIndicator = extensionIndicator;
+	}
+
 	public int getCodeListValueID() {
 		return CodeListValueID;
 	}

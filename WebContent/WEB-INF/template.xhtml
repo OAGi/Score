@@ -84,9 +84,9 @@ ul.ui-menu-child {
 							</p:submenu>
 							
 							<p:submenu label="Code List" icon="ui-icon-flag">
-								<p:menuitem value="Create new blank BIE code list" url="#" />
+								<p:menuitem value="Create new BIE code list w/o base" url="/code_list_create_wo_base.xhtml" />
 								<p:separator />
-								<p:menuitem value="Create new BIE code list by restriction" url="#" />
+								<p:menuitem value="Create new BIE code list by restriction" url="/code_list_create_from_another.xhtml" />
 								<p:separator />
 								<p:menuitem value="Save working BIE code list" url="#" />
 								<p:separator />
@@ -127,11 +127,11 @@ ul.ui-menu-child {
 			<ui:insert name="side_menu" />
 		</p:layoutUnit>
 
-		<p:layoutUnit position="east" size="200" header="Right"
+<!-- 		<p:layoutUnit position="east" size="200" header="Right"
 			resizable="false" closable="false" collapsible="true" effect="drop">
 			<p:graphicImage name="images/#{str['pic']}.jpg" width="150" height="150" style="border:0; margin:0; padding:0;"/> <br/>
 			<h:outputText value="What can I help you?" />
-		</p:layoutUnit>
+		</p:layoutUnit> -->
 
 		<p:layoutUnit position="center">
 			<ui:insert name="content" />

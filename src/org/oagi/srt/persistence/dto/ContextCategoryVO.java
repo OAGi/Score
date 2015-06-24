@@ -35,7 +35,6 @@ public class ContextCategoryVO extends SRTObject {
 	}
 	
 	public void setName(String name){
-		System.out.println("SET NAME:" + name);
 		this.name = name;
 	}
 	

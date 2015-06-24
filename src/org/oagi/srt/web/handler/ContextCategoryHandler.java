@@ -22,23 +22,7 @@ import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.primefaces.event.RowEditEvent;
 
 @ManagedBean
-public class ContextCategoryHandler {
-
-	private DAOFactory df;
-	private SRTDAO dao;
-	private SRTDAO daoCS;
-
-	@PostConstruct
-	private void init() {
-		try {	
-			df = DAOFactory.getDAOFactory();
-			dao = df.getDAO("ContextCategory");
-			daoCS = df.getDAO("ContextScheme");
-			contextCategories = dao.findObjects();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+public class ContextCategoryHandler extends UIHandler {
 
 	private String name;
 	private String description;
@@ -84,6 +68,11 @@ public class ContextCategoryHandler {
 	}
 
 	public List<SRTObject> getContextCategories() {
+		try {	
+			contextCategories = daoCC.findObjects();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return contextCategories;
 	}
 
@@ -111,7 +100,7 @@ public class ContextCategoryHandler {
 			ccVO.setName(this.name);
 			ccVO.setDescription(this.description);
 			ccVO.setContextCategoryGUID(Utility.generateGUID());
-			dao.insertObject(ccVO);
+			daoCC.insertObject(ccVO);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -122,7 +111,7 @@ public class ContextCategoryHandler {
 		List<String> results = new ArrayList<String>();
 
 		try {
-			contextCategories = dao.findObjects();
+			contextCategories = daoCC.findObjects();
 			for(SRTObject obj : contextCategories) {
 				ContextCategoryVO ccVO = (ContextCategoryVO)obj;
 				if(ccVO.getName().contains(query)) {
@@ -139,7 +128,7 @@ public class ContextCategoryHandler {
 		List<String> results = new ArrayList<String>();
 
 		try {
-			contextCategories = dao.findObjects();
+			contextCategories = daoCC.findObjects();
 			for(SRTObject obj : contextCategories) {
 				ContextCategoryVO ccVO = (ContextCategoryVO)obj;
 				if(ccVO.getDescription().contains(query)) {
@@ -185,8 +174,8 @@ public class ContextCategoryHandler {
 		ccVO.setContextCategoryID(this.id);
 		
 		try {
-			dao.updateObject(ccVO);
-			contextCategories = dao.findObjects();
+			daoCC.updateObject(ccVO);
+			contextCategories = daoCC.findObjects();
 			this.selectedCategory = ccVO;
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
@@ -203,8 +192,8 @@ public class ContextCategoryHandler {
 		ccVO.setContextCategoryID(id);
 		
 		try {
-			dao.deleteObject(ccVO);
-			contextCategories = dao.findObjects();
+			daoCC.deleteObject(ccVO);
+			contextCategories = daoCC.findObjects();
 		} catch (SRTDAOException e) {
 			if(e.getLocalizedMessage().contains(SRTConstants.FOREIGNKEY_ERROR_MSG)) {
 				QueryCondition qc = new QueryCondition();
@@ -245,7 +234,7 @@ public class ContextCategoryHandler {
 		ccVO.setContextCategoryGUID(((ContextCategoryVO) event.getObject()).getContextCategoryGUID());
 		ccVO.setContextCategoryID(((ContextCategoryVO) event.getObject()).getContextCategoryID());
 		try {
-			dao.updateObject(ccVO);
+			daoCC.updateObject(ccVO);
 		} catch (SRTDAOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
