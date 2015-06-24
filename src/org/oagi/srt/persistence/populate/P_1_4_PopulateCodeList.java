@@ -119,7 +119,7 @@ public class P_1_4_PopulateCodeList {
 				codelistVO.setCreatedByUserID(id);
 				codelistVO.setLastUpdatedByUserID(id);
 				codelistVO.setLastUpdateTimestamp(current_stamp);
-				codelistVO.setState("");
+				codelistVO.setState("Published");
 		    	dao.insertObject(codelistVO);
 		    }
 		}
@@ -186,7 +186,16 @@ public class P_1_4_PopulateCodeList {
 	    			    		codelistvalueVO.setName(codelistvalueVO.getValue());
 	    			    		codelistvalueVO.setUsedIndicator(true);
 	    			    		codelistvalueVO.setLockedIndicator(false);
-		    			    	Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
+	    			    		
+	    			    		Node union = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
+	    			    		//System.out.println(tmp2.getAttribute("name")+"     "+tmp.getAttribute("name"));
+	    			    		if(union != null){
+		    			    		codelistvalueVO.setExtensionIndicator(true);
+	    			    		}
+	    			    		else
+		    			    		codelistvalueVO.setExtensionIndicator(false);
+
+	    			    		Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
 				    			if(name_node != null) {
 			    			    	Element name_element = (Element)name_node;
 			    			    	codelistvalueVO.setDefinition(name_element.getTextContent());
