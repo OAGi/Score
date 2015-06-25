@@ -120,6 +120,13 @@ public class P_1_4_PopulateCodeList {
 				codelistVO.setLastUpdatedByUserID(id);
 				codelistVO.setLastUpdateTimestamp(current_stamp);
 				codelistVO.setState("Published");
+	    		Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
+	    		if(union_check != null){
+		    		codelistVO.setExtensibleIndicator(true);
+	    		}
+	    		else
+	    			codelistVO.setExtensibleIndicator(false);
+	    		
 		    	dao.insertObject(codelistVO);
 		    }
 		}
@@ -186,15 +193,8 @@ public class P_1_4_PopulateCodeList {
 	    			    		codelistvalueVO.setName(codelistvalueVO.getValue());
 	    			    		codelistvalueVO.setUsedIndicator(true);
 	    			    		codelistvalueVO.setLockedIndicator(false);
+	    			    		codelistvalueVO.setExtensionIndicator(false);
 	    			    		
-	    			    		Node union = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
-	    			    		//System.out.println(tmp2.getAttribute("name")+"     "+tmp.getAttribute("name"));
-	    			    		if(union != null){
-		    			    		codelistvalueVO.setExtensionIndicator(true);
-	    			    		}
-	    			    		else
-		    			    		codelistvalueVO.setExtensionIndicator(false);
-
 	    			    		Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
 				    			if(name_node != null) {
 			    			    	Element name_element = (Element)name_node;
@@ -206,6 +206,7 @@ public class P_1_4_PopulateCodeList {
 				    				codelistvalueVO.setDefinition(null);
 				    				codelistvalueVO.setDefinitionSource(null);
 				    			}
+				    			
 				    		dao.insertObject(codelistvalueVO);
 	    			    	}
 		    				break;
