@@ -67,45 +67,61 @@
 			<p:panel header="Code">
 				<h:panelGrid id="grid2" columns="1" cellpadding="5">
 					<p:dataTable id="tbl" var="codeListValueVO" value="#{codeListHandler.codeListValues}"
-						style="width:800px; margin-bottom:20px">
+						style="width:1000px; margin-bottom:20px;" > 
+						<p:column style="width:65px">
+							<f:facet name="header">
+								<h:outputText value="Select" />
+							</f:facet>
+							<p:selectBooleanButton id="value2" value="#{codeListValueVO.usedIndicator}" disabled="#{codeListValueVO.disabled}" onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:65px">
+					            <p:ajax update="tbl" listener="#{codeListHandler.updateCodeListValue(codeListValueVO.codeListValueID)}" />
+					        </p:selectBooleanButton>
+						</p:column>
 						
-						<p:column style="width:150px">
+						<p:column style="width:100px">
 							<f:facet name="header">
 								<h:outputText value="Code" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.value}" />
+							<h:outputText value="#{codeListValueVO.value}" style="font-weight:bold; color:#{codeListValueVO.color};"/>
 						</p:column>
 		
-						<p:column style="width:150px">
+						<p:column style="width:100px">
 							<f:facet name="header">
 								<h:outputText value="Short Name" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.name}" />
+							<h:outputText value="#{codeListValueVO.name}" style="font-weight:bold; color:#{codeListValueVO.color};"/>
 						</p:column>
 		
-						<p:column style="width:200px">
+						<p:column style="width:335px">
 							<f:facet name="header">
 								<h:outputText value="Definition" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.definition}" />
+							<h:outputText value="#{codeListValueVO.definition}" style="color:#{codeListValueVO.color};"/>
 						</p:column>
 						
-						<p:column style="width:300px">
+						<p:column style="width:400px">
 							<f:facet name="header">
 								<h:outputText value="Definition Source" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.definitionSource}" />
+							<h:outputText value="#{codeListValueVO.definitionSource}" style="color:#{codeListValueVO.color};"/>
 						</p:column>
 					</p:dataTable>
 				</h:panelGrid>
+				<h:panelGrid columns="2" cellpadding="5">
+					<h:outputText style="font-weight:bold; color:blue" value="Add new Code List Value: " />
+					<p:commandButton value="Add" icon="ui-icon-extlink" actionListener="#{codeListHandler.addCodeListValue}">
+				        <p:ajax event="dialogReturn" listener="#{codeListHandler.onCodeListValueAdded}" update=":form:tbl" />
+				    </p:commandButton>
+				</h:panelGrid>
+				<p:separator />
 				<h:panelGrid id="grid3" columns="3" cellpadding="5">
-					<p:commandButton process="tbl" style="width:100px" update="" icon="ui-icon-search" value="Save" oncomplete="" />
+					<p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Save" actionListener="#{codeListHandler.save()}" action="code_lists.xhtml?faces-redirect=true" />
 					
-					<p:commandButton process="tbl" style="width:100px" update="" icon="ui-icon-search" value="Publish" oncomplete="" />
+					<p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Publish" actionListener="#{codeListHandler.publish()}" action="code_lists.xhtml?faces-redirect=true" />
 					
-					<p:commandButton process="tbl" style="width:100px" update="" icon="ui-icon-search" value="Close" oncomplete="" />
+					<p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Cancel" action="code_lists.xhtml?faces-redirect=true" />
 				</h:panelGrid>
 			</p:panel>
+
 		</h:form>
 	</ui:define>
 </ui:composition>

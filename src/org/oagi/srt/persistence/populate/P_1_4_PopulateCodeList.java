@@ -119,7 +119,7 @@ public class P_1_4_PopulateCodeList {
 				codelistVO.setCreatedByUserID(id);
 				codelistVO.setLastUpdatedByUserID(id);
 				codelistVO.setLastUpdateTimestamp(current_stamp);
-				codelistVO.setState("Published");
+				codelistVO.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
 	    		Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
 	    		if(union_check != null){
 		    		codelistVO.setExtensibleIndicator(true);

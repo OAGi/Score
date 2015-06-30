@@ -86,8 +86,16 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 				codelistvalueVO.setDefinition(rs.getString("Definition"));
 				codelistvalueVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistvalueVO.setUsedIndicator(rs.getBoolean("Used_Indicator"));
-				codelistvalueVO.setUsedIndicator(rs.getBoolean("Locked_Indicator"));
+				codelistvalueVO.setLockedIndicator(rs.getBoolean("Locked_Indicator"));
 				codelistvalueVO.setExtensionIndicator(rs.getBoolean("extension_indicator"));
+				if(codelistvalueVO.getUsedIndicator() && !codelistvalueVO.getLockedIndicator() && !codelistvalueVO.isExtensionIndicator())
+					codelistvalueVO.setColor("blue");
+				else if(!codelistvalueVO.getUsedIndicator() && !codelistvalueVO.getLockedIndicator() && !codelistvalueVO.isExtensionIndicator())
+					codelistvalueVO.setColor("orange");
+				else if((!codelistvalueVO.getUsedIndicator() && !codelistvalueVO.getLockedIndicator()) || (codelistvalueVO.getLockedIndicator()))
+					codelistvalueVO.setColor("red");
+				else if(codelistvalueVO.getUsedIndicator() && !codelistvalueVO.getLockedIndicator() && codelistvalueVO.isExtensionIndicator())
+					codelistvalueVO.setColor("green");
 				list.add(codelistvalueVO);
 			}
 			conn.close();
@@ -278,6 +286,7 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 			ps.setBoolean(6, codelistvalueVO.getUsedIndicator());
 			ps.setBoolean(7, codelistvalueVO.getLockedIndicator());
 			ps.setBoolean(8, codelistvalueVO.isExtensionIndicator());
+			ps.setInt(9, codelistvalueVO.getCodeListValueID());
 
 			ps.executeUpdate();
 

@@ -30,7 +30,34 @@ public class CodeListVO extends SRTObject {
 	private Timestamp lastUpdateTimestamp;
 	private String state;
 	private String remark;
+	private boolean editDisabled;
+	private boolean deleteDisabled;
+	private boolean discardDisabled;
 	
+	public boolean isDeleteDisabled() {
+		return deleteDisabled;
+	}
+
+	public void setDeleteDisabled(boolean deleteDisabled) {
+		this.deleteDisabled = deleteDisabled;
+	}
+
+	public boolean isDiscardDisabled() {
+		return discardDisabled;
+	}
+
+	public void setDiscardDisabled(boolean discardDisabled) {
+		this.discardDisabled = discardDisabled;
+	}
+
+	public boolean isEditDisabled() {
+		return editDisabled;
+	}
+
+	public void setEditDisabled(boolean editDisabled) {
+		this.editDisabled = editDisabled;
+	}
+
 	public String getRemark() {
 		return remark;
 	}
