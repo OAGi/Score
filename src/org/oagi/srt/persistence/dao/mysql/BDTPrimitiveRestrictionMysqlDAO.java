@@ -45,7 +45,7 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 		return 0;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = (BDTPrimitiveRestrictionVO) obj;
 		try {
@@ -80,7 +80,7 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -454,6 +454,13 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 
 		return true;
 
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -49,17 +50,18 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 		return 0;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BBIE_SCVO bbie_scVO = (BBIE_SCVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		int key = -1;
 		try {
 			conn = tx.open();
 			if(bbie_scVO.getBBIESCID() == -1)
-				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			else
-				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
 			
 			ps.setInt(1, bbie_scVO.getBBIEID());
@@ -76,6 +78,11 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				ps.setInt(6, bbie_scVO.getBBIESCID());
 			
 			ps.executeUpdate();
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
 			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
@@ -97,7 +104,51 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return key;
+	}
+	
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		BBIE_SCVO bbie_scVO = (BBIE_SCVO)obj;
+		PreparedStatement ps = null;
+		int key = -1;
+		try {
+			if(bbie_scVO.getBBIESCID() == -1)
+				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			else
+				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			
+			
+			ps.setInt(1, bbie_scVO.getBBIEID());
+			ps.setInt(2, bbie_scVO.getDTSCID());
+			ps.setInt(3, bbie_scVO.getMinCardinality());
+			ps.setInt(4, bbie_scVO.getMaxCardinality());
+			
+			if(bbie_scVO.getDTSCPrimitiveRestrictionID() == 0)
+				ps.setNull(5, java.sql.Types.INTEGER);
+			else
+				ps.setInt(5, bbie_scVO.getDTSCPrimitiveRestrictionID());
+			
+			if(bbie_scVO.getBBIESCID() != -1)
+				ps.setInt(6, bbie_scVO.getBBIESCID());
+			
+			ps.executeUpdate();
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return key;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {

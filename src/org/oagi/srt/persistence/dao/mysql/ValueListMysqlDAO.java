@@ -67,7 +67,7 @@ public class ValueListMysqlDAO extends SRTDAO {
 		return null;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ValueListVO value_listVO = (ValueListVO)obj;
 		try {
@@ -107,7 +107,7 @@ public class ValueListMysqlDAO extends SRTDAO {
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 		
 	}
 
@@ -328,5 +328,12 @@ public class ValueListMysqlDAO extends SRTDAO {
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

@@ -16,7 +16,7 @@ public class BBIEVO extends SRTObject {
 	private int BasedBCCID;
 	private int CardinalityMin;
 	private int CardinalityMax;
-	private int isNillable;
+	private int Nillable;
 	private int AssocFromABIEID;
 	private int AssocToBBIEPID;
 	private String Definition;
@@ -73,12 +73,12 @@ public class BBIEVO extends SRTObject {
 		CardinalityMax = cardinalityMax;
 	}
 	
-	public int getisNillable() {
-		return isNillable;
+	public int getNillable() {
+		return Nillable;
 	}
 	
-	public void setisNillable(int isnillable) {
-		isNillable = isnillable;
+	public void setNillable(int nillable) {
+		Nillable = nillable;
 	}
 	
 	public int getAssocFromABIEID() {
@@ -103,14 +103,6 @@ public class BBIEVO extends SRTObject {
 	
 	public void setDefinition(String definition) {
 		Definition = definition;
-	}
-
-	public int isNillable() {
-		return isNillable;
-	}
-
-	public void setNillable(int isNillable) {
-		this.isNillable = isNillable;
 	}
 
 	public String getBbieGuid() {

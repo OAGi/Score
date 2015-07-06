@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -90,17 +91,18 @@ public class ABIEMysqlDAO extends SRTDAO {
 		return max;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ABIEVO abieVO = (ABIEVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		int key = -1;
 		try {
 			conn = tx.open();
 			if(abieVO.getABIEID() == -1)
-				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			else
-				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
 			ps.setInt(1, abieVO.getBasedACCID());
 			ps.setInt(2, abieVO.getIsTopLevel());
@@ -108,7 +110,12 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps.setString(4, abieVO.getDefinition());
 			ps.setInt(5, abieVO.getCreatedByUserID());
 			ps.setInt(6, abieVO.getLastUpdatedByUserID());
-			ps.setInt(7, abieVO.getState());
+			
+			if(abieVO.getState() == 0)
+				ps.setNull(7, java.sql.Types.INTEGER);
+			else
+				ps.setInt(7, abieVO.getState());
+			
 			ps.setString(8, abieVO.getAbieGUID());
 			ps.setString(9, abieVO.getClientID());
 			ps.setString(10, abieVO.getVersion());
@@ -119,7 +126,12 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ps.setInt(14, abieVO.getABIEID());
 
 			ps.executeUpdate();
-
+			
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
 			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
@@ -141,7 +153,55 @@ public class ABIEMysqlDAO extends SRTDAO {
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return key;
+
+	}
+	
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		ABIEVO abieVO = (ABIEVO)obj;
+		PreparedStatement ps = null;
+		int key = -1;
+		try {
+			if(abieVO.getABIEID() == -1)
+				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			else
+				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setInt(1, abieVO.getBasedACCID());
+			ps.setInt(2, abieVO.getIsTopLevel());
+			ps.setInt(3, abieVO.getBusinessContextID());
+			ps.setString(4, abieVO.getDefinition());
+			ps.setInt(5, abieVO.getCreatedByUserID());
+			ps.setInt(6, abieVO.getLastUpdatedByUserID());
+			ps.setInt(7, abieVO.getState());
+			ps.setString(8, abieVO.getAbieGUID());
+			ps.setString(9, abieVO.getClientID());
+			ps.setString(10, abieVO.getVersion());
+			ps.setString(11, abieVO.getStatus());
+			ps.setString(12, abieVO.getRemark());
+			ps.setString(13, abieVO.getBusinessTerm());
+			if(abieVO.getABIEID() != -1)
+				ps.setInt(14, abieVO.getABIEID());
+
+			ps.executeUpdate();
+			
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return key;
 
 	}
 

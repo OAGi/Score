@@ -53,7 +53,7 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 		return null;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		XSDBuiltInTypeVO xsdbuiltintypeVO = (XSDBuiltInTypeVO)obj;
 		
@@ -82,7 +82,7 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 	}
 	
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -313,5 +313,12 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

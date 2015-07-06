@@ -289,7 +289,7 @@ public class TopLevelABIEHandler implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 	
-	private ABIEVO abieVO;
+	private ABIEVO topAbieVO;
 	private ASBIEPVO asbiepVO;
 	private BBIEVO bieVO;
 	
@@ -303,17 +303,22 @@ public class TopLevelABIEHandler implements Serializable {
 			DBAgent tx = new DBAgent();
 			try {
 				conn = tx.open();
-				abieVO = createABIE(selected.getRoleOfACCID(), bCSelected.getBusinessContextID(), 1, 0);
+				topAbieVO = createABIE(selected.getRoleOfACCID(), bCSelected.getBusinessContextID(), 1, 0);
 				// int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
-				int abieId = abieVO.getABIEID();
-				root = new DefaultTreeNode(new ABIEView(selected.getPropertyTerm(), abieVO.getAbieGUID()), null);
-				asbiepVO = createASBIEP(abieId, selected.getASCCPID(), -1);
+				int abieId = topAbieVO.getABIEID();
+				ABIEView aABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
+				aABIEView.setAbieVO(topAbieVO);
+				root = new DefaultTreeNode(aABIEView, null);
+				
+				asbiepVO = createASBIEP(selected.getASCCPID(), abieId, -1);
 				
 				createBIEs(selected.getRoleOfACCID(), abieId, -1, root);
 				
 				createBarModel();
+				tx.commit();
 			} catch (Exception e) {
 				e.printStackTrace();
+				tx.rollback();
 			} finally {
 				try {
 					if(conn != null)
@@ -321,11 +326,36 @@ public class TopLevelABIEHandler implements Serializable {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
+				tx.close();
 			}
 		} 
 		
 		return event.getNewStep();
 	}
+	
+	public void onComplete() {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Progress Completed"));
+    }
+	
+	private Integer progress;
+	 
+    public Integer getProgress() {
+        if(progress == null) {
+            progress = 0;
+        }
+        else {
+            progress = progress + (int)(Math.random() * 35);
+             
+            if(progress > 100)
+                progress = 100;
+        }
+         
+        return progress;
+    }
+ 
+    public void setProgress(Integer progress) {
+        this.progress = progress;
+    }
 	
 	private void createBIEs(int accId, int abie, int groupPosition, TreeNode tNode) throws SRTDAOException {
 		Stack<ACCVO> accList = new Stack<ACCVO>();
@@ -360,10 +390,12 @@ public class TopLevelABIEHandler implements Serializable {
 				qc.add("bccp_id", bccVO.getAssocToBCCPID());
 				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 				
-				ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBbieGuid());
+				ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
+				av.setBccVO(bccVO);
+				av.setBbiepVO(bbiepVO);
+				av.setBbieVO(bbieVO);
+				av.setBccpVO(bccpVO);
 				av.setColor("green");
-				av.setMin(bbieVO.getCardinalityMin());
-				av.setMax(bbieVO.getCardinalityMax());
 				TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 				
 				int bbieID = bbieVO.getBBIEID();
@@ -391,10 +423,14 @@ public class TopLevelABIEHandler implements Serializable {
 					
 					ASBIEVO asbieVO = createASBIE(asccVO.getASCCID(), abie, asbiepVO.getASBIEPID(), seqKey);
 					
-					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getAbieGUID());
+					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), asbieVO.getASBIEID(), "ASBIE");
 					av.setColor("blue");
-					av.setMin(asbieVO.getCardinalityMin());
-					av.setMax(asbieVO.getCardinalityMax());
+					av.setAsccVO(asccVO);
+					av.setAsccpVO(asccpVO);
+					av.setAccVO(accVOFromASCCP);
+					av.setAbieVO(abieVO);
+					av.setAsbiepVO(asbiepVO);
+					av.setAsbieVO(asbieVO);
 					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 					
 					createBIEs(accVOFromASCCP.getACCID(), abieVO.getABIEID(), -1, tNode2);
@@ -542,16 +578,18 @@ public class TopLevelABIEHandler implements Serializable {
 		int userId = getUserId();
 		abieVO.setCreatedByUserID(userId); 
 		abieVO.setLastUpdatedByUserID(userId); 
-		abieVO.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
-		abieVO.setABIEID(Utility.getRandomID(maxABIEId));
-//		try {
-//			abieDao.insertObject(abieVO);
-//			abieCount++;
-//		} catch (SRTDAOException e) {
-//			e.printStackTrace();
-//		}
+		if(topLevel == 1)
+			abieVO.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+		//abieVO.setABIEID(Utility.getRandomID(maxABIEId));
+		try {
+			int key = abieDao.insertObject(abieVO, conn);
+			abieVO.setABIEID(key);
+			abieCount++;
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 		
-		abieCount++;
+		//abieCount++;
 		return abieVO;
 	}
 	
@@ -563,15 +601,16 @@ public class TopLevelABIEHandler implements Serializable {
 		int userId = getUserId();
 		asbiepVO.setCreatedByUserID(userId); 
 		asbiepVO.setLastUpdatedByUserID(userId); 
-		asbiepVO.setASBIEPID(Utility.getRandomID(maxASBIEPId));
-//		try {
-//			asbiepDao.insertObject(asbiepVO);
-//			asbiepCount++;
-//		} catch (SRTDAOException e) {
-//			e.printStackTrace();
-//		}
+		//asbiepVO.setASBIEPID(Utility.getRandomID(maxASBIEPId));
+		try {
+			int key = asbiepDao.insertObject(asbiepVO, conn);
+			asbiepVO.setASBIEPID(key);
+			asbiepCount++;
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 		
-		asbiepCount++;
+		//asbiepCount++;
 		
 		return asbiepVO;
 	}
@@ -586,13 +625,14 @@ public class TopLevelABIEHandler implements Serializable {
 		asbieVO.setCreatedByUserId(userId); 
 		asbieVO.setLastUpdatedByUserId(userId); 
 		asbieVO.setSequencingKey(Double.parseDouble(seqKey));
-//		try {
-//			asbieDao.insertObject(asbieVO);
-//			asbieCount++;
-//		} catch (SRTDAOException e) {
-//			e.printStackTrace();
-//		}
-		asbieCount++;
+		try {
+			int key = asbieDao.insertObject(asbieVO, conn);
+			asbieVO.setASBIEID(key);
+			asbieCount++;
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		//asbieCount++;
 		return asbieVO;
 	}
 	
@@ -655,16 +695,17 @@ public class TopLevelABIEHandler implements Serializable {
 		int userId = getUserId();
 		bbiepVO.setCreatedByUserID(userId); 
 		bbiepVO.setLastUpdatedbyUserID(userId); 
-		bbiepVO.setBBIEPID(Utility.getRandomID(maxBIEPID));
+		//bbiepVO.setBBIEPID(Utility.getRandomID(maxBIEPID));
 		
-//		try {
-//			bbiepDao.insertObject(bbiepVO);
-//			bbiepCount++;
-//		} catch (SRTDAOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			int key = bbiepDao.insertObject(bbiepVO, conn);
+			bbiepVO.setBBIEPID(key);
+			bbiepCount++;
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 		
-		bbiepCount++;
+		//bbiepCount++;
 		return bbiepVO;
 	}
 	
@@ -674,21 +715,22 @@ public class TopLevelABIEHandler implements Serializable {
 		bbieVO.setBasedBCCID(bcc);
 		bbieVO.setAssocFromABIEID(abie);
 		bbieVO.setAssocToBBIEPID(bbiep);
-		bbieVO.setisNillable(0);
+		bbieVO.setNillable(0);
 		int userId = getUserId();
 		bbieVO.setCreatedByUserId(userId); 
 		bbieVO.setLastUpdatedByUserId(userId); 
-		bbieVO.setBBIEID(Utility.getRandomID(maxBIEID));
+		//bbieVO.setBBIEID(Utility.getRandomID(maxBIEID));
 		bbieVO.setSequencing_number(Double.parseDouble(seqKey));
 		
-//		try {
-//			bbieDao.insertObject(bbieVO);
-//			bbieCount++;
-//		} catch (SRTDAOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			int key = bbieDao.insertObject(bbieVO, conn);
+			bbieVO.setBBIEID(key);
+			bbieCount++;
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 		
-		bbieCount++;
+		//bbieCount++;
 		return bbieVO;
 	}
 	
@@ -703,12 +745,14 @@ public class TopLevelABIEHandler implements Serializable {
 				BBIE_SCVO bbiescVO = new BBIE_SCVO();
 				bbiescVO.setBBIEID(bbie);
 				bbiescVO.setDTSCID(dtsc.getDTSCID()); 
-				bbiescVO.setBBIESCID(Utility.getRandomID(maxBBIESCID));
+				//bbiescVO.setBBIESCID(Utility.getRandomID(maxBBIESCID));
 				
-				//bbiescDao.insertObject(bbiescVO);
+				int key = bbiescDao.insertObject(bbiescVO, conn);
 				bbiescCount++;
 				
-				ABIEView av = new ABIEView(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
+				ABIEView av = new ABIEView(dtsc.getPropertyTerm(), key, "BBIESC");
+				av.setDtscVO(dtsc);
+				av.setBbiescVO(bbiescVO);
 				av.setColor("orange");
 				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
 				
@@ -880,23 +924,185 @@ public class TopLevelABIEHandler implements Serializable {
     	return ((UserVO)userDao.findObject(qc, conn)).getUserID();
     }
     
+    private int min;
+    
+    public int getMin() {
+		return min;
+	}
+
+	public void setMin(int min) {
+		this.min = min;
+	}
+	
+	private TreeNode selectedTreeNode;
+	
+	private ABIEView aABIEView;
+	
+	public ABIEView getaABIEView() {
+		if(aABIEView == null)
+			aABIEView = new ABIEView();
+		return aABIEView;
+	}
+
+	public void setaABIEView(ABIEView aABIEView) {
+		this.aABIEView = aABIEView;
+	}
+
+	public TreeNode getSelectedTreeNode() {
+		if(selectedTreeNode == null)
+			selectedTreeNode = root;
+		aABIEView = (ABIEView)selectedTreeNode.getData();
+		return selectedTreeNode;
+    }
+ 
+    public void setSelectedTreeNode(TreeNode selectedTreeNode) {
+        this.selectedTreeNode = selectedTreeNode;
+    }
+
+	public void updateTree() {
+		ABIEView aABIEView = (ABIEView)selectedTreeNode.getData();
+		System.out.println("### " + aABIEView.getName());
+    }
+	
+	public void showDetails() {
+		aABIEView = (ABIEView)selectedTreeNode.getData();
+	}
+	
     public class ABIEView implements Serializable, Comparable<ABIEView> {
-    	 
+
+    	private ASCCVO asccVO;
+		private ASCCPVO asccpVO;
+		private ACCVO accVO;
+		private ABIEVO abieVO;
+		private ASBIEPVO asbiepVO;
+		private ASBIEVO asbieVO;
+		private BCCVO bccVO;
+		private BBIEPVO bbiepVO;
+		private BBIEVO bbieVO;
+		private BCCPVO bccpVO;
+		private DTSCVO dtscVO;
+		private BBIE_SCVO bbiescVO;
+		
         private String name;
-        private String guid;
-        private int min;
-        private int max;
-        private String primitive;
-        private String fixedValue;
+        private int id;
         private String color;
         private String type;
-         
-        public ABIEView(String name, String guid) {
+
+		public ABIEView() {
+			
+		}
+		
+		public ABIEView(String name, int id, String type) {
             this.name = name;
-            this.guid = guid;
+            this.id = id;
+            this.type = type;
         }
-     
-        public String getName() {
+
+		public ASBIEVO getAsbieVO() {
+			return asbieVO;
+		}
+
+		public void setAsbieVO(ASBIEVO asbieVO) {
+			this.asbieVO = asbieVO;
+		}
+
+		public ASCCVO getAsccVO() {
+			return asccVO;
+		}
+
+		public void setAsccVO(ASCCVO asccVO) {
+			this.asccVO = asccVO;
+		}
+
+		public ASCCPVO getAsccpVO() {
+			return asccpVO;
+		}
+
+		public void setAsccpVO(ASCCPVO asccpVO) {
+			this.asccpVO = asccpVO;
+		}
+
+		public ACCVO getAccVO() {
+			return accVO;
+		}
+
+		public void setAccVO(ACCVO accVO) {
+			this.accVO = accVO;
+		}
+
+		public ABIEVO getAbieVO() {
+			return abieVO;
+		}
+
+		public void setAbieVO(ABIEVO abieVO) {
+			this.abieVO = abieVO;
+		}
+
+		public ASBIEPVO getAsbiepVO() {
+			return asbiepVO;
+		}
+
+		public void setAsbiepVO(ASBIEPVO asbiepVO) {
+			this.asbiepVO = asbiepVO;
+		}
+
+		public BCCVO getBccVO() {
+			return bccVO;
+		}
+
+		public void setBccVO(BCCVO bccVO) {
+			this.bccVO = bccVO;
+		}
+
+		public BBIEPVO getBbiepVO() {
+			return bbiepVO;
+		}
+
+		public void setBbiepVO(BBIEPVO bbiepVO) {
+			this.bbiepVO = bbiepVO;
+		}
+
+		public BBIEVO getBbieVO() {
+			return bbieVO;
+		}
+
+		public void setBbieVO(BBIEVO bbieVO) {
+			this.bbieVO = bbieVO;
+		}
+
+		public BCCPVO getBccpVO() {
+			return bccpVO;
+		}
+
+		public void setBccpVO(BCCPVO bccpVO) {
+			this.bccpVO = bccpVO;
+		}
+
+		public DTSCVO getDtscVO() {
+			return dtscVO;
+		}
+
+		public void setDtscVO(DTSCVO dtscVO) {
+			this.dtscVO = dtscVO;
+		}
+
+		public BBIE_SCVO getBbiescVO() {
+			return bbiescVO;
+		}
+
+		public void setBbiescVO(BBIE_SCVO bbiescVO) {
+			this.bbiescVO = bbiescVO;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public String getName() {
             return name;
         }
      
@@ -912,46 +1118,6 @@ public class TopLevelABIEHandler implements Serializable {
             this.type = type;
         }
      
-        public String getGuid() {
-			return guid;
-		}
-
-		public void setGuid(String guid) {
-			this.guid = guid;
-		}
-
-		public int getMin() {
-			return min;
-		}
-
-		public void setMin(int min) {
-			this.min = min;
-		}
-
-		public int getMax() {
-			return max;
-		}
-
-		public void setMax(int max) {
-			this.max = max;
-		}
-
-		public String getPrimitive() {
-			return primitive;
-		}
-
-		public void setPrimitive(String primitive) {
-			this.primitive = primitive;
-		}
-
-		public String getFixedValue() {
-			return fixedValue;
-		}
-
-		public void setFixedValue(String fixedValue) {
-			this.fixedValue = fixedValue;
-		}
-
 		public String getColor() {
 			return color;
 		}
@@ -966,7 +1132,7 @@ public class TopLevelABIEHandler implements Serializable {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((name == null) ? 0 : name.hashCode());
-            result = prime * result + ((guid == null) ? 0 : guid.hashCode());
+            result = prime * result + ((String.valueOf(id) == null) ? 0 : String.valueOf(id).hashCode());
             return result;
         }
      
@@ -984,10 +1150,10 @@ public class TopLevelABIEHandler implements Serializable {
                     return false;
             } else if (!name.equals(other.name))
                 return false;
-            if (guid == null) {
-                if (other.guid != null)
+            if (id <= 0) {
+                if (other.id > 0)
                     return false;
-            } else if (!guid.equals(other.guid))
+            } else if (id != other.id)
                 return false;
             return true;
         }

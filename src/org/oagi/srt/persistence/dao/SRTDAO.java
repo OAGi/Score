@@ -20,7 +20,11 @@ import org.oagi.srt.persistence.dto.ASCCPVO;
  */
 public abstract class SRTDAO {
 
-	public abstract boolean insertObject(SRTObject obj) throws SRTDAOException;
+	//public abstract boolean insertObject(SRTObject obj) throws SRTDAOException;
+	
+	public abstract int insertObject(SRTObject obj) throws SRTDAOException;
+	
+	public abstract int insertObject(SRTObject obj, Connection conn) throws SRTDAOException;
 	
 	public abstract SRTObject findObject(QueryCondition qc)	throws SRTDAOException;
 	

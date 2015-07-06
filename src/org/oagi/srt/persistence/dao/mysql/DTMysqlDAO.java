@@ -58,7 +58,7 @@ public class DTMysqlDAO extends SRTDAO {
 	private final String _DELETE_DT_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE DT_ID = ?";
 
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		DTVO dtVO = (DTVO)obj;
 		try {
@@ -99,7 +99,7 @@ public class DTMysqlDAO extends SRTDAO {
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -639,5 +639,12 @@ public class DTMysqlDAO extends SRTDAO {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

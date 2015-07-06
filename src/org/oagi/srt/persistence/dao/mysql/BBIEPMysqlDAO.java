@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -24,27 +25,27 @@ public class BBIEPMysqlDAO extends SRTDAO {
 	private final String _tableName = "bbiep";
 
 	private final String _FIND_ALL_BBIEP_STATEMENT = "SELECT BBIEP_ID, BBIEP_GUID, Based_BCCP_ID, Definition, "
-			+ "Created_By_User_ID, Last_Updated_by_User_ID, Creation_Timestamp, Last_Update_Timestamp FROM " 
+			+ "Created_By_User_ID, Last_Updated_by_User_ID, Creation_Timestamp, Last_Update_Timestamp, remark, business_term FROM " 
 			+ _tableName;
 	
 	private final String _FIND_MAX_ID_STATEMENT =
 			"SELECT max(BBIEP_ID) as max FROM " + _tableName;
 	
 	private final String _FIND_BBIEP_STATEMENT = "SELECT BBIEP_ID, BBIEP_GUID, Based_BCCP_ID, Definition, "
-			+ "Created_By_User_ID, Last_Updated_by_User_ID, Creation_Timestamp, Last_Update_Timestamp FROM " 
+			+ "Created_By_User_ID, Last_Updated_by_User_ID, Creation_Timestamp, Last_Update_Timestamp, remark, business_term FROM " 
 			+ _tableName;
 	
 	private final String _INSERT_BBIEP_STATEMENT = "INSERT INTO " + _tableName
 			+ " (BBIEP_GUID, Based_BCCP_ID, Definition, Created_By_User_ID, Last_Updated_by_User_ID, "
-			+ "Creation_Timestamp, Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+			+ "Creation_Timestamp, Last_Update_Timestamp, remark, business_term) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
 	
 	private final String _INSERT_BBIEP_WITH_ID_STATEMENT = "INSERT INTO " + _tableName
 			+ " (BBIEP_GUID, Based_BCCP_ID, Definition, Created_By_User_ID, Last_Updated_by_User_ID, "
-			+ "Creation_Timestamp, Last_Update_Timestamp, BBIEP_ID) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+			+ "Creation_Timestamp, Last_Update_Timestamp, remark, business_term, BBIEP_ID) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?)";
 	
 	private final String _UPDATE_BBIEP_STATEMENT = "UPDATE " + _tableName + " SET "
 			+ "Last_Update_Timestamp = CURRENT_TIMESTAMP, BBIEP_GUID = ?, Based_BCCP_ID = ?, Definition = ?, "
-			+ "Created_By_User_ID = ?, Last_Updated_by_User_ID = ?, Creation_Timestamp = ? WHERE BBIEP_ID = ?";
+			+ "Created_By_User_ID = ?, Last_Updated_by_User_ID = ?, Creation_Timestamp = ?, remark = ?, business_term = ? WHERE BBIEP_ID = ?";
 	
 	private final String _DELETE_BBIEP_STATEMENT = "DELETE FROM " + _tableName + " WHERE BBIEP_ID = ?";
 
@@ -82,29 +83,36 @@ public class BBIEPMysqlDAO extends SRTDAO {
 		return max;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BBIEPVO bbiepVO = (BBIEPVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		int key = -1;
 		try {
 			conn = tx.open();
 			
 			if(bbiepVO.getBBIEPID() == -1)
-				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			else
-				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
 			ps.setString(1, bbiepVO.getBBIEPGUID());
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
 			ps.setString(3, bbiepVO.getDefinition());
 			ps.setInt(4, bbiepVO.getCreatedByUserID());
 			ps.setInt(5, bbiepVO.getLastUpdatedbyUserID());
+			ps.setString(6, bbiepVO.getRemark());
+			ps.setString(7, bbiepVO.getBusinessTerm());
 			if(bbiepVO.getBBIEPID() != -1)
-				ps.setInt(6, bbiepVO.getBBIEPID());
-			
+				ps.setInt(8, bbiepVO.getBBIEPID());
 			ps.executeUpdate();
 
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
 			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
@@ -126,7 +134,48 @@ public class BBIEPMysqlDAO extends SRTDAO {
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return key;
+	}
+	
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		BBIEPVO bbiepVO = (BBIEPVO)obj;
+		PreparedStatement ps = null;
+		int key = -1;
+		try {
+			if(bbiepVO.getBBIEPID() == -1)
+				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			else
+				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setString(1, bbiepVO.getBBIEPGUID());
+			ps.setInt(2, bbiepVO.getBasedBCCPID());
+			ps.setString(3, bbiepVO.getDefinition());
+			ps.setInt(4, bbiepVO.getCreatedByUserID());
+			ps.setInt(5, bbiepVO.getLastUpdatedbyUserID());
+			ps.setString(6, bbiepVO.getRemark());
+			ps.setString(7, bbiepVO.getBusinessTerm());
+			if(bbiepVO.getBBIEPID() != -1)
+				ps.setInt(8, bbiepVO.getBBIEPID());
+			
+			ps.executeUpdate();
+
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return key;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -168,6 +217,8 @@ public class BBIEPMysqlDAO extends SRTDAO {
 				bbiepVO.setLastUpdatedbyUserID(rs.getInt("Last_Updated_by_User_ID"));
 				bbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bbiepVO.setRemark(rs.getString("remark"));
+				bbiepVO.setBusinessTerm(rs.getString("business_term"));
 			}
 			tx.commit();
 			conn.close();
@@ -212,6 +263,8 @@ public class BBIEPMysqlDAO extends SRTDAO {
 				bbiepVO.setLastUpdatedbyUserID(rs.getInt("Last_Updated_by_User_ID"));
 				bbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bbiepVO.setRemark(rs.getString("remark"));
+				bbiepVO.setBusinessTerm(rs.getString("business_term"));
 				list.add(bbiepVO);
 			}
 			tx.commit();
@@ -245,14 +298,17 @@ public class BBIEPMysqlDAO extends SRTDAO {
 			Connection conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_BBIEP_STATEMENT);
-
+			
 			ps.setString(1, bbiepVO.getBBIEPGUID());
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
 			ps.setString(3, bbiepVO.getDefinition());
 			ps.setInt(4, bbiepVO.getCreatedByUserID());
 			ps.setInt(5, bbiepVO.getLastUpdatedbyUserID());
 			ps.setTimestamp(6, bbiepVO.getCreationTimestamp());
-			ps.setTimestamp(7, bbiepVO.getLastUpdateTimestamp());
+			ps.setString(7, bbiepVO.getRemark());
+			ps.setString(8, bbiepVO.getBusinessTerm());
+			ps.setInt(9, bbiepVO.getBBIEPID());
+			
 			ps.executeUpdate();
 
 			tx.commit();
@@ -349,6 +405,8 @@ public class BBIEPMysqlDAO extends SRTDAO {
 				bbiepVO.setLastUpdatedbyUserID(rs.getInt("Last_Updated_by_User_ID"));
 				bbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bbiepVO.setRemark(rs.getString("remark"));
+				bbiepVO.setBusinessTerm(rs.getString("business_term"));
 				list.add(bbiepVO);
 			}
 			tx.commit();

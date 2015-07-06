@@ -39,7 +39,7 @@ public class ACCBusinessTermMysqlDAO extends SRTDAO{
 	private final String _DELETE_ACC_Business_Term_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE idACC_Business_Term = ?";
 
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ACCBusinessTermVO accbusinessterm = (ACCBusinessTermVO) obj; 
 		
@@ -66,7 +66,7 @@ public class ACCBusinessTermMysqlDAO extends SRTDAO{
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 	} // I am not sure whether this function is necessary for ACC_Business_Term
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -259,6 +259,13 @@ public class ACCBusinessTermMysqlDAO extends SRTDAO{
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

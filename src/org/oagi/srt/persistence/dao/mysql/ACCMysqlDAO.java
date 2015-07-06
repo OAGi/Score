@@ -54,7 +54,7 @@ public class ACCMysqlDAO extends SRTDAO {
 		return 0;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ACCVO accVO = (ACCVO)obj;
 		Connection conn = null;
@@ -105,7 +105,7 @@ public class ACCMysqlDAO extends SRTDAO {
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -446,5 +446,12 @@ public class ACCMysqlDAO extends SRTDAO {
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

@@ -13,12 +13,27 @@ public class BBIEPVO extends SRTObject {
 	private int BBIEPID;
 	private String BBIEPGUID;
 	private int BasedBCCPID;
-	private String Definition;
 	private int CreatedByUserID;
 	private int LastUpdatedbyUserID;
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	
+	private String definition;
+	private String remark;
+	private String businessTerm;
+	
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getBusinessTerm() {
+		return businessTerm;
+	}
+	public void setBusinessTerm(String businessTerm) {
+		this.businessTerm = businessTerm;
+	}
 	public int getBBIEPID() {
 		return BBIEPID;
 	}
@@ -38,10 +53,10 @@ public class BBIEPVO extends SRTObject {
 		BasedBCCPID = basedBCCPID;
 	}
 	public String getDefinition() {
-		return Definition;
+		return definition;
 	}
 	public void setDefinition(String definition) {
-		Definition = definition;
+		this.definition = definition;
 	}
 	public int getCreatedByUserID() {
 		return CreatedByUserID;

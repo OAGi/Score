@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -86,18 +87,19 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 		return max;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		int key = -1;
 		try {
 			conn = tx.open();
 			
 			if(asbiepVO.getASBIEPID() == -1)
-				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			else
-				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT);
+				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
 			ps.setString(1, asbiepVO.getASBIEPGUID());
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
@@ -109,7 +111,12 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 				ps.setInt(7, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
-
+			
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
 			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
@@ -131,7 +138,47 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return key;
+	}
+	
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
+		PreparedStatement ps = null;
+		int key = -1;
+		try {
+			if(asbiepVO.getASBIEPID() == -1)
+				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			else
+				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			
+			ps.setString(1, asbiepVO.getASBIEPGUID());
+			ps.setInt(2, asbiepVO.getBasedASCCPID());
+			ps.setInt(3, asbiepVO.getRoleOfABIEID());
+			ps.setString(4, asbiepVO.getDefinition());
+			ps.setInt(5, asbiepVO.getCreatedByUserID());
+			ps.setInt(6, asbiepVO.getLastUpdatedByUserID());
+			if(asbiepVO.getASBIEPID() != -1)
+				ps.setInt(7, asbiepVO.getASBIEPID());
+
+			ps.executeUpdate();
+			
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return key;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {

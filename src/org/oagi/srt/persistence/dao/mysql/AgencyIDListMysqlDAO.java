@@ -51,7 +51,7 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 		return 0;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		AgencyIDListVO agencyidlistVO = (AgencyIDListVO) obj;
 		try {
@@ -82,7 +82,7 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 
 	}
 
@@ -292,5 +292,12 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

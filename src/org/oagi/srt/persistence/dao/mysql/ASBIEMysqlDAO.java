@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -26,23 +27,23 @@ public class ASBIEMysqlDAO extends SRTDAO{
 
 	private final String _FIND_ALL_ASBIE_STATEMENT = 
 			"SELECT ASBIE_ID, Assoc_From_ABIE_ID, Assoc_To_ASBIEP_ID, Based_ASCC, Cardinality_Min, Cardinality_Max, "
-			+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp FROM "
+			+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key FROM "
 					+ _tableName;
 
 	private final String _FIND_ASBIE_STATEMENT = 
 			"SELECT ASBIE_ID, Assoc_From_ABIE_ID, Assoc_To_ASBIEP_ID, Based_ASCC, Cardinality_Min, Cardinality_Max, "
-			+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp FROM "
+			+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key FROM "
 					+ _tableName;
 	
 	private final String _INSERT_ASBIE_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Assoc_From_ABIE_ID, Assoc_To_ASBIEP_ID, Based_ASCC, Cardinality_Min, Cardinality_Max, "
-					+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp)"
-					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+					+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 
 	private final String _UPDATE_ASBIE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET ASBIE_ID = ?, Assoc_From_ABIE_ID = ?, Assoc_To_ASBIEP_ID = ?, Based_ASCC = ?, Cardinality_Min = ?, "
-			+ "Cardinality_Max = ?, asbie_guid = ?, definition = ?, nillable = ?, remark = ?, last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP";
+			+ "Cardinality_Max = ?, asbie_guid = ?, definition = ?, nillable = ?, remark = ?, last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_key = ?";
 
 	private final String _DELETE_ASBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASBIE_ID = ?";
@@ -53,14 +54,15 @@ public class ASBIEMysqlDAO extends SRTDAO{
 		return 0;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASBIEVO asbievo = (ASBIEVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		int key = -1;
 		try {
 			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT);
+			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, asbievo.getAssocFromABIEID());
 			ps.setInt(2, asbievo.getAssocToASBIEPID());
 			ps.setInt(3, asbievo.getBasedASCC());
@@ -72,9 +74,14 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			ps.setString(9, asbievo.getRemark());
 			ps.setInt(10, asbievo.getCreatedByUserId());
 			ps.setInt(11, asbievo.getLastUpdatedByUserId());
-
+			ps.setDouble(12, asbievo.getSequencingKey());
 			ps.executeUpdate();
 
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
 			ps.close();
 			tx.commit();
 			conn.close();
@@ -97,7 +104,46 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return key;
+	}
+	
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		ASBIEVO asbievo = (ASBIEVO)obj;
+		PreparedStatement ps = null;
+		int key = -1;
+		try {
+			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			ps.setInt(1, asbievo.getAssocFromABIEID());
+			ps.setInt(2, asbievo.getAssocToASBIEPID());
+			ps.setInt(3, asbievo.getBasedASCC());
+			ps.setInt(4, asbievo.getCardinalityMin());
+			ps.setInt(5, asbievo.getCardinalityMax());
+			ps.setString(6, asbievo.getAsbieGuid());
+			ps.setString(7, asbievo.getDefinition());
+			ps.setInt(8, asbievo.getNillable());
+			ps.setString(9, asbievo.getRemark());
+			ps.setInt(10, asbievo.getCreatedByUserId());
+			ps.setInt(11, asbievo.getLastUpdatedByUserId());
+			ps.setDouble(12, asbievo.getSequencingKey());
+			ps.executeUpdate();
+
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()){
+			    key = rs.getInt(1);
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return key;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -143,6 +189,7 @@ public class ASBIEMysqlDAO extends SRTDAO{
 				asbievo.setRemark(rs.getString("Remark"));
 				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
 			}
 			tx.commit();
 			conn.close();
@@ -191,6 +238,7 @@ public class ASBIEMysqlDAO extends SRTDAO{
 				asbievo.setRemark(rs.getString("Remark"));
 				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
 				list.add(asbievo);
 			}
 			tx.commit();
@@ -235,6 +283,8 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			ps.setInt(8, asbievo.getNillable());
 			ps.setString(9, asbievo.getRemark());
 			ps.setInt(10, asbievo.getLastUpdatedByUserId());
+			ps.setDouble(11, asbievo.getSequencingKey());
+			
 			ps.executeUpdate();
 
 			tx.commit();
@@ -337,6 +387,7 @@ public class ASBIEMysqlDAO extends SRTDAO{
 				asbievo.setRemark(rs.getString("Remark"));
 				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
 				list.add(asbievo);
 			}
 			tx.commit();

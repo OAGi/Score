@@ -52,7 +52,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 		return 0;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		ASCCVO asccVO = (ASCCVO)obj;
 		Connection conn = null;
@@ -100,7 +100,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 			} catch (SQLException e) {}
 			tx.close();
 		}
-		return true;
+		return 1;
 		
 	}
 
@@ -552,6 +552,13 @@ public class ASCCMysqlDAO extends SRTDAO {
 		}
 
 		return list;
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

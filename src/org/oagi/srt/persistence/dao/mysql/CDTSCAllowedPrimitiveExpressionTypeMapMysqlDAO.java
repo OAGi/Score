@@ -168,7 +168,7 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		return list;
 	}
 	
-	public boolean insertObject(SRTObject obj) throws SRTDAOException {
+	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
 				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
@@ -197,7 +197,7 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		} finally {
 			tx.close();
 		}
-		return true;
+		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
@@ -449,6 +449,13 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 
 		return true;
 
+	}
+
+	@Override
+	public int insertObject(SRTObject obj, Connection conn)
+			throws SRTDAOException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
