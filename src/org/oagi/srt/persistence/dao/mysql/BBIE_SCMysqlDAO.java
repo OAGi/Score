@@ -14,6 +14,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIE_SCVO;
+import org.oagi.srt.persistence.dto.DTVO;
 
 /**
  *
@@ -26,10 +27,10 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	private final String _tableName = "bbie_sc";
 
 	private final String _FIND_ALL_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "Min_Cardinality, Max_Cardinality, DT_SC_Primitive_Restriction_ID FROM " + _tableName;
+			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, 'Default', Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
 	
 	private final String _FIND_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "Min_Cardinality, Max_Cardinality, DT_SC_Primitive_Restriction_ID FROM " + _tableName;
+			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, 'Default', Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_SC_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
 			+ "DT_SC_ID, Min_Cardinality, Max_Cardinality, DT_SC_Primitive_Restriction_ID) VALUES (?, ?, ?, ?, ?)";
@@ -181,9 +182,17 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbie_scVO.setDefinition(rs.getString("Definition"));
+				bbie_scVO.setRemark(rs.getString("Remark"));
+				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+
 			}
 			tx.commit();
 			conn.close();
@@ -241,9 +250,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbie_scVO.setDefinition(rs.getString("Definition"));
+				bbie_scVO.setRemark(rs.getString("Remark"));
+				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -276,7 +292,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 		ResultSet rs = null;
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_BBIE_SC_STATEMENT;
+			String sql = _FIND_BBIE_SC_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -284,9 +300,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbie_scVO.setDefinition(rs.getString("Definition"));
+				bbie_scVO.setRemark(rs.getString("Remark"));
+				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
 				list.add(bbie_scVO);
 			}
 			tx.commit();
@@ -320,7 +343,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 		ResultSet rs = null;
 		try {
 			//Connection conn = tx.open();
-			String sql = _FIND_ALL_BBIE_SC_STATEMENT;
+			String sql = _FIND_BBIE_SC_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -328,9 +351,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbie_scVO.setDefinition(rs.getString("Definition"));
+				bbie_scVO.setRemark(rs.getString("Remark"));
+				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
 				list.add(bbie_scVO);
 			}
 			//tx.commit();
@@ -432,8 +462,71 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		DBAgent tx = new DBAgent();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			Connection conn = tx.open();
+			String sql = _FIND_BBIE_SC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BBIE_SCVO bbie_scVO = new BBIE_SCVO();
+				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
+				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
+				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
+				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
+				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
+				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbie_scVO.setDefinition(rs.getString("Definition"));
+				bbie_scVO.setRemark(rs.getString("Remark"));
+				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				list.add(bbie_scVO);
+			}
+			conn.close();
+		} catch (BfPersistenceException e) {
+			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+			tx.close();
+		}
+		return list;
 	}
 
 	@Override
