@@ -42,8 +42,8 @@ public class ASBIEMysqlDAO extends SRTDAO{
 
 	private final String _UPDATE_ASBIE_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET ASBIE_ID = ?, Assoc_From_ABIE_ID = ?, Assoc_To_ASBIEP_ID = ?, Based_ASCC = ?, Cardinality_Min = ?, "
-			+ "Cardinality_Max = ?, asbie_guid = ?, definition = ?, nillable = ?, remark = ?, last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_key = ?";
+			+ " SET Assoc_From_ABIE_ID = ?, Assoc_To_ASBIEP_ID = ?, Based_ASCC = ?, Cardinality_Min = ?, "
+			+ "Cardinality_Max = ?, asbie_guid = ?, definition = ?, nillable = ?, remark = ?, last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_key = ? where ASBIE_ID = ?";
 
 	private final String _DELETE_ASBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASBIE_ID = ?";
@@ -284,6 +284,7 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			ps.setString(9, asbievo.getRemark());
 			ps.setInt(10, asbievo.getLastUpdatedByUserId());
 			ps.setDouble(11, asbievo.getSequencingKey());
+			ps.setInt(12, asbievo.getASBIEID());
 			
 			ps.executeUpdate();
 

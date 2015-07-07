@@ -48,12 +48,6 @@ public class ABIEMysqlDAO extends SRTDAO {
 			+ " Definition, Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
 			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term, ABIE_ID) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
-	private final String _UPDATE_ABIE_STATEMENT = 
-			"UPDATE " + _tableName
-			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, Based_ACC_ID = ?,"
-			+ " isTop_Level = ?, Business_Context_ID = ?, Definition = ?, Created_By_User_ID = ?,"
-			+ " Last_Updated_By_User_ID = ?, State = ?, ABIE_GUID = ?, Client_ID = ?, Version = ?, Status = ?, Remark = ?, Business_Term = ? WHERE ABIE_ID = ?";
-	
 	private final String _DELETE_ABIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ABIE_ID = ?";
 	
@@ -330,6 +324,11 @@ public class ABIEMysqlDAO extends SRTDAO {
 			
 	}
 
+	private final String _UPDATE_ABIE_STATEMENT = 
+			"UPDATE " + _tableName
+			+ " SET Based_ACC_ID = ?, isTop_Level = ?,  "
+			+ " Business_Context_ID = ?, Definition = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
+			+ " Last_Updated_By_User_ID = ?, State = ?, ABIE_GUID = ?, Client_ID = ?, Version = ?, Status = ?, Remark = ?, Business_Term = ? WHERE ABIE_ID = ?";
 	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -352,6 +351,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps.setString(10, abieVO.getStatus());
 			ps.setString(11, abieVO.getRemark());
 			ps.setString(12, abieVO.getBusinessTerm());
+			ps.setInt(13, abieVO.getABIEID());
 			
 			ps.executeUpdate();
 

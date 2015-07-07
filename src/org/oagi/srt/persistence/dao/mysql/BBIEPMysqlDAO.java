@@ -43,10 +43,6 @@ public class BBIEPMysqlDAO extends SRTDAO {
 			+ " (BBIEP_GUID, Based_BCCP_ID, Definition, Created_By_User_ID, Last_Updated_by_User_ID, "
 			+ "Creation_Timestamp, Last_Update_Timestamp, remark, business_term, BBIEP_ID) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?)";
 	
-	private final String _UPDATE_BBIEP_STATEMENT = "UPDATE " + _tableName + " SET "
-			+ "Last_Update_Timestamp = CURRENT_TIMESTAMP, BBIEP_GUID = ?, Based_BCCP_ID = ?, Definition = ?, "
-			+ "Created_By_User_ID = ?, Last_Updated_by_User_ID = ?, Creation_Timestamp = ?, remark = ?, business_term = ? WHERE BBIEP_ID = ?";
-	
 	private final String _DELETE_BBIEP_STATEMENT = "DELETE FROM " + _tableName + " WHERE BBIEP_ID = ?";
 
 	public int findMaxId() throws SRTDAOException {
@@ -289,6 +285,10 @@ public class BBIEPMysqlDAO extends SRTDAO {
 
 		return list;
 	}
+	
+	private final String _UPDATE_BBIEP_STATEMENT = "UPDATE " + _tableName + " SET "
+			+ "Last_Update_Timestamp = CURRENT_TIMESTAMP, BBIEP_GUID = ?, Based_BCCP_ID = ?, Definition = ?, "
+			+ "Created_By_User_ID = ?, Last_Updated_by_User_ID = ?, Creation_Timestamp = ?, remark = ?, business_term = ? WHERE BBIEP_ID = ?";
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();

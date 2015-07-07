@@ -40,12 +40,6 @@ public class BBIEMysqlDAO extends SRTDAO{
 					+ "Definition, bbie_guid, bdt_Primitive_Restriction_Id, code_list_id, bbie.default, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key)"
 					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 
-	private final String _UPDATE_BBIE_STATEMENT = 
-			"UPDATE " + _tableName
-			+ " SET Based_BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, isNillable = ?, Fixed_Value = ?, Assoc_From_ABIE_ID = ?, "
-			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, bbie.default = ?, remark = ?, "
-			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_key = ? where bbie_id = ?";
-
 	private final String _DELETE_BBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BBIE_ID = ?";
 
@@ -305,6 +299,13 @@ public class BBIEMysqlDAO extends SRTDAO{
 		return list;
 	}
 
+	private final String _UPDATE_BBIE_STATEMENT = 
+			"UPDATE " + _tableName
+			+ " SET Based_BCC_ID = ?, Cardinality_Min = ?, Cardinality_Max = ?, isNillable = ?, Fixed_Value = ?, Assoc_From_ABIE_ID = ?, "
+			+ "Assoc_To_BBIEP_ID = ?, Definition = ?, bbie_guid = ?, bdt_Primitive_Restriction_Id = ?, code_list_id = ?, bbie.default = ?, remark = ?, "
+			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_key = ? where bbie_id = ?";
+
+	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		BBIEVO bbieVO = (BBIEVO)obj;
@@ -327,10 +328,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(11, bbieVO.getCodeListId());
 			ps.setString(12, bbieVO.getDefaultText());
 			ps.setString(13, bbieVO.getRemark());
-			ps.setInt(14, bbieVO.getCreatedByUserId());
-			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
-			ps.setDouble(16, bbieVO.getSequencing_number());
-			ps.setInt(17,  bbieVO.getBBIEID());
+			ps.setInt(14, bbieVO.getLastUpdatedByUserId());
+			ps.setDouble(15, bbieVO.getSequencing_number());
+			ps.setInt(16,  bbieVO.getBBIEID());
 			
 			ps.executeUpdate();
 

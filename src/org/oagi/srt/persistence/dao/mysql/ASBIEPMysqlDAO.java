@@ -46,11 +46,6 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			+ "Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp, ASBIEP_ID) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 	
-	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
-			" SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ASBIEP_GUID = ?, Based_ASCCP_ID = ?,"
-			+ " Role_Of_ABIE_ID = ?, Definition = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
-			+ "Creation_Timestamp = ? WHERE ASBIEP_ID = ?";
-	
 	private final String _DELETE_ASBIEP_STATEMENT = "DELETE FROM " + _tableName + " WHERE ASBIEP_ID = ?";
 
 	public int findMaxId() throws SRTDAOException {
@@ -291,6 +286,10 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 		return list;		
 	}
 
+	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
+			" SET ASBIEP_GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
+			+ "Creation_Timestamp = ?, remark = ? WHERE ASBIEP_ID = ?";
+	
 	@Override
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -308,7 +307,8 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.setInt(5, asbiepVO.getCreatedByUserID());
 			ps.setInt(6, asbiepVO.getLastUpdatedByUserID());
 			ps.setTimestamp(7, asbiepVO.getCreationTimestamp());
-			ps.setTimestamp(8, asbiepVO.getLastUpdateTimestamp());
+			ps.setString(8, asbiepVO.getRemark());
+			ps.setInt(9, asbiepVO.getASBIEPID());
 			ps.executeUpdate();
 
 			tx.commit();

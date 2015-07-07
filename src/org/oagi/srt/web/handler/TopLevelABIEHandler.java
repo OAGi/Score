@@ -391,7 +391,10 @@ public class TopLevelABIEHandler implements Serializable {
 				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 				
 				ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
+				bbieVO.setCardinalityMax(bccVO.getCardinalityMax());
+				bbieVO.setCardinalityMin(bccVO.getCardinalityMin());
 				av.setBccVO(bccVO);
+				bbiepVO.setDefinition(bccpVO.getDefinition());
 				av.setBbiepVO(bbiepVO);
 				av.setBbieVO(bbieVO);
 				av.setBccpVO(bccpVO);
@@ -425,10 +428,15 @@ public class TopLevelABIEHandler implements Serializable {
 					
 					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), asbieVO.getASBIEID(), "ASBIE");
 					av.setColor("blue");
+					asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
+					asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
+					asbieVO.setDefinition(asccVO.getDefinition());
 					av.setAsccVO(asccVO);
 					av.setAsccpVO(asccpVO);
 					av.setAccVO(accVOFromASCCP);
+					abieVO.setDefinition(accVO.getDefinition());
 					av.setAbieVO(abieVO);
+					asbiepVO.setDefinition(asccpVO.getDefinition());
 					av.setAsbiepVO(asbiepVO);
 					av.setAsbieVO(asbieVO);
 					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
@@ -751,7 +759,11 @@ public class TopLevelABIEHandler implements Serializable {
 				bbiescCount++;
 				
 				ABIEView av = new ABIEView(dtsc.getPropertyTerm(), key, "BBIESC");
+				bbiescVO.setMaxCardinality(dtsc.getMaxCardinality());
+				bbiescVO.setMinCardinality(dtsc.getMinCardinality());
+				bbiescVO.setDefinition(dtsc.getDefinition());
 				av.setDtscVO(dtsc);
+				
 				av.setBbiescVO(bbiescVO);
 				av.setColor("orange");
 				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
@@ -966,6 +978,54 @@ public class TopLevelABIEHandler implements Serializable {
 	
 	public void showDetails() {
 		aABIEView = (ABIEView)selectedTreeNode.getData();
+	}
+	
+	public void saveChanges() {
+		aABIEView = (ABIEView)selectedTreeNode.getData();
+		if(aABIEView.type.equals("ASBIE")) {
+			saveASBIEChanges(aABIEView);
+		} else if(aABIEView.type.equals("BBIE")) {
+			saveBBIEChanges(aABIEView);
+		} else if(aABIEView.type.equals("BBIESC")) {
+			saveBBIESCChanges(aABIEView);
+		}
+		
+		FacesMessage msg = new FacesMessage("Changes on '" + aABIEView.name + "' are just saved!", "Changes on '" + aABIEView.name + "' are just saved!");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+	
+	private void saveBBIEChanges(ABIEView aABIEView) {
+		BBIEVO bbieVO = aABIEView.getBbieVO();
+		BBIEPVO bbiepVO = aABIEView.getBbiepVO();
+		try {
+			bbieDao.updateObject(bbieVO);
+			bbiepDao.updateObject(bbiepVO);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveBBIESCChanges(ABIEView aABIEView) {
+		BBIE_SCVO bbiescVO = aABIEView.getBbiescVO();
+		try {
+			bbiescDao.updateObject(bbiescVO);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveASBIEChanges(ABIEView aABIEView) {
+		ASBIEVO asbieVO = aABIEView.getAsbieVO();
+		ABIEVO abieVO = aABIEView.getAbieVO();
+		ASBIEPVO asbiepVO = aABIEView.getAsbiepVO();
+		
+		try {
+			asbieDao.updateObject(asbieVO);
+			asbiepDao.updateObject(asbiepVO);
+			abieDao.updateObject(abieVO);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 	}
 	
     public class ABIEView implements Serializable, Comparable<ABIEView> {

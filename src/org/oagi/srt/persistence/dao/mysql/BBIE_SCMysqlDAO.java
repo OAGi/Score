@@ -37,10 +37,6 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	private final String _INSERT_BBIE_SC_WITH_ID_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
 			+ "DT_SC_ID, Min_Cardinality, Max_Cardinality, DT_SC_Primitive_Restriction_ID, BBIE_SC_ID) VALUES (?, ?, ?, ?, ?, ?)";
 	
-	private final String _UPDATE_BBIE_SC_STATEMENT = "UPDATE " + _tableName + " SET BBIE_ID = ?, "
-			+ "DT_SC_ID = ?, Min_Cardinality = ?, Max_Cardinality = ?, DT_SC_Primitive_Restriction_ID = ? "
-			+ "WHERE BBIE_SC_ID = ?";
-	
 	private final String _DELETE_BBIE_SC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BBIE_SC_ID = ?";
 
@@ -359,6 +355,10 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 
 		return list;
 	}
+	
+	private final String _UPDATE_BBIE_SC_STATEMENT = "UPDATE " + _tableName + " SET BBIE_ID = ?, "
+			+ "DT_SC_ID = ?, Min_Cardinality = ?, Max_Cardinality = ?, DT_SC_Primitive_Restriction_ID = ? "
+			+ "WHERE BBIE_SC_ID = ?";
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -374,6 +374,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 			ps.setInt(3, bbie_scVO.getMinCardinality());
 			ps.setInt(4, bbie_scVO.getMaxCardinality());
 			ps.setInt(5, bbie_scVO.getDTSCPrimitiveRestrictionID());
+			ps.setInt(6, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 
 			tx.commit();

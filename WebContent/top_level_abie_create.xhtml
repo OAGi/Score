@@ -235,7 +235,7 @@
         <p:tab id="create_u_bie" title="Create uncommitted BIE">
         	<p:growl id="messages2" />
         	<p:panel header="Create uncommitted BIE">
-        	
+				<p:messages autoUpdate="true" />
         		<p:layout style="min-width:800px; min-height:600px;">
 				    <p:layoutUnit position="west" resizable="true" size="400" minSize="400" maxSize="400">
 				        <p:treeTable id="treeTable" value="#{topLevelABIEHandler.root}" var="aBIEView" selection="#{topLevelABIEHandler.selectedTreeNode}" selectionMode="single" dynamic="true"> 
@@ -261,46 +261,52 @@
 									<h:outputLabel rows="10" value="ASBIE: " style="font-weight:bold; color:red" />
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
-						            
-									<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.nillable}" />
-									
 									<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMin}" />
 									
 									<h:outputLabel rows="10" value="Max:" style="font-weight:bold" /> 
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMax}" />
 									
-									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.definition}" />
-									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.remark}" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbieVO.remark}" />
+									
+									<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.nillable}" />
+									
+									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbieVO.definition}">
+									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
 								<h:panelGrid columns="1" cellpadding="5">
 									<h:outputLabel rows="10" value="ASBIEP" style="font-weight:bold; color:red" />
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
-						            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbiepVO.definition}" />
-									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.asbiepVO.remark}" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.remark}" />
+									
+									<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.businessTerm}" />
+									
+									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbiepVO.definition}">
+									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
 								<h:panelGrid columns="1" cellpadding="5">
 									<h:outputLabel rows="10" value="Target ABIE" style="font-weight:bold; color:red" />
 								</h:panelGrid>
-								<h:panelGrid columns="4" cellpadding="5">
-									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.definition}" />
-									
-						            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.definition}" />
+								<h:panelGrid columns="2" cellpadding="5">
+									<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+									
+						            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+									</p:inputTextarea>
+									
 								</h:panelGrid>
 								<p:separator />
 							</ui:fragment>
@@ -315,37 +321,39 @@
 									<h:outputLabel rows="10" value="BBIE" style="font-weight:bold; color:red" />
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
-									<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.nillable}" />
-									
 									<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMin}" />
 									
 									<h:outputLabel rows="10" value="Max:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMax}" />
 									
-									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.definition}" />
+									<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.nillable}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.remark}" />
 									
 									<h:outputLabel rows="10" value="Fixed value:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.fixedValue}" />
+									
+									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbieVO.definition}">
+									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
 								<h:panelGrid columns="1" cellpadding="5">
 									<h:outputLabel rows="10" value="BBIEP" style="font-weight:bold; color:red" />
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
+									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiepVO.remark}" /> 
+									
 									<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.businessTerm}" />
 									
-						            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.definition}" />
-									
-									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.remark}" /> 
+									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiepVO.definition}">
+									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
 						    </ui:fragment>
@@ -369,17 +377,19 @@
 									<h:outputLabel rows="10" value="Default:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.defaultText}" />
 									
-									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.definition}" />
-									
 									<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.businessTerm}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.remark}" />
+									
+									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiescVO.definition}">
+									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
 						    </ui:fragment>
+						    <p:commandButton value="Save" icon="ui-icon-extlink" actionListener="#{topLevelABIEHandler.saveChanges}" />
 							
 			            </p:panel>
 				    </p:layoutUnit>
