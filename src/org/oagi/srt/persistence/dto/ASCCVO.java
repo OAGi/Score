@@ -15,7 +15,7 @@ public class ASCCVO extends SRTObject {
 	private int CardinalityMin;
 	private int CardinalityMax;
 	private int SequencingKey;
-	private int AssocFromACCID;
+	private int AssocFromACCID;  
 	private int AssocToASCCPID;
 	private String DEN;
 	private String Definition;
@@ -23,6 +23,8 @@ public class ASCCVO extends SRTObject {
 	public int getASCCID(){
 		return ASCCID;
 	}
+	
+	
 	
 	public void setASCCID(int aSCCID){
 		ASCCID = aSCCID;

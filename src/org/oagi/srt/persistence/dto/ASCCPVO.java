@@ -32,6 +32,9 @@ public class ASCCPVO extends SRTObject implements Serializable {
 		return ASCCPID;
 	}
 	
+	
+	
+	
 	public void setASCCPID(int aSCCPID) {
 		ASCCPID = aSCCPID;
 	}

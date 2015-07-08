@@ -728,7 +728,7 @@ public class TopLevelABIEHandler implements Serializable {
 		bbieVO.setCreatedByUserId(userId); 
 		bbieVO.setLastUpdatedByUserId(userId); 
 		//bbieVO.setBBIEID(Utility.getRandomID(maxBIEID));
-		bbieVO.setSequencing_number(Double.parseDouble(seqKey));
+		bbieVO.setSequencing_key(Double.parseDouble(seqKey));
 		
 		try {
 			int key = bbieDao.insertObject(bbieVO, conn);

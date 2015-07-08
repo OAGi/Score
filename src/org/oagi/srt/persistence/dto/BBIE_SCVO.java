@@ -12,20 +12,22 @@ public class BBIE_SCVO extends SRTObject {
 	private int BBIESCID;
 	private int BBIEID;
 	private int DTSCID;
+	private int DTSCPrimitiveRestrictionID;
+	private int codeListId;
+	private int AgencyIdListId;
 	private int MinCardinality;
 	private int MaxCardinality;
-	private int DTSCPrimitiveRestrictionID;
 	
-	private int codeListId;
-	private String defaultText;
-	private String fixedValue;
-	private String definition;
-	private String remark;
-	private String businessTerm;
+	private String Default;
+	private String FixedValue;
+	private String Definition;
+	private String Remark;
+	private String BusinessTerm;
 	
-	public int getBBIESCID() {
+	public int getBBIESCID() {  
 		return BBIESCID;
 	}
+	
 	public void setBBIESCID(int bBIESCID) {
 		BBIESCID = bBIESCID;
 	}
@@ -35,6 +37,7 @@ public class BBIE_SCVO extends SRTObject {
 	public void setBBIEID(int bBIEID) {
 		BBIEID = bBIEID;
 	}
+	
 	public int getDTSCID() {
 		return DTSCID;
 	}
@@ -44,6 +47,8 @@ public class BBIE_SCVO extends SRTObject {
 	public int getMinCardinality() {
 		return MinCardinality;
 	}
+	
+	
 	public void setMinCardinality(int minCardinality) {
 		MinCardinality = minCardinality;
 	}
@@ -65,34 +70,40 @@ public class BBIE_SCVO extends SRTObject {
 	public void setCodeListId(int codeListId) {
 		this.codeListId = codeListId;
 	}
-	public String getDefaultText() {
-		return defaultText;
+	public int getAgencyIdListId() {
+		return AgencyIdListId;
+	}
+	public void setAgencyIdListId(int agencyIdListId) {
+		this.AgencyIdListId = agencyIdListId;
+	}
+	public String getDefault() {
+		return Default;
 	}
 	public void setDefaultText(String defaultText) {
-		this.defaultText = defaultText;
+		this.Default = defaultText;
 	}
 	public String getFixedValue() {
-		return fixedValue;
+		return FixedValue;
 	}
 	public void setFixedValue(String fixedValue) {
-		this.fixedValue = fixedValue;
+		this.FixedValue = fixedValue;
 	}
 	public String getDefinition() {
-		return definition;
+		return Definition;
 	}
 	public void setDefinition(String definition) {
-		this.definition = definition;
+		this.Definition = definition;
 	}
 	public String getRemark() {
-		return remark;
+		return Remark;
 	}
 	public void setRemark(String remark) {
-		this.remark = remark;
+		this.Remark = remark;
 	}
 	public String getBusinessTerm() {
-		return businessTerm;
+		return BusinessTerm;
 	}
 	public void setBusinessTerm(String businessTerm) {
-		this.businessTerm = businessTerm;
+		this.BusinessTerm = businessTerm;
 	}
 }

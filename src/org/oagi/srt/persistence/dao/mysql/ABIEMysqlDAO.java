@@ -100,7 +100,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
 			ps.setInt(1, abieVO.getBasedACCID());
-			ps.setBoolean(2, abieVO.getIsTopLevel());
+			ps.setInt(2, abieVO.getIsTopLevel());
 			ps.setInt(3, abieVO.getBusinessContextID());
 			ps.setString(4, abieVO.getDefinition());
 			ps.setInt(5, abieVO.getCreatedByUserID());
@@ -163,7 +163,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
 			ps.setInt(1, abieVO.getBasedACCID());
-			ps.setBoolean(2, abieVO.getIsTopLevel());
+			ps.setInt(2, abieVO.getIsTopLevel());
 			ps.setInt(3, abieVO.getBusinessContextID());
 			ps.setString(4, abieVO.getDefinition());
 			ps.setInt(5, abieVO.getCreatedByUserID());
@@ -233,7 +233,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
-				abieVO.setIsTopLevel(rs.getBoolean("isTop_Level"));
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
 				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				abieVO.setDefinition(rs.getString("Definition"));
 				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
@@ -285,7 +285,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ABIEVO abieVO = new ABIEVO();
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
-				abieVO.setIsTopLevel(rs.getBoolean("isTop_Level"));
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
 				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				abieVO.setDefinition(rs.getString("Definition"));
 				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
@@ -341,7 +341,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_ABIE_STATEMENT);
 			
 			ps.setInt(1, abieVO.getBasedACCID());
-			ps.setBoolean(2, abieVO.getIsTopLevel());
+			ps.setInt(2, abieVO.getIsTopLevel());
 			ps.setInt(3, abieVO.getBusinessContextID());
 			ps.setString(4, abieVO.getDefinition());
 			ps.setInt(5, abieVO.getLastUpdatedByUserID());
@@ -447,7 +447,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ABIEVO abieVO = new ABIEVO();
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
-				abieVO.setIsTopLevel(rs.getBoolean("isTop_Level"));
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
 				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				abieVO.setDefinition(rs.getString("Definition"));
 				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
@@ -539,7 +539,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO = new ABIEVO();
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
-				abieVO.setIsTopLevel(rs.getBoolean("isTop_Level"));
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
 				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				abieVO.setDefinition(rs.getString("Definition"));
 				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
@@ -627,7 +627,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ABIEVO abieVO = new ABIEVO();
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
-				abieVO.setIsTopLevel(rs.getBoolean("isTop_Level"));
+				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
 				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
 				abieVO.setDefinition(rs.getString("Definition"));
 				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
