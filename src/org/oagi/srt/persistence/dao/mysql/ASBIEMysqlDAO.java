@@ -14,6 +14,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ASBIEVO;
+import org.oagi.srt.persistence.dto.DTVO;
 
 /**
 *
@@ -417,15 +418,172 @@ public class ASBIEMysqlDAO extends SRTDAO{
 	@Override
 	public SRTObject findObject(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ASBIEVO asbievo = null;
+		
+		try {
+			String sql = _FIND_ASBIE_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				asbievo = new ASBIEVO();
+				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
+				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
+				asbievo.setDefinition(rs.getString("Definition"));
+				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setRemark(rs.getString("Remark"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return asbievo;
+
 	}
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			String sql = _FIND_ASBIE_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				ASBIEVO asbievo = new ASBIEVO();
+				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
+				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
+				asbievo.setDefinition(rs.getString("Definition"));
+				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setRemark(rs.getString("Remark"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+				list.add(asbievo);
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return list;
 	}
 
 	@Override

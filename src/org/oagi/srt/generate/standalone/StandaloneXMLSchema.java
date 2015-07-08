@@ -97,7 +97,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ASCCP");
     	QueryCondition qc = new QueryCondition();
 		qc.add("ASCCP_ID", gTlASBIEP.getBasedASCCPID());
-		ArrayList<SRTObject> asccpvo = dao.findObjects(qc);
+		ArrayList<SRTObject> asccpvo = dao.findObjects(qc, conn);
 		for(SRTObject aSRTObject : asccpvo){
 			ASCCPVO asccpVO = (ASCCPVO)aSRTObject;
 			rootEleNode.setAttribute("name", toCamelCase(asccpVO.getDEN().replaceAll("Type", "")));
@@ -126,7 +126,7 @@ public class StandaloneXMLSchema {
 				node = generateASBIEP(anASBIEP, node);
 				ABIEVO anABIE = queryTargetABIE2(anASBIEP);
 				node = generateABIE(anABIE, node);
-				node = generateBIEs(anABIE, node, gSchemaNode);
+				//node = generateBIEs(anABIE, node, gSchemaNode);
 			}
 			else {
 				BBIEVO childBIE = (BBIEVO)aSRTObject;
@@ -142,7 +142,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ABIE");
 		QueryCondition qc = new QueryCondition();
 		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
-		ABIEVO abievo = (ABIEVO)dao.findObject(qc);
+		ABIEVO abievo = (ABIEVO)dao.findObject(qc, conn);
 		return abievo;
 	}
 	
@@ -151,7 +151,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ASBIE");
     	QueryCondition qc = new QueryCondition();
 		qc.add("Assoc_From_ABIE_ID", gABIE.getABIEID());
-		ArrayList<SRTObject> asbievo = dao.findObjects(qc);
+		ArrayList<SRTObject> asbievo = dao.findObjects(qc, conn);
 
 		SRTDAO dao2 = df.getDAO("BBIE");
     	QueryCondition qc2 = new QueryCondition();
@@ -205,7 +205,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ASCCP");
     	QueryCondition qc = new QueryCondition();
 		qc.add("ASCCP_ID", gASBIEP.getBasedASCCPID());
-		ASCCPVO asccpVO = (ASCCPVO)dao.findObject(qc);
+		ASCCPVO asccpVO = (ASCCPVO)dao.findObject(qc, conn);
 		gElementNode.setAttribute("name", toCamelCase(asccpVO.getDEN().replaceAll("Type", "")));	
 		return gElementNode;
 	}
@@ -215,7 +215,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ABIE");
     	QueryCondition qc = new QueryCondition();
 		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
-		ABIEVO abieVO = (ABIEVO)dao.findObject(qc);		
+		ABIEVO abieVO = (ABIEVO)dao.findObject(qc, conn);		
 		return abieVO;
 	}
 	
@@ -241,7 +241,6 @@ public class StandaloneXMLSchema {
 	
 	public Element generateBBIE(BBIEVO gBBIE, DTVO gBDT, Element gPNode, Element gSchemaNode) throws Exception{
 		Element eNode = gPNode.getOwnerDocument().createElement("xsd:element"); 
-		gPNode.appendChild(eNode);
 		
 		Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
 		
@@ -252,17 +251,18 @@ public class StandaloneXMLSchema {
 		BCCVO bccVO = (BCCVO)dao.findObject(qc);
 		nameANode.setValue(toCamelCase(Utility.first(bccVO.getDEN())));
 		eNode.setAttributeNode(nameANode);
+
+		if(gBBIE.getDefaultText() != null && gBBIE.getFixedValue() != null) { 
+			System.out.println("Error");
+			return null;
+		}
 		
 		if(gBBIE.getNillable() == 1) {
 			Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
 			nillable.setValue("true");
 			eNode.setAttributeNode(nillable);
 		}
-		if(gBBIE.getDefaultText() != null && gBBIE.getFixedValue() != null) { 
-			System.out.println("Error");
-			return null;
-		}
-		
+
 		if(gBBIE.getDefaultText() != null) {
 			Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
 			defaulta.setValue(gBBIE.getDefaultText());
@@ -274,6 +274,8 @@ public class StandaloneXMLSchema {
 			fixedvalue.setValue(gBBIE.getFixedValue());
 			eNode.setAttributeNode(fixedvalue);
 		}
+
+		gPNode.appendChild(eNode);
 
 		ArrayList<SRTObject> SCs = queryBBIESCs(gBBIE); 
 
@@ -306,7 +308,7 @@ public class StandaloneXMLSchema {
 				aCL = (CodeListVO)dao1.findObject(qc1_3);
 			}
 		}
-		
+
 		if(aCL.getCodeListID() == 0){
 			if(gBBIE.getBdtPrimitiveRestrictionId() == 0) {
 				if(SCs.size() == 0) {
@@ -488,6 +490,7 @@ public class StandaloneXMLSchema {
 				eNode.setAttributeNode(tNode);
 				return eNode;
 			}
+			
 			else {
 				Element complextType = eNode.getOwnerDocument().createElement("xsd:complexType");
 				Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
@@ -519,10 +522,8 @@ public class StandaloneXMLSchema {
 	public boolean isCodeListGenerated(CodeListVO gCL) throws Exception {
 		Vector<String> GuidVector = getGUIDVector();
 		for(int i = 0; i < GuidVector.size(); i++) {
-			if(gCL.getCodeListGUID() == GuidVector.get(i)){
-				System.out.println("#### true");
+			if(gCL.getCodeListGUID().equals(GuidVector.get(i)))
 				return true;
-			}
 		}
 		return false;
 	}
@@ -580,15 +581,16 @@ public class StandaloneXMLSchema {
 		for(int i = 0; i < codelistid.size(); i++){
 			CodeListValueVO aCodeListValue = (CodeListValueVO)codelistid.get(i);
 			if(aCodeListValue.getUsedIndicator())
-				gCLVs.add(aCodeListValue);				
+				gCLVs.add(aCodeListValue);
 		}
 		for(int i = 0; i< gCLVs.size(); i++){
 			CodeListValueVO bCodeListValue = (CodeListValueVO)gCLVs.get(i);
 			Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-			stNode.appendChild(enumeration);
 			Attr value = stNode.getOwnerDocument().createAttribute("value");
 			value.setNodeValue(bCodeListValue.getValue());
-			stNode.setAttributeNode(value);
+			enumeration.setAttributeNode(value);
+			rtNode.appendChild(enumeration);
+
 		}		
 		return stNode;
 	}
@@ -648,10 +650,10 @@ public class StandaloneXMLSchema {
 		for(int i = 0; i< gCLVs.size(); i++){
 			CodeListValueVO bCodeListValue = (CodeListValueVO)gCLVs.get(i);
 			Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-			stNode.appendChild(enumeration);
 			Attr value = stNode.getOwnerDocument().createAttribute("value");
 			value.setNodeValue(bCodeListValue.getValue());
-			stNode.setAttributeNode(value);
+			enumeration.setAttributeNode(value);
+			rtNode.appendChild(enumeration);			
 		}		
 		return stNode;
 	}
@@ -819,7 +821,7 @@ public class StandaloneXMLSchema {
 	public boolean isAgencyListGenerated(AgencyIDListVO gAL) throws Exception {
 		Vector<String> GuidVector = getGUIDVector();
 		for(int i = 0; i < GuidVector.size(); i++) {
-			if(gAL.getAgencyIDListGUID() == GuidVector.get(i))
+			if(gAL.getAgencyIDListGUID().equals(GuidVector.get(i)))
 				return true;
 		}
 		return false;
@@ -882,6 +884,7 @@ public class StandaloneXMLSchema {
 			AgencyIDListVO agencyIDListVO = (AgencyIDListVO)agencyidlist.get(i);	
 			result.add(agencyIDListVO.getAgencyIDListGUID());
 		}
+
 		return result;
 	}
 
@@ -950,8 +953,8 @@ public class StandaloneXMLSchema {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ABIE");
 		QueryCondition qc = new QueryCondition();
-		qc.add("State", 1);
-		ArrayList<SRTObject> aABIEVO = dao.findObjects(qc);
+		qc.add("ABIE_ID", 1);
+		ArrayList<SRTObject> aABIEVO = dao.findObjects(qc, conn);
 		return aABIEVO;
 	}
 	

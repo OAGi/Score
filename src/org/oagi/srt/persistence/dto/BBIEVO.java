@@ -13,32 +13,40 @@ import org.oagi.srt.common.SRTObject;
 public class BBIEVO extends SRTObject {
 
 	private int BBIEID;
+	private String bbieGuid;
 	private int BasedBCCID;
-	private int CardinalityMin;
-	private int CardinalityMax;
-	private int Nillable;
 	private int AssocFromABIEID;
 	private int AssocToBBIEPID;
-	private String Definition;
-	
-	private String bbieGuid;
 	private int bdtPrimitiveRestrictionId;
 	private int codeListId;
+	private int CardinalityMin;
+	private int CardinalityMax;
 	private String defaultText;
+	private int Nillable;
 	private String fixedValue;
+	private int isNull;
+	private String Definition;
 	private String remark;
 	private int createdByUserId;
 	private int lastUpdatedByUserId;
 	private Timestamp creationTimestamp;
 	private Timestamp lastUpdateTimestamp;
-	private double sequencing_number;
+	private double sequencing_key;
 	
-	public double getSequencing_number() {
-		return sequencing_number;
+	public int getIsNull() {
+		return isNull;
 	}
 
-	public void setSequencing_number(double sequencing_number) {
-		this.sequencing_number = sequencing_number;
+	public void setIsNull(int isNull) {
+		this.isNull = isNull;
+	}
+
+	public double getSequencing_key() {
+		return sequencing_key;
+	}
+
+	public void setSequencing_key(double sequencing_key) {
+		this.sequencing_key = sequencing_key;
 	}
 
 	public int getBBIEID() {

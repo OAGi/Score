@@ -26,12 +26,12 @@ public class BBIEMysqlDAO extends SRTDAO{
 	private final String _tableName = "bbie";
 
 	private final String _FIND_ALL_BBIE_STATEMENT = 
-			"SELECT BBIE_ID, BBIE_GUID, Based_BCC_ID, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, bdt_Primitive_Restriction_Id, code_list_id, Cardinality_Min, Cardinality_Max, 'Default', isNillable, Fixed_Value,  "
+			"SELECT BBIE_ID, BBIE_GUID, Based_BCC_ID, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, bdt_Primitive_Restriction_Id, code_list_id, Cardinality_Min, Cardinality_Max, bbie.Default, isNillable, Fixed_Value,  "
 					+ "isNull, Definition, Remark, Created_by_user_id, Last_updated_by_user_id, Creation_timestamp, Last_update_timestamp, Sequencing_Key"
 					+ " FROM " + _tableName;
 
 	private final String _FIND_BBIE_STATEMENT = 
-			"SELECT BBIE_ID, BBIE_GUID, Based_BCC_ID, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, bdt_Primitive_Restriction_Id, code_list_id, Cardinality_Min, Cardinality_Max, 'Default', isNillable, Fixed_Value,  "
+			"SELECT BBIE_ID, BBIE_GUID, Based_BCC_ID, Assoc_From_ABIE_ID, Assoc_To_BBIEP_ID, bdt_Primitive_Restriction_Id, code_list_id, Cardinality_Min, Cardinality_Max, bbie.Default, isNillable, Fixed_Value,  "
 					+ "isNull, Definition, Remark, Created_by_user_id, Last_updated_by_user_id, Creation_timestamp, Last_update_timestamp, Sequencing_Key"
 					+ " FROM " + _tableName;
 	
@@ -85,7 +85,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(14, bbieVO.getCreatedByUserId());
 			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 			
-			ps.setDouble(16, bbieVO.getSequencing_number());
+			ps.setDouble(16, bbieVO.getSequencing_key());
 
 			ps.executeUpdate();
 			
@@ -150,7 +150,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(14, bbieVO.getCreatedByUserId());
 			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 			
-			ps.setDouble(16, bbieVO.getSequencing_number());
+			ps.setDouble(16, bbieVO.getSequencing_key());
 
 			ps.executeUpdate();
 			
@@ -209,18 +209,19 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
 				bbieVO.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
 				bbieVO.setAssocToBBIEPID(rs.getInt("Assoc_To_BBIEP_ID"));
+				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("BDT_Primitive_Restriction_ID"));
 				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bbieVO.setDefaultText(rs.getString("Default"));
 				bbieVO.setNillable(rs.getInt("isNillable"));
 				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setNillable(rs.getInt("isNull"));
+				bbieVO.setIsNull(rs.getInt("isNull"));
 				bbieVO.setDefinition(rs.getString("Definition"));
 				bbieVO.setRemark(rs.getString("Remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by_user_id"));
-				bbieVO.setSequencing_number(rs.getDouble("Sequencing_Key"));
+				bbieVO.setSequencing_key(rs.getDouble("Sequencing_Key"));
 			}
 			tx.commit();
 			conn.close();
@@ -262,18 +263,19 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
 				bbieVO.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
 				bbieVO.setAssocToBBIEPID(rs.getInt("Assoc_To_BBIEP_ID"));
+				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("BDT_Primitive_Restriction_ID"));
 				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bbieVO.setDefaultText(rs.getString("Default"));
 				bbieVO.setNillable(rs.getInt("isNillable"));
 				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setNillable(rs.getInt("isNull"));
+				bbieVO.setIsNull(rs.getInt("isNull"));
 				bbieVO.setDefinition(rs.getString("Definition"));
 				bbieVO.setRemark(rs.getString("Remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by_user_id"));
-				bbieVO.setSequencing_number(rs.getDouble("Sequencing_Key"));
+				bbieVO.setSequencing_key(rs.getDouble("Sequencing_Key"));
 				list.add(bbieVO);
 			}
 			tx.commit();
@@ -315,22 +317,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 
 			ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
 			
-			ps.setInt(1, bbieVO.getBasedBCCID());
-			ps.setInt(2, bbieVO.getCardinalityMin());
-			ps.setInt(3, bbieVO.getCardinalityMax());
-			ps.setInt(4, bbieVO.getNillable());
-			ps.setString(5, bbieVO.getFixedValue());
-			ps.setInt(6, bbieVO.getAssocFromABIEID());
-			ps.setInt(7, bbieVO.getAssocToBBIEPID());
-			ps.setString(8, bbieVO.getDefinition());
-			ps.setString(9, bbieVO.getBbieGuid());
-			ps.setInt(10, bbieVO.getBdtPrimitiveRestrictionId());
-			ps.setInt(11, bbieVO.getCodeListId());
-			ps.setString(12, bbieVO.getDefaultText());
-			ps.setString(13, bbieVO.getRemark());
-			ps.setInt(14, bbieVO.getLastUpdatedByUserId());
-			ps.setDouble(15, bbieVO.getSequencing_number());
-			ps.setInt(16,  bbieVO.getBBIEID());
+
 			
 			ps.executeUpdate();
 
@@ -427,18 +414,19 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
 				bbieVO.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
 				bbieVO.setAssocToBBIEPID(rs.getInt("Assoc_To_BBIEP_ID"));
+				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("BDT_Primitive_Restriction_ID"));
 				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
 				bbieVO.setDefaultText(rs.getString("Default"));
 				bbieVO.setNillable(rs.getInt("isNillable"));
 				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setNillable(rs.getInt("isNull"));
+				bbieVO.setIsNull(rs.getInt("isNull"));
 				bbieVO.setDefinition(rs.getString("Definition"));
 				bbieVO.setRemark(rs.getString("Remark"));
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by_user_id"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by_user_id"));
-				bbieVO.setSequencing_number(rs.getDouble("Sequencing_Key"));
+				bbieVO.setSequencing_key(rs.getDouble("Sequencing_Key"));
 				list.add(bbieVO);
 			}
 			tx.commit();
