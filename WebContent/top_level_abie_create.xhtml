@@ -251,6 +251,10 @@
 				 
 				    <p:layoutUnit position="center">
 				    	<p:panel id="details" header="View and Edit BIE" collapsed="false" toggleable="false" toggleSpeed="500">
+				    		<p:selectOneRadio id="customRadio" value="#{topLevelABIEHandler.aABIEView.restrictionType}" layout="custom">
+					            <f:selectItem itemLabel="Primitive" itemValue="Primitive" />
+					            <f:selectItem itemLabel="Code" itemValue="Code" />
+					        </p:selectOneRadio>
 							<ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE'}">
 								<h:panelGrid columns="2" cellpadding="5">
 						    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
@@ -356,6 +360,34 @@
 									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
+								<h:panelGrid columns="1" cellpadding="5">
+									<h:outputLabel rows="10" value="BDT Primitive Restriction" style="font-weight:bold; color:red" />
+								</h:panelGrid>
+								<h:panelGrid columns="2" cellpadding="5">
+									<h:outputLabel rows="10" value="BDT Name:" style="font-weight:bold" />
+									<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtName}" style="font-weight:bold; color: blue;" />
+								</h:panelGrid>
+								<h:panelGrid columns="4" cellpadding="5">
+									<p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true" />
+									<h:outputLabel rows="10" value="Primitive:" style="font-weight:bold" />
+									<p:selectOneMenu value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictionId}">
+										<p:ajax listener="#{topLevelABIEHandler.aABIEView.onBDTPrimitiveChange}" />
+									    <f:selectItems value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictions}" />
+									</p:selectOneMenu>
+									<h:outputLabel rows="10" value="(#{topLevelABIEHandler.aABIEView.primitiveType})" style="font-weight:bold; color: green" />
+								</h:panelGrid>
+								<h:panelGrid columns="5" cellpadding="5">
+										<p:radioButton id="opt2" for="customRadio" itemIndex="1" />
+										<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
+										<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
+										<p:commandButton value="Code List" icon="ui-icon-extlink" actionListener="#{topLevelABIEHandler.chooseCodeForTLBIE}" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
+									        <p:ajax event="dialogReturn" listener="#{topLevelABIEHandler.onCodeListChosen}" update=":form:codeSelected" />
+									    </p:commandButton>
+									    
+									    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
+									    </p:commandButton>
+								</h:panelGrid>
+								<p:separator />
 						    </ui:fragment>
 						    
 						    <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'BBIESC'}">   
@@ -394,8 +426,6 @@
 			            </p:panel>
 				    </p:layoutUnit>
 				</p:layout>
-        	
-		        
 			    <p:contextMenu for="treeTable">
 			        <p:menuitem value="View" update="treeTable" actionListener="#{topLevelABIEHandler.updateTree()}" icon="ui-icon-search" />
 			        <p:menuitem value="Edit" update="treeTable" actionListener="#{topLevelABIEHandler.updateTree()}" icon="ui-icon-close"/>
@@ -409,6 +439,41 @@
 			        </p:chart>
                 </h:panelGrid>
             </p:panel>
+            
+            <p:dialog header="Derived Code List" widgetVar="derivedCodeList" showEffect="clip" hideEffect="clip" closable="true" scrollable="true" resizable="true" draggable="true" width="800" height="700">
+        		<p:outputPanel id="derivedCodeListId">
+        			<h:panelGrid id="grid6" cellpadding="5">
+						<p:row>
+	        				<p:column style="width:800px"> 
+								<h:outputLabel value="Derived Code List" style="font-weight:bold; color:red" />
+							</p:column> 
+						</p:row>
+					</h:panelGrid>
+					<p:separator />
+					<p:messages autoUpdate="true" />
+
+		            <p:dataTable id="tbl_01" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+						paginator="true" rows="10" style="width:550px; margin-bottom:20px"
+		            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.codeListVO}" rowKey="#{cVO.codeListID}" selectionMode="single">
+						<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
+	        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
+		                <p:column style="width:400px">
+							<f:facet name="header">
+								<h:outputText value="Name" />
+							</f:facet>
+							<h:outputText value="#{cVO.name}" />
+						</p:column>
+		
+						<p:column style="width:100px">
+							<f:facet name="header">
+								<h:outputText value="Agency Id" />
+							</f:facet>
+							<h:outputText value="#{cVO.agencyID}" />
+						</p:column>
+		            </p:dataTable>
+		            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('derivedCodeList').hide()" />
+				</p:outputPanel>
+		    </p:dialog>
         </p:tab>
  
         <p:tab id="confirm" title="Confirmation">

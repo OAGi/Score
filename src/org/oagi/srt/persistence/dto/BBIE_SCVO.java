@@ -18,7 +18,7 @@ public class BBIE_SCVO extends SRTObject {
 	private int MinCardinality;
 	private int MaxCardinality;
 	
-	private String Default;
+	private String DefaultText;
 	private String FixedValue;
 	private String Definition;
 	private String Remark;
@@ -76,11 +76,11 @@ public class BBIE_SCVO extends SRTObject {
 	public void setAgencyIdListId(int agencyIdListId) {
 		this.AgencyIdListId = agencyIdListId;
 	}
-	public String getDefault() {
-		return Default;
+	public String getDefaultText() {
+		return DefaultText;
 	}
 	public void setDefaultText(String defaultText) {
-		this.Default = defaultText;
+		this.DefaultText = defaultText;
 	}
 	public String getFixedValue() {
 		return FixedValue;
