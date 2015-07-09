@@ -13,6 +13,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.DTVO;
 
 /**
 *
@@ -306,8 +307,77 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 	@Override
 	public SRTObject findObject(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		CDTAllowedPrimitiveExpressionTypeMapVO cdtallowedprimitiveexpressiontypemapVO = null;
+		
+		try {
+			String sql = _FIND_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				cdtallowedprimitiveexpressiontypemapVO = new CDTAllowedPrimitiveExpressionTypeMapVO();
+				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
+				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return cdtallowedprimitiveexpressiontypemapVO;
+
 	}
 
 	@Override

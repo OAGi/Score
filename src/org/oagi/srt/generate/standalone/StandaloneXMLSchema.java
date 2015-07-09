@@ -1,23 +1,19 @@
 package org.oagi.srt.generate.standalone;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -28,7 +24,6 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ACCVO;
 import org.oagi.srt.persistence.dto.ASBIEPVO;
 import org.oagi.srt.persistence.dto.ASBIEVO;
 import org.oagi.srt.persistence.dto.ASCCPVO;
@@ -46,22 +41,19 @@ import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.CodeListValueVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
 import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.UserVO;
 import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
-import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.oagi.srt.common.util.Utility;
 
 public class StandaloneXMLSchema {
 
 	private static Connection conn = null;
+	public static int acc_ids[] = {22202};
+	public static boolean schema_package_flag = false;
 
+	
 	public void writeXSDFile(Document doc, String filename) throws TransformerException {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
@@ -170,7 +162,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao2 = df.getDAO("BBIE");
     	QueryCondition qc2 = new QueryCondition();
 		qc2.add("Assoc_From_ABIE_ID", gABIE.getABIEID());
-		ArrayList<SRTObject> bbievo = dao2.findObjects(qc2);
+		ArrayList<SRTObject> bbievo = dao2.findObjects(qc2, conn);
 		ArrayList<SRTObject> result = new ArrayList<SRTObject>();
 
 		for(SRTObject aSRTObject : asbievo){
@@ -210,7 +202,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ASBIEP");
     	QueryCondition qc = new QueryCondition();
 		qc.add("ASBIEP_ID", gASBIE.getAssocToASBIEPID());
-		ASBIEPVO asbiepVO = (ASBIEPVO)dao.findObject(qc);
+		ASBIEPVO asbiepVO = (ASBIEPVO)dao.findObject(qc, conn);
 		return asbiepVO;
 	}
 	
@@ -231,31 +223,30 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("BCC");
     	QueryCondition qc = new QueryCondition();
 		qc.add("BCC_ID", gBBIE.getBasedBCCID());
-		BCCVO bccVO = (BCCVO)dao.findObject(qc);
+		BCCVO bccVO = (BCCVO)dao.findObject(qc, conn);
 		
 		SRTDAO dao2 = df.getDAO("BCCP");
     	QueryCondition qc2 = new QueryCondition();
 		qc2.add("BCCP_ID", bccVO.getAssocToBCCPID());
-		BCCPVO bccpVO = (BCCPVO)dao2.findObject(qc2);
+		BCCPVO bccpVO = (BCCPVO)dao2.findObject(qc2, conn);
 		
 		SRTDAO dao3 = df.getDAO("DT");
 		QueryCondition qc3 = new QueryCondition();
 		qc3.add("DT_ID", bccpVO.getBDTID());
-		DTVO aBDT = (DTVO)dao3.findObject(qc3);
+		DTVO aBDT = (DTVO)dao3.findObject(qc3, conn);
 		
 		return aBDT;
 	}
 	
 	public Element generateBBIE(BBIEVO gBBIE, DTVO gBDT, Element gPNode, Element gSchemaNode) throws Exception{
 		Element eNode = gPNode.getOwnerDocument().createElement("xsd:element"); 
-		
 		Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-		
+	
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("BCC");
     	QueryCondition qc = new QueryCondition();
 		qc.add("BCC_ID", gBBIE.getBasedBCCID());
-		BCCVO bccVO = (BCCVO)dao.findObject(qc);
+		BCCVO bccVO = (BCCVO)dao.findObject(qc, conn);
 		nameANode.setValue(toCamelCase(Utility.first(bccVO.getDEN())));
 		eNode.setAttributeNode(nameANode);
 
@@ -287,36 +278,45 @@ public class StandaloneXMLSchema {
 		ArrayList<SRTObject> SCs = queryBBIESCs(gBBIE); 
 
 		CodeListVO aCL = new CodeListVO();
+
 		if(gBBIE.getCodeListId() != 0){
 			SRTDAO dao1 = df.getDAO("CodeList");
 	    	QueryCondition qc1 = new QueryCondition();
 			qc1.add("Code_List_ID", gBBIE.getCodeListId());
-			aCL = (CodeListVO)dao1.findObject(qc1);
-		}
-		else if(gBBIE.getBdtPrimitiveRestrictionId() != 0) {
-			SRTDAO dao1 = df.getDAO("CodeList");
-	    	QueryCondition qc1_2 = new QueryCondition();
-			qc1_2.add("Code_List_ID", gBBIE.getBdtPrimitiveRestrictionId());
-			aCL = (CodeListVO)dao1.findObject(qc1_2);
+			aCL = (CodeListVO)dao1.findObject(qc1, conn);
 		}
 		
-		else if(gBBIE.getCodeListId() == 0 && gBBIE.getBdtPrimitiveRestrictionId() == 0) {
+		if(aCL.getCodeListID() == 0) {
+	    	SRTDAO dao2 = df.getDAO("BDTPrimitiveRestriction");
+	    	QueryCondition qc2_2 = new QueryCondition();
+	    	qc2_2.add("BDT_Primitive_Restriction_ID", gBBIE.getBdtPrimitiveRestrictionId());
+	    	BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao2.findObject(qc2_2, conn);
+	    	SRTDAO dao1 = df.getDAO("CodeList");		
+	    	QueryCondition qc1_2 = new QueryCondition();
+	    	qc1_2.add("Code_List_ID", aBDTPrimitiveRestriction.getCodeListID());	    	
+			aCL = (CodeListVO)dao1.findObject(qc1_2, conn);
+		}
+		
+		if(aCL.getCodeListID() == 0) {
 			SRTDAO dao2 = df.getDAO("BDTPrimitiveRestriction");
 	    	QueryCondition qc2 = new QueryCondition();
 			qc2.add("BDT_ID", gBDT.getDTID());
 			qc2.add("isDefault", 1);
-			BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao2.findObject(qc2);
-			if(aBDTPrimitiveRestriction == null)
+			BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao2.findObject(qc2, conn);
+			if(aBDTPrimitiveRestriction.getBDTPrimitiveRestrictionID() == 0)
 				aCL = null;
 			else {
 				SRTDAO dao1 = df.getDAO("CodeList");
 		    	QueryCondition qc1_3 = new QueryCondition();
 				qc1_3.add("Code_List_ID", aBDTPrimitiveRestriction.getCodeListID());
-				aCL = (CodeListVO)dao1.findObject(qc1_3);
+				if(aBDTPrimitiveRestriction.getCodeListID() !=0 )
+					aCL = (CodeListVO)dao1.findObject(qc1_3, conn);
+				else
+					aCL = null;
 			}
 		}
 
-		if(aCL.getCodeListID() == 0){
+		if(aCL == null) {
 			if(gBBIE.getBdtPrimitiveRestrictionId() == 0) {
 				if(SCs.size() == 0) {
 					Attr tNode = eNode.getOwnerDocument().createAttribute("type");
@@ -325,17 +325,17 @@ public class StandaloneXMLSchema {
 			    	QueryCondition qc3 = new QueryCondition();
 					qc3.add("BDT_ID", gBDT.getDTID());
 					qc3.add("isDefault", 1);
-					BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3);
+					BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3, conn);
 					
 					SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 			    	QueryCondition qc4 = new QueryCondition();
 					qc4.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-					CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4);
+					CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
 					
 					SRTDAO dao5 = df.getDAO("XSDBuiltInType");
 			    	QueryCondition qc5 = new QueryCondition();
 					qc5.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-					XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5);
+					XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
 					
 					tNode.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					eNode.setAttributeNode(tNode);
@@ -361,17 +361,17 @@ public class StandaloneXMLSchema {
 				    	QueryCondition qc3 = new QueryCondition();
 						qc3.add("BDT_ID", gBDT.getDTID());
 						qc3.add("isDefault", 1);
-						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3);
+						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3, conn);
 						
 						SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 				    	QueryCondition qc4 = new QueryCondition();
 						qc4.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4);
+						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
 						
 						SRTDAO dao5 = df.getDAO("XSDBuiltInType");
 				    	QueryCondition qc5 = new QueryCondition();
 						qc5.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5);
+						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
 						
 						base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					}
@@ -379,17 +379,17 @@ public class StandaloneXMLSchema {
 						SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
 				    	QueryCondition qc3_2 = new QueryCondition();
 						qc3_2.add("BDT_Primitive_Restriction_ID", gBBIE.getBdtPrimitiveRestrictionId());
-						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2);
+						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2, conn);
 						
 						SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 				    	QueryCondition qc4 = new QueryCondition();
 						qc4.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4);
+						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
 						
 						SRTDAO dao5 = df.getDAO("XSDBuiltInType");
 				    	QueryCondition qc5 = new QueryCondition();
 						qc5.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5);
+						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
 
 						base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					}
@@ -405,17 +405,17 @@ public class StandaloneXMLSchema {
 					SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
 			    	QueryCondition qc3_2 = new QueryCondition();
 					qc3_2.add("BDT_Primitive_Restriction_ID", gBBIE.getBdtPrimitiveRestrictionId());
-					BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2);
+					BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2, conn);
 					
 					SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 			    	QueryCondition qc4 = new QueryCondition();
 					qc4.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-					CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4);
+					CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
 					
 					SRTDAO dao5 = df.getDAO("XSDBuiltInType");
 			    	QueryCondition qc5 = new QueryCondition();
 					qc5.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-					XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5);
+					XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
 
 					tNode.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					eNode.setAttributeNode(tNode);
@@ -439,17 +439,17 @@ public class StandaloneXMLSchema {
 				    	QueryCondition qc3 = new QueryCondition();
 						qc3.add("BDT_ID", gBDT.getDTID());
 						qc3.add("isDefault", 1);
-						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3);
+						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3, conn);
 						
 						SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 				    	QueryCondition qc4 = new QueryCondition();
 						qc4.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4);
+						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
 						
 						SRTDAO dao5 = df.getDAO("XSDBuiltInType");
 				    	QueryCondition qc5 = new QueryCondition();
 						qc5.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5);
+						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
 						
 						base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					}
@@ -457,17 +457,17 @@ public class StandaloneXMLSchema {
 						SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
 				    	QueryCondition qc3_2 = new QueryCondition();
 						qc3_2.add("BDT_Primitive_Restriction_ID", gBBIE.getBdtPrimitiveRestrictionId());
-						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2);
+						BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2, conn);
 						
 						SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 				    	QueryCondition qc4 = new QueryCondition();
 						qc4.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4);
+						CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
 						
 						SRTDAO dao5 = df.getDAO("XSDBuiltInType");
 				    	QueryCondition qc5 = new QueryCondition();
 						qc5.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5);
+						XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
 
 						base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					}
@@ -489,17 +489,17 @@ public class StandaloneXMLSchema {
 		    	QueryCondition qc6 = new QueryCondition();
 				qc6.add("BDT_ID", gBDT.getDTID());
 				qc6.add("isDefault", 1);
-				BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao6.findObject(qc6);
+				BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao6.findObject(qc6, conn);
 				
 				SRTDAO dao7 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 		    	QueryCondition qc7 = new QueryCondition();
 				qc7.add("CDT_Primitive_Expression_Type_Map_ID", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-				CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao7.findObject(qc7);
+				CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao7.findObject(qc7, conn);
 				
 				SRTDAO dao8 = df.getDAO("XSDBuiltInType");
 		    	QueryCondition qc8 = new QueryCondition();
 				qc8.add("XSD_BuiltIn_Type_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-				XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao8.findObject(qc8);
+				XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao8.findObject(qc8, conn);
 				
 				tNode.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 				eNode.setAttributeNode(tNode);
@@ -572,7 +572,7 @@ public class StandaloneXMLSchema {
     	QueryCondition qc = new QueryCondition();
 		qc.add("BDT_ID", gBDT.getDTID());
 		qc.add("isDefault", 1);
-		BDTPrimitiveRestrictionVO dPrim = (BDTPrimitiveRestrictionVO) dao.findObject(qc);
+		BDTPrimitiveRestrictionVO dPrim = (BDTPrimitiveRestrictionVO) dao.findObject(qc, conn);
 		if(dPrim.getCodeListID() != 0) {
 			base.setNodeValue("xsd:token");
 		}
@@ -580,12 +580,12 @@ public class StandaloneXMLSchema {
 			SRTDAO dao2 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 	    	QueryCondition qc2 = new QueryCondition();
 			qc2.add("CDT_Primitive_Expression_Type_Map_ID", dPrim.getCDTPrimitiveExpressionTypeMapID());
-			CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO) dao2.findObject(qc2);
+			CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO) dao2.findObject(qc2, conn);
 	
 			SRTDAO dao3 = df.getDAO("XSDBuiltInType");
 	    	QueryCondition qc3 = new QueryCondition();
 			qc3.add("XSD_BuiltIn_Type_ID", aCDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-			XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao3.findObject(qc3);
+			XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao3.findObject(qc3, conn);
 			base.setNodeValue(aXSDBuiltInType.getBuiltInType());
 		}
 		rtNode.setAttributeNode(base);
@@ -635,7 +635,7 @@ public class StandaloneXMLSchema {
     	QueryCondition qc = new QueryCondition();
 		qc.add("BDT_SC_ID", gSC.getDTSCID());
 		qc.add("isDefault", 1);
-		BDTSCPrimitiveRestrictionVO dPrim = (BDTSCPrimitiveRestrictionVO) dao.findObject(qc);
+		BDTSCPrimitiveRestrictionVO dPrim = (BDTSCPrimitiveRestrictionVO) dao.findObject(qc, conn);
 		if(dPrim.getCodeListID() != 0) {
 			base.setNodeValue("xsd:token");
 		}
@@ -643,12 +643,12 @@ public class StandaloneXMLSchema {
 			SRTDAO dao2 = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
 	    	QueryCondition qc2 = new QueryCondition();
 			qc2.add("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID", dPrim.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-			CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExpressionTypeMap = (CDTSCAllowedPrimitiveExpressionTypeMapVO) dao2.findObject(qc2);
+			CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExpressionTypeMap = (CDTSCAllowedPrimitiveExpressionTypeMapVO) dao2.findObject(qc2, conn);
 	
 			SRTDAO dao3 = df.getDAO("XSDBuiltInType");
 	    	QueryCondition qc3 = new QueryCondition();
 			qc3.add("XSD_BuiltIn_Type_ID", aCDTSCAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-			XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao3.findObject(qc3);
+			XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao3.findObject(qc3, conn);
 			base.setNodeValue(aXSDBuiltInType.getBuiltInType());
 		}
 
@@ -658,7 +658,7 @@ public class StandaloneXMLSchema {
 		SRTDAO dao4 = df.getDAO("CodeListValue");
     	QueryCondition qc4 = new QueryCondition();
 		qc4.add("Code_List_ID", gCL.getCodeListID());
-		ArrayList<SRTObject> codelistid = dao4.findObjects(qc4);
+		ArrayList<SRTObject> codelistid = dao4.findObjects(qc4, conn);
 		ArrayList<CodeListValueVO> gCLVs = new ArrayList<CodeListValueVO>();
 
 		for(int i = 0; i < codelistid.size(); i++){
@@ -705,7 +705,7 @@ public class StandaloneXMLSchema {
 			SRTDAO dao = df.getDAO("DTSC");
 	    	QueryCondition qc = new QueryCondition();
 			qc.add("DT_SC_ID", aBBIESC.getDTSCID());
-			DTSCVO aDTSC = (DTSCVO) dao.findObject(qc);
+			DTSCVO aDTSC = (DTSCVO) dao.findObject(qc, conn);
 			aNameNode.setNodeValue(toLowerCamelCase(aDTSC.getPropertyTerm()).concat(toCamelCase(aDTSC.getRepresentationTerm())));
 			tNode.appendChild(aNode);
 			aNode.setAttributeNode(aNameNode);
@@ -719,29 +719,29 @@ public class StandaloneXMLSchema {
 			qc3.add("BDT_SC_Primitive_Restriction_ID", aBBIESC.getDTSCPrimitiveRestrictionID());
 			CodeListVO aCL = null;
 			BDTSCPrimitiveRestrictionVO aBDTSCPrimitiveRestriction = null;
-			if(((CodeListVO)dao2.findObject(qc2)).getCodeListID() != 0){ 
-				aCL = (CodeListVO) dao2.findObject(qc2);
+			if(((CodeListVO)dao2.findObject(qc2, conn)).getCodeListID() != 0){ 
+				aCL = (CodeListVO) dao2.findObject(qc2, conn);
 			}
 			
-			else if (((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3)).getBDTSCPrimitiveRestrictionID() != 0){
-				aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3);
+			else if (((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn)).getBDTSCPrimitiveRestrictionID() != 0){
+				aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn);
 				QueryCondition qc2_2 = new QueryCondition();
 				qc2_2.add("Code_List_ID", aBDTSCPrimitiveRestriction.getCodeListID());		
-				aCL = (CodeListVO) dao2.findObject(qc2_2);
+				aCL = (CodeListVO) dao2.findObject(qc2_2, conn);
 			}
 			
-			else if(((CodeListVO)dao2.findObject(qc2)).getCodeListID() == 0 && ((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3)).getBDTSCPrimitiveRestrictionID() == 0) {
+			else if(((CodeListVO)dao2.findObject(qc2, conn)).getCodeListID() == 0 && ((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn)).getBDTSCPrimitiveRestrictionID() == 0) {
 				QueryCondition qc3_2 = new QueryCondition();
 				qc3_2.add("BDT_SC_ID", aDTSC.getDTSCID());
 				qc3_2.add("isDefault", 1);
-				BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2);
+				BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2, conn);
 				QueryCondition qc2_3 = new QueryCondition();
 				qc2_3.add("Code_List_ID", bBDTSCPrimitiveRestriction.getCodeListID());		
-				if(((CodeListVO)dao2.findObject(qc2_3)).getCodeListID() == 0){
+				if(((CodeListVO)dao2.findObject(qc2_3, conn)).getCodeListID() == 0){
 					aCL = null;
 				}
 				else {
-					aCL = (CodeListVO) dao2.findObject(qc2_3);
+					aCL = (CodeListVO) dao2.findObject(qc2_3, conn);
 				}
 			}
 
@@ -758,7 +758,7 @@ public class StandaloneXMLSchema {
 				SRTDAO dao4 = df.getDAO("AgencyIDList"); //Get an agency id list
 		    	QueryCondition qc4 = new QueryCondition();
 				qc4.add("Agency_ID_List_ID", aBBIESC.getAgencyIdListId());
-				aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3);
+				aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn);
 				QueryCondition qc2_4 = new QueryCondition();
 				qc2_4.add("Agency_ID_List_ID", aBDTSCPrimitiveRestriction.getAgencyIDListID());
 				
@@ -772,7 +772,7 @@ public class StandaloneXMLSchema {
 					QueryCondition qc3_2 = new QueryCondition();
 					qc3_2.add("BDT_SC_ID", aDTSC.getDTSCID());
 					qc3_2.add("isDefault", 1);
-					bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2);
+					bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2, conn);
 					QueryCondition qc2_5 = new QueryCondition();
 					qc2_5.add("Agency_ID_List_ID", bBDTSCPrimitiveRestriction.getAgencyIDListID());		
 					if(((AgencyIDListVO) dao4.findObject(qc2_5)).getAgencyIDListID() == 0){
@@ -804,7 +804,7 @@ public class StandaloneXMLSchema {
 						SRTDAO dao6 = df.getDAO("XSDBuiltInType");
 						QueryCondition qc6 = new QueryCondition();
 						qc6.add("XSD_BuiltIn_Type_ID", aCDTSCAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-						XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao6.findObject(qc6);
+						XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao6.findObject(qc6, conn);
 						aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
 					}
 					else { //primRestriction = null?
@@ -817,7 +817,7 @@ public class StandaloneXMLSchema {
 						SRTDAO dao6 = df.getDAO("XSDBuiltInType");
 						QueryCondition qc6 = new QueryCondition();
 						qc6.add("XSD_BuiltIn_Type_ID", aCDTSCAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-						XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao6.findObject(qc6);
+						XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao6.findObject(qc6, conn);
 						aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
 					}
 					aNode.setAttributeNode(aTypeNode);
@@ -973,12 +973,16 @@ public class StandaloneXMLSchema {
 		return aASBIEPVO;
 	}
 	
-	public ArrayList<SRTObject> receiveABIE(int ACC_ID) throws SRTDAOException{
+	public ArrayList<SRTObject> receiveABIE(int based_acc_id[]) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ABIE");
-		QueryCondition qc = new QueryCondition();
-		qc.add("Based_ACC_ID", ACC_ID);
-		ArrayList<SRTObject> aABIEVO = dao.findObjects(qc, conn);
+		
+		ArrayList<SRTObject> aABIEVO = new ArrayList<SRTObject>();
+		for(int i = 0; i < based_acc_id.length ; i++) {
+			QueryCondition qc = new QueryCondition();
+			qc.add("Based_ACC_ID", based_acc_id[i]);
+			aABIEVO.addAll(dao.findObjects(qc, conn));
+		}
 		return aABIEVO;
 	}
 	
@@ -988,21 +992,23 @@ public class StandaloneXMLSchema {
 		conn = tx.open();
 
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		ArrayList<SRTObject> gABIE = aa.receiveABIE(18966);
-		boolean schema_package_flag = false;
+		ArrayList<SRTObject> gABIE = aa.receiveABIE(acc_ids);
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		Document doc = docBuilder.newDocument();
 
 		Element schemaNode = aa.generateSchema(doc);
-		
+		Calendar aCalendar = Calendar.getInstance(TimeZone.getTimeZone("EST"));
+
 		if(schema_package_flag == false) {
 			for(SRTObject aSRTObject : gABIE){
 				ABIEVO aABIEVO = (ABIEVO)aSRTObject;
 				ASBIEPVO aASBIEPVO = aa.receiveASBIEP(aABIEVO.getABIEID());
+				System.out.println("Generating Top Level ABIE w/ given ASBIEPVO ID: "+ aASBIEPVO.getASBIEPID());
 				doc = aa.generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
 			}
-			aa.writeXSDFile(doc, "packaged_file");
+			aa.writeXSDFile(doc, "packaged_file_"+(aCalendar.get(Calendar.MONTH)+1)+"_"+aCalendar.get(Calendar.DAY_OF_MONTH)+"_"+
+					aCalendar.get(Calendar.YEAR)+"_"+(aCalendar.get(Calendar.HOUR_OF_DAY)+1)+"_"+aCalendar.get(Calendar.MINUTE)+"_"+aCalendar.get(Calendar.SECOND));
 		}
 		else {
 			for(SRTObject aSRTObject : gABIE){
@@ -1013,7 +1019,8 @@ public class StandaloneXMLSchema {
 				doc = aa.generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
 				aa.writeXSDFile(doc, "Package/" + aABIEVO.getAbieGUID());
 			}
-			Zip.main("test");
+			Zip.main("packaged_zip_file_"+(aCalendar.get(Calendar.MONTH)+1)+"_"+aCalendar.get(Calendar.DAY_OF_MONTH)+"_"+
+					aCalendar.get(Calendar.YEAR)+"_"+(aCalendar.get(Calendar.HOUR_OF_DAY)+1)+"_"+aCalendar.get(Calendar.MINUTE)+"_"+aCalendar.get(Calendar.SECOND));
 		}
 		System.out.println("###END###");
 	}

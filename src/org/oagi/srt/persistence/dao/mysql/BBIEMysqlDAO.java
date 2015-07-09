@@ -14,6 +14,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIEVO;
+import org.oagi.srt.persistence.dto.DTVO;
 
 /**
 *
@@ -462,8 +463,93 @@ public class BBIEMysqlDAO extends SRTDAO{
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			String sql = _FIND_BBIE_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BBIEVO bbieVO = new BBIEVO();
+				bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
+				bbieVO.setBbieGuid(rs.getString("BBIE_GUID"));
+				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
+				bbieVO.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
+				bbieVO.setAssocToBBIEPID(rs.getInt("Assoc_To_BBIEP_ID"));
+				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("BDT_Primitive_Restriction_ID"));
+				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+				bbieVO.setDefaultText(rs.getString("Default"));
+				bbieVO.setNillable(rs.getInt("isNillable"));
+				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbieVO.setIsNull(rs.getInt("isNull"));
+				bbieVO.setDefinition(rs.getString("Definition"));
+				bbieVO.setRemark(rs.getString("Remark"));
+				bbieVO.setCreatedByUserId(rs.getInt("Created_by_user_id"));
+				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by_user_id"));
+				bbieVO.setSequencing_key(rs.getDouble("Sequencing_Key"));
+				list.add(bbieVO);
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return list;
+		
 	}
 
 	@Override
