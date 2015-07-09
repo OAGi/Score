@@ -23,6 +23,7 @@ import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.common.util.Zip;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
@@ -55,6 +56,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.oagi.srt.common.util.Utility;
 
 public class StandaloneXMLSchema {
 
@@ -100,7 +102,7 @@ public class StandaloneXMLSchema {
 		ArrayList<SRTObject> asccpvo = dao.findObjects(qc, conn);
 		for(SRTObject aSRTObject : asccpvo){
 			ASCCPVO asccpVO = (ASCCPVO)aSRTObject;
-			rootEleNode.setAttribute("name", toCamelCase(asccpVO.getDEN().replaceAll("Type", "")));
+			rootEleNode.setAttribute("name", toCamelCase(Utility.first(asccpVO.getDEN().replaceAll("Type", ""))));
 		}
 		return rootEleNode;
 	}
@@ -108,7 +110,6 @@ public class StandaloneXMLSchema {
 	public Element generateABIE(ABIEVO gABIE, Element gElementNode) throws SRTDAOException {
 		Element complexType = gElementNode.getOwnerDocument().createElement("xsd:complexType");
 		Element PNode = gElementNode.getOwnerDocument().createElement("xsd:sequence");
-		
 		Element origin_ElementNode = (Element) gElementNode.getOwnerDocument().getFirstChild();
 		origin_ElementNode.appendChild(complexType);
 		complexType.appendChild(PNode);
@@ -125,8 +126,12 @@ public class StandaloneXMLSchema {
 				ASBIEPVO anASBIEP = queryAssocToASBIEP(childBIE);
 				node = generateASBIEP(anASBIEP, node);
 				ABIEVO anABIE = queryTargetABIE2(anASBIEP);
+				
+				ArrayList<SRTObject> next_childBIEs = queryChildBIEs(anABIE);
+				if(next_childBIEs.size() > 0) {
 				node = generateABIE(anABIE, node);
-				//node = generateBIEs(anABIE, node, gSchemaNode);
+				node = generateBIEs(anABIE, node, gSchemaNode);
+				}
 			}
 			else {
 				BBIEVO childBIE = (BBIEVO)aSRTObject;
@@ -144,6 +149,15 @@ public class StandaloneXMLSchema {
 		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
 		ABIEVO abievo = (ABIEVO)dao.findObject(qc, conn);
 		return abievo;
+	}
+	
+	public ABIEVO queryTargetABIE2(ASBIEPVO gASBIEP) throws SRTDAOException {
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("ABIE");
+    	QueryCondition qc = new QueryCondition();
+		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
+		ABIEVO abieVO = (ABIEVO)dao.findObject(qc, conn);		
+		return abieVO;
 	}
 	
 	public ArrayList<SRTObject> queryChildBIEs(ABIEVO gABIE) throws SRTDAOException {
@@ -210,14 +224,7 @@ public class StandaloneXMLSchema {
 		return gElementNode;
 	}
 	
-	public ABIEVO queryTargetABIE2(ASBIEPVO gASBIEP) throws SRTDAOException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ABIE");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
-		ABIEVO abieVO = (ABIEVO)dao.findObject(qc, conn);		
-		return abieVO;
-	}
+
 	
 	public DTVO queryAssocBDT(BBIEVO gBBIE) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -338,7 +345,12 @@ public class StandaloneXMLSchema {
 					Element complextType = eNode.getOwnerDocument().createElement("xsd:complexType");
 					Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
 					Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
-					eNode.appendChild(complextType);
+
+					if(gPNode.getParentNode().getNextSibling() != null)
+						gSchemaNode.insertBefore(complextType, gPNode.getParentNode().getNextSibling());
+					else
+						gSchemaNode.insertBefore(complextType, gSchemaNode.getNextSibling());
+					
 					complextType.appendChild(simpleContent);
 					simpleContent.appendChild(extNode);
 					
@@ -413,7 +425,10 @@ public class StandaloneXMLSchema {
 					Element complextType = eNode.getOwnerDocument().createElement("xsd:complexType");
 					Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
 					Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
-					eNode.appendChild(complextType);
+					if(gPNode.getParentNode().getNextSibling() != null)
+						gSchemaNode.insertBefore(complextType, gPNode.getParentNode().getNextSibling());
+					else
+						gSchemaNode.insertBefore(complextType, gSchemaNode.getNextSibling());
 					complextType.appendChild(simpleContent);
 					simpleContent.appendChild(extNode);
 					
@@ -457,7 +472,7 @@ public class StandaloneXMLSchema {
 						base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
 					}
 					extNode.setAttributeNode(base);
-					generateSCs(gBBIE,eNode, SCs, gSchemaNode);
+					eNode = generateSCs(gBBIE,eNode, SCs, gSchemaNode);
 					return eNode;
 				}
 			}
@@ -495,7 +510,11 @@ public class StandaloneXMLSchema {
 				Element complextType = eNode.getOwnerDocument().createElement("xsd:complexType");
 				Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
 				Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
-				eNode.appendChild(complextType);
+				if(gPNode.getParentNode().getNextSibling() != null)
+					gSchemaNode.insertBefore(complextType, gPNode.getParentNode().getNextSibling());
+				else
+					gSchemaNode.insertBefore(complextType, gSchemaNode.getNextSibling());
+				
 				extNode.setNodeValue(getCodeListTypeName(aCL));
 				complextType.appendChild(simpleContent);
 				simpleContent.appendChild(extNode);
@@ -659,7 +678,8 @@ public class StandaloneXMLSchema {
 	}
 	
 	public Element generateSCs(BBIEVO gBBIE, Element gBBIENode, ArrayList<SRTObject> gSCs, Element gSchemaNode) throws DOMException, Exception{
-		Element tNode = (Element) gBBIENode.getFirstChild().getFirstChild().getFirstChild();
+		
+		Element tNode = (Element) gBBIENode.getParentNode().getParentNode().getNextSibling().getFirstChild().getFirstChild();
 		for(int i = 0; i < gSCs.size(); i++) {//For each gSC[i]
 			BBIE_SCVO aBBIESC = (BBIE_SCVO)gSCs.get(i);
 			//Generate a DOM Element Node
@@ -699,33 +719,33 @@ public class StandaloneXMLSchema {
 			qc3.add("BDT_SC_Primitive_Restriction_ID", aBBIESC.getDTSCPrimitiveRestrictionID());
 			CodeListVO aCL = null;
 			BDTSCPrimitiveRestrictionVO aBDTSCPrimitiveRestriction = null;
-			if(dao2.findObject(qc2) != null){ 
+			if(((CodeListVO)dao2.findObject(qc2)).getCodeListID() != 0){ 
 				aCL = (CodeListVO) dao2.findObject(qc2);
 			}
 			
-			else if (dao3.findObject(qc3) != null){
+			else if (((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3)).getBDTSCPrimitiveRestrictionID() != 0){
 				aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3);
 				QueryCondition qc2_2 = new QueryCondition();
 				qc2_2.add("Code_List_ID", aBDTSCPrimitiveRestriction.getCodeListID());		
 				aCL = (CodeListVO) dao2.findObject(qc2_2);
 			}
 			
-			else if(dao2.findObject(qc2) == null && dao3.findObject(qc3) == null) {
+			else if(((CodeListVO)dao2.findObject(qc2)).getCodeListID() == 0 && ((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3)).getBDTSCPrimitiveRestrictionID() == 0) {
 				QueryCondition qc3_2 = new QueryCondition();
 				qc3_2.add("BDT_SC_ID", aDTSC.getDTSCID());
 				qc3_2.add("isDefault", 1);
 				BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2);
 				QueryCondition qc2_3 = new QueryCondition();
 				qc2_3.add("Code_List_ID", bBDTSCPrimitiveRestriction.getCodeListID());		
-				if(dao2.findObject(qc2_3) == null){
+				if(((CodeListVO)dao2.findObject(qc2_3)).getCodeListID() == 0){
 					aCL = null;
 				}
 				else {
 					aCL = (CodeListVO) dao2.findObject(qc2_3);
 				}
 			}
-			
-			if(aCL.getCodeListID() != 0) {
+
+			if(aCL != null) {
 				Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
 				stIdNode.setNodeValue(aCL.getCodeListGUID());
 				aNode.setAttributeNode(stIdNode);
@@ -734,7 +754,7 @@ public class StandaloneXMLSchema {
 			AgencyIDListVO aAL = null;
 			BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = null;
 			
-			if(aCL.getCodeListID() == 0) { //aCL = null?
+			if(aCL == null) { //aCL = null?
 				SRTDAO dao4 = df.getDAO("AgencyIDList"); //Get an agency id list
 		    	QueryCondition qc4 = new QueryCondition();
 				qc4.add("Agency_ID_List_ID", aBBIESC.getAgencyIdListId());
@@ -742,29 +762,34 @@ public class StandaloneXMLSchema {
 				QueryCondition qc2_4 = new QueryCondition();
 				qc2_4.add("Agency_ID_List_ID", aBDTSCPrimitiveRestriction.getAgencyIDListID());
 				
-				if(dao4.findObject(qc4) != null)
+				if(((AgencyIDListVO)dao4.findObject(qc4)).getAgencyIDListID() != 0)
 					aAL = (AgencyIDListVO) dao4.findObject(qc4);
 				
-				else if(dao2.findObject(qc2_4) != null){
-					aAL = (AgencyIDListVO) dao2.findObject(qc2_4);
+				else if(((AgencyIDListVO)dao4.findObject(qc2_4)).getAgencyIDListID() != 0){
+					aAL = (AgencyIDListVO) dao4.findObject(qc2_4);
 				}
-				
-				else if(dao4.findObject(qc4) == null && dao2.findObject(qc2_4) == null) {
+				else if(((AgencyIDListVO)dao4.findObject(qc4)).getAgencyIDListID() == 0 && ((AgencyIDListVO) dao4.findObject(qc2_4)).getAgencyIDListID() == 0) {
 					QueryCondition qc3_2 = new QueryCondition();
 					qc3_2.add("BDT_SC_ID", aDTSC.getDTSCID());
 					qc3_2.add("isDefault", 1);
 					bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2);
 					QueryCondition qc2_5 = new QueryCondition();
 					qc2_5.add("Agency_ID_List_ID", bBDTSCPrimitiveRestriction.getAgencyIDListID());		
-					if(dao2.findObject(qc2_5) == null){
+					if(((AgencyIDListVO) dao4.findObject(qc2_5)).getAgencyIDListID() == 0){
 						aAL = null;
 					}
 					else {
-						aAL = (AgencyIDListVO) dao2.findObject(qc2_5);
+						aAL = (AgencyIDListVO) dao4.findObject(qc2_5);
 					}
 				}
 				
-				if(aAL.getAgencyIDListID() == 0) { //aAL = null?
+				if(aAL != null) {
+					Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
+					stIdNode.setNodeValue(aAL.getAgencyIDListGUID());
+					aNode.setAttributeNode(stIdNode);
+				}
+
+				if(aAL == null) { //aAL = null?
 					int primRestriction = aBBIESC.getDTSCPrimitiveRestrictionID(); //primRestriction = gSCs[i]. DT_SC_Primitive_Rescrition_ID
 					Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
 					if(primRestriction == 0){ //primRestriction = null?
@@ -772,10 +797,9 @@ public class StandaloneXMLSchema {
 						qc3_2.add("BDT_SC_ID", aDTSC.getDTSCID());
 						qc3_2.add("isDefault", 1);
 						bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2);
-						
 						SRTDAO dao5 = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
 				    	QueryCondition qc5 = new QueryCondition();
-						qc5.add("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID", bBDTSCPrimitiveRestriction.getCDTSCAllowedPrimitiveExpressionTypeMapID());
+				    	qc5.add("CDT_SC_Allowed_Primitive_Expression_Type_Map_ID", bBDTSCPrimitiveRestriction.getCDTSCAllowedPrimitiveExpressionTypeMapID());
 						CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExpressionTypeMap = (CDTSCAllowedPrimitiveExpressionTypeMapVO) dao5.findObject(qc5);
 						SRTDAO dao6 = df.getDAO("XSDBuiltInType");
 						QueryCondition qc6 = new QueryCondition();
@@ -949,11 +973,11 @@ public class StandaloneXMLSchema {
 		return aASBIEPVO;
 	}
 	
-	public ArrayList<SRTObject> receiveABIE() throws SRTDAOException{
+	public ArrayList<SRTObject> receiveABIE(int ACC_ID) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ABIE");
 		QueryCondition qc = new QueryCondition();
-		qc.add("ABIE_ID", 1);
+		qc.add("Based_ACC_ID", ACC_ID);
 		ArrayList<SRTObject> aABIEVO = dao.findObjects(qc, conn);
 		return aABIEVO;
 	}
@@ -964,7 +988,7 @@ public class StandaloneXMLSchema {
 		conn = tx.open();
 
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		ArrayList<SRTObject> gABIE = aa.receiveABIE();
+		ArrayList<SRTObject> gABIE = aa.receiveABIE(18966);
 		boolean schema_package_flag = false;
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -984,9 +1008,12 @@ public class StandaloneXMLSchema {
 			for(SRTObject aSRTObject : gABIE){
 				ABIEVO aABIEVO = (ABIEVO)aSRTObject;
 				ASBIEPVO aASBIEPVO = aa.receiveASBIEP(aABIEVO.getABIEID());
+				doc = docBuilder.newDocument();
+				schemaNode = aa.generateSchema(doc);
 				doc = aa.generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
-				aa.writeXSDFile(doc, aABIEVO.getAbieGUID());
+				aa.writeXSDFile(doc, "Package/" + aABIEVO.getAbieGUID());
 			}
+			Zip.main("test");
 		}
 		System.out.println("###END###");
 	}

@@ -27,10 +27,10 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	private final String _tableName = "bbie_sc";
 
 	private final String _FIND_ALL_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, 'Default', Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
+			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, bbie_sc.Default, Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
 	
 	private final String _FIND_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, 'Default', Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
+			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, bbie_sc.Default, Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_SC_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
 			+ "DT_SC_ID, Min_Cardinality, Max_Cardinality, DT_SC_Primitive_Restriction_ID) VALUES (?, ?, ?, ?, ?)";
