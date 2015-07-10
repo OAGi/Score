@@ -170,6 +170,7 @@ public class CodeListHandler extends UIHandler {
 		if(ch.getSelected() != null) {
 			QueryCondition qc = new QueryCondition();
 			qc.add("code_list_id", ((CodeListVO)ch.getSelected()).getCodeListID());
+			selected = (CodeListVO)ch.getSelected();
 			try {
 				codeListValues = daoCLV.findObjects(qc);
 				for(SRTObject vo : codeListValues) {
@@ -252,6 +253,20 @@ public class CodeListHandler extends UIHandler {
 		}
 	}
 	
+	public void searchDerived(String id) {
+		try {
+			QueryCondition qc = new QueryCondition();
+			qc.add("code_list_id", id);
+			codeLists = daoCL.findObjects(qc);
+			if(codeLists.size() == 0) {
+				FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists.", "[" + getBasedCodeListName() + "] No such Code List exists.");
+		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void onRowSelect(SelectEvent event) {
         FacesMessage msg = new FacesMessage(((CodeListVO) event.getObject()).getName(), String.valueOf(((CodeListVO) event.getObject()).getCodeListID()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -276,7 +291,7 @@ public class CodeListHandler extends UIHandler {
     		codeListVO.setExtensibleIndicator(extensible);
     		codeListVO.setCodeListGUID(Utility.generateGUID());
     		codeListVO.setEnumerationTypeGUID(Utility.generateGUID());
-    		codeListVO.setBasedCodeListID(((CodeListValueVO)codeListValues.get(0)).getOwnerCodeListID());
+    		codeListVO.setBasedCodeListID(selected.getCodeListID());
     		codeListVO.setState(SRTConstants.CODE_LIST_STATE_EDITING);
     		codeListVO.setCreatedByUserID(userId);
     		codeListVO.setLastUpdatedByUserID(userId);
@@ -359,7 +374,7 @@ public class CodeListHandler extends UIHandler {
     		codeListVO.setExtensibleIndicator(extensible);
     		codeListVO.setCodeListGUID(Utility.generateGUID());
     		codeListVO.setEnumerationTypeGUID(Utility.generateGUID());
-    		codeListVO.setBasedCodeListID(((CodeListValueVO)codeListValues.get(0)).getOwnerCodeListID());
+    		codeListVO.setBasedCodeListID(selected.getCodeListID());
     		codeListVO.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
     		codeListVO.setCreatedByUserID(userId);
     		codeListVO.setLastUpdatedByUserID(userId);

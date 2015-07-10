@@ -318,7 +318,31 @@ public class BBIEMysqlDAO extends SRTDAO{
 
 			ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
 			
-
+			ps.setInt(1, bbieVO.getBasedBCCID());
+			ps.setInt(2, bbieVO.getCardinalityMin());
+			ps.setInt(3, bbieVO.getCardinalityMax());
+			ps.setInt(4, bbieVO.getNillable());
+			ps.setString(5, bbieVO.getFixedValue());
+			ps.setInt(6, bbieVO.getAssocFromABIEID());
+			ps.setInt(7, bbieVO.getAssocToBBIEPID());
+			ps.setString(8, bbieVO.getDefinition());
+			ps.setString(9, bbieVO.getBbieGuid());
+			
+			if(bbieVO.getBdtPrimitiveRestrictionId() > 0)
+				ps.setInt(10, bbieVO.getBdtPrimitiveRestrictionId());
+			else
+				ps.setNull(10, java.sql.Types.INTEGER);
+			
+			if(bbieVO.getCodeListId() > 0)
+				ps.setInt(11, bbieVO.getCodeListId());
+			else
+				ps.setNull(11, java.sql.Types.INTEGER);
+			
+			ps.setString(12, bbieVO.getDefaultText());
+			ps.setString(13, bbieVO.getRemark());
+			ps.setInt(14, bbieVO.getLastUpdatedByUserId());
+			ps.setDouble(15, bbieVO.getSequencing_key());
+			ps.setInt(16,  bbieVO.getBBIEID());
 			
 			ps.executeUpdate();
 

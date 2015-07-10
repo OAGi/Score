@@ -685,13 +685,13 @@ public class StandaloneXMLSchema {
 			//Generate a DOM Element Node
 			Element aNode = tNode.getOwnerDocument().createElement("xsd:attribute");
 			//Handle gSC[i]
-			if(aBBIESC.getDefault() != null && aBBIESC.getFixedValue() != null){
+			if(aBBIESC.getDefaultText() != null && aBBIESC.getFixedValue() != null){
 				System.out.println("default and fixed value options handling error");
 				return null;
 			}
-			else if(aBBIESC.getDefault() != null){
+			else if(aBBIESC.getDefaultText() != null){
 				Attr default_att = aNode.getOwnerDocument().createAttribute("default");
-				default_att.setNodeValue(aBBIESC.getDefault());
+				default_att.setNodeValue(aBBIESC.getDefaultText());
 				aNode.setAttributeNode(default_att);
 			}
 			else if(aBBIESC.getFixedValue() != null){

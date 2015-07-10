@@ -17,19 +17,14 @@
     <h:body>
         <h:form id="form">
         	<p:growl id="messages1" />
-			<p:panel header="Search and Select Based Code List">
+			<p:panel header="Search and Select Code List">
 				<p:messages autoUpdate="true" />
 
-				<h:panelGrid id="grid" columns="5" cellpadding="5">
-					<h:outputLabel for="ccName" value="Based Code List:" style="font-weight:bold" />
-					<p:autoComplete id="ccName" value="#{codeListHandler.basedCodeListName}" completeMethod="#{codeListHandler.completeInput}" />
-					<p:commandButton value="Search" ajax="true" actionListener="#{codeListHandler.search}" update="tbl" icon="ui-icon-search" />
-				</h:panelGrid>
 	            <p:dataTable id="tbl" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 					paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-	            	value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{cVO.codeListID}" selectionMode="single">
-					<p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}" />
-        			<p:ajax event="rowUnselect" listener="#{codeListHandler.onRowUnselect}" />
+	            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.selectedCodeList}" rowKey="#{cVO.codeListID}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
+        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
 	                <p:column style="width:400px">
 						<f:facet name="header">
 							<h:outputText value="Name" />
@@ -44,7 +39,7 @@
 						<h:outputText value="#{cVO.agencyID}" />
 					</p:column>
 	            </p:dataTable>
-	            <p:commandButton ajax="true" icon="ui-icon-search" value="Select" actionListener="#{codeListHandler.closeDialog}" />
+	            <p:commandButton ajax="true" icon="ui-icon-search" value="Select" actionListener="#{topLevelABIEHandler.closeDialog}" />
 	        </p:panel>
         </h:form>
     </h:body>

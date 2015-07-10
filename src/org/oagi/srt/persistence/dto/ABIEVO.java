@@ -16,6 +16,7 @@ public class ABIEVO extends SRTObject {
 	private int BasedACCID;
 	private int IsTopLevel;
 	private int BusinessContextID;
+	private String businessContextName;
 	private String Definition;
 	private int CreatedByUserID;
 	private int LastUpdatedByUserID;
@@ -28,6 +29,14 @@ public class ABIEVO extends SRTObject {
 	private String remark;
 	private String businessTerm;
 	
+	public String getBusinessContextName() {
+		return businessContextName;
+	}
+
+	public void setBusinessContextName(String businessContextName) {
+		this.businessContextName = businessContextName;
+	}
+
 	public int getABIEID(){
 		return ABIEID;
 	}

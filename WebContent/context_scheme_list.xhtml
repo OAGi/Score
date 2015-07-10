@@ -53,13 +53,6 @@
 						<h:outputText value="#{contextSchemeVO.description}" />
 					</p:column>
 					
-					<p:column style="width:100px">
-						<f:facet name="header">
-							<h:outputText value="Agency Name" />
-						</f:facet>
-						<h:outputText value="#{contextSchemeVO.schemeAgencyName}" />
-					</p:column>
-					
 					<p:column style="width:50px">
 						<f:facet name="header">
 							<h:outputText value="Version" />
@@ -88,13 +81,13 @@
 						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.description}" />
 
-						<h:outputText value="Schema Agency Name: " style="font-weight:bold; color:blue" />
+						<h:outputText value="Scheme Agency Name: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyName}" />
 
-						<h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue" />
+						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyID}" />
 						
-						<h:outputText value="Schema Version: " style="font-weight:bold; color:blue" />
+						<h:outputText value="Scheme Version: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersion}" />
 						
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
@@ -153,9 +146,6 @@
 
 						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.description}" />
-
-						<h:outputText value="Schema Agency Name: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyName}" />
 
 						<h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyID}" />
@@ -216,18 +206,15 @@
 						<h:outputText value="Scheme Name: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.schemeName}" />
 
-						<h:outputText value="SDescription: " style="font-weight:bold; color:blue" />
+						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<p:inputTextarea id="desc" rows="5" cols="40" autoResize="false" value="#{contextSchemeHandler.description}"
 							label="Description">
 						</p:inputTextarea>
 
-						<h:outputText value="Schema Agency Name: " style="font-weight:bold; color:blue" />
-						<p:inputText value="#{contextSchemeHandler.schemeAgencyName}" />
-
-						<h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue" />
+						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.schemeAgencyID}" />
 						
-						<h:outputText value="Schema Version: " style="font-weight:bold; color:blue" />
+						<h:outputText value="Scheme Version: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.schemeVersion}" />
 						
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
