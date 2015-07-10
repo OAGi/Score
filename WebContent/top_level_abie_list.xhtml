@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Code List">
+					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages1" showDetail="true"/>
+			<p:panel header="Standalone BOD List">
+				<p:dataTable id="tbl" var="abieView" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="20" style="width:920px; margin-bottom:20px"
+	            	value="#{topLevelABIEHandler.bodList}" selection="#{topLevelABIEHandler.selectedBod}" rowKey="#{abieView.id}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onBODRowSelect}" />
+        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onRowUnselect}" />
+	                <p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{abieView.name}" />
+					</p:column>
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="State" />
+						</f:facet>
+						<h:outputText value="#{(abieView.abieVO.state eq '2') ? 'Editing' : 'Published'}" />
+					</p:column>
+					<p:column style="width:300px">
+						<f:facet name="header">
+							<h:outputText value="Business Context" />
+						</f:facet>
+						<h:outputText value="#{abieView.abieVO.businessContextName}" />
+					</p:column>
+					<p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Creation Timestamp" />
+						</f:facet>
+						<h:outputText value="#{abieView.abieVO.creationTimestamp}" />
+					</p:column>
+	
+	            </p:dataTable>
+			</p:panel>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -267,6 +267,58 @@ public class TopLevelABIEHandler implements Serializable {
     }
 	
 	private boolean skip;
+	
+	private List<ABIEView> bodList = new ArrayList<ABIEView>();
+	private ABIEView selectedBod;
+	
+	public ABIEView getSelectedBod() {
+		return selectedBod;
+	}
+
+	public void setSelectedBod(ABIEView selectedBod) {
+		this.selectedBod = selectedBod;
+	}
+
+	public List<ABIEView> getBodList() {
+		if(bodList.size() == 0) {
+			QueryCondition qc = new QueryCondition();
+			qc.add("isTop_level", 1);
+			
+			try {
+				List<SRTObject> list = abieDao.findObjects(qc);
+				
+				for(SRTObject obj : list) {
+					ABIEVO abieVO = (ABIEVO)obj;
+					QueryCondition qc_01 = new QueryCondition();
+					qc_01.add("role_of_abie_id", abieVO.getABIEID());
+					ASBIEPVO asbiepVO = (ASBIEPVO)asbiepDao.findObject(qc_01);
+					
+					QueryCondition qc_02 = new QueryCondition();
+					qc_02.add("asccp_id", asbiepVO.getBasedASCCPID());
+					ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc_02);
+					
+					QueryCondition qc_03 = new QueryCondition();
+					qc_03.add("business_context_id", abieVO.getBusinessContextID());
+					BusinessContextVO aBusinessContextVO = (BusinessContextVO)daoBC.findObject(qc_03);
+					abieVO.setBusinessContextName(aBusinessContextVO.getName());
+					
+					ABIEView aABIEView = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getABIEID(), "ABIE");
+					aABIEView.setAbieVO(abieVO);
+					bodList.add(aABIEView);
+				}
+				
+				//root = new DefaultTreeNode(aABIEView, null);
+				
+			} catch (SRTDAOException e) {
+				e.printStackTrace();
+			}
+		}
+		return bodList;
+	}
+
+	public void setBodList(List<ABIEView> bodList) {
+		this.bodList = bodList;
+	}
 
 	public void save() {        
 		FacesMessage msg = new FacesMessage("Successful", "Welcome :" + "");
@@ -528,72 +580,6 @@ public class TopLevelABIEHandler implements Serializable {
 		return accVO;
 	}
 	
-//	private void createBIEs(int acc, int abie, TreeNode tNode) {
-//		QueryCondition qc = new QueryCondition();
-//		qc.add("acc_id", acc);
-//		ACCVO accVO = null;
-//		try {
-//			accVO = (ACCVO)accDao.findObject(qc, conn);
-//			if(accVO.getBasedACCID() > 0) {
-//				createASBIEP(abie, accVO.getBasedACCID());
-//				createBIEs(accVO.getBasedACCID(), abie, tNode);
-//			}
-//		} catch (SRTDAOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		createBasicChildBIEs(acc, abie, tNode);
-//		createAggregateDescendantBIEs(acc, abie, tNode);
-//	}
-	
-	private int getABIEID(String key, String value) {
-		QueryCondition qc = new QueryCondition();
-		qc.add(key, value);
-		int id = -1;
-		try {
-			id = ((ABIEVO)abieDao.findObject(qc)).getABIEID();
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-
-	private int getASBIEPID(String key, String value) {
-		QueryCondition qc = new QueryCondition();
-		qc.add(key, value);
-		int id = -1;
-		try {
-			id = ((ASBIEPVO)asbiepDao.findObject(qc)).getASBIEPID();
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-	
-	private int getBBIEPID(String key, String value) {
-		QueryCondition qc = new QueryCondition();
-		qc.add(key, value);
-		int id = -1;
-		try {
-			id = ((BBIEPVO)bbiepDao.findObject(qc)).getBBIEPID();
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-	
-	private int getBBIEID(String key, String value) {
-		QueryCondition qc = new QueryCondition();
-		qc.add(key, value);
-		int id = -1;
-		try {
-			id = ((BBIEVO)bbieDao.findObject(qc)).getBBIEID();
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-	
 	private ABIEVO createABIE(int acc, int bc, int topLevel, int abie) throws SRTDAOException {
 		ABIEVO abieVO = new ABIEVO();
 		String abieGuid = Utility.generateGUID();
@@ -740,15 +726,7 @@ public class TopLevelABIEHandler implements Serializable {
 				hm.put(dtsc.getPropertyTerm(), dtsc.getDTSCGUID());
 				
 			}
-			
-//			for(String key : hm.keySet()) {
-//				bbiescCount++;
-//				ABIEView av = new ABIEView(key, hm.get(key));
-//				av.setColor("orange");
-//				//av.setMin(bbiescVO.getMinCardinality()); // TODO this is temporary treatment to avoid duplicate list. should check dt_sc table to eliminate the duplicates
-//				//av.setMax(bbiescVO.getMaxCardinality());
-//				TreeNode tNode1 = new DefaultTreeNode(av, tNode);
-//			}
+
 		} catch (SRTDAOException e1) {
 			e1.printStackTrace();
 		}
@@ -806,6 +784,12 @@ public class TopLevelABIEHandler implements Serializable {
         selected = (ASCCPVO) event.getObject();
     }
 	
+	public void onBODRowSelect(SelectEvent event) {
+        FacesMessage msg = new FacesMessage(((ABIEView) event.getObject()).getName(), String.valueOf(((ABIEView) event.getObject()).getName()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        selectedBod = (ABIEView) event.getObject();
+    }
+	
 	public void onBCSelect(BusinessContextVO bcVO) {
 		bCSelected = bcVO;
 		FacesMessage msg = new FacesMessage(bCSelected.getName(), bCSelected.getName());
@@ -843,6 +827,11 @@ public class TopLevelABIEHandler implements Serializable {
  
     public void onRowUnselect(UnselectEvent event) {
         FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((ASCCPVO) event.getObject()).getASCCPID()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+    
+    public void onBODRowUnselect(UnselectEvent event) {
+        FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((ABIEView) event.getObject()).getName()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 	
