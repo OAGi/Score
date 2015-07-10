@@ -380,8 +380,8 @@
 										<p:radioButton id="opt2" for="customRadio" itemIndex="1" />
 										<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
 										<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
-										<p:commandButton value="Code List" icon="ui-icon-extlink" actionListener="#{topLevelABIEHandler.chooseCodeForTLBIE}" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
-									        <p:ajax event="dialogReturn" listener="#{topLevelABIEHandler.onCodeListChosen}" update=":form:codeSelected" />
+									    
+									    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
 									    </p:commandButton>
 									    
 									    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
@@ -473,6 +473,38 @@
 		            </p:dataTable>
 		            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('derivedCodeList').hide()" />
 				</p:outputPanel>
+		    </p:dialog>
+		    
+		    <p:dialog header="Code List" widgetVar="codeList" showEffect="clip" hideEffect="clip" closable="true" scrollable="true" resizable="true" draggable="true" width="800" height="700">
+        		<p:outputPanel id="codeListId">
+					<p:messages autoUpdate="true" />
+	
+					<h:panelGrid id="grid02" columns="5" cellpadding="5">
+						<h:outputLabel for="ccName" value="Code List:" style="font-weight:bold" />
+						<p:autoComplete id="ccName" value="#{topLevelABIEHandler.codeListName}" completeMethod="#{topLevelABIEHandler.completeCodeListInput}" />
+						<p:commandButton value="Search" ajax="true" actionListener="#{topLevelABIEHandler.searchCodeList}" update="tbl02" icon="ui-icon-search" />
+					</h:panelGrid>
+		            <p:dataTable id="tbl02" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+						paginator="true" rows="10" style="width:550px; margin-bottom:20px"
+		            	value="#{topLevelABIEHandler.codeLists2}" selection="#{topLevelABIEHandler.codeListVO}" rowKey="#{cVO.codeListID}" selectionMode="single">
+						<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
+	        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
+		                <p:column style="width:400px">
+							<f:facet name="header">
+								<h:outputText value="Name" />
+							</f:facet>
+							<h:outputText value="#{cVO.name}" />
+						</p:column>
+		
+						<p:column style="width:100px">
+							<f:facet name="header">
+								<h:outputText value="Agency Id" />
+							</f:facet>
+							<h:outputText value="#{cVO.agencyID}" />
+						</p:column>
+		            </p:dataTable>
+		            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('codeList').hide()" />
+		    	</p:outputPanel>
 		    </p:dialog>
         </p:tab>
  

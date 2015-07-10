@@ -392,22 +392,24 @@ public class TopLevelABIEHandler implements Serializable {
 					seqKey = seq_base + "." + bccVO.getSequencingKey();
 				}
 				
-				BBIEVO bbieVO = createBBIE(bccVO.getBCCID(), abie, bbiepVO.getBBIEPID(), seqKey);
-				
-				
 				QueryCondition qc = new QueryCondition();
 				qc.add("bccp_id", bccVO.getAssocToBCCPID());
 				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 				
+				QueryCondition qc_02 = new QueryCondition();
+				qc_02.add("bdt_id", bccpVO.getBDTID());
+				qc_02.add("isDefault", 1);
+				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)bdtPrimitiveRestrictionDao.findObject(qc_02, conn);
+				int bdtPrimitiveRestrictionId = aBDTPrimitiveRestrictionVO.getBDTPrimitiveRestrictionID();
+				
+				BBIEVO bbieVO = createBBIE(bccVO, abie, bbiepVO.getBBIEPID(), seqKey, bdtPrimitiveRestrictionId);
+				
 				ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
-				bbieVO.setCardinalityMax(bccVO.getCardinalityMax());
-				bbieVO.setCardinalityMin(bccVO.getCardinalityMin());
 				av.setBccVO(bccVO);
 				bbiepVO.setDefinition(bccpVO.getDefinition());
 				av.setBbiepVO(bbiepVO);
 				av.setBbieVO(bbieVO);
 				av.setBccpVO(bccpVO);
-				
 				
 				QueryCondition qc_01 = new QueryCondition();
 				qc_01.add("dt_id", bccpVO.getBDTID());
@@ -681,13 +683,16 @@ public class TopLevelABIEHandler implements Serializable {
 		return bbiepVO;
 	}
 	
-	private BBIEVO createBBIE(int bcc, int abie, int bbiep, String seqKey) throws SRTDAOException {
+	private BBIEVO createBBIE(BCCVO bccVO, int abie, int bbiep, String seqKey, int bdtPrimitiveRestrictionId) throws SRTDAOException {
 		BBIEVO bbieVO = new BBIEVO();
 		bbieVO.setBbieGuid(Utility.generateGUID());
-		bbieVO.setBasedBCCID(bcc);
+		bbieVO.setBasedBCCID(bccVO.getBCCID());
 		bbieVO.setAssocFromABIEID(abie);
 		bbieVO.setAssocToBBIEPID(bbiep);
 		bbieVO.setNillable(0);
+		bbieVO.setCardinalityMax(bccVO.getCardinalityMax());
+		bbieVO.setCardinalityMin(bccVO.getCardinalityMin());
+		bbieVO.setBdtPrimitiveRestrictionId(bdtPrimitiveRestrictionId);
 		int userId = getUserId();
 		bbieVO.setCreatedByUserId(userId); 
 		bbieVO.setLastUpdatedByUserId(userId); 
@@ -944,10 +949,13 @@ public class TopLevelABIEHandler implements Serializable {
 		BBIEPVO bbiepVO = aABIEView.getBbiepVO();
 		try {
 			
-			if(aABIEView.getRestrictionType().equalsIgnoreCase("Primitive"))
+			if(aABIEView.getRestrictionType().equalsIgnoreCase("Primitive")) {
 				bbieVO.setBdtPrimitiveRestrictionId(aABIEView.getBdtPrimitiveRestrictionId());
-			else if(aABIEView.getRestrictionType().equalsIgnoreCase("Code"))
+				bbieVO.setCodeListId(0);
+			} else if(aABIEView.getRestrictionType().equalsIgnoreCase("Code")) {
 				bbieVO.setCodeListId(codeListVO.getCodeListID());
+				bbieVO.setBdtPrimitiveRestrictionId(0);
+			}
 			bbieDao.updateObject(bbieVO);
 			bbiepDao.updateObject(bbiepVO);
 		} catch (SRTDAOException e) {
@@ -966,12 +974,22 @@ public class TopLevelABIEHandler implements Serializable {
 	
 	private List<SRTObject> codeLists = new ArrayList<SRTObject>();
 	
+	private List<SRTObject> codeLists2 = new ArrayList<SRTObject>();
+	
 	public List<SRTObject> getCodeLists() {
 		return codeLists;
 	}
 
 	public void setCodeLists(List<SRTObject> codeLists) {
 		this.codeLists = codeLists;
+	}
+	
+	public List<SRTObject> getCodeLists2() {
+		return codeLists2;
+	}
+
+	public void setCodeLists2(List<SRTObject> codeLists2) {
+		this.codeLists2 = codeLists2;
 	}
 
 	public void chooseDerivedCodeForTLBIE(int bdtPrimitiveRestrictionId) {
@@ -1034,12 +1052,56 @@ public class TopLevelABIEHandler implements Serializable {
 	public void onCodeListChosen(SelectEvent event) {
 		CodeListHandler ch = (CodeListHandler) event.getObject();
 		codeListVO = (CodeListVO)ch.getSelected();
+		System.out.println(codeListVO.getName());
     }
 	
 	public void onDerivedCodeListChosen(SelectEvent event) {
 		TopLevelABIEHandler ch = (TopLevelABIEHandler) event.getObject();
 		codeListVO = (CodeListVO)ch.getSelectedCodeList();
     }
+	
+	String codeListName;
+	
+	public String getCodeListName() {
+		return codeListName;
+	}
+
+	public void setCodeListName(String codeListName) {
+		this.codeListName = codeListName;
+	}
+	
+	public void searchCodeList() {
+		try {
+			QueryCondition qc = new QueryCondition();
+			qc.addLikeClause("name", "%" + getCodeListName() + "%");
+			qc.add("state", SRTConstants.CODE_LIST_STATE_PUBLISHED);
+			qc.add("extensible_indicator", 1);
+			codeLists2 = daoCL.findObjects(qc);
+			if(codeLists2.size() == 0) {
+				FacesMessage msg = new FacesMessage("[" + getCodeListName() + "] No such Code List exists or not yet published or not extensible", "[" + getCodeListName() + "] No such Code List exists or not yet published or not extensible");
+		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public List<String> completeCodeListInput(String query) {
+		List<String> results = new ArrayList<String>();
+
+		try {
+			QueryCondition qc = new QueryCondition();
+			qc.addLikeClause("name", "%" + query + "%");
+			codeLists2 = daoCL.findObjects(qc);
+			for(SRTObject obj : codeLists2) {
+				CodeListVO clVO = (CodeListVO)obj;
+				results.add(clVO.getName());
+			}
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
 	
 	private void saveBBIESCChanges(ABIEView aABIEView) {
 		BBIE_SCVO bbiescVO = aABIEView.getBbiescVO();
