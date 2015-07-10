@@ -8,7 +8,7 @@ public class Zip {
 	static public String filename;
 
 	public static void main(String filename) {
-		try { 
+		try {
 			BufferedInputStream origin = null;
 			FileOutputStream dest = new FileOutputStream("/Temp/test/"+filename+".zip");
 			ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
