@@ -1,5 +1,6 @@
 package org.oagi.srt.web.handler;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,6 +18,7 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -788,7 +790,176 @@ public class TopLevelABIEHandler implements Serializable {
         FacesMessage msg = new FacesMessage(((ABIEView) event.getObject()).getName(), String.valueOf(((ABIEView) event.getObject()).getName()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
         selectedBod = (ABIEView) event.getObject();
+        root = new DefaultTreeNode(selectedBod, null);
+        
+        System.out.println("###selectedBod " + selectedBod.getId());
+        
+        try {
+	        QueryCondition qc = new QueryCondition();
+			qc.add("role_of_abie_id", selectedBod.getId());
+			ASBIEPVO aASBIEPVO = (ASBIEPVO)asbiepDao.findObject(qc);
+			
+			
+			QueryCondition qc_01 = new QueryCondition();
+			qc_01.add("asccp_id", aASBIEPVO.getBasedASCCPID());
+			ASCCPVO aASCCPVO = (ASCCPVO)asccpDao.findObject(qc_01);
+			
+			QueryCondition qc_02 = new QueryCondition();
+			qc_02.add("assoc_from_abie_id", selectedBod.getId());
+			qc_02.add("assoc_to_asbiep_id", aASBIEPVO.getASBIEPID());
+			ASBIEVO aASBIEVO = (ASBIEVO)asbieDao.findObject(qc_02);
+			
+	        ABIEView av = new ABIEView(aASCCPVO.getPropertyTerm(), aASBIEVO.getASBIEID(), "ASBIE");
+			av.setColor("blue");
+			av.setAsccpVO(aASCCPVO);
+			//av.setAbieVO(abieVO);
+			av.setAsbiepVO(aASBIEPVO);
+			av.setAsbieVO(aASBIEVO);
+			TreeNode tNode2 = new DefaultTreeNode(av, root);
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+        } catch (SRTDAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
+	
+	
+	private void createBIEChildren(int accId, int abie, int groupPosition, TreeNode tNode) throws SRTDAOException {
+		Stack<ACCVO> accList = new Stack<ACCVO>();
+		ACCVO acc = getACC(accId);
+		accList.push(acc);
+		while(acc.getBasedACCID() > 0) {
+			acc = getACC(acc.getBasedACCID());
+			accList.push(acc);
+		}
+		
+		int seq_base = 1;
+		while(!accList.isEmpty()) {
+			ACCVO accVO = accList.pop();
+			
+			ArrayList<SRTObject> bccObjects = getBCC(accVO.getACCID());
+			for(SRTObject bccObject : bccObjects) {
+				BCCVO bccVO = (BCCVO)bccObject;
+				//BCCPVO bccpVO = getBCCP(bccVO.getAssocToBCCPID());
+				BBIEPVO bbiepVO = createBBIEP(bccVO.getAssocToBCCPID(), abie);
+				
+				String seqKey = "";
+				if(groupPosition > 0) { // Group
+					seqKey = groupPosition + "." + bccVO.getSequencingKey();
+				} else { // not group
+					seqKey = seq_base + "." + bccVO.getSequencingKey();
+				}
+				
+				QueryCondition qc = new QueryCondition();
+				qc.add("bccp_id", bccVO.getAssocToBCCPID());
+				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
+				
+				QueryCondition qc_02 = new QueryCondition();
+				qc_02.add("bdt_id", bccpVO.getBDTID());
+				qc_02.add("isDefault", 1);
+				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)bdtPrimitiveRestrictionDao.findObject(qc_02, conn);
+				int bdtPrimitiveRestrictionId = aBDTPrimitiveRestrictionVO.getBDTPrimitiveRestrictionID();
+				
+				BBIEVO bbieVO = createBBIE(bccVO, abie, bbiepVO.getBBIEPID(), seqKey, bdtPrimitiveRestrictionId);
+				
+				ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
+				av.setBccVO(bccVO);
+				bbiepVO.setDefinition(bccpVO.getDefinition());
+				av.setBbiepVO(bbiepVO);
+				av.setBbieVO(bbieVO);
+				av.setBccpVO(bccpVO);
+				
+				QueryCondition qc_01 = new QueryCondition();
+				qc_01.add("dt_id", bccpVO.getBDTID());
+				DTVO dtVO = (DTVO)dtDao.findObject(qc_01, conn);
+				av.setBdtName(dtVO.getDEN());
+				
+				av.setColor("green");
+				TreeNode tNode2 = new DefaultTreeNode(av, tNode);
+				
+				int bbieID = bbieVO.getBBIEID();
+				createBBIESC(bbieID, bccpVO.getBDTID(), tNode2);
+			}
+			
+			ArrayList<SRTObject> asccObjects = getASCC(accVO.getACCID());
+			for(SRTObject asccObject : asccObjects) {
+				ASCCVO asccVO = (ASCCVO)asccObject;
+				ASCCPVO asccpVO = getASCCP(asccVO.getAssocToASCCPID());
+				ACCVO accVOFromASCCP = getACC(asccpVO.getRoleOfACCID());
+				
+				if(accVOFromASCCP.getOAGISComponentType() == 3) {
+					createBIEs(accVOFromASCCP.getACCID(), abie, seq_base, tNode);
+				} else {
+					ABIEVO abieVO = createABIE(accVOFromASCCP.getACCID(), bCSelected.getBusinessContextID(), 0, abie);
+					ASBIEPVO asbiepVO = createASBIEP(asccpVO.getASCCPID(), abieVO.getABIEID(), abie);
+					
+					String seqKey = "";
+					if(groupPosition > 0) { // Group
+						seqKey = groupPosition + "." + asccVO.getSequencingKey();
+					} else { // not group
+						seqKey = seq_base + "." + asccVO.getSequencingKey();
+					}
+					
+					ASBIEVO asbieVO = createASBIE(asccVO.getASCCID(), abie, asbiepVO.getASBIEPID(), seqKey);
+					
+					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), asbieVO.getASBIEID(), "ASBIE");
+					av.setColor("blue");
+					asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
+					asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
+					asbieVO.setDefinition(asccVO.getDefinition());
+					av.setAsccVO(asccVO);
+					av.setAsccpVO(asccpVO);
+					av.setAccVO(accVOFromASCCP);
+					abieVO.setDefinition(accVO.getDefinition());
+					av.setAbieVO(abieVO);
+					asbiepVO.setDefinition(asccpVO.getDefinition());
+					av.setAsbiepVO(asbiepVO);
+					av.setAsbieVO(asbieVO);
+					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
+					
+					createBIEs(accVOFromASCCP.getACCID(), abieVO.getABIEID(), -1, tNode2);
+				}
+			}
+			seq_base++;
+		}
+		
+
+	}
+	
+	
+	public void expand() {
+		System.out.println("###AAA " + ((ABIEView)root.getData()).getName());
+	}
+	
+	public void onEdit() {
+		FacesContext context = FacesContext.getCurrentInstance();
+	    String objectId = context.getExternalContext().getRequestParameterMap().get("objectId");
+	    System.out.println("###objectId " + objectId);
+//	    
+//	    ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+//		try {
+//			System.out.println("### " + selectedBod.getName());
+//			
+//			ABIEView av = new ABIEView("AAA", 1, "ABIE");
+//			root = new DefaultTreeNode(av, null);
+//			ABIEView av1 = new ABIEView("AAA", 1, "ABIE");
+//			selectedBod
+//			DefaultTreeNode node = new DefaultTreeNode(av1, root);
+//			context.setRequest(root);
+//			context.redirect(context.getRequestContextPath() + "/top_level_abie_edit.xhtml");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+	}
 	
 	public void onBCSelect(BusinessContextVO bcVO) {
 		bCSelected = bcVO;
@@ -840,6 +1011,8 @@ public class TopLevelABIEHandler implements Serializable {
     private TreeNode root;
      
     public TreeNode getRoot() {
+    	if(root == null)
+    		root = new DefaultTreeNode();
         return root;
     }
  
@@ -884,6 +1057,7 @@ public class TopLevelABIEHandler implements Serializable {
 	public TreeNode getSelectedTreeNode() {
 		if(selectedTreeNode == null)
 			selectedTreeNode = root;
+		
 		aABIEView = (ABIEView)selectedTreeNode.getData();
 		return selectedTreeNode;
     }
