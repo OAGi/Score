@@ -58,8 +58,7 @@
 			<p:dialog header="Edit Standalone BOD" widgetVar="tbDetail" showEffect="clip" hideEffect="clip" closable="true" scrollable="true" resizable="true" draggable="true" width="800" height="700">
 				<p:outputPanel id="tbDetailid">
 	        		<p:treeTable id="treeTable" value="#{topLevelABIEHandler.root}" var="aBIEView" selection="#{topLevelABIEHandler.selectedTreeNode}" selectionMode="single" dynamic="true"> 
-			        	<p:ajax event="select" listener="#{topLevelABIEHandler.showDetails()}" update="" />
-			        	<p:ajax event="expand" listener="#{topLevelABIEHandler.expand()}" /> 
+			        	<p:ajax event="select" listener="#{topLevelABIEHandler.expand()}" update=":form:treeTable" />
 					    <f:facet name="header">
 				            #{topLevelABIEHandler.selected.module}
 				        </f:facet>

@@ -496,9 +496,9 @@ public class TopLevelABIEHandler implements Serializable {
 						seqKey = seq_base + "." + asccVO.getSequencingKey();
 					}
 					
-					ASBIEVO asbieVO = createASBIE(asccVO.getASCCID(), abie, asbiepVO.getASBIEPID(), seqKey);
+					ASBIEVO asbieVO = createASBIE(asccVO, abie, asbiepVO.getASBIEPID(), seqKey);
 					
-					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), asbieVO.getASBIEID(), "ASBIE");
+					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getABIEID(), "ASBIE");
 					av.setColor("blue");
 					asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
 					asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
@@ -629,12 +629,14 @@ public class TopLevelABIEHandler implements Serializable {
 		return asbiepVO;
 	}
 	
-	private ASBIEVO createASBIE(int ascc, int abie, int asbiep, String seqKey) throws SRTDAOException {
+	private ASBIEVO createASBIE(ASCCVO asccVO, int abie, int asbiep, String seqKey) throws SRTDAOException {
 		ASBIEVO asbieVO = new ASBIEVO();
 		asbieVO.setAsbieGuid(Utility.generateGUID());
 		asbieVO.setAssocFromABIEID(abie);
 		asbieVO.setAssocToASBIEPID(asbiep);
-		asbieVO.setBasedASCC(ascc);
+		asbieVO.setBasedASCC(asccVO.getASCCID());
+		asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
+		asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
 		int userId = getUserId();
 		asbieVO.setCreatedByUserId(userId); 
 		asbieVO.setLastUpdatedByUserId(userId); 
@@ -792,152 +794,127 @@ public class TopLevelABIEHandler implements Serializable {
         selectedBod = (ABIEView) event.getObject();
         root = new DefaultTreeNode(selectedBod, null);
         
-        System.out.println("###selectedBod " + selectedBod.getId());
-        
         try {
-	        QueryCondition qc = new QueryCondition();
-			qc.add("role_of_abie_id", selectedBod.getId());
-			ASBIEPVO aASBIEPVO = (ASBIEPVO)asbiepDao.findObject(qc);
-			
-			
-			QueryCondition qc_01 = new QueryCondition();
-			qc_01.add("asccp_id", aASBIEPVO.getBasedASCCPID());
-			ASCCPVO aASCCPVO = (ASCCPVO)asccpDao.findObject(qc_01);
-			
-			QueryCondition qc_02 = new QueryCondition();
-			qc_02.add("assoc_from_abie_id", selectedBod.getId());
-			qc_02.add("assoc_to_asbiep_id", aASBIEPVO.getASBIEPID());
-			ASBIEVO aASBIEVO = (ASBIEVO)asbieDao.findObject(qc_02);
-			
-	        ABIEView av = new ABIEView(aASCCPVO.getPropertyTerm(), aASBIEVO.getASBIEID(), "ASBIE");
-			av.setColor("blue");
-			av.setAsccpVO(aASCCPVO);
-			//av.setAbieVO(abieVO);
-			av.setAsbiepVO(aASBIEPVO);
-			av.setAsbieVO(aASBIEVO);
-			TreeNode tNode2 = new DefaultTreeNode(av, root);
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-        } catch (SRTDAOException e) {
-			// TODO Auto-generated catch block
+			createBIEChildren(selectedBod.getId(), root);
+		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
     }
 	
-	
-	private void createBIEChildren(int accId, int abie, int groupPosition, TreeNode tNode) throws SRTDAOException {
-		Stack<ACCVO> accList = new Stack<ACCVO>();
-		ACCVO acc = getACC(accId);
-		accList.push(acc);
-		while(acc.getBasedACCID() > 0) {
-			acc = getACC(acc.getBasedACCID());
-			accList.push(acc);
+	private void createBIEChildren(int abieId, TreeNode tNode) throws SRTDAOException {
+		
+		QueryCondition qc_01 = new QueryCondition();
+		qc_01.add("assoc_from_abie_id", abieId);
+		List<SRTObject> list_01 = bbieDao.findObjects(qc_01);
+		for(SRTObject obj : list_01) {
+			BBIEVO bbieVO = (BBIEVO)obj;
+			
+			QueryCondition qc_02 = new QueryCondition();
+			qc_02.add("bbiep_id", bbieVO.getAssocToBBIEPID());
+			BBIEPVO bbiepVO = (BBIEPVO)bbiepDao.findObject(qc_02);
+			
+			QueryCondition qc_03 = new QueryCondition();
+			qc_03.add("bccp_id", bbiepVO.getBasedBCCPID());
+			BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc_03);
+			
+			QueryCondition qc_04 = new QueryCondition();
+			qc_04.add("bcc_id", bbieVO.getBasedBCCID());
+			BCCVO bccVO = (BCCVO)bccDao.findObject(qc_04);
+			
+			ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
+			av.setBccVO(bccVO);
+			bbiepVO.setDefinition(bccpVO.getDefinition());
+			av.setBbiepVO(bbiepVO);
+			av.setBbieVO(bbieVO);
+			av.setBccpVO(bccpVO);
+			
+			QueryCondition qc_05 = new QueryCondition();
+			qc_05.add("dt_id", bccpVO.getBDTID());
+			DTVO dtVO = (DTVO)dtDao.findObject(qc_05);
+			av.setBdtName(dtVO.getDEN());
+			
+			av.setColor("green");
+			TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 		}
 		
-		int seq_base = 1;
-		while(!accList.isEmpty()) {
-			ACCVO accVO = accList.pop();
+		QueryCondition qc_02 = new QueryCondition();
+		qc_02.add("assoc_from_abie_id", abieId);
+		List<SRTObject> list_02 = asbieDao.findObjects(qc_02);
+		for(SRTObject obj : list_02) {
+			ASBIEVO asbieVO = (ASBIEVO)obj;
 			
-			ArrayList<SRTObject> bccObjects = getBCC(accVO.getACCID());
-			for(SRTObject bccObject : bccObjects) {
-				BCCVO bccVO = (BCCVO)bccObject;
-				//BCCPVO bccpVO = getBCCP(bccVO.getAssocToBCCPID());
-				BBIEPVO bbiepVO = createBBIEP(bccVO.getAssocToBCCPID(), abie);
-				
-				String seqKey = "";
-				if(groupPosition > 0) { // Group
-					seqKey = groupPosition + "." + bccVO.getSequencingKey();
-				} else { // not group
-					seqKey = seq_base + "." + bccVO.getSequencingKey();
-				}
-				
-				QueryCondition qc = new QueryCondition();
-				qc.add("bccp_id", bccVO.getAssocToBCCPID());
-				BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
-				
-				QueryCondition qc_02 = new QueryCondition();
-				qc_02.add("bdt_id", bccpVO.getBDTID());
-				qc_02.add("isDefault", 1);
-				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)bdtPrimitiveRestrictionDao.findObject(qc_02, conn);
-				int bdtPrimitiveRestrictionId = aBDTPrimitiveRestrictionVO.getBDTPrimitiveRestrictionID();
-				
-				BBIEVO bbieVO = createBBIE(bccVO, abie, bbiepVO.getBBIEPID(), seqKey, bdtPrimitiveRestrictionId);
-				
-				ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
-				av.setBccVO(bccVO);
-				bbiepVO.setDefinition(bccpVO.getDefinition());
-				av.setBbiepVO(bbiepVO);
-				av.setBbieVO(bbieVO);
-				av.setBccpVO(bccpVO);
-				
-				QueryCondition qc_01 = new QueryCondition();
-				qc_01.add("dt_id", bccpVO.getBDTID());
-				DTVO dtVO = (DTVO)dtDao.findObject(qc_01, conn);
-				av.setBdtName(dtVO.getDEN());
-				
-				av.setColor("green");
-				TreeNode tNode2 = new DefaultTreeNode(av, tNode);
-				
-				int bbieID = bbieVO.getBBIEID();
-				createBBIESC(bbieID, bccpVO.getBDTID(), tNode2);
-			}
+			QueryCondition qc_03 = new QueryCondition();
+			qc_03.add("asbiep_id", asbieVO.getAssocToASBIEPID());
+			ASBIEPVO asbiepVO = (ASBIEPVO)asbiepDao.findObject(qc_03);
 			
-			ArrayList<SRTObject> asccObjects = getASCC(accVO.getACCID());
-			for(SRTObject asccObject : asccObjects) {
-				ASCCVO asccVO = (ASCCVO)asccObject;
-				ASCCPVO asccpVO = getASCCP(asccVO.getAssocToASCCPID());
-				ACCVO accVOFromASCCP = getACC(asccpVO.getRoleOfACCID());
-				
-				if(accVOFromASCCP.getOAGISComponentType() == 3) {
-					createBIEs(accVOFromASCCP.getACCID(), abie, seq_base, tNode);
-				} else {
-					ABIEVO abieVO = createABIE(accVOFromASCCP.getACCID(), bCSelected.getBusinessContextID(), 0, abie);
-					ASBIEPVO asbiepVO = createASBIEP(asccpVO.getASCCPID(), abieVO.getABIEID(), abie);
-					
-					String seqKey = "";
-					if(groupPosition > 0) { // Group
-						seqKey = groupPosition + "." + asccVO.getSequencingKey();
-					} else { // not group
-						seqKey = seq_base + "." + asccVO.getSequencingKey();
-					}
-					
-					ASBIEVO asbieVO = createASBIE(asccVO.getASCCID(), abie, asbiepVO.getASBIEPID(), seqKey);
-					
-					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), asbieVO.getASBIEID(), "ASBIE");
-					av.setColor("blue");
-					asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
-					asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
-					asbieVO.setDefinition(asccVO.getDefinition());
-					av.setAsccVO(asccVO);
-					av.setAsccpVO(asccpVO);
-					av.setAccVO(accVOFromASCCP);
-					abieVO.setDefinition(accVO.getDefinition());
-					av.setAbieVO(abieVO);
-					asbiepVO.setDefinition(asccpVO.getDefinition());
-					av.setAsbiepVO(asbiepVO);
-					av.setAsbieVO(asbieVO);
-					TreeNode tNode2 = new DefaultTreeNode(av, tNode);
-					
-					createBIEs(accVOFromASCCP.getACCID(), abieVO.getABIEID(), -1, tNode2);
-				}
-			}
-			seq_base++;
+			QueryCondition qc_04 = new QueryCondition();
+			qc_04.add("asccp_id", asbiepVO.getBasedASCCPID());
+			ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc_04);
+			
+			QueryCondition qc_05 = new QueryCondition();
+			qc_05.add("ascc_id", asbieVO.getBasedASCC());
+			ASCCVO asccVO = (ASCCVO)asccDao.findObject(qc_05);
+			
+			QueryCondition qc_06 = new QueryCondition();
+			qc_06.add("abie_id", asbiepVO.getRoleOfABIEID());
+			ABIEVO abieVO = (ABIEVO)abieDao.findObject(qc_06);
+			
+			QueryCondition qc_07 = new QueryCondition();
+			qc_07.add("acc_id", abieVO.getBasedACCID());
+			ACCVO accVO = (ACCVO)accDao.findObject(qc_07);
+			
+			ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getABIEID(), "ASBIE");
+			av.setColor("blue");
+			asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
+			asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
+			asbieVO.setDefinition(asccVO.getDefinition());
+			av.setAsccVO(asccVO);
+			av.setAsccpVO(asccpVO);
+			av.setAccVO(accVO);
+			abieVO.setDefinition(accVO.getDefinition());
+			av.setAbieVO(abieVO);
+			asbiepVO.setDefinition(asccpVO.getDefinition());
+			av.setAsbiepVO(asbiepVO);
+			av.setAsbieVO(asbieVO);
+			TreeNode tNode2 = new DefaultTreeNode(av, tNode);
+			
+			//createBIEChildren(abieVO.getABIEID(), tNode2);
 		}
-		
-
 	}
 	
+	private void createBBIESCChild(BBIEVO bbieVO, TreeNode parent) {
+		try {
+			QueryCondition qc_01 = new QueryCondition();
+			qc_01.add("bbie_id", bbieVO.getBBIEID());
+			List<SRTObject> list_01 = bbiescDao.findObjects(qc_01);
+			
+			for(SRTObject obj : list_01) {
+				BBIE_SCVO bbiescVO = (BBIE_SCVO)obj;
+				
+				QueryCondition qc_02 = new QueryCondition();
+				qc_02.add("dt_sc_id", bbiescVO.getDTSCID());
+				DTSCVO dtscVO = (DTSCVO)dtscDao.findObject(qc_02);
+				
+				ABIEView av_01 = new ABIEView(dtscVO.getPropertyTerm(), bbiescVO.getBBIESCID(), "BBIESC");
+				av_01.setDtscVO(dtscVO);
+				av_01.setBbiescVO(bbiescVO);
+				av_01.setColor("orange");
+				TreeNode tNode1 = new DefaultTreeNode(av_01, parent);
+			}
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void expand() {
-		System.out.println("###AAA " + ((ABIEView)root.getData()).getName());
+		try {
+			ABIEView abieView = (ABIEView)selectedTreeNode.getData();
+			abieView.getType();
+			
+			createBIEChildren(((ABIEView)selectedTreeNode.getData()).getAbieVO().getABIEID(), selectedTreeNode);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void onEdit() {
