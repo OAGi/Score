@@ -459,8 +459,82 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			String sql = _FIND_ASBIEP_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				ASBIEPVO asbiepVO = new ASBIEPVO();
+				asbiepVO.setASBIEPID(rs.getInt("ASBIEP_ID"));
+				asbiepVO.setASBIEPGUID(rs.getString("ASBIEP_GUID"));
+				asbiepVO.setBasedASCCPID(rs.getInt("Based_ASCCP_ID"));
+				asbiepVO.setRoleOfABIEID(rs.getInt("Role_Of_ABIE_ID"));
+				asbiepVO.setDefinition(rs.getString("Definition"));
+				asbiepVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
+				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				asbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				list.add(asbiepVO);
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return list;
 	}
 
 	@Override

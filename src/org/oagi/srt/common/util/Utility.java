@@ -18,7 +18,23 @@ public class Utility {
 	}
 
 	public static String first(String den) {
-		return den.substring(0, den.indexOf(".")).replace("_", " ");
+		return den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ","").replaceAll("Identifier","ID");
+	}
+	
+	public static String second(String den) {
+		den = den.substring(den.indexOf(".")+2, den.length());
+		return (den.indexOf(".") == -1 ? den.replaceAll("-", "").replaceAll(" ","") : den.substring(0, den.indexOf(".")).replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID"));
+	}
+	
+	public static String third(String den) {
+		den = den.substring(den.indexOf(".")+2, den.length());
+		den = den.substring(den.indexOf(".")+2, den.length());
+		return (den.indexOf(".") == -1 ? den.replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID") : den.substring(0, den.indexOf(".")).replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID"));
+	}
+
+	public static String DenToName(String den) {
+			den = den.substring(0, den.indexOf(". Type")).replaceAll(" ", "")+"Type";
+		return den;
 	}
 	
 	public static String createDENFormat(String str) {
@@ -97,6 +113,63 @@ public class Utility {
 					+ e.toString());
 		}
 	
+	}
+	
+	public static String toCamelCase(final String init) {
+	    if (init==null)
+	        return null;
+
+	    final StringBuilder ret = new StringBuilder(init.length());
+
+	    for (String word : init.split(" ")) {
+	    	if(word.startsWith("_"))
+	    		word = word.substring(0, 1);
+	    	if(word.startsWith(" "))
+	    		word = word.substring(0, 1);
+	    	if(word.equalsIgnoreCase("identifier"))
+	        	ret.append("ID");      	
+	        if (!word.isEmpty()) {
+	            ret.append(word.substring(0, 1).toUpperCase());
+	            ret.append(word.substring(1));
+	        }
+	    }
+	    return ret.toString();
+	}
+	
+	public static String toLowerCamelCase(final String init) {
+	    if (init==null)
+	        return null;
+
+	    final StringBuilder ret = new StringBuilder(init.length());
+	    
+	    int cnt = 0;
+	    
+	    for (String word : init.split(" ")) {
+	    	if(word.startsWith("_"))
+	    		word = word.substring(0, 1);
+	    	if(word.startsWith(" "))
+	    		word = word.substring(0, 1);
+	    	if(word.equalsIgnoreCase("identifier"))
+	        	ret.append("ID");      	
+
+	        if (!word.isEmpty() && cnt != 0 ) {
+	            ret.append(word.substring(0, 1).toUpperCase());
+	            ret.append(word.substring(1).toLowerCase());
+	        }
+	    	
+	        else if (!word.isEmpty() && cnt == 0 ) {
+	            ret.append(word.substring(0, 1).toLowerCase());
+	            ret.append(word.substring(1).toLowerCase());
+	        }
+	    	
+	    	cnt++;
+	    }
+	    return ret.toString();
+	}
+	
+	public static String format(int a) {
+		String s = String.format("%02d", a);
+		return s;
 	}
 	
 	public static void main(String args[]) {

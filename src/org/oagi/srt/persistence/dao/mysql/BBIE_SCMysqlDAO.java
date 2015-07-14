@@ -532,8 +532,86 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			String sql = _FIND_BBIE_SC_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				BBIE_SCVO bbie_scVO = new BBIE_SCVO();
+				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
+				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
+				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
+				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
+				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
+				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
+				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
+				bbie_scVO.setDefinition(rs.getString("Definition"));
+				bbie_scVO.setRemark(rs.getString("Remark"));
+				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				list.add(bbie_scVO);
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return list;
 	}
 
 }
