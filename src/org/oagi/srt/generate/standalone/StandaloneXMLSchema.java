@@ -387,12 +387,12 @@ public class StandaloneXMLSchema {
 			nillable.setValue("true");
 			eNode.setAttributeNode(nillable);
 		}
-		if(gBBIE.getDefaultText() != null) {
+		if(gBBIE.getDefaultText() != null && gBBIE.getDefaultText().length() != 0) {
 			Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
 			defaulta.setValue(gBBIE.getDefaultText());
 			eNode.setAttributeNode(defaulta);
 		}
-		if(gBBIE.getFixedValue() != null) {
+		if(gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
 			Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
 			fixedvalue.setValue(gBBIE.getFixedValue());
 			eNode.setAttributeNode(fixedvalue);
@@ -426,12 +426,12 @@ public class StandaloneXMLSchema {
 			nillable.setValue("true");
 			eNode.setAttributeNode(nillable);
 		}
-		if(gBBIE.getDefaultText() != null) {
+		if(gBBIE.getDefaultText() != null && gBBIE.getDefaultText().length() != 0) {
 			Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
 			defaulta.setValue(gBBIE.getDefaultText());
 			eNode.setAttributeNode(defaulta);
 		}
-		if(gBBIE.getFixedValue() != null) {
+		if(gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
 			Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
 			fixedvalue.setValue(gBBIE.getFixedValue());
 			eNode.setAttributeNode(fixedvalue);
@@ -663,6 +663,7 @@ public class StandaloneXMLSchema {
 	public String getCodeListTypeName(CodeListVO gCL) throws Exception { //confirm
 		//String CodeListTypeName ="xsd:string";
 		String CodeListTypeName = gCL.getName() + (gCL.getName().endsWith("Code") == true ? "" : "Code") + "ContentType" + "_" + gCL.getAgencyID() + "_" + gCL.getListID() + "_" + gCL.getVersionID();
+		CodeListTypeName = CodeListTypeName.replaceAll(" ", "");
 		return CodeListTypeName;
 	}
 	
@@ -799,12 +800,12 @@ public class StandaloneXMLSchema {
 		if(aBBIESC.getDefaultText() != null && aBBIESC.getFixedValue() != null){
 			System.out.println("default and fixed value options handling error");
 		}
-		else if(aBBIESC.getDefaultText() != null){
+		else if(aBBIESC.getDefaultText() != null && aBBIESC.getDefaultText().length() != 0){
 			Attr default_att = aNode.getOwnerDocument().createAttribute("default");
 			default_att.setNodeValue(aBBIESC.getDefaultText());
 			aNode.setAttributeNode(default_att);
 		}
-		else if(aBBIESC.getFixedValue() != null){
+		else if(aBBIESC.getFixedValue() != null && aBBIESC.getFixedValue().length() != 0){
 			Attr fixed_att = aNode.getOwnerDocument().createAttribute("fixed");
 			fixed_att.setNodeValue(aBBIESC.getFixedValue());
 			aNode.setAttributeNode(fixed_att);
@@ -1034,6 +1035,7 @@ public class StandaloneXMLSchema {
 
 	public String getAgencyListTypeName(AgencyIDListVO gAL) throws Exception {
 		String AgencyListTypeName = "clm" + gAL.getAgencyID() + gAL.getListID() + gAL.getVersionID() + "_" + Utility.toCamelCase(gAL.getName()) + "ContentType";
+		AgencyListTypeName = AgencyListTypeName.replaceAll(" ", "");
 		return AgencyListTypeName;
 	}
 	
@@ -1292,7 +1294,7 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(0);
+		abie_ids.add(195917);
 		aa.generateXMLSchema(abie_ids, true);
 		System.out.println("###END###");
 	}
