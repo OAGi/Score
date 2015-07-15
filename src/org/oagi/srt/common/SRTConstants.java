@@ -46,6 +46,8 @@ public class SRTConstants {
 	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
 	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 	
+	public static final String BOD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/BODs/";
+	
 	public static int getDBType() {
 		ServerProperties props = ServerProperties.getInstance();
 		String dbTypeVal = props.getProperty("srt.db.type");

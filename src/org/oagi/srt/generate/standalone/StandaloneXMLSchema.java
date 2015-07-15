@@ -15,7 +15,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.chanchan.common.persistence.db.DBAgent;
+import org.chanchan.common.persistence.file.BfFileSaveStrategy;
 import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
@@ -55,15 +57,12 @@ public class StandaloneXMLSchema {
 	public static boolean schema_package_flag = false;
 	private ArrayList<String> StoredCC = new ArrayList<String>();
 	
-	public void receive_abie_id(){
-			abie_ids.add(172850);
-	}
-	
 	public String writeXSDFile(Document doc, String filename) throws TransformerException {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		DOMSource source = new DOMSource(doc);
-		String filepath = "/Temp/test/"+filename+".xsd";
+		
+		String filepath = SRTConstants.BOD_FILE_PATH + filename + ".xsd";
 		StreamResult result = new StreamResult(new File(filepath));
 		transformer.transform(source, result);
 		System.out.println(filepath + " is generated");
@@ -1133,7 +1132,7 @@ public class StandaloneXMLSchema {
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
 
-		ArrayList<SRTObject> gABIE = receiveABIE(abie_ids);
+		ArrayList<SRTObject> gABIE = receiveABIE(abie_id);
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		Document doc = docBuilder.newDocument();
@@ -1141,15 +1140,14 @@ public class StandaloneXMLSchema {
 		Element schemaNode = generateSchema(doc);
 		Calendar aCalendar = Calendar.getInstance(TimeZone.getTimeZone("EST"));
 		String filepath = null;
-		if(schema_package_flag == false) {
+		if(schema_package_flag == true) {
 			for(SRTObject aSRTObject : gABIE){
 				ABIEVO aABIEVO = (ABIEVO)aSRTObject;
 				ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
 				System.out.println("Generating Top Level ABIE w/ given ASBIEPVO ID: "+ aASBIEPVO.getASBIEPID());
 				doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
 			}
-			filepath = writeXSDFile(doc, "generated_schema_"+Utility.format((aCalendar.get(Calendar.MONTH)+1))+Utility.format(aCalendar.get(Calendar.DAY_OF_MONTH))+
-					aCalendar.get(Calendar.YEAR)+"_"+Utility.format(aCalendar.get(Calendar.HOUR_OF_DAY)+1)+Utility.format(aCalendar.get(Calendar.MINUTE)));
+			filepath = writeXSDFile(doc, Utility.generateGUID());
 		}
 		else {
 			for(SRTObject aSRTObject : gABIE){
@@ -1160,8 +1158,7 @@ public class StandaloneXMLSchema {
 				doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
 				writeXSDFile(doc, "Package/" + aABIEVO.getAbieGUID());
 			}
-			filepath = Zip.compression("packaged_zip_file_"+Utility.format((aCalendar.get(Calendar.MONTH)+1))+Utility.format(aCalendar.get(Calendar.DAY_OF_MONTH))+
-					aCalendar.get(Calendar.YEAR)+"_"+Utility.format(aCalendar.get(Calendar.HOUR_OF_DAY)+1)+Utility.format(aCalendar.get(Calendar.MINUTE)));
+			filepath = Zip.compression(Utility.generateGUID());
 		}
 		
 		return filepath;
@@ -1169,7 +1166,6 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		aa.receive_abie_id();
 		aa.generateXMLSchema(abie_ids, false);
 		System.out.println("###END###");
 	}
