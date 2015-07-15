@@ -29,7 +29,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 	private final String _FIND_ALL_ABIE_STATEMENT =
 			"SELECT ABIE_ID, ABIE_GUID, Based_ACC_ID, isTop_Level, Business_Context_ID, Definition, "
 			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term FROM " + _tableName;
+			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term FROM " + _tableName + " order by Last_Update_Timestamp desc";
 	
 	private final String _FIND_MAX_ID_STATEMENT =
 			"SELECT max(abie_id) as max FROM " + _tableName;
@@ -430,6 +430,9 @@ public class ABIEMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			
+			sql += " order by Last_Update_Timestamp desc";
+			
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {

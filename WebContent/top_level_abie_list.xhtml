@@ -25,7 +25,7 @@
 				<p:dataTable id="tbl" var="abieView" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 					paginator="true" rows="20" style="width:920px; margin-bottom:20px"
 	            	value="#{topLevelABIEHandler.bodList}" selection="#{topLevelABIEHandler.selectedBod}" rowKey="#{abieView.id}" selectionMode="single">
-					<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onBODRowSelect}" />
+					<p:ajax event="rowSelect" update=":form:detailList" listener="#{topLevelABIEHandler.onBODRowSelect}" />
         			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onRowUnselect}" />
 	                <p:column style="width:200px">
 						<f:facet name="header">
@@ -52,7 +52,7 @@
 						<h:outputText value="#{abieView.abieVO.creationTimestamp}" />
 					</p:column>
 	            </p:dataTable>
-	            <p:commandButton process="tbl" update=":form:tbDetailid" icon="ui-icon-search" value="Edit" oncomplete="PF('tbDetail').show()" />
+	            <p:commandButton process="tbl" ajax="true" update=":form:tbDetailid" icon="ui-icon-search" value="Edit" oncomplete="PF('tbDetail').show()" />
 			</p:panel>
 			<p:dialog header="Edit Standalone BOD" widgetVar="tbDetail" showEffect="clip" hideEffect="clip" closable="true" scrollable="true" resizable="true" draggable="true" width="80%" height="700px">
 				<p:growl id="messages2" />
@@ -71,12 +71,35 @@
 						    </p:treeTable>
 						</p:layoutUnit>
 				 
-						<p:layoutUnit position="center" resizable="true">
+						<p:layoutUnit id="detailList" position="center" resizable="true">
 					    	<p:panel id="details" header="View and Edit BIE" collapsed="false" toggleable="false" toggleSpeed="500">
 					    		<p:selectOneRadio id="customRadio" value="#{topLevelABIEHandler.aABIEView.restrictionType}" layout="custom">
 						            <f:selectItem itemLabel="Primitive" itemValue="Primitive" />
 						            <f:selectItem itemLabel="Code" itemValue="Code" />
 						        </p:selectOneRadio>
+						        <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ABIE'}">
+									<h:panelGrid columns="2" cellpadding="5">
+							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
+										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
+									</h:panelGrid>
+									<p:separator />
+									<h:panelGrid columns="1" cellpadding="5">
+										<h:outputLabel rows="10" value="Top-level BIE Info: " style="font-weight:bold; color:red" />
+									</h:panelGrid>
+									<h:panelGrid columns="4" cellpadding="5">
+										<h:outputLabel rows="10" value="Biz Term" style="font-weight:bold" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+										
+										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" /> 
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+										
+										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+										</p:inputTextarea>
+									</h:panelGrid>
+									<p:separator />
+								</ui:fragment>
+							
 								<ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE'}">
 									<h:panelGrid columns="2" cellpadding="5">
 							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />

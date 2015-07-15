@@ -18,8 +18,7 @@
 	
 <style type="text/css">
 .companyHeaderGrid tr, .companyHeaderGrid td {
-    border: none !important;
-    border-style: hidden !important;
+    border: none;
 }
 </style>
 
@@ -32,7 +31,7 @@
 					<p:row>
 						<p:column> 
 							<h:outputLabel for="desc" value="Select top-level ABIEs: "
-								style="font-weight:bold; color: blue" />
+								style="font-weight:bold; color: red" />
 						</p:column>
 						<p:column>
 							<p:commandButton value="Add" icon="ui-icon-extlink" actionListener="#{standaloneBODHandler.chooseABIE}">
@@ -103,65 +102,31 @@
 		            <f:selectItem itemLabel="All" itemValue="All" />
 		            <f:selectItem itemLabel="Each" itemValue="Each" />
 		        </p:selectOneRadio>
-				<p:panelGrid id="grid3" cellpadding="5" styleClass="companyHeaderGrid">	
-					<p:row>
-						<p:column> 
-							<p:panelGrid id="grid4" cellpadding="2" styleClass="companyHeaderGrid">	
-								<p:row>
-									<p:column colspan="2"> 
-										<h:outputLabel for="desc" value="Select expression" style="font-weight:bold; color: blue" />
-									</p:column>
-								</p:row>
-								<p:row>
-									<p:column>
-								        <p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true" />
-								    </p:column>
-									<p:column>
-								        <h:outputLabel rows="10" value="XML Schema" style="font-weight:bold" />
-								    </p:column>
-								</p:row>
-								<p:row>
-									<p:column>
-								        <p:radioButton id="opt2" for="customRadio" itemIndex="0" selected="false" />
-								    </p:column>
-									<p:column>
-								        <h:outputLabel rows="10" value="JSON Schema" style="font-weight:bold" />
-							        </p:column>
-								</p:row>
-							</p:panelGrid>
-						</p:column>
-						<p:column> 
-							<p:panelGrid id="grid8" cellpadding="2" styleClass="companyHeaderGrid">	
-								<p:row>
-									<p:column colspan="2"> 
-										<h:outputLabel for="desc" value="Schema package option" style="font-weight:bold; color: blue" />
-									</p:column>
-								</p:row>
-								<p:row>
-									<p:column>
-								        <p:radioButton id="opt3" for="customRadio2" itemIndex="0" selected="true" />
-								    </p:column>
-									<p:column>
-								        <h:outputLabel rows="10" value="Put all schemas in the same package" style="font-weight:bold" />
-								    </p:column>
-								</p:row>
-								<p:row>
-									<p:column>
-										<p:radioButton id="opt4" for="customRadio2" itemIndex="0" selected="true" />
-									</p:column>
-									<p:column>
-										<h:outputLabel rows="10" value="Put each schemas in the different package" style="font-weight:bold" />
-									</p:column>
-								</p:row>
-							</p:panelGrid>
-						</p:column>
-					</p:row>
-					<p:row>
-        				<p:column>
-        					<p:commandButton value="Generate" icon="ui-icon-extlink" actionListener="#{standaloneBODHandler.generate}" />
-        				</p:column>
-        			</p:row>
-				</p:panelGrid>
+				<h:panelGrid id="grid3" cellpadding="5" columns="5" styleClass="companyHeaderGrid">	
+					<h:outputLabel for="desc" value="#1 " style="font-weight:bold; color: green" /> <h:outputLabel for="desc" value="Select expression" style="font-weight:bold; color: blue" />
+					<h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray" />
+					<h:outputLabel for="desc" value="#2 " style="font-weight:bold; color: green" /> <h:outputLabel for="desc" value="Schema package option" style="font-weight:bold; color: blue" />
+					
+			        <p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true" />
+			        <h:outputLabel rows="10" value="XML Schema" style="font-weight:bold" />
+			        <h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray" />
+			        <p:radioButton id="opt3" for="customRadio2" itemIndex="0" selected="true" />
+			        <h:outputLabel rows="10" value="Put all schemas in the same package" style="font-weight:bold" />
+			        
+			        <p:radioButton id="opt2" for="customRadio" itemIndex="0" selected="false" />
+			        <h:outputLabel rows="10" value="JSON Schema" style="font-weight:bold" />
+			        <h:outputLabel rows="10" value="|" style="font-weight:bold; color:gray" />
+					<p:radioButton id="opt4" for="customRadio2" itemIndex="0" selected="true" />
+					<h:outputLabel rows="10" value="Put each schemas in the different package" style="font-weight:bold" />
+      				
+				</h:panelGrid>
+				<p:separator />
+				<h:panelGrid id="grid44" cellpadding="5" columns="2" styleClass="companyHeaderGrid">	
+					<p:commandButton value="Generate" update="downloadButton" icon="ui-icon-extlink" actionListener="#{standaloneBODHandler.generate}" />
+      				<p:commandButton id="downloadButton" value="Download" disabled="#{standaloneBODHandler.filePath eq null ? true : false}" ajax="false" icon="ui-icon-arrowthick-1-s">
+				        <p:fileDownload value="#{standaloneBODHandler.file}" />
+				    </p:commandButton>
+				</h:panelGrid>
 			</p:panel>
 		</h:form>
 	</ui:define>

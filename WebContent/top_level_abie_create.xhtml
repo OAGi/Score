@@ -236,6 +236,9 @@
         	<p:growl id="messages2" />
         	<p:panel header="Create uncommitted BIE">
 				<p:messages autoUpdate="true" />
+				
+				<h:panelGrid style="width:100%;">
+				
         		<p:layout style="min-width:800px; min-height:600px;">
 				    <p:layoutUnit position="west" resizable="true" size="400" minSize="400" maxSize="400">
 				        <p:treeTable id="treeTable" value="#{topLevelABIEHandler.root}" var="aBIEView" selection="#{topLevelABIEHandler.selectedTreeNode}" selectionMode="single" dynamic="true"> 
@@ -255,6 +258,30 @@
 					            <f:selectItem itemLabel="Primitive" itemValue="Primitive" />
 					            <f:selectItem itemLabel="Code" itemValue="Code" />
 					        </p:selectOneRadio>
+					        
+					        <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ABIE'}">
+								<h:panelGrid columns="2" cellpadding="5">
+						    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
+									<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
+								</h:panelGrid>
+								<p:separator />
+								<h:panelGrid columns="1" cellpadding="5">
+									<h:outputLabel rows="10" value="Top-level BIE Info: " style="font-weight:bold; color:red" />
+								</h:panelGrid>
+								<h:panelGrid columns="4" cellpadding="5">
+									<h:outputLabel rows="10" value="Biz Term" style="font-weight:bold" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+									
+									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" /> 
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+									
+									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+									</p:inputTextarea>
+								</h:panelGrid>
+								<p:separator />
+							</ui:fragment>
+					        
 							<ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE'}">
 								<h:panelGrid columns="2" cellpadding="5">
 						    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
@@ -368,7 +395,7 @@
 									<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtName}" style="font-weight:bold; color: blue;" />
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
-									<p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true" />
+									<p:radioButton id="opt1" for="customRadio" itemIndex="0" />
 									<h:outputLabel rows="10" value="Primitive:" style="font-weight:bold" />
 									<p:selectOneMenu value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictionId}">
 										<p:ajax listener="#{topLevelABIEHandler.aABIEView.onBDTPrimitiveChange}" />
@@ -381,10 +408,10 @@
 										<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
 										<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
 									    
-									    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
+									    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
 									    </p:commandButton>
 									    
-									    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
+									    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
 									    </p:commandButton>
 								</h:panelGrid>
 								<p:separator />
@@ -426,10 +453,12 @@
 			            </p:panel>
 				    </p:layoutUnit>
 				</p:layout>
-			    <p:contextMenu for="treeTable">
-			        <p:menuitem value="View" update="treeTable" actionListener="#{topLevelABIEHandler.updateTree()}" icon="ui-icon-search" />
-			        <p:menuitem value="Edit" update="treeTable" actionListener="#{topLevelABIEHandler.updateTree()}" icon="ui-icon-close"/>
-			    </p:contextMenu>
+				
+				
+				</h:panelGrid>
+				<h:panelGrid>
+			    	<p:commandButton value="Submit" icon="ui-icon-check" action="top_level_abie_list.xhtml?faces-redirect=true" />
+			    </h:panelGrid>
 			</p:panel>
             <p:panel header="Number of Uncommitted BIEs">
                 <p:messages id="chartMsg" />
@@ -442,6 +471,7 @@
             
             <p:dialog header="Derived Code List" widgetVar="derivedCodeList" showEffect="clip" hideEffect="clip" closable="true" scrollable="true" resizable="true" draggable="true" width="800" height="700">
         		<p:outputPanel id="derivedCodeListId">
+        			<p:messages autoUpdate="true" />
         			<h:panelGrid id="grid6" cellpadding="5">
 						<p:row>
 	        				<p:column style="width:800px"> 
@@ -450,7 +480,6 @@
 						</p:row>
 					</h:panelGrid>
 					<p:separator />
-					<p:messages autoUpdate="true" />
 
 		            <p:dataTable id="tbl_01" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 						paginator="true" rows="10" style="width:550px; margin-bottom:20px"
@@ -506,16 +535,6 @@
 		            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('codeList').hide()" />
 		    	</p:outputPanel>
 		    </p:dialog>
-        </p:tab>
- 
-        <p:tab id="confirm" title="Confirmation">
-            <p:panel header="Confirmation">
-                <h:panelGrid id="confirmation" columns="3" columnClasses="grid,grid,grid">
-  
-                </h:panelGrid>
- 
-                <p:commandButton value="Submit" actionListener="#{topLevelABIEHandler.save}" update="growl" process="@this"/>
-            </p:panel>
         </p:tab>
     </p:wizard>
  

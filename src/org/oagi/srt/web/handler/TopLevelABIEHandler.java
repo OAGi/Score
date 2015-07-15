@@ -374,13 +374,21 @@ public class TopLevelABIEHandler implements Serializable {
 				topAbieVO = createABIE(accVO, bCSelected.getBusinessContextID(), 1, 0);
 				// int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
 				int abieId = topAbieVO.getABIEID();
-				ABIEView aABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
-				aABIEView.setAbieVO(topAbieVO);
-				root = new DefaultTreeNode(aABIEView, null);
+				
+				ABIEView rootABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
+				rootABIEView.setAbieVO(topAbieVO);
+				root = new DefaultTreeNode(rootABIEView, null);
 				
 				asbiepVO = createASBIEP(selected, abieId, -1);
 				
-				createBIEs(selected.getRoleOfACCID(), abieId, -1, root);
+				aABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
+				aABIEView.setAbieVO(topAbieVO);
+				aABIEView.setColor("blue");
+				aABIEView.setAccVO(accVO);
+				aABIEView.setAsbiepVO(asbiepVO);
+				TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
+				
+				createBIEs(selected.getRoleOfACCID(), abieId, -1, toplevelNode);
 				
 				createBarModel();
 				tx.commit();
@@ -797,10 +805,20 @@ public class TopLevelABIEHandler implements Serializable {
         FacesMessage msg = new FacesMessage(((ABIEView) event.getObject()).getName(), String.valueOf(((ABIEView) event.getObject()).getName()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
         selectedBod = (ABIEView) event.getObject();
-        root = new DefaultTreeNode(selectedBod, null);
+        //root = new DefaultTreeNode(selectedBod, null);
+        
+        System.out.println("#### " + selectedBod.getName());
+        ABIEView rootABIEView = new ABIEView(selectedBod.getName(), selectedBod.getId(), "ROOT");
+		rootABIEView.setAbieVO(selectedBod.getAbieVO());
+		root = new DefaultTreeNode(rootABIEView, null);
+		
+		aABIEView = new ABIEView(selectedBod.getName(), selectedBod.getId(), "ABIE");
+		aABIEView.setAbieVO(selectedBod.getAbieVO());
+		aABIEView.setColor("blue");
+		TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
         
         try {
-			createBIEChildren(selectedBod.getId(), root);
+			createBIEChildren(selectedBod.getId(), toplevelNode);
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
@@ -1103,6 +1121,8 @@ public class TopLevelABIEHandler implements Serializable {
 			saveBBIEChanges(aABIEView);
 		} else if(aABIEView.getType().equals("BBIESC")) {
 			saveBBIESCChanges(aABIEView);
+		} else if(aABIEView.getType().equals("ABIE")) {
+			saveABIEChanges(aABIEView);
 		}
 		
 		FacesMessage msg = new FacesMessage("Changes on '" + aABIEView.getName() + "' are just saved!", "Changes on '" + aABIEView.getName() + "' are just saved!");
@@ -1200,12 +1220,13 @@ public class TopLevelABIEHandler implements Serializable {
         FacesMessage msg = new FacesMessage(((CodeListVO) event.getObject()).getName(), String.valueOf(((CodeListVO) event.getObject()).getCodeListID()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
         codeListVO = (CodeListVO) event.getObject();
+        System.out.println("######## " + codeListVO.getName());
     }
  
     public void onCodeListRowUnselect(UnselectEvent event) {
         FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((CodeListVO) event.getObject()).getCodeListID()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
-        codeListVO = null;
+        //codeListVO = null;
     }
 	
 	public CodeListVO getCodeListVO() {
@@ -1291,6 +1312,15 @@ public class TopLevelABIEHandler implements Serializable {
 		try {
 			asbieDao.updateObject(asbieVO);
 			asbiepDao.updateObject(asbiepVO);
+			abieDao.updateObject(abieVO);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveABIEChanges(ABIEView aABIEView) {
+		ABIEVO abieVO = aABIEView.getAbieVO();
+		try {
 			abieDao.updateObject(abieVO);
 		} catch (SRTDAOException e) {
 			e.printStackTrace();

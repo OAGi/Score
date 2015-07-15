@@ -1,5 +1,9 @@
 package org.oagi.srt.web.handler;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +15,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
@@ -35,7 +40,9 @@ import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 
 @ManagedBean
@@ -194,10 +201,36 @@ public class StandaloneBODHandler extends UIHandler implements Serializable {
 			al.add(av.getAbieVO().getABIEID());
 		}
 		try {
-			String filePath = schema.generateXMLSchema(al, true);
+			filePath = schema.generateXMLSchema(al, true);
 			System.out.println("### " + filePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	private StreamedContent file;
+	private String filePath;
+    
+    public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
+	}
+
+	public StreamedContent getFile() {
+    	InputStream stream;
+		try {
+			stream = new FileInputStream(new File(filePath));
+			file = new DefaultStreamedContent(stream, "text/xml", filePath.substring(filePath.lastIndexOf("/") + 1));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+        return file;
+    }
 }
