@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,9 +51,9 @@ import org.w3c.dom.Element;
 public class StandaloneXMLSchema {
 
 	private static Connection conn = null;
-	public static Vector<Integer> abie_ids = new Vector<Integer>();
+	public static ArrayList<Integer> abie_ids = new ArrayList<Integer>();
 	public static boolean schema_package_flag = false;
-	private Vector<String> StoredCC = new Vector<String>();
+	private ArrayList<String> StoredCC = new ArrayList<String>();
 	
 	public void receive_abie_id(){
 			abie_ids.add(172850);
@@ -151,7 +150,7 @@ public class StandaloneXMLSchema {
 		for(SRTObject aSRTObject : childBIEs){
 			if(aSRTObject.getClass().getCanonicalName().endsWith("ASBIEVO")){
 				ASBIEVO childBIE = (ASBIEVO)aSRTObject;
-				ASCCVO gASCC = queryBasedASCC(childBIE);
+//				ASCCVO gASCC = queryBasedASCC(childBIE);
 //				if(isCCStored(gASCC.getASCCGUID()))
 //					continue;
 				
@@ -164,7 +163,7 @@ public class StandaloneXMLSchema {
 			}
 			else {
 				BBIEVO childBIE = (BBIEVO)aSRTObject;
-				BCCVO bccVO = queryBasedBCC(childBIE);
+//				BCCVO bccVO = queryBasedBCC(childBIE);
 //				if(isCCStored(bccVO.getBCCGUID()))
 //					continue;
 				DTVO aBDT = queryAssocBDT(childBIE);
@@ -877,9 +876,9 @@ public class StandaloneXMLSchema {
 	}
 	
 	public boolean isAgencyListGenerated(AgencyIDListVO gAL) throws Exception {
-		Vector<String> GuidVector = getGUIDVector();
-		for(int i = 0; i < GuidVector.size(); i++) {
-			if(gAL.getAgencyIDListGUID().equals(GuidVector.get(i)))
+		ArrayList<String> GuidArrayList = getGUIDArrayList();
+		for(int i = 0; i < GuidArrayList.size(); i++) {
+			if(gAL.getAgencyIDListGUID().equals(GuidArrayList.get(i)))
 				return true;
 		}
 		return false;
@@ -926,8 +925,8 @@ public class StandaloneXMLSchema {
 		return stNode;
 	}
 	
-	public Vector<String> getGUIDVector() throws Exception{
-		Vector<String> result = new Vector<String>();// Store code list and agency ID lists 
+	public ArrayList<String> getGUIDArrayList() throws Exception{
+		ArrayList<String> result = new ArrayList<String>();// Store code list and agency ID lists 
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("CodeList");
@@ -957,7 +956,7 @@ public class StandaloneXMLSchema {
 		return aASBIEPVO;
 	}
 	
-	public ArrayList<SRTObject> receiveABIE(Vector<Integer> abie_id) throws SRTDAOException{
+	public ArrayList<SRTObject> receiveABIE(ArrayList<Integer> abie_id) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ABIE");
 		
@@ -1112,9 +1111,9 @@ public class StandaloneXMLSchema {
 	}
 	
 	public boolean isCodeListGenerated(CodeListVO gCL) throws Exception {
-		Vector<String> GuidVector = getGUIDVector();
-		for(int i = 0; i < GuidVector.size(); i++) {
-			if(gCL.getCodeListGUID().equals(GuidVector.get(i)))
+		ArrayList<String> GuidArrayList = getGUIDArrayList();
+		for(int i = 0; i < GuidArrayList.size(); i++) {
+			if(gCL.getCodeListGUID().equals(GuidArrayList.get(i)))
 				return true;
 		}
 		return false;
@@ -1129,7 +1128,7 @@ public class StandaloneXMLSchema {
 		return false;
 	}
 
-	public String generateXMLSchema (Vector<Integer> abie_id, boolean schema_package_flag) throws Exception {
+	public String generateXMLSchema (ArrayList<Integer> abie_id, boolean schema_package_flag) throws Exception {
 		Utility.dbSetup();
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
