@@ -343,7 +343,12 @@ public class StandaloneXMLSchema {
 		while(!gPNode.getNodeName().equals("xsd:sequence")) {
 			gPNode = (Element) gPNode.getParentNode();
 		}
-		
+		Element annotation = element.getOwnerDocument().createElement("xsd:annotation"); 
+		Element documentation = element.getOwnerDocument().createElement("xsd:documentation");
+		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+		documentation.setTextContent(gASBIE.getDefinition());
+		annotation.appendChild(documentation);
+		element.appendChild(annotation);
 		gPNode.appendChild(element);
 		StoredCC.add(gASCC.getASCCGUID());//check
 		return element;
@@ -405,8 +410,14 @@ public class StandaloneXMLSchema {
 			eNode.setAttribute("maxOccurs", String.valueOf(gBBIE.getCardinalityMax()));
 		if(gBBIE.getNillable() !=0)
 			eNode.setAttribute("nillable", String.valueOf(gBBIE.getNillable()));
-
-
+		
+		Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation"); 
+		Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+		documentation.setTextContent(gBBIE.getDefinition());
+		annotation.appendChild(documentation);
+		eNode.appendChild(annotation);
+		
 		return eNode;
 	}
 	
@@ -440,6 +451,12 @@ public class StandaloneXMLSchema {
 			eNode.setAttribute("use", "required");
 		else
 			eNode.setAttribute("use" ,"optional");
+		Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation"); 
+		Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+		documentation.setTextContent(gBBIE.getDefinition());
+		annotation.appendChild(documentation);
+		eNode.appendChild(annotation);
 		return eNode;
 	}
 	
@@ -819,6 +836,14 @@ public class StandaloneXMLSchema {
 		DTSCVO aDTSC = (DTSCVO) dao.findObject(qc, conn);
 		aNameNode.setNodeValue(aDTSC.getPropertyTerm().replaceAll(" ", "").concat(aDTSC.getRepresentationTerm().replaceAll(" ", "")));
 		aNode.setAttributeNode(aNameNode);
+		
+		Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation"); 
+		Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
+		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+		documentation.setTextContent(aBBIESC.getDefinition());
+		annotation.appendChild(documentation);
+		aNode.appendChild(annotation);
+		
 		return aNode;
 	}
 	
