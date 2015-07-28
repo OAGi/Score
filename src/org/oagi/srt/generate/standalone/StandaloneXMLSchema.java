@@ -834,9 +834,13 @@ public class StandaloneXMLSchema {
     	QueryCondition qc = new QueryCondition();
 		qc.add("DT_SC_ID", aBBIESC.getDTSCID());
 		DTSCVO aDTSC = (DTSCVO) dao.findObject(qc, conn);
-		aNameNode.setNodeValue(aDTSC.getPropertyTerm().replaceAll(" ", "").concat(aDTSC.getRepresentationTerm().replaceAll(" ", "")));
+		if(aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
+			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().replaceAll(" ", "")));
+		else if(aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
+			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().replaceAll(" ", "")).concat("ID"));
+		else
+			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().replaceAll(" ", "")).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm().replaceAll(" ", ""))));
 		aNode.setAttributeNode(aNameNode);
-		
 		Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation"); 
 		Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
 		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
