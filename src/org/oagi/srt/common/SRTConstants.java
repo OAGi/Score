@@ -37,6 +37,7 @@ public class SRTConstants {
 	
 	public static final String TAB_TOP_LEVEL_ABIE_SELECT_BC = "select_bc";
 	public static final String TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE = "create_u_bie";
+	public static final String TAB_TOP_LEVEL_ABIE_COPY_UC_BIE = "edit_bod";
 	
 	public static final int TOP_LEVEL_ABIE_STATE_EDITING = 2;
 	public static final int TOP_LEVEL_ABIE_STATE_PUBLISHED = 4;
@@ -46,7 +47,7 @@ public class SRTConstants {
 	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
 	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 	
-	public static final String BOD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/BODs/";
+	public static final String BOD_FILE_PATH = "/Temp/test/";
 	
 	public static int getDBType() {
 		ServerProperties props = ServerProperties.getInstance();

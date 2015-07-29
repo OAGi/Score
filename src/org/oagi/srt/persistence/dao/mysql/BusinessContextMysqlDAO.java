@@ -13,6 +13,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BusinessContextVO;
+import org.oagi.srt.persistence.dto.DTVO;
 
 /**
  *
@@ -255,8 +256,78 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 	@Override
 	public SRTObject findObject(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		BusinessContextVO business_contextVO = null;
+		
+		try {
+			String sql = _FIND_BUSINESS_CONTEXT_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				business_contextVO = new BusinessContextVO();
+				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				business_contextVO.setName(rs.getString("Name"));
+				business_contextVO.setBusinessContextGUID(rs.getString("Business_Context_GUID"));
+				business_contextVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
+				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return business_contextVO;
 	}
 
 	@Override

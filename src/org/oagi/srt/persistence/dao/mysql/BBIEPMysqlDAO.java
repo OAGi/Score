@@ -14,6 +14,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIEPVO;
+import org.oagi.srt.persistence.dto.DTVO;
 
 /**
  *
@@ -435,8 +436,83 @@ public class BBIEPMysqlDAO extends SRTDAO {
 	@Override
 	public SRTObject findObject(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		BBIEPVO bbiepVO = null;
+		
+		try {
+			String sql = _FIND_BBIEP_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				bbiepVO = new BBIEPVO();
+				bbiepVO.setBBIEPID(rs.getInt("BBIEP_ID"));
+				bbiepVO.setBBIEPGUID(rs.getString("BBIEP_GUID"));
+				bbiepVO.setBasedBCCPID(rs.getInt("Based_BCCP_ID"));
+				bbiepVO.setDefinition(rs.getString("Definition"));
+				bbiepVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
+				bbiepVO.setLastUpdatedbyUserID(rs.getInt("Last_Updated_by_User_ID"));
+				bbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				bbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bbiepVO.setRemark(rs.getString("remark"));
+				bbiepVO.setBusinessTerm(rs.getString("business_term"));
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return bbiepVO;
 	}
 
 	@Override
