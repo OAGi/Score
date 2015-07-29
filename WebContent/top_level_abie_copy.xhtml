@@ -7,7 +7,6 @@
 	<ui:define name="side_menu">
 		<h:form id="side">
 			<p:growl id="messages" showDetail="false" />
-
 			<p:menu>
 				<p:submenu style="width: 180px !important;" label="Code List">
 					<p:menuitem value="List" url="context_category_list.xhtml"
@@ -69,33 +68,33 @@
 
 				<p:tab id="select_bc" title="Select Business Context">
 					<p:outputPanel id="tbl_bc">
-						<p:dataTable id="tbl_bc2" var="BusinessContextVO"
-							value="#{businessContextHandler.businessContexts}"
-							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-							paginator="true" rows="10"
-							style="width:700px; margin-bottom:20px"
-							selection="#{businessContextHandler.bcDetail}"  	
-							rowKey="#{BusinessContextVO.businessContextID}">
-							<p:column selectionMode="single"
-								style="width:16px;text-align:center" />
-							<p:column style="width:200px">
-								<f:facet name="header">
-									<h:outputText value="Name" />
-								</f:facet>
-								<h:outputText value="#{BusinessContextVO.name}" />
-							</p:column>
-							<p:column style="width:300px">
-								<f:facet name="header">
-									<h:outputText value="GUID" />
-								</f:facet>
-								<h:outputText value="#{BusinessContextVO.businessContextGUID}" />
-							</p:column>
-						</p:dataTable>
-						<p:commandButton process="tbl_bc" icon="ui-icon-search"
-							update=":bcdetail:bcDetailid" value="Detail"
-							oncomplete="PF('bcDetail').show()" /> 
-						<p:commandButton value="Select" icon="ui-icon-check"
-							actionListener="#{topLevelABIEHandler.onBCSelect(businessContextHandler.bcDetail)}" />
+						<p:panel header="Select Business Context">
+							<p:dataTable id="tbl_bc2" var="BusinessContextVO"
+								value="#{businessContextHandler.businessContexts}"
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+								paginator="true" rows="10"
+								style="width:700px; margin-bottom:20px"
+								selection="#{businessContextHandler.bcDetail}"
+								rowKey="#{BusinessContextVO.businessContextID}">
+								<p:column selectionMode="single"
+									style="width:16px;text-align:center" />
+								<p:column style="width:200px">
+									<f:facet name="header">
+										<h:outputText value="Name" />
+									</f:facet>
+									<h:outputText value="#{BusinessContextVO.name}" />
+								</p:column>
+								<p:column style="width:300px">
+									<f:facet name="header">
+										<h:outputText value="GUID" />
+									</f:facet>
+									<h:outputText value="#{BusinessContextVO.businessContextGUID}" />
+								</p:column>
+							</p:dataTable>
+							<p:commandButton process="tbl_bc" icon="ui-icon-search"
+								update=":bcdetail:bcDetailid" value="Detail"
+								oncomplete="PF('bcDetail').show()" />
+						</p:panel>
 					</p:outputPanel>
 				</p:tab>
 
@@ -549,45 +548,48 @@
 				</p:tab>
 			</p:wizard>
 		</h:form>
-		<h:form id = "bcdetail">
-		<p:dialog header="Business Context Detail" widgetVar="bcDetail" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="300">
-        		<p:outputPanel id="bcDetailid">
+		<h:form id="bcdetail">
+			<p:dialog header="Business Context Detail" widgetVar="bcDetail"
+				showEffect="clip" hideEffect="clip" closable="true" resizable="true"
+				draggable="true" width="800" height="300">
+				<p:outputPanel id="bcDetailid">
 					<h:panelGrid id="grid" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:200px"> 
+							<p:column style="width:200px">
 								<h:outputLabel value="Name: " style="font-weight:bold" />
-							</p:column> 
-							<p:column style="width:600px"> 
+							</p:column>
+							<p:column style="width:600px">
 								<h:outputText value="#{businessContextHandler.bcDetail.name}" />
-							</p:column> 
+							</p:column>
 						</p:row>
 						<p:row>
-							<p:column> 
+							<p:column>
 								<h:outputLabel for="desc" value="Business Context Value "
 									style="font-weight:bold" />
 							</p:column>
 							<p:column>
-							</p:column> 
-						</p:row>		
+							</p:column>
+						</p:row>
 						<p:row>
-							<p:column colspan="2"> 					
-								<p:dataTable id="tbl1" var="businessContextValues" value="#{businessContextHandler.bcDetails}"
+							<p:column colspan="2">
+								<p:dataTable id="tbl1" var="businessContextValues"
+									value="#{businessContextHandler.bcDetails}"
 									style="width:600px; margin-bottom:20px">
-									
+
 									<p:column style="width:200px">
 										<f:facet name="header">
 											<h:outputText value="Context Category" />
 										</f:facet>
 										<h:outputText value="#{businessContextValues.ccVO.name}" />
 									</p:column>
-					
+
 									<p:column style="width:200px">
 										<f:facet name="header">
 											<h:outputText value="Context Scheme Name" />
 										</f:facet>
 										<h:outputText value="#{businessContextValues.csVO.schemeName}" />
 									</p:column>
-					
+
 									<p:column style="width:200px">
 										<f:facet name="header">
 											<h:outputText value="Context Scheme Value" />
@@ -598,15 +600,19 @@
 							</p:column>
 						</p:row>
 						<p:row>
-	        				<p:column>
-							</p:column> 
-							<p:column> 
-								<p:commandButton value="Close" icon="ui-icon-check" oncomplete="PF('bcDetail').hide()"/>
+							<p:column>
+							</p:column>
+							<p:column>
+								<p:commandButton value="Select" icon="ui-icon-check"
+									actionListener="#{topLevelABIEHandler.onBCSelect(businessContextHandler.bcDetail)}"
+									oncomplete="PF('bcDetail').hide()" />
+								<p:commandButton value="Close" icon="ui-icon-check"
+									oncomplete="PF('bcDetail').hide()" />
 							</p:column>
 						</p:row>
 					</h:panelGrid>
 				</p:outputPanel>
-		    </p:dialog>
+			</p:dialog>
 		</h:form>
 	</ui:define>
 </ui:composition>
