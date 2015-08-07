@@ -17,19 +17,32 @@ public class Utility {
 		return "oagis-id-" + UUID.randomUUID().toString().replaceAll("-", "");
 	}
 
-	public static String first(String den) {
-		return den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ","").replaceAll("Identifier","ID");
+	public static String first(String den, boolean upp) {
+		den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ","").replaceAll("Identifier","ID");
+		if(upp==false)
+			den = den.substring(0, 1).toLowerCase()+den.substring(1);
+		return den;
 	}
 	
-	public static String second(String den) {
+	public static String first(String den) {
+		den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ","").replaceAll("Identifier","ID");
+		return den;
+	}
+	
+	public static String second(String den, boolean upp) {
 		den = den.substring(den.indexOf(".")+2, den.length());
-		return (den.indexOf(".") == -1 ? den.replaceAll("-", "").replaceAll(" ","") : den.substring(0, den.indexOf(".")).replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID"));
+		den = den.indexOf(".") == -1 ? den.replaceAll("-", "").replaceAll(" ","") : den.substring(0, den.indexOf(".")).replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID");
+		if(upp==false)
+			den = den.substring(0, 1).toLowerCase()+den.substring(1);
+		return den;
 	}
 	
 	public static String third(String den) {
 		den = den.substring(den.indexOf(".")+2, den.length());
 		den = den.substring(den.indexOf(".")+2, den.length());
-		return (den.indexOf(".") == -1 ? den.replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID") : den.substring(0, den.indexOf(".")).replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID"));
+		den = den.indexOf(".") == -1 ? den.replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID") : den.substring(0, den.indexOf(".")).replaceAll("-", "").replaceAll(" ","").replaceAll("Identifier","ID");
+		den = den.substring(0, 1).toLowerCase()+den.substring(1);
+		return den;
 	}
 
 	public static String DenToName(String den) {
@@ -151,17 +164,17 @@ public class Utility {
 	    		word = word.substring(0, 1);
 	    	if(word.equalsIgnoreCase("identifier"))
 	        	ret.append("ID");      	
-
-	        if (!word.isEmpty() && cnt != 0 ) {
-	            ret.append(word.substring(0, 1).toUpperCase());
-	            ret.append(word.substring(1).toLowerCase());
-	        }
-	    	
-	        else if (!word.isEmpty() && cnt == 0 ) {
-	            ret.append(word.substring(0, 1).toLowerCase());
-	            ret.append(word.substring(1).toLowerCase());
-	        }
-	    	
+	    	else {
+		        if (!word.isEmpty() && cnt != 0 ) {
+		            ret.append(word.substring(0, 1).toUpperCase());
+		            ret.append(word.substring(1).toLowerCase());
+		        }
+		    	
+		        else if (!word.isEmpty() && cnt == 0 ) {
+		            ret.append(word.substring(0, 1).toLowerCase());
+		            ret.append(word.substring(1).toLowerCase());
+		        }
+	    	}
 	    	cnt++;
 	    }
 	    return ret.toString();

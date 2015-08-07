@@ -361,7 +361,7 @@ public class StandaloneXMLSchema {
     	QueryCondition qc = new QueryCondition();
 		qc.add("ASCCP_ID", gASBIEP.getBasedASCCPID());
 		ASCCPVO asccp = (ASCCPVO)dao.findObject(qc, conn);
-		gElementNode.setAttribute("name", Utility.first(asccp.getDEN()));	
+		gElementNode.setAttribute("name", Utility.first(asccp.getDEN(), true));	
 		//gElementNode.setAttribute("type", Utility.second(asccp.getDEN())+"Type");
 		return gElementNode;
 		
@@ -380,7 +380,7 @@ public class StandaloneXMLSchema {
 		
 		BCCVO bccVO = queryBasedBCC(gBBIE);
 		Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-		nameANode.setValue(Utility.second(bccVO.getDEN())); 
+		nameANode.setValue(Utility.second(bccVO.getDEN(), true)); 
 		eNode.setAttributeNode(nameANode);
 		eNode.setAttribute("id", gBBIE.getBbieGuid()); //eNode.setAttribute("id", bccVO.getBCCGUID());
 		StoredCC.add(bccVO.getBCCGUID());
@@ -425,7 +425,7 @@ public class StandaloneXMLSchema {
 		
 		BCCVO bccVO = queryBasedBCC(gBBIE);
 		Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-		nameANode.setValue(Utility.second(bccVO.getDEN())); 
+		nameANode.setValue(Utility.second(bccVO.getDEN(), false)); 
 		eNode.setAttributeNode(nameANode);
 		eNode.setAttribute("id", gBBIE.getBbieGuid()); //eNode.setAttribute("id", bccVO.getBCCGUID());
 		StoredCC.add(bccVO.getBCCGUID());
@@ -1323,7 +1323,7 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(195917);
+		abie_ids.add(221021);
 		aa.generateXMLSchema(abie_ids, true);
 		System.out.println("###END###");
 	}

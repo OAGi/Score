@@ -69,7 +69,7 @@ public class SRTConstants {
 	public static final String COMPONENTS_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Components.xsd";
 	public static final String NOUNS_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/";
 	public static final String XBT_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
-		
+	public static final String XML_TEST_FILE_PATH = "/Temp/test/result/";
 	public static String filepath(String list) {
 		String prefix_filepath = "/Users/yslee/Work/Project/OAG/Development/";
 		//String prefix_filepath = "C:/Users/yslee/Work/Project/OAG/Development/";
