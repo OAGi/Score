@@ -88,8 +88,8 @@ public class P_1_7_PopulateQBDTInDT {
 	private void populate() throws XPathExpressionException, SRTDAOException {
 		NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
 		NodeList elementsFromMetaXSD = meta_xsd.getNodeList("/xsd:schema/xsd:element");
-		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd);
-		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
+		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd, 0);
+		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd, 1); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
 //		insertCDTSCAllowedPrimitive(elementsFromFieldsXSD, fields_xsd);
 //		insertCDTSCAllowedPrimitive(elementsFromMetaXSD, meta_xsd);
 //		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromFieldsXSD, fields_xsd);
@@ -130,7 +130,7 @@ public class P_1_7_PopulateQBDTInDT {
 		return cdtSCAPMapDAO.findObjects(qc, conn);
 	}
 	
-	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
+	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler, int xsdType) throws XPathExpressionException, SRTDAOException {
 		for(int i = 0; i < elementsFromXSD.getLength(); i++) {
 			String bccp = ((Element)elementsFromXSD.item(i)).getAttribute("name");
 			String guid = ((Element)elementsFromXSD.item(i)).getAttribute("id");
@@ -139,6 +139,17 @@ public class P_1_7_PopulateQBDTInDT {
 
 			Node simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
 			Node simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+			
+			if(simpleContent == null && simpleType == null) {
+				if(xsdType == 0)
+					xHandler = meta_xsd;
+				else
+					xHandler = fields_xsd;
+			}
+			
+			simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
+			simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+			
 			if(simpleContent != null || simpleType != null) {
 			
 				//System.out.println("#### type " + type);
