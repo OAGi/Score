@@ -3,6 +3,7 @@ package org.oagi.srt.generate.standalone;
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -146,12 +147,14 @@ public class StandaloneXMLSchema {
 		Element node = null;
 		
 		for(SRTObject aSRTObject : childBIEs){
-			if(aSRTObject.getClass().getCanonicalName().endsWith("ASBIEVO")){
+			if(aSRTObject.getClass().getCanonicalName().endsWith("BBIEVO")) {
+				BBIEVO childBIE = (BBIEVO)aSRTObject;
+				DTVO aBDT = queryAssocBDT(childBIE);
+				generateBBIE(childBIE, aBDT, gPNode, gSchemaNode);				
+			}
+			
+			else {
 				ASBIEVO childBIE = (ASBIEVO)aSRTObject;
-//				ASCCVO gASCC = queryBasedASCC(childBIE);
-//				if(isCCStored(gASCC.getASCCGUID()))
-//					continue;
-				
 				node = generateASBIE(childBIE, gPNode);
 				ASBIEPVO anASBIEP = queryAssocToASBIEP(childBIE);
 				node = generateASBIEP(anASBIEP, node);
@@ -159,14 +162,7 @@ public class StandaloneXMLSchema {
 				node = generateABIE(anABIE, node, gSchemaNode);
 				node = generateBIEs(anABIE, node, gSchemaNode);
 			}
-			else {
-				BBIEVO childBIE = (BBIEVO)aSRTObject;
-//				BCCVO bccVO = queryBasedBCC(childBIE);
-//				if(isCCStored(bccVO.getBCCGUID()))
-//					continue;
-				DTVO aBDT = queryAssocBDT(childBIE);
-				generateBBIE(childBIE, aBDT, gPNode, gSchemaNode);				
-			}
+
 		}
 		return gSchemaNode;
 	}	
@@ -623,7 +619,7 @@ public class StandaloneXMLSchema {
 			while(!gPNode.getNodeName().equals("xsd:complexType")) {
 				gPNode = (Element) gPNode.getParentNode();
 			}
-			
+
 			gPNode.appendChild(eNode);
 			
 			ArrayList<SRTObject> SCs = queryBBIESCs(gBBIE); 
@@ -989,8 +985,12 @@ public class StandaloneXMLSchema {
 		while(true){
 			if(tNode.getNodeName().equals("xsd:simpleType") || tNode.getNodeName().equals("xsd:complexType"))
 				break;
-			tNode = (Element) tNode.getParentNode();
+			tNode = (Element) tNode.getLastChild();
+			//tNode = (Element) tNode.getParentNode();
 		}
+		
+		if(tNode.getFirstChild().getNodeName().equals("xsd:simpleContent"))
+			tNode = (Element) tNode.getFirstChild().getFirstChild();
 
 		for(int i = 0; i < gSCs.size(); i++) {
 			BBIE_SCVO aBBIESC = (BBIE_SCVO)gSCs.get(i);
@@ -1216,17 +1216,18 @@ public class StandaloneXMLSchema {
 		ArrayList<SRTObject> bbievo = dao2.findObjects(qc2, conn);
 		ArrayList<SRTObject> result = new ArrayList<SRTObject>();
 
+		for(SRTObject aSRTObject : bbievo){
+			BBIEVO aBBIEVO = (BBIEVO)aSRTObject;
+			if(aBBIEVO.getCardinalityMax() != 0)
+				result.add(aBBIEVO);
+		} 
+		
 		for(SRTObject aSRTObject : asbievo){
 			ASBIEVO aASBIEVO = (ASBIEVO)aSRTObject;
 			if(aASBIEVO.getCardinalityMax() != 0)
 				result.add(aASBIEVO);
 		}
 		
-		for(SRTObject aSRTObject : bbievo){
-			BBIEVO aBBIEVO = (BBIEVO)aSRTObject;
-			if(aBBIEVO.getCardinalityMax() != 0)
-				result.add(aBBIEVO);
-		}//sorting 
 		return result;
 	}
 	
@@ -1323,7 +1324,7 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(221021);
+		abie_ids.add(218980);
 		aa.generateXMLSchema(abie_ids, true);
 		System.out.println("###END###");
 	}

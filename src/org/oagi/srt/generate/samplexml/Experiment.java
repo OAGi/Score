@@ -16,8 +16,6 @@ public class Experiment {
 		//xml file generation
 		//XmlTest.xmltest_exp(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
 		//XmlTest.xmltest_exp(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
-		
-		//validate xml against xsd 
 		//ValidateXML.validate_exp(oagxsdfilename, oagxmlfilename);
 		//ValidateXML.validate_exp(generatedxsdfilename, generatedxmlfilename);
 		ValidateXML.validate_exp(oagxsdfilename, generatedxmlfilename);
