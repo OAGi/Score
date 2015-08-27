@@ -90,6 +90,7 @@ public class P_1_5_3_PopulateSCInDTSC {
 					
 					int min_cardinality = 0;
 					int max_cardinality = 1;
+					int cnt = 0;
 					for(int i = 0; i < attributeList.getLength(); i++) {
 						Node attribute = attributeList.item(i);
 						Element attrElement = (Element)attribute;
@@ -102,15 +103,28 @@ public class P_1_5_3_PopulateSCInDTSC {
 						DTSCVO vo = new DTSCVO();
 						vo.setDTSCGUID(attrElement.getAttribute("id"));
 						
-						Node propertyTermNode = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_PropertyTermName\"]");
-						vo.setPropertyTerm(propertyTermNode.getTextContent());
+						qc = new QueryCondition();
+						qc.add("owner_dt_id", dtVO2.getDTID());
+						DTSCVO dtVO3 = (DTSCVO)daoDTSC.findObject(qc, conn);
+						int baseddtscid = dtVO3.getDTSCID() + cnt;
+						vo.setBasedDTSCID(baseddtscid);
 						
-						Node representationTermNode = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_RepresentationTermName\"]");
-						vo.setRepresentationTerm(representationTermNode.getTextContent());
+						qc = new QueryCondition();
+						qc.add("dt_sc_id", baseddtscid);
+						DTSCVO dtVO4 = (DTSCVO)daoDTSC.findObject(qc, conn);
+						vo.setPropertyTerm(dtVO4.getPropertyTerm());
+						vo.setRepresentationTerm(dtVO4.getRepresentationTerm());
+						vo.setDefinition(dtVO4.getDefinition());
 						
-						Node definitionNode = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
-						
-						vo.setDefinition(definitionNode.getTextContent());
+//						Node propertyTermNode = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_PropertyTermName\"]");
+//						vo.setPropertyTerm(propertyTermNode.getTextContent());
+//						
+//						Node representationTermNode = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_RepresentationTermName\"]");
+//						vo.setRepresentationTerm(representationTermNode.getTextContent());
+//						
+//						Node definitionNode = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attrElement.getAttribute("name") + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+//						
+//						vo.setDefinition(definitionNode.getTextContent());
 						vo.setOwnerDTID(dtVO.getDTID());
 						
 						vo.setMinCardinality(min_cardinality);
@@ -119,13 +133,9 @@ public class P_1_5_3_PopulateSCInDTSC {
 							max_cardinality = 0;
 						vo.setMaxCardinality(max_cardinality);
 						
-						qc = new QueryCondition();
-						qc.add("owner_dt_id", dtVO2.getDTID());
-						DTSCVO dtVO3 = (DTSCVO)daoDTSC.findObject(qc, conn);
-						vo.setBasedDTSCID(dtVO3.getDTSCID());
-						
+
+						cnt++;
 						daoDTSC.insertObject(vo);
-						
 					}
 				}
 				

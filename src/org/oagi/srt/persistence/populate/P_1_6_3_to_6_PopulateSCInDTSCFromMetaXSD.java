@@ -76,7 +76,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 			dtscVO_02.setBasedDTSCID(dtscVO_01.getDTSCID());
 			dtscVO_02.setDefinition(dtscVO_01.getDefinition());
 			dtscVO_02.setDTSCGUID(dtscVO_01.getDTSCGUID());
-			dtscVO_02.setMaxCardinality(0);
+			dtscVO_02.setMaxCardinality(dtscVO_01.getMaxCardinality());
 			dtscVO_02.setMinCardinality(dtscVO_01.getMinCardinality());
 			dtscVO_02.setOwnerDTID(dtVO_011.getDTID());
 			dtscVO_02.setPropertyTerm(dtscVO_01.getPropertyTerm());

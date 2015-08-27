@@ -3,7 +3,13 @@ package org.oagi.srt.generate.standalone;
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,6 +54,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class StandaloneXMLSchema {
 
@@ -831,12 +838,17 @@ public class StandaloneXMLSchema {
 		qc.add("DT_SC_ID", aBBIESC.getDTSCID());
 		DTSCVO aDTSC = (DTSCVO) dao.findObject(qc, conn);
 		if(aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
-			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().replaceAll(" ", "")));
+			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
 		else if(aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().replaceAll(" ", "")).concat("ID"));
+			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("ID"));
 		else
-			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().replaceAll(" ", "")).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm().replaceAll(" ", ""))));
+			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
+			//aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm())));
 		aNode.setAttributeNode(aNameNode);
+		if(aBBIESC.getMinCardinality() >= 1)
+			aNode.setAttribute("use", "required");
+		else
+			aNode.setAttribute("use" ,"optional");
 		Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation"); 
 		Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
 		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
@@ -988,13 +1000,24 @@ public class StandaloneXMLSchema {
 			tNode = (Element) tNode.getLastChild();
 			//tNode = (Element) tNode.getParentNode();
 		}
+		Node tmp = tNode.getFirstChild();
+		do {
+			if(tmp.getNodeName().equals("xsd:simpleContent")) 
+			{
+				tNode = (Element) tmp.getFirstChild();
+				break;
+			}
+			if(tmp.getNextSibling() != null)
+				tmp = tmp.getNextSibling();			
+		} while(tmp != null);
 		
-		if(tNode.getFirstChild().getNodeName().equals("xsd:simpleContent"))
-			tNode = (Element) tNode.getFirstChild().getFirstChild();
-
+//		if(tNode.getFirstChild().getNodeName().equals("xsd:simpleContent"))
+//			tNode = (Element) tNode.getFirstChild().getFirstChild();
+		//here
 		for(int i = 0; i < gSCs.size(); i++) {
 			BBIE_SCVO aBBIESC = (BBIE_SCVO)gSCs.get(i);
-			
+			if(aBBIESC.getMaxCardinality() == 0)
+				continue;
 			Element aNode = tNode.getOwnerDocument().createElement("xsd:attribute");
 			aNode = handleBBIESCvalue(aBBIESC, aNode); //Generate a DOM Element Node, handle values
 
@@ -1046,9 +1069,9 @@ public class StandaloneXMLSchema {
 				aTypeNode.setNodeValue(getCodeListTypeName(aCL));
 				aNode.setAttributeNode(aTypeNode);
 			}
-			if(isCCStored(aNode.getAttribute("id")))
-				continue;
-			StoredCC.add(aNode.getAttribute("id"));
+//			if(isCCStored(aNode.getAttribute("id")))
+//				continue;
+//			StoredCC.add(aNode.getAttribute("id"));
 			tNode.appendChild(aNode);
 		}
 		return tNode; 
@@ -1204,12 +1227,15 @@ public class StandaloneXMLSchema {
 	}
 	
 	public ArrayList<SRTObject> queryChildBIEs(ABIEVO gABIE) throws SRTDAOException {
+		HashMap<SRTObject, Double> sequence = new HashMap<SRTObject, Double>();
+		ValueComparator bvc =  new ValueComparator(sequence);
+		TreeMap<SRTObject, Double> ordered_sequence = new TreeMap<SRTObject, Double>(bvc);
+		
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ASBIE");
     	QueryCondition qc = new QueryCondition();
 		qc.add("Assoc_From_ABIE_ID", gABIE.getABIEID());
 		ArrayList<SRTObject> asbievo = dao.findObjects(qc, conn);
-
 		SRTDAO dao2 = df.getDAO("BBIE");
     	QueryCondition qc2 = new QueryCondition();
 		qc2.add("Assoc_From_ABIE_ID", gABIE.getABIEID());
@@ -1219,18 +1245,42 @@ public class StandaloneXMLSchema {
 		for(SRTObject aSRTObject : bbievo){
 			BBIEVO aBBIEVO = (BBIEVO)aSRTObject;
 			if(aBBIEVO.getCardinalityMax() != 0)
-				result.add(aBBIEVO);
+				sequence.put(aBBIEVO, aBBIEVO.getSequencing_key());
 		} 
 		
 		for(SRTObject aSRTObject : asbievo){
 			ASBIEVO aASBIEVO = (ASBIEVO)aSRTObject;
 			if(aASBIEVO.getCardinalityMax() != 0)
-				result.add(aASBIEVO);
+				sequence.put(aASBIEVO, aASBIEVO.getSequencingKey());
 		}
 		
+		ordered_sequence.putAll(sequence);
+		Set set = ordered_sequence.entrySet();
+		Iterator i = set.iterator();
+		while(i.hasNext()) {
+			Map.Entry me = (Map.Entry)i.next();
+			result.add((SRTObject)me.getKey());
+		}
 		return result;
 	}
 	
+	class ValueComparator implements Comparator<SRTObject> {
+
+	    Map<SRTObject, Double> base;
+	    public ValueComparator(Map<SRTObject, Double> base) {
+	        this.base = base;
+	    }
+
+	    // Note: this comparator imposes orderings that are inconsistent with equals.    
+	    public int compare(SRTObject a, SRTObject b) {
+	        if (base.get(a) <= base.get(b)) {
+	            return -1;
+	        } else {
+	            return 1;
+	        } // returning 0 would merge keys
+	    }
+
+	}
 	public ASBIEPVO queryAssocToASBIEP(ASBIEVO gASBIE) throws SRTDAOException {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ASBIEP");
@@ -1324,7 +1374,7 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(218980);
+		abie_ids.add(1099);
 		aa.generateXMLSchema(abie_ids, true);
 		System.out.println("###END###");
 	}

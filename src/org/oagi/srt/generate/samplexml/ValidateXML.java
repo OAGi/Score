@@ -35,14 +35,14 @@ public class ValidateXML {
 	}
 	
 	public static void validate_exp(String xsdfilename, String xmlfilename) throws FileNotFoundException {
-		File xml = new File(SRTConstants.XML_TEST_FILE_PATH+xmlfilename+".xml");
-		InputStream xsd = new FileInputStream(SRTConstants.XML_TEST_FILE_PATH+xsdfilename+".xsd");
+		File xml = new File(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml");
+		InputStream xsd = new FileInputStream(SRTConstants.TEST_BOD_FILE_PATH+xsdfilename+".xsd");
 		validate(xml, xsd);
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		File xml = new File(SRTConstants.XML_TEST_FILE_PATH+"AcknowledgeField1.xml");
-		InputStream xsd = new FileInputStream(SRTConstants.XML_TEST_FILE_PATH+"AcknowledgeField_modified.xsd");
+		File xml = new File(SRTConstants.TEST_XML_FILE_PATH+"AcknowledgeField1.xml");
+		InputStream xsd = new FileInputStream(SRTConstants.TEST_BOD_FILE_PATH+"AcknowledgeField_modified.xsd");
 		//InputStream xsd = new FileInputStream("/Temp/test/AcknowledgeField.xsd");
 		validate(xml, xsd);
 	}

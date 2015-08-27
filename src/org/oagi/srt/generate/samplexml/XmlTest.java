@@ -47,8 +47,8 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
     
     public static void xmltest_exp(String xsdfilename, String xmlfilename, String rootElementname, String prefix) throws Exception, FileNotFoundException {
     	String oagis = "http://www.openapplications.org/oagis/10";
-    	XSModel xsModel = new XSParser().parse(SRTConstants.XML_TEST_FILE_PATH+xsdfilename+".xsd");
-        XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.XML_TEST_FILE_PATH+xmlfilename+".xml")), false, 4, null);
+    	XSModel xsModel = new XSParser().parse(SRTConstants.TEST_XML_FILE_PATH+xsdfilename+".xsd");
+        XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
         XSInstance xsInstance = new XSInstance();
         QName rootElement = new QName(oagis, rootElementname, prefix);
         xsInstance.minimumElementsGenerated = 1;
@@ -58,7 +58,7 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         xsInstance.generateAllChoices = true;
         xsInstance.generateOptionalElements = true;
         xsInstance.generateDefaultAttributes = true;
-        xsInstance.generateOptionalAttributes = true;
+        xsInstance.generateOptionalAttributes = false;
         //xsInstance.sampleValueGenerator = new XmlTest();
         
         xsInstance.showContentModel = false;
@@ -74,8 +74,8 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
     	String rootElementname = "AcknowledgeField";
     	String prefix = "xs";
     	String oagis = "http://www.openapplications.org/oagis/10";
-    	XSModel xsModel = new XSParser().parse(SRTConstants.XML_TEST_FILE_PATH+xsdfilename+".xsd");
-        XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.XML_TEST_FILE_PATH+xmlfilename+".xml")), false, 4, null);
+    	XSModel xsModel = new XSParser().parse(SRTConstants.TEST_XML_FILE_PATH+xsdfilename+".xsd");
+        XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
         XSInstance xsInstance = new XSInstance();
         QName rootElement = new QName(oagis, rootElementname, prefix);
         xsInstance.minimumElementsGenerated = 1;

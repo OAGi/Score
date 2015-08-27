@@ -303,6 +303,98 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO2.getDTID(), defaultId);
 	}
 	
+	private void importExceptionalDataTypeList(String dataType) throws Exception {
+		String typeName;
+		String xsdTypeName;
+		String dataTypeTerm;
+		
+//		String type = "complex";
+//		
+//		XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+//		
+//		//Type Name
+//		Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + dataType + "']/xsd:simpleContent/xsd:extension");
+//		if (typeNameNode == null){
+//			type = "simple";
+//			typeNameNode = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']/xsd:restriction");
+//		} 
+//		Element typeNameElement = (Element)typeNameNode;
+//		typeName = typeNameElement.getAttribute("base");	
+//		
+//		Node aNodeTN = fields_xsd.getNode("//xsd:"+type+"Type[@name = '" + dataType + "']");
+//		Element aElementTN = (Element)aNodeTN;
+		
+		//Data Type Term
+		
+		typeName = "ValueType_039C44";
+		String type = "simple";
+		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
+		
+		Element dataTypeTermElement = (Element)dataTypeTermNode;
+		dataTypeTerm = dataTypeTermElement.getTextContent();
+		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
+			dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
+		//dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
+						
+		//Definitions
+		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+		Element definitionElement = (Element)definitionNode;
+		Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+		if (ccDefinitionNode == null)
+			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+		if (ccDefinitionNode == null)
+			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+		Element ccDefinitionElement = (Element)ccDefinitionNode;				
+		
+		Node aNodeBDT = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']");
+		Element aElementBDT = (Element)aNodeBDT;
+		
+		Node union = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union");
+		int defaultId = -1;
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("XSDBuiltInType");
+		if(union != null) {
+			QueryCondition qc3 = new QueryCondition();
+			qc3.add("name", "token");
+			defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
+		} else {
+			Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']//xsd:extension");
+			if(xsdTypeNameNode == null)
+				xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']//xsd:restriction");
+			if(xsdTypeNameNode != null) {
+				Element xsdTypeNameElement = (Element)xsdTypeNameNode;
+				xsdTypeName = xsdTypeNameElement.getAttribute("base");	
+				
+				QueryCondition qc3 = new QueryCondition();
+				qc3.add("builtin_type", xsdTypeName);
+				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
+				if(defaultId == 0) {
+					Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
+					QueryCondition qc4 = new QueryCondition();
+					qc4.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
+					defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc4, conn)).getXSDBuiltInTypeID();
+				}
+			} 
+		}
+		
+		typeName = typeName.replaceAll("Type", "");
+		
+		DTVO dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+		
+		insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId);
+
+		//Unqualified Type Name
+		String unQualifiedTypeName = dataType.replaceAll("Type", "");
+
+		//Unqualified Data Type Term
+		String unQualifiedDataTypeTerm = dataTypeTerm;
+		
+		DTVO dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"));
+		insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO2.getDTID(), defaultId);
+	}
+	
 	private void insertBDTPrimitiveRestriction(int cdtID, int bdtID, int defaultId) throws SRTDAOException {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO aBDTPrimitiveRestrictionDAO = df.getDAO("BDTPrimitiveRestriction");
@@ -376,7 +468,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		    	populateAdditionalDefault_BDTStatement(nouns_xsd);
 		    }
 		}
-		
+		importExceptionalDataTypeList("ValueType_039C44");
 		tx.close();
 		conn.close();
 		System.out.println("### 1.5.1-2 End");

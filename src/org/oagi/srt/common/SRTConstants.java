@@ -60,18 +60,22 @@ public class SRTConstants {
 		return Integer.parseInt(dbTypeVal);
 	}
 	
-	public static final String BOD_FILE_PATH_01 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
-	public static final String BOD_FILE_PATH_02 = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
+	public static final String BOD_FILE_PATH_01 = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
+	public static final String BOD_FILE_PATH_02 = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
+
+	public static final String FILEDS_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified.xsd";
+	public static final String FILEDS_EXTENDED_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified_extended.xsd";
+	public static final String META_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
+	public static final String META_EXTENDED_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta_extended.xsd";
+	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/BusinessDataType_1_modified.xsd";
+	public static final String COMPONENTS_XSD_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Components.xsd";
+	public static final String NOUNS_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/";
+	public static final String XBT_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
+	public static final String TEST_BOD_FILE_PATH = "/Temp/test/result/BOD/";
+	public static final String TEST_XML_FILE_PATH = "/Temp/test/result/BOD/";
 	
-	public static final String FILEDS_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified.xsd";
-	public static final String META_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
-	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/BusinessDataType_1_modified.xsd";
-	public static final String COMPONENTS_XSD_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Components.xsd";
-	public static final String NOUNS_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/";
-	public static final String XBT_FILE_PATH = "/Users/yslee/Work/Project/OAG/Development/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
-	public static final String XML_TEST_FILE_PATH = "/Temp/test/result/";
 	public static String filepath(String list) {
-		String prefix_filepath = "/Users/yslee/Work/Project/OAG/Development/";
+		String prefix_filepath = "/Users/jnl18/Documents/";
 		//String prefix_filepath = "C:/Users/yslee/Work/Project/OAG/Development/";
 		String origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/";
 		if(list.equals("AgencyID")){

@@ -49,7 +49,7 @@ public class P_1_7_PopulateQBDTInDT {
 	
 	private XPathHandler fields_xsd;
 	private XPathHandler meta_xsd;
-	
+	private XPathHandler businessdatatype_xsd;
 	private static Connection conn = null;
 	
 	DAOFactory df;
@@ -83,7 +83,9 @@ public class P_1_7_PopulateQBDTInDT {
 		
 		fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
 		meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+		businessdatatype_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 	}
+
 	
 	private void populate() throws XPathExpressionException, SRTDAOException {
 		NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
@@ -130,29 +132,31 @@ public class P_1_7_PopulateQBDTInDT {
 		return cdtSCAPMapDAO.findObjects(qc, conn);
 	}
 	
-	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler, int xsdType) throws XPathExpressionException, SRTDAOException {
+	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler org_xHandler, int xsdType) throws XPathExpressionException, SRTDAOException {
+		XPathHandler xHandler = org_xHandler;
 		for(int i = 0; i < elementsFromXSD.getLength(); i++) {
+			xHandler = org_xHandler;
 			String bccp = ((Element)elementsFromXSD.item(i)).getAttribute("name");
 			String guid = ((Element)elementsFromXSD.item(i)).getAttribute("id");
 			String type = ((Element)elementsFromXSD.item(i)).getAttribute("type");
-			String den = Utility.createDENFormat(type);
-
+			//String den = Utility.createDENFormat(type);
 			Node simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
 			Node simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
-			
 			if(simpleContent == null && simpleType == null) {
 				if(xsdType == 0)
 					xHandler = meta_xsd;
 				else
 					xHandler = fields_xsd;
-			}
-			
+			}	
 			simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
 			simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
 			
+			if(simpleContent == null && simpleType == null) 
+				xHandler = businessdatatype_xsd;
+			simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
+			simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+				
 			if(simpleContent != null || simpleType != null) {
-			
-				//System.out.println("#### type " + type);
 				Node documentationFromXSD = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation");
 				String definition = "";
 				if(documentationFromXSD != null) {
@@ -168,6 +172,7 @@ public class P_1_7_PopulateQBDTInDT {
 				String typeGuid = ((Element)typeNode).getAttribute("id");
 				qc.add("dt_guid", typeGuid);
 				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
+				
 				if(dtVO == null) {
 					// add new QBDT
 					DTVO dVO = addToDT(typeGuid, type, typeNode, xHandler);
@@ -288,7 +293,7 @@ public class P_1_7_PopulateQBDTInDT {
 							bdtscprimitiverestionvo.setisDefault(true);
 						else 
 							bdtscprimitiverestionvo.setisDefault(false);
-						//bdtSCPRDAO.insertObject(bdtscprimitiverestionvo); 
+						bdtSCPRDAO.insertObject(bdtscprimitiverestionvo); 
 						
 //						// add code_list id for this case
 //						bdtscprimitiverestionvo.setCodeListID(getCodeListID(type.substring(0, type.indexOf("CodeContentType"))));
@@ -301,7 +306,7 @@ public class P_1_7_PopulateQBDTInDT {
 							bdtscprimitiverestionvo.setisDefault(true);
 						else 
 							bdtscprimitiverestionvo.setisDefault(false);
-						//bdtSCPRDAO.insertObject(bdtscprimitiverestionvo);
+						bdtSCPRDAO.insertObject(bdtscprimitiverestionvo);
 						
 //						System.out.println("### Agency Id");
 //						// add agency_id_list id for this case
@@ -448,7 +453,6 @@ public class P_1_7_PopulateQBDTInDT {
 		bccpVO.setDefinition(definition);
 		bccpVO.setCreatedByUserId(1);
 		bccpVO.setLastUpdatedByUserId(1);
-		
 		bccpDAO.insertObject(bccpVO);
 		
 	}
@@ -503,6 +507,11 @@ public class P_1_7_PopulateQBDTInDT {
 					min_cardinality = 0;
 				else if(attrElement.getAttribute("use").equalsIgnoreCase("required"))
 					min_cardinality = 1;
+				
+				if(attrElement.getAttribute("use") == null || attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("required"))
+					max_cardinality = 1;
+				else if(attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
+					max_cardinality = 0;
 				
 				String attrName = attrElement.getAttribute("name");
 				
