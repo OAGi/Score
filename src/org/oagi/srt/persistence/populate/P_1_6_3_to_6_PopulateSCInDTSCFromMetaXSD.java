@@ -53,11 +53,15 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		SRTDAO codeListDao = df.getDAO("CodeList");
 		
 		QueryCondition qc_01 = new QueryCondition();
-		qc_01.add("DT_GUID", "oagis-id-d5cb8551edf041389893fee25a496394");
+		qc_01.add("DT_GUID", "oagis-id-d5cb8551edf041389893fee25a496395");
 		DTVO dtVO_01 = (DTVO)dtDao.findObject(qc_01, conn);
 		
+		QueryCondition qc_011 = new QueryCondition();
+		qc_011.add("DT_ID", dtVO_01.getBasedDTID());
+		DTVO dtVO_012 = (DTVO)dtDao.findObject(qc_011, conn);
+		
 		QueryCondition qc_02 = new QueryCondition();
-		qc_02.add("owner_dt_id", dtVO_01.getDTID());
+		qc_02.add("owner_dt_id", dtVO_012.getDTID());
 		DTSCVO dtscVO_01 = (DTSCVO)dtscDao.findObject(qc_02, conn);
 		
 		

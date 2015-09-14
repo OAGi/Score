@@ -33,16 +33,24 @@ public class Experiment {
 			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_created")) {
 				String oagxsdfilename = file.getName().substring(0, file.getName().indexOf("."));
 				String generatedxsdfilename = oagxsdfilename+"_created";
-				String oagxmlfilename = "XML_From_"+oagxsdfilename;
-				String generatedxmlfilename = "XML_From_"+generatedxsdfilename;
-				String rootElementname = oagxsdfilename;
-				String prefix = "xs";
-				if(test_type == 49) {
-					XmlTest.xmltest_exp(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
-					XmlTest.xmltest_exp(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
+				for(File file2 : listOfF1){
+					if(file2.getName().substring(0, file2.getName().indexOf(".")).equals(generatedxsdfilename)) {
+						System.out.println("Processing "+file2.getName().substring(0, file2.getName().indexOf(".")));
+						String oagxmlfilename = "XML_From_"+oagxsdfilename;
+						String generatedxmlfilename = "XML_From_"+generatedxsdfilename;
+						String rootElementname = oagxsdfilename;
+						String prefix = "xs";
+						if(test_type == 49) {
+							XmlTest.xmltest_exp(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
+							XmlTest.xmltest_exp(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
+	
+						}
+						ValidateXML.validate_exp(oagxsdfilename, oagxmlfilename);
+						ValidateXML.validate_exp(generatedxsdfilename, generatedxmlfilename);	
+						ValidateXML.validate_exp(oagxsdfilename, generatedxmlfilename);
+						ValidateXML.validate_exp(generatedxsdfilename, oagxmlfilename);		
+					}		
 				}
-				ValidateXML.validate_exp(oagxsdfilename, generatedxmlfilename);
-				ValidateXML.validate_exp(generatedxsdfilename, oagxmlfilename);		
 			}
 		}
 	}

@@ -110,7 +110,7 @@ public class CDTAllowedPrimitiveMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				cdtallowedprimitiveVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_SC_ID"));
+				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_ID"));
 				cdtallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
 				cdtallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
 			}
@@ -167,7 +167,7 @@ public class CDTAllowedPrimitiveMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				cdtallowedprimitiveVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_SC_ID"));
+				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_ID"));
 				cdtallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
 				cdtallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
 			}
@@ -202,7 +202,7 @@ public class CDTAllowedPrimitiveMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CDTAllowedPrimitiveVO cdtallowedprimitiveVO = new CDTAllowedPrimitiveVO();
 				cdtallowedprimitiveVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_SC_ID"));
+				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_ID"));
 				cdtallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
 				cdtallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
 				list.add(cdtallowedprimitiveVO);
@@ -242,7 +242,7 @@ public class CDTAllowedPrimitiveMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CDTAllowedPrimitiveVO cdtallowedprimitiveVO = new CDTAllowedPrimitiveVO();
 				cdtallowedprimitiveVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_SC_ID"));
+				cdtallowedprimitiveVO.setCDTID(rs.getInt("CDT_ID"));
 				cdtallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
 				cdtallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
 				list.add(cdtallowedprimitiveVO);

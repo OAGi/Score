@@ -1,6 +1,8 @@
 package org.oagi.srt.persistence.populate;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -50,7 +52,9 @@ public class P_1_7_PopulateQBDTInDT {
 	private XPathHandler fields_xsd;
 	private XPathHandler meta_xsd;
 	private XPathHandler businessdatatype_xsd;
+	private XPathHandler component_xsd;
 	private static Connection conn = null;
+	private File f1;
 	
 	DAOFactory df;
 	SRTDAO aDTDAO;
@@ -84,14 +88,37 @@ public class P_1_7_PopulateQBDTInDT {
 		fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
 		meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 		businessdatatype_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		component_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
+		
+		f1 = new File(SRTConstants.CODE_LIST_FILE_PATH);
 	}
 
+	private File[] getBODs(File f) {
+		return f.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.matches(".*.xsd");
+			}
+		});
+	}
 	
-	private void populate() throws XPathExpressionException, SRTDAOException {
+	private void populate() throws XPathExpressionException, SRTDAOException, FileNotFoundException, ParserConfigurationException, SAXException, IOException {
 		NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
 		NodeList elementsFromMetaXSD = meta_xsd.getNodeList("/xsd:schema/xsd:element");
+		NodeList elementsFromComponentsXSD = component_xsd.getNodeList("/xsd:schema/xsd:element");
 		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd, 0);
 		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd, 1); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
+		insertDTAndBCCP(elementsFromComponentsXSD, component_xsd, 2);
+		File[] listOfF1 = getBODs(f1);
+		
+		for (File file : listOfF1) {
+			System.out.println(file.getName()+" ing...");
+			XPathHandler codelist_xsd = new XPathHandler(SRTConstants.CODE_LIST_FILE_PATH + file.getName());
+			NodeList elementsFromCodeListXSD = codelist_xsd.getNodeList("/xsd:schema/xsd:element");
+			insertDTAndBCCP(elementsFromCodeListXSD, codelist_xsd, 3);
+		}
+		
+		
 //		insertCDTSCAllowedPrimitive(elementsFromFieldsXSD, fields_xsd);
 //		insertCDTSCAllowedPrimitive(elementsFromMetaXSD, meta_xsd);
 //		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromFieldsXSD, fields_xsd);
@@ -143,14 +170,21 @@ public class P_1_7_PopulateQBDTInDT {
 			Node simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
 			Node simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
 			if(simpleContent == null && simpleType == null) {
-				if(xsdType == 0)
-					xHandler = meta_xsd;
-				else
+				if(xsdType == 1)
 					xHandler = fields_xsd;
+				else
+					xHandler = meta_xsd;
 			}	
 			simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
 			simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
 			
+			if(simpleContent == null && simpleType == null) {
+				if(xsdType == 2){
+					xHandler = fields_xsd;
+					simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
+					simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
+				}
+			}
 			if(simpleContent == null && simpleType == null) 
 				xHandler = businessdatatype_xsd;
 			simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
@@ -172,6 +206,10 @@ public class P_1_7_PopulateQBDTInDT {
 				String typeGuid = ((Element)typeNode).getAttribute("id");
 				qc.add("dt_guid", typeGuid);
 				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
+				
+				QueryCondition qc2 = new QueryCondition();
+				qc2.add("Code_List_GUID", typeGuid);
+				CodeListVO codelistVO = (CodeListVO)aCodeListDAO.findObject(qc2, conn);
 				
 				if(dtVO == null) {
 					// add new QBDT

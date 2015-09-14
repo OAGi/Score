@@ -232,6 +232,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		
 		//Data Type Term
 		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
+		
 		if(dataTypeTermNode == null && type.equals("simple")) {
 			type = "complex";
 			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
@@ -239,7 +240,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			type = "simple";
 			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 		}
-		
 		Element dataTypeTermElement = (Element)dataTypeTermNode;
 		dataTypeTerm = dataTypeTermElement.getTextContent();
 		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))

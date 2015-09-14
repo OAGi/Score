@@ -33,8 +33,8 @@ public class BODSchemaHandler {
 			DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
 			XSImplementation impl = (XSImplementation) registry.getDOMImplementation("XS-Loader");
 			XSLoader schemaLoader = impl.createXSLoader(null);
-			DOMConfiguration config = schemaLoader.getConfig();
-			config.setParameter("validate", Boolean.TRUE);
+			//DOMConfiguration config = schemaLoader.getConfig();
+			//config.setParameter("validate", Boolean.FALSE);
 			model = schemaLoader.loadURI(schemaPath);
 			rootName = schemaPath.substring(schemaPath.lastIndexOf(File.separator) + 1, schemaPath.lastIndexOf("."));
 		} catch (ClassNotFoundException e) {

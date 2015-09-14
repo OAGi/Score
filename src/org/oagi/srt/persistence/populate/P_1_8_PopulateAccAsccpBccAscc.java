@@ -67,11 +67,17 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
+			//if(!file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
+				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
+			//}
 		}
 
 		for (File file : listOfF2) {
+			//if(!file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
+				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
+			//}
 		}
 	} 
 	

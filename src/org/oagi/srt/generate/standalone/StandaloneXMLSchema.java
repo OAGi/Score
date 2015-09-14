@@ -1374,7 +1374,7 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(1099);
+		abie_ids.add(407);
 		aa.generateXMLSchema(abie_ids, true);
 		System.out.println("###END###");
 	}

@@ -62,7 +62,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setRevisionType(0);
 		    
 		    QueryCondition qc = new QueryCondition();
-			qc.add("DT_GUID", "oagis-id-d5cb8551edf041389893fee25a496394");
+			qc.add("DT_GUID", "oagis-id-d5cb8551edf041389893fee25a496395");
 			DTVO dtVO_01 = (DTVO)dao.findObject(qc, conn);
 		    
 		    

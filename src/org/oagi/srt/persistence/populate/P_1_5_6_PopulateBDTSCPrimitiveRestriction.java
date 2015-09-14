@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
  * @version 1.0
  * @author Yunsu Lee
  */
-public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
+public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 	
 	private static Connection conn = null;
 	
@@ -46,7 +46,7 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 	}
 
 	public void run() throws Exception {
-		System.out.println("### 1.5.4 Start");
+		System.out.println("### 1.5.6 Start");
 		
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
@@ -199,7 +199,7 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 		
 		tx.close();
 		conn.close();
-		System.out.println("### 1.5.4 End");
+		System.out.println("### 1.5.6 End");
 	}
 	
 	public DTSCVO getDTSC(int id) throws SRTDAOException{
@@ -228,7 +228,7 @@ public class P_1_5_4_PopulateBDTSCPrimitiveRestriction {
 
 	public static void main(String args[]) throws Exception {
 		Utility.dbSetup();
-		P_1_5_4_PopulateBDTSCPrimitiveRestriction p = new P_1_5_4_PopulateBDTSCPrimitiveRestriction();
+		P_1_5_6_PopulateBDTSCPrimitiveRestriction p = new P_1_5_6_PopulateBDTSCPrimitiveRestriction();
 		p.run();
 	}
 }
