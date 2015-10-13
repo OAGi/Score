@@ -72,7 +72,18 @@ public class BODSchemaHandler {
 			return false;
 		}
 	}
-
+	
+	public boolean isComplexWithSimpleContent(String type) {
+		if(model.getTypeDefinition(type, SRTConstants.OAGI_NS) instanceof XSComplexTypeDecl) {
+			if(((XSComplexTypeDecl)model.getTypeDefinition(type, SRTConstants.OAGI_NS)).getSimpleType() != null) 
+				return true;
+			else 
+				return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public ArrayList<BODElementVO> processParticle(XSParticle theXSParticle, int order) {
 		ArrayList<BODElementVO> al = new ArrayList<BODElementVO>();
 		XSTerm xsTerm = theXSParticle.getTerm();

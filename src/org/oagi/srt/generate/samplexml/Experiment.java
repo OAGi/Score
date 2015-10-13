@@ -3,15 +3,18 @@ package org.oagi.srt.generate.samplexml;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.web.handler.TopLevelABIEHandler;
 
 import java.io.FilenameFilter;
-
 
 public class Experiment {
 	
 	private static File f1 = new File(SRTConstants.TEST_BOD_FILE_PATH);
-
+	
 	private File[] getBODs(File f) {
 		return f.listFiles(new FilenameFilter() {
 			@Override
@@ -41,8 +44,8 @@ public class Experiment {
 						String rootElementname = oagxsdfilename;
 						String prefix = "xs";
 						if(test_type == 49) {
-							XmlTest.xmltest_exp(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
-							XmlTest.xmltest_exp(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
+							XmlTest.xmltest_exp_remove_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
+							XmlTest.xmltest_exp_remove_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
 	
 						}
 						ValidateXML.validate_exp(oagxsdfilename, oagxmlfilename);
@@ -55,8 +58,46 @@ public class Experiment {
 		}
 	}
 	
-	public static void main(String args[]) throws FileNotFoundException, Exception  {
+	public void macrotest() throws Exception {
+		TopLevelABIEHandler a = new TopLevelABIEHandler();
+		//String filepath = a.macro("oagis-id-dedeb4e4be384d5282c33ee5533f5ff2");
+		//String filepath = a.macro("oagis-id-9712b728b0d34677a367b2a3555bcdfa");
+		File[] listOfF1 = getBODs(f1);
+
+		for (File file : listOfF1) {
+			String bodname = Utility.spaceSeparator(file.getName().substring(0, file.getName().indexOf(".")));
+			a.macro(bodname);
+		}
+
+		for (File file : listOfF1) {
+			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_created")) {
+				String oagxsdfilename = file.getName().substring(0, file.getName().indexOf("."));
+				String generatedxsdfilename = oagxsdfilename+"_created";
+				String oagxsdfilename_remove_any = oagxsdfilename+"_remove_any";
+				String generatedxsdfilename_remove_any = generatedxsdfilename+"_remove_any";
+				for(File file2 : listOfF1){
+					if(file2.getName().substring(0, file2.getName().indexOf(".")).equals(generatedxsdfilename)) {
+						System.out.println("Processing "+file2.getName().substring(0, file2.getName().indexOf(".")));
+						String oagxmlfilename = "XML_From_"+oagxsdfilename;
+						String generatedxmlfilename = "XML_From_"+generatedxsdfilename;
+						String rootElementname = oagxsdfilename;
+						String prefix = "xs";
+						XmlTest.xmltest_exp_remove_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
+						XmlTest.xmltest_exp_remove_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
+
+						ValidateXML.validate_exp(oagxsdfilename_remove_any, oagxmlfilename);
+						ValidateXML.validate_exp(generatedxsdfilename_remove_any, generatedxmlfilename);	
+						ValidateXML.validate_exp(oagxsdfilename_remove_any, generatedxmlfilename);
+						ValidateXML.validate_exp(generatedxsdfilename_remove_any, oagxmlfilename);		
+					}		
+				}
+			}
+		}
+	}
+	
+	public static void main(String args[]) throws FileNotFoundException, Exception {
 		Experiment a = new Experiment();
-		a.test();
+		//a.test();
+		a.macrotest();
 	}
 }

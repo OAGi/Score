@@ -67,14 +67,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			//if(!file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
+			//if(file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
 			//}
 		}
 
 		for (File file : listOfF2) {
-			//if(!file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
+			//if(file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
 			//}
@@ -632,6 +632,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 							qc3.add("asccp_guid", bodVO.getId());
 							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3, conn);
 							insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO1);
+						}
+						else if(bodSchemaHandler.isComplexWithSimpleContent(bodVO.getTypeName())){ //here
+							bccpVO = insertBCCP(bodVO.getName(), bodVO.getId());
+							insertBCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), bccpVO);
 						}
 					}
 //					try {

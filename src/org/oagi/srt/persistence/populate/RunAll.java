@@ -34,7 +34,7 @@ public class RunAll {
 		P_1_7_PopulateQBDTInDT p13 = new P_1_7_PopulateQBDTInDT();
 		p13.run();
 		
-		P_1_8_PopulateAccAsccpBccAscc p14 = new P_1_8_PopulateAccAsccpBccAscc();
-		p14.run();
+//		P_1_8_PopulateAccAsccpBccAscc p14 = new P_1_8_PopulateAccAsccpBccAscc();
+//		p14.run();
 	}
 }

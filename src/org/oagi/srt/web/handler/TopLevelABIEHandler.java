@@ -6,9 +6,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -30,6 +32,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.component.UIComponent;
 
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
@@ -37,6 +40,7 @@ import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
@@ -426,6 +430,70 @@ public class TopLevelABIEHandler implements Serializable {
 		return event.getNewStep();
 	}
 	
+	public String macro(String bodname) throws Exception {//here
+			Utility.dbSetup();
+			DBAgent tx = new DBAgent();
+			conn = tx.open();
+			df = DAOFactory.getDAOFactory();
+			dao = df.getDAO("ASCCP");
+			asccDao = df.getDAO("ASCC");
+			bccDao = df.getDAO("BCC");
+			accDao = df.getDAO("ACC");
+			abieDao = df.getDAO("ABIE");
+			asbiepDao = df.getDAO("ASBIEP");
+			asbieDao = df.getDAO("ASBIE");
+			asccpDao = df.getDAO("ASCCP");
+			bccpDao = df.getDAO("BCCP");
+			bbiepDao = df.getDAO("BBIEP");
+			bbieDao = df.getDAO("BBIE");
+			bbiescDao = df.getDAO("BBIE_SC");
+			dtscDao = df.getDAO("DTSC");
+			dtDao = df.getDAO("DT");
+			daoBC = df.getDAO("BusinessContext");
+			daoBCV = df.getDAO("BusinessContextValue");
+			userDao = df.getDAO("User");
+			bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
+			daoCL = df.getDAO("CodeList");
+			
+			ASCCPVO asccpvo = new ASCCPVO();
+			QueryCondition qc1 = new QueryCondition();
+			qc1.add("Property_Term", bodname);
+			asccpvo = (ASCCPVO) asccpDao.findObject(qc1, conn);
+			selected = asccpvo;
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("Business_Context_ID", "1");
+			BusinessContextVO bcVO = (BusinessContextVO) daoBC.findObject(qc2, conn);
+			bCSelected = bcVO;
+			System.out.println("### Start to create uncommitted "+asccpvo.getPropertyTerm());
+			QueryCondition qc = new QueryCondition();
+			qc.add("acc_id", selected.getRoleOfACCID());
+			ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
+			topAbieVO = createABIE(accVO, bCSelected.getBusinessContextID(), 1, 0);
+			int abieId = topAbieVO.getABIEID();
+			asbiepVO = createASBIEP(selected, abieId, -1);
+			TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
+			createBIEs(selected.getRoleOfACCID(), abieId, -1, toplevelNode);
+			
+			PreparedStatement ps = null;
+			ps = conn.prepareStatement("update oagsrt.asbie set Cardinality_Max = 1;");
+			ps.executeUpdate();
+			tx.commit();
+			ps = conn.prepareStatement("update oagsrt.bbie set Cardinality_Max = 1;");
+			ps.executeUpdate();
+			tx.commit();
+			conn.close();
+				
+			System.out.println("### Finish creating uncommitted "+asccpvo.getPropertyTerm());
+			
+			System.out.println("### Start to generate schema of "+asccpvo.getPropertyTerm());
+			StandaloneXMLSchema test = new StandaloneXMLSchema();
+			ArrayList<Integer> abies = new ArrayList<Integer>();
+			abies.add(abieId);
+			String filepath = test.generateXMLSchema(abies, true);
+			System.out.println("### Finish generating schema of "+asccpvo.getPropertyTerm());
+			
+			return filepath;
+	}
 	
 	public String onFlowProcess_Copy(FlowEvent event) {
 		
@@ -506,6 +574,7 @@ public class TopLevelABIEHandler implements Serializable {
     public void setProgress(Integer progress) {
         this.progress = progress;
     }
+    
 	
 	private void createBIEs(int accId, int abie, int groupPosition, TreeNode tNode) throws SRTDAOException, InstantiationException, IllegalAccessException {
 		//Stack<ACCVO> accList = new Stack<ACCVO>();
@@ -578,13 +647,15 @@ public class TopLevelABIEHandler implements Serializable {
 			Iterator i = set.iterator();
 			while(i.hasNext()) {
 				Map.Entry me = (Map.Entry)i.next();
-				if(me.getKey().getClass().getCanonicalName().endsWith("BCCVO"))
+				//if(me.getKey().getClass().getCanonicalName().endsWith("BCCVO"))
+				if(me.getKey() instanceof BCCVO)
 					createBBIETree((BCCVO)me.getKey(), abie, (Double)me.getValue(), tNode);
 				else 
 					createASBIETree((ASCCVO)me.getKey(), abie, (Double)me.getValue(), tNode, skb); //check
 					//createASBIETree((ASCCVO)me.getKey(), abie, (Double)me.getValue(), tNode, skb+bccObjects.size()+asccObjects.size());
 			}
 			//seq_base++;
+			
 		}
 	}
 
@@ -1859,5 +1930,6 @@ public class TopLevelABIEHandler implements Serializable {
 			e.printStackTrace();
 		}
 	}
+
 	
 }
