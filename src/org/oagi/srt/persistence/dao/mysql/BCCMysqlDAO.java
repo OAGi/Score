@@ -183,7 +183,16 @@ public class BCCMysqlDAO extends SRTDAO{
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
 			ps = conn.prepareStatement(sql);
+
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
@@ -194,7 +203,17 @@ public class BCCMysqlDAO extends SRTDAO{
 					}
 				}
 			}
-
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				bccVO = new BCCVO();
@@ -483,6 +502,14 @@ public class BCCMysqlDAO extends SRTDAO{
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
@@ -494,8 +521,19 @@ public class BCCMysqlDAO extends SRTDAO{
 					}
 				}
 			}
-
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
 			rs = ps.executeQuery();
+			
 			while (rs.next()) {
 				BCCVO bccVO = new BCCVO();
 				bccVO.setBCCID(rs.getInt("BCC_ID"));

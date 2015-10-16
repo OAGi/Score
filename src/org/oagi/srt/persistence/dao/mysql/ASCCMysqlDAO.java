@@ -502,8 +502,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			//System.out.println("### sql: " + sql);
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
 			ps = conn.prepareStatement(sql);
+
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
@@ -514,7 +522,17 @@ public class ASCCMysqlDAO extends SRTDAO {
 					}
 				}
 			}
-
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ASCCVO asccVO = new ASCCVO();

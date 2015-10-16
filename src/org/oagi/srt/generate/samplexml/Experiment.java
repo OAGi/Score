@@ -10,6 +10,8 @@ import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.web.handler.TopLevelABIEHandler;
 
 import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Experiment {
 	
@@ -58,7 +60,7 @@ public class Experiment {
 		}
 	}
 	
-	public void macrotest() throws Exception {
+	public void macrotest_create() throws Exception {
 		TopLevelABIEHandler a = new TopLevelABIEHandler();
 		//String filepath = a.macro("oagis-id-dedeb4e4be384d5282c33ee5533f5ff2");
 		//String filepath = a.macro("oagis-id-9712b728b0d34677a367b2a3555bcdfa");
@@ -66,9 +68,24 @@ public class Experiment {
 
 		for (File file : listOfF1) {
 			String bodname = Utility.spaceSeparator(file.getName().substring(0, file.getName().indexOf(".")));
+			long time = System.currentTimeMillis(); 
+			SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+			String str = dayTime.format(new Date(time));
+			System.out.println(str);
+			long start = System.currentTimeMillis() ; 
+			System.out.println("Before creating profie BOD : " + str); 
 			a.macro(bodname);
+			long end = System.currentTimeMillis(); 
+			System.out.println("After creating profie BOD : " + str + "   computation time = " + (end-start)); 
+			System.gc();
 		}
 
+	}
+	
+	public void macrotest_validate() throws Exception {
+		
+		File[] listOfF1 = getBODs(f1);
+		
 		for (File file : listOfF1) {
 			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_created")) {
 				String oagxsdfilename = file.getName().substring(0, file.getName().indexOf("."));
@@ -92,12 +109,14 @@ public class Experiment {
 					}		
 				}
 			}
+		System.gc();
 		}
 	}
 	
 	public static void main(String args[]) throws FileNotFoundException, Exception {
 		Experiment a = new Experiment();
 		//a.test();
-		a.macrotest();
+		a.macrotest_create();
+		a.macrotest_validate();
 	}
 }
