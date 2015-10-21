@@ -38,14 +38,16 @@ public class ValidateXML {
 			    @Override
 			    public void fatalError(SAXParseException exception) throws SAXException
 			    {
-			    	System.out.println(exceptions);
+			    	if(exception.getMessage().startsWith("cvc-complex-type.2.1"))
+			    		System.out.println(exception.getMessage());
 			    	exceptions.add(exception);
 			    }
 
 			    @Override
 			    public void error(SAXParseException exception) throws SAXException
 			    {
-			    	System.out.println(exception.getMessage());
+			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4"))
+			    		System.out.println(exception.getMessage());
 			    	exceptions.add(exception);
 			    }
 			  });

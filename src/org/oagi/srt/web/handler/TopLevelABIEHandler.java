@@ -319,7 +319,6 @@ public class TopLevelABIEHandler implements Serializable {
 					qc_03.add("business_context_id", abieVO.getBusinessContextID());
 					BusinessContextVO aBusinessContextVO = (BusinessContextVO)daoBC.findObject(qc_03);
 					abieVO.setBusinessContextName(aBusinessContextVO.getName());
-					
 					ABIEView aABIEView = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getABIEID(), "ABIE");
 					aABIEView.setAbieVO(abieVO);
 					bodList.add(aABIEView);
@@ -460,7 +459,7 @@ public class TopLevelABIEHandler implements Serializable {
 			asccpvo = (ASCCPVO) asccpDao.findObject(qc1, conn);
 			selected = asccpvo;
 			QueryCondition qc2 = new QueryCondition();
-			qc2.add("Business_Context_ID", "1");
+			qc2.add("Business_Context_ID", "2");
 			BusinessContextVO bcVO = (BusinessContextVO) daoBC.findObject(qc2, conn);
 			bCSelected = bcVO;
 			System.out.println("### Start to create uncommitted "+asccpvo.getPropertyTerm());
@@ -596,8 +595,8 @@ public class TopLevelABIEHandler implements Serializable {
 				}
 				while(copied_accList.size() > 0) {
 					ACCVO accvo_next = (ACCVO) copied_accList.poll();
-					ArrayList<SRTObject> tmpbcc = getBCC(accvo_next.getACCID());
-					ArrayList<SRTObject> tmpascc = getASCC(accvo_next.getACCID());
+					ArrayList<SRTObject> tmpbcc = getBCCwoAttribute(accvo_next.getACCID());
+					ArrayList<SRTObject> tmpascc = getASCCwoAttribute(accvo_next.getACCID());				
 					skb += (tmpbcc.size() + tmpascc.size());
 				}
 			}
@@ -724,6 +723,7 @@ public class TopLevelABIEHandler implements Serializable {
 			createBIEs(accVOFromASCCP.getACCID(), abieVO.getABIEID(), -1, tNode2);
 		}
 	}
+	
 	private int adjustSeqKeyforGroup(ASCCVO asccVO) {
 		QueryCondition qc = new QueryCondition();
 		qc.add("Assoc_From_ACC_ID", asccVO.getAssocFromACCID());
@@ -735,15 +735,17 @@ public class TopLevelABIEHandler implements Serializable {
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
-		int adjustSeqKey = 0;
+		int adjustSeqKey = 1;
+
 		for(SRTObject obj : accs_from_ascc) {
 			ASCCVO ascc = (ASCCVO) obj;
-			if(ascc.getSequencingKey() < asccVO.getSequencingKey())
+			if(ascc.getSequencingKey() < asccVO.getSequencingKey() && ascc.getSequencingKey() > 0)
 				adjustSeqKey++;
 		}
+		
 		for(SRTObject obj : accs_from_bcc) {
 			BCCVO bcc = (BCCVO) obj;
-			if(bcc.getSequencingKey() < asccVO.getSequencingKey())
+			if(bcc.getSequencingKey() < asccVO.getSequencingKey() && bcc.getSequencingKey() > 0)
 				adjustSeqKey++;
 		}
 		
@@ -761,6 +763,50 @@ public class TopLevelABIEHandler implements Serializable {
 		return res;
 	}
 	
+	private ArrayList<SRTObject> getBCCwoAttribute(int accId) {
+		QueryCondition qc = new QueryCondition();
+		qc.add("assoc_from_acc_id", accId);
+		ArrayList<SRTObject> res = new ArrayList<SRTObject>();
+		try {
+			res = bccDao.findObjects(qc, conn);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+
+		ArrayList<SRTObject> res2 = new ArrayList<SRTObject>();
+		ArrayList<String> groupnames = new ArrayList<String>();
+		boolean rep_check = false;
+
+		for(SRTObject obj : res) {
+			BCCVO bcc = (BCCVO) obj;
+			rep_check = false;
+//			if(bcc.getDEN().substring(0, bcc.getDEN().indexOf(".")).contains("Group")){
+//				for(int i = 0 ; i < groupnames.size() ; i++) {
+//					if(groupnames.get(i).equals((bcc.getDEN().substring(0, bcc.getDEN().indexOf(".") )))){
+//							rep_check = true;
+//							break;
+//					}
+//				}
+//				if(!rep_check) {
+//					System.out.println("bcc group = "+bcc.getDEN().substring(0, bcc.getDEN().indexOf(".") ));
+//					groupnames.add(bcc.getDEN().substring(0, bcc.getDEN().indexOf(".") ));		
+//					res2.add(obj);
+//				}
+//			}
+//			else {
+				if(bcc.getSequencingKey() > 0)
+					res2.add(obj);
+//			}
+		}
+		
+//		for(SRTObject asccObject : res) {
+//		ASCCVO asccVO = (ASCCVO)asccObject;
+//		if(asccVO.getSequencingKey() > 0)
+//			res2.add(asccObject);
+//	}
+		return res2;
+	}
+	
 	private ArrayList<SRTObject> getASCC(int accId) {
 		QueryCondition qc = new QueryCondition();
 		qc.add("assoc_from_acc_id", accId);
@@ -773,6 +819,50 @@ public class TopLevelABIEHandler implements Serializable {
 		return res;
 	}
 	
+	private ArrayList<SRTObject> getASCCwoAttribute(int accId) {
+		QueryCondition qc = new QueryCondition();
+		qc.add("assoc_from_acc_id", accId);
+		ArrayList<SRTObject> res = new ArrayList<SRTObject>();
+		try {
+			res = asccDao.findObjects(qc, conn);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+
+		
+		ArrayList<SRTObject> res2 = new ArrayList<SRTObject>();
+		ArrayList<String> groupnames = new ArrayList<String>();
+		boolean rep_check = false;
+
+		for(SRTObject obj : res) {
+			ASCCVO ascc = (ASCCVO) obj;
+//			rep_check = false;
+//			if(ascc.getDEN().substring(0, ascc.getDEN().indexOf(".")).contains("Group")){
+//				for(int i = 0 ; i < groupnames.size() ; i++) {
+//					if(groupnames.get(i).equals((ascc.getDEN().substring(0, ascc.getDEN().indexOf(".") )))){
+//							rep_check = true;
+//							break;
+//					}
+//				}
+//				if(!rep_check) {
+//					System.out.println("ascc group = "+ascc.getDEN().substring(0, ascc.getDEN().indexOf(".") ));
+//					groupnames.add(ascc.getDEN().substring(0, ascc.getDEN().indexOf(".") ));		
+//					res2.add(obj);
+//				}
+//			}
+//			else {
+				if(ascc.getSequencingKey() > 0)
+					res2.add(obj);
+//			}
+		}
+		
+//		for(SRTObject asccObject : res) {
+//		ASCCVO asccVO = (ASCCVO)asccObject;
+//		if(asccVO.getSequencingKey() > 0)
+//			res2.add(asccObject);
+//	}
+		return res2;
+	}	
 	
 	private ASCCPVO getASCCP(int asccpId) {
 		QueryCondition qc = new QueryCondition();

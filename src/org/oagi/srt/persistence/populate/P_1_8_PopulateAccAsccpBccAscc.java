@@ -19,6 +19,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.BODElementVO;
 import org.oagi.srt.common.util.BODSchemaHandler;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
@@ -28,6 +29,7 @@ import org.oagi.srt.persistence.dto.ASCCVO;
 import org.oagi.srt.persistence.dto.BCCPVO;
 import org.oagi.srt.persistence.dto.BCCVO;
 import org.oagi.srt.persistence.dto.DTVO;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -67,18 +69,19 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			//if(file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
+			//if(file.getName().equalsIgnoreCase("AcknowledgeAllocateResource.xsd")){
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
 			//}
 		}
 
 		for (File file : listOfF2) {
-			//if(file.getName().equalsIgnoreCase("ProcessChartOfAccounts.xsd")){
+			//if(file.getName().equalsIgnoreCase("AcknowledgeAllocateResource.xsd")){
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
 			//}
 		}
+		modifySequeceKeyforGroup();
 	} 
 	
 	private void insertASCCP(File file) throws Exception {
@@ -198,7 +201,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			int cardinalityMin = bodVO.getMinOccur();
 			int cardinalityMax = bodVO.getMaxOccur();
 			int sequenceKey = bodVO.getOrder();
-	
 			int assocToASCCPId =  asccpVO.getASCCPID();
 			String den = Utility.first(accVO.getDEN()) + ". " + asccpVO.getDEN();
 	
@@ -213,8 +215,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asscVO.setAssocToASCCPID(assocToASCCPId);
 			asscVO.setDEN(den);
 			asscVO.setDefinition(definition);
-			//System.out.println("ascc guid = "+asccGuid+"  acc id = "+assocFromACCId+"   den = "+den);
-	
 			asccDao.insertObject(asscVO);
 			
 //			
@@ -262,7 +262,37 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			
 		}
 	}
-	
+	private void modifySequeceKeyforGroup() throws SRTDAOException{
+		//modify sequenceKey for group
+		QueryCondition qc = new QueryCondition();
+		qc.add("Definition", "Group");
+		ArrayList<SRTObject> groupobjects = asccDao.findObjects(qc, conn); 
+		for(SRTObject asccVO : groupobjects) {
+			int ElementsInGroup = 0;
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("Assoc_From_ACC_ID", ((ASCCVO)asccVO).getAssocFromACCID());
+			ArrayList<SRTObject> asccObjects = asccDao.findObjects(qc2, conn); 
+			for(SRTObject asccObject : asccObjects) {
+				ASCCVO ascc = (ASCCVO)asccObject;
+				QueryCondition qc3 = new QueryCondition();
+				qc3.add("ASCCP_ID", ascc.getAssocToASCCPID());
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc3, conn);
+				if(asccp.getDefinition() != null && asccp.getDefinition().equalsIgnoreCase("Group") && ((ASCCVO)asccVO).getSequencingKey() > ((ASCCVO)asccObject).getSequencingKey()){
+					String groupname = asccp.getPropertyTerm().replaceAll(" ", "");
+					QueryCondition qc4 = new QueryCondition();
+					qc4.addLikeClause("DEN", groupname+"%");
+					ArrayList<SRTObject> asccObjectsinGroup = asccDao.findObjects(qc4, conn);
+					ArrayList<SRTObject> bccObjectsinGroup = bccDao.findObjects(qc4, conn);
+					ElementsInGroup += (asccObjectsinGroup.size()+bccObjectsinGroup.size());
+					if((asccObjectsinGroup.size()+bccObjectsinGroup.size()) > 0)
+						ElementsInGroup--;
+				}				
+			}
+			int new_seq = ((ASCCVO)asccVO).getSequencingKey() - ElementsInGroup;
+			((ASCCVO)asccVO).setSequencingKey(new_seq);
+			asccDao.updateObject(asccVO);
+		}
+	}
 	private ACCVO getACC(String guid) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", guid);
