@@ -110,7 +110,11 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         	Node bb = any.item(i);
         	bb.getParentNode().removeChild(any.item(i));
         }
-
+        NodeList includenodelist = doc.getElementsByTagName("xsd:include");
+        if(includenodelist.getLength() > 0){
+        	Node include = includenodelist.item(0);
+        	((Element)include).setAttribute("schemaLocation", SRTConstants.COMPONENTS_XSD_FILE_PATH);
+        }
 //        NodeList union = doc.getElementsByTagName("xsd:union");
 //        for(int i = union.getLength()-1; i >= 0 ; i--){
 //        	Node bb = union.item(i);

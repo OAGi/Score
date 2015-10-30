@@ -69,19 +69,16 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			//if(file.getName().equalsIgnoreCase("AcknowledgeAllocateResource.xsd")){
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
-			//}
 		}
 
 		for (File file : listOfF2) {
-			//if(file.getName().equalsIgnoreCase("AcknowledgeAllocateResource.xsd")){
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
-			//}
 		}
 		modifySequeceKeyforGroup();
+		modifySequeceKeyforGroup_temp();
 	} 
 	
 	private void insertASCCP(File file) throws Exception {
@@ -262,6 +259,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			
 		}
 	}
+
 	private void modifySequeceKeyforGroup() throws SRTDAOException{
 		//modify sequenceKey for group
 		QueryCondition qc = new QueryCondition();
@@ -284,8 +282,26 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					ArrayList<SRTObject> asccObjectsinGroup = asccDao.findObjects(qc4, conn);
 					ArrayList<SRTObject> bccObjectsinGroup = bccDao.findObjects(qc4, conn);
 					ElementsInGroup += (asccObjectsinGroup.size()+bccObjectsinGroup.size());
-					if((asccObjectsinGroup.size()+bccObjectsinGroup.size()) > 0)
+					if((asccObjectsinGroup.size()+bccObjectsinGroup.size()) > 0){
 						ElementsInGroup--;
+					}
+				}				
+			}
+			for(SRTObject asccObject : asccObjects) {
+				ASCCVO ascc = (ASCCVO)asccObject;
+				QueryCondition qc3 = new QueryCondition();
+				qc3.add("ASCCP_ID", ascc.getAssocToASCCPID());
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc3, conn);
+				if(asccp.getDefinition() != null && asccp.getDefinition().equalsIgnoreCase("Group") && ((ASCCVO)asccVO).getSequencingKey() > ((ASCCVO)asccObject).getSequencingKey()){
+					String groupname = asccp.getPropertyTerm().replaceAll(" ", "");
+					QueryCondition qc4 = new QueryCondition();
+					qc4.addLikeClause("DEN", groupname+"%");
+					ArrayList<SRTObject> asccObjectsinGroup = asccDao.findObjects(qc4, conn);
+					ArrayList<SRTObject> bccObjectsinGroup = bccDao.findObjects(qc4, conn);
+					ElementsInGroup += (asccObjectsinGroup.size()+bccObjectsinGroup.size());
+					if((asccObjectsinGroup.size()+bccObjectsinGroup.size()) > 0){
+						ElementsInGroup--;
+					}
 				}				
 			}
 			int new_seq = ((ASCCVO)asccVO).getSequencingKey() - ElementsInGroup;
@@ -293,6 +309,48 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccDao.updateObject(asccVO);
 		}
 	}
+	
+	private void modifySequeceKeyforGroup_temp() throws SRTDAOException{
+		//modify sequenceKey for group
+		System.out.println("Modifying sequence key for groups temporarily");
+		QueryCondition qc = new QueryCondition();
+		qc.addLikeClause("DEN", "%Actual Resource Group%");
+		ArrayList<SRTObject> groupobjects = asccDao.findObjects(qc, conn); 
+		for(SRTObject asccVO : groupobjects) {
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("Assoc_From_ACC_ID", ((ASCCVO)asccVO).getAssocFromACCID());
+			ArrayList<SRTObject> asccObjects = asccDao.findObjects(qc2, conn); 
+			ArrayList<SRTObject> bccObjects = bccDao.findObjects(qc2, conn);
+			for(int i = 0 ; i < asccObjects.size(); i++) {
+				ASCCVO ascc = (ASCCVO)asccObjects.get(i);
+				if(ascc.getDEN()!= null && ascc.getDEN().contains("Actual Resource Group")) {
+					if(i+1 < asccObjects.size()) {
+						ASCCVO ascc2 = (ASCCVO)asccObjects.get(i+1);
+						if(ascc2.getDEN()!= null && ascc2.getDEN().contains("Free Form Text Group")){
+							ascc2.setSequencingKey(ascc.getSequencingKey()+1);
+							asccDao.updateObject(ascc2);
+							for(int j = 0 ; j < asccObjects.size(); j ++) {
+								ASCCVO changed_ascc = (ASCCVO)asccObjects.get(j);
+								if(changed_ascc.getSequencingKey() >= ascc2.getSequencingKey() && changed_ascc.getASCCID() != ascc2.getASCCID()){
+									changed_ascc.setSequencingKey(changed_ascc.getSequencingKey()+1);
+									asccDao.updateObject(changed_ascc);
+								}
+							}
+							for(int j = 0 ; j < bccObjects.size(); j ++) {
+								BCCVO changed_bcc = (BCCVO)bccObjects.get(j);
+								if(changed_bcc.getSequencingKey() >= ascc2.getSequencingKey()){
+									changed_bcc.setSequencingKey(changed_bcc.getSequencingKey()+1);
+									bccDao.updateObject(changed_bcc);
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	private ACCVO getACC(String guid) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("acc_guid", guid);
@@ -449,7 +507,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			oagisComponentType = 0;
 		else if(Utility.first(den).endsWith("Extension") || Utility.first(den).equals("Open User Area") || Utility.first(den).equals("Any User Area") || Utility.first(den).equals("All Extension"))
 			oagisComponentType = 2;
-		else if(Utility.first(den).endsWith("Group"))
+		else if(Utility.first(den).endsWith("Group") || objectClassName.equalsIgnoreCase("Common Time Reporting"))
 			oagisComponentType = 3;
 		String module = fullFilePath.substring(fullFilePath.lastIndexOf(File.separator) + 1, fullFilePath.lastIndexOf("."));
 		

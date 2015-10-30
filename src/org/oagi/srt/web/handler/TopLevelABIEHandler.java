@@ -609,7 +609,10 @@ public class TopLevelABIEHandler implements Serializable {
 				BCCVO bccVO = (BCCVO)bccObject;
 				String seqKey = "";
 				if(groupPosition > 0) { // Group
-					seqKey = groupPosition + "." + bccVO.getSequencingKey();
+					if(bccVO.getSequencingKey() < 10)
+						seqKey = groupPosition + ".0" + bccVO.getSequencingKey();
+					else
+						seqKey = groupPosition + "." + bccVO.getSequencingKey();
 				} else { // not group
 					//seqKey = seq_base + "." + bccVO.getSequencingKey();
 					seqKey = (skb + bccVO.getSequencingKey()) + ".0";
@@ -621,7 +624,10 @@ public class TopLevelABIEHandler implements Serializable {
 				ASCCVO asccVO = (ASCCVO)asccObject;
 				String seqKey = "";
 				if(groupPosition > 0) { // Group
-					seqKey = groupPosition + "." + asccVO.getSequencingKey();
+					if(asccVO.getSequencingKey() < 10)
+						seqKey = groupPosition + ".0" + asccVO.getSequencingKey();
+					else
+						seqKey = groupPosition + "." + asccVO.getSequencingKey();
 				} else { // not group
 					//seqKey = seq_base + "." + asccVO.getSequencingKey();
 					seqKey = (skb + asccVO.getSequencingKey()) + ".0";

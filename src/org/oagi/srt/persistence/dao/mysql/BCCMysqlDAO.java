@@ -38,8 +38,8 @@ public class BCCMysqlDAO extends SRTDAO{
 
 	private final String _UPDATE_BCC_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET BCC_ID = ?, BCC_GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Assoc_To_BCCP_ID = ?, "
-			+ "Assoc_From_ACC_ID = ?, Sequencing_key = ?, Entity_Type = ?, DEN = ?";
+			+ " SET BCC_GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Assoc_To_BCCP_ID = ?, "
+			+ "Assoc_From_ACC_ID = ?, Sequencing_key = ?, Entity_Type = ?, DEN = ? WHERE BCC_ID = ?";
 
 	private final String _DELETE_BCC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BCC_ID = ?";
@@ -361,6 +361,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
 			ps.setString(8, bccVO.getDEN());
+			ps.setInt(9, bccVO.getBCCID());
 			ps.executeUpdate();
 
 			tx.commit();
