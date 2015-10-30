@@ -254,9 +254,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 //				}
 //				
 //			}
-
-			
-			
 		}
 	}
 
@@ -265,6 +262,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		QueryCondition qc = new QueryCondition();
 		qc.add("Definition", "Group");
 		ArrayList<SRTObject> groupobjects = asccDao.findObjects(qc, conn); 
+		ArrayList<SRTObject> checked_groupobjects = new ArrayList<SRTObject>();
 		for(SRTObject asccVO : groupobjects) {
 			int ElementsInGroup = 0;
 			QueryCondition qc2 = new QueryCondition();
@@ -285,24 +283,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 					if((asccObjectsinGroup.size()+bccObjectsinGroup.size()) > 0){
 						ElementsInGroup--;
 					}
-				}				
-			}
-			for(SRTObject asccObject : asccObjects) {
-				ASCCVO ascc = (ASCCVO)asccObject;
-				QueryCondition qc3 = new QueryCondition();
-				qc3.add("ASCCP_ID", ascc.getAssocToASCCPID());
-				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc3, conn);
-				if(asccp.getDefinition() != null && asccp.getDefinition().equalsIgnoreCase("Group") && ((ASCCVO)asccVO).getSequencingKey() > ((ASCCVO)asccObject).getSequencingKey()){
-					String groupname = asccp.getPropertyTerm().replaceAll(" ", "");
-					QueryCondition qc4 = new QueryCondition();
-					qc4.addLikeClause("DEN", groupname+"%");
-					ArrayList<SRTObject> asccObjectsinGroup = asccDao.findObjects(qc4, conn);
-					ArrayList<SRTObject> bccObjectsinGroup = bccDao.findObjects(qc4, conn);
-					ElementsInGroup += (asccObjectsinGroup.size()+bccObjectsinGroup.size());
-					if((asccObjectsinGroup.size()+bccObjectsinGroup.size()) > 0){
-						ElementsInGroup--;
-					}
-				}				
+				}
 			}
 			int new_seq = ((ASCCVO)asccVO).getSequencingKey() - ElementsInGroup;
 			((ASCCVO)asccVO).setSequencingKey(new_seq);
