@@ -172,6 +172,43 @@ public class TopLevelABIEHandler implements Serializable {
 		}
 	}
 	
+	public static void main(String[] args) throws Exception {
+		TopLevelABIEHandler t = new TopLevelABIEHandler();
+		Utility.dbSetup();
+		t.init();
+		DBAgent tx = new DBAgent();
+		try {
+			t.conn = tx.open();
+			QueryCondition qc = new QueryCondition();
+			qc.add("ACC_ID", "3618");
+			ACCVO accvo = (ACCVO)t.accDao.findObject(qc);
+			ArrayList<SRTObject> aa = t.queryNestedChildAssoc_wo_attribute(accvo);
+			System.out.println("size = "+aa.size());
+			for(SRTObject srt : aa){
+				if(srt instanceof BCCVO){
+					BCCVO bcc = (BCCVO) srt;
+					System.out.println("bcc  den = "+bcc.getDEN());
+				}
+				else if(srt instanceof ASCCVO){
+					ASCCVO ascc = (ASCCVO) srt;
+					System.out.println("ascc  den = "+ascc.getDEN());
+				}	
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			tx.rollback();
+		} finally {
+			try {
+				if(t.conn != null)
+					t.conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			tx.close();
+		}
+		
+	}
+	
 	public BarChartModel getBarModel() {
         return barModel;
     }
@@ -573,8 +610,199 @@ public class TopLevelABIEHandler implements Serializable {
         this.progress = progress;
     }
     
+	private ArrayList<SRTObject> queryNestedChildAssoc(ACCVO accVO) throws SRTDAOException {
+		ArrayList<SRTObject> tmp_assoc = getBCC(accVO.getACCID());
+		tmp_assoc.addAll(getASCC(accVO.getACCID()));
+		ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
+		SRTObject a = new SRTObject(); 
+		for(int i = 0 ; i < tmp_assoc.size() ; i++)
+			assoc.add(a);
+		
+		int attribute_cnt = 0;
+		for(SRTObject srt : tmp_assoc){
+			if(srt instanceof BCCVO){
+				BCCVO bcc = (BCCVO) srt;
+				if(bcc.getSequencingKey() == 0){
+					assoc.set(attribute_cnt, bcc);
+					attribute_cnt++;
+				}
+			}
+		}
+		
+		for(SRTObject srt : tmp_assoc){
+			if(srt instanceof BCCVO){
+				BCCVO bcc = (BCCVO) srt;
+				if(bcc.getSequencingKey() > 0)
+					assoc.set(bcc.getSequencingKey()-1+attribute_cnt, bcc);
+			}
+			else {
+				ASCCVO ascc = (ASCCVO) srt;
+				assoc.set(ascc.getSequencingKey()-1+attribute_cnt, ascc);
+			}				
+		}
+		
+		assoc.trimToSize();
+		for(int i = 0 ; i < assoc.size(); i ++){
+			SRTObject srt = assoc.get(i);
+			if(srt instanceof ASCCVO && groupcheck(srt)){
+				ASCCVO ascc = (ASCCVO)srt;
+				QueryCondition qc = new QueryCondition();
+				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+				QueryCondition qc2 = new QueryCondition();
+				qc2.add("ACC_ID", asccp.getRoleOfACCID());
+				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
+				assoc = handleNestedGroup(acc, assoc, i);
+			}
+		}
+		return assoc;
+	}
+	private ArrayList<SRTObject> queryNestedChildAssoc_wo_attribute(ACCVO accVO) throws SRTDAOException {
+		ArrayList<SRTObject> tmp_assoc = getBCCwoAttribute(accVO.getACCID());
+		tmp_assoc.addAll(getASCC(accVO.getACCID()));
+		ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
+		SRTObject a = new SRTObject(); 
+		for(int i = 0 ; i < tmp_assoc.size() ; i++)
+			assoc.add(a);
+		
+		for(SRTObject srt : tmp_assoc){
+			if(srt instanceof BCCVO){
+				BCCVO bcc = (BCCVO) srt;
+				if(bcc.getSequencingKey() > 0)
+					assoc.set(bcc.getSequencingKey()-1, bcc);
+			}
+			else {
+				ASCCVO ascc = (ASCCVO) srt;
+				assoc.set(ascc.getSequencingKey()-1, ascc);
+			}				
+		}
+		
+		assoc.trimToSize();
+		for(int i = 0 ; i < assoc.size(); i ++){
+			SRTObject srt = assoc.get(i);
+			if(srt instanceof ASCCVO && groupcheck(srt)){
+				ASCCVO ascc = (ASCCVO)srt;
+				QueryCondition qc = new QueryCondition();
+				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+				QueryCondition qc2 = new QueryCondition();
+				qc2.add("ACC_ID", asccp.getRoleOfACCID());
+				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
+				assoc = handleNestedGroup(acc, assoc, i);
+			}
+		}
+		return assoc;
+	}
 	
-	private void createBIEs(int accId, int abie, int groupPosition, TreeNode tNode) throws SRTDAOException, InstantiationException, IllegalAccessException {
+	private ArrayList<SRTObject> queryChildAssoc(ACCVO accVO) throws SRTDAOException {
+		ArrayList<SRTObject> tmp_assoc = getBCC(accVO.getACCID());
+		tmp_assoc.addAll(getASCC(accVO.getACCID()));
+		ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
+		SRTObject a = new SRTObject(); 
+		for(int i = 0 ; i < tmp_assoc.size() ; i++)
+			assoc.add(a);
+
+		int attribute_cnt = 0;
+		for(SRTObject srt : tmp_assoc){
+			if(srt instanceof BCCVO){
+				BCCVO bcc = (BCCVO) srt;
+				if(bcc.getSequencingKey() == 0){
+					assoc.set(attribute_cnt, bcc);
+					attribute_cnt++;
+				}
+			}
+		}
+		
+		for(SRTObject srt : tmp_assoc){
+			if(srt instanceof BCCVO){
+				BCCVO bcc = (BCCVO) srt;
+				if(bcc.getSequencingKey() > 0)
+					assoc.set(bcc.getSequencingKey()-1+attribute_cnt, bcc);
+			}
+			else {
+				ASCCVO ascc = (ASCCVO) srt;
+				assoc.set(ascc.getSequencingKey()-1+attribute_cnt, ascc);
+			}				
+		}
+		assoc.trimToSize();
+		return assoc;
+	}
+	
+	private ArrayList<SRTObject> handleNestedGroup(ACCVO acc, ArrayList<SRTObject> aList, int gPosition) throws SRTDAOException{
+		ArrayList<SRTObject> bList = queryChildAssoc(acc);
+		aList.addAll(gPosition, bList);
+		aList.remove(gPosition+bList.size());
+		for(int i = 0 ; i < aList.size(); i ++){
+			SRTObject srt = aList.get(i);
+			if(srt instanceof ASCCVO && groupcheck(srt)){
+				ASCCVO ascc = (ASCCVO)srt;
+				QueryCondition qc = new QueryCondition();
+				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+				QueryCondition qc2 = new QueryCondition();
+				qc2.add("ACC_ID", asccp.getRoleOfACCID());
+				ACCVO re_acc = (ACCVO) accDao.findObject(qc2, conn);
+				aList = handleNestedGroup(re_acc, aList, i);
+			}
+		}
+		return aList;
+	}
+	
+	private boolean groupcheck(SRTObject srt){
+		ASCCVO ascc = (ASCCVO) srt;
+		boolean check = false;
+		try {
+			QueryCondition qc = new QueryCondition();
+			qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+			ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("ACC_ID", asccp.getRoleOfACCID());
+			ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
+			if(acc.getOAGISComponentType() == 3){
+				check = true;
+			}
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
+		return check;
+	}
+
+	private void createBIEs(int accId, int abie, double groupPosition, TreeNode tNode) throws SRTDAOException, InstantiationException, IllegalAccessException {
+		LinkedList<ACCVO> accList = new LinkedList<ACCVO>();
+		ACCVO acc = getACC(accId);
+		accList.add(acc);
+		while(acc.getBasedACCID() > 0) {
+			acc = getACC(acc.getBasedACCID());
+			accList.add(acc);
+		}
+		
+		while(!accList.isEmpty()) {
+			ACCVO accVO = accList.pollFirst();
+			int skb = 0;
+			
+			for(ACCVO cnt_acc : accList){
+				skb += queryNestedChildAssoc_wo_attribute(cnt_acc).size(); //here
+			}
+			
+			ArrayList<SRTObject> childAssoc = queryNestedChildAssoc(accVO);
+			int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(accVO).size();
+			for(int i = 0 ; i < childAssoc.size(); i ++) {
+				SRTObject assoc = childAssoc.get(i);
+				if(assoc instanceof BCCVO){
+					BCCVO bcc = (BCCVO) assoc;
+					if(bcc.getSequencingKey() > 0)
+						createBBIETree(bcc, abie, skb+i-attr_cnt, tNode);
+					else
+						createBBIETree(bcc, abie, skb, tNode);
+				}
+				else if(assoc instanceof ASCCVO){
+					ASCCVO ascc = (ASCCVO) assoc;					
+					createASBIETree(ascc, abie, skb+i-attr_cnt, tNode, skb);
+				}	
+			}
+		}
+	}
+	private void createBIEsold(int accId, int abie, double groupPosition, TreeNode tNode) throws SRTDAOException, InstantiationException, IllegalAccessException {
 		Queue<ACCVO> accList = new LinkedList<ACCVO>();
 		ACCVO acc = getACC(accId);
 		accList.add(acc);
@@ -608,30 +836,32 @@ public class TopLevelABIEHandler implements Serializable {
 			for(SRTObject bccObject : bccObjects) {
 				BCCVO bccVO = (BCCVO)bccObject;
 				String seqKey = "";
-				if(groupPosition > 0) { // Group
-					if(bccVO.getSequencingKey() < 10)
-						seqKey = groupPosition + ".0" + bccVO.getSequencingKey();
-					else
-						seqKey = groupPosition + "." + bccVO.getSequencingKey();
-				} else { // not group
-					//seqKey = seq_base + "." + bccVO.getSequencingKey();
-					seqKey = (skb + bccVO.getSequencingKey()) + ".0";
-				}
+//				if(groupPosition > 0) { // Group
+//					if(bccVO.getSequencingKey() < 10)
+//						seqKey = groupPosition + ".0" + bccVO.getSequencingKey();
+//					else
+//						seqKey = groupPosition + "." + bccVO.getSequencingKey();
+//				} else { // not group
+//					//seqKey = seq_base + "." + bccVO.getSequencingKey();
+//					seqKey = (skb + bccVO.getSequencingKey()) + ".0";
+//				}
+				seqKey = (skb + bccVO.getSequencingKey())+ ".0";
 				sequence.put(bccVO, Double.parseDouble(seqKey));
 			}
 			
 			for(SRTObject asccObject : asccObjects) {
 				ASCCVO asccVO = (ASCCVO)asccObject;
 				String seqKey = "";
-				if(groupPosition > 0) { // Group
-					if(asccVO.getSequencingKey() < 10)
-						seqKey = groupPosition + ".0" + asccVO.getSequencingKey();
-					else
-						seqKey = groupPosition + "." + asccVO.getSequencingKey();
-				} else { // not group
-					//seqKey = seq_base + "." + asccVO.getSequencingKey();
-					seqKey = (skb + asccVO.getSequencingKey()) + ".0";
-				}
+//				if(groupPosition > 0) { // Group
+//					if(asccVO.getSequencingKey() < 10)
+//						seqKey = groupPosition + ".0" + asccVO.getSequencingKey();
+//					else
+//						seqKey = groupPosition + "." + asccVO.getSequencingKey();
+//				} else { // not group
+//					//seqKey = seq_base + "." + asccVO.getSequencingKey();
+//					seqKey = (skb + asccVO.getSequencingKey()) + ".0";
+//				}
+				seqKey = (skb + asccVO.getSequencingKey())+ ".0";
 				sequence.put(asccVO, (Double.parseDouble(seqKey)));
 			}
 
@@ -706,10 +936,10 @@ public class TopLevelABIEHandler implements Serializable {
 	private void createASBIETree(ASCCVO asccVO, int abie, double seqKey, TreeNode tNode, int seq_base) throws SRTDAOException, InstantiationException, IllegalAccessException {
 		ASCCPVO asccpVO = getASCCP(asccVO.getAssocToASCCPID());
 		ACCVO accVOFromASCCP = getACC(asccpVO.getRoleOfACCID());
-		if(accVOFromASCCP.getOAGISComponentType() == 3) {
-			int adjustSeqKey = adjustSeqKeyforGroup(asccVO);
-			createBIEs(accVOFromASCCP.getACCID(), abie, seq_base+adjustSeqKey, tNode);
-		} else {
+//		if(accVOFromASCCP.getOAGISComponentType() == 3) {
+//			//int adjustSeqKey = adjustSeqKeyforGroup(asccVO);
+//			createBIEs(accVOFromASCCP.getACCID(), abie, seq_base+seqKey, tNode);
+//		} else {
 			ABIEVO abieVO = createABIE(accVOFromASCCP, bCSelected.getBusinessContextID(), 0, abie);
 			ASBIEPVO asbiepVO = createASBIEP(asccpVO, abieVO.getABIEID(), abie);
 
@@ -727,7 +957,7 @@ public class TopLevelABIEHandler implements Serializable {
 			TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 			
 			createBIEs(accVOFromASCCP.getACCID(), abieVO.getABIEID(), -1, tNode2);
-		}
+//		}
 	}
 	
 	private int adjustSeqKeyforGroup(ASCCVO asccVO) {
@@ -780,36 +1010,11 @@ public class TopLevelABIEHandler implements Serializable {
 		}
 
 		ArrayList<SRTObject> res2 = new ArrayList<SRTObject>();
-		ArrayList<String> groupnames = new ArrayList<String>();
-		boolean rep_check = false;
-
 		for(SRTObject obj : res) {
 			BCCVO bcc = (BCCVO) obj;
-			rep_check = false;
-//			if(bcc.getDEN().substring(0, bcc.getDEN().indexOf(".")).contains("Group")){
-//				for(int i = 0 ; i < groupnames.size() ; i++) {
-//					if(groupnames.get(i).equals((bcc.getDEN().substring(0, bcc.getDEN().indexOf(".") )))){
-//							rep_check = true;
-//							break;
-//					}
-//				}
-//				if(!rep_check) {
-//					System.out.println("bcc group = "+bcc.getDEN().substring(0, bcc.getDEN().indexOf(".") ));
-//					groupnames.add(bcc.getDEN().substring(0, bcc.getDEN().indexOf(".") ));		
-//					res2.add(obj);
-//				}
-//			}
-//			else {
 				if(bcc.getSequencingKey() > 0)
 					res2.add(obj);
-//			}
 		}
-		
-//		for(SRTObject asccObject : res) {
-//		ASCCVO asccVO = (ASCCVO)asccObject;
-//		if(asccVO.getSequencingKey() > 0)
-//			res2.add(asccObject);
-//	}
 		return res2;
 	}
 	

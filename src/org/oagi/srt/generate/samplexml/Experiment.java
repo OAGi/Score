@@ -62,8 +62,6 @@ public class Experiment {
 	
 	public void macrotest_create() throws Exception {
 		TopLevelABIEHandler a = new TopLevelABIEHandler();
-		//String filepath = a.macro("oagis-id-dedeb4e4be384d5282c33ee5533f5ff2");
-		//String filepath = a.macro("oagis-id-9712b728b0d34677a367b2a3555bcdfa");
 		File[] listOfF1 = getBODs(f1);
 
 		for (File file : listOfF1) {
@@ -115,7 +113,6 @@ public class Experiment {
 	
 	public static void main(String args[]) throws FileNotFoundException, Exception {
 		Experiment a = new Experiment();
-		//a.test();
 		a.macrotest_create();
 		Thread.sleep(150);
 		a.macrotest_validate();
