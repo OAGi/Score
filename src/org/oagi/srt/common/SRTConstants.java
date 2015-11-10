@@ -47,7 +47,6 @@ public class SRTConstants {
 	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
 	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 	
-	public static final String BOD_FILE_PATH = "/Temp/test/BOD/";
 	
 	public static int getDBType() {
 		ServerProperties props = ServerProperties.getInstance();
@@ -59,7 +58,6 @@ public class SRTConstants {
 
 		return Integer.parseInt(dbTypeVal);
 	}
-	
 	public static final String BOD_FILE_PATH_01 = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
 	public static final String BOD_FILE_PATH_02 = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
 
@@ -73,7 +71,8 @@ public class SRTConstants {
 	public static final String XBT_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
 	public static final String CODE_LIST_FILE_PATH = "/Users/jnl18/Documents/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/CodeLists/";
 	public static final String TEST_BOD_FILE_PATH = "/Temp/test/BOD/";
-	public static final String TEST_XML_FILE_PATH = "/Temp/test/BOD/";
+	public static final String BOD_FILE_PATH = TEST_BOD_FILE_PATH;
+	public static final String TEST_XML_FILE_PATH = TEST_BOD_FILE_PATH;
 	
 	public static String filepath(String list) {
 		String prefix_filepath = "/Users/jnl18/Documents/";

@@ -95,9 +95,10 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         xsInstance.generateOptionalAttributes = false;
         xsInstance.showContentModel = false;
         String schemalocation = oagis + " "+ newxsdfilename + ".xsd";
+        System.out.println("### Start to generate an instance of " + xsdfilename);
         xsInstance.generate(xsModel, rootElement, sampleXML, schemalocation, null);
        
-        System.out.println(xmlfilename+".xsd from "+ xsdfilename+".xsd is generated...");
+        System.out.println("### Finish generating an instance of " + xsdfilename);
     }
     
     public static String remove_any(String xsdfilename) throws Exception {

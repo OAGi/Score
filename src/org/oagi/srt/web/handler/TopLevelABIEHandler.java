@@ -499,7 +499,7 @@ public class TopLevelABIEHandler implements Serializable {
 			qc2.add("Business_Context_ID", "2");
 			BusinessContextVO bcVO = (BusinessContextVO) daoBC.findObject(qc2, conn);
 			bCSelected = bcVO;
-			System.out.println("### Start to create uncommitted "+asccpvo.getPropertyTerm());
+			System.out.println("### Start to create a standalone "+asccpvo.getPropertyTerm());
 			QueryCondition qc = new QueryCondition();
 			qc.add("acc_id", selected.getRoleOfACCID());
 			ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
@@ -518,14 +518,14 @@ public class TopLevelABIEHandler implements Serializable {
 			tx.commit();
 			conn.close();
 				
-			System.out.println("### Finish creating uncommitted "+asccpvo.getPropertyTerm());
+			System.out.println("### Finish creating a standalone "+asccpvo.getPropertyTerm());
 			
-			System.out.println("### Start to generate schema of "+asccpvo.getPropertyTerm());
+			System.out.println("### Start to generate a schema of "+asccpvo.getPropertyTerm());
 			StandaloneXMLSchema test = new StandaloneXMLSchema();
 			ArrayList<Integer> abies = new ArrayList<Integer>();
 			abies.add(abieId);
 			String filepath = test.generateXMLSchema(abies, true);
-			System.out.println("### Finish generating schema of "+asccpvo.getPropertyTerm());
+			System.out.println("### Finish generating a schema of "+asccpvo.getPropertyTerm());
 			
 			return filepath;
 	}
