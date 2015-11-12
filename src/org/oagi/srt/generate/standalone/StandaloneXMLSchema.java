@@ -1393,7 +1393,7 @@ public class StandaloneXMLSchema {
 				ASCCPVO asccpvo = (ASCCPVO)dao.findObject(qc, conn);
 				filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
 			}
-			filepath = writeXSDFile(doc, filename+"_created");
+			filepath = writeXSDFile(doc, filename+"_standalone");
 		}
 		else {
 			for(SRTObject aSRTObject : gABIE){

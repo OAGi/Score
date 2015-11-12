@@ -180,7 +180,7 @@ public class TopLevelABIEHandler implements Serializable {
 		try {
 			t.conn = tx.open();
 			QueryCondition qc = new QueryCondition();
-			qc.add("ACC_ID", "3618");
+			qc.add("ACC_ID", "4872");
 			ACCVO accvo = (ACCVO)t.accDao.findObject(qc);
 			ArrayList<SRTObject> aa = t.queryNestedChildAssoc_wo_attribute(accvo);
 			System.out.println("size = "+aa.size());

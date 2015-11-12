@@ -13,7 +13,7 @@ import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Experiment {
+public class Experiment implements Runnable {
 	
 	private File[] getBODs(File f) {
 		return f.listFiles(new FilenameFilter() {
@@ -40,19 +40,19 @@ public class Experiment {
 		File[] listOfF1 = getBODs(f1);
 		
 		for (File file : listOfF1) {
-			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_created")) {
+			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_standlone")) {
 				String oagxsdfilename = file.getName().substring(0, file.getName().indexOf("."));
-				String generatedxsdfilename = oagxsdfilename+"_created";
-				String oagxsdfilename_remove_any = oagxsdfilename+"_remove_any";
-				String generatedxsdfilename_remove_any = generatedxsdfilename+"_remove_any";
+				String generatedxsdfilename = oagxsdfilename+"_standalone";
+				String oagxsdfilename_remove_any = oagxsdfilename+"_replace_any";
+				String generatedxsdfilename_remove_any = generatedxsdfilename+"_replace_any";
 				for(File file2 : listOfF1){
 					if(file2.getName().substring(0, file2.getName().indexOf(".")).equals(generatedxsdfilename)) {
 						String oagxmlfilename = "XML_From_"+oagxsdfilename;
 						String generatedxmlfilename = "XML_From_"+generatedxsdfilename;
 						String rootElementname = oagxsdfilename;
 						String prefix = "xs";
-						XmlTest.xmltest_exp_remove_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
-						XmlTest.xmltest_exp_remove_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
+						XmlTest.xmltest_exp_replace_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
+						XmlTest.xmltest_exp_replace_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
 						System.out.println("### Start to validate "+oagxsdfilename);
 						//ValidateXML.validate_exp(oagxsdfilename_remove_any, oagxmlfilename);
 						//ValidateXML.validate_exp(generatedxsdfilename_remove_any, generatedxmlfilename);	
@@ -66,13 +66,45 @@ public class Experiment {
 		}
 	}
 	
-	public static void main(String args[]) throws FileNotFoundException, Exception {
-		String EXP_BOD_FILE_PATH = args[0];
-		File f1 = new File(EXP_BOD_FILE_PATH);
-		System.out.println(EXP_BOD_FILE_PATH);
-		Experiment a = new Experiment();
-		a.macrotest_create(f1);
-		Thread.sleep(150);
-		a.macrotest_validate(f1);
+	private Thread t;
+	String EXP_BOD_FILE_PATH;
+	File f1 ;
+	
+	public void start() {
+		if( t == null) {
+			t = new Thread(this, "New Thread");
+			t.run();
+		}
 	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		System.out.println("Thread = "+Thread.currentThread().getName());
+		try {
+			//macrotest_create(f1);
+			macrotest_validate(f1);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void main(String args[]) throws FileNotFoundException, Exception {
+		
+//		Experiment a = new Experiment();
+//		a.macrotest_create(f1);
+//		a.macrotest_validate(f1);
+		
+		Experiment R1 = new Experiment();
+		R1.EXP_BOD_FILE_PATH = args[0];
+		R1.f1 = new File(R1.EXP_BOD_FILE_PATH);
+		R1.start();
+		
+//		Experiment R2 = new Experiment();
+//		R2.f1 = new File(R1.EXP_BOD_FILE_PATH);
+//		R2.start();
+
+		
+	}
+
 }

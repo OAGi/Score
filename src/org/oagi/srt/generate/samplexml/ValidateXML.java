@@ -41,14 +41,14 @@ public class ValidateXML {
 
 			    public void fatalError(SAXParseException exception) throws SAXException
 			    {
-			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4.a"))
+			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4.a") && !exception.getMessage().contains("ns:anyElement"))
 			    		System.out.println(exception);
 			    	exceptions.add(exception);
 			    }
 
 			    public void error(SAXParseException exception) throws SAXException
 			    {
-			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4.a"))
+			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4.a") && !exception.getMessage().contains("ns:anyElement"))
 			    		System.out.println(exception);
 			    	exceptions.add(exception);
 			    }
