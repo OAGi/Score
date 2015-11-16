@@ -18,8 +18,26 @@ public class BCCVO extends SRTObject {
 	private int AssocFromACCID;
 	private int sequencingKey;
 	private int EntityType;
+	private String definition;
+	private String ccDefinition;
 	private String DEN;
 	
+	public String getCcDefinition() {
+		return ccDefinition;
+	}
+
+	public void setCcDefinition(String ccDefinition) {
+		this.ccDefinition = ccDefinition;
+	}
+
+	public String getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(String definition) {
+		this.definition = definition;
+	}
+
 	public int getBCCID() {
 		return BCCID;
 	}

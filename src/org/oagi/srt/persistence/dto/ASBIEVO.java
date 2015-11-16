@@ -21,6 +21,7 @@ public class ASBIEVO extends SRTObject {
 	
 	private String asbieGuid;
 	private String definition;
+	private String ccDefinition;
 	private int nillable;
 	private String remark;
 	private int createdByUserId;
@@ -28,6 +29,14 @@ public class ASBIEVO extends SRTObject {
 	private Timestamp creationTimestamp;
 	private Timestamp lastUpdateTimestamp;
 	private double sequencingKey;
+
+	public String getCcDefinition() {
+		return ccDefinition;
+	}
+
+	public void setCcDefinition(String ccDefinition) {
+		this.ccDefinition = ccDefinition;
+	}
 
 	public double getSequencingKey() {
 		return sequencingKey;

@@ -26,6 +26,7 @@ public class BBIEVO extends SRTObject {
 	private String fixedValue;
 	private int isNull;
 	private String Definition;
+	private String ccDefinition;
 	private String remark;
 	private int createdByUserId;
 	private int lastUpdatedByUserId;
@@ -33,6 +34,14 @@ public class BBIEVO extends SRTObject {
 	private Timestamp lastUpdateTimestamp;
 	private double sequencing_key;
 	
+	public String getCcDefinition() {
+		return ccDefinition;
+	}
+
+	public void setCcDefinition(String ccDefinition) {
+		this.ccDefinition = ccDefinition;
+	}
+
 	public int getIsNull() {
 		return isNull;
 	}

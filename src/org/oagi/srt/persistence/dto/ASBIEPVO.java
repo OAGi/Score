@@ -15,6 +15,7 @@ public class ASBIEPVO extends SRTObject {
 	private int BasedASCCPID;
 	private int RoleOfABIEID;
 	private String Definition;
+	private String ccDefinition;
 	private int CreatedByUserID;
 	private int LastUpdatedByUserID;
 	private Timestamp CreationTimestamp;
@@ -23,6 +24,13 @@ public class ASBIEPVO extends SRTObject {
 	private String remark;
 	private String businessTerm;
 	
+	
+	public String getCcDefinition() {
+		return ccDefinition;
+	}
+	public void setCcDefinition(String ccDefinition) {
+		this.ccDefinition = ccDefinition;
+	}
 	public int getASBIEPID() {
 		return ASBIEPID;
 	}

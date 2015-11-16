@@ -428,7 +428,7 @@ public class TopLevelABIEHandler implements Serializable {
 				QueryCondition qc = new QueryCondition();
 				qc.add("acc_id", selected.getRoleOfACCID());
 				ACCVO accVO = (ACCVO)accDao.findObject(qc, conn);
-				topAbieVO = createABIE(accVO, bCSelected.getBusinessContextID(), 1, 0);
+				topAbieVO = createABIE(accVO, bCSelected.getBusinessContextID(), -1, 0);
 				// int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
 				int abieId = topAbieVO.getABIEID();
 				
@@ -446,6 +446,7 @@ public class TopLevelABIEHandler implements Serializable {
 				TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
 				createBIEs(selected.getRoleOfACCID(), abieId, -1, toplevelNode);
 				
+				updateABIE(topAbieVO);
 				createBarModel();
 				tx.commit();
 			} catch (Exception e) {
@@ -1141,7 +1142,7 @@ public class TopLevelABIEHandler implements Serializable {
 		String abieGuid = Utility.generateGUID();
 		abieVO.setAbieGUID(abieGuid);
 		abieVO.setBasedACCID(accVO.getACCID());
-		abieVO.setDefinition(accVO.getDefinition());
+		//abieVO.setDefinition(accVO.getDefinition());
 		abieVO.setIsTopLevel(topLevel);
 		abieVO.setBusinessContextID(bc);
 		int userId = getUserId();
@@ -1158,8 +1159,19 @@ public class TopLevelABIEHandler implements Serializable {
 			e.printStackTrace();
 		}
 		
+		abieVO.setCcDefinition(accVO.getDefinition());
 		//abieCount++;
 		return abieVO;
+	}
+	
+	private void updateABIE(ABIEVO abieVO) throws SRTDAOException {
+		abieVO.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+		abieVO.setIsTopLevel(1);
+		try {
+			abieDao.updateObject(abieVO);
+		} catch (SRTDAOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private ASBIEPVO createASBIEP(ASCCPVO asccpVO, int tAabie, int gAabie) throws SRTDAOException {
@@ -1170,7 +1182,7 @@ public class TopLevelABIEHandler implements Serializable {
 		int userId = getUserId();
 		asbiepVO.setCreatedByUserID(userId); 
 		asbiepVO.setLastUpdatedByUserID(userId); 
-		asbiepVO.setDefinition(asccpVO.getDefinition());
+		
 		//asbiepVO.setASBIEPID(Utility.getRandomID(maxASBIEPId));
 		try {
 			int key = asbiepDao.insertObject(asbiepVO, conn);
@@ -1181,6 +1193,7 @@ public class TopLevelABIEHandler implements Serializable {
 		}
 		
 		//asbiepCount++;
+		asbiepVO.setCcDefinition(asccpVO.getDefinition());
 		
 		return asbiepVO;
 	}
@@ -1193,7 +1206,7 @@ public class TopLevelABIEHandler implements Serializable {
 		asbieVO.setBasedASCC(asccVO.getASCCID());
 		asbieVO.setCardinalityMax(asccVO.getCardinalityMax());
 		asbieVO.setCardinalityMin(asccVO.getCardinalityMin());
-		asbieVO.setDefinition(asccVO.getDefinition());
+		
 		int userId = getUserId();
 		asbieVO.setCreatedByUserId(userId); 
 		asbieVO.setLastUpdatedByUserId(userId); 
@@ -1205,6 +1218,7 @@ public class TopLevelABIEHandler implements Serializable {
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
+		asbieVO.setCcDefinition(asccVO.getDefinition());
 		//asbieCount++;
 		return asbieVO;
 	}
@@ -1216,7 +1230,7 @@ public class TopLevelABIEHandler implements Serializable {
 		int userId = getUserId();
 		bbiepVO.setCreatedByUserID(userId); 
 		bbiepVO.setLastUpdatedbyUserID(userId); 
-		bbiepVO.setDefinition(bccpVO.getDefinition());
+		
 		//bbiepVO.setBBIEPID(Utility.getRandomID(maxBIEPID));
 		
 		try {
@@ -1226,7 +1240,7 @@ public class TopLevelABIEHandler implements Serializable {
 		} catch (SRTDAOException e) {
 			e.printStackTrace();
 		}
-		
+		bbiepVO.setCcDefinition(bccpVO.getDefinition());
 		//bbiepCount++;
 		return bbiepVO;
 	}
@@ -1256,6 +1270,7 @@ public class TopLevelABIEHandler implements Serializable {
 			e.printStackTrace();
 		}
 		
+		bbieVO.setCcDefinition(bccVO.getDefinition());
 		//bbieCount++;
 		return bbieVO;
 	}
@@ -1745,8 +1760,13 @@ public class TopLevelABIEHandler implements Serializable {
 		BCCVO bccVO = (BCCVO)bccDao.findObject(qc_04);
 		ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
 		av.setBccVO(bccVO);
+		
+		bbiepVO.setCcDefinition(bccpVO.getDefinition());
 		av.setBbiepVO(bbiepVO);
+		
+		bbieVO.setCcDefinition(bccVO.getDefinition());
 		av.setBbieVO(bbieVO);
+		
 		av.setBccpVO(bccpVO);
 		
 		QueryCondition qc_05 = new QueryCondition();
@@ -1784,8 +1804,14 @@ public class TopLevelABIEHandler implements Serializable {
 		av.setAsccVO(asccVO);
 		av.setAsccpVO(asccpVO);
 		av.setAccVO(accVO);
+		
+		abieVO.setCcDefinition(accVO.getDefinition());
 		av.setAbieVO(abieVO);
+		
+		asbiepVO.setCcDefinition(asccpVO.getDefinition());
 		av.setAsbiepVO(asbiepVO);
+		
+		asbieVO.setCcDefinition(asccVO.getDefinition());
 		av.setAsbieVO(asbieVO);
 		TreeNode tNode2 = new DefaultTreeNode(av, tNode);
 		//createBIEChildren(abieVO.getABIEID(), tNode2);

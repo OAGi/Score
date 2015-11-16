@@ -18,6 +18,7 @@ public class ABIEVO extends SRTObject {
 	private int BusinessContextID;
 	private String businessContextName;
 	private String Definition;
+	private String ccDefinition;
 	private int CreatedByUserID;
 	private int LastUpdatedByUserID;
 	private Timestamp CreationTimestamp;
@@ -29,6 +30,14 @@ public class ABIEVO extends SRTObject {
 	private String remark;
 	private String businessTerm;
 	
+	public String getCcDefinition() {
+		return ccDefinition;
+	}
+
+	public void setCcDefinition(String ccDefinition) {
+		this.ccDefinition = ccDefinition;
+	}
+
 	public String getBusinessContextName() {
 		return businessContextName;
 	}

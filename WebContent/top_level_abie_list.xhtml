@@ -102,62 +102,67 @@
 							
 								<ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE'}">
 									<h:panelGrid columns="2" cellpadding="5">
-							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
-										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
+						    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
+									<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
 									</h:panelGrid>
 									<p:separator />
-									<h:panelGrid columns="1" cellpadding="5">
-										<h:outputLabel rows="10" value="ASBIE: " style="font-weight:bold; color:red" />
-									</h:panelGrid>
-									<h:panelGrid columns="4" cellpadding="5">
-										<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMin}" />
-										
-										<h:outputLabel rows="10" value="Max:" style="font-weight:bold" /> 
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMax}" />
-										
-										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbieVO.remark}" />
-										
-										<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.nillable}" />
-										
-										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbieVO.definition}">
-										</p:inputTextarea>
-									</h:panelGrid>
-									<p:separator />
-									<h:panelGrid columns="1" cellpadding="5">
-										<h:outputLabel rows="10" value="ASBIEP" style="font-weight:bold; color:red" />
-									</h:panelGrid>
-									<h:panelGrid columns="4" cellpadding="5">
-										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.remark}" />
-										
-										<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.businessTerm}" />
-										
-										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbiepVO.definition}">
-										</p:inputTextarea>
-									</h:panelGrid>
-									<p:separator />
-									<h:panelGrid columns="1" cellpadding="5">
-										<h:outputLabel rows="10" value="Target ABIE" style="font-weight:bold; color:red" />
-									</h:panelGrid>
-									<h:panelGrid columns="2" cellpadding="5">
-										<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
-										
-										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
-										
-							            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
-										</p:inputTextarea>
-										
-									</h:panelGrid>
-									<p:separator />
+									<p:panel id="ASBIE" header="ASBIE" collapsed="false" toggleable="true" toggleSpeed="500">
+										<h:panelGrid columns="4" cellpadding="5">
+											<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMin}" />
+											
+											<h:outputLabel rows="10" value="Max:" style="font-weight:bold" /> 
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMax}" />
+											
+											<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
+											<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbieVO.remark}" />
+											
+											<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.nillable}" />
+											
+											<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbieVO.definition}">
+											</p:inputTextarea>
+											
+											<h:outputLabel rows="10" value="CC Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" disabled="true" value="#{topLevelABIEHandler.aABIEView.asbieVO.ccDefinition}">
+											</p:inputTextarea>
+										</h:panelGrid>
+									</p:panel>
+									<p:panel id="ASBIEP" header="ASBIEP" collapsed="true" toggleable="true" toggleSpeed="500">
+										<h:panelGrid columns="4" cellpadding="5">
+											<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
+											<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.remark}" />
+											
+											<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
+											<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.businessTerm}" />
+											
+											<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbiepVO.definition}">
+											</p:inputTextarea>
+											
+											<h:outputLabel rows="10" value="CC Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" disabled="true" value="#{topLevelABIEHandler.aABIEView.asbiepVO.ccDefinition}">
+											</p:inputTextarea>
+										</h:panelGrid>
+									</p:panel>
+									<p:panel id="TargetABIE" header="Target ABIE" collapsed="true" toggleable="true" toggleSpeed="500">
+										<h:panelGrid columns="2" cellpadding="5">
+											<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+											
+											<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
+											<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+											
+								            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+											</p:inputTextarea>
+											
+											<h:outputLabel rows="10" value="CC Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="40" autoResize="false" disabled="true" value="#{topLevelABIEHandler.aABIEView.abieVO.ccDefinition}">
+											</p:inputTextarea>
+										</h:panelGrid>
+									</p:panel>
 								</ui:fragment>
 							
 							    <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'BBIE'}">  
@@ -166,73 +171,76 @@
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:green" />
 									</h:panelGrid>
 									<p:separator />
-							    	<h:panelGrid columns="1" cellpadding="5">
-										<h:outputLabel rows="10" value="BBIE" style="font-weight:bold; color:red" />
-									</h:panelGrid>
-									<h:panelGrid columns="4" cellpadding="5">
-										<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMin}" />
-										
-										<h:outputLabel rows="10" value="Max:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMax}" />
-										
-										<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.nillable}" />
-										
-										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.remark}" />
-										
-										<h:outputLabel rows="10" value="Fixed value:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.fixedValue}" />
-										
-										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbieVO.definition}">
-										</p:inputTextarea>
-									</h:panelGrid>
-									<p:separator />
-									<h:panelGrid columns="1" cellpadding="5">
-										<h:outputLabel rows="10" value="BBIEP" style="font-weight:bold; color:red" />
-									</h:panelGrid>
-									<h:panelGrid columns="4" cellpadding="5">
-										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiepVO.remark}" /> 
-										
-										<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.businessTerm}" />
-										
-										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiepVO.definition}">
-										</p:inputTextarea>
-									</h:panelGrid>
-									<p:separator />
-									<h:panelGrid columns="1" cellpadding="5">
-										<h:outputLabel rows="10" value="BDT Primitive Restriction" style="font-weight:bold; color:red" />
-									</h:panelGrid>
-									<h:panelGrid columns="2" cellpadding="5">
-										<h:outputLabel rows="10" value="BDT Name:" style="font-weight:bold" />
-										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtName}" style="font-weight:bold; color: blue;" />
-									</h:panelGrid>
-									<h:panelGrid columns="4" cellpadding="5">
-										<p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true" />
-										<h:outputLabel rows="10" value="Primitive:" style="font-weight:bold" />
-										<p:selectOneMenu value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictionId}" required="true" requiredMessage="Select one of the options">
-											<p:ajax listener="#{topLevelABIEHandler.aABIEView.onBDTPrimitiveChange}" />
-										    <f:selectItems value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictions}" />
-										</p:selectOneMenu>
-										<h:outputLabel rows="10" value="(#{topLevelABIEHandler.aABIEView.primitiveType})" style="font-weight:bold; color: green" />
-									</h:panelGrid>
-									<h:panelGrid columns="5" cellpadding="5">
-											<p:radioButton id="opt2" for="customRadio" itemIndex="1" />
-											<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
-											<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
-										    
-										    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
-										    </p:commandButton>
-										    
-										    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
-										    </p:commandButton>
-									</h:panelGrid>
-									<p:separator />
+							    
+							    	<p:panel id="BBIE" header="BBIE" collapsed="false" toggleable="true" toggleSpeed="500">
+										<h:panelGrid columns="4" cellpadding="5">
+											<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMin}" />
+											
+											<h:outputLabel rows="10" value="Max:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMax}" />
+											
+											<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.nillable}" />
+											
+											<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.remark}" />
+											
+											<h:outputLabel rows="10" value="Fixed value:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.fixedValue}" />
+											
+											<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbieVO.definition}">
+											</p:inputTextarea>
+											
+											<h:outputLabel rows="10" value="CC Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" disabled="true" value="#{topLevelABIEHandler.aABIEView.bbieVO.ccDefinition}">
+											</p:inputTextarea>
+										</h:panelGrid>
+									</p:panel>
+									<p:panel id="BBIEP" header="BBIEP" collapsed="true" toggleable="true" toggleSpeed="500">
+										<h:panelGrid columns="4" cellpadding="5">
+											<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
+											<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiepVO.remark}" /> 
+											
+											<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
+											<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.businessTerm}" />
+											
+											<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiepVO.definition}">
+											</p:inputTextarea>
+											
+											<h:outputLabel rows="10" value="CC Definition:" style="font-weight:bold" />
+											<p:inputTextarea rows="2" cols="30" autoResize="false" disabled="true" value="#{topLevelABIEHandler.aABIEView.bbiepVO.ccDefinition}">
+											</p:inputTextarea>
+										</h:panelGrid>
+									</p:panel>
+									<p:panel id="BDTPrimitiveRestriction" header="BDT Primitive Restriction" collapsed="false" toggleable="true" toggleSpeed="500">
+										<h:panelGrid columns="2" cellpadding="5">
+											<h:outputLabel rows="10" value="BDT Name:" style="font-weight:bold" />
+											<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtName}" style="font-weight:bold; color: blue;" />
+										</h:panelGrid>
+										<h:panelGrid columns="4" cellpadding="5">
+											<p:radioButton id="opt1" for="customRadio" itemIndex="0" />
+											<h:outputLabel rows="10" value="Primitive:" style="font-weight:bold" />
+											<p:selectOneMenu value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictionId}">
+												<p:ajax listener="#{topLevelABIEHandler.aABIEView.onBDTPrimitiveChange}" />
+											    <f:selectItems value="#{topLevelABIEHandler.aABIEView.bdtPrimitiveRestrictions}" />
+											</p:selectOneMenu>
+											<h:outputLabel rows="10" value="(#{topLevelABIEHandler.aABIEView.primitiveType})" style="font-weight:bold; color: green" />
+										</h:panelGrid>
+										<h:panelGrid columns="5" cellpadding="5">
+												<p:radioButton id="opt2" for="customRadio" itemIndex="1" />
+												<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
+												<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
+											    
+											    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
+											    </p:commandButton>
+											    
+											    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
+											    </p:commandButton>
+										</h:panelGrid>
+									</p:panel>
 							    </ui:fragment>
 							    
 							    <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'BBIESC'}">   

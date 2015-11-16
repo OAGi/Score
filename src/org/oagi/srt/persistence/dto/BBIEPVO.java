@@ -19,9 +19,16 @@ public class BBIEPVO extends SRTObject {
 	private Timestamp LastUpdateTimestamp;
 	
 	private String definition;
+	private String ccDefinition;
 	private String remark;
 	private String businessTerm;
 	
+	public String getCcDefinition() {
+		return ccDefinition;
+	}
+	public void setCcDefinition(String ccDefinition) {
+		this.ccDefinition = ccDefinition;
+	}
 	public String getRemark() {
 		return remark;
 	}
