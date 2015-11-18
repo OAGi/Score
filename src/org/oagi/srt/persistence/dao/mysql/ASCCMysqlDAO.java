@@ -63,10 +63,12 @@ public class ASCCMysqlDAO extends SRTDAO {
 			
 			ps.setString(1, asccVO.getASCCGUID());
 			ps.setInt(2, asccVO.getCardinalityMin());
-			if(asccVO.getCardinalityMax() == -1)
-				ps.setNull(3, java.sql.Types.INTEGER);
-			else
-				ps.setInt(3, asccVO.getCardinalityMax());
+//			if(asccVO.getCardinalityMax() == -1)
+//				ps.setNull(3, java.sql.Types.INTEGER);
+//			else
+//				ps.setInt(3, asccVO.getCardinalityMax());
+			
+			ps.setInt(3, asccVO.getCardinalityMax());
 			ps.setInt(4, asccVO.getSequencingKey());
 			ps.setInt(5, asccVO.getAssocFromACCID());
 			ps.setInt(6, asccVO.getAssocToASCCPID());

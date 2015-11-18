@@ -323,7 +323,8 @@ public class ContextSchemeHandler {
 			ccVO.setSchemeName(name);
 			ccVO.setDescription(description);
 			ccVO.setSchemeGUID(guid);
-			ccVO.setSchemeID(Utility.generateGUID());
+			//ccVO.setSchemeID(Utility.generateGUID());
+			ccVO.setSchemeID(schemeId);
 			ccVO.setSchemeAgencyID(schemeAgencyID);
 			ccVO.setSchemeAgencyName(schemeAgencyName);
 			ccVO.setSchemeVersion(schemeVersion);

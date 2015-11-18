@@ -83,6 +83,9 @@
 
 						<h:outputText value="Scheme Agency Name: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyName}" />
+						
+						<h:outputText value="Scheme ID: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeID}" />
 
 						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyID}" />
@@ -146,6 +149,9 @@
 
 						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.description}" />
+						
+						<h:outputText value="Schema ID: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeID}" />
 
 						<h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyID}" />
@@ -210,6 +216,9 @@
 						<p:inputTextarea id="desc" rows="5" cols="40" autoResize="false" value="#{contextSchemeHandler.description}"
 							label="Description">
 						</p:inputTextarea>
+						
+						<h:outputText value="Scheme ID (or short name): " style="font-weight:bold; color:blue" />
+						<p:inputText value="#{contextSchemeHandler.schemeId}" />
 
 						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.schemeAgencyID}" />

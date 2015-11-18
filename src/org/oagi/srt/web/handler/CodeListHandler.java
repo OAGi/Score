@@ -291,7 +291,8 @@ public class CodeListHandler extends UIHandler {
     		codeListVO.setExtensibleIndicator(extensible);
     		codeListVO.setCodeListGUID(Utility.generateGUID());
     		codeListVO.setEnumerationTypeGUID(Utility.generateGUID());
-    		codeListVO.setBasedCodeListID(selected.getCodeListID());
+    		if(selected != null)
+    			codeListVO.setBasedCodeListID(selected.getCodeListID());
     		codeListVO.setState(SRTConstants.CODE_LIST_STATE_EDITING);
     		codeListVO.setCreatedByUserID(userId);
     		codeListVO.setLastUpdatedByUserID(userId);

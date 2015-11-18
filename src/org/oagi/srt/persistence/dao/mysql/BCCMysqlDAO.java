@@ -61,10 +61,12 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setString(1, bccVO.getBCCGUID());
 			ps.setInt(2, bccVO.getCardinalityMin());
 			
-			if(bccVO.getCardinalityMax() == -1)
-				ps.setNull(3, java.sql.Types.INTEGER);
-			else
-				ps.setInt(3, bccVO.getCardinalityMax());
+//			if(bccVO.getCardinalityMax() == -1)
+//				ps.setNull(3, java.sql.Types.INTEGER);
+//			else
+//				ps.setInt(3, bccVO.getCardinalityMax());
+			
+			ps.setInt(3, bccVO.getCardinalityMax());
 			
 			ps.setInt(4, bccVO.getAssocToBCCPID());
 			ps.setInt(5, bccVO.getAssocFromACCID());
