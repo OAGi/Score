@@ -82,7 +82,7 @@ public class Experiment implements Runnable {
 		// TODO Auto-generated method stub
 		System.out.println("Thread = "+Thread.currentThread().getName());
 		try {
-			//macrotest_create(f1);
+			macrotest_create(f1);
 			macrotest_validate(f1);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

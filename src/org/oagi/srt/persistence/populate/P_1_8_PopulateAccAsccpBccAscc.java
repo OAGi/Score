@@ -69,17 +69,17 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			//if(!file.getName().endsWith("AcknowledgeInvoice.xsd")){	
+			if(!file.getName().endsWith("AcknowledgeInvoice.xsd")){	
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
-			//}
+			}
 		}
 
 		for (File file : listOfF2) {
-			//if(!file.getName().endsWith("AcknowledgeInvoice.xsd")){		
+			if(!file.getName().endsWith("AcknowledgeInvoice.xsd")){		
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
-			//}
+			}
 		}
 		modifySequeceKeyforGroup();
 		modifySequeceKeyforGroup_temp();
@@ -120,7 +120,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			} 
 			roleOfAccId = accVO.getACCID();
 
-			String den = propertyTerm + ". " + Utility.first(accVO.getDEN());
+			String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDEN()));
 			int state = 4;
 			String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
 
@@ -541,7 +541,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 //			}
 			
 			asccpVO.setRoleOfACCID(groupAccId);
-			asccpVO.setDEN(propertyTerm + ". " + Utility.first(accDen));
+			asccpVO.setDEN(Utility.spaceSeparator(propertyTerm + ". " + Utility.first(accDen)));
 			asccpVO.setState(4);
 			asccpVO.setModule(module);
 			asccpVO.setCreatedByUserId(1);
