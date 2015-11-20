@@ -1666,7 +1666,7 @@ public class TopLevelABIEHandler implements Serializable {
 		for(SRTObject obj : list_02) {
 			ASBIEVO asbieVO = (ASBIEVO)obj;
 			double sk = asbieVO.getSequencingKey();
-			sequence.put(asbieVO, sk);
+			sequence.put(asbieVO, sk+1);
 		}
 		
 		ordered_sequence.putAll(sequence);
@@ -1772,7 +1772,16 @@ public class TopLevelABIEHandler implements Serializable {
 		QueryCondition qc_05 = new QueryCondition();
 		qc_05.add("dt_id", bccpVO.getBDTID());
 		DTVO dtVO = (DTVO)dtDao.findObject(qc_05);
-		av.setBdtName(dtVO.getDEN());
+		
+		
+		if(bbieVO.getBdtPrimitiveRestrictionId() > 0)
+			av.setBdtName(dtVO.getDEN());
+		else {
+			QueryCondition qc_06 = new QueryCondition();
+			qc_06.add("code_list_id", bbieVO.getCodeListId());
+			CodeListVO clVO = (CodeListVO)daoCL.findObject(qc_06);
+			av.setBdtName(clVO.getName());
+		}
 		
 		av.setColor("green");
 		TreeNode tNode2 = new DefaultTreeNode(av, tNode);
@@ -1877,6 +1886,15 @@ public class TopLevelABIEHandler implements Serializable {
 					QueryCondition qc = new QueryCondition();
 			        qc.add("based_code_list_id", aBDTPrimitiveRestrictionVO.getCodeListID());
 			        codeLists = daoCL.findObjects(qc);
+			        
+			        if(aABIEView.getBbieVO().getBdtPrimitiveRestrictionId() > 0)
+			        	aABIEView.setBdtName(aABIEView.getBdtName());
+					else {
+						QueryCondition qc_06 = new QueryCondition();
+						qc_06.add("code_list_id", aABIEView.getBbieVO().getCodeListId());
+						CodeListVO clVO = (CodeListVO)daoCL.findObject(qc_06);
+						aABIEView.setBdtName(clVO.getName());
+					}
 			        
 				} catch (SRTDAOException e) {
 					e.printStackTrace();
@@ -2196,7 +2214,7 @@ public class TopLevelABIEHandler implements Serializable {
 			QueryCondition qc = new QueryCondition();
 			qc.addLikeClause("name", "%" + getCodeListName() + "%");
 			qc.add("state", SRTConstants.CODE_LIST_STATE_PUBLISHED);
-			qc.add("extensible_indicator", 1);
+			//qc.add("extensible_indicator", 1);
 			codeLists2 = daoCL.findObjects(qc);
 			if(codeLists2.size() == 0) {
 				FacesMessage msg = new FacesMessage("[" + getCodeListName() + "] No such Code List exists or not yet published or not extensible", "[" + getCodeListName() + "] No such Code List exists or not yet published or not extensible");

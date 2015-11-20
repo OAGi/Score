@@ -217,7 +217,7 @@
 									</p:panel>
 									<p:panel id="BDTPrimitiveRestriction" header="BDT Primitive Restriction" collapsed="false" toggleable="true" toggleSpeed="500">
 										<h:panelGrid columns="2" cellpadding="5">
-											<h:outputLabel rows="10" value="BDT Name:" style="font-weight:bold" />
+											<h:outputLabel rows="10" value="Name:" style="font-weight:bold" />
 											<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtName}" style="font-weight:bold; color: blue;" />
 										</h:panelGrid>
 										<h:panelGrid columns="4" cellpadding="5">
@@ -234,10 +234,10 @@
 												<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
 												<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
 											    
-											    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
+											    <p:commandButton process="tbl" update=":form:BDTPrimitiveRestriction" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
 											    </p:commandButton>
 											    
-											    <p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
+											    <p:commandButton process="tbl" update=":form:BDTPrimitiveRestriction" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
 											    </p:commandButton>
 										</h:panelGrid>
 									</p:panel>
