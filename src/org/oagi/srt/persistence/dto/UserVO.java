@@ -14,6 +14,7 @@ public class UserVO extends SRTObject {
 	private String Password;
 	private String Name;
 	private String Organization;
+	private boolean Oagis_developer_indicator;
 	
 	public int getUserID() {
 		return UserID;
@@ -44,6 +45,13 @@ public class UserVO extends SRTObject {
 	}
 	public void setOrganization(String organization) {
 		Organization = organization;
+	}
+	
+	public boolean getOagis_developer_indicator() {
+		return Oagis_developer_indicator;
+	}
+	public void setOagis_developer_indicator(boolean oagis_developer_indicator) {
+		Oagis_developer_indicator = oagis_developer_indicator;
 	}
 
 }

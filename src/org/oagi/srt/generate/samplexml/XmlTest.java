@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.StringReader;
 
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.util.Utility;
 
 public class XmlTest implements XSInstance.SampleValueGenerator{
     public String generateSampleValue(XSElementDeclaration elem, XSSimpleTypeDefinition xsSimpleTypeDefinition){
@@ -78,9 +79,9 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         System.out.println(xmlfilename+".xsd from "+ xsdfilename+".xsd is generated...");
     }
     
-    public static void xmltest_exp_remove_any(String xsdfilename, String xmlfilename, String rootElementname, String prefix) throws Exception, FileNotFoundException {
+    public static void xmltest_exp_replace_any(String xsdfilename, String xmlfilename, String rootElementname, String prefix) throws Exception, FileNotFoundException {
     	String oagis = "http://www.openapplications.org/oagis/10";
-    	String newxsdfilename = remove_any(xsdfilename);
+    	String newxsdfilename = replace_any(xsdfilename);
     	XSModel xsModel = new XSParser().parse(SRTConstants.TEST_BOD_FILE_PATH+newxsdfilename+".xsd");
         XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
         XSInstance xsInstance = new XSInstance();
@@ -95,22 +96,35 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         xsInstance.generateOptionalAttributes = false;
         xsInstance.showContentModel = false;
         String schemalocation = oagis + " "+ newxsdfilename + ".xsd";
+        System.out.println("### Start to generate an instance of " + xsdfilename);
         xsInstance.generate(xsModel, rootElement, sampleXML, schemalocation, null);
        
-        System.out.println(xmlfilename+".xsd from "+ xsdfilename+".xsd is generated...");
+        System.out.println("### Finish generating an instance of " + xsdfilename);
     }
     
-    public static String remove_any(String xsdfilename) throws Exception {
+    public static String replace_any(String xsdfilename) throws Exception {
     	DocumentBuilderFactory f = DocumentBuilderFactory.newInstance(); 
     	DocumentBuilder db = f.newDocumentBuilder();
     	File XSD = new File(SRTConstants.TEST_BOD_FILE_PATH+xsdfilename+".xsd");
         Document doc = db.parse(XSD);
         NodeList any = doc.getElementsByTagName("xsd:any");
+        NodeList replaced = doc.getElementsByTagName("xsd:element");
+        Node replacedNode = replaced.item(0);
+        Element aa = doc.createElement("xsd:element");
+        aa.setAttribute("id", Utility.generateGUID());
+        aa.setAttribute("name", ((Element)replacedNode).getAttribute("name")); 
+        
         for(int i = any.getLength()-1; i >= 0 ; i--){
         	Node bb = any.item(i);
-        	bb.getParentNode().removeChild(any.item(i));
+        	//bb.getParentNode().removeChild(any.item(i));
+        	bb.getParentNode().replaceChild(aa, any.item(i));
         }
-
+        
+        NodeList includenodelist = doc.getElementsByTagName("xsd:include");
+        if(includenodelist.getLength() > 0){
+        	Node include = includenodelist.item(0);
+        	((Element)include).setAttribute("schemaLocation", SRTConstants.COMPONENTS_XSD_FILE_PATH);
+        }
 //        NodeList union = doc.getElementsByTagName("xsd:union");
 //        for(int i = union.getLength()-1; i >= 0 ; i--){
 //        	Node bb = union.item(i);
@@ -129,7 +143,7 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         
         DOMSource source = new DOMSource(doc);
-        String newxsdfilname = xsdfilename+"_remove_any";
+        String newxsdfilname = xsdfilename+"_replace_any";
         StreamResult result = new StreamResult(SRTConstants.TEST_BOD_FILE_PATH+newxsdfilname+".xsd");
         t.transform(source, result);
         return newxsdfilname;

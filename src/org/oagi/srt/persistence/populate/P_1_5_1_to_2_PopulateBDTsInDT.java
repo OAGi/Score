@@ -49,11 +49,11 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
 		QueryCondition qc = new QueryCondition();
 		qc.add("Data_Type_Term", dataTypeTerm);
-		qc.add("DT_Type", new Integer(0));
+		qc.add("type", new Integer(0));
 		int basedDTID = ((DTVO)dao.findObject(qc, conn)).getDTID();
 		
 		QueryCondition qc1 = new QueryCondition();
-		qc1.add("DT_GUID", id);
+		qc1.add("guid", id);
 		
 		if(dao.findObject(qc1, conn) == null) {
 	
@@ -78,7 +78,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		}
 		
 		QueryCondition qc2 = new QueryCondition();
-		qc2.add("DT_GUID", id);
+		qc2.add("guid", id);
 		return (DTVO)dao.findObject(qc2, conn);
 	}
 	
@@ -177,11 +177,11 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		SRTDAO dao = df.getDAO("DT");
 
 		QueryCondition qc = new QueryCondition();
-		qc.add("DT_GUID", defaultGUID);
+		qc.add("guid", defaultGUID);
 		int basedDTID = ((DTVO)dao.findObject(qc, conn)).getDTID();
 		
 		QueryCondition qc1 = new QueryCondition();
-		qc1.add("DT_GUID", id);
+		qc1.add("guid", id);
 		
 		if(dao.findObject(qc1, conn) == null) {
 				
@@ -203,7 +203,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		}
 		
 		QueryCondition qc2 = new QueryCondition();
-		qc2.add("DT_GUID", id);
+		qc2.add("guid", id);
 		return (DTVO)dao.findObject(qc2, conn);
 	}
 	
@@ -410,7 +410,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			CDTAllowedPrimitiveVO aCDTAllowedPrimitiveVO = (CDTAllowedPrimitiveVO)aSRTObject3;
 			
 			QueryCondition qc4 = new QueryCondition();
-			qc4.add("cdt_allowed_primitive_id", aCDTAllowedPrimitiveVO.getCDTAllowedPrimitiveID());
+			qc4.add("cdt_awd_pri_id", aCDTAllowedPrimitiveVO.getCDTAllowedPrimitiveID());
 			ArrayList<SRTObject> al4 = aCDTAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc4);
 			
 			for(SRTObject aSRTObject4 : al4) {
@@ -441,7 +441,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("User");
 		QueryCondition qc = new QueryCondition();
-		qc.add("user_name", "oagis");
+		qc.add("name", "oagis");
 		userId = ((UserVO)dao.findObject(qc, conn)).getUserID();
 		
 		XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);

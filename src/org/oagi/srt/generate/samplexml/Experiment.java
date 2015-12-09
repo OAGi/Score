@@ -10,10 +10,10 @@ import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.web.handler.TopLevelABIEHandler;
 
 import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class Experiment {
-	
-	private static File f1 = new File(SRTConstants.TEST_BOD_FILE_PATH);
+public class Experiment implements Runnable {
 	
 	private File[] getBODs(File f) {
 		return f.listFiles(new FilenameFilter() {
@@ -24,44 +24,8 @@ public class Experiment {
 		});
 	}
 	
-	public void test() throws FileNotFoundException, Exception {
-
-		System.out.println("Please, press the test_type (1 : create sample instances and validation, 2 : validation");
-		
-		int test_type = System.in.read();
-		
-		File[] listOfF1 = getBODs(f1);
-
-		for (File file : listOfF1) {
-			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_created")) {
-				String oagxsdfilename = file.getName().substring(0, file.getName().indexOf("."));
-				String generatedxsdfilename = oagxsdfilename+"_created";
-				for(File file2 : listOfF1){
-					if(file2.getName().substring(0, file2.getName().indexOf(".")).equals(generatedxsdfilename)) {
-						System.out.println("Processing "+file2.getName().substring(0, file2.getName().indexOf(".")));
-						String oagxmlfilename = "XML_From_"+oagxsdfilename;
-						String generatedxmlfilename = "XML_From_"+generatedxsdfilename;
-						String rootElementname = oagxsdfilename;
-						String prefix = "xs";
-						if(test_type == 49) {
-							XmlTest.xmltest_exp_remove_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
-							XmlTest.xmltest_exp_remove_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
-	
-						}
-						ValidateXML.validate_exp(oagxsdfilename, oagxmlfilename);
-						ValidateXML.validate_exp(generatedxsdfilename, generatedxmlfilename);	
-						ValidateXML.validate_exp(oagxsdfilename, generatedxmlfilename);
-						ValidateXML.validate_exp(generatedxsdfilename, oagxmlfilename);		
-					}		
-				}
-			}
-		}
-	}
-	
-	public void macrotest() throws Exception {
+	public void macrotest_create(File f1) throws Exception {
 		TopLevelABIEHandler a = new TopLevelABIEHandler();
-		//String filepath = a.macro("oagis-id-dedeb4e4be384d5282c33ee5533f5ff2");
-		//String filepath = a.macro("oagis-id-9712b728b0d34677a367b2a3555bcdfa");
 		File[] listOfF1 = getBODs(f1);
 
 		for (File file : listOfF1) {
@@ -69,35 +33,78 @@ public class Experiment {
 			a.macro(bodname);
 		}
 
+	}
+	
+	public void macrotest_validate(File f1) throws Exception {
+		
+		File[] listOfF1 = getBODs(f1);
+		
 		for (File file : listOfF1) {
-			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_created")) {
+			if(!file.getName().substring(0, file.getName().indexOf(".")).endsWith("_standlone")) {
 				String oagxsdfilename = file.getName().substring(0, file.getName().indexOf("."));
-				String generatedxsdfilename = oagxsdfilename+"_created";
-				String oagxsdfilename_remove_any = oagxsdfilename+"_remove_any";
-				String generatedxsdfilename_remove_any = generatedxsdfilename+"_remove_any";
+				String generatedxsdfilename = oagxsdfilename+"_standalone";
+				String oagxsdfilename_remove_any = oagxsdfilename+"_replace_any";
+				String generatedxsdfilename_remove_any = generatedxsdfilename+"_replace_any";
 				for(File file2 : listOfF1){
 					if(file2.getName().substring(0, file2.getName().indexOf(".")).equals(generatedxsdfilename)) {
-						System.out.println("Processing "+file2.getName().substring(0, file2.getName().indexOf(".")));
 						String oagxmlfilename = "XML_From_"+oagxsdfilename;
 						String generatedxmlfilename = "XML_From_"+generatedxsdfilename;
 						String rootElementname = oagxsdfilename;
 						String prefix = "xs";
-						XmlTest.xmltest_exp_remove_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
-						XmlTest.xmltest_exp_remove_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
-
-						ValidateXML.validate_exp(oagxsdfilename_remove_any, oagxmlfilename);
-						ValidateXML.validate_exp(generatedxsdfilename_remove_any, generatedxmlfilename);	
+						XmlTest.xmltest_exp_replace_any(oagxsdfilename, oagxmlfilename, rootElementname, prefix);
+						XmlTest.xmltest_exp_replace_any(generatedxsdfilename, generatedxmlfilename, rootElementname, prefix);
+						System.out.println("### Start to validate "+oagxsdfilename);
+						//ValidateXML.validate_exp(oagxsdfilename_remove_any, oagxmlfilename);
+						//ValidateXML.validate_exp(generatedxsdfilename_remove_any, generatedxmlfilename);	
+						ValidateXML.validate_exp(generatedxsdfilename_remove_any, oagxmlfilename);	
 						ValidateXML.validate_exp(oagxsdfilename_remove_any, generatedxmlfilename);
-						ValidateXML.validate_exp(generatedxsdfilename_remove_any, oagxmlfilename);		
+						System.out.println("### Finish validating "+oagxsdfilename);
 					}		
 				}
 			}
+		System.gc();
 		}
 	}
 	
-	public static void main(String args[]) throws FileNotFoundException, Exception {
-		Experiment a = new Experiment();
-		//a.test();
-		a.macrotest();
+	private Thread t;
+	String EXP_BOD_FILE_PATH;
+	File f1 ;
+	
+	public void start() {
+		if( t == null) {
+			t = new Thread(this, "New Thread");
+			t.run();
+		}
 	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		System.out.println("Thread = "+Thread.currentThread().getName());
+		try {
+			macrotest_create(f1);
+			macrotest_validate(f1);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void main(String args[]) throws FileNotFoundException, Exception {
+		
+//		Experiment a = new Experiment();
+//		a.macrotest_create(f1);
+//		a.macrotest_validate(f1);
+		
+		Experiment R1 = new Experiment();
+		R1.EXP_BOD_FILE_PATH = args[0];
+		R1.f1 = new File(R1.EXP_BOD_FILE_PATH);
+		R1.start();
+		
+//		Experiment R2 = new Experiment();
+//		R2.f1 = new File(R1.EXP_BOD_FILE_PATH);
+//		R2.start();
+
+		
+	}
+
 }

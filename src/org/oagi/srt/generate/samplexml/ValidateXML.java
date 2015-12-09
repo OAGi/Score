@@ -19,33 +19,37 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+
 public class ValidateXML {
 
 	public static void validate(File xml, InputStream xsd, String xsdfilename) {
 		try {
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			factory.setFeature("http://apache.org/xml/features/honour-all-schemaLocations", true);
+			factory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
+			
 			Schema schema = factory.newSchema(new StreamSource(xsd));
+			
 			Validator validator = schema.newValidator();
-			  final List<SAXParseException> exceptions = new LinkedList<SAXParseException>();
-			  validator.setErrorHandler(new ErrorHandler()
+		    final List<SAXParseException> exceptions = new LinkedList<SAXParseException>();
+		    validator.setErrorHandler(new ErrorHandler()
 			  {
-			    @Override
 			    public void warning(SAXParseException exception) throws SAXException
 			    {
 			    	exceptions.add(exception);
 			    }
 
-			    @Override
 			    public void fatalError(SAXParseException exception) throws SAXException
 			    {
-			    	System.out.println(exceptions);
+			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4.a") && !exception.getMessage().contains("ns:anyElement"))
+			    		System.out.println(exception);
 			    	exceptions.add(exception);
 			    }
 
-			    @Override
 			    public void error(SAXParseException exception) throws SAXException
 			    {
-			    	System.out.println(exception.getMessage());
+			    	if(exception.getMessage().startsWith("cvc-complex-type.2.4.a") && !exception.getMessage().contains("ns:anyElement"))
+			    		System.out.println(exception);
 			    	exceptions.add(exception);
 			    }
 			  });
@@ -54,9 +58,6 @@ public class ValidateXML {
 			System.out.println(xml.getName()+" is valid against given"+ xsdfilename);
 			System.out.println("");
 		} catch (SAXException e) {
-            System.out.print(xml.getName() + " is not valid against given "+ xsdfilename +", because ");
-            System.out.println(e.getMessage());
-            System.out.println("");
             e.printStackTrace();
    		} catch (IOException e) {
 			e.printStackTrace();

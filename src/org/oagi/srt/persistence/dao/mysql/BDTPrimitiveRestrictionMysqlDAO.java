@@ -21,23 +21,23 @@ import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
 *
 */
 public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
-	private final String _tableName = "bdt_primitive_restriction";
+	private final String _tableName = "bdt_pri_restri";
 
 	private final String _FIND_ALL_BDT_Primitive_Restriction_STATEMENT = 
-			"SELECT BDT_Primitive_Restriction_ID, BDT_ID, CDT_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault FROM " + _tableName;
+			"SELECT bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default FROM " + _tableName;
 
 	private final String _FIND_BDT_Primitive_Restriction_STATEMENT = 
-			"SELECT BDT_Primitive_Restriction_ID, BDT_ID, CDT_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault FROM " + _tableName;
+			"SELECT bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default FROM " + _tableName;
 
 	private final String _INSERT_BDT_Primitive_Restriction_STATEMENT = 
-			"INSERT INTO " + _tableName + " (BDT_ID, CDT_Primitive_Expression_Type_Map_ID, Code_List_ID, isDefault) VALUES (?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default) VALUES (?, ?, ?, ?)";
 
 	private final String _UPDATE_BDT_Primitive_Restriction_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET BDT_Primitive_Restriction_ID = ?, BDT_ID = ?, CDT_Primitive_Expression_Type_Map_ID = ?, Code_List_ID = ?, isDefault = ? WHERE BDT_Primitive_Restriction_ID = ?";
+			+ " SET bdt_pri_restri_id = ?, bdt_id = ?, cdt_awd_pri_xps_type_map_id = ?, code_list_id = ?, is_default = ? WHERE bdt_pri_restri_id = ?";
 
 	private final String _DELETE_BDT_Primitive_Restriction_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE BDT_Primitive_Restriction_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE bdt_pri_restri_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -115,11 +115,11 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
-				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
-				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
-				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("bdt_pri_restri_id"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("bdt_id"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
 			}
 			tx.commit();
 			conn.close();
@@ -173,11 +173,11 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
-				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
-				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
-				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("bdt_pri_restri_id"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("bdt_id"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -209,11 +209,11 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
-				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
-				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
-				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
-				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("bdt_pri_restri_id"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("bdt_id"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 			tx.commit();
@@ -270,11 +270,11 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
-				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
-				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
-				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
-				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("bdt_pri_restri_id"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("bdt_id"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 			tx.commit();
@@ -311,11 +311,11 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
-				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
-				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
-				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
-				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("bdt_pri_restri_id"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("bdt_id"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 		} catch (SQLException e) {
@@ -365,11 +365,11 @@ public class BDTPrimitiveRestrictionMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BDTPrimitiveRestrictionVO bdtprimitiverestrictionVO = new BDTPrimitiveRestrictionVO();
-				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("BDT_Primitive_Restriction_ID"));
-				bdtprimitiverestrictionVO.setBDTID(rs.getInt("BDT_ID"));
-				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("Code_List_ID"));
-				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("isDefault"));
+				bdtprimitiverestrictionVO.setBDTPrimitiveRestrictionID(rs.getInt("bdt_pri_restri_id"));
+				bdtprimitiverestrictionVO.setBDTID(rs.getInt("bdt_id"));
+				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
+				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 		} catch (SQLException e) {

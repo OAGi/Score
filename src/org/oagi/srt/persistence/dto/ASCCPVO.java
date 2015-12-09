@@ -27,13 +27,19 @@ public class ASCCPVO extends SRTObject implements Serializable {
 	private int State;
 	private String Module;
 	private boolean ReusableIndicator;
+
+	private int NamespaceId;
+	private int OwnerUserId;
+	private int RevisionNum;
+	private int RevisionTrackingNum;
+	private int RevisionAction;
+	private int ReleaseId;
+	private int CurrentAsccpId;
+
 	
 	public int getASCCPID() {
 		return ASCCPID;
 	}
-	
-	
-	
 	
 	public void setASCCPID(int aSCCPID) {
 		ASCCPID = aSCCPID;
@@ -134,5 +140,59 @@ public class ASCCPVO extends SRTObject implements Serializable {
 	public void setReusableIndicator(boolean reusableIndicator) {
 		ReusableIndicator = reusableIndicator;
 	}
+	public int getNamespaceId() {
+		return NamespaceId;
+	}
 	
+	public void setNamespaceId(int namespaceId) {
+		NamespaceId = namespaceId;
+	}
+	
+	public int getOwnerUserId() {
+		return OwnerUserId;
+	}
+	
+	public void setOwnerUserId(int ownerUserId) {
+		OwnerUserId = ownerUserId;
+	}
+	
+	public int getRevisionNum() {
+		return RevisionNum;
+	}
+	
+	public void setRevisionNum(int revisionNum) {
+		RevisionNum = revisionNum;
+	}
+	
+	public int getRevisionTrackingNum() {
+		return RevisionTrackingNum;
+	}
+	
+	public void setRevisionTrackingNum(int revisionTrackingNum) {
+		RevisionTrackingNum = revisionTrackingNum;
+	}
+	
+	public int getRevisionAction() {
+		return RevisionAction;
+	}
+	
+	public void setRevisionAction(int revisionAction) {
+		RevisionAction = revisionAction;
+	}
+	
+	public int getReleaseId() {
+		return ReleaseId;
+	}
+	
+	public void setReleaseId(int releaseId) {
+		ReleaseId = releaseId;
+	}
+	
+	public int getCurrentAsccpId() {
+		return CurrentAsccpId;
+	}
+	
+	public void setCurrentAsccpId(int currentAsccpId) {
+		CurrentAsccpId = currentAsccpId;
+	}
 }

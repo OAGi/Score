@@ -70,7 +70,7 @@ public class P_1_5_3_PopulateSCInDTSC {
 		SRTDAO dao = df.getDAO("DT");
 		SRTDAO daoDTSC = df.getDAO("DTSC");
 		QueryCondition qc = new QueryCondition();
-		qc.add("dt_type", 1);
+		qc.add("type", 1);
 		List<SRTObject> srtObjects = dao.findObjects(qc, conn);
 		for(SRTObject srtObject :  srtObjects) {
 			DTVO dtVO = (DTVO)srtObject;

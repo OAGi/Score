@@ -53,7 +53,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		SRTDAO codeListDao = df.getDAO("CodeList");
 		
 		QueryCondition qc_01 = new QueryCondition();
-		qc_01.add("DT_GUID", "oagis-id-d5cb8551edf041389893fee25a496395");
+		qc_01.add("guid", "oagis-id-d5cb8551edf041389893fee25a496395");
 		DTVO dtVO_01 = (DTVO)dtDao.findObject(qc_01, conn);
 		
 		QueryCondition qc_011 = new QueryCondition();
@@ -73,7 +73,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		    
 			// inherit all values from default Text BDT with two exceptions (max cardinality and based DTSC Id)
 			QueryCondition qc_021 = new QueryCondition();
-			qc_021.add("dt_guid", eleGuid);
+			qc_021.add("guid", eleGuid);
 			DTVO dtVO_011 = (DTVO)dtDao.findObject(qc_021, conn);
 			
 			DTSCVO dtscVO_02 = new DTSCVO();
@@ -89,7 +89,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 			dtscDao.insertObject(dtscVO_02);
 			
 			QueryCondition qc_0211 = new QueryCondition();
-			qc_0211.add("dt_sc_guid", dtscVO_01.getDTSCGUID());
+			qc_0211.add("guid", dtscVO_01.getDTSCGUID());
 			qc_0211.add("owner_dt_id", dtVO_011.getDTID());
 			int bdtSCId = ((DTSCVO)dtscDao.findObject(qc_0211, conn)).getDTSCID();
 			
@@ -110,7 +110,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 			
 			// populate using attributes
 		    QueryCondition qc_03 = new QueryCondition();
-		    qc_03.add("dt_guid", eleGuid);
+		    qc_03.add("guid", eleGuid);
 			DTVO dtVO_02 = (DTVO)dtDao.findObject(qc_03, conn);
 			
 		    NodeList attributes = ele.getElementsByTagName("xsd:attribute");
@@ -137,7 +137,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 				
 				// populate CDT_SC for this new dt_sc
 				QueryCondition qc_04 = new QueryCondition();
-			    qc_04.add("dt_sc_guid", attr.getAttribute("id"));
+			    qc_04.add("guid", attr.getAttribute("id"));
 			    String[] name = {"NormalizedString", "String", "Token"};
 			    int dt_sc_id = 0;
 			    for(int k = 0; k < name.length; k++) {
@@ -153,7 +153,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 					
 					QueryCondition qc_05 = new QueryCondition();
 					qc_05.add("cdt_sc_id", dt_sc_id);
-					qc_05.add("cdt_primitive_id", cdtPrimitiveID);
+					qc_05.add("cdt_pri_id", cdtPrimitiveID);
 					int cdtSCAllowedPrimitiveId = ((CDTSCAllowedPrimitiveVO)cdtSCAPDao.findObject(qc_05, conn)).getCDTSCAllowedPrimitiveID();
 
 					// populate CDT_SC_Allowed_Primitive_Expression_Type_Map 
@@ -168,8 +168,8 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 						cdtSCAPMapDao.insertObject(mapVO);
 						
 						QueryCondition qc_07 = new QueryCondition();
-						qc_07.add("cdt_sc_allowed_primitive", cdtSCAllowedPrimitiveId);
-						qc_07.add("xsd_builtin_type_id", xdtBuiltTypeId);
+						qc_07.add("cdt_sc_awd_pri", cdtSCAllowedPrimitiveId);
+						qc_07.add("xbt_id", xdtBuiltTypeId);
 						int mapId = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)cdtSCAPMapDao.findObject(qc_07, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
 						
 						// populate BDT_SC_Primitive_Restriction table for expressionLanguage and actionCode

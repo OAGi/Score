@@ -182,4 +182,5 @@ public class DTVO extends SRTObject {
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
 		LastUpdateTimestamp = lastUpdateTimestamp;
 	}
+	
 }

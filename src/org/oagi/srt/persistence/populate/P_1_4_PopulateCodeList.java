@@ -136,7 +136,7 @@ public class P_1_4_PopulateCodeList {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("User");
     	QueryCondition qc = new QueryCondition();
-		qc.add("User_Name", new String(userName));
+		qc.add("Name", new String(userName));
 		UserVO userVO = (UserVO)dao.findObject(qc, conn);
 		int id = userVO.getUserID();
 		return id;
@@ -162,7 +162,7 @@ public class P_1_4_PopulateCodeList {
 	    		typenode = xh.getNodeList("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:enumeration");
 		    	SRTDAO dao2 = df2.getDAO("CodeList");
 			   	QueryCondition qc = new QueryCondition();
-				qc.add("Code_List_GUID", new String(tmp.getAttribute("id")));
+				qc.add("GUID", new String(tmp.getAttribute("id")));
 				CodeListVO codelistVO = (CodeListVO)dao2.findObject(qc, conn);
 	    		
 	    		for(int j = 0; j < result.getLength(); j++) {

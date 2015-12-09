@@ -9,6 +9,7 @@ import org.oagi.srt.common.SRTObject;
  * @version 1.0
  * @author Jaehun Lee
  */
+
 public class ACCVO extends SRTObject {
 
 	private int ACCID;
@@ -25,6 +26,13 @@ public class ACCVO extends SRTObject {
 	private Timestamp LastUpdateTimestamp;
 	private int State;
 	private String Module;
+	private int NamespaceId;
+	private int OwnerUserId;
+	private int RevisionNum;
+	private int RevisionTrackingNum;
+	private int RevisionAction;
+	private int ReleaseId;
+	private int CurrentAccId;
 	
 	public int getACCID() {
 		return ACCID;
@@ -136,5 +144,61 @@ public class ACCVO extends SRTObject {
 	
 	public void setModule(String module) {
 		Module = module;
+	}
+	
+	public int getNamespaceId() {
+		return NamespaceId;
+	}
+	
+	public void setNamespaceId(int namespaceId) {
+		NamespaceId = namespaceId;
+	}
+	
+	public int getOwnerUserId() {
+		return OwnerUserId;
+	}
+	
+	public void setOwnerUserId(int ownerUserId) {
+		OwnerUserId = ownerUserId;
+	}
+	
+	public int getRevisionNum() {
+		return RevisionNum;
+	}
+	
+	public void setRevisionNum(int revisionNum) {
+		RevisionNum = revisionNum;
+	}
+	
+	public int getRevisionTrackingNum() {
+		return RevisionTrackingNum;
+	}
+	
+	public void setRevisionTrackingNum(int revisionTrackingNum) {
+		RevisionTrackingNum = revisionTrackingNum;
+	}
+	
+	public int getRevisionAction() {
+		return RevisionAction;
+	}
+	
+	public void setRevisionAction(int revisionAction) {
+		RevisionAction = revisionAction;
+	}
+	
+	public int getReleaseId() {
+		return ReleaseId;
+	}
+	
+	public void setReleaseId(int releaseId) {
+		ReleaseId = releaseId;
+	}
+	
+	public int getCurrentAccId() {
+		return CurrentAccId;
+	}
+	
+	public void setCurrentAccId(int currentAccId) {
+		CurrentAccId = currentAccId;
 	}
 }

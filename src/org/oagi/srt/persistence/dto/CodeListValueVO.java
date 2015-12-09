@@ -22,7 +22,7 @@ public class CodeListValueVO extends SRTObject {
 	private boolean extensionIndicator;
 	private String color;
 	private boolean disabled = false;
-	
+
 	public boolean isDisabled() {
 		if(color != null && (color.equals("red") || color.equals("green")))
 			return true;
@@ -113,6 +113,5 @@ public class CodeListValueVO extends SRTObject {
 	public void setLockedIndicator(boolean lockedIndicator) {
 		LockedIndicator = lockedIndicator;
 	}
-	
 	
 }

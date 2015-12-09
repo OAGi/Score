@@ -27,24 +27,24 @@ public class ASBIEMysqlDAO extends SRTDAO{
 	private final String _tableName = "asbie";
 
 	private final String _FIND_ALL_ASBIE_STATEMENT = 
-			"SELECT ASBIE_ID, Assoc_From_ABIE_ID, Assoc_To_ASBIEP_ID, Based_ASCC, Cardinality_Min, Cardinality_Max, "
-			+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key FROM "
+			"SELECT ASBIE_ID, guid, From_ABIE_ID, To_ASBIEP_ID, Based_ASCC, definition, Cardinality_Min, Cardinality_Max, "
+			+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key FROM "
 					+ _tableName;
 
 	private final String _FIND_ASBIE_STATEMENT = 
-			"SELECT ASBIE_ID, Assoc_From_ABIE_ID, Assoc_To_ASBIEP_ID, Based_ASCC, Cardinality_Min, Cardinality_Max, "
-			+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key FROM "
+			"SELECT ASBIE_ID, guid, From_ABIE_ID, To_ASBIEP_ID, Based_ASCC, definition, Cardinality_Min, Cardinality_Max, "
+			+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key FROM "
 					+ _tableName;
 	
 	private final String _INSERT_ASBIE_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Assoc_From_ABIE_ID, Assoc_To_ASBIEP_ID, Based_ASCC, Cardinality_Min, Cardinality_Max, "
-					+ "asbie_guid, definition, nillable, remark, created_by_user_id, last_updated_by_user_id, creation_timestamp, last_update_timestamp, sequencing_key)"
+			"INSERT INTO " + _tableName + " (GUID, From_ABIE_ID, To_ASBIEP_ID, Based_ASCC, definition, Cardinality_Min, Cardinality_Max, "
+					+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key)"
 					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 
 	private final String _UPDATE_ASBIE_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Assoc_From_ABIE_ID = ?, Assoc_To_ASBIEP_ID = ?, Based_ASCC = ?, Cardinality_Min = ?, "
-			+ "Cardinality_Max = ?, asbie_guid = ?, definition = ?, nillable = ?, remark = ?, last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, sequencing_key = ? where ASBIE_ID = ?";
+			+ " SET From_ABIE_ID = ?, To_ASBIEP_ID = ?, Based_ASCC = ?, definition = ?, Cardinality_Min = ?, "
+			+ "Cardinality_Max = ?, guid = ?, is_nillable = ?, remark = ?, last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where ASBIE_ID = ?";
 
 	private final String _DELETE_ASBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASBIE_ID = ?";
@@ -64,13 +64,13 @@ public class ASBIEMysqlDAO extends SRTDAO{
 		try {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, asbievo.getAssocFromABIEID());
-			ps.setInt(2, asbievo.getAssocToASBIEPID());
-			ps.setInt(3, asbievo.getBasedASCC());
-			ps.setInt(4, asbievo.getCardinalityMin());
-			ps.setInt(5, asbievo.getCardinalityMax());
-			ps.setString(6, asbievo.getAsbieGuid());
-			ps.setString(7, asbievo.getDefinition());
+			ps.setString(1, asbievo.getAsbieGuid());
+			ps.setInt(2, asbievo.getAssocFromABIEID());
+			ps.setInt(3, asbievo.getAssocToASBIEPID());
+			ps.setInt(4, asbievo.getBasedASCC());
+			ps.setString(5, asbievo.getDefinition());
+			ps.setInt(6, asbievo.getCardinalityMin());
+			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
 			ps.setString(9, asbievo.getRemark());
 			ps.setInt(10, asbievo.getCreatedByUserId());
@@ -114,13 +114,13 @@ public class ASBIEMysqlDAO extends SRTDAO{
 		int key = -1;
 		try {
 			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			ps.setInt(1, asbievo.getAssocFromABIEID());
-			ps.setInt(2, asbievo.getAssocToASBIEPID());
-			ps.setInt(3, asbievo.getBasedASCC());
-			ps.setInt(4, asbievo.getCardinalityMin());
-			ps.setInt(5, asbievo.getCardinalityMax());
-			ps.setString(6, asbievo.getAsbieGuid());
-			ps.setString(7, asbievo.getDefinition());
+			ps.setString(1, asbievo.getAsbieGuid());
+			ps.setInt(2, asbievo.getAssocFromABIEID());
+			ps.setInt(3, asbievo.getAssocToASBIEPID());
+			ps.setInt(4, asbievo.getBasedASCC());
+			ps.setString(5, asbievo.getDefinition());
+			ps.setInt(6, asbievo.getCardinalityMin());
+			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
 			ps.setString(9, asbievo.getRemark());
 			ps.setInt(10, asbievo.getCreatedByUserId());
@@ -179,18 +179,18 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
-				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
-				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setAsbieGuid(rs.getString("GUID"));
+				asbievo.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("To_ASBIEP_ID"));
 				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setDefinition(rs.getString("Definition"));
 				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
-				asbievo.setDefinition(rs.getString("Definition"));
-				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setNillable(rs.getInt("is_Nillable"));
 				asbievo.setRemark(rs.getString("Remark"));
-				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
-				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				asbievo.setSequencingKey(rs.getDouble("seq_key"));
 			}
 			tx.commit();
 			conn.close();
@@ -228,18 +228,18 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			while (rs.next()) {
 				ASBIEVO asbievo = new ASBIEVO();
 				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
-				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
-				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setAsbieGuid(rs.getString("GUID"));
+				asbievo.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("To_ASBIEP_ID"));
 				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setDefinition(rs.getString("Definition"));
 				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
-				asbievo.setDefinition(rs.getString("Definition"));
-				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setNillable(rs.getInt("is_Nillable"));
 				asbievo.setRemark(rs.getString("Remark"));
-				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
-				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				asbievo.setSequencingKey(rs.getDouble("seq_key"));
 				list.add(asbievo);
 			}
 			tx.commit();
@@ -274,18 +274,18 @@ public class ASBIEMysqlDAO extends SRTDAO{
 
 			ps = conn.prepareStatement(_UPDATE_ASBIE_STATEMENT);
 			
-			ps.setInt(1, asbievo.getAssocFromABIEID());
-			ps.setInt(2, asbievo.getAssocToASBIEPID());
-			ps.setInt(3, asbievo.getBasedASCC());
-			ps.setInt(4, asbievo.getCardinalityMin());
-			ps.setInt(5, asbievo.getCardinalityMax());
-			ps.setString(6, asbievo.getAsbieGuid());
-			ps.setString(7, asbievo.getDefinition());
+			ps.setString(1, asbievo.getAsbieGuid());
+			ps.setInt(2, asbievo.getAssocFromABIEID());
+			ps.setInt(3, asbievo.getAssocToASBIEPID());
+			ps.setInt(4, asbievo.getBasedASCC());
+			ps.setString(5, asbievo.getDefinition());
+			ps.setInt(6, asbievo.getCardinalityMin());
+			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
 			ps.setString(9, asbievo.getRemark());
-			ps.setInt(10, asbievo.getLastUpdatedByUserId());
-			ps.setDouble(11, asbievo.getSequencingKey());
-			ps.setInt(12, asbievo.getASBIEID());
+			ps.setInt(10, asbievo.getCreatedByUserId());
+			ps.setInt(11, asbievo.getLastUpdatedByUserId());
+			ps.setDouble(12, asbievo.getSequencingKey());
 			
 			ps.executeUpdate();
 
@@ -378,18 +378,18 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			while (rs.next()) {
 				ASBIEVO asbievo = new ASBIEVO();
 				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
-				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
-				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setAsbieGuid(rs.getString("GUID"));
+				asbievo.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("To_ASBIEP_ID"));
 				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setDefinition(rs.getString("Definition"));
 				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
-				asbievo.setDefinition(rs.getString("Definition"));
-				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setNillable(rs.getInt("is_Nillable"));
 				asbievo.setRemark(rs.getString("Remark"));
-				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
-				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				asbievo.setSequencingKey(rs.getDouble("seq_key"));
 				list.add(asbievo);
 			}
 			tx.commit();
@@ -469,18 +469,18 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			if (rs.next()) {
 				asbievo = new ASBIEVO();
 				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
-				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
-				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setAsbieGuid(rs.getString("GUID"));
+				asbievo.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("To_ASBIEP_ID"));
 				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setDefinition(rs.getString("Definition"));
 				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
-				asbievo.setDefinition(rs.getString("Definition"));
-				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setNillable(rs.getInt("is_Nillable"));
 				asbievo.setRemark(rs.getString("Remark"));
-				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
-				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				asbievo.setSequencingKey(rs.getDouble("seq_key"));
 			}
 			
 		} catch (SQLException e) {
@@ -554,18 +554,18 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			while (rs.next()) {
 				ASBIEVO asbievo = new ASBIEVO();
 				asbievo.setASBIEID(rs.getInt("ASBIE_ID"));
-				asbievo.setAssocFromABIEID(rs.getInt("Assoc_From_ABIE_ID"));
-				asbievo.setAssocToASBIEPID(rs.getInt("Assoc_To_ASBIEP_ID"));
+				asbievo.setAsbieGuid(rs.getString("GUID"));
+				asbievo.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+				asbievo.setAssocToASBIEPID(rs.getInt("To_ASBIEP_ID"));
 				asbievo.setBasedASCC(rs.getInt("Based_ASCC"));
+				asbievo.setDefinition(rs.getString("Definition"));
 				asbievo.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asbievo.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asbievo.setAsbieGuid(rs.getString("ASBIE_GUID"));
-				asbievo.setDefinition(rs.getString("Definition"));
-				asbievo.setNillable(rs.getInt("Nillable"));
+				asbievo.setNillable(rs.getInt("is_Nillable"));
 				asbievo.setRemark(rs.getString("Remark"));
-				asbievo.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
-				asbievo.setSequencingKey(rs.getDouble("sequencing_key"));
+				asbievo.setCreatedByUserId(rs.getInt("created_by"));
+				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				asbievo.setSequencingKey(rs.getDouble("seq_key"));
 				list.add(asbievo);
 			}
 			

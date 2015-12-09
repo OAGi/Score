@@ -24,22 +24,22 @@ import org.oagi.srt.persistence.dto.DTVO;
 
 public class BusinessContextMysqlDAO extends SRTDAO {
 	
-	private final String _tableName = "business_context";
+	private final String _tableName = "biz_ctx";
 	
 	private final String _FIND_ALL_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT Business_Context_ID, Business_Context_GUID, Name, created_by_user_id, last_updated_by_user_id FROM " + _tableName + " order by business_context_id desc";
+			"SELECT biz_ctx_id, guid, name, created_by, last_updated_by, creation_timestamp, last_update_timestamp FROM " + _tableName;
 	
 	private final String _FIND_BUSINESS_CONTEXT_STATEMENT = 
-			"SELECT Business_Context_ID, Business_Context_GUID, Name, created_by_user_id, last_updated_by_user_id FROM " + _tableName;
-	
+			"SELECT biz_ctx_id, guid, name, created_by, last_updated_by, creation_timestamp, last_update_timestamp FROM " + _tableName;
+
 	private final String _INSERT_BUSINESS_CONTEXT_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Name, Business_Context_GUID, created_by_user_id, last_updated_by_user_id) VALUES (?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (guid, name, created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 	
 	private final String _UPDATE_BUSINESS_CONTEXT_STATEMENT =
-			"UPDATE " + _tableName + " SET Name = ?, created_by_user_id = ?, last_updated_by_user_id = ? WHERE Business_Context_ID = ?";
+			"UPDATE " + _tableName + " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?, Name = ?, created_by_user_id = ?, last_updated_by_user_id = ? WHERE biz_ctx_id = ?";
 	
 	private final String _DELETE_BUSINESS_CONTEXT_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE Business_Context_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE biz_ctx_id = ?";
 	
 
 	@Override
@@ -55,11 +55,11 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_BUSINESS_CONTEXT_STATEMENT);
-			ps.setString(1, business_contextVO.getName());
-			ps.setString(2, business_contextVO.getBusinessContextGUID());
+			ps.setString(1, business_contextVO.getBusinessContextGUID());
+			ps.setString(2, business_contextVO.getName());
 			ps.setInt(3,  business_contextVO.getCreatedByUserId());
 			ps.setInt(4, business_contextVO.getLastUpdatedByUserId());
-			
+
 			ps.executeUpdate();
 			ps.close();
 			tx.commit();
@@ -108,11 +108,13 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
-				business_contextVO.setName(rs.getString("Name"));
-				business_contextVO.setBusinessContextGUID(rs.getString("Business_Context_GUID"));
-				business_contextVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				business_contextVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
+				business_contextVO.setBusinessContextGUID(rs.getString("guid"));
+				business_contextVO.setName(rs.getString("name"));
+				business_contextVO.setCreatedByUserId(rs.getInt("created_by"));
+				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				business_contextVO.setCreationTimestamp(rs.getTimestamp("creation_timestamp"));
+				business_contextVO.setLastUpdateTimestamp(rs.getTimestamp("last_update_timestamp"));
 			}
 			tx.commit();
 			conn.close();
@@ -149,11 +151,13 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()){
 				BusinessContextVO business_contextVO =  new BusinessContextVO();
-				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
-				business_contextVO.setName(rs.getString("Name"));
-				business_contextVO.setBusinessContextGUID(rs.getString("Business_Context_GUID"));
-				business_contextVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				business_contextVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
+				business_contextVO.setBusinessContextGUID(rs.getString("guid"));
+				business_contextVO.setName(rs.getString("name"));
+				business_contextVO.setCreatedByUserId(rs.getInt("created_by"));
+				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				business_contextVO.setCreationTimestamp(rs.getTimestamp("creation_timestamp"));
+				business_contextVO.setLastUpdateTimestamp(rs.getTimestamp("last_update_timestamp"));
 				list.add(business_contextVO);
 			}
 			tx.commit();
@@ -188,10 +192,12 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			Connection conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_BUSINESS_CONTEXT_STATEMENT);
+			
+			ps.setString(1, business_contextVO.getBusinessContextGUID());
+			ps.setString(2, business_contextVO.getName());
+			ps.setInt(3,  business_contextVO.getCreatedByUserId());
+			ps.setInt(4, business_contextVO.getLastUpdatedByUserId());
 
-			ps.setString(1, business_contextVO.getName());
-			ps.setInt(2,  business_contextVO.getCreatedByUserId());
-			ps.setInt(3, business_contextVO.getLastUpdatedByUserId());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -306,11 +312,13 @@ public class BusinessContextMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				business_contextVO = new BusinessContextVO();
-				business_contextVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
-				business_contextVO.setName(rs.getString("Name"));
-				business_contextVO.setBusinessContextGUID(rs.getString("Business_Context_GUID"));
-				business_contextVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				business_contextVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
+				business_contextVO.setBusinessContextGUID(rs.getString("guid"));
+				business_contextVO.setName(rs.getString("name"));
+				business_contextVO.setCreatedByUserId(rs.getInt("created_by"));
+				business_contextVO.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				business_contextVO.setCreationTimestamp(rs.getTimestamp("creation_timestamp"));
+				business_contextVO.setLastUpdateTimestamp(rs.getTimestamp("last_update_timestamp"));
 			}
 			
 		} catch (SQLException e) {

@@ -12,35 +12,34 @@ import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.ClientVO;
 
 /**
- *
- * @author Nasif Sikder
- * @version 1.0
- *
- */
-public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
-	private final String _tableName = "cdt_sc_awd_pri_xps_type_map";
+*
+* @author Jaehun Lee
+* @version 1.0
+*
+*/
 
-	private final String _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "SELECT cdt_sc_awd_pri_xps_type_map_id, cdt_sc_awd_pri, xbt_id "
-			+ "FROM " + _tableName;
-	
-	private final String _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "SELECT cdt_sc_awd_pri_xps_type_map_id, cdt_sc_awd_pri, xbt_id "
-			+ "FROM " + _tableName;
-	
-	private final String _INSERT_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "INSERT INTO " + _tableName + " (cdt_sc_awd_pri, xbt_id) VALUES (?, ?)";
-	
-	private final String _UPDATE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "UPDATE " + _tableName + " SET cdt_sc_awd_pri = ?, xbt_id = ? "
-			+ "WHERE cdt_sc_awd_pri_xps_type_map_id = ?";
-	
-	private final String _DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
-	= "DELETE FROM " + _tableName + " WHERE cdt_sc_awd_pri_xps_type_map_id = ?";
+public class ClientMysqlDAO extends SRTDAO {
 
+	private final String _tableName = "client";
+
+	private final String _FIND_ALL_Client_STATEMENT = 
+			"SELECT client_id, name FROM " + _tableName;
+
+	private final String _FIND_Client_STATEMENT = 
+			"SELECT client_id, name FROM " + _tableName;
+
+	private final String _INSERT_Client_STATEMENT = 
+			"INSERT INTO " + _tableName + " (client_id, name) VALUES (?, ?)";
+
+	private final String _UPDATE_Client_STATEMENT = 
+			"UPDATE " + _tableName
+			+ " SET client_id = ?, name = ? WHERE client_id = ?";
+
+	private final String _DELETE_Client_STATEMENT = 
+			"DELETE FROM " + _tableName + " WHERE client_id = ?";	
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -58,8 +57,8 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		ResultSet rs = null;
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
-			
+			String sql = _FIND_Client_STATEMENT;
+
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
 			if (nCond > 0) {
@@ -68,6 +67,15 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
@@ -80,14 +88,22 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 				}
 			}
 			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("cdt_sc_awd_pri_xps_type_map_id"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("cdt_sc_awd_pri"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
-				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
+				ClientVO clientVO = new ClientVO();
+				clientVO.setClient_id(rs.getInt("client_id"));
+				clientVO.setName(rs.getString("Name"));
+				list.add(clientVO);
 			}
 			tx.commit();
 			conn.close();
@@ -112,73 +128,14 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		return list;
 	}
 	
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
-			
-			String WHERE_OR_AND = " WHERE ";
-			int nCond = qc.getSize();
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
-					WHERE_OR_AND = " AND ";
-				}
-			}
-			ps = conn.prepareStatement(sql);
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					Object value = qc.getValue(n);
-					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
-					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
-					}
-				}
-			}
-			
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("cdt_sc_awd_pri_xps_type_map_id"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("cdt_sc_awd_pri"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
-				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
-			}
-		} catch (SQLException e) {
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-		}
-
-		return list;
-	}
-	
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
+		ClientVO clientVO = (ClientVO)obj;
 		try {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
-			ps = conn.prepareStatement(_INSERT_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
-			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCDTSCAllowedPrimitive());
-			ps.setInt(2, cdt_sc_allowed_primitive_expression_type_mapVO.getXSDBuiltInTypeID());
-
+			ps = conn.prepareStatement(_INSERT_Client_STATEMENT);
+			ps.setString(1, clientVO.getName());
 			ps.executeUpdate();
 
 			//ResultSet tableKeys = ps.getGeneratedKeys();
@@ -198,17 +155,17 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 			tx.close();
 		}
 		return 1;
+
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-		new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+		ClientVO clientVO = new ClientVO();
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+			String sql = _FIND_Client_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -218,6 +175,15 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
@@ -229,12 +195,24 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 					}
 				}
 			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("cdt_sc_awd_pri_xps_type_map_id"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("cdt_sc_awd_pri"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
+				clientVO.setClient_id(rs.getInt("client_id"));
+				clientVO.setName(rs.getString("Name"));
 			}
 			tx.commit();
 			conn.close();
@@ -255,16 +233,15 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 			}
 			tx.close();
 		}
-		return cdt_sc_allowed_primitive_expression_type_mapVO;
+		return clientVO;
 	}
 	
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-		new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+		ClientVO clientVO = new ClientVO();
 		try {
-			String sql = _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+			String sql = _FIND_Client_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -274,6 +251,15 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
@@ -285,12 +271,24 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 					}
 				}
 			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("cdt_sc_awd_pri_xps_type_map_id"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("cdt_sc_awd_pri"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
+				clientVO.setClient_id(rs.getInt("client_id"));
+				clientVO.setName(rs.getString("Name"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -306,7 +304,7 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 				} catch (SQLException e) {}
 			}
 		}
-		return cdt_sc_allowed_primitive_expression_type_mapVO;
+		return clientVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
@@ -317,16 +315,14 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		ResultSet rs = null;
 		try {
 			Connection conn = tx.open();
-			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+			String sql = _FIND_ALL_Client_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("cdt_sc_awd_pri_xps_type_map_id"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("cdt_sc_awd_pri"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
-				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
+				ClientVO clientVO = new ClientVO();
+				clientVO.setClient_id(rs.getInt("client_id"));
+				clientVO.setName(rs.getString("Name"));
+				list.add(clientVO);
 			}
 			tx.commit();
 			conn.close();
@@ -349,6 +345,7 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		}
 
 		return list;
+			
 	}
 	
 	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
@@ -357,16 +354,14 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
+			String sql = _FIND_ALL_Client_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-						new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCTSCAllowedPrimitiveExpressionTypeMapID(rs.getInt("cdt_sc_awd_pri_xps_type_map_id"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setCDTSCAllowedPrimitive(rs.getInt("cdt_sc_awd_pri"));
-				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
-				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
+				ClientVO clientVO = new ClientVO();
+				clientVO.setClient_id(rs.getInt("client_id"));
+				clientVO.setName(rs.getString("Name"));
+				list.add(clientVO);
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -384,20 +379,20 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		}
 
 		return list;
+			
 	}
-
+	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
+		ClientVO clientVO = (ClientVO)obj;
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_UPDATE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
+			ps = conn.prepareStatement(_UPDATE_Client_STATEMENT);
+			
+			ps.setString(1, clientVO.getName());
 
-			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCDTSCAllowedPrimitive());
-			ps.setInt(2, cdt_sc_allowed_primitive_expression_type_mapVO.getXSDBuiltInTypeID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -419,16 +414,17 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		return true;
 	}
 
+	
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
+		ClientVO clientVO = (ClientVO)obj;
+		
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		try {
 			Connection conn = tx.open();
 
-			ps = conn.prepareStatement(_DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
-			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCTSCAllowedPrimitiveExpressionTypeMapID());
+			ps = conn.prepareStatement(_DELETE_Client_STATEMENT);
+			ps.setInt(1, clientVO.getClient_id());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -449,6 +445,81 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 
 		return true;
 
+
+	}
+
+	@Override
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
+			throws SRTDAOException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+		try {
+			String sql = _FIND_Client_STATEMENT;
+
+			String WHERE_OR_AND = " WHERE ";
+			int nCond = qc.getSize();
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
+			
+			ps = conn.prepareStatement(sql);
+			if (nCond > 0) {
+				for (int n = 0; n < nCond; n++) {
+					Object value = qc.getValue(n);
+					if (value instanceof String) {
+						ps.setString(n+1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(n+1, ((Integer) value).intValue());
+					}
+				}
+			}
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				ClientVO clientVO = new ClientVO();
+				clientVO.setClient_id(rs.getInt("client_id"));
+				clientVO.setName(rs.getString("Name"));
+				list.add(clientVO);
+			}
+			
+		} catch (SQLException e) {
+			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+		} finally {
+			if(ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {}
+			}
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {}
+			}
+		}
+		return list;
 	}
 
 	@Override
@@ -457,5 +528,4 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

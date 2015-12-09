@@ -25,21 +25,21 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 	private final String _tableName = "agency_id_list";
 	
 	private final String _FIND_ALL_Agency_ID_List_STATEMENT =
-			"SELECT Agency_ID_List_ID, Agency_ID_List_GUID, Enumeration_Type_GUID, Name, List_ID, Agency_ID, Version_ID, Definition "
+			"SELECT Agency_ID_List_ID, GUID, Enum_Type_GUID, Name, List_ID, Agency_ID, Version_ID, Definition "
 			+ "FROM " + _tableName;
 	
 	private final String _FIND_Agency_ID_List_STATEMENT =
-			"SELECT Agency_ID_List_ID, Agency_ID_List_GUID, Enumeration_Type_GUID, Name, List_ID, Agency_ID, Version_ID, Definition "
+			"SELECT Agency_ID_List_ID, GUID, Enum_Type_GUID, Name, List_ID, Agency_ID, Version_ID, Definition "
 			+ "FROM " + _tableName;
 	
 	private final String _INSERT_Agency_ID_List_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Agency_ID_List_GUID, Enumeration_Type_GUID, Name, List_ID, Agency_ID, Version_ID, Definition)"
+			"INSERT INTO " + _tableName + " (GUID, Enum_Type_GUID, Name, List_ID, Agency_ID, Version_ID, Definition)"
 			+ " VALUES (?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_Agency_ID_List_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Agency_ID_List_GUID = ?,"
-			+ " Enumeration_Type_GUID = ?, Name = ?, List_ID = ?, Agency_ID = ?,"
+			+ " SET GUID = ?,"
+			+ " Enum_Type_GUID = ?, Name = ?, List_ID = ?, Agency_ID = ?,"
 			+ " Version_ID = ?, Definition = ? WHERE Agency_ID_List_ID = ?";
 	
 	private final String _DELETE_Agency_ID_List_STATEMENT = 
@@ -118,8 +118,8 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				agencyidlistVO.setAgencyIDListID(rs.getInt("Agency_ID_List_ID"));
-				agencyidlistVO.setAgencyIDListGUID(rs.getString("Agency_ID_List_GUID"));
-				agencyidlistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				agencyidlistVO.setAgencyIDListGUID(rs.getString("GUID"));
+				agencyidlistVO.setEnumerationTypeGUID(rs.getString("Enum_Type_GUID"));
 				agencyidlistVO.setName(rs.getString("Name"));
 				agencyidlistVO.setListID(rs.getString("List_ID"));
 				agencyidlistVO.setAgencyID(rs.getInt("Agency_ID"));
@@ -162,8 +162,8 @@ public class AgencyIDListMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				AgencyIDListVO agencyidlistVO = new AgencyIDListVO();
 				agencyidlistVO.setAgencyIDListID(rs.getInt("Agency_ID_List_ID"));
-				agencyidlistVO.setAgencyIDListGUID(rs.getString("Agency_ID_List_GUID"));
-				agencyidlistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				agencyidlistVO.setAgencyIDListGUID(rs.getString("GUID"));
+				agencyidlistVO.setEnumerationTypeGUID(rs.getString("Enum_Type_GUID"));
 				agencyidlistVO.setName(rs.getString("Name"));
 				agencyidlistVO.setListID(rs.getString("List_ID"));
 				agencyidlistVO.setAgencyID(rs.getInt("Agency_ID"));

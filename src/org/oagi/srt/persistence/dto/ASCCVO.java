@@ -10,6 +10,7 @@ import org.oagi.srt.common.SRTObject;
 * @author Nasif Sikder
 */
 public class ASCCVO extends SRTObject {
+
 	private int ASCCID;
 	private String ASCCGUID;
 	private int CardinalityMin;
@@ -19,6 +20,19 @@ public class ASCCVO extends SRTObject {
 	private int AssocToASCCPID;
 	private String DEN;
 	private String Definition;
+	
+	private int CreatedByUserId;
+	private int OwnerUserId;
+	private int LastUpdatedByUserId;
+	private Timestamp CreationTimestamp;
+	private Timestamp LastUpdateTimestamp;
+	private int State;
+	private int RevisionNum;
+	private int RevisionTrackingNum;
+	private int RevisionAction;
+	private int ReleaseId;
+	private int CurrentAsccId;
+
 	
 	public int getASCCID(){
 		return ASCCID;
@@ -93,4 +107,94 @@ public class ASCCVO extends SRTObject {
 	public void setDefinition(String definition){
 		Definition = definition;
 	}
+	
+	public int getCreatedByUserId() {
+		return CreatedByUserId;
+	}
+	
+	public void setCreatedByUserId(int createdByUserId) {
+		CreatedByUserId = createdByUserId;
+	}
+	
+	public int getLastUpdatedByUserId() {
+		return LastUpdatedByUserId;
+	}
+	
+	public void setLastUpdatedByUserId(int lastUpdatedByUserId) {
+		LastUpdatedByUserId = lastUpdatedByUserId;
+	}
+	
+	public Timestamp getCreationTimestamp() {
+		return CreationTimestamp;
+	}
+	
+	public void setCreationTimestamp(Timestamp creationTimestamp) {
+		CreationTimestamp = creationTimestamp;
+	}
+	
+	public Timestamp getLastUpdateTimestamp() {
+		return LastUpdateTimestamp;
+	}
+	
+	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
+		LastUpdateTimestamp = lastUpdateTimestamp;
+	}
+	
+	public int getState() {
+		return State;
+	}
+	
+	public void setState(int state) {
+		State = state;
+	}
+	
+
+	public int getOwnerUserId() {
+		return OwnerUserId;
+	}
+	
+	public void setOwnerUserId(int ownerUserId) {
+		OwnerUserId = ownerUserId;
+	}
+	
+	public int getRevisionNum() {
+		return RevisionNum;
+	}
+	
+	public void setRevisionNum(int revisionNum) {
+		RevisionNum = revisionNum;
+	}
+	
+	public int getRevisionTrackingNum() {
+		return RevisionTrackingNum;
+	}
+	
+	public void setRevisionTrackingNum(int revisionTrackingNum) {
+		RevisionTrackingNum = revisionTrackingNum;
+	}
+	
+	public int getRevisionAction() {
+		return RevisionAction;
+	}
+	
+	public void setRevisionAction(int revisionAction) {
+		RevisionAction = revisionAction;
+	}
+	
+	public int getReleaseId() {
+		return ReleaseId;
+	}
+	
+	public void setReleaseId(int releaseId) {
+		ReleaseId = releaseId;
+	}
+	
+	public int getCurrentAsccId() {
+		return CurrentAsccId;
+	}
+	
+	public void setCurrentAsccId(int currentAsccId) {
+		CurrentAsccId = currentAsccId;
+	}
+	
 }

@@ -27,16 +27,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	private final String _tableName = "bbie_sc";
 
 	private final String _FIND_ALL_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, bbie_sc.Default, Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
+			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term FROM " + _tableName;
 	
 	private final String _FIND_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, bbie_sc.Default, Fixed_Value, Definition, Remark, Business_Term FROM " + _tableName;
+			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_SC_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
-			+ "DT_SC_ID, DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, bbie_sc.Default, Fixed_Value, Definition, Remark, Business_Term) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _INSERT_BBIE_SC_WITH_ID_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
-			+ "DT_SC_ID, DT_SC_Primitive_Restriction_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, bbie_sc.Default, Fixed_Value, Definition, Remark, Business_Term, BBIE_SC_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "DT_SC_ID, DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term, BBIE_SC_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _DELETE_BBIE_SC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BBIE_SC_ID = ?";
@@ -212,16 +212,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Pri_Restri_ID"));
 				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setDefaultText(rs.getString("Default_value"));
 				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
-				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
 
 			}
 			tx.commit();
@@ -280,16 +280,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Pri_Restri_ID"));
 				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setDefaultText(rs.getString("Default_value"));
 				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
-				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -330,16 +330,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Pri_Restri_ID"));
 				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setDefaultText(rs.getString("Default_value"));
 				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
-				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(bbie_scVO);
 			}
 			tx.commit();
@@ -381,16 +381,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Pri_Restri_ID"));
 				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setDefaultText(rs.getString("Default_value"));
 				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
-				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(bbie_scVO);
 			}
 			//tx.commit();
@@ -417,8 +417,8 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 	}
 	
 	private final String _UPDATE_BBIE_SC_STATEMENT = "UPDATE " + _tableName + " SET BBIE_ID = ?, "
-			+ "DT_SC_ID = ?, DT_SC_Primitive_Restriction_ID = ?, Code_List_ID = ?, Agency_ID_List_ID = ?, Min_Cardinality = ?, Max_Cardinality = ?,  "
-			+ "bbie_sc.Default = ?, Fixed_Value = ?, Definition = ?, Remark = ?, Business_Term = ? WHERE BBIE_SC_ID = ?";
+			+ "DT_SC_ID = ?, DT_SC_Pri_Restri_ID = ?, Code_List_ID = ?, Agency_ID_List_ID = ?, Min_Cardinality = ?, Max_Cardinality = ?,  "
+			+ "Default_Value = ?, Fixed_Value = ?, Definition = ?, Remark = ?, biz_term = ? WHERE BBIE_SC_ID = ?";
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -547,16 +547,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Pri_Restri_ID"));
 				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setDefaultText(rs.getString("Default_value"));
 				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
-				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(bbie_scVO);
 			}
 			conn.close();
@@ -635,16 +635,16 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 				bbie_scVO.setBBIESCID(rs.getInt("BBIE_SC_ID"));
 				bbie_scVO.setBBIEID(rs.getInt("BBIE_ID"));
 				bbie_scVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Primitive_Restriction_ID"));
+				bbie_scVO.setDTSCPrimitiveRestrictionID(rs.getInt("DT_SC_Pri_Restri_ID"));
 				bbie_scVO.setCodeListId(rs.getInt("Code_List_ID"));
 				bbie_scVO.setAgencyIdListId(rs.getInt("Agency_ID_List_ID"));
 				bbie_scVO.setMinCardinality(rs.getInt("Min_Cardinality"));
 				bbie_scVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
-				bbie_scVO.setDefaultText(rs.getString("Default"));
+				bbie_scVO.setDefaultText(rs.getString("Default_value"));
 				bbie_scVO.setFixedValue(rs.getString("Fixed_Value"));
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
-				bbie_scVO.setBusinessTerm(rs.getString("Business_Term"));
+				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(bbie_scVO);
 			}
 			

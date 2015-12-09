@@ -23,24 +23,20 @@ public class DTSCMysqlDAO extends SRTDAO {
 	private final String _tableName = "dt_sc";
 
 	private final String _FIND_ALL_DT_SC_STATEMENT = 
-			"SELECT DT_SC_ID, DT_SC_GUID, Property_Term, Representation_Term, Definition, "
+			"SELECT DT_SC_ID, guid, Property_Term, Representation_Term, Definition, "
 					+ "Owner_DT_ID, Min_Cardinality, Max_Cardinality, Based_DT_SC_ID FROM " + _tableName;
 
 	private final String _FIND_DT_SC_STATEMENT = 
-			"SELECT DT_SC_ID, DT_SC_GUID, Property_Term, Representation_Term, Definition, "
+			"SELECT DT_SC_ID, guid, Property_Term, Representation_Term, Definition, "
 					+ "Owner_DT_ID, Min_Cardinality, Max_Cardinality, Based_DT_SC_ID FROM " + _tableName;
 	
-//	private final String _INSERT_DT_SC_STATEMENT = 
-//			"INSERT INTO " + _tableName + " (DT_SC_GUID, Property_Term, Representation_Term, Definition, "
-//					+ "Owner_DT_ID, Min_Cardinality, Max_Cardinality, Based_DT_SC_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-	
 	private final String _INSERT_DT_SC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (DT_SC_GUID, Property_Term, Representation_Term, Definition, "
+			"INSERT INTO " + _tableName + " (guid, Property_Term, Representation_Term, Definition, "
 					+ "Owner_DT_ID, Min_Cardinality, Max_Cardinality, Based_DT_SC_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_DT_SC_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET DT_SC_GUID = ?, Property_Term = ?, Representation_Term = ?, Definition = ?, "
+			+ " SET guid = ?, Property_Term = ?, Representation_Term = ?, Definition = ?, "
 			+ "Owner_DT_ID = ?, Min_Cardinality = ?, Max_Cardinality = ?, Based_DT_SC_ID = ? WHERE DT_SC_ID = ?";
 
 	private final String _DELETE_DT_SC_STATEMENT = 
@@ -88,7 +84,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				DTSCVO dtscVO = new DTSCVO();
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setDTSCGUID(rs.getString("guid"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
 				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				dtscVO.setDefinition(rs.getString("Definition"));
@@ -156,7 +152,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				DTSCVO dtscVO = new DTSCVO();
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setDTSCGUID(rs.getString("guid"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
 				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				dtscVO.setDefinition(rs.getString("Definition"));
@@ -263,7 +259,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setDTSCGUID(rs.getString("guid"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
 				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				dtscVO.setDefinition(rs.getString("Definition"));
@@ -327,7 +323,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				dtscVO = new DTSCVO();
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setDTSCGUID(rs.getString("guid"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
 				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				dtscVO.setDefinition(rs.getString("Definition"));
@@ -372,7 +368,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				DTSCVO dtscVO = new DTSCVO();
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setDTSCGUID(rs.getString("guid"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
 				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				dtscVO.setDefinition(rs.getString("Definition"));
@@ -419,7 +415,7 @@ public class DTSCMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				DTSCVO dtscVO = new DTSCVO();
 				dtscVO.setDTSCID(rs.getInt("DT_SC_ID"));
-				dtscVO.setDTSCGUID(rs.getString("DT_SC_GUID"));
+				dtscVO.setDTSCGUID(rs.getString("guid"));
 				dtscVO.setPropertyTerm(rs.getString("Property_Term"));
 				dtscVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				dtscVO.setDefinition(rs.getString("Definition"));

@@ -194,5 +194,4 @@ public class CodeListVO extends SRTObject {
 		this.lastUpdateTimestamp = lastUpdateTimestamp;
 	}
 	
-
 }

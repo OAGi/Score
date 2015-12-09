@@ -43,7 +43,7 @@ public class P_1_5_4_to_5_PopulateCDTSCAllowedPrimitive {
 		
 		
 		QueryCondition qc_00 = new QueryCondition();
-		qc_00.add("DT_Type", 0);
+		qc_00.add("Type", 0);
 		qc_00.add("Data_Type_Term", "Name");
 		DTVO aDTVO = (DTVO)aDTDAO.findObject(qc_00); 
 		int nametypecdtid = aDTVO.getDTID();
@@ -89,12 +89,12 @@ public class P_1_5_4_to_5_PopulateCDTSCAllowedPrimitive {
 						
 						QueryCondition qc_051 = new QueryCondition();
 						qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
-						qc_051.add("CDT_Primitive_ID", aVO.getCDTPrimitiveID());
+						qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
 						CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
 						int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
 						
 						QueryCondition qc_06 = new QueryCondition();
-						qc_06.add("CDT_Primitive_ID", aVO.getCDTPrimitiveID());
+						qc_06.add("cdt_pri_id", aVO.getCDTPrimitiveID());
 						CDTPrimitiveVO aCDTPrimitiveVO = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc_06);
 						String cdt_primitive_name = aCDTPrimitiveVO.getName();
 						ArrayList<String> xsd_builtin_type = new ArrayList<String>();

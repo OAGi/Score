@@ -22,23 +22,23 @@ import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 */
 
 public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
-	private final String _tableName = "xsd_builtin_type";
+	private final String _tableName = "xbt";
 
 	private final String _FIND_ALL_XSD_BuiltIn_Type_STATEMENT = 
-			"SELECT XSD_BuiltIn_Type_ID, Name, BuiltIn_Type FROM " + _tableName;
+			"SELECT xbt_id, name, builtIn_type, subtype_of_xbt_id FROM " + _tableName;
 
 	private final String _FIND_XSD_BuiltIn_Type_STATEMENT = 
-			"SELECT XSD_BuiltIn_Type_ID, Name, BuiltIn_Type, Subtype_Of_XSD_Builtin_Type_ID FROM " + _tableName;
+			"SELECT xbt_id, name, builtIn_type, subtype_of_xbt_id FROM " + _tableName;
 
 	private final String _INSERT_XSD_BuiltIn_Type_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Name, BuiltIn_Type) VALUES (?, ?)";
+			"INSERT INTO " + _tableName + " (name, builtIn_type, subtype_of_xbt_id) VALUES (?, ?, ?)";
 
 	private final String _UPDATE_XSD_BuiltIn_Type_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET XSD_BuiltIn_Type_ID = ?, Name = ?, BuiltIn_Type = ?, WHERE XSD_BuiltIn_Type_ID = ?";
+			+ " SET name = ?, builtIn_type = ?, subtype_of_xbt_id = ?, WHERE xbt_id = ?";
 
 	private final String _DELETE_XSD_BuiltIn_Type_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE XSD_BuiltIn_Type_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE xbt_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -63,6 +63,7 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 			ps = conn.prepareStatement(_INSERT_XSD_BuiltIn_Type_STATEMENT);
 			ps.setString(1, xsdbuiltintypeVO.getName());
 			ps.setString(2, xsdbuiltintypeVO.getBuiltInType());
+			ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
 
 			ps.executeUpdate();
 
@@ -117,10 +118,10 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 				xsdbuiltintypeVO.setName(rs.getString("Name"));
 				xsdbuiltintypeVO.setBuiltInType(rs.getString("BuiltIn_Type"));
-				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("Subtype_Of_XSD_Builtin_Type_ID"));
+				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("subtype_of_xbt_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -174,10 +175,10 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 				xsdbuiltintypeVO.setName(rs.getString("Name"));
 				xsdbuiltintypeVO.setBuiltInType(rs.getString("BuiltIn_Type"));
-				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("Subtype_Of_XSD_Builtin_Type_ID"));
+				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("subtype_of_xbt_id"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -209,9 +210,10 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				XSDBuiltInTypeVO xsdbuiltintypeVO = new XSDBuiltInTypeVO();
-				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				xsdbuiltintypeVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 				xsdbuiltintypeVO.setName(rs.getString("Name"));
 				xsdbuiltintypeVO.setBuiltInType(rs.getString("BuiltIn_Type"));
+				xsdbuiltintypeVO.setSubtypeOfXSDBuiltinTypeId(rs.getInt("subtype_of_xbt_id"));
 				list.add(xsdbuiltintypeVO);
 			}
 			tx.commit();
@@ -248,6 +250,8 @@ public class XSDBuiltInTypeMysqlDAO extends SRTDAO {
 
 			ps.setString(1, xsdbuiltintypeVO.getName());
 			ps.setString(2, xsdbuiltintypeVO.getBuiltInType());
+			ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
+			ps.setInt(4, xsdbuiltintypeVO.getXSDBuiltInTypeID());
 			ps.executeUpdate();
 
 			tx.commit();

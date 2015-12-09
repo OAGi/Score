@@ -338,9 +338,9 @@ public class StandaloneXMLSchema {
 		
 		if(gBBIE.getBdtPrimitiveRestrictionId() == 0)			
 			base = setBDTBase(gBDT, base);
-		else
+		else{
 			base = setBDTBase(gBBIE, base);
-		extNode.setAttributeNode(base);
+		}extNode.setAttributeNode(base);
 		eNode.appendChild(complexType);
 		return eNode;
 	}
@@ -480,7 +480,7 @@ public class StandaloneXMLSchema {
 	}
 	
 	public CodeListVO getCodeList(BBIEVO gBBIE, DTVO gBDT) throws Exception{
-		CodeListVO aCL = new CodeListVO();
+		CodeListVO aCL = null;
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
 		if(gBBIE.getCodeListId() != 0){
@@ -490,18 +490,21 @@ public class StandaloneXMLSchema {
 			aCL = (CodeListVO)dao1.findObject(qc1, conn);
 		}
 		
-		if(aCL.getCodeListID() == 0) {
+		if(aCL == null) {
 	    	SRTDAO dao2 = df.getDAO("BDTPrimitiveRestriction");
 	    	QueryCondition qc2_2 = new QueryCondition();
 	    	qc2_2.add("BDT_Primitive_Restriction_ID", gBBIE.getBdtPrimitiveRestrictionId());
 	    	BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao2.findObject(qc2_2, conn);
 	    	SRTDAO dao1 = df.getDAO("CodeList");		
 	    	QueryCondition qc1_2 = new QueryCondition();
-	    	qc1_2.add("Code_List_ID", aBDTPrimitiveRestriction.getCodeListID());	    	
-			aCL = (CodeListVO)dao1.findObject(qc1_2, conn);
+	    	if(aBDTPrimitiveRestriction.getCodeListID() != 0){
+	    		qc1_2.add("Code_List_ID", aBDTPrimitiveRestriction.getCodeListID());	    	
+	    		aCL = (CodeListVO)dao1.findObject(qc1_2, conn);
+	    	}
+			
 		}
 		
-		if(aCL.getCodeListID() == 0) {
+		if(aCL == null) {
 			SRTDAO dao2 = df.getDAO("BDTPrimitiveRestriction");
 	    	QueryCondition qc2 = new QueryCondition();
 			qc2.add("BDT_ID", gBDT.getDTID());
@@ -519,7 +522,6 @@ public class StandaloneXMLSchema {
 					aCL = null;
 			}
 		}
-		
 		return aCL;
 	}
 
@@ -579,10 +581,9 @@ public class StandaloneXMLSchema {
 		
 		BCCVO gBCC = queryBasedBCC(gBBIE);
 		Element eNode = null;
+		eNode = gPNode.getOwnerDocument().createElement("xsd:element"); 
+		eNode = handleBBIE_Elementvalue(gBBIE, eNode);
 		if(gBCC.getEntityType() == 1) {
-			eNode = gPNode.getOwnerDocument().createElement("xsd:element"); 
-			eNode = handleBBIE_Elementvalue(gBBIE, eNode);
-			
 			while(!gPNode.getNodeName().equals("xsd:sequence")) {
 				gPNode = (Element) gPNode.getParentNode();
 			}
@@ -638,43 +639,59 @@ public class StandaloneXMLSchema {
 
 		}
 		else {
-			eNode = gPNode.getOwnerDocument().createElement("xsd:attribute"); 
-			eNode = handleBBIE_Attributevalue(gBBIE, eNode);
-			
-			while(!gPNode.getNodeName().equals("xsd:complexType")) {
-				gPNode = (Element) gPNode.getParentNode();
-			}
-
-			gPNode.appendChild(eNode);
-			
 			ArrayList<SRTObject> SCs = queryBBIESCs(gBBIE); 
-			
 			CodeListVO aCL = getCodeList(gBBIE, gBDT);
-
 			if(aCL == null) {
 				if(gBBIE.getBdtPrimitiveRestrictionId() == 0) {
 					if(SCs.size() == 0) {
+						eNode = gPNode.getOwnerDocument().createElement("xsd:attribute"); 
+						eNode = handleBBIE_Attributevalue(gBBIE, eNode);
+						
+						while(!gPNode.getNodeName().equals("xsd:complexType")) {
+							gPNode = (Element) gPNode.getParentNode();
+						}
+
+						gPNode.appendChild(eNode);
 						eNode = setBBIE_Attr_Type(gBDT, eNode);
 						return eNode;
 					}
 					else {
-						eNode = setBBIE_Attr_Type(gBBIE, eNode);
+						//eNode = setBBIE_Attr_Type(gBBIE, eNode);
+						eNode = generateBDT(gBBIE, eNode);
 						return eNode;
 					}
 				}
 				else {
 					if(SCs.size() == 0) {
+						eNode = gPNode.getOwnerDocument().createElement("xsd:attribute"); 
+						eNode = handleBBIE_Attributevalue(gBBIE, eNode);
+						
+						while(!gPNode.getNodeName().equals("xsd:complexType")) {
+							gPNode = (Element) gPNode.getParentNode();
+						}
+
+						gPNode.appendChild(eNode);
 						eNode = setBBIE_Attr_Type(gBBIE, eNode);
 						return eNode;
 					}
 					else {
-						eNode = setBBIE_Attr_Type(gBBIE, eNode);
+						//eNode = setBBIE_Attr_Type(gBBIE, eNode);
+						eNode = generateBDT(gBBIE, eNode);
 						return eNode;
 					}
 				}
 			}
 			
 			else { //is aCL null?
+				eNode = gPNode.getOwnerDocument().createElement("xsd:attribute"); 
+				eNode = handleBBIE_Attributevalue(gBBIE, eNode);
+				
+				while(!gPNode.getNodeName().equals("xsd:complexType")) {
+					gPNode = (Element) gPNode.getParentNode();
+				}
+
+				gPNode.appendChild(eNode);
+				
 				if(!isCodeListGenerated(aCL)) {
 					generateCodeList(aCL, gBDT, gSchemaNode); 
 				}
@@ -1393,7 +1410,7 @@ public class StandaloneXMLSchema {
 				ASCCPVO asccpvo = (ASCCPVO)dao.findObject(qc, conn);
 				filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
 			}
-			filepath = writeXSDFile(doc, filename+"_created");
+			filepath = writeXSDFile(doc, filename+"_standalone");
 		}
 		else {
 			for(SRTObject aSRTObject : gABIE){
@@ -1412,7 +1429,7 @@ public class StandaloneXMLSchema {
 	
 	public static void main(String args[]) throws Exception {
 		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(407);
+		abie_ids.add(2871957);
 		aa.generateXMLSchema(abie_ids, true);
 		System.out.println("###END###");
 	}

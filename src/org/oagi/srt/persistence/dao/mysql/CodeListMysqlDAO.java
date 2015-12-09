@@ -25,32 +25,30 @@ import org.oagi.srt.persistence.dto.DTVO;
 public class CodeListMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "code_list";
-	
 	private final String _FIND_ALL_Code_List_STATEMENT =
-			"SELECT Code_List_ID, Code_List_GUID, Enumeration_Type_GUID, Name, List_ID, "
-			+ "Agency_ID, Version_ID, Definition, Definition_Source, Based_Code_List_ID, Extensible_Indicator,  Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, remark FROM " + _tableName + " order by Creation_Timestamp desc";
+			"SELECT code_list_id, guid, enum_type_guid, Name, List_ID, "
+			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State FROM " + _tableName + " order by Creation_Timestamp desc";
 	
 	private final String _FIND_Code_List_STATEMENT =
-			"SELECT Code_List_ID, Code_List_GUID, Enumeration_Type_GUID, Name, List_ID, "
-			+ "Agency_ID, Version_ID, Definition, Definition_Source, Based_Code_List_ID, Extensible_Indicator,  Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, remark FROM " + _tableName;
+			"SELECT code_list_id, guid, enum_type_guid, Name, List_ID, "
+			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State FROM " + _tableName ;
 	
 	private final String _INSERT_Code_List_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Code_List_GUID, Enumeration_Type_GUID, Name, List_ID,"
-			+ " Agency_ID, Version_ID, Definition, Definition_Source, Based_Code_List_ID, Extensible_Indicator,  Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp,  "
-			+ "Last_Update_Timestamp, State, remark) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (guid, enum_type_guid, Name, List_ID, "
+			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
 	
 	private final String _UPDATE_Code_List_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, Code_List_GUID = ?,"
-			+ " Enumeration_Type_GUID = ?, Name = ?, List_ID = ?, Agency_ID = ?, Version_ID = ?, Definition = ?, Definition_Source = ?, Based_Code_List_ID = ?, Extensible_Indicator = ?, Created_By_User_ID = ?,"
-			+ " Last_Updated_By_User_ID = ?, Creation_Timestamp = ?, Last_Update_Timestamp = ?, State = ?, remark = ? WHERE Code_List_ID = ?";
+			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?,"
+			+ " enum_type_guid = ?, Name = ?, List_ID = ?, Agency_ID = ?, Version_ID = ?, Definition = ?, Definition_Source = ?, Based_Code_List_ID = ?, Extensible_Indicator = ?, Created_By = ?,"
+			+ " Last_Updated_By = ?, Creation_Timestamp = ?, Last_Update_Timestamp = ?, State = ?, remark = ? WHERE Code_List_ID = ?";
 	
 	private final String _DELETE_Code_List_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Code_List_ID = ?";
 	
-
 	@Override
 	public int findMaxId() throws SRTDAOException {
 		// TODO Auto-generated method stub
@@ -112,22 +110,22 @@ public class CodeListMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CodeListVO codelistVO = new CodeListVO();
 				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
-				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
-				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setCodeListGUID(rs.getString("guid"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("enum_type_guid"));
 				codelistVO.setName(rs.getString("Name"));
 				codelistVO.setListID(rs.getString("List_ID"));
 				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
 				codelistVO.setVersionID(rs.getString("Version_ID"));
 				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setRemark(rs.getString("remark"));
 				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
 				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
-				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				codelistVO.setState(rs.getString("State"));
-				codelistVO.setRemark(rs.getString("remark"));
 				list.add(codelistVO);
 			}
 			tx.commit();
@@ -167,17 +165,17 @@ public class CodeListMysqlDAO extends SRTDAO {
 			ps.setInt(5, codelistVO.getAgencyID());
 			ps.setString(6, codelistVO.getVersionID());
 			ps.setString(7, codelistVO.getDefinition());
-			ps.setString(8, codelistVO.getDefinitionSource());
+			ps.setString(8, codelistVO.getRemark());
+			ps.setString(9, codelistVO.getDefinitionSource());
 			if(codelistVO.getBasedCodeListID() > 0)
-				ps.setInt(9, codelistVO.getBasedCodeListID());
+				ps.setInt(10, codelistVO.getBasedCodeListID());
 			else
-				ps.setNull(9, codelistVO.getBasedCodeListID());
-			ps.setBoolean(10, codelistVO.getExtensibleIndicator());
-			ps.setInt(11, codelistVO.getCreatedByUserID());
-			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
-			ps.setTimestamp(13, codelistVO.getLastUpdateTimestamp());
-			ps.setString(14, codelistVO.getState());
-			ps.setString(15, codelistVO.getRemark());
+				ps.setNull(10, codelistVO.getBasedCodeListID());
+			ps.setBoolean(11, codelistVO.getExtensibleIndicator());
+			ps.setInt(12, codelistVO.getCreatedByUserID());
+			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
+			ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
+			ps.setString(15, codelistVO.getState());
 
 			ps.executeUpdate();
 
@@ -255,22 +253,22 @@ public class CodeListMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
-				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
-				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setCodeListGUID(rs.getString("guid"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("enum_type_guid"));
 				codelistVO.setName(rs.getString("Name"));
 				codelistVO.setListID(rs.getString("List_ID"));
 				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
 				codelistVO.setVersionID(rs.getString("Version_ID"));
 				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setRemark(rs.getString("remark"));
 				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
 				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
-				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				codelistVO.setState(rs.getString("State"));
-				codelistVO.setRemark(rs.getString("remark"));
 			}
 			tx.commit();
 			conn.close();
@@ -346,22 +344,22 @@ public class CodeListMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
-				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
-				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setCodeListGUID(rs.getString("guid"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("enum_type_guid"));
 				codelistVO.setName(rs.getString("Name"));
 				codelistVO.setListID(rs.getString("List_ID"));
 				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
 				codelistVO.setVersionID(rs.getString("Version_ID"));
 				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setRemark(rs.getString("remark"));
 				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
 				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
-				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				codelistVO.setState(rs.getString("State"));
-				codelistVO.setRemark(rs.getString("remark"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -394,22 +392,22 @@ public class CodeListMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CodeListVO codelistVO = new CodeListVO();
 				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
-				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
-				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setCodeListGUID(rs.getString("guid"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("enum_type_guid"));
 				codelistVO.setName(rs.getString("Name"));
 				codelistVO.setListID(rs.getString("List_ID"));
 				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
 				codelistVO.setVersionID(rs.getString("Version_ID"));
 				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setRemark(rs.getString("remark"));
 				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
 				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
-				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				codelistVO.setState(rs.getString("State"));
-				codelistVO.setRemark(rs.getString("remark"));
 				list.add(codelistVO);
 			}
 			tx.commit();
@@ -448,22 +446,22 @@ public class CodeListMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CodeListVO codelistVO = new CodeListVO();
 				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
-				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
-				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setCodeListGUID(rs.getString("guid"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("enum_type_guid"));
 				codelistVO.setName(rs.getString("Name"));
 				codelistVO.setListID(rs.getString("List_ID"));
 				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
 				codelistVO.setVersionID(rs.getString("Version_ID"));
 				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setRemark(rs.getString("remark"));
 				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
 				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
-				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				codelistVO.setState(rs.getString("State"));
-				codelistVO.setRemark(rs.getString("remark"));
 				list.add(codelistVO);
 			}
 		} catch (SQLException e) {
@@ -501,15 +499,15 @@ public class CodeListMysqlDAO extends SRTDAO {
 			ps.setInt(5, codelistVO.getAgencyID());
 			ps.setString(6, codelistVO.getVersionID());
 			ps.setString(7, codelistVO.getDefinition());
-			ps.setString(8, codelistVO.getDefinitionSource());
-			ps.setInt(9, codelistVO.getBasedCodeListID());
-			ps.setBoolean(10, codelistVO.getExtensibleIndicator());
-			ps.setInt(11, codelistVO.getCreatedByUserID());
-			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
-			ps.setTimestamp(13, codelistVO.getCreationTimestamp());
-			ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
-			ps.setString(15, codelistVO.getState());
-			ps.setString(16, codelistVO.getRemark());
+			ps.setString(8, codelistVO.getRemark());
+			ps.setString(9, codelistVO.getDefinitionSource());
+			ps.setInt(10, codelistVO.getBasedCodeListID());
+			ps.setBoolean(11, codelistVO.getExtensibleIndicator());
+			ps.setInt(12, codelistVO.getCreatedByUserID());
+			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
+			ps.setTimestamp(14, codelistVO.getCreationTimestamp());
+			ps.setTimestamp(15, codelistVO.getLastUpdateTimestamp());
+			ps.setString(16, codelistVO.getState());
 			ps.setInt(17, codelistVO.getCodeListID());
 			ps.executeUpdate();
 
@@ -619,22 +617,22 @@ public class CodeListMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				CodeListVO codelistVO = new CodeListVO();
 				codelistVO.setCodeListID(rs.getInt("Code_List_ID"));
-				codelistVO.setCodeListGUID(rs.getString("Code_List_GUID"));
-				codelistVO.setEnumerationTypeGUID(rs.getString("Enumeration_Type_GUID"));
+				codelistVO.setCodeListGUID(rs.getString("guid"));
+				codelistVO.setEnumerationTypeGUID(rs.getString("enum_type_guid"));
 				codelistVO.setName(rs.getString("Name"));
 				codelistVO.setListID(rs.getString("List_ID"));
 				codelistVO.setAgencyID(rs.getInt("Agency_ID"));
 				codelistVO.setVersionID(rs.getString("Version_ID"));
 				codelistVO.setDefinition(rs.getString("Definition"));
+				codelistVO.setRemark(rs.getString("remark"));
 				codelistVO.setDefinitionSource(rs.getString("Definition_Source"));
 				codelistVO.setBasedCodeListID(rs.getInt("Based_Code_List_ID"));
 				codelistVO.setExtensibleIndicator(rs.getBoolean("Extensible_Indicator"));
-				codelistVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				codelistVO.setCreatedByUserID(rs.getInt("Created_By"));
+				codelistVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				codelistVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				codelistVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				codelistVO.setState(rs.getString("State"));
-				codelistVO.setRemark(rs.getString("remark"));
 				list.add(codelistVO);
 			}
 			

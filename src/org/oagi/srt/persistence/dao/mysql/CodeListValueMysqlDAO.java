@@ -135,7 +135,6 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 			ps.setBoolean(6, codelistvalueVO.getUsedIndicator());
 			ps.setBoolean(7, codelistvalueVO.getLockedIndicator());
 			ps.setBoolean(8, codelistvalueVO.isExtensionIndicator());
-			
 
 			ps.executeUpdate();
 
@@ -199,6 +198,7 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 				codelistvalueVO.setUsedIndicator(rs.getBoolean("Used_Indicator"));
 				codelistvalueVO.setUsedIndicator(rs.getBoolean("Locked_Indicator"));
 				codelistvalueVO.setExtensionIndicator(rs.getBoolean("extension_indicator"));
+
 			}
 			tx.commit();
 			conn.close();
@@ -244,6 +244,7 @@ public class CodeListValueMysqlDAO extends SRTDAO {
 				codelistvalueVO.setUsedIndicator(rs.getBoolean("Used_Indicator"));
 				codelistvalueVO.setUsedIndicator(rs.getBoolean("Locked_Indicator"));
 				codelistvalueVO.setExtensionIndicator(rs.getBoolean("extension_indicator"));
+
 				list.add(codelistvalueVO);
 			}
 			tx.commit();

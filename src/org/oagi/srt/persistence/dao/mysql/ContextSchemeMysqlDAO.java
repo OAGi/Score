@@ -24,24 +24,25 @@ import org.oagi.srt.persistence.dto.ContextSchemeVO;
 
 public class ContextSchemeMysqlDAO extends SRTDAO {
 	
-	private final String _tableName = "classification_context_scheme";
+	private final String _tableName = "classification_ctx_scheme";
 
-	private final String _FIND_ALL_CONTEXT_SCHEME_STATEMENT = "SELECT classification_context_scheme_id, classification_Context_Scheme_GUID, Scheme_ID, Scheme_Name, "
-	+ "Description, Scheme_Agency_ID, Scheme_Version_Id, Context_Category_ID, created_by_user_id, last_updated_by_user_id FROM " + _tableName;
+	private final String _FIND_ALL_CONTEXT_SCHEME_STATEMENT = "SELECT classification_ctx_scheme_id, guid, scheme_id, scheme_name, "
+	+ "description, scheme_agency_id, scheme_version_id, ctx_category_id, created_by, last_updated_by, creation_timestamp, last_update_timestamp FROM " + _tableName;
 	
-	private final String _FIND_CONTEXT_SCHEME_STATEMENT = "SELECT classification_context_scheme_id, classification_Context_Scheme_GUID, Scheme_ID, Scheme_Name, "
-	+ "Description, Scheme_Agency_ID, Scheme_Version_Id, Context_Category_ID, created_by_user_id, last_updated_by_user_id FROM " + _tableName;
+	private final String _FIND_CONTEXT_SCHEME_STATEMENT = "SELECT classification_ctx_scheme_id, guid, scheme_id, scheme_name, "
+			+ "description, scheme_agency_id, scheme_version_id, ctx_category_id, created_by, last_updated_by, creation_timestamp, last_update_timestamp FROM " + _tableName;
 	
 	private final String _INSERT_CONTEXT_SCHEME_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Scheme_ID, Scheme_Name, Description, Scheme_Agency_ID, "
-					+ "Scheme_Version_Id, Context_Category_ID, classification_Context_Scheme_GUID, created_by_user_id, last_updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (guid, scheme_id, scheme_name, "
+			+ "description, scheme_agency_id, scheme_version_id, ctx_category_id, created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 	
 	private final String _UPDATE_CONTEXT_SCHEME_STATEMENT =
-			"UPDATE " + _tableName + " SET Scheme_Name = ?, Description = ?, Scheme_Agency_ID = ?, "
-				+ "Scheme_Version_Id = ?, Context_Category_ID = ?, created_by_user_id = ?, last_updated_by_user_id = ? WHERE classification_context_scheme_id = ?";
+			"UPDATE " + _tableName + " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?, scheme_id = ?, scheme_name = ?, "
+				+ "description = ?, scheme_agency_id = ?, scheme_version_id = ?, ctx_category_id = ?, "
+				+ "created_by = ?, last_updated_by = ? WHERE classification_context_scheme_id = ?";
 	
 	private final String _DELETE_CONTEXT_SCHEME_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE classification_context_scheme_id = ?";
+			"DELETE FROM " + _tableName + " WHERE classification_ctx_scheme_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -104,18 +105,18 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ContextSchemeVO context_schemeVO = new ContextSchemeVO();
-				context_schemeVO.setContextSchemeID(rs.getInt("classification_context_scheme_id"));
-				context_schemeVO.setSchemeGUID(rs.getString("classification_Context_Scheme_GUID"));
-				context_schemeVO.setSchemeID(rs.getString("Scheme_ID"));
-				context_schemeVO.setSchemeName(rs.getString("Scheme_Name"));
-				context_schemeVO.setDescription(rs.getString("Description"));
-				context_schemeVO.setSchemeAgencyID(rs.getString("Scheme_Agency_ID"));
-				//context_schemeVO.setSchemeAgencyName(rs.getString("Scheme_Agency_Name"));
-				context_schemeVO.setSchemeVersion("Scheme_Version_Id");
-				context_schemeVO.setContextCategoryID(rs.getInt("Context_Category_ID"));
-				context_schemeVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				context_schemeVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
-				
+				context_schemeVO.setContextSchemeID(rs.getInt("classification_ctx_scheme_id"));
+				context_schemeVO.setSchemeGUID(rs.getString("guid"));
+				context_schemeVO.setSchemeID(rs.getString("scheme_id"));
+				context_schemeVO.setSchemeName(rs.getString("scheme_name"));
+				context_schemeVO.setDescription(rs.getString("description"));
+				context_schemeVO.setSchemeAgencyID(rs.getString("scheme_agency_id"));
+				context_schemeVO.setSchemeVersion("scheme_version_id");
+				context_schemeVO.setContextCategoryID(rs.getInt("ctx_category_id"));
+				context_schemeVO.setCreatedByUserId(rs.getInt("created_by"));
+				context_schemeVO.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				context_schemeVO.setCreationTimestamp(rs.getTimestamp("creation_timestamp"));
+				context_schemeVO.setLastUpdateTimestamp(rs.getTimestamp("last_update_timestamp"));
 				list.add(context_schemeVO);
 			}
 			tx.commit();
@@ -151,14 +152,13 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_CONTEXT_SCHEME_STATEMENT);
-			ps.setString(1, context_schemeVO.getSchemeID());
-			ps.setString(2, context_schemeVO.getSchemeName());
-			ps.setString(3, context_schemeVO.getDescription());
-			ps.setString(4, context_schemeVO.getSchemeAgencyID());
-			//ps.setString(5, context_schemeVO.getSchemeAgencyName());
-			ps.setString(5, context_schemeVO.getSchemeVersion());
-			ps.setInt(6, context_schemeVO.getContextCategoryID());
-			ps.setString(7, context_schemeVO.getSchemeGUID());
+			ps.setString(1, context_schemeVO.getSchemeGUID());
+			ps.setString(2, context_schemeVO.getSchemeID());
+			ps.setString(3, context_schemeVO.getSchemeName());
+			ps.setString(4, context_schemeVO.getDescription());
+			ps.setString(5, context_schemeVO.getSchemeAgencyID());
+			ps.setString(6, context_schemeVO.getSchemeVersion());
+			ps.setInt(7, context_schemeVO.getContextCategoryID());
 			ps.setInt(8,  context_schemeVO.getCreatedByUserId());
 			ps.setInt(9, context_schemeVO.getLastUpdatedByUserId());
 
@@ -210,17 +210,18 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				context_schemeVO.setContextSchemeID(rs.getInt("classification_context_scheme_id"));
-				context_schemeVO.setSchemeGUID(rs.getString("classification_Context_Scheme_GUID"));
-				context_schemeVO.setSchemeID(rs.getString("Scheme_ID"));
-				context_schemeVO.setSchemeName(rs.getString("Scheme_Name"));
-				context_schemeVO.setDescription(rs.getString("Description"));
-				context_schemeVO.setSchemeAgencyID(rs.getString("Scheme_Agency_ID"));
-				//context_schemeVO.setSchemeAgencyName(rs.getString("Scheme_Agency_Name"));
-				context_schemeVO.setSchemeVersion("Scheme_Version_Id");
-				context_schemeVO.setContextCategoryID(rs.getInt("Context_Category_ID"));
-				context_schemeVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				context_schemeVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				context_schemeVO.setContextSchemeID(rs.getInt("classification_ctx_scheme_id"));
+				context_schemeVO.setSchemeGUID(rs.getString("guid"));
+				context_schemeVO.setSchemeID(rs.getString("scheme_id"));
+				context_schemeVO.setSchemeName(rs.getString("scheme_name"));
+				context_schemeVO.setDescription(rs.getString("description"));
+				context_schemeVO.setSchemeAgencyID(rs.getString("scheme_agency_id"));
+				context_schemeVO.setSchemeVersion("scheme_version_id");
+				context_schemeVO.setContextCategoryID(rs.getInt("ctx_category_id"));
+				context_schemeVO.setCreatedByUserId(rs.getInt("created_by"));
+				context_schemeVO.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				context_schemeVO.setCreationTimestamp(rs.getTimestamp("creation_timestamp"));
+				context_schemeVO.setLastUpdateTimestamp(rs.getTimestamp("last_update_timestamp"));
 
 			}
 			tx.commit();
@@ -258,17 +259,18 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ContextSchemeVO context_schemeVO = new ContextSchemeVO();
-				context_schemeVO.setContextSchemeID(rs.getInt("classification_context_scheme_id"));
-				context_schemeVO.setSchemeGUID(rs.getString("classification_Context_Scheme_GUID"));
-				context_schemeVO.setSchemeID(rs.getString("Scheme_ID"));
-				context_schemeVO.setSchemeName(rs.getString("Scheme_Name"));
-				context_schemeVO.setDescription(rs.getString("Description"));
-				context_schemeVO.setSchemeAgencyID(rs.getString("Scheme_Agency_ID"));
-				//context_schemeVO.setSchemeAgencyName(rs.getString("Scheme_Agency_Name"));
-				context_schemeVO.setSchemeVersion(rs.getString("Scheme_Version_Id"));
-				context_schemeVO.setContextCategoryID(rs.getInt("Context_Category_ID"));
-				context_schemeVO.setCreatedByUserId(rs.getInt("created_by_user_id"));
-				context_schemeVO.setLastUpdatedByUserId(rs.getInt("last_updated_by_user_id"));
+				context_schemeVO.setContextSchemeID(rs.getInt("classification_ctx_scheme_id"));
+				context_schemeVO.setSchemeGUID(rs.getString("guid"));
+				context_schemeVO.setSchemeID(rs.getString("scheme_id"));
+				context_schemeVO.setSchemeName(rs.getString("scheme_name"));
+				context_schemeVO.setDescription(rs.getString("description"));
+				context_schemeVO.setSchemeAgencyID(rs.getString("scheme_agency_id"));
+				context_schemeVO.setSchemeVersion("scheme_version_id");
+				context_schemeVO.setContextCategoryID(rs.getInt("ctx_category_id"));
+				context_schemeVO.setCreatedByUserId(rs.getInt("created_by"));
+				context_schemeVO.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
+				context_schemeVO.setCreationTimestamp(rs.getTimestamp("creation_timestamp"));
+				context_schemeVO.setLastUpdateTimestamp(rs.getTimestamp("last_update_timestamp"));
 				list.add(context_schemeVO);
 			}
 			tx.commit();
@@ -304,15 +306,16 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_SCHEME_STATEMENT);
 
-			ps.setString(1, context_schemeVO.getSchemeName());
-			ps.setString(2, context_schemeVO.getDescription());
-			ps.setString(3, context_schemeVO.getSchemeAgencyID());
-			//ps.setString(4, context_schemeVO.getSchemeAgencyName());
-			ps.setString(4, context_schemeVO.getSchemeVersion());
-			ps.setInt(5, context_schemeVO.getContextCategoryID());
-			ps.setInt(6,  context_schemeVO.getCreatedByUserId());
-			ps.setInt(7, context_schemeVO.getLastUpdatedByUserId());
-			ps.setInt(8, context_schemeVO.getContextSchemeID());
+			ps.setString(1, context_schemeVO.getSchemeGUID());
+			ps.setString(2, context_schemeVO.getSchemeID());
+			ps.setString(3, context_schemeVO.getSchemeName());
+			ps.setString(4, context_schemeVO.getDescription());
+			ps.setString(5, context_schemeVO.getSchemeAgencyID());
+			ps.setString(6, context_schemeVO.getSchemeVersion());
+			ps.setInt(7, context_schemeVO.getContextCategoryID());
+			ps.setInt(8,  context_schemeVO.getCreatedByUserId());
+			ps.setInt(9, context_schemeVO.getLastUpdatedByUserId());
+			ps.setInt(10, context_schemeVO.getContextCategoryID());
 			ps.executeUpdate();
 
 			tx.commit();

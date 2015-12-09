@@ -115,12 +115,12 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 					
 					QueryCondition qc03 = new QueryCondition();
 					qc03.add("cdt_sc_id", cdt_id); 
-					qc03.add("CDT_Primitive_id", CDT_Primitive_id);
-					int cdt_sc_allowed_primitive_id = ((CDTSCAllowedPrimitiveVO)aCDTSCAllowedPrimitiveDAO.findObject(qc03, conn)).getCDTSCAllowedPrimitiveID();
+					qc03.add("CDT_Pri_id", CDT_Primitive_id);
+					int cdt_sc_awd_pri_id = ((CDTSCAllowedPrimitiveVO)aCDTSCAllowedPrimitiveDAO.findObject(qc03, conn)).getCDTSCAllowedPrimitiveID();
 					
 					QueryCondition qc04 = new QueryCondition();
-					qc04.add("CDT_SC_Allowed_Primitive", cdt_sc_allowed_primitive_id);
-					qc04.add("xsd_builtin_type_id", xbt_id);
+					qc04.add("CDT_SC_awd_pri", cdt_sc_awd_pri_id);
+					qc04.add("xbt_id", xbt_id);
 					int CDTAllowedPrimitiveExpressionTypeMapID = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc04, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
 					
 					BDTSCPrimitiveRestrictionVO bVO1 = new BDTSCPrimitiveRestrictionVO();
@@ -149,7 +149,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 						CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO)aSRTObject3;
 						
 						QueryCondition qc1 = new QueryCondition();
-						qc1.add("cdt_sc_allowed_primitive", aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID());
+						qc1.add("cdt_sc_awd_pri", aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID());
 						ArrayList<SRTObject> al4 = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc1, conn);
 						for(SRTObject aSRTObject4 : al4) {
 							CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExVO = (CDTSCAllowedPrimitiveExpressionTypeMapVO)aSRTObject4;
@@ -214,7 +214,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
     	QueryCondition qc = new QueryCondition();
-		qc.add("cdt_primitive_id",  id);
+		qc.add("cdt_pri_id",  id);
 		return ((CDTPrimitiveVO)aCDTPrimitiveDAO.findObject(qc)).getName();
 	}
 	
@@ -222,7 +222,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO aXSDBuiltInTypeDAO = df.getDAO("XSDBuiltInType");
     	QueryCondition qc = new QueryCondition();
-		qc.add("XSD_BuiltIn_Type_id", id);
+		qc.add("xbt_id", id);
 		return (XSDBuiltInTypeVO)aXSDBuiltInTypeDAO.findObject(qc);
 	}
 

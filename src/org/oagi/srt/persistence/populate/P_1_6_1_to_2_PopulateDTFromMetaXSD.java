@@ -62,7 +62,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setRevisionType(0);
 		    
 		    QueryCondition qc = new QueryCondition();
-			qc.add("DT_GUID", "oagis-id-d5cb8551edf041389893fee25a496395");
+			qc.add("guid", "oagis-id-d5cb8551edf041389893fee25a496395");
 			DTVO dtVO_01 = (DTVO)dao.findObject(qc, conn);
 		    
 		    
@@ -87,7 +87,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setRevisionState(1);
 		    
 		    QueryCondition qc_02 = new QueryCondition();
-			qc.add("User_Name", "oagis");
+			qc.add("Name", "oagis");
 			int userId = ((UserVO)daoUser.findObject(qc_02, conn)).getUserID();
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
@@ -97,7 +97,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    
 		    // BDT_Primitive_Restriction
 		    QueryCondition qc2 = new QueryCondition();
-			qc2.add("DT_GUID", dtVO.getDTGUID());
+			qc2.add("guid", dtVO.getDTGUID());
 			
 			insertBDTPrimitiveRestriction(dtVO_01.getDTID(), ((DTVO)dao.findObject(qc2, conn)).getDTID());
 	    }

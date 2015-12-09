@@ -21,23 +21,23 @@ import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
 *
 */
 public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
-	private final String _tableName = "cdt_sc_allowed_primitive";
+	private final String _tableName = "cdt_sc_awd_pri";
 
 	private final String _FIND_ALL_CDT_SC_Allowed_Primitive_STATEMENT = 
-			"SELECT CDT_SC_Allowed_Primitive_ID, CDT_SC_ID, CDT_Primitive_ID, isDefault FROM " + _tableName;
+			"SELECT cdt_sc_awd_pri_id, cdt_sc_id, cdt_pri_id, is_default FROM " + _tableName;
 
 	private final String _FIND_CDT_SC_Allowed_Primitive_STATEMENT = 
-			"SELECT CDT_SC_Allowed_Primitive_ID, CDT_SC_ID, CDT_Primitive_ID, isDefault FROM " + _tableName;
+			"SELECT cdt_sc_awd_pri_id, cdt_sc_id, cdt_pri_id, is_default FROM " + _tableName;
 
 	private final String _INSERT_CDT_SC_Allowed_Primitive_STATEMENT = 
-			"INSERT INTO " + _tableName + " (CDT_SC_ID, CDT_Primitive_ID, isDefault) VALUES (?, ?, ?)";
+			"INSERT INTO " + _tableName + " (cdt_sc_id, cdt_pri_id, is_default) VALUES (?, ?, ?)";
 
 	private final String _UPDATE_CDT_SC_Allowed_Primitive_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET CDT_SC_Allowed_Primitive_ID = ?, CDT_SC_ID = ?, CDT_Primitive_ID = ?, isDefault = ? WHERE CDT_SC_Allowed_Primitive_ID = ?";
+			+ " SET cdt_sc_awd_pri_id = ?, cdt_sc_id = ?, cdt_pri_id = ?, is_default = ? WHERE cdt_sc_awd_pri_id = ?";
 
 	private final String _DELETE_CDT_SC_Allowed_Primitive_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE CDT_SC_Allowed_Primitive_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE cdt_sc_awd_pri_id = ?";
 
 
 	@Override
@@ -81,10 +81,10 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTSCAllowedPrimitiveVO cdtscallowedprimitiveVO = new CDTSCAllowedPrimitiveVO();
-				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
-				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
-				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
-				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("cdt_sc_awd_pri_id"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("cdt_sc_id"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(cdtscallowedprimitiveVO);
 			}
 			tx.commit();
@@ -142,10 +142,10 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTSCAllowedPrimitiveVO cdtscallowedprimitiveVO = new CDTSCAllowedPrimitiveVO();
-				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
-				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
-				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
-				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("cdt_sc_awd_pri_id"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("cdt_sc_id"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(cdtscallowedprimitiveVO);
 			}
 		} catch (SQLException e) {
@@ -230,10 +230,10 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
-				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
-				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
-				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("cdt_sc_awd_pri_id"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("cdt_sc_id"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("is_default"));
 			}
 			tx.commit();
 			conn.close();
@@ -287,10 +287,10 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
-				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
-				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
-				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("cdt_sc_awd_pri_id"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("cdt_sc_id"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("is_default"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -322,10 +322,10 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTSCAllowedPrimitiveVO cdtscallowedprimitiveVO = new CDTSCAllowedPrimitiveVO();
-				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("CDT_SC_Allowed_Primitive_ID"));
-				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("CDT_SC_ID"));
-				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
-				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("isDefault"));
+				cdtscallowedprimitiveVO.setCDTSCAllowedPrimitiveID(rs.getInt("cdt_sc_awd_pri_id"));
+				cdtscallowedprimitiveVO.setCDTSCID(rs.getInt("cdt_sc_id"));
+				cdtscallowedprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
+				cdtscallowedprimitiveVO.setisDefault(rs.getBoolean("is_default"));
 				list.add(cdtscallowedprimitiveVO);
 			}
 			tx.commit();
@@ -363,6 +363,7 @@ public class CDTSCAllowedPrimitiveMysqlDAO extends SRTDAO {
 			ps.setInt(1, cdtscallowedprimitiveVO.getCDTSCID());
 			ps.setInt(2, cdtscallowedprimitiveVO.getCDTPrimitiveID());
 			ps.setBoolean(3, cdtscallowedprimitiveVO.getisDefault());
+			ps.setInt(4, cdtscallowedprimitiveVO.getCDTSCAllowedPrimitiveID());
 			ps.executeUpdate();
 
 			tx.commit();

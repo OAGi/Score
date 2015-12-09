@@ -25,25 +25,30 @@ public class BCCPMysqlDAO extends SRTDAO {
 	private final String _tableName = "bccp";
 
 	private final String _FIND_ALL_BCCP_STATEMENT = 
-			"SELECT BCCP_ID, BCCP_GUID, Property_Term, Representation_Term, BDT_ID, "
-					+ "Den, Definition, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp FROM " + _tableName;
+			"SELECT BCCP_ID, GUID, Property_Term, Representation_Term, BDT_ID, "
+					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id FROM " + _tableName;
 
 	private final String _FIND_BCCP_STATEMENT = 
-			"SELECT BCCP_ID, BCCP_GUID, Property_Term, Representation_Term, BDT_ID, "
-					+ "Den, Definition, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp FROM " + _tableName;
+			"SELECT BCCP_ID, GUID, Property_Term, Representation_Term, BDT_ID, "
+					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id FROM " + _tableName;
 
+	//start from here
 	private final String _INSERT_BCCP_STATEMENT = 
-			"INSERT INTO " + _tableName + " (BCCP_GUID, Property_Term, Representation_Term, BDT_ID, "
-					+ "Den, Definition, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+			"INSERT INTO " + _tableName + " (GUID, Property_Term, Representation_Term, BDT_ID, "
+					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BCCP_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, BCCP_GUID = ?, Property_Term = ?, Representation_Term = ?, BDT_ID = ?, "
-			+ "Den = ?, Definition = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
-			+ "Creation_Timestamp = ? WHERE BCCP_ID = ?";
+			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Property_Term = ?, Representation_Term = ?, BDT_ID = ?, "
+			+ "Den = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
+			+ "Creation_Timestamp = ?, State = ?, Module = ?,"
+			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bccp_id = ? WHERE BCCP_ID = ?";
 
 	private final String _DELETE_BCCP_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BCCP_ID = ?";
@@ -72,7 +77,15 @@ public class BCCPMysqlDAO extends SRTDAO {
 			else
 				ps.setString(6, bccpVO.getDefinition());
 			ps.setInt(7, bccpVO.getCreatedByUserId());
-			ps.setInt(8, bccpVO.getLastUpdatedByUserId());
+			ps.setInt(8, bccpVO.getOwnerUserId());
+			ps.setInt(9, bccpVO.getLastUpdatedByUserId());
+			ps.setInt(10, bccpVO.getState());
+			ps.setString(11, bccpVO.getModule());
+			ps.setInt(12, bccpVO.getRevisionNum());
+			ps.setInt(13, bccpVO.getRevisionTrackingNum());
+			ps.setInt(14, bccpVO.getRevisionAction());
+			ps.setInt(15, bccpVO.getReleaseId());
+			ps.setInt(16, bccpVO.getCurrentBccpId());
 
 			ps.executeUpdate();
 
@@ -138,16 +151,24 @@ public class BCCPMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				bccpVO = new BCCPVO();
 				bccpVO.setBCCPID(rs.getInt("BCCP_ID"));
-				bccpVO.setBCCPGUID(rs.getString("BCCP_GUID"));
+				bccpVO.setBCCPGUID(rs.getString("GUID"));
 				bccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				bccpVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				bccpVO.setBDTID(rs.getInt("BDT_ID"));
 				bccpVO.setDEN(rs.getString("DEN"));
 				bccpVO.setDefinition(rs.getString("Definition"));
-				bccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				bccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				bccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				bccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bccpVO.setState(rs.getInt("State"));
+				bccpVO.setModule(rs.getString("Module"));
+				bccpVO.setRevisionNum(rs.getInt("revision_num"));
+				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
+				bccpVO.setReleaseId(rs.getInt("release_id"));
+				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -209,16 +230,24 @@ public class BCCPMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				bccpVO = new BCCPVO();
 				bccpVO.setBCCPID(rs.getInt("BCCP_ID"));
-				bccpVO.setBCCPGUID(rs.getString("BCCP_GUID"));
+				bccpVO.setBCCPGUID(rs.getString("GUID"));
 				bccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				bccpVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				bccpVO.setBDTID(rs.getInt("BDT_ID"));
 				bccpVO.setDEN(rs.getString("DEN"));
 				bccpVO.setDefinition(rs.getString("Definition"));
-				bccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				bccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				bccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				bccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bccpVO.setState(rs.getInt("State"));
+				bccpVO.setModule(rs.getString("Module"));
+				bccpVO.setRevisionNum(rs.getInt("revision_num"));
+				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
+				bccpVO.setReleaseId(rs.getInt("release_id"));
+				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -260,16 +289,24 @@ public class BCCPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				BCCPVO bccpVO = new BCCPVO();
 				bccpVO.setBCCPID(rs.getInt("BCCP_ID"));
-				bccpVO.setBCCPGUID(rs.getString("BCCP_GUID"));
+				bccpVO.setBCCPGUID(rs.getString("GUID"));
 				bccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				bccpVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				bccpVO.setBDTID(rs.getInt("BDT_ID"));
 				bccpVO.setDEN(rs.getString("DEN"));
 				bccpVO.setDefinition(rs.getString("Definition"));
-				bccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				bccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				bccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				bccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bccpVO.setState(rs.getInt("State"));
+				bccpVO.setModule(rs.getString("Module"));
+				bccpVO.setRevisionNum(rs.getInt("revision_num"));
+				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
+				bccpVO.setReleaseId(rs.getInt("release_id"));
+				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				list.add(bccpVO);
 			}
 			tx.commit();
@@ -309,16 +346,24 @@ public class BCCPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				BCCPVO bccpVO = new BCCPVO();
 				bccpVO.setBCCPID(rs.getInt("BCCP_ID"));
-				bccpVO.setBCCPGUID(rs.getString("BCCP_GUID"));
+				bccpVO.setBCCPGUID(rs.getString("GUID"));
 				bccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				bccpVO.setRepresentationTerm(rs.getString("Representation_Term"));
 				bccpVO.setBDTID(rs.getInt("BDT_ID"));
 				bccpVO.setDEN(rs.getString("DEN"));
 				bccpVO.setDefinition(rs.getString("Definition"));
-				bccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				bccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				bccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				bccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				bccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				bccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				bccpVO.setState(rs.getInt("State"));
+				bccpVO.setModule(rs.getString("Module"));
+				bccpVO.setRevisionNum(rs.getInt("revision_num"));
+				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
+				bccpVO.setReleaseId(rs.getInt("release_id"));
+				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				list.add(bccpVO);
 			}
 			//tx.commit();
@@ -358,10 +403,22 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setString(3, bccpVO.getRepresentationTerm());
 			ps.setInt(4, bccpVO.getBDTID());
 			ps.setString(5, bccpVO.getDEN());
-			ps.setString(6, bccpVO.getDefinition());
+			if(bccpVO.getDefinition() == null)
+				ps.setString(6, "");
+			else
+				ps.setString(6, bccpVO.getDefinition());
 			ps.setInt(7, bccpVO.getCreatedByUserId());
-			ps.setInt(8, bccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(9, bccpVO.getLastUpdateTimestamp());
+			ps.setInt(8, bccpVO.getOwnerUserId());
+			ps.setInt(9, bccpVO.getLastUpdatedByUserId());
+			ps.setTimestamp(10, bccpVO.getCreationTimestamp());
+			ps.setInt(11, bccpVO.getState());
+			ps.setString(12, bccpVO.getModule());
+			ps.setInt(13, bccpVO.getRevisionNum());
+			ps.setInt(14, bccpVO.getRevisionTrackingNum());
+			ps.setInt(15, bccpVO.getRevisionAction());
+			ps.setInt(16, bccpVO.getReleaseId());
+			ps.setInt(17, bccpVO.getCurrentBccpId());
+
 			ps.executeUpdate();
 
 			tx.commit();

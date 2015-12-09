@@ -155,7 +155,7 @@ public class P_1_7_PopulateQBDTInDT {
 	
 	private List<SRTObject> getCdtSCAPMap(int cdtSCAllowedPrimitiveId) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
-		qc.add("cdt_sc_allowed_primitive", cdtSCAllowedPrimitiveId);
+		qc.add("cdt_sc_awd_pri", cdtSCAllowedPrimitiveId);
 		return cdtSCAPMapDAO.findObjects(qc, conn);
 	}
 	
@@ -204,11 +204,11 @@ public class P_1_7_PopulateQBDTInDT {
 				
 				QueryCondition qc = new QueryCondition();
 				String typeGuid = ((Element)typeNode).getAttribute("id");
-				qc.add("dt_guid", typeGuid);
+				qc.add("guid", typeGuid);
 				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
 				
 				QueryCondition qc2 = new QueryCondition();
-				qc2.add("Code_List_GUID", typeGuid);
+				qc2.add("GUID", typeGuid);
 				CodeListVO codelistVO = (CodeListVO)aCodeListDAO.findObject(qc2, conn);
 				
 				if(dtVO == null) {
@@ -432,7 +432,7 @@ public class P_1_7_PopulateQBDTInDT {
 			aDTDAO.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();
-			qc1.add("dt_guid", guid);
+			qc1.add("guid", guid);
 			
 			DTVO res = (DTVO)aDTDAO.findObject(qc1, conn);
 			// add to BDTPrimitiveRestriction
@@ -618,7 +618,7 @@ public class P_1_7_PopulateQBDTInDT {
 					// populate CDT_SC_Allowed_Primitives
 					QueryCondition qc_01 = new QueryCondition();
 					qc_01.add("owner_dt_iD", vo.getOwnerDTID());
-					qc_01.add("dt_sc_guid", vo.getDTSCGUID());
+					qc_01.add("guid", vo.getDTSCGUID());
 					
 					DTSCVO dtscVO = (DTSCVO)aDTSCDAO.findObject(qc_01, conn);
 					String representationTerm = dtscVO.getRepresentationTerm();
@@ -636,7 +636,7 @@ public class P_1_7_PopulateQBDTInDT {
 						// populate CDT_SC_Allowed_Primitive_Expression_Type_Map
 						QueryCondition qc_02 = new QueryCondition();
 						qc_02.add("cdt_sc_id", cdtSCAllowedVO.getCDTSCID());
-						qc_02.add("cdt_primitive_id", cdtSCAllowedVO.getCDTPrimitiveID());
+						qc_02.add("cdt_pri_id", cdtSCAllowedVO.getCDTPrimitiveID());
 						int cdtSCAllowedPrimitiveId = ((CDTSCAllowedPrimitiveVO)aCDTSCAllowedPrimitiveDAO.findObject(qc_02, conn)).getCDTSCAllowedPrimitiveID();
 						
 						List<String> xsdbs = Types.getCorrespondingXSDBuiltType(getPrimitiveName(cdtSCAllowedVO.getCDTPrimitiveID()));
@@ -688,13 +688,13 @@ public class P_1_7_PopulateQBDTInDT {
 	
 	public DTSCVO getDTSCVO(String guid) throws SRTDAOException{
     	QueryCondition qc = new QueryCondition();
-		qc.add("DT_SC_GUID", guid);
+		qc.add("GUID", guid);
 		return (DTSCVO)aDTSCDAO.findObject(qc);
 	}
 	
 	public DTSCVO getDTSCVO(String guid, int ownerId) throws SRTDAOException{
     	QueryCondition qc = new QueryCondition();
-		qc.add("DT_SC_GUID", guid);
+		qc.add("GUID", guid);
 		qc.add("owner_dt_id", ownerId);
 		return (DTSCVO)aDTSCDAO.findObject(qc);
 	}
@@ -702,7 +702,7 @@ public class P_1_7_PopulateQBDTInDT {
 	public int getDTID(String DataTypeTerm) throws SRTDAOException{
     	QueryCondition qc = new QueryCondition();
 		qc.add("Data_Type_Term", new String(DataTypeTerm));
-		qc.add("DT_Type", 0);
+		qc.add("Type", 0);
 		DTVO dtVO = (DTVO)aDTDAO.findObject(qc);		
 		int id = dtVO.getDTID();
 		return id;
@@ -718,7 +718,7 @@ public class P_1_7_PopulateQBDTInDT {
 	
 	public String getRepresentationTerm(String DTSCGUID) throws SRTDAOException{
     	QueryCondition qc = new QueryCondition();
-		qc.add("DT_SC_GUID", new String(DTSCGUID));
+		qc.add("GUID", new String(DTSCGUID));
 		DTSCVO dtscVO = (DTSCVO)aDTSCDAO.findObject(qc);
 		String term = dtscVO.getRepresentationTerm();
 		return term;
@@ -726,7 +726,7 @@ public class P_1_7_PopulateQBDTInDT {
 	
 	public String getPrimitiveName(int CDTPrimitiveID) throws SRTDAOException{
     	QueryCondition qc = new QueryCondition();
-		qc.add("CDT_Primitive_ID", CDTPrimitiveID);
+		qc.add("CDT_Pri_ID", CDTPrimitiveID);
 		return ((CDTPrimitiveVO)aCDTPrimitiveDAO.findObject(qc)).getName();
 	}
 	
@@ -765,20 +765,20 @@ public class P_1_7_PopulateQBDTInDT {
 	private DTVO getDTVOWithDEN(String den) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("den", den);
-		qc.add("dt_type", 1);
+		qc.add("type", 1);
 		return (DTVO)aDTDAO.findObject(qc, conn);
 	}
 	
 	private DTVO getDTVOWithRepresentationTerm(String representationTerm) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("data_type_term", representationTerm);
-		qc.add("dt_type", 0);
+		qc.add("type", 0);
 		return (DTVO)aDTDAO.findObject(qc, conn);
 	}
 	
 	private DTVO getDTVOWithGUID(String guid) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
-		qc.add("dt_guid", guid);
+		qc.add("guid", guid);
 		return (DTVO)aDTDAO.findObject(qc, conn);
 	}
 	

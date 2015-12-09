@@ -23,22 +23,22 @@ import org.oagi.srt.persistence.dto.ContextCategoryVO;
  */
 public class BusinessContextValueMysqlDAO extends SRTDAO {
 	
-	private final String _tableName = "business_context_value";
+	private final String _tableName = "biz_ctx_value";
 
 	private final String _FIND_ALL_BUSINESS_CONTEXT_VALUE_STATEMENT =
-			"SELECT Business_Context_Value_ID, Business_Context_ID, Context_Scheme_Value_ID FROM " + _tableName;
+			"SELECT biz_ctx_value_id, biz_ctx_id, ctx_scheme_value_id FROM " + _tableName;
 	
 	private final String _FIND_BUSINESS_CONTEXT_VALUE_STATEMENT = 
-			"SELECT Business_Context_Value_ID, Business_Context_ID, Context_Scheme_Value_ID FROM " + _tableName;
+			"SELECT biz_ctx_value_id, biz_ctx_id, ctx_scheme_value_id FROM " + _tableName;
 	
 	private final String _INSERT_BUSINESS_CONTEXT_VALUE_STATEMENT =
-			"INSERT INTO " + _tableName + " (Business_Context_ID, Context_Scheme_Value_ID) VALUES (?, ?)";
+			"INSERT INTO " + _tableName + " (biz_ctx_id, ctx_scheme_value_id) VALUES (?, ?)";
 	
 	private final String _UPDATE_BUSINESS_CONTEXT_VALUE_STATEMENT = "UPDATE " + _tableName + 
-			" SET Business_Context_ID = ?, Context_Scheme_Value_ID = ? WHERE Business_Context_Value_ID = ?";
+			" SET biz_ctx_id = ?, ctx_scheme_value_id = ? WHERE biz_ctx_value_id = ?";
 	
 	private final String _DELETE_BUSINESS_CONTEXT_VALUE_STATEMENT =
-			"DELETE FROM " + _tableName + " WHERE Business_Context_Value_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE biz_ctx_value_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -104,9 +104,9 @@ public class BusinessContextValueMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				business_context_valueVO.setBusinessContextValueID(rs.getInt("Business_Context_Value_ID"));
-				business_context_valueVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
-				business_context_valueVO.setContextSchemeValueID(rs.getInt("Context_Scheme_Value_ID"));
+				business_context_valueVO.setBusinessContextValueID(rs.getInt("biz_ctx_value_id"));
+				business_context_valueVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
+				business_context_valueVO.setContextSchemeValueID(rs.getInt("ctx_scheme_value_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -143,9 +143,9 @@ public class BusinessContextValueMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BusinessContextValueVO business_context_valueVO = new BusinessContextValueVO();
-				business_context_valueVO.setBusinessContextValueID(rs.getInt("Business_Context_Value_ID"));
-				business_context_valueVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
-				business_context_valueVO.setContextSchemeValueID(rs.getInt("Context_Scheme_Value_ID"));
+				business_context_valueVO.setBusinessContextValueID(rs.getInt("biz_ctx_value_id"));
+				business_context_valueVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
+				business_context_valueVO.setContextSchemeValueID(rs.getInt("ctx_scheme_value_id"));
 				list.add(business_context_valueVO);
 			}
 			tx.commit();
@@ -289,9 +289,9 @@ public class BusinessContextValueMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				BusinessContextValueVO business_context_valueVO = new BusinessContextValueVO();
-				business_context_valueVO.setBusinessContextValueID(rs.getInt("Business_Context_Value_ID"));
-				business_context_valueVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
-				business_context_valueVO.setContextSchemeValueID(rs.getInt("Context_Scheme_Value_ID"));
+				business_context_valueVO.setBusinessContextValueID(rs.getInt("biz_ctx_value_id"));
+				business_context_valueVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
+				business_context_valueVO.setContextSchemeValueID(rs.getInt("ctx_scheme_value_id"));
 				list.add(business_context_valueVO);
 			}
 			tx.commit();

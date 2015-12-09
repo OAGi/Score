@@ -1,5 +1,7 @@
 package org.oagi.srt.persistence.dto;
 
+import java.sql.Timestamp;
+
 import org.oagi.srt.common.SRTObject;
 
 /**
@@ -14,6 +16,8 @@ public class BusinessContextVO extends SRTObject {
 	private String name;
 	private int createdByUserId;
 	private int lastUpdatedByUserId;
+	private Timestamp CreationTimestamp;
+	private Timestamp LastUpdateTimestamp;
 	
 	public int getBusinessContextID(){
 		return businessContextID;
@@ -54,4 +58,21 @@ public class BusinessContextVO extends SRTObject {
 	public void setLastUpdatedByUserId(int lastUpdatedByUserId) {
 		this.lastUpdatedByUserId = lastUpdatedByUserId;
 	}
+	
+	public Timestamp getCreationTimestamp() {
+		return CreationTimestamp;
+	}
+	
+	public void setCreationTimestamp(Timestamp creationTimestamp) {
+		CreationTimestamp = creationTimestamp;
+	}
+	
+	public Timestamp getLastUpdateTimestamp() {
+		return LastUpdateTimestamp;
+	}
+	
+	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
+		LastUpdateTimestamp = lastUpdateTimestamp;
+	}
+	
 }

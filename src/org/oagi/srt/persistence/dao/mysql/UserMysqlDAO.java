@@ -22,21 +22,21 @@ import org.oagi.srt.persistence.dto.UserVO;
  */
 public class UserMysqlDAO extends SRTDAO {
 	
-	private final String _tableName = "user";
+	private final String _tableName = "app_user";
 
 	private final String _FIND_ALL_USER_STATEMENT =
-			"SELECT User_ID, User_Name, Password, Name, Organization FROM " + _tableName;
+			"SELECT app_user_id, login_id, Password, Name, Organization, oagis_developer_indicator FROM " + _tableName;
 	
 	private final String _FIND_USER_STATEMENT = 
-			"SELECT User_ID, User_Name, Password, Name, Organization FROM " + _tableName;
+			"SELECT app_user_id, login_id, Password, Name, Organization, oagis_developer_indicator FROM " + _tableName;
 	
 	private final String _INSERT_USER_STATEMENT = "INSERT INTO " + _tableName + 
-			" (User_Name, Password, Name, Organization) VALUES (?, ?, ?, ?)";
+			" (login_id, Password, Name, Organization, oagis_developer_indicator) VALUES (?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_USER_STATEMENT = "UPDATE " + _tableName + 
-			" SET User_Name = ?, Password = ?, Name = ?, Organization = ? WHERE User_ID = ?";
+			" SET login_id = ?, Password = ?, Name = ?, Organization = ?, oagis_developer_indicator = ? WHERE app_user_id = ?";
 	
-	private final String _DELETE_USER_STATEMENT = "DELETE FROM " + _tableName + " WHERE User_ID = ?";
+	private final String _DELETE_USER_STATEMENT = "DELETE FROM " + _tableName + " WHERE app_user_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -55,6 +55,7 @@ public class UserMysqlDAO extends SRTDAO {
 			ps.setString(2, userVO.getPassword());
 			ps.setString(3, userVO.getName());
 			ps.setString(4, userVO.getOrganization());
+			ps.setBoolean(5, userVO.getOagis_developer_indicator());
 
 			ps.executeUpdate();
 			ps.close();
@@ -103,11 +104,12 @@ public class UserMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				userVO.setUserID(rs.getInt("User_ID"));
-				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setUserID(rs.getInt("app_user_id"));
+				userVO.setUserName(rs.getString("login_id"));
 				userVO.setPassword(rs.getString("Password"));
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
+				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
 
 			}
 			tx.commit();
@@ -161,11 +163,12 @@ public class UserMysqlDAO extends SRTDAO {
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				userVO.setUserID(rs.getInt("User_ID"));
-				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setUserID(rs.getInt("app_user_id"));
+				userVO.setUserName(rs.getString("login_id"));
 				userVO.setPassword(rs.getString("Password"));
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
+				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
 
 			}
 		} catch (SQLException e) {
@@ -198,11 +201,12 @@ public class UserMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				UserVO userVO = new UserVO();
-				userVO.setUserID(rs.getInt("User_ID"));
-				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setUserID(rs.getInt("app_user_id"));
+				userVO.setUserName(rs.getString("login_id"));
 				userVO.setPassword(rs.getString("Password"));
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
+				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
 				list.add(userVO);
 			}
 			tx.commit();
@@ -259,11 +263,12 @@ public class UserMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				UserVO userVO = new UserVO();
-				userVO.setUserID(rs.getInt("User_ID"));
-				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setUserID(rs.getInt("app_user_id"));
+				userVO.setUserName(rs.getString("login_id"));
 				userVO.setPassword(rs.getString("Password"));
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
+				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
 				list.add(userVO);
 			}
 			tx.commit();
@@ -300,11 +305,12 @@ public class UserMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				UserVO userVO = new UserVO();
-				userVO.setUserID(rs.getInt("User_ID"));
-				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setUserID(rs.getInt("app_user_id"));
+				userVO.setUserName(rs.getString("login_id"));
 				userVO.setPassword(rs.getString("Password"));
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
+				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
 				list.add(userVO);
 			}
 		} catch (SQLException e) {
@@ -355,11 +361,12 @@ public class UserMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				UserVO userVO = new UserVO();
-				userVO.setUserID(rs.getInt("User_ID"));
-				userVO.setUserName(rs.getString("User_Name"));
+				userVO.setUserID(rs.getInt("app_user_id"));
+				userVO.setUserName(rs.getString("login_id"));
 				userVO.setPassword(rs.getString("Password"));
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
+				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
 				list.add(userVO);
 			}
 		} catch (SQLException e) {
@@ -393,6 +400,7 @@ public class UserMysqlDAO extends SRTDAO {
 			ps.setString(2, userVO.getPassword());
 			ps.setString(3, userVO.getName());
 			ps.setString(4, userVO.getOrganization());
+			ps.setBoolean(5, userVO.getOagis_developer_indicator());
 			ps.executeUpdate();
 
 			tx.commit();

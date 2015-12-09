@@ -25,25 +25,29 @@ public class ASCCPMysqlDAO extends SRTDAO {
 	private final String _tableName = "asccp";
 
 	private final String _FIND_ALL_ASCCP_STATEMENT = 
-			"SELECT ASCCP_ID, ASCCP_GUID, Property_Term, "
-					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator FROM " + _tableName + " order by Property_Term asc";
+			"SELECT ASCCP_ID, GUID, Property_Term, "
+					+ "Definition, Role_Of_ACC_ID, Den, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, namespace_id, Reusable_Indicator, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id FROM " + _tableName + " order by Property_Term asc";
 
 	private final String _FIND_ASCCP_STATEMENT = 
-			"SELECT ASCCP_ID, ASCCP_GUID, Property_Term, "
-					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, Reusable_Indicator FROM " + _tableName;
+			"SELECT ASCCP_ID, GUID, Property_Term, "
+					+ "Definition, Role_Of_ACC_ID, Den, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, namespace_id, Reusable_Indicator, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id FROM " + _tableName;
 	
 	private final String _INSERT_ASCCP_STATEMENT = 
-			"INSERT INTO " + _tableName + " (ASCCP_GUID, Property_Term, "
-					+ "Definition, Role_Of_ACC_ID, Den, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (GUID, Property_Term, "
+					+ "Definition, Role_Of_ACC_ID, Den, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, namespace_id, Reusable_Indicator, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_ASCCP_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ASCCP_GUID = ?, Property_Term = ?, "
-			+ "Definition = ?, Role_Of_ACC_ID = ?, Den = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
-			+ "Creation_Timestamp = ?, State = ? Module = ?, Reusable_Indicator =? WHERE ASCCP_ID = ?";
+			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Property_Term = ?, "
+			+ "Definition = ?, Role_Of_ACC_ID = ?, Den = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
+			+ "Creation_Timestamp = ?, State = ?, Module = ?, namespace_id = ?, Reusable_Indicator = ?,"
+			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_asccp_id = ? WHERE ASCCP_ID = ?";
 
 	private final String _DELETE_ASCCP_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASCCP_ID = ?";
@@ -68,10 +72,18 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setInt(4, asccpVO.getRoleOfACCID());
 			ps.setString(5, asccpVO.getDEN());
 			ps.setInt(6, asccpVO.getCreatedByUserId());
-			ps.setInt(7, asccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(8, asccpVO.getLastUpdateTimestamp());
-			ps.setInt(9, asccpVO.getState());
-			ps.setString(10, asccpVO.getModule());
+			ps.setInt(7, asccpVO.getOwnerUserId());
+			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
+			ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
+			ps.setInt(10, asccpVO.getState());
+			ps.setString(11, asccpVO.getModule());
+			ps.setInt(12, asccpVO.getNamespaceId());
+			ps.setBoolean(13, asccpVO.getReusableIndicator());
+			ps.setInt(14, asccpVO.getRevisionNum());
+			ps.setInt(15, asccpVO.getRevisionTrackingNum());
+			ps.setInt(16, asccpVO.getRevisionAction());
+			ps.setInt(17, asccpVO.getReleaseId());
+			ps.setInt(18, asccpVO.getCurrentAsccpId());
 
 			ps.executeUpdate();
 
@@ -157,17 +169,25 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				asccpVO = new ASCCPVO();
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
-				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setASCCPGUID(rs.getString("GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
 				asccpVO.setDEN(rs.getString("DEN"));
-				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
+				asccpVO.setNamespaceId(rs.getInt("namespace_id"));
+				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
+				asccpVO.setRevisionNum(rs.getInt("revision_num"));
+				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setReleaseId(rs.getInt("release_id"));
+				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -249,17 +269,25 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				asccpVO = new ASCCPVO();
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
-				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setASCCPGUID(rs.getString("GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
 				asccpVO.setDEN(rs.getString("DEN"));
-				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
+				asccpVO.setNamespaceId(rs.getInt("namespace_id"));
+				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
+				asccpVO.setRevisionNum(rs.getInt("revision_num"));
+				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setReleaseId(rs.getInt("release_id"));
+				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -344,17 +372,25 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ASCCPVO asccpVO = new ASCCPVO();
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
-				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setASCCPGUID(rs.getString("GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
 				asccpVO.setDEN(rs.getString("DEN"));
-				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
+				asccpVO.setNamespaceId(rs.getInt("namespace_id"));
+				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
+				asccpVO.setRevisionNum(rs.getInt("revision_num"));
+				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setReleaseId(rs.getInt("release_id"));
+				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				list.add(asccpVO);
 			}
 			tx.commit();
@@ -440,17 +476,25 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ASCCPVO asccpVO = new ASCCPVO();
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
-				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setASCCPGUID(rs.getString("GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
 				asccpVO.setDEN(rs.getString("DEN"));
-				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
+				asccpVO.setNamespaceId(rs.getInt("namespace_id"));
+				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
+				asccpVO.setRevisionNum(rs.getInt("revision_num"));
+				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setReleaseId(rs.getInt("release_id"));
+				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				list.add(asccpVO);
 			}
 			//tx.commit();
@@ -493,18 +537,25 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ASCCPVO asccpVO = new ASCCPVO();
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
-				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setASCCPGUID(rs.getString("GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
 				asccpVO.setDEN(rs.getString("DEN"));
-				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
-				asccpVO.setReusableIndicator(rs.getBoolean("Reusable_Indicator"));
+				asccpVO.setNamespaceId(rs.getInt("namespace_id"));
+				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
+				asccpVO.setRevisionNum(rs.getInt("revision_num"));
+				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setReleaseId(rs.getInt("release_id"));
+				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				list.add(asccpVO);
 			}
 			tx.commit();
@@ -544,18 +595,25 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ASCCPVO asccpVO = new ASCCPVO();
 				asccpVO.setASCCPID(rs.getInt("ASCCP_ID"));
-				asccpVO.setASCCPGUID(rs.getString("ASCCP_GUID"));
+				asccpVO.setASCCPGUID(rs.getString("GUID"));
 				asccpVO.setPropertyTerm(rs.getString("Property_Term"));
 				asccpVO.setDefinition(rs.getString("Definition"));
 				asccpVO.setRoleOfACCID(rs.getInt("Role_Of_ACC_ID"));
 				asccpVO.setDEN(rs.getString("DEN"));
-				asccpVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				asccpVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccpVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccpVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				asccpVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asccpVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				asccpVO.setState(rs.getInt("State"));
 				asccpVO.setModule(rs.getString("Module"));
-				asccpVO.setReusableIndicator(rs.getBoolean("Reusable_Indicator"));
+				asccpVO.setNamespaceId(rs.getInt("namespace_id"));
+				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
+				asccpVO.setRevisionNum(rs.getInt("revision_num"));
+				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setReleaseId(rs.getInt("release_id"));
+				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				list.add(asccpVO);
 			}
 			//tx.commit();
@@ -596,11 +654,18 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setInt(4, asccpVO.getRoleOfACCID());
 			ps.setString(5, asccpVO.getDEN());
 			ps.setInt(6, asccpVO.getCreatedByUserId());
-			ps.setInt(7, asccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(8, asccpVO.getLastUpdateTimestamp());
-			ps.setInt(9, asccpVO.getState());
-			ps.setString(10, asccpVO.getModule());
-			ps.setBoolean(11, asccpVO.getReusableIndicator());
+			ps.setInt(7, asccpVO.getOwnerUserId());
+			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
+			ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
+			ps.setInt(10, asccpVO.getState());
+			ps.setString(11, asccpVO.getModule());
+			ps.setInt(12, asccpVO.getNamespaceId());
+			ps.setBoolean(13, asccpVO.getReusableIndicator());
+			ps.setInt(14, asccpVO.getRevisionNum());
+			ps.setInt(15, asccpVO.getRevisionTrackingNum());
+			ps.setInt(16, asccpVO.getRevisionAction());
+			ps.setInt(17, asccpVO.getReleaseId());
+			ps.setInt(18, asccpVO.getCurrentAsccpId());
 			ps.executeUpdate();
 
 			tx.commit();

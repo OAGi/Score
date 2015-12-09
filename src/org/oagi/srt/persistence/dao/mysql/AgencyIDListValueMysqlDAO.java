@@ -25,21 +25,21 @@ public class AgencyIDListValueMysqlDAO extends SRTDAO {
 	private final String _tableName = "agency_id_list_value";
 	
 	private final String _FIND_ALL_Agency_ID_Value_List_STATEMENT =
-			"SELECT Agency_ID_List_Value_ID, Value, Name, Definition, Owner_Agency_ID_List_ID "
+			"SELECT Agency_ID_List_Value_ID, Value, Name, Definition, owner_list_id "
 			+ "FROM " + _tableName;
 	
 	private final String _FIND_Agency_ID_Value_List_STATEMENT =
-			"SELECT Agency_ID_List_Value_ID, Value, Name, Definition, Owner_Agency_ID_List_ID "
+			"SELECT Agency_ID_List_Value_ID, Value, Name, Definition, owner_list_id "
 			+ "FROM " + _tableName;
 	
 	private final String _INSERT_Agency_ID_Value_List_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Value, Name, Definition, Owner_Agency_ID_List_ID)"
+			"INSERT INTO " + _tableName + " (Value, Name, Definition, owner_list_id)"
 			+ " VALUES (?, ?, ?, ?)";
 	
 	private final String _UPDATE_Agency_ID_Value_List_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " Agency_ID_List_Value_ID = ?, Value = ?,"
-			+ " Name = ?, Definition = ?, Owner_Agency_ID_List_ID = ?"
+			+ " Name = ?, Definition = ?, owner_list_id = ?"
 			+ " WHERE Agency_ID_List_Value_ID = ?";
 	
 	private final String _DELETE_Agency_ID_Value_List_STATEMENT = 
@@ -118,7 +118,7 @@ public class AgencyIDListValueMysqlDAO extends SRTDAO {
 				agencyidlistvalueVO.setValue(rs.getString("Value"));
 				agencyidlistvalueVO.setName(rs.getString("Name"));
 				agencyidlistvalueVO.setDefinition(rs.getString("Definition"));
-				agencyidlistvalueVO.setOwnerAgencyIDListID(rs.getInt("Owner_Agency_ID_List_ID"));
+				agencyidlistvalueVO.setOwnerAgencyIDListID(rs.getInt("owner_list_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -159,7 +159,7 @@ public class AgencyIDListValueMysqlDAO extends SRTDAO {
 				agencyidlistvalueVO.setValue(rs.getString("Value"));
 				agencyidlistvalueVO.setName(rs.getString("Name"));
 				agencyidlistvalueVO.setDefinition(rs.getString("Definition"));
-				agencyidlistvalueVO.setOwnerAgencyIDListID(rs.getInt("Owner_Agency_ID_List_ID"));
+				agencyidlistvalueVO.setOwnerAgencyIDListID(rs.getInt("owner_list_id"));
 				list.add(agencyidlistvalueVO);
 			}
 			tx.commit();

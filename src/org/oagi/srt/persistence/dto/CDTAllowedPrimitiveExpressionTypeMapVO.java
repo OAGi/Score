@@ -38,5 +38,7 @@ public class CDTAllowedPrimitiveExpressionTypeMapVO extends SRTObject {
 	public void setXSDBuiltInTypeID(int xsdBuiltInTypeID) {
 		XSDBuiltInTypeID = xsdBuiltInTypeID;
 	}
+	
+
 
 }

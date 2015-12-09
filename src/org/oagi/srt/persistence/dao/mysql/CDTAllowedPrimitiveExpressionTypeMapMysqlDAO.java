@@ -22,23 +22,23 @@ import org.oagi.srt.persistence.dto.DTVO;
 *
 */
 public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
-	private final String _tableName = "cdt_allowed_primitive_expression_type_map";
+	private final String _tableName = "cdt_awd_pri_xps_type_map";
 
 	private final String _FIND_ALL_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT = 
-			"SELECT CDT_Primitive_Expression_Type_Map_ID, CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID FROM " + _tableName;
+			"SELECT cdt_awd_pri_xps_type_map_id, cdt_awd_pri_id, xbt_id FROM " + _tableName;
 
 	private final String _FIND_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT = 
-			"SELECT CDT_Primitive_Expression_Type_Map_ID, CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID FROM " + _tableName;
+			"SELECT cdt_awd_pri_xps_type_map_id, cdt_awd_pri_id, xbt_id FROM " + _tableName;
 
 	private final String _INSERT_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT = 
-			"INSERT INTO " + _tableName + " (CDT_Allowed_Primitive_ID, XSD_BuiltIn_Type_ID) VALUES (?, ?)";
+			"INSERT INTO " + _tableName + " (cdt_awd_pri_id, xbt_id) VALUES (?, ?)";
 
 	private final String _UPDATE_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET CDT_Primitive_Expression_Type_Map_ID = ?, CDT_Allowed_Primitive_ID = ?, XSD_BuiltIn_Type_ID = ? WHERE CDT_Primitive_Expression_Type_Map_ID = ?";
+			+ " SET cdt_awd_pri_id = ?, CDT_Allowed_Primitive_ID = ?, xbt_id = ? WHERE cdt_awd_pri_xps_type_map_id = ?";
 
 	private final String _DELETE_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE CDT_Primitive_Expression_Type_Map_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE cdt_awd_pri_xps_type_map_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -110,10 +110,9 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				//Here
-				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("cdt_awd_pri_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -150,9 +149,9 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTAllowedPrimitiveExpressionTypeMapVO cdtallowedprimitiveexpressiontypemapVO = new CDTAllowedPrimitiveExpressionTypeMapVO();
-				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("cdt_awd_pri_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 				list.add(cdtallowedprimitiveexpressiontypemapVO);
 			}
 			tx.commit();
@@ -189,6 +188,7 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 
 			ps.setInt(1, cdtallowedprimitiveexpressiontypemapVO.getCDTAllowedPrimitiveID());
 			ps.setInt(2, cdtallowedprimitiveexpressiontypemapVO.getXSDBuiltInTypeID());
+			ps.setInt(3, cdtallowedprimitiveexpressiontypemapVO.getCDTPrimitiveExpressionTypeMapID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -277,9 +277,9 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTAllowedPrimitiveExpressionTypeMapVO cdtallowedprimitiveexpressiontypemapVO = new CDTAllowedPrimitiveExpressionTypeMapVO();
-				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("cdt_awd_pri_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 				list.add(cdtallowedprimitiveexpressiontypemapVO);
 			}
 			tx.commit();
@@ -357,9 +357,9 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				cdtallowedprimitiveexpressiontypemapVO = new CDTAllowedPrimitiveExpressionTypeMapVO();
-				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("CDT_Primitive_Expression_Type_Map_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("CDT_Allowed_Primitive_ID"));
-				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("XSD_BuiltIn_Type_ID"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setCDTAllowedPrimitiveID(rs.getInt("cdt_awd_pri_id"));
+				cdtallowedprimitiveexpressiontypemapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 			}
 			
 		} catch (SQLException e) {

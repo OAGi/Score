@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.dto;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import org.oagi.srt.common.SRTObject;
 
@@ -25,6 +26,9 @@ public class ContextSchemeVO extends SRTObject implements Serializable {
 	private String contextCategoryStr;
 	private int createdByUserId;
 	private int lastUpdatedByUserId;
+	private Timestamp CreationTimestamp;
+	private Timestamp LastUpdateTimestamp;
+	private String Classification_ctx_schemecol;
 	
 	public int getLastUpdatedByUserId() {
 		return lastUpdatedByUserId;
@@ -97,6 +101,24 @@ public class ContextSchemeVO extends SRTObject implements Serializable {
 	}
 	public void setContextCategoryStr(String contextCategoryStr) {
 		this.contextCategoryStr = contextCategoryStr;
+	}
+	public Timestamp getCreationTimestamp() {
+		return CreationTimestamp;
+	}
+	public void setCreationTimestamp(Timestamp creationTimestamp) {
+		CreationTimestamp = creationTimestamp;
+	}
+	public Timestamp getLastUpdateTimestamp() {
+		return LastUpdateTimestamp;
+	}
+	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
+		LastUpdateTimestamp = lastUpdateTimestamp;
+	}
+	public String getClassification_ctx_schemecol() {
+		return Classification_ctx_schemecol;
+	}
+	public void setClassification_ctx_schemecol(String classification_ctx_schemecol) {
+		Classification_ctx_schemecol = classification_ctx_schemecol;
 	}
 	
 }

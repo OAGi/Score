@@ -21,23 +21,23 @@ import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
 *
 */
 public class CDTPrimitiveMysqlDAO extends SRTDAO{
-	private final String _tableName = "cdt_primitive";
+	private final String _tableName = "cdt_pri";
 
 	private final String _FIND_ALL_CDT_Primitive_STATEMENT = 
-			"SELECT CDT_Primitive_ID, Name FROM " + _tableName;
+			"SELECT cdt_pri_id, Name FROM " + _tableName;
 
 	private final String _FIND_CDT_Primitive_STATEMENT = 
-			"SELECT CDT_Primitive_ID, Name FROM " + _tableName;
+			"SELECT cdt_pri_id, Name FROM " + _tableName;
 
 	private final String _INSERT_CDT_Primitive_STATEMENT = 
 			"INSERT INTO " + _tableName + " (Name) VALUES (?)";
 
 	private final String _UPDATE_CDT_Primitive_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET CDT_Primitive_ID = ?, Name = ? WHERE CDT_Primitive_ID = ?";
+			+ " SET cdt_pri_id = ?, Name = ? WHERE cdt_pri_id = ?";
 
 	private final String _DELETE_CDT_Primitive_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE CDT_Primitive_ID = ?";
+			"DELETE FROM " + _tableName + " WHERE cdt_pri_id = ?";
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
@@ -115,7 +115,7 @@ public class CDTPrimitiveMysqlDAO extends SRTDAO{
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
 				cdtprimitiveVO.setName(rs.getString("Name"));
 			}
 			tx.commit();
@@ -170,7 +170,7 @@ public class CDTPrimitiveMysqlDAO extends SRTDAO{
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
 				cdtprimitiveVO.setName(rs.getString("Name"));
 			}
 		} catch (SQLException e) {
@@ -203,7 +203,7 @@ public class CDTPrimitiveMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTPrimitiveVO cdtprimitiveVO = new CDTPrimitiveVO();
-				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
 				cdtprimitiveVO.setName(rs.getString("Name"));
 				list.add(cdtprimitiveVO);
 			}
@@ -241,7 +241,7 @@ public class CDTPrimitiveMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTPrimitiveVO cdtprimitiveVO = new CDTPrimitiveVO();
-				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
 				cdtprimitiveVO.setName(rs.getString("Name"));
 				list.add(cdtprimitiveVO);
 			}
@@ -360,7 +360,7 @@ public class CDTPrimitiveMysqlDAO extends SRTDAO{
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTPrimitiveVO cdtprimitiveVO = new CDTPrimitiveVO();
-				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("CDT_Primitive_ID"));
+				cdtprimitiveVO.setCDTPrimitiveID(rs.getInt("cdt_pri_id"));
 				cdtprimitiveVO.setName(rs.getString("Name"));
 				list.add(cdtprimitiveVO);
 			}

@@ -25,25 +25,25 @@ public class ACCMysqlDAO extends SRTDAO {
 	private final String _tableName = "acc";
 
 	private final String _FIND_ALL_ACC_STATEMENT = 
-			"SELECT ACC_ID, ACC_GUID, Object_Class_Term, "
-					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module FROM " + _tableName;
+			"SELECT ACC_ID, GUID, Object_Class_Term, "
+					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Module, namespace_id, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id FROM " + _tableName;
 
 	private final String _FIND_ACC_STATEMENT = 
-			"SELECT ACC_ID, ACC_GUID, Object_Class_Term, "
-					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module FROM " + _tableName;
+			"SELECT ACC_ID, GUID, Object_Class_Term, "
+					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Module, namespace_id, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id FROM " + _tableName;
 	
 	private final String _INSERT_ACC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (ACC_GUID, Object_Class_Term, "
-					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Created_By_User_ID, Last_Updated_By_User_ID, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (GUID, Object_Class_Term, "
+					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Module, namespace_id, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_ACC_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, ACC_GUID = ?, Object_Class_Term = ?, "
-			+ "Den = ?, Definition = ?, Based_ACC_ID = ?, Object_Class_Qualifier = ?, OAGIS_Component_Type = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, "
-			+ "Creation_Timestamp = ?, State =?, Module = ? WHERE ACC_ID = ?";
+			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Object_Class_Term = ?, "
+			+ "Den = ?, Definition = ?, Based_ACC_ID = ?, Object_Class_Qualifier = ?, OAGIS_Component_Type = ?, Module = ?, namespace_id = ?, Created_By = ?, Last_Updated_By = ?, "
+			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_acc_id = ? WHERE ACC_ID = ?";
 
 	private final String _DELETE_ACC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ACC_ID = ?";
@@ -72,11 +72,18 @@ public class ACCMysqlDAO extends SRTDAO {
 				ps.setInt(5, accVO.getBasedACCID());
 			ps.setString(6, accVO.getObjectClassQualifier());
 			ps.setInt(7, accVO.getOAGISComponentType());
-			ps.setInt(8, accVO.getCreatedByUserId());
-			ps.setInt(9, accVO.getLastUpdatedByUserId());
-			ps.setTimestamp(10, accVO.getLastUpdateTimestamp());
-			ps.setInt(11, accVO.getState());
-			ps.setString(12, accVO.getModule());
+			ps.setString(8, accVO.getModule());
+			ps.setInt(9, accVO.getNamespaceId());
+			ps.setInt(10, accVO.getCreatedByUserId());
+			ps.setInt(11, accVO.getOwnerUserId());
+			ps.setInt(12, accVO.getLastUpdatedByUserId());
+			ps.setTimestamp(13, accVO.getLastUpdateTimestamp());
+			ps.setInt(14, accVO.getState());
+			ps.setInt(15, accVO.getRevisionNum());
+			ps.setInt(16, accVO.getRevisionTrackingNum());
+			ps.setInt(17, accVO.getRevisionAction());
+			ps.setInt(18, accVO.getReleaseId());
+			ps.setInt(19, accVO.getCurrentAccId());
 
 			ps.executeUpdate();
 
@@ -142,19 +149,26 @@ public class ACCMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				accVO = new ACCVO();
 				accVO.setACCID(rs.getInt("ACC_ID"));
-				accVO.setACCGUID(rs.getString("ACC_GUID"));
+				accVO.setACCGUID(rs.getString("GUID"));
 				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
 				accVO.setDEN(rs.getString("DEN"));
 				accVO.setDefinition(rs.getString("Definition"));
 				accVO.setBasedACCID(rs.getInt("Based_ACC_ID"));
 				accVO.setObjectClassQualifier(rs.getString("Object_Class_Qualifier"));
 				accVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
-				accVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				accVO.setModule(rs.getString("Module"));
+				accVO.setNamespaceId(rs.getInt("namespace_id"));
+				accVO.setCreatedByUserId(rs.getInt("Created_By"));
+				accVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				accVO.setState(rs.getInt("State"));
-				accVO.setModule(rs.getString("Module"));
+				accVO.setRevisionNum(rs.getInt("revision_num"));
+				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
+				accVO.setReleaseId(rs.getInt("release_id"));
+				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -216,19 +230,26 @@ public class ACCMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				accVO = new ACCVO();
 				accVO.setACCID(rs.getInt("ACC_ID"));
-				accVO.setACCGUID(rs.getString("ACC_GUID"));
+				accVO.setACCGUID(rs.getString("GUID"));
 				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
 				accVO.setDEN(rs.getString("DEN"));
 				accVO.setDefinition(rs.getString("Definition"));
 				accVO.setBasedACCID(rs.getInt("Based_ACC_ID"));
 				accVO.setObjectClassQualifier(rs.getString("Object_Class_Qualifier"));
 				accVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
-				accVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				accVO.setModule(rs.getString("Module"));
+				accVO.setNamespaceId(rs.getInt("namespace_id"));
+				accVO.setCreatedByUserId(rs.getInt("Created_By"));
+				accVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				accVO.setState(rs.getInt("State"));
-				accVO.setModule(rs.getString("Module"));
+				accVO.setRevisionNum(rs.getInt("revision_num"));
+				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
+				accVO.setReleaseId(rs.getInt("release_id"));
+				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -270,19 +291,26 @@ public class ACCMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ACCVO accVO = new ACCVO();
 				accVO.setACCID(rs.getInt("ACC_ID"));
-				accVO.setACCGUID(rs.getString("ACC_GUID"));
+				accVO.setACCGUID(rs.getString("GUID"));
 				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
 				accVO.setDEN(rs.getString("DEN"));
 				accVO.setDefinition(rs.getString("Definition"));
 				accVO.setBasedACCID(rs.getInt("Based_ACC_ID"));
 				accVO.setObjectClassQualifier(rs.getString("Object_Class_Qualifier"));
 				accVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
-				accVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				accVO.setModule(rs.getString("Module"));
+				accVO.setNamespaceId(rs.getInt("namespace_id"));
+				accVO.setCreatedByUserId(rs.getInt("Created_By"));
+				accVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				accVO.setState(rs.getInt("State"));
-				accVO.setModule(rs.getString("Module"));
+				accVO.setRevisionNum(rs.getInt("revision_num"));
+				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
+				accVO.setReleaseId(rs.getInt("release_id"));
+				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 				list.add(accVO);
 			}
 			tx.commit();
@@ -322,19 +350,26 @@ public class ACCMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ACCVO accVO = new ACCVO();
 				accVO.setACCID(rs.getInt("ACC_ID"));
-				accVO.setACCGUID(rs.getString("ACC_GUID"));
+				accVO.setACCGUID(rs.getString("GUID"));
 				accVO.setObjectClassTerm(rs.getString("Object_Class_Term"));
 				accVO.setDEN(rs.getString("DEN"));
 				accVO.setDefinition(rs.getString("Definition"));
 				accVO.setBasedACCID(rs.getInt("Based_ACC_ID"));
 				accVO.setObjectClassQualifier(rs.getString("Object_Class_Qualifier"));
 				accVO.setOAGISComponentType(rs.getInt("OAGIS_Component_Type"));
-				accVO.setCreatedByUserId(rs.getInt("Created_By_User_ID"));
-				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By_User_ID"));
+				accVO.setModule(rs.getString("Module"));
+				accVO.setNamespaceId(rs.getInt("namespace_id"));
+				accVO.setCreatedByUserId(rs.getInt("Created_By"));
+				accVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				accVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				accVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				accVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				accVO.setState(rs.getInt("State"));
-				accVO.setModule(rs.getString("Module"));
+				accVO.setRevisionNum(rs.getInt("revision_num"));
+				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
+				accVO.setReleaseId(rs.getInt("release_id"));
+				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 				list.add(accVO);
 			}
 			//tx.commit();
@@ -376,11 +411,19 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(5, accVO.getBasedACCID());
 			ps.setString(6, accVO.getObjectClassQualifier());
 			ps.setInt(7, accVO.getOAGISComponentType());
-			ps.setInt(8, accVO.getCreatedByUserId());
-			ps.setInt(9, accVO.getLastUpdatedByUserId());
-			ps.setTimestamp(10, accVO.getLastUpdateTimestamp());
-			ps.setInt(11, accVO.getState());
-			ps.setString(12, accVO.getModule());
+			ps.setString(8, accVO.getModule());
+			ps.setInt(9, accVO.getNamespaceId());
+			ps.setInt(10, accVO.getCreatedByUserId());
+			ps.setInt(11, accVO.getOwnerUserId());
+			ps.setInt(12, accVO.getLastUpdatedByUserId());
+			ps.setTimestamp(13, accVO.getLastUpdateTimestamp());
+			ps.setInt(14, accVO.getState());
+			ps.setInt(15, accVO.getRevisionNum());
+			ps.setInt(16, accVO.getRevisionTrackingNum());
+			ps.setInt(17, accVO.getRevisionAction());
+			ps.setInt(18, accVO.getReleaseId());
+			ps.setInt(19, accVO.getCurrentAccId());
+			
 			ps.executeUpdate();
 
 			tx.commit();

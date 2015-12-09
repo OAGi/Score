@@ -27,25 +27,25 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 	private final String _tableName = "asbiep";
 
 	private final String _FIND_ALL_ASBIEP_STATEMENT = 
-			"SELECT ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
-			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
+			"SELECT ASBIEP_ID, GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Remark, biz_term, Created_By,"
+			+ " Last_Updated_By, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
 	
 	private final String _FIND_MAX_ID_STATEMENT =
 			"SELECT max(ASBIEP_ID) as max FROM " + _tableName;
 	
 	private final String _FIND_ASBIEP_STATEMENT = 
-			"SELECT ASBIEP_ID, ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID,"
-			+ " Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
+			"SELECT ASBIEP_ID, GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Remark, biz_term, Created_By,"
+			+ " Last_Updated_By, Creation_Timestamp, Last_Update_Timestamp from " + _tableName;
 	
 	private final String _INSERT_ASBIEP_STATEMENT = "INSERT INTO " + _tableName + " "
-			+ "(ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID, "
-			+ "Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+			+ "(GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Remark, biz_term, Created_By,"
+			+ " Last_Updated_By, Creation_Timestamp, Last_Update_Timestamp) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 	
 	private final String _INSERT_ASBIEP_WITH_ID_STATEMENT = "INSERT INTO " + _tableName + " "
-			+ "(ASBIEP_GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Created_By_User_ID, "
-			+ "Last_Updated_By_User_ID, Creation_Timestamp, Last_Update_Timestamp, ASBIEP_ID) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+			+ "(GUID, Based_ASCCP_ID, Role_Of_ABIE_ID, Definition, Remark, biz_term, Created_By,"
+			+ " Last_Updated_By, Creation_Timestamp, Last_Update_Timestamp, ASBIEP_ID) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 	
 	private final String _DELETE_ASBIEP_STATEMENT = "DELETE FROM " + _tableName + " WHERE ASBIEP_ID = ?";
 
@@ -101,10 +101,12 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
 			ps.setString(4, asbiepVO.getDefinition());
-			ps.setInt(5, asbiepVO.getCreatedByUserID());
-			ps.setInt(6, asbiepVO.getLastUpdatedByUserID());
+			ps.setString(5, asbiepVO.getRemark());
+			ps.setString(6, asbiepVO.getBusinessTerm());
+			ps.setInt(7, asbiepVO.getCreatedByUserID());
+			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			if(asbiepVO.getASBIEPID() != -1)
-				ps.setInt(7, asbiepVO.getASBIEPID());
+				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
 			
@@ -151,10 +153,12 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
 			ps.setString(4, asbiepVO.getDefinition());
-			ps.setInt(5, asbiepVO.getCreatedByUserID());
-			ps.setInt(6, asbiepVO.getLastUpdatedByUserID());
+			ps.setString(5, asbiepVO.getRemark());
+			ps.setString(6, asbiepVO.getBusinessTerm());
+			ps.setInt(7, asbiepVO.getCreatedByUserID());
+			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			if(asbiepVO.getASBIEPID() != -1)
-				ps.setInt(7, asbiepVO.getASBIEPID());
+				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
 			
@@ -209,12 +213,14 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				asbiepVO.setASBIEPID(rs.getInt("ASBIEP_ID"));
-				asbiepVO.setASBIEPGUID(rs.getString("ASBIEP_GUID"));
+				asbiepVO.setASBIEPGUID(rs.getString("GUID"));
 				asbiepVO.setBasedASCCPID(rs.getInt("Based_ASCCP_ID"));
 				asbiepVO.setRoleOfABIEID(rs.getInt("Role_Of_ABIE_ID"));
 				asbiepVO.setDefinition(rs.getString("Definition"));
-				asbiepVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				asbiepVO.setRemark(rs.getString("Remark"));
+				asbiepVO.setBusinessTerm(rs.getString("biz_term"));
+				asbiepVO.setCreatedByUserID(rs.getInt("Created_By"));
+				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				asbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 			}
@@ -254,12 +260,14 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ASBIEPVO asbiepVO = new ASBIEPVO();
 				asbiepVO.setASBIEPID(rs.getInt("ASBIEP_ID"));
-				asbiepVO.setASBIEPGUID(rs.getString("ASBIEP_GUID"));
+				asbiepVO.setASBIEPGUID(rs.getString("GUID"));
 				asbiepVO.setBasedASCCPID(rs.getInt("Based_ASCCP_ID"));
 				asbiepVO.setRoleOfABIEID(rs.getInt("Role_Of_ABIE_ID"));
 				asbiepVO.setDefinition(rs.getString("Definition"));
-				asbiepVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				asbiepVO.setRemark(rs.getString("Remark"));
+				asbiepVO.setBusinessTerm(rs.getString("biz_term"));
+				asbiepVO.setCreatedByUserID(rs.getInt("Created_By"));
+				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				asbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				list.add(asbiepVO);
@@ -288,8 +296,8 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 	}
 
 	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
-			" SET ASBIEP_GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Created_By_User_ID = ?, Last_Updated_By_User_ID = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
-			+ "Creation_Timestamp = ?, remark = ? WHERE ASBIEP_ID = ?";
+			" SET GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Remark = ?, biz_term = ?, Created_By = ?, Last_Updated_By = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
+			+ "Creation_Timestamp = ? WHERE ASBIEP_ID = ?";
 	
 	@Override
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
@@ -305,11 +313,12 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
 			ps.setString(4, asbiepVO.getDefinition());
-			ps.setInt(5, asbiepVO.getCreatedByUserID());
-			ps.setInt(6, asbiepVO.getLastUpdatedByUserID());
-			ps.setTimestamp(7, asbiepVO.getCreationTimestamp());
-			ps.setString(8, asbiepVO.getRemark());
+			ps.setString(5, asbiepVO.getRemark());
+			ps.setString(6, asbiepVO.getBusinessTerm());
+			ps.setInt(7, asbiepVO.getCreatedByUserID());
+			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			ps.setInt(9, asbiepVO.getASBIEPID());
+			
 			ps.executeUpdate();
 
 			tx.commit();
@@ -428,12 +437,14 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				asbiepVO = new ASBIEPVO();
 				asbiepVO.setASBIEPID(rs.getInt("ASBIEP_ID"));
-				asbiepVO.setASBIEPGUID(rs.getString("ASBIEP_GUID"));
+				asbiepVO.setASBIEPGUID(rs.getString("GUID"));
 				asbiepVO.setBasedASCCPID(rs.getInt("Based_ASCCP_ID"));
 				asbiepVO.setRoleOfABIEID(rs.getInt("Role_Of_ABIE_ID"));
 				asbiepVO.setDefinition(rs.getString("Definition"));
-				asbiepVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				asbiepVO.setRemark(rs.getString("Remark"));
+				asbiepVO.setBusinessTerm(rs.getString("biz_term"));
+				asbiepVO.setCreatedByUserID(rs.getInt("Created_By"));
+				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				asbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 			}
@@ -509,12 +520,14 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			while (rs.next()) {
 				ASBIEPVO asbiepVO = new ASBIEPVO();
 				asbiepVO.setASBIEPID(rs.getInt("ASBIEP_ID"));
-				asbiepVO.setASBIEPGUID(rs.getString("ASBIEP_GUID"));
+				asbiepVO.setASBIEPGUID(rs.getString("GUID"));
 				asbiepVO.setBasedASCCPID(rs.getInt("Based_ASCCP_ID"));
 				asbiepVO.setRoleOfABIEID(rs.getInt("Role_Of_ABIE_ID"));
 				asbiepVO.setDefinition(rs.getString("Definition"));
-				asbiepVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				asbiepVO.setRemark(rs.getString("Remark"));
+				asbiepVO.setBusinessTerm(rs.getString("biz_term"));
+				asbiepVO.setCreatedByUserID(rs.getInt("Created_By"));
+				asbiepVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				asbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				list.add(asbiepVO);

@@ -26,22 +26,27 @@ public class ASCCMysqlDAO extends SRTDAO {
 	private final String _tableName = "ascc";
 	
 	private final String _FIND_ALL_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, ASCC_GUID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM " + _tableName;
+			"SELECT ASCC_ID, GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
+			+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
+			+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id FROM " + _tableName;
 	
 	private final String _FIND_ASCC_STATEMENT = 
-			"SELECT ASCC_ID, ASCC_GUID, Cardinality_Min, Cardinality_Max, Sequencing_Key, "
-			+ "Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition FROM " + _tableName;
+			"SELECT ASCC_ID, GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
+					+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id FROM " + _tableName;
 	
 	private final String _INSERT_ASCC_STATEMENT = 
-			"INSERT INTO " + _tableName + " (ASCC_GUID, Cardinality_Min, Cardinality_Max, "
-			+ "Sequencing_Key, Assoc_From_ACC_ID, Assco_To_ASCCP_ID, DEN, Definition) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
+					+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_ASCC_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET ASCC_GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Sequencing_Key = ?, "
-			+ "Assoc_From_ACC_ID = ?, Assco_To_ASCCP_ID = ?, DEN = ?, Definition = ? WHERE ASCC_ID = ?";
+			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Seq_Key = ?, "
+			+ "From_ACC_ID = ?, To_ASCCP_ID = ?, DEN = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
+			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_ascc_id = ? "
+			+ "WHERE ASCC_ID = ?";
 	
 	private final String _DELETE_ASCC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASCC_ID = ?";
@@ -72,6 +77,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(6, asccVO.getAssocToASCCPID());
 			ps.setString(7, asccVO.getDEN());
 			ps.setString(8, asccVO.getDefinition());
+			ps.setInt(9, asccVO.getCreatedByUserId());
+			ps.setInt(10, asccVO.getOwnerUserId());
+			ps.setInt(11, asccVO.getLastUpdatedByUserId());
+			ps.setTimestamp(12, asccVO.getLastUpdateTimestamp());
+			ps.setInt(13, asccVO.getState());
+			ps.setInt(14, asccVO.getRevisionNum());
+			ps.setInt(15, asccVO.getRevisionTrackingNum());
+			ps.setInt(16, asccVO.getRevisionAction());
+			ps.setInt(17, asccVO.getReleaseId());
+			ps.setInt(18, asccVO.getCurrentAsccId());
 			
 			ps.executeUpdate();
 
@@ -140,14 +155,26 @@ public class ASCCMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				asccVO = new ASCCVO();
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setASCCGUID(rs.getString("GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setSequencingKey(rs.getInt("Seq_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
+				asccVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
+				asccVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccVO.setState(rs.getInt("State"));
+				asccVO.setRevisionNum(rs.getInt("revision_num"));
+				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
+				asccVO.setReleaseId(rs.getInt("release_id"));
+				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
+
 			}
 			tx.commit();
 			conn.close();
@@ -207,14 +234,25 @@ public class ASCCMysqlDAO extends SRTDAO {
 			if (rs.next()) {
 				asccVO = new ASCCVO();
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setASCCGUID(rs.getString("GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setSequencingKey(rs.getInt("Seq_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
+				asccVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
+				asccVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccVO.setState(rs.getInt("State"));
+				asccVO.setRevisionNum(rs.getInt("revision_num"));
+				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
+				asccVO.setReleaseId(rs.getInt("release_id"));
+				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -254,14 +292,25 @@ public class ASCCMysqlDAO extends SRTDAO {
 				ASCCVO asccVO = new ASCCVO();
 				
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setASCCGUID(rs.getString("GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setSequencingKey(rs.getInt("Seq_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
+				asccVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
+				asccVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccVO.setState(rs.getInt("State"));
+				asccVO.setRevisionNum(rs.getInt("revision_num"));
+				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
+				asccVO.setReleaseId(rs.getInt("release_id"));
+				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				
 				list.add(asccVO);
 			}
@@ -304,14 +353,25 @@ public class ASCCMysqlDAO extends SRTDAO {
 				ASCCVO asccVO = new ASCCVO();
 				
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setASCCGUID(rs.getString("GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setSequencingKey(rs.getInt("Seq_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
+				asccVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
+				asccVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccVO.setState(rs.getInt("State"));
+				asccVO.setRevisionNum(rs.getInt("revision_num"));
+				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
+				asccVO.setReleaseId(rs.getInt("release_id"));
+				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				
 				list.add(asccVO);
 			}
@@ -356,7 +416,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(6, asccVO.getAssocToASCCPID());
 			ps.setString(7, asccVO.getDEN());
 			ps.setString(8, asccVO.getDefinition());
-			ps.setInt(9, asccVO.getASCCID());
+			ps.setInt(9, asccVO.getCreatedByUserId());
+			ps.setInt(10, asccVO.getOwnerUserId());
+			ps.setInt(11, asccVO.getLastUpdatedByUserId());
+			ps.setTimestamp(12, asccVO.getLastUpdateTimestamp());
+			ps.setInt(13, asccVO.getState());
+			ps.setInt(14, asccVO.getRevisionNum());
+			ps.setInt(15, asccVO.getRevisionTrackingNum());
+			ps.setInt(16, asccVO.getRevisionAction());
+			ps.setInt(17, asccVO.getReleaseId());
+			ps.setInt(18, asccVO.getCurrentAsccId());
 
 			ps.executeUpdate();
 
@@ -449,14 +518,25 @@ public class ASCCMysqlDAO extends SRTDAO {
 				ASCCVO asccVO = new ASCCVO();
 				
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setASCCGUID(rs.getString("GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setSequencingKey(rs.getInt("Seq_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
+				asccVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
+				asccVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccVO.setState(rs.getInt("State"));
+				asccVO.setRevisionNum(rs.getInt("revision_num"));
+				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
+				asccVO.setReleaseId(rs.getInt("release_id"));
+				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				
 				list.add(asccVO);
 			}
@@ -502,8 +582,16 @@ public class ASCCMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			//System.out.println("### sql: " + sql);
+			
+			int nCond2 = qc.getLikeSize();
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+					WHERE_OR_AND = " AND ";
+				}
+			}
 			ps = conn.prepareStatement(sql);
+
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
@@ -514,20 +602,41 @@ public class ASCCMysqlDAO extends SRTDAO {
 					}
 				}
 			}
-
+			
+			if (nCond2 > 0) {
+				for (int n = 0; n < nCond2; n++) {
+					Object value = qc.getLikeValue(n);
+					if (value instanceof String) {
+						ps.setString(nCond + n + 1, (String) value);
+					} else if (value instanceof Integer) {
+						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+					}
+				}
+			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ASCCVO asccVO = new ASCCVO();
 				
 				asccVO.setASCCID(rs.getInt("ASCC_ID"));
-				asccVO.setASCCGUID(rs.getString("ASCC_GUID"));
+				asccVO.setASCCGUID(rs.getString("GUID"));
 				asccVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
 				asccVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				asccVO.setSequencingKey(rs.getInt("Sequencing_Key"));
-				asccVO.setAssocFromACCID(rs.getInt("Assoc_From_ACC_ID"));
-				asccVO.setAssocToASCCPID(rs.getInt("Assco_To_ASCCP_ID"));
+				asccVO.setSequencingKey(rs.getInt("Seq_Key"));
+				asccVO.setAssocFromACCID(rs.getInt("From_ACC_ID"));
+				asccVO.setAssocToASCCPID(rs.getInt("To_ASCCP_ID"));
 				asccVO.setDEN(rs.getString("DEN"));
 				asccVO.setDefinition(rs.getString("Definition"));
+				asccVO.setCreatedByUserId(rs.getInt("Created_By"));
+				asccVO.setOwnerUserId(rs.getInt("owner_user_id"));
+				asccVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
+				asccVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
+				asccVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				asccVO.setState(rs.getInt("State"));
+				asccVO.setRevisionNum(rs.getInt("revision_num"));
+				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
+				asccVO.setReleaseId(rs.getInt("release_id"));
+				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				
 				list.add(asccVO);
 			}

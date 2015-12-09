@@ -23,6 +23,15 @@ public class BCCPVO extends SRTObject {
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	
+	private int OwnerUserId;
+	private int State;
+	private String Module;
+	private int RevisionNum;
+	private int RevisionTrackingNum;
+	private int RevisionAction;
+	private int ReleaseId;
+	private int CurrentBccpId;
+	
 	public int getBCCPID() {
 		return BCCPID;
 	}
@@ -110,4 +119,69 @@ public class BCCPVO extends SRTObject {
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
 		LastUpdateTimestamp = lastUpdateTimestamp;
 	}
+	
+	public int getState() {
+		return State;
+	}
+	
+	public void setState(int state) {
+		State = state;
+	}
+	
+	public String getModule() {
+		return Module;
+	}
+	
+	public void setModule(String module) {
+		Module = module;
+	}
+	
+	public int getOwnerUserId() {
+		return OwnerUserId;
+	}
+	
+	public void setOwnerUserId(int ownerUserId) {
+		OwnerUserId = ownerUserId;
+	}
+	
+	public int getRevisionNum() {
+		return RevisionNum;
+	}
+	
+	public void setRevisionNum(int revisionNum) {
+		RevisionNum = revisionNum;
+	}
+	
+	public int getRevisionTrackingNum() {
+		return RevisionTrackingNum;
+	}
+	
+	public void setRevisionTrackingNum(int revisionTrackingNum) {
+		RevisionTrackingNum = revisionTrackingNum;
+	}
+	
+	public int getRevisionAction() {
+		return RevisionAction;
+	}
+	
+	public void setRevisionAction(int revisionAction) {
+		RevisionAction = revisionAction;
+	}
+	
+	public int getReleaseId() {
+		return ReleaseId;
+	}
+	
+	public void setReleaseId(int releaseId) {
+		ReleaseId = releaseId;
+	}
+	
+	public int getCurrentBccpId() {
+		return CurrentBccpId;
+	}
+	
+	public void setCurrentBccpId(int currentBccpId) {
+		CurrentBccpId = currentBccpId;
+	}
+	
 }
