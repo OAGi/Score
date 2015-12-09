@@ -19,35 +19,37 @@ import org.oagi.srt.persistence.dto.DTVO;
 /**
  *
  * @author Nasif Sikder
- * @version 1.0
+ * @author Jaehun Lee
+ * @version 1.1
  *
  */
+
 public class ABIEMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "abie";
 	
 	private final String _FIND_ALL_ABIE_STATEMENT =
-			"SELECT ABIE_ID, ABIE_GUID, Based_ACC_ID, isTop_Level, Business_Context_ID, Definition, "
-			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term FROM " + _tableName + " order by Last_Update_Timestamp desc";
+			"SELECT ABIE_ID, GUID, Based_ACC_ID, isTop_Level, biz_ctx_id, Definition, "
+			+ "Created_By, Last_Updated_By, Creation_Timestamp, "
+			+ "Last_Update_Timestamp, State, Client_ID, Version, Status, Remark, biz_term FROM " + _tableName + " order by Last_Update_Timestamp desc";
 	
 	private final String _FIND_MAX_ID_STATEMENT =
 			"SELECT max(abie_id) as max FROM " + _tableName;
 	
 	private final String _FIND_ABIE_STATEMENT =
-			"SELECT ABIE_ID, ABIE_GUID, Based_ACC_ID, isTop_Level, Business_Context_ID, Definition, "
-			+ "Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term FROM " + _tableName;
+			"SELECT ABIE_ID, GUID, Based_ACC_ID, isTop_Level, biz_ctx_id, Definition, "
+					+ "Created_By, Last_Updated_By, Creation_Timestamp, "
+					+ "Last_Update_Timestamp, State, Client_ID, Version, Status, Remark, biz_term FROM " + _tableName;
 	
 	private final String _INSERT_ABIE_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Based_ACC_ID, isTop_Level, Business_Context_ID,"
-			+ " Definition, Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ? ,? , ?)";
+			"INSERT INTO " + _tableName + " (GUID, Based_ACC_ID, isTop_Level, biz_ctx_id, Definition, "
+					+ "Created_By, Last_Updated_By, Creation_Timestamp, "
+					+ "Last_Update_Timestamp, State, Client_ID, Version, Status, Remark, biz_term) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ? ,?)";
 	
 	private final String _INSERT_ABIE_WITH_ID_STATEMENT = 
-			"INSERT INTO " + _tableName + " (Based_ACC_ID, isTop_Level, Business_Context_ID,"
-			+ " Definition, Created_By_User_ID, Last_Updated_By_User_ID, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State, ABIE_GUID, Client_ID, Version, Status, Remark, Business_Term, ABIE_ID) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (GUID, Based_ACC_ID, isTop_Level, biz_ctx_id, Definition, "
+					+ "Created_By, Last_Updated_By, Creation_Timestamp, "
+					+ "Last_Update_Timestamp, State, Client_ID, Version, Status, Remark, biz_term, ABIE_ID) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ? ,?, ?)";
 	
 	private final String _DELETE_ABIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ABIE_ID = ?";
@@ -99,19 +101,17 @@ public class ABIEMysqlDAO extends SRTDAO {
 			else
 				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
-			ps.setInt(1, abieVO.getBasedACCID());
-			ps.setInt(2, abieVO.getIsTopLevel());
-			ps.setInt(3, abieVO.getBusinessContextID());
-			ps.setString(4, abieVO.getDefinition());
-			ps.setInt(5, abieVO.getCreatedByUserID());
-			ps.setInt(6, abieVO.getLastUpdatedByUserID());
-			
+			ps.setString(1, abieVO.getAbieGUID());
+			ps.setInt(2, abieVO.getBasedACCID());
+			ps.setInt(3, abieVO.getIsTopLevel());
+			ps.setInt(4, abieVO.getBusinessContextID());
+			ps.setString(5, abieVO.getDefinition());
+			ps.setInt(6, abieVO.getCreatedByUserID());
+			ps.setInt(7, abieVO.getLastUpdatedByUserID());
 			if(abieVO.getState() == 0)
-				ps.setNull(7, java.sql.Types.INTEGER);
+				ps.setNull(8, java.sql.Types.INTEGER);
 			else
-				ps.setInt(7, abieVO.getState());
-			
-			ps.setString(8, abieVO.getAbieGUID());
+				ps.setInt(8, abieVO.getState());
 			ps.setString(9, abieVO.getClientID());
 			ps.setString(10, abieVO.getVersion());
 			ps.setString(11, abieVO.getStatus());
@@ -162,14 +162,14 @@ public class ABIEMysqlDAO extends SRTDAO {
 			else
 				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			
-			ps.setInt(1, abieVO.getBasedACCID());
-			ps.setInt(2, abieVO.getIsTopLevel());
-			ps.setInt(3, abieVO.getBusinessContextID());
-			ps.setString(4, abieVO.getDefinition());
-			ps.setInt(5, abieVO.getCreatedByUserID());
-			ps.setInt(6, abieVO.getLastUpdatedByUserID());
-			ps.setInt(7, abieVO.getState());
-			ps.setString(8, abieVO.getAbieGUID());
+			ps.setString(1, abieVO.getAbieGUID());
+			ps.setInt(2, abieVO.getBasedACCID());
+			ps.setInt(3, abieVO.getIsTopLevel());
+			ps.setInt(4, abieVO.getBusinessContextID());
+			ps.setString(5, abieVO.getDefinition());
+			ps.setInt(6, abieVO.getCreatedByUserID());
+			ps.setInt(7, abieVO.getLastUpdatedByUserID());
+			ps.setInt(8, abieVO.getState());
 			ps.setString(9, abieVO.getClientID());
 			ps.setString(10, abieVO.getVersion());
 			ps.setString(11, abieVO.getStatus());
@@ -177,6 +177,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps.setString(13, abieVO.getBusinessTerm());
 			if(abieVO.getABIEID() != -1)
 				ps.setInt(14, abieVO.getABIEID());
+
 
 			ps.executeUpdate();
 			
@@ -234,19 +235,19 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
 				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
-				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
 				abieVO.setDefinition(rs.getString("Definition"));
-				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
-				abieVO.setAbieGUID(rs.getString("ABIE_GUID"));
+				abieVO.setAbieGUID(rs.getString("GUID"));
 				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
-				abieVO.setBusinessTerm(rs.getString("Business_Term"));
+				abieVO.setBusinessTerm(rs.getString("biz_term"));
 			}
 			tx.commit();
 			conn.close();
@@ -286,19 +287,19 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
 				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
-				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
 				abieVO.setDefinition(rs.getString("Definition"));
-				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
-				abieVO.setAbieGUID(rs.getString("ABIE_GUID"));
+				abieVO.setAbieGUID(rs.getString("GUID"));
 				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
-				abieVO.setBusinessTerm(rs.getString("Business_Term"));
+				abieVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(abieVO);
 			}
 			tx.commit();
@@ -328,8 +329,8 @@ public class ABIEMysqlDAO extends SRTDAO {
 	private final String _UPDATE_ABIE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Based_ACC_ID = ?, isTop_Level = ?,  "
-			+ " Business_Context_ID = ?, Definition = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
-			+ " Last_Updated_By_User_ID = ?, State = ?, ABIE_GUID = ?, Client_ID = ?, Version = ?, Status = ?, Remark = ?, Business_Term = ? WHERE ABIE_ID = ?";
+			+ " biz_ctx_ID = ?, Definition = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
+			+ " Last_Updated_By = ?, State = ?, GUID = ?, Client_ID = ?, Version = ?, Status = ?, Remark = ?, biz_term = ? WHERE ABIE_ID = ?";
 	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -340,13 +341,13 @@ public class ABIEMysqlDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_ABIE_STATEMENT);
 			
-			ps.setInt(1, abieVO.getBasedACCID());
-			ps.setInt(2, abieVO.getIsTopLevel());
-			ps.setInt(3, abieVO.getBusinessContextID());
-			ps.setString(4, abieVO.getDefinition());
-			ps.setInt(5, abieVO.getLastUpdatedByUserID());
-			ps.setInt(6, abieVO.getState());
-			ps.setString(7, abieVO.getAbieGUID());
+			ps.setString(1, abieVO.getAbieGUID());
+			ps.setInt(2, abieVO.getBasedACCID());
+			ps.setInt(3, abieVO.getIsTopLevel());
+			ps.setInt(4, abieVO.getBusinessContextID());
+			ps.setString(5, abieVO.getDefinition());
+			ps.setInt(6, abieVO.getLastUpdatedByUserID());
+			ps.setInt(7, abieVO.getState());
 			ps.setString(8, abieVO.getClientID());
 			ps.setString(9, abieVO.getVersion());
 			ps.setString(10, abieVO.getStatus());
@@ -451,19 +452,19 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
 				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
-				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
 				abieVO.setDefinition(rs.getString("Definition"));
-				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
-				abieVO.setAbieGUID(rs.getString("ABIE_GUID"));
+				abieVO.setAbieGUID(rs.getString("GUID"));
 				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
-				abieVO.setBusinessTerm(rs.getString("Business_Term"));
+				abieVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(abieVO);
 			}
 			conn.close();
@@ -543,19 +544,19 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
 				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
-				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
 				abieVO.setDefinition(rs.getString("Definition"));
-				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
-				abieVO.setAbieGUID(rs.getString("ABIE_GUID"));
+				abieVO.setAbieGUID(rs.getString("GUID"));
 				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
-				abieVO.setBusinessTerm(rs.getString("Business_Term"));
+				abieVO.setBusinessTerm(rs.getString("biz_term"));
 			}
 			
 		} catch (SQLException e) {
@@ -631,19 +632,19 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setABIEID(rs.getInt("ABIE_ID"));
 				abieVO.setBasedACCID(rs.getInt("Based_ACC_ID"));				
 				abieVO.setIsTopLevel(rs.getInt("isTop_Level"));
-				abieVO.setBusinessContextID(rs.getInt("Business_Context_ID"));
+				abieVO.setBusinessContextID(rs.getInt("biz_ctx_id"));
 				abieVO.setDefinition(rs.getString("Definition"));
-				abieVO.setCreatedByUserID(rs.getInt("Created_By_User_ID"));
-				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By_User_ID"));
+				abieVO.setCreatedByUserID(rs.getInt("Created_By"));
+				abieVO.setLastUpdatedByUserID(rs.getInt("Last_Updated_By"));
 				abieVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
-				abieVO.setAbieGUID(rs.getString("ABIE_GUID"));
+				abieVO.setAbieGUID(rs.getString("GUID"));
 				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
-				abieVO.setBusinessTerm(rs.getString("Business_Term"));
+				abieVO.setBusinessTerm(rs.getString("biz_term"));
 				list.add(abieVO);
 			}
 			

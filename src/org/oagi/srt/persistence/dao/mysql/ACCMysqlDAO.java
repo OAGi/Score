@@ -17,7 +17,7 @@ import org.oagi.srt.persistence.dto.ACCVO;
 /**
  *
  * @author Jaehun Lee
- * @version 1.01
+ * @version 1.0
  *
  */
 public class ACCMysqlDAO extends SRTDAO {
