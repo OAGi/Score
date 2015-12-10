@@ -39,7 +39,7 @@ public class ContextSchemeMysqlDAO extends SRTDAO {
 	private final String _UPDATE_CONTEXT_SCHEME_STATEMENT =
 			"UPDATE " + _tableName + " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?, scheme_id = ?, scheme_name = ?, "
 				+ "description = ?, scheme_agency_id = ?, scheme_version_id = ?, ctx_category_id = ?, "
-				+ "created_by = ?, last_updated_by = ? WHERE classification_context_scheme_id = ?";
+				+ "created_by = ?, last_updated_by = ? WHERE classification_ctx_scheme_id = ?";
 	
 	private final String _DELETE_CONTEXT_SCHEME_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE classification_ctx_scheme_id = ?";

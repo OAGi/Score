@@ -27,16 +27,16 @@ public class ContextSchemeValueMysqlDAO extends SRTDAO {
 	private final String _tableName = "ctx_scheme_value";
 
 	private final String _FIND_ALL_CONTEXT_SCHEME_VALUE_STATEMENT =
-			"SELECT ctx_scheme_value_id, guid, Value, Meaning, Owner_Context_Scheme_ID FROM " + _tableName;
+			"SELECT ctx_scheme_value_id, guid, Value, Meaning, owner_ctx_scheme_id FROM " + _tableName;
 	
 	private final String _FIND_CONTEXT_SCHEME_VALUE_STATEMENT = 
-			"SELECT ctx_scheme_value_id, guid, Value, Meaning, Owner_Context_Scheme_ID FROM " + _tableName;
+			"SELECT ctx_scheme_value_id, guid, Value, Meaning, owner_ctx_scheme_id FROM " + _tableName;
 	
 	private final String _INSERT_CONTEXT_SCHEME_VALUE_STATEMENT = 
-			"INSERT INTO " + _tableName + " (ctx_scheme_value_id, guid, Value, Meaning, Owner_Context_Scheme_ID) VALUES (?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (guid, Value, Meaning, owner_ctx_scheme_id) VALUES (?, ?, ?, ?)";
 	
 	private final String _UPDATE_CONTEXT_SCHEME_VALUE_STATEMENT = "UPDATE " + _tableName + " SET guid = ?,"
-			+ " Value = ?, Meaning = ?, Owner_Context_Scheme_ID = ? WHERE ctx_scheme_value_id = ?";
+			+ " Value = ?, Meaning = ?, owner_ctx_scheme_id = ? WHERE ctx_scheme_value_id = ?";
 	
 	private final String _DELETE_CONTEXT_SCHEME_VALUE_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE ctx_scheme_value_id = ?";

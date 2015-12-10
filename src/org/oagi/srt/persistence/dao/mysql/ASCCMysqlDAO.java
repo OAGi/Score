@@ -68,10 +68,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 			
 			ps.setString(1, asccVO.getASCCGUID());
 			ps.setInt(2, asccVO.getCardinalityMin());
-			if(asccVO.getCardinalityMax() == -1)
-				ps.setNull(3, java.sql.Types.INTEGER);
-			else
-				ps.setInt(3, asccVO.getCardinalityMax());
+			ps.setInt(3, asccVO.getCardinalityMax());
 			ps.setInt(4, asccVO.getSequencingKey());
 			ps.setInt(5, asccVO.getAssocFromACCID());
 			ps.setInt(6, asccVO.getAssocToASCCPID());
@@ -419,14 +416,14 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(9, asccVO.getCreatedByUserId());
 			ps.setInt(10, asccVO.getOwnerUserId());
 			ps.setInt(11, asccVO.getLastUpdatedByUserId());
-			ps.setTimestamp(12, asccVO.getLastUpdateTimestamp());
+			ps.setTimestamp(12, asccVO.getCreationTimestamp());
 			ps.setInt(13, asccVO.getState());
 			ps.setInt(14, asccVO.getRevisionNum());
 			ps.setInt(15, asccVO.getRevisionTrackingNum());
 			ps.setInt(16, asccVO.getRevisionAction());
 			ps.setInt(17, asccVO.getReleaseId());
 			ps.setInt(18, asccVO.getCurrentAsccId());
-
+			ps.setInt(19, asccVO.getASCCID());
 			ps.executeUpdate();
 
 			tx.commit();

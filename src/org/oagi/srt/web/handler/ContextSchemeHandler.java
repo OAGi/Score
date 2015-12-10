@@ -53,7 +53,7 @@ public class ContextSchemeHandler {
 			daoUser = df.getDAO("User");
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("user_name", "oagis");
+			qc.add("name", "oagis");
 			userId = ((UserVO)daoUser.findObject(qc)).getUserID();
 			
 		} catch (Exception e) {
@@ -86,7 +86,7 @@ public class ContextSchemeHandler {
 	public List<SRTObject> getSelectedCSValues() {
 		if(selectedScheme != null) {
 			QueryCondition qc = new QueryCondition();
-			qc.add("owner_context_scheme_id", ((ContextSchemeVO)selectedScheme).getContextSchemeID());
+			qc.add("owner_ctx_scheme_id", ((ContextSchemeVO)selectedScheme).getContextSchemeID());
 			try {
 				selectedCSValues = daoCSV.findObjects(qc);
 			} catch (SRTDAOException e) {
@@ -220,7 +220,7 @@ public class ContextSchemeHandler {
 			contextSchemes = daoCS.findObjects();
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("owner_context_scheme_id", ccVO.getContextSchemeID());
+			qc.add("owner_ctx_scheme_id", ccVO.getContextSchemeID());
 			List<SRTObject> lists = daoCSV.findObjects(qc);
 			
 			HashMap<Integer, String> hm = new HashMap<Integer, String>();
@@ -264,7 +264,7 @@ public class ContextSchemeHandler {
 	
 	public void deleteCSV(String guid, int id) {
 		QueryCondition qc1 = new QueryCondition();
-		qc1.add("context_scheme_value_id", id);
+		qc1.add("ctx_scheme_value_id", id);
 		String msg = "";
 		try {
 			List<SRTObject> list = daoBCV.findObjects(qc1);
@@ -333,7 +333,7 @@ public class ContextSchemeHandler {
 			daoCS.insertObject(ccVO);
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("classification_context_scheme_guid", guid);
+			qc.add("guid", guid);
 			ContextSchemeVO cVO = (ContextSchemeVO)daoCS.findObject(qc);
 			
 			for(SRTObject obj : csValues) {
@@ -382,12 +382,12 @@ public class ContextSchemeHandler {
 		setMeaning("");
 		try {
 			QueryCondition qc = new QueryCondition();
-			qc.add("owner_context_scheme_id", ccVO.getContextSchemeID());
+			qc.add("owner_ctx_scheme_id", ccVO.getContextSchemeID());
 			
 			List<SRTObject> lists = daoCSV.findObjects(qc);
 			for(SRTObject obj : lists) {
 				QueryCondition qc1 = new QueryCondition();
-				qc1.add("context_scheme_value_id", ((ContextSchemeValueVO)obj).getContextSchemeValueID());
+				qc1.add("ctx_scheme_value_id", ((ContextSchemeValueVO)obj).getContextSchemeValueID());
 				String msg = "";
 				try {
 					List<SRTObject> list = daoBCV.findObjects(qc1);
@@ -424,7 +424,7 @@ public class ContextSchemeHandler {
     	
     	for(Integer i : hm.keySet()) {
     		QueryCondition qc = new QueryCondition();
-    		qc.add("business_context_id", i);
+    		qc.add("biz_ctx_id", i);
     		try {
 				sb.append(((BusinessContextVO)daoBC.findObject(qc)).getName() + ", ");
 			} catch (SRTDAOException e) {

@@ -69,20 +69,20 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		File[] listOfF2 = getBODs(f2);
 
 		for (File file : listOfF1) {
-			if(file.getName().endsWith("AcknowledgeInvoice.xsd")){	
+			if(!file.getName().endsWith("AcknowledgeInvoice.xsd")){	
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
 			}
 		}
 
 		for (File file : listOfF2) {
-			if(file.getName().endsWith("AcknowledgeInvoice.xsd")){		
+			if(!file.getName().endsWith("AcknowledgeInvoice.xsd")){		
 				System.out.println(file.getName()+" ing...");
 				insertASCCP(file);
 			}
 		}
-		//modifySequeceKeyforGroup();
-		//modifySequeceKeyforGroup_temp();
+		modifySequeceKeyforGroup();
+		modifySequeceKeyforGroup_temp();
 	} 
 	
 	private void insertASCCP(File file) throws Exception {
@@ -134,7 +134,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			accpVO.setModule(module);
 			accpVO.setCreatedByUserId(1);
 			accpVO.setLastUpdatedByUserId(1);
-
+			accpVO.setReleaseId(1);//tmp
+			accpVO.setNamespaceId(1); //tmp
 			asccpDao.insertObject(accpVO);
 
 		}
@@ -173,7 +174,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		accpVO.setModule(module);
 		accpVO.setCreatedByUserId(1);
 		accpVO.setLastUpdatedByUserId(1);
-
+		accpVO.setReleaseId(1);//tmp
+		accpVO.setNamespaceId(1);//tmp
 		asccpDao.insertObject(accpVO);
 
 //		try {
@@ -216,6 +218,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asscVO.setAssocToASCCPID(assocToASCCPId);
 			asscVO.setDEN(den);
 			asscVO.setDefinition(definition);
+			asscVO.setReleaseId(1);//tmp
 			asccDao.insertObject(asscVO);
 			
 //			
@@ -387,7 +390,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setSequencingKey(sequenceKey);
 			aBCCVO.setEntityType(entityType);
 			aBCCVO.setDEN(den);
-	
+			aBCCVO.setReleaseId(1);//tmp
 			bccDao.insertObject(aBCCVO);
 		}
 
@@ -434,7 +437,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setSequencingKey(sequenceKey);
 			aBCCVO.setEntityType(entityType);
 			aBCCVO.setDEN(den);
-	
+			aBCCVO.setReleaseId(1);//tmp
 			bccDao.insertObject(aBCCVO);
 		}
 	}
@@ -470,7 +473,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		bccpVO.setDEN(den);
 		bccpVO.setCreatedByUserId(1);
 		bccpVO.setLastUpdatedByUserId(1);
-
+		bccpVO.setReleaseId(1);//tmp
 		bccpDao.insertObject(bccpVO);
 
 		QueryCondition qc1 = new QueryCondition();
@@ -519,7 +522,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aACCVO.setLastUpdatedByUserId(1);
 			aACCVO.setState(4);
 			aACCVO.setModule(module);
-	
+			aACCVO.setReleaseId(1);//tmp
+			aACCVO.setNamespaceId(1);//tmp
 			accDao.insertObject(aACCVO);
 		}
 	}
@@ -546,7 +550,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccpVO.setModule(module);
 			asccpVO.setCreatedByUserId(1);
 			asccpVO.setLastUpdatedByUserId(1);
-	
+			asccpVO.setReleaseId(1);//tmp
+			asccpVO.setNamespaceId(1);//tmp
 			asccpDao.insertObject(asccpVO);
 		}
 	}
@@ -578,6 +583,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 			asscVO.setDEN(Utility.first(accVO2.getDEN()) + ". " + asccpVO1.getDEN());
 			asscVO.setDefinition("Group");
+			asscVO.setReleaseId(1);//tmp
 			asccDao.insertObject(asscVO);
 		//}
 	}
@@ -639,7 +645,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		aACCVO.setLastUpdatedByUserId(1);
 		aACCVO.setState(state);
 		aACCVO.setModule(module);
-
+		aACCVO.setReleaseId(1);//tmp
+		aACCVO.setNamespaceId(1);//tmp
 		accDao.insertObject(aACCVO);
 		
 		XSParticle particle = complexType.getParticle();

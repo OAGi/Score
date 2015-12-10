@@ -41,7 +41,7 @@ public class UIHandler {
 			daoUser = df.getDAO("User");
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("user_name", "oagis");
+			qc.add("name", "oagis");
 			userId = ((UserVO)daoUser.findObject(qc)).getUserID();
 			
 		} catch (Exception e) {
