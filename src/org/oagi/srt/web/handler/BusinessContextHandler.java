@@ -172,7 +172,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 			daoBC.insertObject(bcVO);
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("Business_Context_GUID", guid);
+			qc.add("GUID", guid);
 			BusinessContextVO bvVO1 = (BusinessContextVO)daoBC.findObject(qc);
 			
 			for(BusinessContextValues bcv : bcValues) {
@@ -272,7 +272,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
         if(event.getObject() instanceof ContextSchemeVO) {
         	selected1 = (ContextSchemeVO) event.getObject();
         	QueryCondition qc = new QueryCondition();
-        	qc.add("Owner_Context_Scheme_ID", selected1.getContextSchemeID());
+        	qc.add("Owner_ctx_Scheme_ID", selected1.getContextSchemeID());
         	try {
         		contextValues = daoCV.findObjects(qc);
 			} catch (SRTDAOException e) {
@@ -339,28 +339,28 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 		if(bcDetail != null) {
 			bcId = bcDetail.getBusinessContextID();
 			QueryCondition qc = new QueryCondition();
-			qc.add("Business_Context_ID", bcDetail.getBusinessContextID());
+			qc.add("biz_ctx_ID", bcDetail.getBusinessContextID());
 			try {
 				BusinessContextVO bcVO = (BusinessContextVO)daoBC.findObject(qc);
 				qc = new QueryCondition();
-				qc.add("Business_Context_ID", bcDetail.getBusinessContextID());
+				qc.add("biz_ctx_ID", bcDetail.getBusinessContextID());
 				
 				List<SRTObject> bcvVOList = daoBCV.findObjects(qc);
 				for(SRTObject sVO : bcvVOList) {
 					BusinessContextValues bcv = new BusinessContextValues();
 					BusinessContextValueVO bcvVO = (BusinessContextValueVO)sVO;
 					qc = new QueryCondition();
-					qc.add("Context_Scheme_Value_ID", bcvVO.getContextSchemeValueID());
+					qc.add("ctx_scheme_Value_ID", bcvVO.getContextSchemeValueID());
 					ContextSchemeValueVO  csvVO = (ContextSchemeValueVO)daoCV.findObject(qc);
 					bcv.setCsvVO(csvVO);
 					
 					qc = new QueryCondition();
-					qc.add("Classification_Context_Scheme_ID", csvVO.getOwnerContextSchemeID());
+					qc.add("Classification_ctx_Scheme_ID", csvVO.getOwnerContextSchemeID());
 					ContextSchemeVO csVO = (ContextSchemeVO)daoCS.findObject(qc);
 					bcv.setCsVO(csVO);
 					
 					qc = new QueryCondition();
-					qc.add("Context_Category_ID", csVO.getContextCategoryID());
+					qc.add("Ctx_Category_ID", csVO.getContextCategoryID());
 					ContextCategoryVO ccVO = (ContextCategoryVO)daoCC.findObject(qc);
 					bcv.setCcVO(ccVO);
 					

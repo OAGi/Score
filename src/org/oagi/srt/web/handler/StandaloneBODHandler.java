@@ -112,7 +112,7 @@ public class StandaloneBODHandler extends UIHandler implements Serializable {
 			SRTDAO asccpDao = df.getDAO("ASCCP");
 						
 			QueryCondition qc_01 = new QueryCondition();
-			qc_01.add("isTop_Level", 1); 
+			qc_01.add("is_Top_Level", 1); 
 			List<SRTObject> list_01 = abieDao.findObjects(qc_01);
 			for(SRTObject abie : list_01) {
 				ABIEVO abieVO = (ABIEVO) abie;
@@ -143,7 +143,7 @@ public class StandaloneBODHandler extends UIHandler implements Serializable {
 			SRTDAO asccpDao = df.getDAO("ASCCP");
 						
 			QueryCondition qc_01 = new QueryCondition();
-			qc_01.add("isTop_Level", 1); 
+			qc_01.add("is_Top_Level", 1); 
 			List<SRTObject> list_01 = abieDao.findObjects(qc_01);
 			for(SRTObject abie : list_01) {
 				ABIEVO abieVO = (ABIEVO) abie;

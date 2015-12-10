@@ -298,8 +298,8 @@ public class CodeListHandler extends UIHandler {
 			daoCL.insertObject(codeListVO);
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("code_list_guid", codeListVO.getCodeListGUID());
-			qc.add("enumeration_type_guid", codeListVO.getEnumerationTypeGUID());
+			qc.add("guid", codeListVO.getCodeListGUID());
+			qc.add("enum_type_guid", codeListVO.getEnumerationTypeGUID());
 			qc.add("name", codeListVO.getName());
 			qc.add("definition", codeListVO.getDefinition());
 			int clId = ((CodeListVO)daoCL.findObject(qc)).getCodeListID();
@@ -381,9 +381,9 @@ public class CodeListHandler extends UIHandler {
 			daoCL.insertObject(codeListVO);
 			
 			QueryCondition qc = new QueryCondition();
-			qc.add("code_list_guid", codeListVO.getCodeListGUID());
-			qc.add("enumeration_type_guid", codeListVO.getEnumerationTypeGUID());
-			qc.add("based_code_list_id", codeListVO.getBasedCodeListID());
+			qc.add("guid", codeListVO.getCodeListGUID());
+			qc.add("enum_type_guid", codeListVO.getEnumerationTypeGUID());
+			qc.add("code_list_id", codeListVO.getBasedCodeListID());
 			qc.add("name", codeListVO.getName());
 			qc.add("definition", codeListVO.getDefinition());
 			int clId = ((CodeListVO)daoCL.findObject(qc)).getCodeListID();

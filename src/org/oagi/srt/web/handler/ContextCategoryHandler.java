@@ -197,7 +197,7 @@ public class ContextCategoryHandler extends UIHandler {
 		} catch (SRTDAOException e) {
 			if(e.getLocalizedMessage().contains(SRTConstants.FOREIGNKEY_ERROR_MSG)) {
 				QueryCondition qc = new QueryCondition();
-				qc.add("context_category_id", id);
+				qc.add("ctx_category_id", id);
 				String msg = "";
 				try {
 					List<SRTObject> list = daoCS.findObjects(qc);
