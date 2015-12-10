@@ -247,7 +247,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
         if(event.getObject() instanceof ContextCategoryVO) {
         	selected = (ContextCategoryVO) event.getObject();
         	QueryCondition qc = new QueryCondition();
-        	qc.add("Context_Category_ID", selected.getContextCategoryID());
+        	qc.add("ctx_Category_ID", selected.getContextCategoryID());
         	try {
         		contextSchemes = daoCS.findObjects(qc);
         		contextValues = new ArrayList<SRTObject>();

@@ -1607,7 +1607,7 @@ public class TopLevelABIEHandler implements Serializable {
 					aABIEView.getBdtPrimitiveRestrictions();
 					
 					QueryCondition qc_01 = new QueryCondition();
-					qc_01.add("bdt_pri_restrin_id", aABIEView.getBdtPrimitiveRestrictionId());
+					qc_01.add("bdt_pri_restri_id", aABIEView.getBdtPrimitiveRestrictionId());
 					BDTPrimitiveRestrictionVO  aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)bdtPrimitiveRestrictionDao.findObject(qc_01);
 					
 					QueryCondition qc = new QueryCondition();

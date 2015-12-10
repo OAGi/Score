@@ -120,12 +120,12 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 					
 					SRTDAO cdtAllowedPrimitiveExpressionTypeMapDao = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 					QueryCondition qc_03 = new QueryCondition();
-					qc_03.add("cdt_primitive_expression_type_map_id", cc.getCDTPrimitiveExpressionTypeMapID());
+					qc_03.add("cdt_awd_pri_xps_type_map_id", cc.getCDTPrimitiveExpressionTypeMapID());
 					CDTAllowedPrimitiveExpressionTypeMapVO vo = (CDTAllowedPrimitiveExpressionTypeMapVO)cdtAllowedPrimitiveExpressionTypeMapDao.findObject(qc_03);
 					
 					SRTDAO xsdBuiltInTypeDao = df.getDAO("XSDBuiltInType");
 					QueryCondition qc_04 = new QueryCondition();
-					qc_04.add("xsd_builtin_type_id", vo.getXSDBuiltInTypeID());
+					qc_04.add("xbt_id", vo.getXSDBuiltInTypeID());
 					XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO)xsdBuiltInTypeDao.findObject(qc_04);
 					bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBDTPrimitiveRestrictionID());
 				} else {
