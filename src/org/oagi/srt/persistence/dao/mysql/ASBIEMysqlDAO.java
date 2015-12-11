@@ -273,19 +273,19 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			Connection conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_ASBIE_STATEMENT);
-			
-			ps.setString(1, asbievo.getAsbieGuid());
-			ps.setInt(2, asbievo.getAssocFromABIEID());
-			ps.setInt(3, asbievo.getAssocToASBIEPID());
-			ps.setInt(4, asbievo.getBasedASCC());
-			ps.setString(5, asbievo.getDefinition());
-			ps.setInt(6, asbievo.getCardinalityMin());
-			ps.setInt(7, asbievo.getCardinalityMax());
+
+			ps.setInt(1, asbievo.getAssocFromABIEID());
+			ps.setInt(2, asbievo.getAssocToASBIEPID());
+			ps.setInt(3, asbievo.getBasedASCC());
+			ps.setString(4, asbievo.getDefinition());
+			ps.setInt(5, asbievo.getCardinalityMin());
+			ps.setInt(6, asbievo.getCardinalityMax());
+			ps.setString(7, asbievo.getAsbieGuid());
 			ps.setInt(8, asbievo.getNillable());
 			ps.setString(9, asbievo.getRemark());
-			ps.setInt(10, asbievo.getCreatedByUserId());
-			ps.setInt(11, asbievo.getLastUpdatedByUserId());
-			ps.setDouble(12, asbievo.getSequencingKey());
+			ps.setInt(10, asbievo.getLastUpdatedByUserId());
+			ps.setDouble(11, asbievo.getSequencingKey());
+			ps.setInt(12, asbievo.getASBIEID());
 			
 			ps.executeUpdate();
 

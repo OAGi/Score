@@ -314,14 +314,8 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
-				ps.setNull(5, java.sql.Types.INTEGER);
-			else
-				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
-				ps.setNull(6, java.sql.Types.INTEGER);
-			else
-				ps.setInt(6, bbieVO.getCodeListId());
+			ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
+			ps.setInt(6, bbieVO.getCodeListId());
 			ps.setInt(7, bbieVO.getCardinalityMin());
 			ps.setInt(8, bbieVO.getCardinalityMax());
 			ps.setString(9, bbieVO.getDefaultText());
@@ -330,9 +324,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(12, bbieVO.getIsNull());
 			ps.setString(13, bbieVO.getDefinition());
 			ps.setString(14, bbieVO.getRemark());
-			ps.setInt(15, bbieVO.getCreatedByUserId());
-			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
-			ps.setDouble(17, bbieVO.getSequencing_key());
+			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
+			ps.setDouble(16, bbieVO.getSequencing_key());
+			ps.setInt(17, bbieVO.getBBIEID());
 			
 			ps.executeUpdate();
 
