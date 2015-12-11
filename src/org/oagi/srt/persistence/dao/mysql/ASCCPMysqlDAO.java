@@ -81,7 +81,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setBoolean(13, asccpVO.getReusableIndicator());
 			ps.setInt(14, asccpVO.getRevisionNum());
 			ps.setInt(15, asccpVO.getRevisionTrackingNum());
-			ps.setInt(16, asccpVO.getRevisionAction());
+			ps.setBoolean(16, asccpVO.getRevisionAction());
 			ps.setInt(17, asccpVO.getReleaseId());
 			ps.setInt(18, asccpVO.getCurrentAsccpId());
 			ps.setBoolean(19, asccpVO.getIs_deprecated());
@@ -185,7 +185,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
 				asccpVO.setRevisionNum(rs.getInt("revision_num"));
 				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setRevisionAction(rs.getBoolean("revision_action"));
 				asccpVO.setReleaseId(rs.getInt("release_id"));
 				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				asccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -286,7 +286,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
 				asccpVO.setRevisionNum(rs.getInt("revision_num"));
 				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setRevisionAction(rs.getBoolean("revision_action"));
 				asccpVO.setReleaseId(rs.getInt("release_id"));
 				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				asccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -390,7 +390,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
 				asccpVO.setRevisionNum(rs.getInt("revision_num"));
 				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setRevisionAction(rs.getBoolean("revision_action"));
 				asccpVO.setReleaseId(rs.getInt("release_id"));
 				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				asccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -495,7 +495,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
 				asccpVO.setRevisionNum(rs.getInt("revision_num"));
 				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setRevisionAction(rs.getBoolean("revision_action"));
 				asccpVO.setReleaseId(rs.getInt("release_id"));
 				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				asccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -557,7 +557,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
 				asccpVO.setRevisionNum(rs.getInt("revision_num"));
 				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setRevisionAction(rs.getBoolean("revision_action"));
 				asccpVO.setReleaseId(rs.getInt("release_id"));
 				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				asccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -616,7 +616,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 				asccpVO.setReusableIndicator(rs.getBoolean("reusable_indicator"));
 				asccpVO.setRevisionNum(rs.getInt("revision_num"));
 				asccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccpVO.setRevisionAction(rs.getInt("revision_action"));
+				asccpVO.setRevisionAction(rs.getBoolean("revision_action"));
 				asccpVO.setReleaseId(rs.getInt("release_id"));
 				asccpVO.setCurrentAsccpId(rs.getInt("current_asccp_id"));
 				asccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -669,7 +669,7 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setBoolean(13, asccpVO.getReusableIndicator());
 			ps.setInt(14, asccpVO.getRevisionNum());
 			ps.setInt(15, asccpVO.getRevisionTrackingNum());
-			ps.setInt(16, asccpVO.getRevisionAction());
+			ps.setBoolean(16, asccpVO.getRevisionAction());
 			ps.setInt(17, asccpVO.getReleaseId());
 			ps.setInt(18, asccpVO.getCurrentAsccpId());
 			ps.setBoolean(19, asccpVO.getIs_deprecated());
