@@ -298,7 +298,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 			+ " SET GUID = ?, Based_BCC_ID = ?,  From_ABIE_ID = ?, To_BBIEP_ID = ?, bdt_pri_restri_id = ?, code_list_id = ?, "
 			+ "Cardinality_Min = ?, Cardinality_Max = ?, default_value = ?, is_Nillable = ?, Fixed_Value = ?,"
 			+ "is_null = ?, Definition = ?, remark = ?, "
-			+ "last_updated_by_user_id = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where bbie_id = ?";
+			+ "last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where bbie_id = ?";
 
 	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {

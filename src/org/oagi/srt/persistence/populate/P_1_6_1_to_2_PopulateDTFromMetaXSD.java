@@ -59,7 +59,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setDTGUID(ele.getAttribute("id"));
 		    dtVO.setDTType(1);
 		    dtVO.setVersionNumber("1.0");
-		    dtVO.setRevisionType(0);
+		    //dtVO.setRevisionType(0);
 		    
 		    QueryCondition qc = new QueryCondition();
 			qc.add("guid", "oagis-id-d5cb8551edf041389893fee25a496395");
@@ -84,7 +84,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    
 		    dtVO.setContentComponentDefinition(null);
 		    dtVO.setRevisionDocumentation(null);
-		    dtVO.setRevisionState(1);
+		    dtVO.setState(1);
 		    
 		    QueryCondition qc_02 = new QueryCondition();
 			qc.add("Name", "oagis");
@@ -92,6 +92,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
 			dtVO.setRevisionDocumentation("");
+			dtVO.setRevisionNum(0);
+			dtVO.setRevisionTrackingNum(0);
+			dtVO.setRevisionAction(true);
+			dtVO.setIs_deprecated(false);
 			
 		    dao.insertObject(dtVO);
 		    

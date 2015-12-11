@@ -385,7 +385,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setDTGUID(guid);
 			dtVO.setDTType(1);
 			dtVO.setVersionNumber("1.0");
-			dtVO.setRevisionType(0);
+			//dtVO.setRevisionType(0);
 			
 			//System.out.println("### type: " + type);
 			
@@ -424,11 +424,14 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
 			dtVO.setDefinition(null);
 			dtVO.setContentComponentDefinition(null);
-			dtVO.setRevisionState(1);
+			dtVO.setState(1);
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
 			dtVO.setRevisionDocumentation("");
-			
+			dtVO.setRevisionNum(0);
+			dtVO.setRevisionTrackingNum(0);
+			dtVO.setRevisionAction(true);
+			dtVO.setIs_deprecated(false);
 			aDTDAO.insertObject(dtVO);
 			
 			QueryCondition qc1 = new QueryCondition();

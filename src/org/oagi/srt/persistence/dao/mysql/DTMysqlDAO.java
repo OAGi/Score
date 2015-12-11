@@ -26,28 +26,31 @@ public class DTMysqlDAO extends SRTDAO {
 
 	private final String _FIND_ALL_DT_STATEMENT = 
 			"SELECT DT_ID, guid, Type, Version_Num, Previous_Version_DT_ID, "
-					+ "Revision_Type, Data_Type_Term, Qualifier, Based_DT_ID, DEN, Content_Component_DEN, "
-					+ "Definition, Content_Component_Definition, Revision_Documentation, Revision_State, Created_By, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp FROM " + _tableName;
+					+ "Data_Type_Term, Qualifier, Based_DT_ID, DEN, Content_Component_DEN, "
+					+ "Definition, Content_Component_Definition, Revision_Doc, State, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated FROM " + _tableName;
 
 	private final String _FIND_DT_STATEMENT = 
 			"SELECT DT_ID, guid, Type, Version_Num, Previous_Version_DT_ID, "
-					+ "Revision_Type, Data_Type_Term, Qualifier, Based_DT_ID, DEN, Content_Component_DEN, "
-					+ "Definition, Content_Component_Definition, Revision_Documentation, Revision_State, Created_By, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp FROM " + _tableName;
+					+ "Data_Type_Term, Qualifier, Based_DT_ID, DEN, Content_Component_DEN, "
+					+ "Definition, Content_Component_Definition, Revision_Doc, State, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated FROM " + _tableName;
 
 	private final String _INSERT_DT_STATEMENT = 
 			"INSERT INTO " + _tableName + " (guid, Type, Version_Num, Previous_Version_DT_ID, "
-					+ "Revision_Type, Data_Type_Term, Qualifier, Based_DT_ID, DEN, Content_Component_DEN, "
-					+ "Definition, Content_Component_Definition, Revision_Documentation, Revision_State, Created_By, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+					+ "Data_Type_Term, Qualifier, Based_DT_ID, DEN, Content_Component_DEN, "
+					+ "Definition, Content_Component_Definition, Revision_Doc, State, Created_By, owner_user_id, Last_Updated_By, "
+					+ "Creation_Timestamp, Last_Update_Timestamp, "
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_DT_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?, Type = ?, Version_Num = ?, Previous_Version_DT_ID = ?, "
-			+ "Revision_Type = ?, Data_Type_Term = ?, Qualifier = ?, Based_DT_ID = ?, DEN = ?, Content_Component_DEN = ?, "
-			+ "Definition = ?, Content_Component_Definition = ?, Revision_Documentation = ?, Revision_State = ?, Created_By = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ? WHERE DT_ID = ?";
+			+ "Data_Type_Term = ?, Qualifier = ?, Based_DT_ID = ?, DEN = ?, Content_Component_DEN = ?, "
+			+ "Definition = ?, Content_Component_Definition = ?, Revision_Doc = ?, State = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
+			+ "Creation_Timestamp = ?, revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bdt_id = ?, is_deprecated = ? WHERE DT_ID = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -69,19 +72,24 @@ public class DTMysqlDAO extends SRTDAO {
 			ps.setInt(2, dtVO.getDTType());
 			ps.setString(3, dtVO.getVersionNumber());
 			ps.setInt(4, dtVO.getPreviousVersionDTID());
-			ps.setInt(5, dtVO.getRevisionType());
-			ps.setString(6, dtVO.getDataTypeTerm());
-			ps.setString(7, dtVO.getQualifier());
-			ps.setInt(8, dtVO.getBasedDTID());
-			ps.setString(9, dtVO.getDEN());
-			ps.setString(10, dtVO.getContentComponentDEN());
-			ps.setString(11, dtVO.getDefinition());
-			ps.setString(12, dtVO.getContentComponentDefinition());
-			ps.setString(13, dtVO.getRevisionDocumentation());
-			ps.setInt(14, dtVO.getRevisionState());
-			ps.setInt(15, dtVO.getCreatedByUserId());
+			ps.setString(5, dtVO.getDataTypeTerm());
+			ps.setString(6, dtVO.getQualifier());
+			ps.setInt(7, dtVO.getBasedDTID());
+			ps.setString(8, dtVO.getDEN());
+			ps.setString(9, dtVO.getContentComponentDEN());
+			ps.setString(10, dtVO.getDefinition());
+			ps.setString(11, dtVO.getContentComponentDefinition());
+			ps.setString(12, dtVO.getRevisionDocumentation());
+			ps.setInt(13, dtVO.getState());
+			ps.setInt(14, dtVO.getCreatedByUserId());
+			ps.setInt(15, dtVO.getOwnerUserId());
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
-
+			ps.setInt(17, dtVO.getRevisionNum());
+			ps.setInt(18, dtVO.getRevisionTrackingNum());
+			ps.setBoolean(19, dtVO.getRevisionAction());
+			ps.setInt(20, dtVO.getReleaseId());
+			ps.setInt(21, dtVO.getCurrentBdtId());
+			ps.setBoolean(22, dtVO.getIs_deprecated());
 			ps.executeUpdate();
 
 			//ResultSet tableKeys = ps.getGeneratedKeys();
@@ -162,7 +170,6 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setDTType(rs.getInt("type"));
 				dtVO.setVersionNumber(rs.getString("version_num"));
 				dtVO.setPreviousVersionDTID(rs.getInt("previous_version_dt_id"));
-				dtVO.setRevisionType(rs.getInt("revision_type"));
 				dtVO.setDataTypeTerm(rs.getString("data_type_term"));
 				dtVO.setQualifier(rs.getString("qualifier"));
 				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
@@ -170,12 +177,19 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
 				dtVO.setContentComponentDefinition("Content_Component_Definition");
-				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
-				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
+				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
+				dtVO.setOwnerUserId(rs.getInt("owner_user_id"));
 				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				dtVO.setRevisionNum(rs.getInt("revision_num"));
+				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setReleaseId(rs.getInt("release_id"));
+				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
+				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			
 			conn.close();
@@ -259,7 +273,6 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setDTType(rs.getInt("type"));
 				dtVO.setVersionNumber(rs.getString("version_num"));
 				dtVO.setPreviousVersionDTID(rs.getInt("previous_version_dt_id"));
-				dtVO.setRevisionType(rs.getInt("revision_type"));
 				dtVO.setDataTypeTerm(rs.getString("data_type_term"));
 				dtVO.setQualifier(rs.getString("qualifier"));
 				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
@@ -267,12 +280,19 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
 				dtVO.setContentComponentDefinition("Content_Component_Definition");
-				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
-				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
+				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
+				dtVO.setOwnerUserId(rs.getInt("owner_user_id"));
 				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				dtVO.setRevisionNum(rs.getInt("revision_num"));
+				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setReleaseId(rs.getInt("release_id"));
+				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
+				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			
 		} catch (SQLException e) {
@@ -329,7 +349,6 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setDTType(rs.getInt("type"));
 				dtVO.setVersionNumber(rs.getString("version_num"));
 				dtVO.setPreviousVersionDTID(rs.getInt("previous_version_dt_id"));
-				dtVO.setRevisionType(rs.getInt("revision_type"));
 				dtVO.setDataTypeTerm(rs.getString("data_type_term"));
 				dtVO.setQualifier(rs.getString("qualifier"));
 				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
@@ -337,12 +356,19 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
 				dtVO.setContentComponentDefinition("Content_Component_Definition");
-				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
-				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
+				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
+				dtVO.setOwnerUserId(rs.getInt("owner_user_id"));
 				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				dtVO.setRevisionNum(rs.getInt("revision_num"));
+				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setReleaseId(rs.getInt("release_id"));
+				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
+				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
 			conn.close();
@@ -384,7 +410,6 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setDTType(rs.getInt("type"));
 				dtVO.setVersionNumber(rs.getString("version_num"));
 				dtVO.setPreviousVersionDTID(rs.getInt("previous_version_dt_id"));
-				dtVO.setRevisionType(rs.getInt("revision_type"));
 				dtVO.setDataTypeTerm(rs.getString("data_type_term"));
 				dtVO.setQualifier(rs.getString("qualifier"));
 				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
@@ -392,12 +417,19 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
 				dtVO.setContentComponentDefinition("Content_Component_Definition");
-				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
-				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
+				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
+				dtVO.setOwnerUserId(rs.getInt("owner_user_id"));
 				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				dtVO.setRevisionNum(rs.getInt("revision_num"));
+				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setReleaseId(rs.getInt("release_id"));
+				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
+				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
 			conn.close();
@@ -435,19 +467,25 @@ public class DTMysqlDAO extends SRTDAO {
 			ps.setInt(2, dtVO.getDTType());
 			ps.setString(3, dtVO.getVersionNumber());
 			ps.setInt(4, dtVO.getPreviousVersionDTID());
-			ps.setInt(5, dtVO.getRevisionType());
-			ps.setString(6, dtVO.getDataTypeTerm());
-			ps.setString(7, dtVO.getQualifier());
-			ps.setInt(8, dtVO.getBasedDTID());
-			ps.setString(9, dtVO.getDEN());
-			ps.setString(10, dtVO.getContentComponentDEN());
-			ps.setString(11, dtVO.getDefinition());
-			ps.setString(12, dtVO.getContentComponentDefinition());
-			ps.setString(13, dtVO.getRevisionDocumentation());
-			ps.setInt(14, dtVO.getRevisionState());
-			ps.setInt(15, dtVO.getCreatedByUserId());
+			ps.setString(5, dtVO.getDataTypeTerm());
+			ps.setString(6, dtVO.getQualifier());
+			ps.setInt(7, dtVO.getBasedDTID());
+			ps.setString(8, dtVO.getDEN());
+			ps.setString(9, dtVO.getContentComponentDEN());
+			ps.setString(10, dtVO.getDefinition());
+			ps.setString(11, dtVO.getContentComponentDefinition());
+			ps.setString(12, dtVO.getRevisionDocumentation());
+			ps.setInt(13, dtVO.getState());
+			ps.setInt(14, dtVO.getCreatedByUserId());
+			ps.setInt(15, dtVO.getOwnerUserId());
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
-			ps.setInt(17, dtVO.getDTID());
+			ps.setInt(17, dtVO.getRevisionNum());
+			ps.setInt(18, dtVO.getRevisionTrackingNum());
+			ps.setBoolean(19, dtVO.getRevisionAction());
+			ps.setInt(20, dtVO.getReleaseId());
+			ps.setInt(21, dtVO.getCurrentBdtId());
+			ps.setBoolean(22, dtVO.getIs_deprecated());
+			ps.setInt(23, dtVO.getDTID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -557,7 +595,6 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setDTType(rs.getInt("type"));
 				dtVO.setVersionNumber(rs.getString("version_num"));
 				dtVO.setPreviousVersionDTID(rs.getInt("previous_version_dt_id"));
-				dtVO.setRevisionType(rs.getInt("revision_type"));
 				dtVO.setDataTypeTerm(rs.getString("data_type_term"));
 				dtVO.setQualifier(rs.getString("qualifier"));
 				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
@@ -565,12 +602,19 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
 				dtVO.setContentComponentDefinition("Content_Component_Definition");
-				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
-				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
+				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
+				dtVO.setOwnerUserId(rs.getInt("owner_user_id"));
 				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				dtVO.setRevisionNum(rs.getInt("revision_num"));
+				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setReleaseId(rs.getInt("release_id"));
+				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
+				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
 			
@@ -609,7 +653,6 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setDTType(rs.getInt("type"));
 				dtVO.setVersionNumber(rs.getString("version_num"));
 				dtVO.setPreviousVersionDTID(rs.getInt("previous_version_dt_id"));
-				dtVO.setRevisionType(rs.getInt("revision_type"));
 				dtVO.setDataTypeTerm(rs.getString("data_type_term"));
 				dtVO.setQualifier(rs.getString("qualifier"));
 				dtVO.setBasedDTID(rs.getInt("Based_DT_ID"));
@@ -617,12 +660,19 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
 				dtVO.setContentComponentDefinition("Content_Component_Definition");
-				dtVO.setRevisionDocumentation(rs.getString("Revision_Documentation"));
-				dtVO.setRevisionState(rs.getInt("Revision_State"));
+				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
+				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
+				dtVO.setOwnerUserId(rs.getInt("owner_user_id"));
 				dtVO.setLastUpdatedByUserId(rs.getInt("Last_Updated_By"));
 				dtVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
+				dtVO.setRevisionNum(rs.getInt("revision_num"));
+				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
+				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setReleaseId(rs.getInt("release_id"));
+				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
+				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
 		} catch (SQLException e) {

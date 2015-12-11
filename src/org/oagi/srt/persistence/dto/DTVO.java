@@ -16,7 +16,6 @@ public class DTVO extends SRTObject {
 	private int DTType;
 	private String VersionNumber;
 	private int PreviousVersionDTID;
-	private int RevisionType;
 	private String DataTypeTerm;
 	private String Qualifier;
 	private int BasedDTID;
@@ -25,11 +24,19 @@ public class DTVO extends SRTObject {
 	private String Definition;
 	private String ContentComponentDefinition;
 	private String RevisionDocumentation;
-	private int RevisionState;
+	private int State;
 	private int CreatedByUserId;
+	private int OwnerUserId;
 	private int LastUpdatedByUserId;
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
+	private int RevisionNum;
+	private int RevisionTrackingNum;
+	private boolean RevisionAction;
+	private int ReleaseId;
+	private int CurrentBdtId;
+	private boolean Is_deprecated;
+	
 	
 	public int getDTID() {
 		return DTID;
@@ -69,14 +76,6 @@ public class DTVO extends SRTObject {
 	
 	public void setPreviousVersionDTID(int previousVersionDTID) {
 		PreviousVersionDTID = previousVersionDTID;
-	}
-	
-	public int getRevisionType() {
-		return RevisionType;
-	}
-	
-	public void setRevisionType(int revisionType) {
-		RevisionType = revisionType;
 	}
 	
 	public String getDataTypeTerm() {
@@ -143,12 +142,12 @@ public class DTVO extends SRTObject {
 		RevisionDocumentation = revisionDocumentation;
 	}
 	
-	public int getRevisionState() {
-		return RevisionState;
+	public int getState() {
+		return State;
 	}
 	
-	public void setRevisionState(int revisionState) {
-		RevisionState = revisionState;
+	public void setState(int state) {
+		State = state;
 	}
 	
 	public int getCreatedByUserId() {
@@ -157,6 +156,14 @@ public class DTVO extends SRTObject {
 	
 	public void setCreatedByUserId(int createdByUserId) {
 		CreatedByUserId = createdByUserId;
+	}
+	
+	public int getOwnerUserId() {
+		return OwnerUserId;
+	}
+	
+	public void setOwnerUserId(int ownerUserId) {
+		OwnerUserId = ownerUserId;
 	}
 	
 	public int getLastUpdatedByUserId() {
@@ -182,5 +189,51 @@ public class DTVO extends SRTObject {
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
 		LastUpdateTimestamp = lastUpdateTimestamp;
 	}
+	public int getRevisionNum() {
+		return RevisionNum;
+	}
 	
+	public void setRevisionNum(int revisionNum) {
+		RevisionNum = revisionNum;
+	}
+	
+	public int getRevisionTrackingNum() {
+		return RevisionTrackingNum;
+	}
+	
+	public void setRevisionTrackingNum(int revisionTrackingNum) {
+		RevisionTrackingNum = revisionTrackingNum;
+	}
+	
+	public boolean getRevisionAction() {
+		return RevisionAction;
+	}
+	
+	public void setRevisionAction(boolean revisionAction) {
+		RevisionAction = revisionAction;
+	}
+	
+	public int getReleaseId() {
+		return ReleaseId;
+	}
+	
+	public void setReleaseId(int releaseId) {
+		ReleaseId = releaseId;
+	}
+	
+	public int getCurrentBdtId() {
+		return CurrentBdtId;
+	}
+	
+	public void setCurrentBdtId(int currentBdtId) {
+		CurrentBdtId = currentBdtId;
+	}
+	
+	public boolean getIs_deprecated() {
+		return Is_deprecated;
+	}
+	
+	public void setIs_deprecated(boolean is_deprecated) {
+		Is_deprecated = is_deprecated;
+	}
 }

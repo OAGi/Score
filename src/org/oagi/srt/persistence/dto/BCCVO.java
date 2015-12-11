@@ -34,6 +34,7 @@ public class BCCVO extends SRTObject {
 	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentBccId;
+	private boolean Is_deprecated;
 	
 	public int getBCCID() {
 		return BCCID;
@@ -202,5 +203,13 @@ public class BCCVO extends SRTObject {
 	
 	public void setCurrentBccId(int currentBccId) {
 		CurrentBccId = currentBccId;
+	}
+	
+	public boolean getIs_deprecated() {
+		return Is_deprecated;
+	}
+	
+	public void setIs_deprecated(boolean is_deprecated) {
+		Is_deprecated = is_deprecated;
 	}
 }

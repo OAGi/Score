@@ -33,6 +33,7 @@ public class ACCVO extends SRTObject {
 	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentAccId;
+	private boolean Is_deprecated;
 	
 	public int getACCID() {
 		return ACCID;
@@ -201,4 +202,13 @@ public class ACCVO extends SRTObject {
 	public void setCurrentAccId(int currentAccId) {
 		CurrentAccId = currentAccId;
 	}
+	
+	public boolean getIs_deprecated() {
+		return Is_deprecated;
+	}
+	
+	public void setIs_deprecated(boolean is_deprecated) {
+		Is_deprecated = is_deprecated;
+	}
+		
 }

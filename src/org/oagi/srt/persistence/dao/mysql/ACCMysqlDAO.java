@@ -27,23 +27,23 @@ public class ACCMysqlDAO extends SRTDAO {
 	private final String _FIND_ALL_ACC_STATEMENT = 
 			"SELECT ACC_ID, GUID, Object_Class_Term, "
 					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Module, namespace_id, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id, is_deprecated FROM " + _tableName;
 
 	private final String _FIND_ACC_STATEMENT = 
 			"SELECT ACC_ID, GUID, Object_Class_Term, "
 					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Module, namespace_id, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id, is_deprecated FROM " + _tableName;
 	
 	private final String _INSERT_ACC_STATEMENT = 
 			"INSERT INTO " + _tableName + " (GUID, Object_Class_Term, "
 					+ "Den, Definition, Based_ACC_ID, Object_Class_Qualifier, OAGIS_Component_Type, Module, namespace_id, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_acc_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_ACC_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Object_Class_Term = ?, "
 			+ "Den = ?, Definition = ?, Based_ACC_ID = ?, Object_Class_Qualifier = ?, OAGIS_Component_Type = ?, Module = ?, namespace_id = ?, Created_By = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_acc_id = ? WHERE ACC_ID = ?";
+			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_acc_id = ?, is_deprecated = ? WHERE ACC_ID = ?";
 
 	private final String _DELETE_ACC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ACC_ID = ?";
@@ -84,6 +84,7 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(17, accVO.getRevisionAction());
 			ps.setInt(18, accVO.getReleaseId());
 			ps.setInt(19, accVO.getCurrentAccId());
+			ps.setBoolean(20, accVO.getIs_deprecated());
 
 			ps.executeUpdate();
 
@@ -169,6 +170,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
+				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			tx.commit();
 			conn.close();
@@ -250,6 +252,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
+				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -311,6 +314,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
+				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(accVO);
 			}
 			tx.commit();
@@ -370,6 +374,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
+				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(accVO);
 			}
 			//tx.commit();
@@ -423,7 +428,8 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(17, accVO.getRevisionAction());
 			ps.setInt(18, accVO.getReleaseId());
 			ps.setInt(19, accVO.getCurrentAccId());
-			
+			ps.setBoolean(20, accVO.getIs_deprecated());
+			ps.setInt(21, accVO.getACCID());
 			ps.executeUpdate();
 
 			tx.commit();

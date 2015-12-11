@@ -62,17 +62,21 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setDTGUID(id);
 			dtVO.setDTType(1);
 			dtVO.setVersionNumber("1.0");
-			dtVO.setRevisionType(0);
+			//dtVO.setRevisionType(0);
 			dtVO.setDataTypeTerm(dataTypeTerm);
 			dtVO.setBasedDTID(basedDTID);
 			dtVO.setDEN(typeName + ". Type");
 			dtVO.setContentComponentDEN(typeName + ". Content");
 			dtVO.setDefinition(definition);
 			dtVO.setContentComponentDefinition(ccDefinition);
-			dtVO.setRevisionState(1);
+			dtVO.setState(1);
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
 			dtVO.setRevisionDocumentation("");
+			dtVO.setRevisionNum(0);
+			dtVO.setRevisionTrackingNum(0);
+			dtVO.setRevisionAction(true);
+			dtVO.setIs_deprecated(false);
 	
 			dao.insertObject(dtVO);
 		}
@@ -190,15 +194,19 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setDTGUID(id);
 			dtVO.setDTType(1);
 			dtVO.setVersionNumber("1.0");
-			dtVO.setRevisionType(0);
+			//dtVO.setRevisionType(0);
 			dtVO.setDataTypeTerm(dataTypeTerm);
 			dtVO.setBasedDTID(basedDTID);
 			dtVO.setDEN(typeName + ". Type");
 			dtVO.setContentComponentDEN(typeName + ". Content");
-			dtVO.setRevisionState(1);
+			dtVO.setState(1);
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
 			dtVO.setRevisionDocumentation("");
+			dtVO.setRevisionNum(0);
+			dtVO.setRevisionTrackingNum(0);
+			dtVO.setRevisionAction(true);
+			dtVO.setIs_deprecated(false);
 			dao.insertObject(dtVO);
 		}
 		

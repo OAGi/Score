@@ -27,23 +27,23 @@ public class BCCMysqlDAO extends SRTDAO{
 	private final String _FIND_ALL_BCC_STATEMENT = 
 			"SELECT BCC_ID, GUID, Cardinality_Min, Cardinality_Max, To_BCCP_ID, From_ACC_ID, "
 					+ "Seq_key, Entity_Type, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id, is_deprecated FROM " + _tableName;
 
 	private final String _FIND_BCC_STATEMENT = 
 			"SELECT BCC_ID, GUID, Cardinality_Min, Cardinality_Max, To_BCCP_ID, From_ACC_ID, "
 					+ "Seq_key, Entity_Type, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id, is_deprecated FROM " + _tableName;
 	
 	private final String _INSERT_BCC_STATEMENT = 
 			"INSERT INTO " + _tableName + " (GUID, Cardinality_Min, Cardinality_Max, To_BCCP_ID, From_ACC_ID, "
 					+ "Seq_key, Entity_Type, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BCC_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, "
-			+ "To_BCCP_ID = ?, From_ACC_ID = ?, Seq_Key = ?, DEN = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bcc_id = ? "
+			+ "To_BCCP_ID = ?, From_ACC_ID = ?, Seq_Key = ?, Entity_Type = ?, DEN = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
+			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bcc_id = ?, is_deprecated = ? "
 			+ "WHERE BCC_ID = ?";
 
 	private final String _DELETE_BCC_STATEMENT = 
@@ -82,7 +82,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setInt(17, bccVO.getRevisionAction());
 			ps.setInt(18, bccVO.getReleaseId());
 			ps.setInt(19, bccVO.getCurrentBccId());
-
+			ps.setBoolean(20, bccVO.getIs_deprecated());
 			ps.executeUpdate();
 
 //			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -165,6 +165,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
+				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 
 			}
 			tx.commit();
@@ -261,7 +262,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
-
+				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -319,6 +320,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
+				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccVO);
 			}
 			tx.commit();
@@ -378,6 +380,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
+				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccVO);
 			}
 			//tx.commit();
@@ -411,7 +414,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			Connection conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_BCC_STATEMENT);
-			
+
 			ps.setString(1, bccVO.getBCCGUID());
 			ps.setInt(2, bccVO.getCardinalityMin());
 			ps.setInt(3, bccVO.getCardinalityMax());
@@ -431,6 +434,8 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setInt(17, bccVO.getRevisionAction());
 			ps.setInt(18, bccVO.getReleaseId());
 			ps.setInt(19, bccVO.getCurrentBccId());
+			ps.setBoolean(20, bccVO.getIs_deprecated());
+			ps.setInt(21, bccVO.getBCCID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -540,6 +545,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
+				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccVO);
 			}
 			tx.commit();
@@ -639,6 +645,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
+				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccVO);
 			}
 			//tx.commit();

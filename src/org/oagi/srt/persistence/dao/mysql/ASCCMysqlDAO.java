@@ -28,24 +28,24 @@ public class ASCCMysqlDAO extends SRTDAO {
 	private final String _FIND_ALL_ASCC_STATEMENT = 
 			"SELECT ASCC_ID, GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
 			+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
-			+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id FROM " + _tableName;
+			+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id, is_deprecated FROM " + _tableName;
 	
 	private final String _FIND_ASCC_STATEMENT = 
 			"SELECT ASCC_ID, GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
 					+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id FROM " + _tableName;
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id, is_deprecated FROM " + _tableName;
 	
 	private final String _INSERT_ASCC_STATEMENT = 
 			"INSERT INTO " + _tableName + " (GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
 					+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id, is_deprecated) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_ASCC_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Seq_Key = ?, "
 			+ "From_ACC_ID = ?, To_ASCCP_ID = ?, DEN = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_ascc_id = ? "
+			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_ascc_id = ?, is_deprecated = ? "
 			+ "WHERE ASCC_ID = ?";
 	
 	private final String _DELETE_ASCC_STATEMENT = 
@@ -84,7 +84,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(16, asccVO.getRevisionAction());
 			ps.setInt(17, asccVO.getReleaseId());
 			ps.setInt(18, asccVO.getCurrentAsccId());
-			
+			ps.setBoolean(19, asccVO.getIs_deprecated());
 			ps.executeUpdate();
 
 //			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -171,6 +171,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
+				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 
 			}
 			tx.commit();
@@ -250,6 +251,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
+				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -308,7 +310,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
-				
+				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(asccVO);
 			}
 			tx.commit();
@@ -369,7 +371,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
-				
+				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(asccVO);
 			}
 			//tx.commit();
@@ -423,7 +425,8 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(16, asccVO.getRevisionAction());
 			ps.setInt(17, asccVO.getReleaseId());
 			ps.setInt(18, asccVO.getCurrentAsccId());
-			ps.setInt(19, asccVO.getASCCID());
+			ps.setBoolean(19, asccVO.getIs_deprecated());
+			ps.setInt(20, asccVO.getASCCID());
 			ps.executeUpdate();
 
 			tx.commit();
@@ -534,7 +537,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
-				
+				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(asccVO);
 			}
 			tx.commit();
@@ -634,7 +637,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
-				
+				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(asccVO);
 			}
 			//tx.commit();

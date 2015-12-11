@@ -35,7 +35,7 @@ public class ASCCPVO extends SRTObject implements Serializable {
 	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentAsccpId;
-
+	private boolean Is_deprecated;
 	
 	public int getASCCPID() {
 		return ASCCPID;
@@ -194,5 +194,13 @@ public class ASCCPVO extends SRTObject implements Serializable {
 	
 	public void setCurrentAsccpId(int currentAsccpId) {
 		CurrentAsccpId = currentAsccpId;
+	}
+	
+	public boolean getIs_deprecated() {
+		return Is_deprecated;
+	}
+	
+	public void setIs_deprecated(boolean is_deprecated) {
+		Is_deprecated = is_deprecated;
 	}
 }

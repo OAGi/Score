@@ -28,27 +28,27 @@ public class BCCPMysqlDAO extends SRTDAO {
 			"SELECT BCCP_ID, GUID, Property_Term, Representation_Term, BDT_ID, "
 					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
 					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
-					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id FROM " + _tableName;
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id, is_deprecated FROM " + _tableName;
 
 	private final String _FIND_BCCP_STATEMENT = 
 			"SELECT BCCP_ID, GUID, Property_Term, Representation_Term, BDT_ID, "
 					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
 					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
-					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id FROM " + _tableName;
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id, is_deprecated FROM " + _tableName;
 
 	//start from here
 	private final String _INSERT_BCCP_STATEMENT = 
 			"INSERT INTO " + _tableName + " (GUID, Property_Term, Representation_Term, BDT_ID, "
 					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
 					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
-					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BCCP_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Property_Term = ?, Representation_Term = ?, BDT_ID = ?, "
 			+ "Den = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
 			+ "Creation_Timestamp = ?, State = ?, Module = ?,"
-			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bccp_id = ? WHERE BCCP_ID = ?";
+			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bccp_id = ?, is_deprecated = ? WHERE BCCP_ID = ?";
 
 	private final String _DELETE_BCCP_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BCCP_ID = ?";
@@ -86,7 +86,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setInt(14, bccpVO.getRevisionAction());
 			ps.setInt(15, bccpVO.getReleaseId());
 			ps.setInt(16, bccpVO.getCurrentBccpId());
-
+			ps.setBoolean(17, bccpVO.getIs_deprecated());
 			ps.executeUpdate();
 
 			//ResultSet tableKeys = ps.getGeneratedKeys();
@@ -169,6 +169,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
+				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			tx.commit();
 			conn.close();
@@ -248,6 +249,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
+				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			//tx.commit();
 			//conn.close();
@@ -307,6 +309,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
+				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccpVO);
 			}
 			tx.commit();
@@ -364,6 +367,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
+				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccpVO);
 			}
 			//tx.commit();
@@ -418,7 +422,8 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setInt(15, bccpVO.getRevisionAction());
 			ps.setInt(16, bccpVO.getReleaseId());
 			ps.setInt(17, bccpVO.getCurrentBccpId());
-
+			ps.setBoolean(18, bccpVO.getIs_deprecated());
+			ps.setInt(19, bccpVO.getBCCPID());
 			ps.executeUpdate();
 
 			tx.commit();

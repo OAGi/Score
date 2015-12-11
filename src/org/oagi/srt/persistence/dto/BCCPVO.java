@@ -31,6 +31,7 @@ public class BCCPVO extends SRTObject {
 	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentBccpId;
+	private boolean Is_deprecated;
 	
 	public int getBCCPID() {
 		return BCCPID;
@@ -184,4 +185,11 @@ public class BCCPVO extends SRTObject {
 		CurrentBccpId = currentBccpId;
 	}
 	
+	public boolean getIs_deprecated() {
+		return Is_deprecated;
+	}
+	
+	public void setIs_deprecated(boolean is_deprecated) {
+		Is_deprecated = is_deprecated;
+	}
 }
