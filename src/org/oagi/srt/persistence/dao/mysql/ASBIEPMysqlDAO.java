@@ -317,7 +317,8 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.setString(6, asbiepVO.getBusinessTerm());
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			ps.setInt(9, asbiepVO.getASBIEPID());
+			ps.setTimestamp(9, asbiepVO.getCreationTimestamp());
+			ps.setInt(10, asbiepVO.getASBIEPID());
 			
 			ps.executeUpdate();
 
