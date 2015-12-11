@@ -314,8 +314,14 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			ps.setInt(6, bbieVO.getCodeListId());
+			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+				ps.setNull(5, java.sql.Types.INTEGER);
+			else
+				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
+			if(bbieVO.getCodeListId() == 0)
+				ps.setNull(6, java.sql.Types.INTEGER);
+			else
+				ps.setInt(6, bbieVO.getCodeListId());
 			ps.setInt(7, bbieVO.getCardinalityMin());
 			ps.setInt(8, bbieVO.getCardinalityMax());
 			ps.setString(9, bbieVO.getDefaultText());
