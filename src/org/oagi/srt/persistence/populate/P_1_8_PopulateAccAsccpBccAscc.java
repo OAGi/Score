@@ -733,7 +733,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 							ASCCPVO asccpVO1 = (ASCCPVO)asccpDao.findObject(qc3, conn);
 							insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO1);
 						}
-						else if(bodSchemaHandler.isComplexWithSimpleContent(bodVO.getTypeName())){ //here
+						else if(bodSchemaHandler.isComplexWithSimpleContent(bodVO.getTypeName())){
 							bccpVO = insertBCCP(bodVO.getName(), bodVO.getId());
 							insertBCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), bccpVO);
 						}

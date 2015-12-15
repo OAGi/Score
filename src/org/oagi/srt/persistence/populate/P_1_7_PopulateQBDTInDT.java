@@ -194,7 +194,11 @@ public class P_1_7_PopulateQBDTInDT {
 				Node documentationFromXSD = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation");
 				String definition = "";
 				if(documentationFromXSD != null) {
-					definition = ((Element)documentationFromXSD).getTextContent();
+					Node documentationFromCCTS = xHandler.getNode("/xsd:schema/xsd:element[@name = '" + bccp + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+					if(documentationFromCCTS != null)
+						definition = ((Element)documentationFromCCTS).getTextContent();
+					else
+						definition = ((Element)documentationFromXSD).getTextContent();
 				}
 				
 				Node typeNode = xHandler.getNode("//xsd:complexType[@name = '" + type + "']");
@@ -627,7 +631,11 @@ public class P_1_7_PopulateQBDTInDT {
 					
 				Node documentationNode = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getDTGUID() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");
 				if(documentationNode != null) {
-					definition = ((Element)documentationNode).getTextContent();
+					Node documentationFromCCTS = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getDTGUID() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+					if(documentationFromCCTS != null)
+						definition = ((Element)documentationFromCCTS).getTextContent();
+					else
+						definition = ((Element)documentationNode).getTextContent();
 				} else {
 					definition = null;
 				}
