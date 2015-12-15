@@ -61,6 +61,16 @@ public class Utility {
 		return part1 + "Type" + part2;
 	}
 	
+	public static String denToUnqualified(String den) {
+		if(den.contains("_")){
+			String part1 = den.substring(0, den.indexOf("_"));
+			String part2 = den.substring(den.indexOf("."), den.length());
+			return part1 + part2;
+		}
+		else
+			return den;
+	}
+	
 	public static String firstToUpperCase(String str) {
 		String prefix = str.substring(0, 1);
 		String suffix = str.substring(1);

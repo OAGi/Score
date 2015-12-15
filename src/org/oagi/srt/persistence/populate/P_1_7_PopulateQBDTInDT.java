@@ -331,7 +331,7 @@ public class P_1_7_PopulateQBDTInDT {
 							bdtscprimitiverestionvo.setisDefault(true);
 						else 
 							bdtscprimitiverestionvo.setisDefault(false);
-						bdtSCPRDAO.insertObject(bdtscprimitiverestionvo); 
+						//bdtSCPRDAO.insertObject(bdtscprimitiverestionvo); 
 						
 //						// add code_list id for this case
 //						bdtscprimitiverestionvo.setCodeListID(getCodeListID(type.substring(0, type.indexOf("CodeContentType"))));
@@ -344,7 +344,7 @@ public class P_1_7_PopulateQBDTInDT {
 							bdtscprimitiverestionvo.setisDefault(true);
 						else 
 							bdtscprimitiverestionvo.setisDefault(false);
-						bdtSCPRDAO.insertObject(bdtscprimitiverestionvo);
+						//bdtSCPRDAO.insertObject(bdtscprimitiverestionvo);
 						
 //						System.out.println("### Agency Id");
 //						// add agency_id_list id for this case
@@ -393,7 +393,7 @@ public class P_1_7_PopulateQBDTInDT {
 			String base = extension.getAttribute("base");
 			
 			if(base.endsWith("CodeContentType")) {
-				dVO = getDTVOWithDEN("Code_1DEB05. Type");
+				dVO = getDTVOWithDEN("Code. Type");
 			} else {
 				String den = Utility.createDENFormat(base);
 				dVO = getDTVOWithDEN(den);
@@ -418,8 +418,7 @@ public class P_1_7_PopulateQBDTInDT {
 			String tmp = Utility.spaceSeparator(type);
 			String qualifier = tmp.substring(0, tmp.indexOf(" "));
 			dtVO.setQualifier(qualifier);
-			
-			String den = qualifier + "_ " + dVO.getDEN();
+			String den = qualifier + "_ " + Utility.denToUnqualified(dVO.getDEN());
 			dtVO.setDEN(den);
 			dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
 			dtVO.setDefinition(null);
@@ -452,17 +451,7 @@ public class P_1_7_PopulateQBDTInDT {
 		qc.add("bdt_id", dVO.getBasedDTID());
 		ArrayList<SRTObject> al = aBDTPrimitiveRestrictionDAO.findObjects(qc, conn);
 		
-		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
-			for(SRTObject aSRTObject : al) {
-				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
-				BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
-				theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
-				theBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID());
-				theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
-				
-				aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
-			}
-		} else {
+		if(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && !(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
 			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
 			if(base.endsWith("CodeContentType")) {
@@ -478,7 +467,51 @@ public class P_1_7_PopulateQBDTInDT {
 			}
 			theBDT_Primitive_RestrictionVO.setisDefault(true);
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+		} 
+		
+		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))){
+			for(SRTObject aSRTObject : al) {
+				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
+				BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
+				theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
+				theBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID());
+
+				if(base.endsWith("CodeContentType"))
+					theBDT_Primitive_RestrictionVO.setisDefault(false);
+				else
+					theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
+				aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+			}
 		}
+		
+		
+//		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
+//			for(SRTObject aSRTObject : al) {
+//				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
+//				BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
+//				theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
+//				theBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID());
+//				theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
+//				
+//				aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+//			}
+//		} else {
+//			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
+//			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
+//			if(base.endsWith("CodeContentType")) {
+//				theBDT_Primitive_RestrictionVO.setCodeListID(getCodeListID(base.substring(0, base.indexOf("CodeContentType"))));
+//			} else {
+//				for(SRTObject aSRTObject : al) {
+//					BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
+//					if(aBDTPrimitiveRestrictionVO.getCodeListID() > 0) {
+//						theBDT_Primitive_RestrictionVO.setCodeListID(aBDTPrimitiveRestrictionVO.getCodeListID());
+//						break;
+//					}
+//				}
+//			}
+//			theBDT_Primitive_RestrictionVO.setisDefault(true);
+//			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+//		}
 	}
 	
 	private void addToBCCP(String guid, String bccp, DTVO dtVO, String definition) throws SRTDAOException {

@@ -136,8 +136,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			accpVO.setLastUpdatedByUserId(1);
 			accpVO.setIs_deprecated(false);
 			accpVO.setRevisionAction(true);
-			accpVO.setReleaseId(1);//tmp
 			accpVO.setNamespaceId(1); //tmp
+			accpVO.setReleaseId(1);//tmp
 			asccpDao.insertObject(accpVO);
 
 		}
@@ -178,8 +178,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		accpVO.setLastUpdatedByUserId(1);
 		accpVO.setIs_deprecated(false);
 		accpVO.setRevisionAction(true);
+		accpVO.setNamespaceId(1); //tmp
 		accpVO.setReleaseId(1);//tmp
-		accpVO.setNamespaceId(1);//tmp
 		asccpDao.insertObject(accpVO);
 
 //		try {
@@ -536,8 +536,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aACCVO.setModule(module);
 			aACCVO.setIs_deprecated(false);
 			aACCVO.setRevisionAction(true);
+			aACCVO.setNamespaceId(1); //tmp
 			aACCVO.setReleaseId(1);//tmp
-			aACCVO.setNamespaceId(1);//tmp
 			accDao.insertObject(aACCVO);
 		}
 	}
@@ -566,8 +566,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccpVO.setLastUpdatedByUserId(1);
 			asccpVO.setIs_deprecated(false);
 			asccpVO.setRevisionAction(true);
+			asccpVO.setNamespaceId(1); //tmp
 			asccpVO.setReleaseId(1);//tmp
-			asccpVO.setNamespaceId(1);//tmp
 			asccpDao.insertObject(asccpVO);
 		}
 	}
@@ -665,8 +665,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		aACCVO.setModule(module);
 		aACCVO.setIs_deprecated(false);
 		aACCVO.setRevisionAction(true);
+		aACCVO.setNamespaceId(1); //tmp
 		aACCVO.setReleaseId(1);//tmp
-		aACCVO.setNamespaceId(1);//tmp
 		accDao.insertObject(aACCVO);
 		
 		XSParticle particle = complexType.getParticle();

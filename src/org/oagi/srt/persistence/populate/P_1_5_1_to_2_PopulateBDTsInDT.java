@@ -170,7 +170,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 						
 					DTVO dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, (definitionElement != null) ? definitionElement.getTextContent() : null, (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
 					
-					insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId);
+					insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId); // here --> modify
 				}
 			}
 		}

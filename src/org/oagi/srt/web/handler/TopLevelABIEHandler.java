@@ -824,6 +824,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private void createBBIETree(BCCVO bccVO, int abie, double seqKey) throws SRTDAOException{
 		QueryCondition qc = new QueryCondition();
 		qc.add("bccp_id", bccVO.getAssocToBCCPID());
+		qc.add("revision_num", 0);
 		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 		
 		BBIEPVO bbiepVO = createBBIEP(bccpVO, abie);
@@ -909,6 +910,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private ASCCPVO getASCCP(int asccpId) {
 		QueryCondition qc = new QueryCondition();
 		qc.add("asccp_id", asccpId);
+		qc.add("revision_num", 0);
 		ASCCPVO asccpVO = null;
 		try {
 			asccpVO = (ASCCPVO)asccpDao.findObject(qc, conn);
@@ -921,6 +923,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private ACCVO getACC(int accId) {
 		QueryCondition qc = new QueryCondition();
 		qc.add("ACC_ID", accId);
+		qc.add("revision_num", 0);
 		ACCVO accVO = null;
 		try {
 			accVO = (ACCVO)accDao.findObject(qc, conn);
