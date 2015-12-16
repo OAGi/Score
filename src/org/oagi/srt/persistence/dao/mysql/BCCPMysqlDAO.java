@@ -47,7 +47,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Property_Term = ?, Representation_Term = ?, BDT_ID = ?, "
 			+ "Den = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, State = ?, Module = ?,"
+			+ "State = ?, Module = ?,"
 			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bccp_id = ?, is_deprecated = ? WHERE BCCP_ID = ?";
 
 	private final String _DELETE_BCCP_STATEMENT = 
@@ -414,16 +414,16 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setInt(7, bccpVO.getCreatedByUserId());
 			ps.setInt(8, bccpVO.getOwnerUserId());
 			ps.setInt(9, bccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(10, bccpVO.getCreationTimestamp());
-			ps.setInt(11, bccpVO.getState());
-			ps.setString(12, bccpVO.getModule());
-			ps.setInt(13, bccpVO.getRevisionNum());
-			ps.setInt(14, bccpVO.getRevisionTrackingNum());
-			ps.setBoolean(15, bccpVO.getRevisionAction());
-			ps.setInt(16, bccpVO.getReleaseId());
-			ps.setInt(17, bccpVO.getCurrentBccpId());
-			ps.setBoolean(18, bccpVO.getIs_deprecated());
-			ps.setInt(19, bccpVO.getBCCPID());
+			//ps.setTimestamp(10, bccpVO.getCreationTimestamp());
+			ps.setInt(10, bccpVO.getState());
+			ps.setString(11, bccpVO.getModule());
+			ps.setInt(12, bccpVO.getRevisionNum());
+			ps.setInt(13, bccpVO.getRevisionTrackingNum());
+			ps.setBoolean(14, bccpVO.getRevisionAction());
+			ps.setInt(15, bccpVO.getReleaseId());
+			ps.setInt(16, bccpVO.getCurrentBccpId());
+			ps.setBoolean(17, bccpVO.getIs_deprecated());
+			ps.setInt(18, bccpVO.getBCCPID());
 			ps.executeUpdate();
 
 			tx.commit();

@@ -50,7 +50,7 @@ public class DTMysqlDAO extends SRTDAO {
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?, Type = ?, Version_Num = ?, Previous_Version_DT_ID = ?, "
 			+ "Data_Type_Term = ?, Qualifier = ?, Based_DT_ID = ?, DEN = ?, Content_Component_DEN = ?, "
 			+ "Definition = ?, Content_Component_Definition = ?, Revision_Doc = ?, State = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bdt_id = ?, is_deprecated = ? WHERE DT_ID = ?";
+			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bdt_id = ?, is_deprecated = ? WHERE DT_ID = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {

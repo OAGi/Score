@@ -297,7 +297,7 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 
 	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
 			" SET GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Remark = ?, biz_term = ?, Created_By = ?, Last_Updated_By = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
-			+ "Creation_Timestamp = ? WHERE ASBIEP_ID = ?";
+			+ "WHERE ASBIEP_ID = ?";
 	
 	@Override
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
@@ -317,8 +317,8 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 			ps.setString(6, asbiepVO.getBusinessTerm());
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			ps.setTimestamp(9, asbiepVO.getCreationTimestamp());
-			ps.setInt(10, asbiepVO.getASBIEPID());
+			//ps.setTimestamp(9, asbiepVO.getCreationTimestamp());
+			ps.setInt(9, asbiepVO.getASBIEPID());
 			
 			ps.executeUpdate();
 

@@ -38,7 +38,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 	private final String _INSERT_Code_List_STATEMENT = 
 			"INSERT INTO " + _tableName + " (guid, enum_type_guid, Name, List_ID, "
 			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
-			+ "Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
+			+ "Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 	
 	private final String _UPDATE_Code_List_STATEMENT = 
 			"UPDATE " + _tableName
@@ -174,8 +174,8 @@ public class CodeListMysqlDAO extends SRTDAO {
 			ps.setBoolean(11, codelistVO.getExtensibleIndicator());
 			ps.setInt(12, codelistVO.getCreatedByUserID());
 			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
-			ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
-			ps.setString(15, codelistVO.getState());
+			//ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
+			ps.setString(14, codelistVO.getState());
 
 			ps.executeUpdate();
 

@@ -40,13 +40,13 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			"INSERT INTO " + _tableName + " (GUID, Property_Term, "
 					+ "Definition, Role_Of_ACC_ID, Den, Created_By, owner_user_id, Last_Updated_By, "
 					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, namespace_id, Reusable_Indicator, "
-					+ "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_ASCCP_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Property_Term = ?, "
 			+ "Definition = ?, Role_Of_ACC_ID = ?, Den = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, State = ?, Module = ?, namespace_id = ?, Reusable_Indicator = ?,"
+			+ "State = ?, Module = ?, namespace_id = ?, Reusable_Indicator = ?,"
 			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_asccp_id = ?, is_deprecated = ? WHERE ASCCP_ID = ?";
 
 	private final String _DELETE_ASCCP_STATEMENT = 
@@ -74,17 +74,17 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setInt(6, asccpVO.getCreatedByUserId());
 			ps.setInt(7, asccpVO.getOwnerUserId());
 			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
-			ps.setInt(10, asccpVO.getState());
-			ps.setString(11, asccpVO.getModule());
-			ps.setInt(12, asccpVO.getNamespaceId());
-			ps.setBoolean(13, asccpVO.getReusableIndicator());
-			ps.setInt(14, asccpVO.getRevisionNum());
-			ps.setInt(15, asccpVO.getRevisionTrackingNum());
-			ps.setBoolean(16, asccpVO.getRevisionAction());
-			ps.setInt(17, asccpVO.getReleaseId());
-			ps.setInt(18, asccpVO.getCurrentAsccpId());
-			ps.setBoolean(19, asccpVO.getIs_deprecated());
+			//ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
+			ps.setInt(9, asccpVO.getState());
+			ps.setString(10, asccpVO.getModule());
+			ps.setInt(11, asccpVO.getNamespaceId());
+			ps.setBoolean(12, asccpVO.getReusableIndicator());
+			ps.setInt(13, asccpVO.getRevisionNum());
+			ps.setInt(14, asccpVO.getRevisionTrackingNum());
+			ps.setBoolean(15, asccpVO.getRevisionAction());
+			ps.setInt(16, asccpVO.getReleaseId());
+			ps.setInt(17, asccpVO.getCurrentAsccpId());
+			ps.setBoolean(18, asccpVO.getIs_deprecated());
 			ps.executeUpdate();
 
 			//ResultSet tableKeys = ps.getGeneratedKeys();
@@ -662,18 +662,18 @@ public class ASCCPMysqlDAO extends SRTDAO {
 			ps.setInt(6, asccpVO.getCreatedByUserId());
 			ps.setInt(7, asccpVO.getOwnerUserId());
 			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
-			ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
-			ps.setInt(10, asccpVO.getState());
-			ps.setString(11, asccpVO.getModule());
-			ps.setInt(12, asccpVO.getNamespaceId());
-			ps.setBoolean(13, asccpVO.getReusableIndicator());
-			ps.setInt(14, asccpVO.getRevisionNum());
-			ps.setInt(15, asccpVO.getRevisionTrackingNum());
-			ps.setBoolean(16, asccpVO.getRevisionAction());
-			ps.setInt(17, asccpVO.getReleaseId());
-			ps.setInt(18, asccpVO.getCurrentAsccpId());
-			ps.setBoolean(19, asccpVO.getIs_deprecated());
-			ps.setInt(20, asccpVO.getASCCPID());
+			//ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
+			ps.setInt(9, asccpVO.getState());
+			ps.setString(10, asccpVO.getModule());
+			ps.setInt(11, asccpVO.getNamespaceId());
+			ps.setBoolean(12, asccpVO.getReusableIndicator());
+			ps.setInt(13, asccpVO.getRevisionNum());
+			ps.setInt(14, asccpVO.getRevisionTrackingNum());
+			ps.setBoolean(15, asccpVO.getRevisionAction());
+			ps.setInt(16, asccpVO.getReleaseId());
+			ps.setInt(17, asccpVO.getCurrentAsccpId());
+			ps.setBoolean(18, asccpVO.getIs_deprecated());
+			ps.setInt(19, asccpVO.getASCCPID());
 			ps.executeUpdate();
 
 			tx.commit();

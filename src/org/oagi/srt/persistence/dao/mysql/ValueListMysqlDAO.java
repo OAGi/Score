@@ -42,13 +42,13 @@ public class ValueListMysqlDAO extends SRTDAO {
 					+ " Version_ID, Definition, Based_Code_List_ID, Extensible_Indicator, "
 					+ "Created_By_User_ID, Creation_Timestamp, Last_Update_Timestamp, "
 					+ "Definition_Source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-					+ "CURRENT_TIMESTAMP, ?, ?)";
+					+ "CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 	
 	private final String _UPDATE_VALUE_LIST_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, Type = ?, Value_List_GUID = ?,"
 			+ " List_ID = ?, Agency_ID = ?, Version_ID = ?, Definition = ?, Based_Code_List_ID = ?,"
-			+ " Extensible_Indicator = ?, Created_By_User_ID = ?, Creation_Timestamp = ?,"
+			+ " Extensible_Indicator = ?, Created_By_User_ID = ?, "
 			+ " Definition_Source = ? WHERE Value_List_ID = ?";
 
 	private final String _DELETE_VALUE_LIST_STATEMENT = 
@@ -85,9 +85,9 @@ public class ValueListMysqlDAO extends SRTDAO {
 			ps.setInt(9, value_listVO.getExtensibleIndicator());
 			ps.setInt(10, value_listVO.getCreatedByUserID());
 			ps.setInt(11, value_listVO.getLastUpdatedByUserID());
-			ps.setTimestamp(12, value_listVO.getCreationTimestamp());
-			ps.setTimestamp(13, value_listVO.getLastUpdateTimestamp());
-			ps.setString(14, value_listVO.getDefinitionSource());
+			//ps.setTimestamp(12, value_listVO.getCreationTimestamp());
+			//ps.setTimestamp(13, value_listVO.getLastUpdateTimestamp());
+			ps.setString(12, value_listVO.getDefinitionSource());
 			
 			ps.executeUpdate();
 
@@ -253,9 +253,11 @@ public class ValueListMysqlDAO extends SRTDAO {
 			ps.setInt(9, value_listVO.getExtensibleIndicator());
 			ps.setInt(10, value_listVO.getCreatedByUserID());
 			ps.setInt(11, value_listVO.getLastUpdatedByUserID());
-			ps.setTimestamp(12, value_listVO.getCreationTimestamp());
-			ps.setTimestamp(13, value_listVO.getLastUpdateTimestamp());
-			ps.setString(14, value_listVO.getDefinitionSource());
+			//ps.setTimestamp(12, value_listVO.getCreationTimestamp());
+			//ps.setTimestamp(13, value_listVO.getLastUpdateTimestamp());
+			ps.setString(12, value_listVO.getDefinitionSource());
+			ps.setInt(13, value_listVO.getValueListID());
+			
 			ps.executeUpdate();
 
 			tx.commit();

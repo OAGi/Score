@@ -290,7 +290,7 @@ public class BBIEPMysqlDAO extends SRTDAO {
 	
 	private final String _UPDATE_BBIEP_STATEMENT = "UPDATE " + _tableName + " SET "
 			+ "Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Based_BCCP_ID = ?, Definition = ?, "
-			+ "remark = ?, biz_term = ?, Created_By = ?, Last_Updated_by = ?, Creation_Timestamp = ? WHERE BBIEP_ID = ?";
+			+ "remark = ?, biz_term = ?, Created_By = ?, Last_Updated_by = ?, WHERE BBIEP_ID = ?";
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -308,8 +308,8 @@ public class BBIEPMysqlDAO extends SRTDAO {
 			ps.setString(5, bbiepVO.getBusinessTerm());
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
 			ps.setInt(7, bbiepVO.getLastUpdatedbyUserID());
-			ps.setTimestamp(8, bbiepVO.getCreationTimestamp());
-			ps.setInt(9, bbiepVO.getBBIEPID());
+			//ps.setTimestamp(8, bbiepVO.getCreationTimestamp());
+			ps.setInt(8, bbiepVO.getBBIEPID());
 			ps.executeUpdate();
 
 			tx.commit();

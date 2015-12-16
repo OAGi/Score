@@ -42,7 +42,7 @@ public class NamespaceMysqlDAO extends SRTDAO {
 	private final String _UPDATE_NAMESPACE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, uri = ?, prefix = ?, prescription = ?, owner_user_id = ?, "
-			+ "created_by = ?, last_updated_by = ?, creation_timestamp = ? WHERE namespace_id = ?";
+			+ "created_by = ?, last_updated_by = ? WHERE namespace_id = ?";
 
 	@Override
 	public int findMaxId() throws SRTDAOException {
@@ -381,7 +381,9 @@ public class NamespaceMysqlDAO extends SRTDAO {
 			ps.setInt(4, namespaceVO.getOwneruserID());
 			ps.setInt(5, namespaceVO.getCreatedByUserId());
 			ps.setInt(6, namespaceVO.getLastUpdatedByUserId());
-			ps.setTimestamp(7, namespaceVO.getCreationTimestamp());
+			//ps.setTimestamp(7, namespaceVO.getCreationTimestamp());
+			ps.setInt(7, namespaceVO.getNamespaceID());
+			
 			ps.executeUpdate();
 
 			tx.commit();

@@ -39,13 +39,13 @@ public class ASCCMysqlDAO extends SRTDAO {
 			"INSERT INTO " + _tableName + " (GUID, Cardinality_Min, Cardinality_Max, Seq_Key, "
 					+ "From_ACC_ID, To_ASCCP_ID, DEN, Definition, Created_By, owner_user_id, Last_Updated_By, "
 					+ "Creation_Timestamp, Last_Update_Timestamp, State, revision_num, revision_tracking_num, revision_action, release_id, current_ascc_id, is_deprecated) "
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _UPDATE_ASCC_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Cardinality_Min = ?, Cardinality_Max = ?, Seq_Key = ?, "
 			+ "From_ACC_ID = ?, To_ASCCP_ID = ?, DEN = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "Creation_Timestamp = ?, State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_ascc_id = ?, is_deprecated = ? "
+			+ "State =?,  revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_ascc_id = ?, is_deprecated = ? "
 			+ "WHERE ASCC_ID = ?";
 	
 	private final String _DELETE_ASCC_STATEMENT = 
@@ -77,14 +77,14 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(9, asccVO.getCreatedByUserId());
 			ps.setInt(10, asccVO.getOwnerUserId());
 			ps.setInt(11, asccVO.getLastUpdatedByUserId());
-			ps.setTimestamp(12, asccVO.getLastUpdateTimestamp());
-			ps.setInt(13, asccVO.getState());
-			ps.setInt(14, asccVO.getRevisionNum());
-			ps.setInt(15, asccVO.getRevisionTrackingNum());
-			ps.setBoolean(16, asccVO.getRevisionAction());
-			ps.setInt(17, asccVO.getReleaseId());
-			ps.setInt(18, asccVO.getCurrentAsccId());
-			ps.setBoolean(19, asccVO.getIs_deprecated());
+			//ps.setTimestamp(12, asccVO.getLastUpdateTimestamp());
+			ps.setInt(12, asccVO.getState());
+			ps.setInt(13, asccVO.getRevisionNum());
+			ps.setInt(14, asccVO.getRevisionTrackingNum());
+			ps.setBoolean(15, asccVO.getRevisionAction());
+			ps.setInt(16, asccVO.getReleaseId());
+			ps.setInt(17, asccVO.getCurrentAsccId());
+			ps.setBoolean(18, asccVO.getIs_deprecated());
 			ps.executeUpdate();
 
 //			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -418,15 +418,15 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(9, asccVO.getCreatedByUserId());
 			ps.setInt(10, asccVO.getOwnerUserId());
 			ps.setInt(11, asccVO.getLastUpdatedByUserId());
-			ps.setTimestamp(12, asccVO.getCreationTimestamp());
-			ps.setInt(13, asccVO.getState());
-			ps.setInt(14, asccVO.getRevisionNum());
-			ps.setInt(15, asccVO.getRevisionTrackingNum());
-			ps.setBoolean(16, asccVO.getRevisionAction());
-			ps.setInt(17, asccVO.getReleaseId());
-			ps.setInt(18, asccVO.getCurrentAsccId());
-			ps.setBoolean(19, asccVO.getIs_deprecated());
-			ps.setInt(20, asccVO.getASCCID());
+			//ps.setTimestamp(12, asccVO.getCreationTimestamp());
+			ps.setInt(12, asccVO.getState());
+			ps.setInt(13, asccVO.getRevisionNum());
+			ps.setInt(14, asccVO.getRevisionTrackingNum());
+			ps.setBoolean(15, asccVO.getRevisionAction());
+			ps.setInt(16, asccVO.getReleaseId());
+			ps.setInt(17, asccVO.getCurrentAsccId());
+			ps.setBoolean(18, asccVO.getIs_deprecated());
+			ps.setInt(19, asccVO.getASCCID());
 			ps.executeUpdate();
 
 			tx.commit();
