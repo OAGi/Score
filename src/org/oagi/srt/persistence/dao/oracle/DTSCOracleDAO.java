@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -192,10 +193,28 @@ public class DTSCOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_DT_SC_STATEMENT);
-			ps.setString(1, dtscVO.getDTSCGUID());
-			ps.setString(2, dtscVO.getPropertyTerm());
-			ps.setString(3, dtscVO.getRepresentationTerm());
-			ps.setString(4, dtscVO.getDefinition());
+			if( dtscVO.getDTSCGUID()==null ||  dtscVO.getDTSCGUID().length()==0 ||  dtscVO.getDTSCGUID().isEmpty() ||  dtscVO.getDTSCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, dtscVO.getDTSCGUID());
+
+			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, dtscVO.getPropertyTerm());
+
+			if( dtscVO.getRepresentationTerm()==null ||  dtscVO.getRepresentationTerm().length()==0 ||  dtscVO.getRepresentationTerm().isEmpty() ||  dtscVO.getRepresentationTerm().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, dtscVO.getRepresentationTerm());
+
+			if(dtscVO.getDefinition()==null || dtscVO.getDefinition().length()==0 || dtscVO.getDefinition().isEmpty() || dtscVO.getDefinition().equals("")){
+				ps.setString(4, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(dtscVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
@@ -457,10 +476,27 @@ public class DTSCOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_DT_SC_STATEMENT);
 
-			ps.setString(1, dtscVO.getDTSCGUID());
-			ps.setString(2, dtscVO.getPropertyTerm());
-			ps.setString(3, dtscVO.getRepresentationTerm());
-			ps.setString(4, dtscVO.getDefinition());
+			if( dtscVO.getDTSCGUID()==null ||  dtscVO.getDTSCGUID().length()==0 ||  dtscVO.getDTSCGUID().isEmpty() ||  dtscVO.getDTSCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, dtscVO.getDTSCGUID());
+
+			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, dtscVO.getPropertyTerm());
+
+			if( dtscVO.getRepresentationTerm()==null ||  dtscVO.getRepresentationTerm().length()==0 ||  dtscVO.getRepresentationTerm().isEmpty() ||  dtscVO.getRepresentationTerm().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, dtscVO.getRepresentationTerm());
+
+			if( dtscVO.getDefinition()==null ||  dtscVO.getDefinition().length()==0 ||  dtscVO.getDefinition().isEmpty() ||  dtscVO.getDefinition().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(dtscVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());

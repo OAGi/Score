@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -66,25 +67,59 @@ public class ASCCPOracleDAO extends SRTDAO {
 		try {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASCCP_STATEMENT);
-			ps.setString(1, asccpVO.getASCCPGUID());
-			ps.setString(2, asccpVO.getPropertyTerm());
-			ps.setString(3, asccpVO.getDefinition());
+			if( asccpVO.getASCCPGUID()==null ||  asccpVO.getASCCPGUID().length()==0 ||  asccpVO.getASCCPGUID().isEmpty() ||  asccpVO.getASCCPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asccpVO.getASCCPGUID());
+
+			if( asccpVO.getPropertyTerm()==null ||  asccpVO.getPropertyTerm().length()==0 ||  asccpVO.getPropertyTerm().isEmpty() ||  asccpVO.getPropertyTerm().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, asccpVO.getPropertyTerm());
+
+			if( asccpVO.getDefinition()==null ||  asccpVO.getDefinition().length()==0 ||  asccpVO.getDefinition().isEmpty() ||  asccpVO.getDefinition().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(asccpVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
 			ps.setInt(4, asccpVO.getRoleOfACCID());
-			ps.setString(5, asccpVO.getDEN());
+			if(asccpVO.getDEN()==null || asccpVO.getDEN().length()==0 || asccpVO.getDEN().isEmpty() || asccpVO.getDEN().equals("")){
+				ps.setString(5, "\u00A0");
+			}
+			else 
+				ps.setString(5, asccpVO.getDEN());
+			
 			ps.setInt(6, asccpVO.getCreatedByUserId());
 			ps.setInt(7, asccpVO.getOwnerUserId());
 			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
 			ps.setInt(9, asccpVO.getState());
-			ps.setString(10, asccpVO.getModule());
+			if( asccpVO.getModule()==null ||  asccpVO.getModule().length()==0 ||  asccpVO.getModule().isEmpty() ||  asccpVO.getModule().equals(""))				
+				ps.setString(10,"\u00A0");
+			else 	
+				ps.setString(10, asccpVO.getModule());
+
 			ps.setInt(11, asccpVO.getNamespaceId());
-			ps.setBoolean(12, asccpVO.getReusableIndicator());
+			if( asccpVO.getReusableIndicator())				
+				ps.setInt(12,1);
+			else 	
+				ps.setInt(12,0);
+
 			ps.setInt(13, asccpVO.getRevisionNum());
 			ps.setInt(14, asccpVO.getRevisionTrackingNum());
-			ps.setBoolean(15, asccpVO.getRevisionAction());
+			if( asccpVO.getRevisionAction())				
+				ps.setInt(15,1);
+			else 	
+				ps.setInt(15,0);
+
 			ps.setInt(16, asccpVO.getReleaseId());
 			ps.setInt(17, asccpVO.getCurrentAsccpId());
-			ps.setBoolean(18, asccpVO.getIs_deprecated());
+			if( asccpVO.getIs_deprecated())				
+				ps.setInt(18,1);
+			else 	
+				ps.setInt(18,0);
+
 			ps.executeUpdate();
 
 			//ResultSet tableKeys = ps.getGeneratedKeys();
@@ -654,25 +689,59 @@ public class ASCCPOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_ASCCP_STATEMENT);
 
-			ps.setString(1, asccpVO.getASCCPGUID());
-			ps.setString(2, asccpVO.getPropertyTerm());
-			ps.setString(3, asccpVO.getDefinition());
+			if( asccpVO.getASCCPGUID()==null ||  asccpVO.getASCCPGUID().length()==0 ||  asccpVO.getASCCPGUID().isEmpty() ||  asccpVO.getASCCPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asccpVO.getASCCPGUID());
+
+			if( asccpVO.getPropertyTerm()==null ||  asccpVO.getPropertyTerm().length()==0 ||  asccpVO.getPropertyTerm().isEmpty() ||  asccpVO.getPropertyTerm().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, asccpVO.getPropertyTerm());
+
+			if( asccpVO.getDefinition()==null ||  asccpVO.getDefinition().length()==0 ||  asccpVO.getDefinition().isEmpty() ||  asccpVO.getDefinition().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(asccpVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
+
 			ps.setInt(4, asccpVO.getRoleOfACCID());
-			ps.setString(5, asccpVO.getDEN());
+			if( asccpVO.getDEN()==null ||  asccpVO.getDEN().length()==0 ||  asccpVO.getDEN().isEmpty() ||  asccpVO.getDEN().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, asccpVO.getDEN());
+
 			ps.setInt(6, asccpVO.getCreatedByUserId());
 			ps.setInt(7, asccpVO.getOwnerUserId());
 			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
 			ps.setInt(9, asccpVO.getState());
-			ps.setString(10, asccpVO.getModule());
+			if( asccpVO.getModule()==null ||  asccpVO.getModule().length()==0 ||  asccpVO.getModule().isEmpty() ||  asccpVO.getModule().equals(""))				
+				ps.setString(10,"\u00A0");
+			else 	
+				ps.setString(10, asccpVO.getModule());
+
 			ps.setInt(11, asccpVO.getNamespaceId());
-			ps.setBoolean(12, asccpVO.getReusableIndicator());
+			if( asccpVO.getReusableIndicator())				
+				ps.setInt(12,1);
+			else 	
+				ps.setInt(12,0);
+
 			ps.setInt(13, asccpVO.getRevisionNum());
 			ps.setInt(14, asccpVO.getRevisionTrackingNum());
-			ps.setBoolean(15, asccpVO.getRevisionAction());
+			if( asccpVO.getRevisionAction())				
+				ps.setInt(15,1);
+			else 	
+				ps.setInt(15,0);
+
 			ps.setInt(16, asccpVO.getReleaseId());
 			ps.setInt(17, asccpVO.getCurrentAsccpId());
-			ps.setBoolean(18, asccpVO.getIs_deprecated());
+			if( asccpVO.getIs_deprecated())				
+				ps.setInt(18,1);
+			else 	
+				ps.setInt(18,0);
+
 			ps.setInt(19, asccpVO.getASCCPID());
 			ps.executeUpdate();
 

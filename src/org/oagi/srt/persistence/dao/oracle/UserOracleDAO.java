@@ -51,11 +51,31 @@ public class UserOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_USER_STATEMENT);
-			ps.setString(1, userVO.getUserName());
-			ps.setString(2, userVO.getPassword());
-			ps.setString(3, userVO.getName());
-			ps.setString(4, userVO.getOrganization());
-			ps.setBoolean(5, userVO.getOagis_developer_indicator());
+			if( userVO.getUserName()==null ||  userVO.getUserName().length()==0 ||  userVO.getUserName().isEmpty() ||  userVO.getUserName().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, userVO.getUserName());
+
+			if( userVO.getPassword()==null ||  userVO.getPassword().length()==0 ||  userVO.getPassword().isEmpty() ||  userVO.getPassword().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, userVO.getPassword());
+
+			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, userVO.getName());
+
+			if( userVO.getOrganization()==null ||  userVO.getOrganization().length()==0 ||  userVO.getOrganization().isEmpty() ||  userVO.getOrganization().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, userVO.getOrganization());
+
+			if( userVO.getOagis_developer_indicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
 
 			ps.executeUpdate();
 			ps.close();
@@ -396,11 +416,31 @@ public class UserOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_USER_STATEMENT);
 
-			ps.setString(1, userVO.getUserName());
-			ps.setString(2, userVO.getPassword());
-			ps.setString(3, userVO.getName());
-			ps.setString(4, userVO.getOrganization());
-			ps.setBoolean(5, userVO.getOagis_developer_indicator());
+			if( userVO.getUserName()==null ||  userVO.getUserName().length()==0 ||  userVO.getUserName().isEmpty() ||  userVO.getUserName().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, userVO.getUserName());
+
+			if( userVO.getPassword()==null ||  userVO.getPassword().length()==0 ||  userVO.getPassword().isEmpty() ||  userVO.getPassword().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, userVO.getPassword());
+
+			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, userVO.getName());
+
+			if( userVO.getOrganization()==null ||  userVO.getOrganization().length()==0 ||  userVO.getOrganization().isEmpty() ||  userVO.getOrganization().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, userVO.getOrganization());
+
+			if( userVO.getOagis_developer_indicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
 			ps.executeUpdate();
 
 			tx.commit();

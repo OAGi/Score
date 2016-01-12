@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -62,17 +63,44 @@ public class ACCOracleDAO extends SRTDAO {
 		try {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ACC_STATEMENT);
-			ps.setString(1, accVO.getACCGUID());
-			ps.setString(2, accVO.getObjectClassTerm());
-			ps.setString(3, accVO.getDEN());
-			ps.setString(4, accVO.getDefinition());
+			if( accVO.getACCGUID()==null ||  accVO.getACCGUID().length()==0 ||  accVO.getACCGUID().isEmpty() ||  accVO.getACCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, accVO.getACCGUID());
+
+			if(accVO.getObjectClassTerm()==null || accVO.getObjectClassTerm().length()==0 || accVO.getObjectClassTerm().isEmpty() || accVO.getObjectClassTerm().equals("")){
+				ps.setString(2, "\u00A0");
+			}
+			else 
+				ps.setString(2, accVO.getObjectClassTerm());
+			if(accVO.getDEN()==null || accVO.getDEN().length()==0 || accVO.getDEN().isEmpty() || accVO.getDEN().equals("")){
+				ps.setString(3, "\u00A0");
+			}
+			else 
+				ps.setString(3, accVO.getDEN());
+			if(accVO.getDefinition()==null || accVO.getDefinition().length()==0 || accVO.getDefinition().isEmpty() || accVO.getDefinition().equals("")){
+				ps.setString(4, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(accVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+
 			if(accVO.getBasedACCID() == -1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, accVO.getBasedACCID());
-			ps.setString(6, accVO.getObjectClassQualifier());
+			if( accVO.getObjectClassQualifier()==null ||  accVO.getObjectClassQualifier().length()==0 ||  accVO.getObjectClassQualifier().isEmpty() ||  accVO.getObjectClassQualifier().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, accVO.getObjectClassQualifier());
+
 			ps.setInt(7, accVO.getOAGISComponentType());
-			ps.setString(8, accVO.getModule());
+			if( accVO.getModule()==null ||  accVO.getModule().length()==0 ||  accVO.getModule().isEmpty() ||  accVO.getModule().equals(""))				
+				ps.setString(8,"\u00A0");
+			else 	
+				ps.setString(8, accVO.getModule());
+
 			ps.setInt(9, accVO.getNamespaceId());
 			ps.setInt(10, accVO.getCreatedByUserId());
 			ps.setInt(11, accVO.getOwnerUserId());
@@ -81,10 +109,16 @@ public class ACCOracleDAO extends SRTDAO {
 			ps.setInt(13, accVO.getState());
 			ps.setInt(14, accVO.getRevisionNum());
 			ps.setInt(15, accVO.getRevisionTrackingNum());
-			ps.setBoolean(16, accVO.getRevisionAction());
+			if(accVO.getRevisionAction())
+				ps.setInt(16, 1);
+			else 
+				ps.setInt(16, 0);
 			ps.setInt(17, accVO.getReleaseId());
 			ps.setInt(18, accVO.getCurrentAccId());
-			ps.setBoolean(19, accVO.getIs_deprecated());
+			if(accVO.getIs_deprecated())
+				ps.setInt(19,1);
+			else
+				ps.setInt(19,0);
 
 			ps.executeUpdate();
 
@@ -409,14 +443,40 @@ public class ACCOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_ACC_STATEMENT);
 
-			ps.setString(1, accVO.getACCGUID());
-			ps.setString(2, accVO.getObjectClassTerm());
-			ps.setString(3, accVO.getDEN());
-			ps.setString(4, accVO.getDefinition());
+			if( accVO.getACCGUID()==null ||  accVO.getACCGUID().length()==0 ||  accVO.getACCGUID().isEmpty() ||  accVO.getACCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, accVO.getACCGUID());
+
+			if( accVO.getObjectClassTerm()==null ||  accVO.getObjectClassTerm().length()==0 ||  accVO.getObjectClassTerm().isEmpty() ||  accVO.getObjectClassTerm().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, accVO.getObjectClassTerm());
+
+			if( accVO.getDEN()==null ||  accVO.getDEN().length()==0 ||  accVO.getDEN().isEmpty() ||  accVO.getDEN().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, accVO.getDEN());
+
+			if( accVO.getDefinition()==null ||  accVO.getDefinition().length()==0 ||  accVO.getDefinition().isEmpty() ||  accVO.getDefinition().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(accVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+
 			ps.setInt(5, accVO.getBasedACCID());
-			ps.setString(6, accVO.getObjectClassQualifier());
+			if( accVO.getObjectClassQualifier()==null ||  accVO.getObjectClassQualifier().length()==0 ||  accVO.getObjectClassQualifier().isEmpty() ||  accVO.getObjectClassQualifier().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, accVO.getObjectClassQualifier());
+
 			ps.setInt(7, accVO.getOAGISComponentType());
-			ps.setString(8, accVO.getModule());
+			if( accVO.getModule()==null ||  accVO.getModule().length()==0 ||  accVO.getModule().isEmpty() ||  accVO.getModule().equals(""))				
+				ps.setString(8,"\u00A0");
+			else 	
+				ps.setString(8, accVO.getModule());
+
 			ps.setInt(9, accVO.getNamespaceId());
 			ps.setInt(10, accVO.getCreatedByUserId());
 			ps.setInt(11, accVO.getOwnerUserId());
@@ -425,10 +485,18 @@ public class ACCOracleDAO extends SRTDAO {
 			ps.setInt(13, accVO.getState());
 			ps.setInt(14, accVO.getRevisionNum());
 			ps.setInt(15, accVO.getRevisionTrackingNum());
-			ps.setBoolean(16, accVO.getRevisionAction());
+			if( accVO.getRevisionAction())				
+				ps.setInt(16,1);
+			else 	
+				ps.setInt(16,0);
+
 			ps.setInt(17, accVO.getReleaseId());
 			ps.setInt(18, accVO.getCurrentAccId());
-			ps.setBoolean(19, accVO.getIs_deprecated());
+			if( accVO.getIs_deprecated())				
+				ps.setInt(19,1);
+			else 	
+				ps.setInt(19,0);
+
 			ps.setInt(20, accVO.getACCID());
 			ps.executeUpdate();
 

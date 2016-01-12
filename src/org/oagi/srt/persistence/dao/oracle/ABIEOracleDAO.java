@@ -3,10 +3,12 @@ package org.oagi.srt.persistence.dao.oracle;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -95,28 +97,57 @@ public class ABIEOracleDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
+			String keys[] = {"ABIE_ID"};
 			conn = tx.open();
 			if(abieVO.getABIEID() == -1)
-				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT, keys);
 			else
-				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			
-			ps.setString(1, abieVO.getAbieGUID());
+				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, keys);
+			if(abieVO.getAbieGUID()==null || abieVO.getAbieGUID().length()==0 || abieVO.getAbieGUID().isEmpty() ||abieVO.getAbieGUID().equals(""))
+				ps.setString(1, "\u00A0");
+			else 
+				ps.setString(1, abieVO.getAbieGUID());	
 			ps.setInt(2, abieVO.getBasedACCID());
 			ps.setInt(3, abieVO.getIsTopLevel());
 			ps.setInt(4, abieVO.getBusinessContextID());
-			ps.setString(5, abieVO.getDefinition());
+			if(abieVO.getDefinition()==null || abieVO.getDefinition().length()==0 || abieVO.getDefinition().isEmpty() ||abieVO.getDefinition().equals(""))
+				ps.setString(5, "\u00A0");
+			else {
+				String s = StringUtils.abbreviate(abieVO.getDefinition(), 4000);
+				ps.setString(5, s);
+			}
 			ps.setInt(6, abieVO.getCreatedByUserID());
 			ps.setInt(7, abieVO.getLastUpdatedByUserID());
 			if(abieVO.getState() == 0)
 				ps.setNull(8, java.sql.Types.INTEGER);
 			else
 				ps.setInt(8, abieVO.getState());
-			ps.setString(9, abieVO.getClientID());
-			ps.setString(10, abieVO.getVersion());
-			ps.setString(11, abieVO.getStatus());
-			ps.setString(12, abieVO.getRemark());
-			ps.setString(13, abieVO.getBusinessTerm());
+			if(abieVO.getClientID()==0)
+				ps.setNull(9, java.sql.Types.INTEGER);
+			else
+				ps.setInt(9, abieVO.getClientID());
+			
+			if( abieVO.getVersion()==null ||  abieVO.getVersion().length()==0 ||  abieVO.getVersion().isEmpty() ||  abieVO.getVersion().equals(""))				
+				ps.setString(10,"\u00A0");
+			else 	
+				ps.setString(10, abieVO.getVersion());
+
+
+			if( abieVO.getStatus()==null ||  abieVO.getStatus().length()==0 ||  abieVO.getStatus().isEmpty() ||  abieVO.getStatus().equals(""))					
+				ps.setString(11,"\u00A0");	
+			else 		
+				ps.setString(11, abieVO.getStatus());	
+
+			if( abieVO.getRemark()==null ||  abieVO.getRemark().length()==0 ||  abieVO.getRemark().isEmpty() ||  abieVO.getRemark().equals(""))				
+				ps.setString(12,"\u00A0");
+			else 	
+				ps.setString(12, abieVO.getRemark());
+
+			if( abieVO.getBusinessTerm()==null ||  abieVO.getBusinessTerm().length()==0 ||  abieVO.getBusinessTerm().isEmpty() ||  abieVO.getBusinessTerm().equals(""))					
+				ps.setString(13,"\u00A0");	
+			else 		
+				ps.setString(13, abieVO.getBusinessTerm());	
+
 			if(abieVO.getABIEID() != -1)
 				ps.setInt(14, abieVO.getABIEID());
 
@@ -124,7 +155,7 @@ public class ABIEOracleDAO extends SRTDAO {
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -157,33 +188,68 @@ public class ABIEOracleDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			if(abieVO.getABIEID() == -1)
-				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			String[] keys = {"ABIE_ID"};
+			if(abieVO.getABIEID() == 0)
+				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT,keys);
 			else
-				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, keys);
 			
-			ps.setString(1, abieVO.getAbieGUID());
+			if( abieVO.getAbieGUID()==null ||  abieVO.getAbieGUID().length()==0 ||  abieVO.getAbieGUID().isEmpty() ||  abieVO.getAbieGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, abieVO.getAbieGUID());
+
 			ps.setInt(2, abieVO.getBasedACCID());
 			ps.setInt(3, abieVO.getIsTopLevel());
 			ps.setInt(4, abieVO.getBusinessContextID());
-			ps.setString(5, abieVO.getDefinition());
+			if(abieVO.getDefinition()==null || abieVO.getDefinition().length()==0 || abieVO.getDefinition().isEmpty() ||abieVO.getDefinition().equals(""))
+				ps.setString(5, "\u00A0");
+			else {
+				String s = StringUtils.abbreviate(abieVO.getDefinition(), 4000);
+				ps.setString(5, s);
+			}
 			ps.setInt(6, abieVO.getCreatedByUserID());
 			ps.setInt(7, abieVO.getLastUpdatedByUserID());
-			ps.setInt(8, abieVO.getState());
-			ps.setString(9, abieVO.getClientID());
-			ps.setString(10, abieVO.getVersion());
-			ps.setString(11, abieVO.getStatus());
-			ps.setString(12, abieVO.getRemark());
-			ps.setString(13, abieVO.getBusinessTerm());
-			if(abieVO.getABIEID() != -1)
+			if(abieVO.getState()==0)
+				ps.setNull(8, java.sql.Types.INTEGER);
+			else
+				ps.setInt(8, abieVO.getState());
+			if(abieVO.getClientID()==0)
+				ps.setNull(9, java.sql.Types.INTEGER);
+			else
+				ps.setInt(9, abieVO.getClientID());
+			
+
+			if( abieVO.getVersion()==null ||  abieVO.getVersion().length()==0 ||  abieVO.getVersion().isEmpty() ||  abieVO.getVersion().equals(""))				
+				ps.setString(10,"\u00A0");
+			else 	
+				ps.setString(10, abieVO.getVersion());
+
+			if( abieVO.getStatus()==null ||  abieVO.getStatus().length()==0 ||  abieVO.getStatus().isEmpty() ||  abieVO.getStatus().equals(""))				
+				ps.setString(11,"\u00A0");
+			else 	
+				ps.setString(11, abieVO.getStatus());
+
+			if( abieVO.getRemark()==null ||  abieVO.getRemark().length()==0 ||  abieVO.getRemark().isEmpty() ||  abieVO.getRemark().equals(""))				
+				ps.setString(12,"\u00A0");
+			else 	
+				ps.setString(12, abieVO.getRemark());
+
+			if( abieVO.getBusinessTerm()==null ||  abieVO.getBusinessTerm().length()==0 ||  abieVO.getBusinessTerm().isEmpty() ||  abieVO.getBusinessTerm().equals(""))				
+				ps.setString(13,"\u00A0");
+			else 	
+				ps.setString(13, abieVO.getBusinessTerm());
+
+			if(abieVO.getABIEID() != 0)
 				ps.setInt(14, abieVO.getABIEID());
 
 
 			ps.executeUpdate();
 			
 			ResultSet rs = ps.getGeneratedKeys();
+			
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -243,7 +309,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -295,7 +361,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -344,15 +410,41 @@ public class ABIEOracleDAO extends SRTDAO {
 			ps.setInt(1, abieVO.getBasedACCID());
 			ps.setInt(2, abieVO.getIsTopLevel());
 			ps.setInt(3, abieVO.getBusinessContextID());
-			ps.setString(4, abieVO.getDefinition());
+			if(abieVO.getDefinition()==null || abieVO.getDefinition().length()==0 || abieVO.getDefinition().isEmpty() ||abieVO.getDefinition().equals(""))
+				ps.setString(4, "\u00A0");
+			else {
+				String s = StringUtils.abbreviate(abieVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
 			ps.setInt(5, abieVO.getLastUpdatedByUserID());
 			ps.setInt(6, abieVO.getState());
-			ps.setString(7, abieVO.getAbieGUID());
-			ps.setString(8, abieVO.getClientID());
-			ps.setString(9, abieVO.getVersion());
-			ps.setString(10, abieVO.getStatus());
-			ps.setString(11, abieVO.getRemark());
-			ps.setString(12, abieVO.getBusinessTerm());
+			if( abieVO.getAbieGUID()==null ||  abieVO.getAbieGUID().length()==0 ||  abieVO.getAbieGUID().isEmpty() ||  abieVO.getAbieGUID().equals(""))				
+				ps.setString(7,"\u00A0");
+			else 	
+				ps.setString(7, abieVO.getAbieGUID());
+
+			ps.setInt(8, abieVO.getClientID());
+
+			if( abieVO.getVersion()==null ||  abieVO.getVersion().length()==0 ||  abieVO.getVersion().isEmpty() ||  abieVO.getVersion().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, abieVO.getVersion());
+
+			if( abieVO.getStatus()==null ||  abieVO.getStatus().length()==0 ||  abieVO.getStatus().isEmpty() ||  abieVO.getStatus().equals(""))				
+				ps.setString(10,"\u00A0");
+			else 	
+				ps.setString(10, abieVO.getStatus());
+
+			if( abieVO.getRemark()==null ||  abieVO.getRemark().length()==0 ||  abieVO.getRemark().isEmpty() ||  abieVO.getRemark().equals(""))				
+				ps.setString(11,"\u00A0");
+			else 	
+				ps.setString(11, abieVO.getRemark());
+
+			if( abieVO.getBusinessTerm()==null ||  abieVO.getBusinessTerm().length()==0 ||  abieVO.getBusinessTerm().isEmpty() ||  abieVO.getBusinessTerm().equals(""))				
+				ps.setString(12,"\u00A0");
+			else 	
+				ps.setString(12, abieVO.getBusinessTerm());
+
 			ps.setInt(13, abieVO.getABIEID());
 			
 			ps.executeUpdate();
@@ -460,7 +552,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -552,7 +644,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -640,7 +732,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));

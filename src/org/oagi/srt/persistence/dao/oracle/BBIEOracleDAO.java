@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -57,10 +58,14 @@ public class BBIEOracleDAO extends SRTDAO{
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			
+			String keys[] = {"BBIE_ID"};
 			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, bbieVO.getBbieGuid());
+			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
+			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bbieVO.getBbieGuid());
+
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
@@ -74,12 +79,31 @@ public class BBIEOracleDAO extends SRTDAO{
 				ps.setInt(6, bbieVO.getCodeListId());
 			ps.setInt(7, bbieVO.getCardinalityMin());
 			ps.setInt(8, bbieVO.getCardinalityMax());
-			ps.setString(9, bbieVO.getDefaultText());
+			if( bbieVO.getDefaultText()==null ||  bbieVO.getDefaultText().length()==0 ||  bbieVO.getDefaultText().isEmpty() ||  bbieVO.getDefaultText().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, bbieVO.getDefaultText());
+
 			ps.setInt(10, bbieVO.getNillable());
-			ps.setString(11, bbieVO.getFixedValue());
+			if( bbieVO.getFixedValue()==null ||  bbieVO.getFixedValue().length()==0 ||  bbieVO.getFixedValue().isEmpty() ||  bbieVO.getFixedValue().equals(""))				
+				ps.setString(11,"\u00A0");
+			else 	
+				ps.setString(11, bbieVO.getFixedValue());
+
 			ps.setInt(12, bbieVO.getIsNull());
-			ps.setString(13, bbieVO.getDefinition());
-			ps.setString(14, bbieVO.getRemark());
+			if(bbieVO.getDefinition()==null || bbieVO.getDefinition().length()==0 || bbieVO.getDefinition().isEmpty() || bbieVO.getDefinition().equals("")){
+				ps.setString(13, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(bbieVO.getDefinition(), 4000);
+				ps.setString(13, s);
+			}
+			
+			if( bbieVO.getRemark()==null ||  bbieVO.getRemark().length()==0 ||  bbieVO.getRemark().isEmpty() ||  bbieVO.getRemark().equals(""))				
+				ps.setString(14,"\u00A0");
+			else 	
+				ps.setString(14, bbieVO.getRemark());
+
 			ps.setInt(15, bbieVO.getCreatedByUserId());
 			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
 			ps.setDouble(17, bbieVO.getSequencing_key());
@@ -87,7 +111,7 @@ public class BBIEOracleDAO extends SRTDAO{
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -119,8 +143,13 @@ public class BBIEOracleDAO extends SRTDAO{
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, bbieVO.getBbieGuid());
+			String[] keys = {"BBIE_ID"};
+			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
+			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bbieVO.getBbieGuid());
+
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
@@ -134,12 +163,31 @@ public class BBIEOracleDAO extends SRTDAO{
 				ps.setInt(6, bbieVO.getCodeListId());
 			ps.setInt(7, bbieVO.getCardinalityMin());
 			ps.setInt(8, bbieVO.getCardinalityMax());
-			ps.setString(9, bbieVO.getDefaultText());
+			if( bbieVO.getDefaultText()==null ||  bbieVO.getDefaultText().length()==0 ||  bbieVO.getDefaultText().isEmpty() ||  bbieVO.getDefaultText().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, bbieVO.getDefaultText());
+
 			ps.setInt(10, bbieVO.getNillable());
-			ps.setString(11, bbieVO.getFixedValue());
+			if( bbieVO.getFixedValue()==null ||  bbieVO.getFixedValue().length()==0 ||  bbieVO.getFixedValue().isEmpty() ||  bbieVO.getFixedValue().equals(""))				
+				ps.setString(11,"\u00A0");
+			else 	
+				ps.setString(11, bbieVO.getFixedValue());
+
 			ps.setInt(12, bbieVO.getIsNull());
-			ps.setString(13, bbieVO.getDefinition());
-			ps.setString(14, bbieVO.getRemark());
+			if(bbieVO.getDefinition()==null || bbieVO.getDefinition().length()==0 || bbieVO.getDefinition().isEmpty() || bbieVO.getDefinition().equals("")){
+				ps.setString(13, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(bbieVO.getDefinition(), 4000);
+				ps.setString(13, s);
+			}
+			
+			if( bbieVO.getRemark()==null ||  bbieVO.getRemark().length()==0 ||  bbieVO.getRemark().isEmpty() ||  bbieVO.getRemark().equals(""))				
+				ps.setString(14,"\u00A0");
+			else 	
+				ps.setString(14, bbieVO.getRemark());
+
 			ps.setInt(15, bbieVO.getCreatedByUserId());
 			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
 			ps.setDouble(17, bbieVO.getSequencing_key());
@@ -148,7 +196,7 @@ public class BBIEOracleDAO extends SRTDAO{
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -310,7 +358,11 @@ public class BBIEOracleDAO extends SRTDAO{
 
 			ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
 			
-			ps.setString(1, bbieVO.getBbieGuid());
+			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bbieVO.getBbieGuid());
+
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
@@ -324,12 +376,30 @@ public class BBIEOracleDAO extends SRTDAO{
 				ps.setInt(6, bbieVO.getCodeListId());
 			ps.setInt(7, bbieVO.getCardinalityMin());
 			ps.setInt(8, bbieVO.getCardinalityMax());
-			ps.setString(9, bbieVO.getDefaultText());
+			if( bbieVO.getDefaultText()==null ||  bbieVO.getDefaultText().length()==0 ||  bbieVO.getDefaultText().isEmpty() ||  bbieVO.getDefaultText().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, bbieVO.getDefaultText());
+
 			ps.setInt(10, bbieVO.getNillable());
-			ps.setString(11, bbieVO.getFixedValue());
+			if( bbieVO.getFixedValue()==null ||  bbieVO.getFixedValue().length()==0 ||  bbieVO.getFixedValue().isEmpty() ||  bbieVO.getFixedValue().equals(""))				
+				ps.setString(11,"\u00A0");
+			else 	
+				ps.setString(11, bbieVO.getFixedValue());
+
 			ps.setInt(12, bbieVO.getIsNull());
-			ps.setString(13, bbieVO.getDefinition());
-			ps.setString(14, bbieVO.getRemark());
+			if( bbieVO.getDefinition()==null ||  bbieVO.getDefinition().length()==0 ||  bbieVO.getDefinition().isEmpty() ||  bbieVO.getDefinition().equals(""))				
+				ps.setString(13,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(bbieVO.getDefinition(), 4000);
+				ps.setString(13, s);
+			}
+
+			if( bbieVO.getRemark()==null ||  bbieVO.getRemark().length()==0 ||  bbieVO.getRemark().isEmpty() ||  bbieVO.getRemark().equals(""))				
+				ps.setString(14,"\u00A0");
+			else 	
+				ps.setString(14, bbieVO.getRemark());
+
 			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 			ps.setDouble(16, bbieVO.getSequencing_key());
 			ps.setInt(17, bbieVO.getBBIEID());

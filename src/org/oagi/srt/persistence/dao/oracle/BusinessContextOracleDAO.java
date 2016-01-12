@@ -55,8 +55,16 @@ public class BusinessContextOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_BUSINESS_CONTEXT_STATEMENT);
-			ps.setString(1, business_contextVO.getBusinessContextGUID());
-			ps.setString(2, business_contextVO.getName());
+			if( business_contextVO.getBusinessContextGUID()==null ||  business_contextVO.getBusinessContextGUID().length()==0 ||  business_contextVO.getBusinessContextGUID().isEmpty() ||  business_contextVO.getBusinessContextGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, business_contextVO.getBusinessContextGUID());
+
+			if( business_contextVO.getName()==null ||  business_contextVO.getName().length()==0 ||  business_contextVO.getName().isEmpty() ||  business_contextVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, business_contextVO.getName());
+
 			ps.setInt(3,  business_contextVO.getCreatedByUserId());
 			ps.setInt(4, business_contextVO.getLastUpdatedByUserId());
 
@@ -193,8 +201,16 @@ public class BusinessContextOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_BUSINESS_CONTEXT_STATEMENT);
 			
-			ps.setString(1, business_contextVO.getBusinessContextGUID());
-			ps.setString(2, business_contextVO.getName());
+			if( business_contextVO.getBusinessContextGUID()==null ||  business_contextVO.getBusinessContextGUID().length()==0 ||  business_contextVO.getBusinessContextGUID().isEmpty() ||  business_contextVO.getBusinessContextGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, business_contextVO.getBusinessContextGUID());
+
+			if( business_contextVO.getName()==null ||  business_contextVO.getName().length()==0 ||  business_contextVO.getName().isEmpty() ||  business_contextVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, business_contextVO.getName());
+
 			ps.setInt(3,  business_contextVO.getCreatedByUserId());
 			ps.setInt(4, business_contextVO.getLastUpdatedByUserId());
 

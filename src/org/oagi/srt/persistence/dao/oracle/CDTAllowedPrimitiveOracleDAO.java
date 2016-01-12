@@ -54,7 +54,11 @@ public class CDTAllowedPrimitiveOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_INSERT_CDT_Allowed_Primitive_STATEMENT);
 			ps.setInt(1, cdtallowedprimitiveVO.getCDTID());
 			ps.setInt(2, cdtallowedprimitiveVO.getCDTPrimitiveID());
-			ps.setBoolean(3, cdtallowedprimitiveVO.getisDefault());
+			if( cdtallowedprimitiveVO.getisDefault())				
+				ps.setInt(3,1);
+			else 	
+				ps.setInt(3,0);
+
 
 			ps.executeUpdate();
 
@@ -276,7 +280,11 @@ public class CDTAllowedPrimitiveOracleDAO extends SRTDAO {
 
 			ps.setInt(1, cdtallowedprimitiveVO.getCDTID());
 			ps.setInt(2, cdtallowedprimitiveVO.getCDTPrimitiveID());
-			ps.setBoolean(3, cdtallowedprimitiveVO.getisDefault());
+			if( cdtallowedprimitiveVO.getisDefault())				
+				ps.setInt(3,1);
+			else 	
+				ps.setInt(3,0);
+
 			ps.executeUpdate();
 
 			tx.commit();

@@ -60,7 +60,11 @@ public class CDTPrimitiveOracleDAO extends SRTDAO{
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_CDT_Primitive_STATEMENT);
-			ps.setString(1, cdtprimitiveVO.getName());
+			if( cdtprimitiveVO.getName()==null ||  cdtprimitiveVO.getName().length()==0 ||  cdtprimitiveVO.getName().isEmpty() ||  cdtprimitiveVO.getName().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, cdtprimitiveVO.getName());
+
 
 			ps.executeUpdate();
 
@@ -273,7 +277,11 @@ public class CDTPrimitiveOracleDAO extends SRTDAO{
 			ps = conn.prepareStatement(_UPDATE_CDT_Primitive_STATEMENT);
 
 			ps.setInt(1, cdtprimitiveVO.getCDTPrimitiveID());
-			ps.setString(2, cdtprimitiveVO.getName());
+			if( cdtprimitiveVO.getName()==null ||  cdtprimitiveVO.getName().length()==0 ||  cdtprimitiveVO.getName().isEmpty() ||  cdtprimitiveVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, cdtprimitiveVO.getName());
+
 			ps.executeUpdate();
 
 			tx.commit();

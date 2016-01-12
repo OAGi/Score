@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -62,17 +63,32 @@ public class ASBIEOracleDAO extends SRTDAO{
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
+			String keys[] ={"ASBIE_ID"};
 			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, asbievo.getAsbieGuid());
+			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, keys);
+			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asbievo.getAsbieGuid());
+
 			ps.setInt(2, asbievo.getAssocFromABIEID());
 			ps.setInt(3, asbievo.getAssocToASBIEPID());
 			ps.setInt(4, asbievo.getBasedASCC());
-			ps.setString(5, asbievo.getDefinition());
+			if(asbievo.getDefinition()==null || asbievo.getDefinition().length()==0 || asbievo.getDefinition().isEmpty() || asbievo.getDefinition().equals("")){
+				ps.setString(5, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(asbievo.getDefinition(), 4000);
+				ps.setString(5, s);
+			}
 			ps.setInt(6, asbievo.getCardinalityMin());
 			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
-			ps.setString(9, asbievo.getRemark());
+			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, asbievo.getRemark());
+
 			ps.setInt(10, asbievo.getCreatedByUserId());
 			ps.setInt(11, asbievo.getLastUpdatedByUserId());
 			ps.setDouble(12, asbievo.getSequencingKey());
@@ -80,7 +96,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -113,16 +129,31 @@ public class ASBIEOracleDAO extends SRTDAO{
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, asbievo.getAsbieGuid());
+			String keys[] = {"ASBIE_ID"};
+			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, keys);
+			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asbievo.getAsbieGuid());
+
 			ps.setInt(2, asbievo.getAssocFromABIEID());
 			ps.setInt(3, asbievo.getAssocToASBIEPID());
 			ps.setInt(4, asbievo.getBasedASCC());
-			ps.setString(5, asbievo.getDefinition());
+			if(asbievo.getDefinition()==null || asbievo.getDefinition().length()==0 || asbievo.getDefinition().isEmpty() || asbievo.getDefinition().equals("")){
+				ps.setString(5, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(asbievo.getDefinition(), 4000);
+				ps.setString(5, s);
+			}
 			ps.setInt(6, asbievo.getCardinalityMin());
 			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
-			ps.setString(9, asbievo.getRemark());
+			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, asbievo.getRemark());
+
 			ps.setInt(10, asbievo.getCreatedByUserId());
 			ps.setInt(11, asbievo.getLastUpdatedByUserId());
 			ps.setDouble(12, asbievo.getSequencingKey());
@@ -130,7 +161,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -277,12 +308,25 @@ public class ASBIEOracleDAO extends SRTDAO{
 			ps.setInt(1, asbievo.getAssocFromABIEID());
 			ps.setInt(2, asbievo.getAssocToASBIEPID());
 			ps.setInt(3, asbievo.getBasedASCC());
-			ps.setString(4, asbievo.getDefinition());
+			if( asbievo.getDefinition()==null ||  asbievo.getDefinition().length()==0 ||  asbievo.getDefinition().isEmpty() ||  asbievo.getDefinition().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(asbievo.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
 			ps.setInt(5, asbievo.getCardinalityMin());
 			ps.setInt(6, asbievo.getCardinalityMax());
-			ps.setString(7, asbievo.getAsbieGuid());
+			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
+				ps.setString(7,"\u00A0");
+			else 	
+				ps.setString(7, asbievo.getAsbieGuid());
+
 			ps.setInt(8, asbievo.getNillable());
-			ps.setString(9, asbievo.getRemark());
+			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, asbievo.getRemark());
+
 			ps.setInt(10, asbievo.getLastUpdatedByUserId());
 			ps.setDouble(11, asbievo.getSequencingKey());
 			ps.setInt(12, asbievo.getASBIEID());

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -44,7 +45,7 @@ public class CodeListOracleDAO extends SRTDAO {
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?,"
 			+ " enum_type_guid = ?, Name = ?, List_ID = ?, Agency_ID = ?, Version_ID = ?, Definition = ?, Definition_Source = ?, Based_Code_List_ID = ?, Extensible_Indicator = ?, Created_By = ?,"
-			+ " Last_Updated_By = ?, Creation_Timestamp = ?, Last_Update_Timestamp = ?, State = ?, remark = ? WHERE Code_List_ID = ?";
+			+ " Last_Updated_By = ?, State = ?, remark = ? WHERE Code_List_ID = ?";
 	
 	private final String _DELETE_Code_List_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Code_List_ID = ?";
@@ -158,24 +159,66 @@ public class CodeListOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Code_List_STATEMENT);
-			ps.setString(1, codelistVO.getCodeListGUID());
-			ps.setString(2, codelistVO.getEnumerationTypeGUID());
-			ps.setString(3, codelistVO.getName());
-			ps.setString(4, codelistVO.getListID());
+			if( codelistVO.getCodeListGUID()==null ||  codelistVO.getCodeListGUID().length()==0 ||  codelistVO.getCodeListGUID().isEmpty() ||  codelistVO.getCodeListGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, codelistVO.getCodeListGUID());
+
+			if( codelistVO.getEnumerationTypeGUID()==null ||  codelistVO.getEnumerationTypeGUID().length()==0 ||  codelistVO.getEnumerationTypeGUID().isEmpty() ||  codelistVO.getEnumerationTypeGUID().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, codelistVO.getEnumerationTypeGUID());
+
+			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, codelistVO.getName());
+
+			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, codelistVO.getListID());
+
 			ps.setInt(5, codelistVO.getAgencyID());
-			ps.setString(6, codelistVO.getVersionID());
-			ps.setString(7, codelistVO.getDefinition());
-			ps.setString(8, codelistVO.getRemark());
-			ps.setString(9, codelistVO.getDefinitionSource());
+			if( codelistVO.getVersionID()==null ||  codelistVO.getVersionID().length()==0 ||  codelistVO.getVersionID().isEmpty() ||  codelistVO.getVersionID().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, codelistVO.getVersionID());
+
+			if(codelistVO.getDefinition()==null || codelistVO.getDefinition().length()==0 || codelistVO.getDefinition().isEmpty() || codelistVO.getDefinition().equals("")){
+				ps.setString(7, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(codelistVO.getDefinition(), 4000);
+				ps.setString(7, s);
+			}
+			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
+				ps.setString(8,"\u00A0");
+			else 	
+				ps.setString(8, codelistVO.getRemark());
+
+			if( codelistVO.getDefinitionSource()==null ||  codelistVO.getDefinitionSource().length()==0 ||  codelistVO.getDefinitionSource().isEmpty() ||  codelistVO.getDefinitionSource().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	
+				ps.setString(9, codelistVO.getDefinitionSource());
+
 			if(codelistVO.getBasedCodeListID() > 0)
 				ps.setInt(10, codelistVO.getBasedCodeListID());
 			else
 				ps.setNull(10, codelistVO.getBasedCodeListID());
-			ps.setBoolean(11, codelistVO.getExtensibleIndicator());
+			if( codelistVO.getExtensibleIndicator())				
+				ps.setInt(11,1);
+			else 	
+				ps.setInt(11,0);
+
 			ps.setInt(12, codelistVO.getCreatedByUserID());
 			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
-			ps.setString(14, codelistVO.getState());
+			if( codelistVO.getState()==null ||  codelistVO.getState().length()==0 ||  codelistVO.getState().isEmpty() ||  codelistVO.getState().equals(""))				
+				ps.setString(14,"\u00A0");
+			else 	
+				ps.setString(14, codelistVO.getState());
+
 
 			ps.executeUpdate();
 
@@ -492,23 +535,60 @@ public class CodeListOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_Code_List_STATEMENT);
 			
-			ps.setString(1, codelistVO.getCodeListGUID());
-			ps.setString(2, codelistVO.getEnumerationTypeGUID());
-			ps.setString(3, codelistVO.getName());
-			ps.setString(4, codelistVO.getListID());
+			if( codelistVO.getCodeListGUID()==null ||  codelistVO.getCodeListGUID().length()==0 ||  codelistVO.getCodeListGUID().isEmpty() ||  codelistVO.getCodeListGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, codelistVO.getCodeListGUID());
+
+			if( codelistVO.getEnumerationTypeGUID()==null ||  codelistVO.getEnumerationTypeGUID().length()==0 ||  codelistVO.getEnumerationTypeGUID().isEmpty() ||  codelistVO.getEnumerationTypeGUID().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, codelistVO.getEnumerationTypeGUID());
+
+			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, codelistVO.getName());
+
+			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, codelistVO.getListID());
+
 			ps.setInt(5, codelistVO.getAgencyID());
-			ps.setString(6, codelistVO.getVersionID());
-			ps.setString(7, codelistVO.getDefinition());
-			ps.setString(8, codelistVO.getRemark());
-			ps.setString(9, codelistVO.getDefinitionSource());
-			ps.setInt(10, codelistVO.getBasedCodeListID());
-			ps.setBoolean(11, codelistVO.getExtensibleIndicator());
-			ps.setInt(12, codelistVO.getCreatedByUserID());
-			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
-			ps.setTimestamp(14, codelistVO.getCreationTimestamp());
-			ps.setTimestamp(15, codelistVO.getLastUpdateTimestamp());
-			ps.setString(16, codelistVO.getState());
-			ps.setInt(17, codelistVO.getCodeListID());
+			if( codelistVO.getVersionID()==null ||  codelistVO.getVersionID().length()==0 ||  codelistVO.getVersionID().isEmpty() ||  codelistVO.getVersionID().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, codelistVO.getVersionID());
+
+			if( codelistVO.getDefinition()==null ||  codelistVO.getDefinition().length()==0 ||  codelistVO.getDefinition().isEmpty() ||  codelistVO.getDefinition().equals(""))				
+				ps.setString(7,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(codelistVO.getDefinition(), 4000);
+				ps.setString(7, s);
+			}
+			if( codelistVO.getDefinitionSource()==null ||  codelistVO.getDefinitionSource().length()==0 ||  codelistVO.getDefinitionSource().isEmpty() ||  codelistVO.getDefinitionSource().equals(""))				
+				ps.setString(8,"\u00A0");
+			else 	
+				ps.setString(8, codelistVO.getDefinitionSource());
+
+			ps.setInt(9, codelistVO.getBasedCodeListID());
+			if( codelistVO.getExtensibleIndicator())				
+				ps.setInt(10,1);
+			else 	
+				ps.setInt(10,0);
+
+			ps.setInt(11, codelistVO.getCreatedByUserID());
+			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
+			if( codelistVO.getState()==null ||  codelistVO.getState().length()==0 ||  codelistVO.getState().isEmpty() ||  codelistVO.getState().equals(""))				
+				ps.setString(13,"\u00A0");
+			else 	
+				ps.setString(13, codelistVO.getState());
+			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
+				ps.setString(14,"\u00A0");
+			else 	
+				ps.setString(14, codelistVO.getRemark());
+			ps.setInt(15, codelistVO.getCodeListID());
 			ps.executeUpdate();
 
 			tx.commit();

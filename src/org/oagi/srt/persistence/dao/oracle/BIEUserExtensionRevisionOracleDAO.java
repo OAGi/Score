@@ -58,19 +58,23 @@ public class BIEUserExtensionRevisionOracleDAO extends SRTDAO{
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			
+			String keys[] = {"BIE_USER_EXT_REVISION_ID"};
 			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_BIEUserExtensionRevision_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			ps = conn.prepareStatement(_INSERT_BIEUserExtensionRevision_STATEMENT, keys);
 			ps.setInt(1, bieUserExtensionRevisionVO.getTop_level_abie_id());
 			ps.setInt(2, bieUserExtensionRevisionVO.getExt_abie_id());
 			ps.setInt(3, bieUserExtensionRevisionVO.getExt_acc_id());
 			ps.setInt(4, bieUserExtensionRevisionVO.getUser_ext_acc_id());
-			ps.setBoolean(5, bieUserExtensionRevisionVO.getRevised_indicator());
+			if( bieUserExtensionRevisionVO.getRevised_indicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
 			ps.executeUpdate();
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -102,18 +106,23 @@ public class BIEUserExtensionRevisionOracleDAO extends SRTDAO{
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			ps = conn.prepareStatement(_INSERT_BIEUserExtensionRevision_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+			String keys[] = {"BIE_USER_EXT_REVISION_ID"};
+			ps = conn.prepareStatement(_INSERT_BIEUserExtensionRevision_STATEMENT, keys);
 			ps.setInt(1, bieUserExtensionRevisionVO.getTop_level_abie_id());
 			ps.setInt(2, bieUserExtensionRevisionVO.getExt_abie_id());
 			ps.setInt(3, bieUserExtensionRevisionVO.getExt_acc_id());
 			ps.setInt(4, bieUserExtensionRevisionVO.getUser_ext_acc_id());
-			ps.setBoolean(5, bieUserExtensionRevisionVO.getRevised_indicator());
+			if( bieUserExtensionRevisionVO.getRevised_indicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
 
 			ps.executeUpdate();
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -248,7 +257,11 @@ public class BIEUserExtensionRevisionOracleDAO extends SRTDAO{
 			ps.setInt(2, bieUserExtensionRevisionVO.getExt_abie_id());
 			ps.setInt(3, bieUserExtensionRevisionVO.getExt_acc_id());
 			ps.setInt(4, bieUserExtensionRevisionVO.getUser_ext_acc_id());
-			ps.setBoolean(5, bieUserExtensionRevisionVO.getRevised_indicator());
+			if( bieUserExtensionRevisionVO.getRevised_indicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
 			ps.setInt(6, bieUserExtensionRevisionVO.getBie_user_ext_revision_id());
 			
 			ps.executeUpdate();

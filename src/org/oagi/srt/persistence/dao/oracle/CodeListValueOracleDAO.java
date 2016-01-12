@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -128,13 +129,43 @@ public class CodeListValueOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Code_List_Value_STATEMENT);
 			ps.setInt(1, codelistvalueVO.getOwnerCodeListID());
-			ps.setString(2, codelistvalueVO.getValue());
-			ps.setString(3, codelistvalueVO.getName());
-			ps.setString(4, codelistvalueVO.getDefinition());
-			ps.setString(5, codelistvalueVO.getDefinitionSource());
-			ps.setBoolean(6, codelistvalueVO.getUsedIndicator());
-			ps.setBoolean(7, codelistvalueVO.getLockedIndicator());
-			ps.setBoolean(8, codelistvalueVO.isExtensionIndicator());
+			if( codelistvalueVO.getValue()==null ||  codelistvalueVO.getValue().length()==0 ||  codelistvalueVO.getValue().isEmpty() ||  codelistvalueVO.getValue().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, codelistvalueVO.getValue());
+
+			if( codelistvalueVO.getName()==null ||  codelistvalueVO.getName().length()==0 ||  codelistvalueVO.getName().isEmpty() ||  codelistvalueVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, codelistvalueVO.getName());
+
+			if(codelistvalueVO.getDefinition()==null || codelistvalueVO.getDefinition().length()==0 || codelistvalueVO.getDefinition().isEmpty() || codelistvalueVO.getDefinition().equals("")){
+				ps.setString(4, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(codelistvalueVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+			if( codelistvalueVO.getDefinitionSource()==null ||  codelistvalueVO.getDefinitionSource().length()==0 ||  codelistvalueVO.getDefinitionSource().isEmpty() ||  codelistvalueVO.getDefinitionSource().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, codelistvalueVO.getDefinitionSource());
+
+			if( codelistvalueVO.getUsedIndicator())				
+				ps.setInt(6,1);
+			else 	
+				ps.setInt(6,0);
+
+			if( codelistvalueVO.getLockedIndicator())				
+				ps.setInt(7,1);
+			else 	
+				ps.setInt(7,0);
+
+			if( codelistvalueVO.isExtensionIndicator())				
+				ps.setInt(8,1);
+			else 	
+				ps.setInt(8,0);
+
 
 			ps.executeUpdate();
 
@@ -280,13 +311,42 @@ public class CodeListValueOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_Code_List_Value_STATEMENT);
 
 			ps.setInt(1, codelistvalueVO.getOwnerCodeListID());
-			ps.setString(2, codelistvalueVO.getValue());
-			ps.setString(3, codelistvalueVO.getName());
-			ps.setString(4, codelistvalueVO.getDefinition());
-			ps.setString(5, codelistvalueVO.getDefinitionSource());
-			ps.setBoolean(6, codelistvalueVO.getUsedIndicator());
-			ps.setBoolean(7, codelistvalueVO.getLockedIndicator());
-			ps.setBoolean(8, codelistvalueVO.isExtensionIndicator());
+			if( codelistvalueVO.getValue()==null ||  codelistvalueVO.getValue().length()==0 ||  codelistvalueVO.getValue().isEmpty() ||  codelistvalueVO.getValue().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, codelistvalueVO.getValue());
+
+			if( codelistvalueVO.getName()==null ||  codelistvalueVO.getName().length()==0 ||  codelistvalueVO.getName().isEmpty() ||  codelistvalueVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, codelistvalueVO.getName());
+
+			if( codelistvalueVO.getDefinition()==null ||  codelistvalueVO.getDefinition().length()==0 ||  codelistvalueVO.getDefinition().isEmpty() ||  codelistvalueVO.getDefinition().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(codelistvalueVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+			if( codelistvalueVO.getDefinitionSource()==null ||  codelistvalueVO.getDefinitionSource().length()==0 ||  codelistvalueVO.getDefinitionSource().isEmpty() ||  codelistvalueVO.getDefinitionSource().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, codelistvalueVO.getDefinitionSource());
+
+			if( codelistvalueVO.getUsedIndicator())				
+				ps.setInt(6,1);
+			else 	
+				ps.setInt(6,0);
+
+			if( codelistvalueVO.getLockedIndicator())				
+				ps.setInt(7,1);
+			else 	
+				ps.setInt(7,0);
+
+			if( codelistvalueVO.isExtensionIndicator())				
+				ps.setInt(8,1);
+			else 	
+				ps.setInt(8,0);
+
 			ps.setInt(9, codelistvalueVO.getCodeListValueID());
 
 			ps.executeUpdate();

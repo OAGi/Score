@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -88,17 +89,35 @@ public class BBIEPOracleDAO extends SRTDAO {
 		int key = -1;
 		try {
 			conn = tx.open();
-			
+			String keys[] = {"BBIEP_ID"};
 			if(bbiepVO.getBBIEPID() == -1)
-				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, keys);
 			else
-				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, keys);
 			
-			ps.setString(1, bbiepVO.getBBIEPGUID());
+			if( bbiepVO.getBBIEPGUID()==null ||  bbiepVO.getBBIEPGUID().length()==0 ||  bbiepVO.getBBIEPGUID().isEmpty() ||  bbiepVO.getBBIEPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bbiepVO.getBBIEPGUID());
+
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
-			ps.setString(3, bbiepVO.getDefinition());
-			ps.setString(4, bbiepVO.getRemark());
-			ps.setString(5, bbiepVO.getBusinessTerm());
+			if(bbiepVO.getDefinition()==null || bbiepVO.getDefinition().length()==0 || bbiepVO.getDefinition().isEmpty() || bbiepVO.getDefinition().equals("")){
+				ps.setString(3, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(bbiepVO.getDefinition(), 4000);
+				ps.setString(3, s);	
+			}
+			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, bbiepVO.getRemark());
+
+			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, bbiepVO.getBusinessTerm());
+
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
 			ps.setInt(7, bbiepVO.getLastUpdatedbyUserID());
 
@@ -108,7 +127,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -140,16 +159,35 @@ public class BBIEPOracleDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
+			String keys[] = {"BBIEP_ID"};
 			if(bbiepVO.getBBIEPID() == -1)
-				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, keys);
 			else
-				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, keys);
 			
-			ps.setString(1, bbiepVO.getBBIEPGUID());
+			if( bbiepVO.getBBIEPGUID()==null ||  bbiepVO.getBBIEPGUID().length()==0 ||  bbiepVO.getBBIEPGUID().isEmpty() ||  bbiepVO.getBBIEPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bbiepVO.getBBIEPGUID());
+
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
-			ps.setString(3, bbiepVO.getDefinition());
-			ps.setString(4, bbiepVO.getRemark());
-			ps.setString(5, bbiepVO.getBusinessTerm());
+			if(bbiepVO.getDefinition()==null || bbiepVO.getDefinition().length()==0 || bbiepVO.getDefinition().isEmpty() || bbiepVO.getDefinition().equals("")){
+				ps.setString(3, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(bbiepVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
+			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, bbiepVO.getRemark());
+
+			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, bbiepVO.getBusinessTerm());
+
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
 			ps.setInt(7, bbiepVO.getLastUpdatedbyUserID());
 			if(bbiepVO.getBBIEPID() != -1)
@@ -159,7 +197,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -301,11 +339,29 @@ public class BBIEPOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_BBIEP_STATEMENT);
 			
-			ps.setString(1, bbiepVO.getBBIEPGUID());
+			if( bbiepVO.getBBIEPGUID()==null ||  bbiepVO.getBBIEPGUID().length()==0 ||  bbiepVO.getBBIEPGUID().isEmpty() ||  bbiepVO.getBBIEPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bbiepVO.getBBIEPGUID());
+
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
-			ps.setString(3, bbiepVO.getDefinition());
-			ps.setString(4, bbiepVO.getRemark());
-			ps.setString(5, bbiepVO.getBusinessTerm());
+			if( bbiepVO.getDefinition()==null ||  bbiepVO.getDefinition().length()==0 ||  bbiepVO.getDefinition().isEmpty() ||  bbiepVO.getDefinition().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(bbiepVO.getDefinition(), 4000);
+				ps.setString(3,s);
+			}
+
+			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, bbiepVO.getRemark());
+
+			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, bbiepVO.getBusinessTerm());
+
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
 			ps.setInt(7, bbiepVO.getLastUpdatedbyUserID());
 			//ps.setTimestamp(8, bbiepVO.getCreationTimestamp());

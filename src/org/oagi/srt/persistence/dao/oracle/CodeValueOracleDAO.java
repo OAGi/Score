@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -34,7 +35,7 @@ public class CodeValueOracleDAO extends SRTDAO {
 
 	private final String _UPDATE_Code_Value_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET Code_Value_ID = ?, Owner_Code_List_ID = ?, Value = ?, Definition = ?, Used_Indicator = ?, Locked_Indicator = ? WHERE Code_Value_ID = ?";
+			+ " SET Owner_Code_List_ID = ?, Value = ?, Definition = ?, Used_Indicator = ?, Locked_Indicator = ? WHERE Code_Value_ID = ?";
 
 	private final String _DELETE_Code_Value_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE Code_Value_ID = ?";
@@ -60,10 +61,27 @@ public class CodeValueOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Code_Value_STATEMENT);
 			ps.setInt(1, codevalueVO.getOwnerCodeListID());
-			ps.setString(2, codevalueVO.getValue());
-			ps.setString(3, codevalueVO.getDefinition());
-			ps.setBoolean(4, codevalueVO.getUsedIndicator());
-			ps.setBoolean(5, codevalueVO.getLockedIndicator());
+			if( codevalueVO.getValue()==null ||  codevalueVO.getValue().length()==0 ||  codevalueVO.getValue().isEmpty() ||  codevalueVO.getValue().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, codevalueVO.getValue());
+
+			if( codevalueVO.getDefinition()==null ||  codevalueVO.getDefinition().length()==0 ||  codevalueVO.getDefinition().isEmpty() ||  codevalueVO.getDefinition().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(codevalueVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
+			if( codevalueVO.getUsedIndicator())				
+				ps.setInt(4,1);
+			else 	
+				ps.setInt(4,0);
+
+			if( codevalueVO.getLockedIndicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
 
 			ps.executeUpdate();
 
@@ -201,10 +219,28 @@ public class CodeValueOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_Code_Value_STATEMENT);
 
 			ps.setInt(1, codevalueVO.getOwnerCodeListID());
-			ps.setString(2, codevalueVO.getValue());
-			ps.setString(3, codevalueVO.getDefinition());
-			ps.setBoolean(4, codevalueVO.getUsedIndicator());
-			ps.setBoolean(5, codevalueVO.getLockedIndicator());
+			if( codevalueVO.getValue()==null ||  codevalueVO.getValue().length()==0 ||  codevalueVO.getValue().isEmpty() ||  codevalueVO.getValue().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, codevalueVO.getValue());
+
+			if( codevalueVO.getDefinition()==null ||  codevalueVO.getDefinition().length()==0 ||  codevalueVO.getDefinition().isEmpty() ||  codevalueVO.getDefinition().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(codevalueVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
+			if( codevalueVO.getUsedIndicator())				
+				ps.setInt(4,1);
+			else 	
+				ps.setInt(4,0);
+
+			if( codevalueVO.getLockedIndicator())				
+				ps.setInt(5,1);
+			else 	
+				ps.setInt(5,0);
+
+			ps.setInt(6, codevalueVO.getCodeValueID());
 			ps.executeUpdate();
 
 			tx.commit();

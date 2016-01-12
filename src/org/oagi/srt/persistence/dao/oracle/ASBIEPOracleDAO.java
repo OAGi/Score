@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -91,18 +92,36 @@ public class ASBIEPOracleDAO extends SRTDAO {
 		int key = -1;
 		try {
 			conn = tx.open();
-			
+			String keys[] = {"ASBIEP_ID"};
 			if(asbiepVO.getASBIEPID() == -1)
-				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, keys);
 			else
-				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
 			
-			ps.setString(1, asbiepVO.getASBIEPGUID());
+			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asbiepVO.getASBIEPGUID());
+
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
-			ps.setString(4, asbiepVO.getDefinition());
-			ps.setString(5, asbiepVO.getRemark());
-			ps.setString(6, asbiepVO.getBusinessTerm());
+			if(asbiepVO.getDefinition()==null || asbiepVO.getDefinition().length()==0 || asbiepVO.getDefinition().isEmpty() || asbiepVO.getDefinition().equals("")){
+				ps.setString(4, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(asbiepVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, asbiepVO.getRemark());
+
+			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, asbiepVO.getBusinessTerm());
+
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			if(asbiepVO.getASBIEPID() != -1)
@@ -112,7 +131,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -144,17 +163,36 @@ public class ASBIEPOracleDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
+			String keys[] = {"ASBIEP_ID"};
 			if(asbiepVO.getASBIEPID() == -1)
-				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, keys);
 			else
-				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
+				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
 			
-			ps.setString(1, asbiepVO.getASBIEPGUID());
+			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asbiepVO.getASBIEPGUID());
+
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
-			ps.setString(4, asbiepVO.getDefinition());
-			ps.setString(5, asbiepVO.getRemark());
-			ps.setString(6, asbiepVO.getBusinessTerm());
+			if(asbiepVO.getDefinition()==null || asbiepVO.getDefinition().length()==0 || asbiepVO.getDefinition().isEmpty() || asbiepVO.getDefinition().equals("")){
+				ps.setString(4, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(asbiepVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, asbiepVO.getRemark());
+
+			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, asbiepVO.getBusinessTerm());
+
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			if(asbiepVO.getASBIEPID() != -1)
@@ -164,7 +202,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()){
-			    key = rs.getInt(1);
+			    key = (int) rs.getLong(1);
 			}
 			rs.close();
 			ps.close();
@@ -309,12 +347,29 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_ASBIEP_STATEMENT);
 
-			ps.setString(1, asbiepVO.getASBIEPGUID());
+			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asbiepVO.getASBIEPGUID());
+
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
-			ps.setString(4, asbiepVO.getDefinition());
-			ps.setString(5, asbiepVO.getRemark());
-			ps.setString(6, asbiepVO.getBusinessTerm());
+			if( asbiepVO.getDefinition()==null ||  asbiepVO.getDefinition().length()==0 ||  asbiepVO.getDefinition().isEmpty() ||  asbiepVO.getDefinition().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(asbiepVO.getDefinition(), 4000);
+				ps.setString(4, s);
+			}
+			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, asbiepVO.getRemark());
+
+			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, asbiepVO.getBusinessTerm());
+
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(9, asbiepVO.getCreationTimestamp());

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -75,19 +76,49 @@ public class ValueListOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_VALUE_LIST_STATEMENT);
 			ps.setInt(1, value_listVO.getType());
-			ps.setString(2, value_listVO.getValueListGUID());
-			ps.setString(3, value_listVO.getName());
-			ps.setString(4, value_listVO.getListID());
-			ps.setString(5, value_listVO.getAgencyID());
-			ps.setString(6, value_listVO.getVersionID());
-			ps.setString(7, value_listVO.getDefinition());
+			if( value_listVO.getValueListGUID()==null ||  value_listVO.getValueListGUID().length()==0 ||  value_listVO.getValueListGUID().isEmpty() ||  value_listVO.getValueListGUID().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, value_listVO.getValueListGUID());
+
+			if( value_listVO.getName()==null ||  value_listVO.getName().length()==0 ||  value_listVO.getName().isEmpty() ||  value_listVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, value_listVO.getName());
+
+			if( value_listVO.getListID()==null ||  value_listVO.getListID().length()==0 ||  value_listVO.getListID().isEmpty() ||  value_listVO.getListID().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, value_listVO.getListID());
+
+			if( value_listVO.getAgencyID()==null ||  value_listVO.getAgencyID().length()==0 ||  value_listVO.getAgencyID().isEmpty() ||  value_listVO.getAgencyID().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, value_listVO.getAgencyID());
+
+			if( value_listVO.getVersionID()==null ||  value_listVO.getVersionID().length()==0 ||  value_listVO.getVersionID().isEmpty() ||  value_listVO.getVersionID().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, value_listVO.getVersionID());
+
+			if(value_listVO.getDefinition()==null || value_listVO.getDefinition().length()==0 || value_listVO.getDefinition().isEmpty() || value_listVO.getDefinition().equals("")){
+				ps.setString(7, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(value_listVO.getDefinition(), 4000);
+				ps.setString(7, s);
+			}
 			ps.setInt(8, value_listVO.getBasedCodeListID());
 			ps.setInt(9, value_listVO.getExtensibleIndicator());
 			ps.setInt(10, value_listVO.getCreatedByUserID());
 			ps.setInt(11, value_listVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(12, value_listVO.getCreationTimestamp());
 			//ps.setTimestamp(13, value_listVO.getLastUpdateTimestamp());
-			ps.setString(12, value_listVO.getDefinitionSource());
+			if( value_listVO.getDefinitionSource()==null ||  value_listVO.getDefinitionSource().length()==0 ||  value_listVO.getDefinitionSource().isEmpty() ||  value_listVO.getDefinitionSource().equals(""))				
+				ps.setString(12,"\u00A0");
+			else 	
+				ps.setString(12, value_listVO.getDefinitionSource());
+
 			
 			ps.executeUpdate();
 
@@ -243,19 +274,48 @@ public class ValueListOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_VALUE_LIST_STATEMENT);
 
 			ps.setInt(1, value_listVO.getType());
-			ps.setString(2, value_listVO.getValueListGUID());
-			ps.setString(3, value_listVO.getName());
-			ps.setString(4, value_listVO.getListID());
-			ps.setString(5, value_listVO.getAgencyID());
-			ps.setString(6, value_listVO.getVersionID());
-			ps.setString(7, value_listVO.getDefinition());
+			if( value_listVO.getValueListGUID()==null ||  value_listVO.getValueListGUID().length()==0 ||  value_listVO.getValueListGUID().isEmpty() ||  value_listVO.getValueListGUID().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, value_listVO.getValueListGUID());
+
+			if( value_listVO.getName()==null ||  value_listVO.getName().length()==0 ||  value_listVO.getName().isEmpty() ||  value_listVO.getName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, value_listVO.getName());
+
+			if( value_listVO.getListID()==null ||  value_listVO.getListID().length()==0 ||  value_listVO.getListID().isEmpty() ||  value_listVO.getListID().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, value_listVO.getListID());
+
+			if( value_listVO.getAgencyID()==null ||  value_listVO.getAgencyID().length()==0 ||  value_listVO.getAgencyID().isEmpty() ||  value_listVO.getAgencyID().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, value_listVO.getAgencyID());
+
+			if( value_listVO.getVersionID()==null ||  value_listVO.getVersionID().length()==0 ||  value_listVO.getVersionID().isEmpty() ||  value_listVO.getVersionID().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, value_listVO.getVersionID());
+
+			if( value_listVO.getDefinition()==null ||  value_listVO.getDefinition().length()==0 ||  value_listVO.getDefinition().isEmpty() ||  value_listVO.getDefinition().equals(""))				
+				ps.setString(7,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(value_listVO.getDefinition(), 4000);
+				ps.setString(7, s);
+			}
 			ps.setInt(8, value_listVO.getBasedCodeListID());
 			ps.setInt(9, value_listVO.getExtensibleIndicator());
 			ps.setInt(10, value_listVO.getCreatedByUserID());
 			ps.setInt(11, value_listVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(12, value_listVO.getCreationTimestamp());
 			//ps.setTimestamp(13, value_listVO.getLastUpdateTimestamp());
-			ps.setString(12, value_listVO.getDefinitionSource());
+			if( value_listVO.getDefinitionSource()==null ||  value_listVO.getDefinitionSource().length()==0 ||  value_listVO.getDefinitionSource().isEmpty() ||  value_listVO.getDefinitionSource().equals(""))				
+				ps.setString(12,"\u00A0");
+			else 	
+				ps.setString(12, value_listVO.getDefinitionSource());
+
 			ps.setInt(13, value_listVO.getValueListID());
 			
 			ps.executeUpdate();

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -63,15 +64,30 @@ public class BCCOracleDAO extends SRTDAO{
 		try {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BCC_STATEMENT);
-			ps.setString(1, bccVO.getBCCGUID());
+			if( bccVO.getBCCGUID()==null ||  bccVO.getBCCGUID().length()==0 ||  bccVO.getBCCGUID().isEmpty() ||  bccVO.getBCCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bccVO.getBCCGUID());
+
 			ps.setInt(2, bccVO.getCardinalityMin());
 			ps.setInt(3, bccVO.getCardinalityMax());
 			ps.setInt(4, bccVO.getAssocToBCCPID());
 			ps.setInt(5, bccVO.getAssocFromACCID());
 			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
-			ps.setString(8, bccVO.getDEN());
-			ps.setString(9, bccVO.getDefinition());
+			if(bccVO.getDEN()==null || bccVO.getDEN().length()==0 || bccVO.getDEN().isEmpty() || bccVO.getDEN().equals("")){
+				ps.setString(8, "\u00A0");
+			}
+			else 
+				ps.setString(8, bccVO.getDEN());
+			
+			if(bccVO.getDefinition()==null || bccVO.getDefinition().length()==0 || bccVO.getDefinition().isEmpty() || bccVO.getDefinition().equals("")){
+				ps.setString(9, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(bccVO.getDefinition(), 4000);
+				ps.setString(9, s);
+			}
 			ps.setInt(10, bccVO.getCreatedByUserId());
 			ps.setInt(11, bccVO.getOwnerUserId());
 			ps.setInt(12, bccVO.getLastUpdatedByUserId());
@@ -79,10 +95,18 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(13, bccVO.getState());
 			ps.setInt(14, bccVO.getRevisionNum());
 			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			ps.setBoolean(16, bccVO.getRevisionAction());
+			if( bccVO.getRevisionAction())				
+				ps.setInt(16,1);
+			else 	
+				ps.setInt(16,0);
+
 			ps.setInt(17, bccVO.getReleaseId());
 			ps.setInt(18, bccVO.getCurrentBccId());
-			ps.setBoolean(19, bccVO.getIs_deprecated());
+			if( bccVO.getIs_deprecated())				
+				ps.setInt(19,1);
+			else 	
+				ps.setInt(19,0);
+
 			ps.executeUpdate();
 
 //			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -415,27 +439,49 @@ public class BCCOracleDAO extends SRTDAO{
 
 			ps = conn.prepareStatement(_UPDATE_BCC_STATEMENT);
 
-			ps.setString(1, bccVO.getBCCGUID());
+			if( bccVO.getBCCGUID()==null ||  bccVO.getBCCGUID().length()==0 ||  bccVO.getBCCGUID().isEmpty() ||  bccVO.getBCCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, bccVO.getBCCGUID());
+
 			ps.setInt(2, bccVO.getCardinalityMin());
 			ps.setInt(3, bccVO.getCardinalityMax());
 			ps.setInt(4, bccVO.getAssocToBCCPID());
 			ps.setInt(5, bccVO.getAssocFromACCID());
 			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
-			ps.setString(8, bccVO.getDEN());
-			ps.setString(9, bccVO.getDefinition());
+			if( bccVO.getDEN()==null ||  bccVO.getDEN().length()==0 ||  bccVO.getDEN().isEmpty() ||  bccVO.getDEN().equals(""))				
+				ps.setString(8,"\u00A0");
+			else 	
+				ps.setString(8, bccVO.getDEN());
+
+			if( bccVO.getDefinition()==null ||  bccVO.getDefinition().length()==0 ||  bccVO.getDefinition().isEmpty() ||  bccVO.getDefinition().equals(""))				
+				ps.setString(9,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(bccVO.getDefinition(), 4000);
+				ps.setString(9, s);
+			}
+
 			ps.setInt(10, bccVO.getCreatedByUserId());
 			ps.setInt(11, bccVO.getOwnerUserId());
 			ps.setInt(12, bccVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(13, bccVO.getLastUpdateTimestamp());
-			ps.setInt(14, bccVO.getState());
-			ps.setInt(15, bccVO.getRevisionNum());
-			ps.setInt(16, bccVO.getRevisionTrackingNum());
-			ps.setBoolean(17, bccVO.getRevisionAction());
-			ps.setInt(18, bccVO.getReleaseId());
-			ps.setInt(19, bccVO.getCurrentBccId());
-			ps.setBoolean(20, bccVO.getIs_deprecated());
-			ps.setInt(21, bccVO.getBCCID());
+			ps.setInt(13, bccVO.getState());
+			ps.setInt(14, bccVO.getRevisionNum());
+			ps.setInt(15, bccVO.getRevisionTrackingNum());
+			if( bccVO.getRevisionAction())				
+				ps.setInt(16,1);
+			else 	
+				ps.setInt(16,0);
+
+			ps.setInt(17, bccVO.getReleaseId());
+			ps.setInt(18, bccVO.getCurrentBccId());
+			if( bccVO.getIs_deprecated())				
+				ps.setInt(19,1);
+			else 	
+				ps.setInt(19,0);
+
+			ps.setInt(20, bccVO.getBCCID());
 			ps.executeUpdate();
 
 			tx.commit();

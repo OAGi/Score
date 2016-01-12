@@ -56,8 +56,16 @@ public class ReleaseOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_RELEASE_STATEMENT);
-			ps.setString(1, releaseVO.getReleaseNum());
-			ps.setString(2, releaseVO.getReleaseNote());
+			if( releaseVO.getReleaseNum()==null ||  releaseVO.getReleaseNum().length()==0 ||  releaseVO.getReleaseNum().isEmpty() ||  releaseVO.getReleaseNum().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, releaseVO.getReleaseNum());
+
+			if( releaseVO.getReleaseNote()==null ||  releaseVO.getReleaseNote().length()==0 ||  releaseVO.getReleaseNote().isEmpty() ||  releaseVO.getReleaseNote().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, releaseVO.getReleaseNote());
+
 			ps.setInt(3, releaseVO.getNamespaceID());
 			ps.executeUpdate();
 
@@ -344,8 +352,16 @@ public class ReleaseOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_RELEASE_STATEMENT);
 
-			ps.setString(1, releaseVO.getReleaseNum());
-			ps.setString(2, releaseVO.getReleaseNote());
+			if( releaseVO.getReleaseNum()==null ||  releaseVO.getReleaseNum().length()==0 ||  releaseVO.getReleaseNum().isEmpty() ||  releaseVO.getReleaseNum().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, releaseVO.getReleaseNum());
+
+			if( releaseVO.getReleaseNote()==null ||  releaseVO.getReleaseNote().length()==0 ||  releaseVO.getReleaseNote().isEmpty() ||  releaseVO.getReleaseNote().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, releaseVO.getReleaseNote());
+
 			ps.setInt(3, releaseVO.getNamespaceID());
 			ps.setInt(4, releaseVO.getReleaseID());
 			ps.executeUpdate();

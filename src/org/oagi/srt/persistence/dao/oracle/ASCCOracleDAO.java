@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -66,14 +67,29 @@ public class ASCCOracleDAO extends SRTDAO {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASCC_STATEMENT);
 			
-			ps.setString(1, asccVO.getASCCGUID());
+			if( asccVO.getASCCGUID()==null ||  asccVO.getASCCGUID().length()==0 ||  asccVO.getASCCGUID().isEmpty() ||  asccVO.getASCCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asccVO.getASCCGUID());
+
 			ps.setInt(2, asccVO.getCardinalityMin());
 			ps.setInt(3, asccVO.getCardinalityMax());
 			ps.setInt(4, asccVO.getSequencingKey());
 			ps.setInt(5, asccVO.getAssocFromACCID());
 			ps.setInt(6, asccVO.getAssocToASCCPID());
-			ps.setString(7, asccVO.getDEN());
-			ps.setString(8, asccVO.getDefinition());
+			if(asccVO.getDEN()==null || asccVO.getDEN().length()==0 || asccVO.getDEN().isEmpty() || asccVO.getDEN().equals("")){
+				ps.setString(7, "\u00A0");
+			}
+			else 
+				ps.setString(7, asccVO.getDEN());
+			
+			if(asccVO.getDefinition()==null || asccVO.getDefinition().length()==0 || asccVO.getDefinition().isEmpty() || asccVO.getDefinition().equals("")){
+				ps.setString(8, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(asccVO.getDefinition(), 4000);
+				ps.setString(8, s);
+			}
 			ps.setInt(9, asccVO.getCreatedByUserId());
 			ps.setInt(10, asccVO.getOwnerUserId());
 			ps.setInt(11, asccVO.getLastUpdatedByUserId());
@@ -81,10 +97,18 @@ public class ASCCOracleDAO extends SRTDAO {
 			ps.setInt(12, asccVO.getState());
 			ps.setInt(13, asccVO.getRevisionNum());
 			ps.setInt(14, asccVO.getRevisionTrackingNum());
-			ps.setBoolean(15, asccVO.getRevisionAction());
+			if( asccVO.getRevisionAction())				
+				ps.setInt(15,1);
+			else 	
+				ps.setInt(15,0);
+
 			ps.setInt(16, asccVO.getReleaseId());
 			ps.setInt(17, asccVO.getCurrentAsccId());
-			ps.setBoolean(18, asccVO.getIs_deprecated());
+			if( asccVO.getIs_deprecated())				
+				ps.setInt(18,1);
+			else 	
+				ps.setInt(18,0);
+
 			ps.executeUpdate();
 
 //			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -407,14 +431,28 @@ public class ASCCOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_ASCC_STATEMENT);
 
-			ps.setString(1, asccVO.getASCCGUID());
+			if( asccVO.getASCCGUID()==null ||  asccVO.getASCCGUID().length()==0 ||  asccVO.getASCCGUID().isEmpty() ||  asccVO.getASCCGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, asccVO.getASCCGUID());
+
 			ps.setInt(2, asccVO.getCardinalityMin());
 			ps.setInt(3, asccVO.getCardinalityMax());
 			ps.setInt(4, asccVO.getSequencingKey());
 			ps.setInt(5, asccVO.getAssocFromACCID());
 			ps.setInt(6, asccVO.getAssocToASCCPID());
-			ps.setString(7, asccVO.getDEN());
-			ps.setString(8, asccVO.getDefinition());
+			if( asccVO.getDEN()==null ||  asccVO.getDEN().length()==0 ||  asccVO.getDEN().isEmpty() ||  asccVO.getDEN().equals(""))				
+				ps.setString(7,"\u00A0");
+			else 	
+				ps.setString(7, asccVO.getDEN());
+
+			if( asccVO.getDefinition()==null ||  asccVO.getDefinition().length()==0 ||  asccVO.getDefinition().isEmpty() ||  asccVO.getDefinition().equals(""))				
+				ps.setString(8,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(asccVO.getDefinition(), 4000);
+				ps.setString(8, s);
+			}
+
 			ps.setInt(9, asccVO.getCreatedByUserId());
 			ps.setInt(10, asccVO.getOwnerUserId());
 			ps.setInt(11, asccVO.getLastUpdatedByUserId());
@@ -422,10 +460,18 @@ public class ASCCOracleDAO extends SRTDAO {
 			ps.setInt(12, asccVO.getState());
 			ps.setInt(13, asccVO.getRevisionNum());
 			ps.setInt(14, asccVO.getRevisionTrackingNum());
-			ps.setBoolean(15, asccVO.getRevisionAction());
+			if( asccVO.getRevisionAction())				
+				ps.setInt(15,1);
+			else 	
+				ps.setInt(15,0);
+
 			ps.setInt(16, asccVO.getReleaseId());
 			ps.setInt(17, asccVO.getCurrentAsccId());
-			ps.setBoolean(18, asccVO.getIs_deprecated());
+			if( asccVO.getIs_deprecated())				
+				ps.setInt(18,1);
+			else 	
+				ps.setInt(18,0);
+
 			ps.setInt(19, asccVO.getASCCID());
 			ps.executeUpdate();
 

@@ -152,12 +152,36 @@ public class ContextSchemeOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_CONTEXT_SCHEME_STATEMENT);
-			ps.setString(1, context_schemeVO.getSchemeGUID());
-			ps.setString(2, context_schemeVO.getSchemeID());
-			ps.setString(3, context_schemeVO.getSchemeName());
-			ps.setString(4, context_schemeVO.getDescription());
-			ps.setString(5, context_schemeVO.getSchemeAgencyID());
-			ps.setString(6, context_schemeVO.getSchemeVersion());
+			if( context_schemeVO.getSchemeGUID()==null ||  context_schemeVO.getSchemeGUID().length()==0 ||  context_schemeVO.getSchemeGUID().isEmpty() ||  context_schemeVO.getSchemeGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, context_schemeVO.getSchemeGUID());
+
+			if( context_schemeVO.getSchemeID()==null ||  context_schemeVO.getSchemeID().length()==0 ||  context_schemeVO.getSchemeID().isEmpty() ||  context_schemeVO.getSchemeID().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, context_schemeVO.getSchemeID());
+
+			if( context_schemeVO.getSchemeName()==null ||  context_schemeVO.getSchemeName().length()==0 ||  context_schemeVO.getSchemeName().isEmpty() ||  context_schemeVO.getSchemeName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, context_schemeVO.getSchemeName());
+
+			if( context_schemeVO.getDescription()==null ||  context_schemeVO.getDescription().length()==0 ||  context_schemeVO.getDescription().isEmpty() ||  context_schemeVO.getDescription().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, context_schemeVO.getDescription());
+
+			if( context_schemeVO.getSchemeAgencyID()==null ||  context_schemeVO.getSchemeAgencyID().length()==0 ||  context_schemeVO.getSchemeAgencyID().isEmpty() ||  context_schemeVO.getSchemeAgencyID().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, context_schemeVO.getSchemeAgencyID());
+
+			if( context_schemeVO.getSchemeVersion()==null ||  context_schemeVO.getSchemeVersion().length()==0 ||  context_schemeVO.getSchemeVersion().isEmpty() ||  context_schemeVO.getSchemeVersion().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, context_schemeVO.getSchemeVersion());
+
 			ps.setInt(7, context_schemeVO.getContextCategoryID());
 			ps.setInt(8,  context_schemeVO.getCreatedByUserId());
 			ps.setInt(9, context_schemeVO.getLastUpdatedByUserId());
@@ -306,12 +330,36 @@ public class ContextSchemeOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_SCHEME_STATEMENT);
 
-			ps.setString(1, context_schemeVO.getSchemeGUID());
-			ps.setString(2, context_schemeVO.getSchemeID());
-			ps.setString(3, context_schemeVO.getSchemeName());
-			ps.setString(4, context_schemeVO.getDescription());
-			ps.setString(5, context_schemeVO.getSchemeAgencyID());
-			ps.setString(6, context_schemeVO.getSchemeVersion());
+			if( context_schemeVO.getSchemeGUID()==null ||  context_schemeVO.getSchemeGUID().length()==0 ||  context_schemeVO.getSchemeGUID().isEmpty() ||  context_schemeVO.getSchemeGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, context_schemeVO.getSchemeGUID());
+
+			if( context_schemeVO.getSchemeID()==null ||  context_schemeVO.getSchemeID().length()==0 ||  context_schemeVO.getSchemeID().isEmpty() ||  context_schemeVO.getSchemeID().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, context_schemeVO.getSchemeID());
+
+			if( context_schemeVO.getSchemeName()==null ||  context_schemeVO.getSchemeName().length()==0 ||  context_schemeVO.getSchemeName().isEmpty() ||  context_schemeVO.getSchemeName().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, context_schemeVO.getSchemeName());
+
+			if( context_schemeVO.getDescription()==null ||  context_schemeVO.getDescription().length()==0 ||  context_schemeVO.getDescription().isEmpty() ||  context_schemeVO.getDescription().equals(""))				
+				ps.setString(4,"\u00A0");
+			else 	
+				ps.setString(4, context_schemeVO.getDescription());
+
+			if( context_schemeVO.getSchemeAgencyID()==null ||  context_schemeVO.getSchemeAgencyID().length()==0 ||  context_schemeVO.getSchemeAgencyID().isEmpty() ||  context_schemeVO.getSchemeAgencyID().equals(""))				
+				ps.setString(5,"\u00A0");
+			else 	
+				ps.setString(5, context_schemeVO.getSchemeAgencyID());
+
+			if( context_schemeVO.getSchemeVersion()==null ||  context_schemeVO.getSchemeVersion().length()==0 ||  context_schemeVO.getSchemeVersion().isEmpty() ||  context_schemeVO.getSchemeVersion().equals(""))				
+				ps.setString(6,"\u00A0");
+			else 	
+				ps.setString(6, context_schemeVO.getSchemeVersion());
+
 			ps.setInt(7, context_schemeVO.getContextCategoryID());
 			ps.setInt(8,  context_schemeVO.getCreatedByUserId());
 			ps.setInt(9, context_schemeVO.getLastUpdatedByUserId());

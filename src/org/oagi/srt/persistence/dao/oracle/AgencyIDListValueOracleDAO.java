@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -58,9 +59,24 @@ public class AgencyIDListValueOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Agency_ID_Value_List_STATEMENT);
-			ps.setString(1, agencyidlistvalueVO.getValue());
-			ps.setString(2, agencyidlistvalueVO.getName());
-			ps.setString(3, agencyidlistvalueVO.getDefinition());
+			if( agencyidlistvalueVO.getValue()==null ||  agencyidlistvalueVO.getValue().length()==0 ||  agencyidlistvalueVO.getValue().isEmpty() ||  agencyidlistvalueVO.getValue().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, agencyidlistvalueVO.getValue());
+
+			if( agencyidlistvalueVO.getName()==null ||  agencyidlistvalueVO.getName().length()==0 ||  agencyidlistvalueVO.getName().isEmpty() ||  agencyidlistvalueVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, agencyidlistvalueVO.getName());
+
+			if(agencyidlistvalueVO.getDefinition()==null || agencyidlistvalueVO.getDefinition().length()==0 || agencyidlistvalueVO.getDefinition().isEmpty() || agencyidlistvalueVO.getDefinition().equals("")){
+				ps.setString(3, "\u00A0");
+			}
+			else {
+				String s = StringUtils.abbreviate(agencyidlistvalueVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
+			
 			ps.setInt(4, agencyidlistvalueVO.getOwnerAgencyIDListID());
 			ps.executeUpdate();
 
@@ -195,9 +211,23 @@ public class AgencyIDListValueOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_Agency_ID_Value_List_STATEMENT);
-			ps.setString(1, agencyidlistvalueVO.getValue());
-			ps.setString(2, agencyidlistvalueVO.getName());
-			ps.setString(3, agencyidlistvalueVO.getDefinition());
+			if( agencyidlistvalueVO.getValue()==null ||  agencyidlistvalueVO.getValue().length()==0 ||  agencyidlistvalueVO.getValue().isEmpty() ||  agencyidlistvalueVO.getValue().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, agencyidlistvalueVO.getValue());
+
+			if( agencyidlistvalueVO.getName()==null ||  agencyidlistvalueVO.getName().length()==0 ||  agencyidlistvalueVO.getName().isEmpty() ||  agencyidlistvalueVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, agencyidlistvalueVO.getName());
+
+			if( agencyidlistvalueVO.getDefinition()==null ||  agencyidlistvalueVO.getDefinition().length()==0 ||  agencyidlistvalueVO.getDefinition().isEmpty() ||  agencyidlistvalueVO.getDefinition().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	{
+				String s = StringUtils.abbreviate(agencyidlistvalueVO.getDefinition(), 4000);
+				ps.setString(3, s);
+			}
+
 			ps.setInt(4, agencyidlistvalueVO.getOwnerAgencyIDListID());
 			ps.executeUpdate();
 

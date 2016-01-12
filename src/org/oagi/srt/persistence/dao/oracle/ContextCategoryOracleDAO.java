@@ -143,9 +143,21 @@ public class ContextCategoryOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_CONTEXT_CATEGORY_STATEMENT);
-			ps.setString(1, context_categoryVO.getContextCategoryGUID());
-			ps.setString(2, context_categoryVO.getName());
-			ps.setString(3, context_categoryVO.getDescription());
+			if( context_categoryVO.getContextCategoryGUID()==null ||  context_categoryVO.getContextCategoryGUID().length()==0 ||  context_categoryVO.getContextCategoryGUID().isEmpty() ||  context_categoryVO.getContextCategoryGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, context_categoryVO.getContextCategoryGUID());
+
+			if( context_categoryVO.getName()==null ||  context_categoryVO.getName().length()==0 ||  context_categoryVO.getName().isEmpty() ||  context_categoryVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, context_categoryVO.getName());
+
+			if( context_categoryVO.getDescription()==null ||  context_categoryVO.getDescription().length()==0 ||  context_categoryVO.getDescription().isEmpty() ||  context_categoryVO.getDescription().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, context_categoryVO.getDescription());
+
 			
 			ps.executeUpdate();
 			ps.close();
@@ -272,9 +284,21 @@ public class ContextCategoryOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_CATEGORY_STATEMENT);
 
-			ps.setString(1, context_categoryVO.getContextCategoryGUID());
-			ps.setString(2, context_categoryVO.getName());
-			ps.setString(3, context_categoryVO.getDescription());
+			if( context_categoryVO.getContextCategoryGUID()==null ||  context_categoryVO.getContextCategoryGUID().length()==0 ||  context_categoryVO.getContextCategoryGUID().isEmpty() ||  context_categoryVO.getContextCategoryGUID().equals(""))				
+				ps.setString(1,"\u00A0");
+			else 	
+				ps.setString(1, context_categoryVO.getContextCategoryGUID());
+
+			if( context_categoryVO.getName()==null ||  context_categoryVO.getName().length()==0 ||  context_categoryVO.getName().isEmpty() ||  context_categoryVO.getName().equals(""))				
+				ps.setString(2,"\u00A0");
+			else 	
+				ps.setString(2, context_categoryVO.getName());
+
+			if( context_categoryVO.getDescription()==null ||  context_categoryVO.getDescription().length()==0 ||  context_categoryVO.getDescription().isEmpty() ||  context_categoryVO.getDescription().equals(""))				
+				ps.setString(3,"\u00A0");
+			else 	
+				ps.setString(3, context_categoryVO.getDescription());
+
 			ps.setInt(4, context_categoryVO.getContextCategoryID());
 			ps.executeUpdate();
 
