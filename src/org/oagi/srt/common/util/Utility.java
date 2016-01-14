@@ -71,6 +71,18 @@ public class Utility {
 			return den;
 	}
 	
+	public static String typeToDen(String type) {
+		String den;
+		if(type.contains("_")){
+			String part1 = type.substring(0, type.indexOf("Type"));
+			String part2 = type.substring(type.indexOf("_"), type.length());
+			den = part1 + part2 + ". Type";
+		}
+		else
+			den = type.substring(0, type.indexOf("Type"))+". Type";
+		return den;
+	}
+	
 	public static String firstToUpperCase(String str) {
 		String prefix = str.substring(0, 1);
 		String suffix = str.substring(1);
