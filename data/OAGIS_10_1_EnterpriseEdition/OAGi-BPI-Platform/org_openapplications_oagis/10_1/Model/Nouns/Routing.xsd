@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/Routing.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="Routing" type="RoutingType" id="oagis-id-527121e5cf54477c94c4f502124b4d4e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Routing is the description of all of the resources, steps, and activities associated with a path or routing associated with a manufacturing or production process.  Typically, a routing contains people, machines, tooling, operations, and steps.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RoutingHeader" type="RoutingHeaderType" id="oagis-id-eb23707cc8d14cbf82fedbb737814c49"/>
+	<xsd:element name="OperationGroupElement" type="OperationGroupElementType" id="oagis-id-eb53946c65f84cb18febd26bc48f63f3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying a grouping of operations and their relationships.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RouteOperation" type="RouteOperationType" id="oagis-id-e6e1b6065de14cbf9e1961ac5b2efbb6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying the operations and there order for the specified routing.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="GroupMember" type="GroupMemberType" id="oagis-id-3c9596c461c04585b0d71b1739c009b3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying the occurrence of the operations within an OperationGroup.  At least one occurrence of the GroupMember component is required for each occurrence of the OperationGroup component. Except for the request BODs which use the verbs Get and GetList.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RoutingType" id="oagis-id-16cba3b27124471b8fff951bb0982433">
+		<xsd:sequence>
+			<xsd:element ref="RoutingHeader" id="oagis-id-0e7b56264e35400196ff61db51879b43" minOccurs="0"/>
+			<xsd:element ref="Operation" id="oagis-id-2fed8dc6157e404a92ada40ebcf16f93" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Information that describes the operation to be performed. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c201bf87b6d249a6b1c4382d9f42ed14"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-a267b1c15df143ac800640bdf8ae23b8"/>
+	</xsd:complexType>
+	<xsd:complexType name="RoutingHeaderBaseType" id="oagis-id-4da11ef20e0f4d3d95c8d6c281b41805">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="BOMReference" id="oagis-id-9ac971864008486ab049cd854ef6bfcc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a Bill-Of-Material Document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-aa4733dd03dc4459996b561971a5ceaf" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ManufacturingItem" id="oagis-id-ddd71146daf24f6785cb05f8365b32f2" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the manufacturing view of an Item where the complete detail of an Item is represented by the MasterItem.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ManufacturingItemInstance" id="oagis-id-c282153e82524d49927b7e409531e76a" minOccurs="0"/>
+					<xsd:element ref="SiteLocation" id="oagis-id-f950aa75a22a4f73a7b0afeea9fa58ed" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Distribution" id="oagis-id-37e1f810520c432c9616f3d7dc685e3e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The accounting distribution information associated with a Business Object Document. The position of the Distribution within a Business Object Document provides the context and additional meaning. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Charge" id="oagis-id-3db3cb53967f4c33b3bd0ef757d043ae" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the different Charges that may be applied to the associated document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationGroupElement" id="oagis-id-49edb4394d3e4d7092f7847484a26307" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying a grouping of operations and their relationships.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RouteOperation" id="oagis-id-31d481a426e349399bf2ed7c0b1da58c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying the operations and there order for the specified routing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InQueueLocation" id="oagis-id-d90224d270d242358cc65f1e4a93cbc9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the location that the associated entity receives raw material from. 
+
+In the case of an Operation is the location that the Operation receives it's raw materials. In order to produce the specified widget the corresponding raw materials must be available at the given location.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OutQueueLocation" id="oagis-id-b173e76ff8134d07a978ef4941643d87" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the location that the associated entity places the material from. 
+
+In the case of an Operation is the location that the Operation its resulting materials. In order to produce the specified widget the widgets will be placed in the is location.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProjectReference" id="oagis-id-e8e6ae77d1bc407692c3a9fd297354f9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a project that is associated with the given component.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RoutingHeaderType" id="oagis-id-0676a0424df24833b39e4f1fe261a7dd">
+		<xsd:complexContent>
+			<xsd:extension base="RoutingHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RoutingHeaderExtensionType" id="oagis-id-a72cf02cfd9e4ce5b4aabb306a74ed15" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OperationGroupBaseType" id="oagis-id-5078ab6725934dc19a88ef04831a2f61">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In a manufacturing environment where a CNC Lathe or a Manual Lathe may be alternative operations used in the production of a finished good.
+In the example above the Manual Lathe OperationGroup Name would be Alternate OperationGroupType.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="GroupName" id="oagis-id-ed3eda87cf744cb89fa0d90edfb15d35" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a grouping of entities together. An example usage may be a grouping of Operatations for a Routing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GroupTypeCode" id="oagis-id-6e36768ef14c4af5909814495bf39762" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the type of grouping. An example of usage may be a grouping of like operations. i.e. a grouping of CNC Lathe operations.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GroupMember" id="oagis-id-198d2b637cf749d4a5e4239157dda4d5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying the occurrence of the operations within an OperationGroup.  At least one occurrence of the GroupMember component is required for each occurrence of the OperationGroup component. Except for the request BODs which use the verbs Get and GetList.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OperationGroupElementType" id="oagis-id-601e225a9d83421283bd7817375a13be">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In a manufacturing environment where a CNC Lathe or a Manual Lathe may be alternative operations used in the production of a finished good.
+In the example above the Manual Lathe OperationGroup Name would be Alternate OperationGroupType.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="OperationGroupBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="OperationGroupExtensionType" id="oagis-id-9b683f61fc33439a830ac81c291b46ab" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="GroupMemberBaseType" id="oagis-id-830baf15b40c45edbec60c29b03d96e2">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="OperationDocumentIdentification" id="oagis-id-2427cab309a847a984132f88a19aa373" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the identifier of a specific operation.  Possible examples of use are in the Manufacturing Routing or the Maintenance Order. or WorkINProcessOperation. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationName" id="oagis-id-b441e59407a74e68bf3d52cf19515525" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the name of the operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-2d0836befdf74220901454e7b3bca618">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="GroupMemberType" id="oagis-id-7845aa71f7c2493eaa2518630d9ab61c">
+		<xsd:complexContent>
+			<xsd:extension base="GroupMemberBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="GroupMemberExtensionType" id="oagis-id-3f30204f5fe84bbebd538a1c2d8db88e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RouteOperationType" id="oagis-id-442a31c7c3b2435c9ad819cb9fab33e1">
+		<xsd:complexContent>
+			<xsd:extension base="ManufacturingRouteOperationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RouteOperationExtensionType" id="oagis-id-b9638c4b13f8497499df51180cd8e9c3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

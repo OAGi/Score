@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10.1 Platform 2_1 
+   Date:               27 Jun 2014 
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+
+	This file is an implementation of a Business Code List as defined by UN/CEFACT XML Naming and Design Rules v3.0 of the Unit Code List from UN/CEFACT Recommendation 20 (6_Recommendation20_5).
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_UnitCode_UNECE_7_04.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:simpleType name="clm6Recommendation205_MeasurementUnitCommonCodeContentType" id="oagis-id-cbb8c3e6d3bb40428f8efd8639c8e222">
+		<xsd:restriction base="xsd:normalizedString"/>
+	</xsd:simpleType>
+	<xsd:complexType name="clm6Recommendation205_MeasurementUnitCommonCodeType" id="oagis-id-1ca3c10db56749b69a7a7e8b8e7e30cb">
+		<xsd:simpleContent>
+			<xsd:extension base="clm6Recommendation205_MeasurementUnitCommonCodeContentType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:schema>

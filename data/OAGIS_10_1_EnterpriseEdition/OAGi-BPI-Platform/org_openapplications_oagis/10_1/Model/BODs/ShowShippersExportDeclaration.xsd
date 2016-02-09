@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowShippersExportDeclaration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersExportDeclaration.xsd"/>
+	<xsd:element name="ShowShippersExportDeclaration" type="ShowShippersExportDeclarationType" id="oagis-id-9237c1f4b3bb42bbbeb107b25021e5bb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowShippersExportDeclaration is to supply ShippersExportDeclaration information to another business application module. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowShippersExportDeclarationType" id="oagis-id-30d50222724848cbb16e02e7ed4d654d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowShippersExportDeclarationDataAreaType" id="oagis-id-4d08885d72624fac9e38b77ddb6f6839">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowShippersExportDeclaration. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the response from the request for information through a Get on the Noun (ShippersExportDeclaration).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowShippersExportDeclarationDataAreaType" id="oagis-id-e7a5d1a53921408b937263b61e4f8af2">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-c16ea068a7884da8bcfc68defe2d7ee5"/>
+			<xsd:element ref="ShippersExportDeclaration" maxOccurs="unbounded" id="oagis-id-41a4f6696a4f4b51a6ddf7567679982f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

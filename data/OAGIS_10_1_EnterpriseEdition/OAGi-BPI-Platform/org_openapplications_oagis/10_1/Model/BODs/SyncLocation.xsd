@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncLocation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Location.xsd"/>
+        <xsd:element name="SyncLocation" type="SyncLocationType" id="oagis-id-29cb638530c049d49af6ff12b1340704">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Sync Location is to enable a mechanism to ensure that the physical location identifiers are synchronized between the business applications that require this to communicate clearly.  This is particularly critical when only the codes that identify locations are used.  Without the meaning of the codes clearly communicated, the integration is not effective.  This BOD enables the Location codes to be synchronized among business applications.
+
+This BOD may also be initiated by the sending system upon some event occurring.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate Location information.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncLocationType" id="oagis-id-10cec9faf54647fd98d762c34c273abe">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncLocationDataAreaType" id="oagis-id-820c780e466745dd9cc0717c9d771677">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncLocation. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (Location).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncLocationDataAreaType" id="oagis-id-ee0fab3a4d934d4b9cf749850d23f1cc">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-b0517b8516ba409cbdd76d474f631776"/>
+                        <xsd:element ref="Location" maxOccurs="unbounded" id="oagis-id-c719e049990e42e78a62f186cb419a51"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/IssueInventory.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="IssueInventory" type="IssueInventoryType" id="oagis-id-4aa72298d66b4902acd30d95d584eed7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The IssueInventory can be used to request an application to process an issue or request information about an issue </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="IssueInventoryHeader" type="IssueInventoryHeaderType" id="oagis-id-8962db4856c343b78079f0a745f48d90">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the common elments of the IssueInventory.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="IssueInventoryLine" type="IssueInventoryLineType" id="oagis-id-e0e89e49d07a4363ab8d6e980a730239">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the lie items and quantities that are issued the IssueInventory.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="IssueInventoryType" id="oagis-id-55f5ca495c174b56ba279b055b7b7cfc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The IssueInventory can be used to request an application to process an issue or request information about an issue </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="IssueInventoryHeader" id="oagis-id-84faa1062f5444d0ba32bc62d90de16c" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the common elments of the IssueInventory.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="IssueInventoryLine" id="oagis-id-01e59460a97245069f8f5d9b8ec2125c" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the lie items and quantities that are issued the IssueInventory.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-16745424a985439d9c9d63d6645e5caf"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-0f7ec89738364d1a9b7b498114673b2a"/>
+	</xsd:complexType>
+	<xsd:complexType name="IssueInventoryHeaderBaseType" id="oagis-id-9db8c82b2a96475fa5165385349e022f">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="MaintenanceOrderReference" id="oagis-id-efeb0ffe4633492e9215426ba9c539d1" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-705d38f0a19f48238679ee0541996c0d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SalesOrderReference" id="oagis-id-22b882deef40418db229f9cc8f43338d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a SalesOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReasonCode" id="oagis-id-2003d9f6059d482c9ae6de313a96e5cd" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="IssueInventoryHeaderType" id="oagis-id-4dc6083a47ab4db18e7f42079935655c">
+		<xsd:complexContent>
+			<xsd:extension base="IssueInventoryHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="IssueInventoryHeaderExtensionType" id="oagis-id-266000d4e3cc45ceb03149b72b8161c5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="IssueInventoryLineBaseType" id="oagis-id-2b0a5646e6f6414c946d31a9b7bbfb19">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="MaintenanceOrderReference" id="oagis-id-4e4ec558b4ed41b597b454784cd8ca8c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductionOrderReference" id="oagis-id-c511422e0ec74158ab7c058f9b269bc4" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SalesOrderReference" id="oagis-id-a45c13e0010545259299fb9b5187b0ac" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a SalesOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-510739fdceb140808bf9a92b7a5cbd46"/>
+					<xsd:element ref="Quantity" id="oagis-id-da3fb489574a4dd8ae40c69c49b12769" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-12581e12888c474385de43fce51aa07f"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="IssueInventoryLineType" id="oagis-id-513006d6581d4985ac2edd2405a97fc8">
+		<xsd:complexContent>
+			<xsd:extension base="IssueInventoryLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="IssueInventoryLineExtensionType" id="oagis-id-5d6139d1252a4adf9faeaf05ab94dec7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

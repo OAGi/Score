@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelShippersLetterOfInstruction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersLetterOfInstruction.xsd"/>
+	<xsd:element name="CancelShippersLetterOfInstruction" type="CancelShippersLetterOfInstructionType" id="oagis-id-061e257470264010be8dbf237f294180">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelShippersLetterOfInstruction is to transmit an ShippersLetterOfInstruction from a supplier to a customer. Indicating that the receiver of the ShippersLetterOfInstruction is to Cancel the ShippersLetterOfInstruction for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelShippersLetterOfInstructionType" id="oagis-id-6f46b063ea8a43cda29692f6b1bf8f18">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelShippersLetterOfInstructionDataAreaType" id="oagis-id-6361202b5dec434a91b14ecd17e5f72a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelShippersLetterOfInstruction. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (ShippersLetterOfInstruction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelShippersLetterOfInstructionDataAreaType" id="oagis-id-e24acebe18d74d61b3933846684680bc">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-b65410c2fdf2433faba753ed84e0b1da"/>
+			<xsd:element ref="ShippersLetterOfInstruction" maxOccurs="unbounded" id="oagis-id-5825b4562f8b466a907c10d1e0346d46"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

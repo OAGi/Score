@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="Test">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Element1"/>
+				<xs:group ref="Group1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="Group1">
+		<xs:sequence>
+			<xs:element name="E1inG1"/>
+			<xs:element name="E2inG1"/>
+			<xs:group ref="Group2"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="Group2">
+		<xs:sequence>
+			<xs:element name="E1inG2"/>
+			<xs:element name="E2inG2"/>
+			<xs:group ref="Group3"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="Group3">
+		<xs:sequence>
+			<xs:element name="E1inG3"/>
+			<xs:element name="E2inG3"/>
+		</xs:sequence>
+	</xs:group>
+</xs:schema>

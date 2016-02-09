@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ReceiveDelivery.xsd"/>
+	<xsd:element name="SyncReceiveDelivery" type="SyncReceiveDeliveryType" id="oagis-id-ba91cff762e640e7b74fc146896d4686">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SyncReceiveDelivery provides the ability to request an application/ system to create a ReceiveDelivery</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncReceiveDeliveryType" id="oagis-id-87d25303f0854d87803247f07b5b3e5c">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncReceiveDeliveryDataAreaType" id="oagis-id-2ca8013df24840e1a0a2480cc7448442">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncReceiveDelivery. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (ReceiveDelivery).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncReceiveDeliveryDataAreaType" id="oagis-id-558cf9a54fb04fbca1530b831ef73dc1">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-237fc9b984464740bd2604622f18b8db"/>
+			<xsd:element ref="ReceiveDelivery" maxOccurs="unbounded" id="oagis-id-92142dcf98424457ad747667cc6cee68"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

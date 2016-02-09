@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelProductionPerformance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductionPerformance.xsd"/>
+	<xsd:element name="CancelProductionPerformance" type="CancelProductionPerformanceType" id="oagis-id-110a94238049463aa1c4f093c73df30c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelProductionPerformance is to respond to a request  to Cancel a ProductionPerformance with the status of the Canceling of the ProductionPerformance of the movement of WIP (Work in Progress).
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelProductionPerformanceType" id="oagis-id-2d93a34334714340a470e5a04a52a971">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelProductionPerformanceDataAreaType" id="oagis-id-d1395bb8d9f9479a8edd259e0ad7ddcb">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelProductionPerformance. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (ProductionPerformance).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelProductionPerformanceDataAreaType" id="oagis-id-fd5869074ee44748b24c537a6004dc31">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-a1045296ab2749e9ba5ba1cc0599c3b6"/>
+			<xsd:element ref="ProductionPerformance" maxOccurs="unbounded" id="oagis-id-02be245322a543d1a34f5aaed86e9755"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

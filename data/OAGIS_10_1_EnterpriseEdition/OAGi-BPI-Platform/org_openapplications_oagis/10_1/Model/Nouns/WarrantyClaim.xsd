@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/PickList.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="WarrantyClaim" type="WarrantyClaimType" id="oagis-id-0d3abca57401415bb3d04faa50f6079a"/>
+	<xsd:element name="WarrantyClaimHeader" type="WarrantyClaimHeaderType" id="oagis-id-19a120ed26554963aa98593ce5f2477e"/>
+	<xsd:element name="WarrantyClaimLine" type="WarrantyClaimLineType" id="oagis-id-69afea35d23e4d4bb0edb3c867bbe04a"/>
+	<xsd:complexType name="WarrantyClaimType" id="oagis-id-fee7aff16d71471f8e6d43ab757af097">
+		<xsd:sequence>
+			<xsd:element ref="WarrantyClaimHeader" id="oagis-id-1204ac4e91594ee88c07e72d496e0375" minOccurs="0"/>
+			<xsd:element ref="WarrantyClaimLine" id="oagis-id-7cb4b3e0986b4aeead1a7008d1f379e4" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-00c1e38fe05e425380b56adad434178a"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-40b71f12e73c45c885912431d9303f06"/>
+	</xsd:complexType>
+	<xsd:complexType name="WarrantyClaimHeaderBaseType" id="oagis-id-9130475c51f943288a941e96f0ee128a">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Party" id="oagis-id-d87f74a69c374075990157582ee76432" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-6a36a488fa934da78b89db2f3291b0f0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OwnerParty" id="oagis-id-7670ae0772ca40f4a0806fe05b13a358" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to identify who or which organization owns the item or part. The content of this field is user defined based on a specific Customer or Supplier.
+
+Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WarrantyReference" id="oagis-id-37d0a58f24af47a3b5eac5f3e4937e7a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="RepairOrderReference" id="oagis-id-bb1986f212dc4621ac5ea692490cef07" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceContractReference" id="oagis-id-b204926b0f6349f38e2cd3de88d70f5a" minOccurs="0"/>
+					<xsd:element ref="Case" id="oagis-id-adcabe07037d407dbe03014a22a0f042" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceAdvisorParty" id="oagis-id-241630ed2d3c4d8f98c419cd6440f225" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="UsageRange" id="oagis-id-a1b399f1e0a64f07930d7e8f5a68436d" minOccurs="0"/>
+					<xsd:element ref="ProvidedAlternateItem" id="oagis-id-3bb8b22511c3412a8a44452b7ad21c7c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServicedItemInstance" id="oagis-id-8fc8941b457849f1824009b93ef64bb9" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceComponentItem" id="oagis-id-06ccec2cba074dc994f482ad831ac2b4" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="LaborRateAmount" id="oagis-id-6a10e459997b48f59fb5c1d9dc85c1fc" minOccurs="0"/>
+					<xsd:element ref="Tax" id="oagis-id-f1ca422d62ce4494bac27e112c7788c7" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the tax for the object associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalTax" id="oagis-id-6e6590cd54094e2797f6a3c95f600b77" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">mlr   Amount or Tax...Is the total tax amount for the given tax code for the document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Price" id="oagis-id-1ed68823dcc549c19f7025e3ea95ba28" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TotalAmount" id="oagis-id-53c555fa12e24b03872bdf4eb2e5faee" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the total amount of the object associated. This includes the Price and the total of all the charges, allowances and taxes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Sublet" id="oagis-id-f51aa0970f5646f9903e573775fb594f" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WarrantyClaimHeaderType" id="oagis-id-ff448396216b4456b0410b707df843db">
+		<xsd:complexContent>
+			<xsd:extension base="WarrantyClaimHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WarrantyClaimHeaderExtensionType" id="oagis-id-58133a121a4043f3b3211954115ed27a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WarrantyClaimLineBaseType" id="oagis-id-de282c4b157b4e979605a454e60a7212">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Party" id="oagis-id-1fdd422f157c439c9fa57815aa89f8d2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-ba0bc11890f6420090326a08b2e5c6d8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OwnerParty" id="oagis-id-c422fdac6f934a0db15545175da1bb5b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to identify who or which organization owns the item or part. The content of this field is user defined based on a specific Customer or Supplier.
+
+Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WarrantyReference" id="oagis-id-c8aaf7123dda4779ba2fd8cd1336f640" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="RepairOrderReference" id="oagis-id-27cda242b8a442beabc518b2d50f9015" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceContractReference" id="oagis-id-b614abf60c6642cbafbf7debfa17b3d6" minOccurs="0"/>
+					<xsd:element ref="Case" id="oagis-id-e93c52b2083a48228f8fca767c7308c3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ServiceAdvisorParty" id="oagis-id-42cc4e69b0284a7cb5566a3c74d15010" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="UsageRange" id="oagis-id-70a236ea38ba43cb989308ce6f6db490" minOccurs="0"/>
+					<xsd:element ref="ProvidedAlternateItem" id="oagis-id-6c141be4e258444aad5889f008824973" minOccurs="0"/>
+					<xsd:element ref="ServicedItemInstance" id="oagis-id-4207c6f0e3a24a43bb0703a587331aaa" minOccurs="0"/>
+					<xsd:element ref="ServiceComponentItem" id="oagis-id-50ac4673ac514e32be29cea81e93b78a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="LaborRateAmount" id="oagis-id-d0473470be694100b00168aa68dba22c" minOccurs="0"/>
+					<xsd:element ref="Tax" id="oagis-id-89131be4d13b4adfb2ca65a7b9aae920" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the tax for the object associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalTax" id="oagis-id-54741c6eb85847dbb2f44c9b75ec6a4b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">mlr   Amount or Tax...Is the total tax amount for the given tax code for the document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Price" id="oagis-id-30ff894ecbba4af1854e0eef59c8ffeb" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="TotalAmount" id="oagis-id-13d27323c9cb41c887746f109f38495f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the total amount of the object associated. This includes the Price and the total of all the charges, allowances and taxes.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Sublet" id="oagis-id-a259cf3e6e88460589bc10cb4144cabc" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Quantity" id="oagis-id-935a04e601f74aedb39339fbba8b2dd0" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WarrantyClaimLineType" id="oagis-id-e33bde96625f460ab52efd25649640a2">
+		<xsd:complexContent>
+			<xsd:extension base="WarrantyClaimLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WarrantyClaimLineExtensionType" id="oagis-id-9997876448da430fa3c6dcde8e8c46d3" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

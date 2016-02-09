@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10rc2  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10rc2/Model/BODs/LoadResponseJournalEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/JournalEntry.xsd"/>
+	<xsd:element name="LoadResponseJournalEntry" type="LoadResponseJournalEntryType" id="oagis-id-90ac009d6de74711ba1139402cfa7a52">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadResponseJournalEntry is to enable an application or component to respond to a ProcessJournalEntry.
+
+The response to the LoadResponseJournalEntry is the response to the ProcessJournalEntry. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LoadResponseJournalEntryType" id="oagis-id-93d2a9d2730e4c22915f6216b2a7b540">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="LoadResponseJournalEntryDataAreaType" id="oagis-id-78f500573d174aec8eab4c38daa13b61">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadResponseJournalEntry. The information consists of a Verb and one or more Nouns. The verb (LoadResponse) indicates the action to be performed on the Noun (JournalEntry). In response to the PostJournalEntry.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LoadResponseJournalEntryDataAreaType" id="oagis-id-8ef38eb8568746b9b5703f1c126cfa45">
+		<xsd:sequence>
+			<xsd:element ref="LoadResponse" id="oagis-id-fed883adffca4dc9a988b7e11a301fed"/>
+			<xsd:element ref="JournalEntry" maxOccurs="unbounded" id="oagis-id-36d75c9de144489d86e6c4c9e99e1597"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

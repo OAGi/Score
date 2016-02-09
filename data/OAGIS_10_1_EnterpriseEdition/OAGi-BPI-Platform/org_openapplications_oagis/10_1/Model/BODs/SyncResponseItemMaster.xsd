@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseItemMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ItemMaster.xsd"/>
+	<xsd:element name="SyncResponseItemMaster" type="SyncResponseItemMasterType" id="oagis-id-8ae462431e2b4cb09871da8e8aecf096">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseItemMaster is to supply Item information for goods or services to another business application module.  This BOD may also be initiated by the sending system upon some event occurring.
+
+This BOD is not for SyncResponsehronizing ITEM quantities at each inventory location.   The SyncResponseInventoryBalance Business Object Document is used for this purpose.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate item information. 
+
+This BOD can be used to SyncResponsehronize items used in finished goods, raw materials, work-in-process or components in a bill of materials.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseItemMasterType" id="oagis-id-4355eed19bd644d3a380a309d55400e1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseItemMasterDataAreaType" id="oagis-id-cf8076141af04adb85c9f314a8db4e09">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseItemMaster. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ItemMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseItemMasterDataAreaType" id="oagis-id-04dcc226a47f43bda80d4cb245df8ed6">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-72e17e6d01f94e98845c840a41acdcee"/>
+			<xsd:element ref="ItemMaster" maxOccurs="unbounded" id="oagis-id-c8dc46d6bea244f48fb04fc4640a1e96"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

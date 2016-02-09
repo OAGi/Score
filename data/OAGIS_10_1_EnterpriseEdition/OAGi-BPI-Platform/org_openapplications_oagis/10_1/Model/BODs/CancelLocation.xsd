@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelLocation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Location.xsd"/>
+	<xsd:element name="CancelLocation" type="CancelLocationType" id="oagis-id-c81711ce704c4af2b0baaf086fa6c6dc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Cancel Location is to enable a mechanism to ensure that the physical location identifiers are Cancelhronized between the business applications that require this to communicate clearly.  This is particularly critical when only the codes that identify locations are used.  Without the meaning of the codes clearly communicated, the integration is not effective.  This BOD enables the Location codes to be Cancelhronized among business applications.
+
+This BOD may also be initiated by the sending system upon some event occurring.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate Location information.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelLocationType" id="oagis-id-7a8e59cb730f4d92bd638da14b217e1a">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelLocationDataAreaType" id="oagis-id-de9036552ecb45a4b95208a88c2b8fb2">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelLocation. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (Location).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelLocationDataAreaType" id="oagis-id-ae84187cf15e44cb83c82e380266dfd4">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-8d1b01f22cae47a697b99a6acb9fe412"/>
+			<xsd:element ref="Location" maxOccurs="unbounded" id="oagis-id-83e69d800ca547d28093129cef60c036"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               		  27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/OAGIS-Nouns.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="Platform/2_1/OAGi-Platform.xsd"/>
+	<xsd:include schemaLocation="Platform/2_1/Nouns/BOD.xsd"/>
+	<xsd:include schemaLocation="Platform/2_1/Nouns/Field.xsd"/>
+	<xsd:include schemaLocation="Platform/2_1/Nouns/Table.xsd"/>
+	<xsd:include schemaLocation="Platform/2_1/Nouns/UOMGroup.xsd"/>
+	<xsd:include schemaLocation="Nouns/ActualLedger.xsd"/>
+	<xsd:include schemaLocation="Nouns/AllocateResource.xsd"/>
+	<xsd:include schemaLocation="Nouns/BatchCertificateOfAnalysis.xsd"/>
+	<xsd:include schemaLocation="Nouns/BOM.xsd"/>
+	<xsd:include schemaLocation="Nouns/BudgetLedger.xsd"/>
+	<xsd:include schemaLocation="Nouns/CarrierRoute.xsd"/>
+	<xsd:include schemaLocation="Nouns/Catalog.xsd"/>
+	<xsd:include schemaLocation="Nouns/ChartOfAccounts.xsd"/>
+	<xsd:include schemaLocation="Nouns/CommercialInvoice.xsd"/>
+	<xsd:include schemaLocation="Nouns/Configuration.xsd"/>
+	<xsd:include schemaLocation="Nouns/ConfirmWIP.xsd"/>
+	<xsd:include schemaLocation="Nouns/CostingActivity.xsd"/>
+	<xsd:include schemaLocation="Nouns/Credit.xsd"/>
+	<xsd:include schemaLocation="Nouns/CreditStatus.xsd"/>
+	<xsd:include schemaLocation="Nouns/CreditTransfer.xsd"/>
+	<xsd:include schemaLocation="Nouns/CreditTransferIST.xsd"/>
+	<xsd:include schemaLocation="Nouns/CurrencyExchangeRate.xsd"/>
+	<xsd:include schemaLocation="Nouns/CustomerPartyMaster.xsd"/>
+	<xsd:include schemaLocation="Nouns/DebitTransfer.xsd"/>
+	<xsd:include schemaLocation="Nouns/DebitTransferIST.xsd"/>
+	<xsd:include schemaLocation="Nouns/DispatchList.xsd"/>
+	<xsd:include schemaLocation="Nouns/EmployeeWorkSchedule.xsd"/>
+	<xsd:include schemaLocation="Nouns/EmployeeWorkTime.xsd"/>
+	<xsd:include schemaLocation="Nouns/EngineeringChangeOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/EngineeringWorkDocument.xsd"/>
+	<xsd:include schemaLocation="Nouns/FreightInvoice.xsd"/>
+	<xsd:include schemaLocation="Nouns/HazardousMaterialShipmentDocument.xsd"/>
+	<xsd:include schemaLocation="Nouns/InspectDelivery.xsd"/>
+	<xsd:include schemaLocation="Nouns/InventoryBalance.xsd"/>
+	<xsd:include schemaLocation="Nouns/InventoryConsumption.xsd"/>
+	<xsd:include schemaLocation="Nouns/InventoryCount.xsd"/>
+	<xsd:include schemaLocation="Nouns/Invoice.xsd"/>
+	<xsd:include schemaLocation="Nouns/InvoiceLedgerEntry.xsd"/>
+	<xsd:include schemaLocation="Nouns/IssueInventory.xsd"/>
+	<xsd:include schemaLocation="Nouns/ItemCertificateOfAnalysis.xsd"/>
+	<xsd:include schemaLocation="Nouns/ItemMaster.xsd"/>
+	<xsd:include schemaLocation="Nouns/ItemNonconformance.xsd"/>
+	<xsd:include schemaLocation="Nouns/JournalEntry.xsd"/>
+	<xsd:include schemaLocation="Nouns/Location.xsd"/>
+	<xsd:include schemaLocation="Nouns/LocationService.xsd"/>
+	<xsd:include schemaLocation="Nouns/MaintenanceOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/MatchDocument.xsd"/>
+	<xsd:include schemaLocation="Nouns/MergeWIP.xsd"/>
+	<xsd:include schemaLocation="Nouns/MoveInventory.xsd"/>
+	<xsd:include schemaLocation="Nouns/MoveProduct.xsd"/>
+	<xsd:include schemaLocation="Nouns/MoveProductForecast.xsd"/>
+	<xsd:include schemaLocation="Nouns/MoveWIP.xsd"/>
+	<xsd:include schemaLocation="Nouns/OnlineOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/OnlineSession.xsd"/>
+	<xsd:include schemaLocation="Nouns/Operation.xsd"/>
+	<xsd:include schemaLocation="Nouns/Opportunity.xsd"/>
+	<xsd:include schemaLocation="Nouns/PartyMaster.xsd"/>
+	<xsd:include schemaLocation="Nouns/PartyScreen.xsd"/>
+	<xsd:include schemaLocation="Nouns/PartyScreenResponse.xsd"/>
+	<xsd:include schemaLocation="Nouns/Payable.xsd"/>
+	<xsd:include schemaLocation="Nouns/PaymentStatus.xsd"/>
+	<xsd:include schemaLocation="Nouns/PaymentStatusIST.xsd"/>
+	<xsd:include schemaLocation="Nouns/Personnel.xsd"/>
+	<xsd:include schemaLocation="Nouns/PickList.xsd"/>
+	<xsd:include schemaLocation="Nouns/PlanningSchedule.xsd"/>
+	<xsd:include schemaLocation="Nouns/PriceList.xsd"/>
+	<xsd:include schemaLocation="Nouns/ProductAvailability.xsd"/>
+	<xsd:include schemaLocation="Nouns/ProductionOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/ProductionPerformance.xsd"/>
+	<xsd:include schemaLocation="Nouns/ProductionSchedule.xsd"/>
+	<xsd:include schemaLocation="Nouns/ProjectAccounting.xsd"/>
+	<xsd:include schemaLocation="Nouns/ProjectMaster.xsd"/>
+	<xsd:include schemaLocation="Nouns/PurchaseOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/Quote.xsd"/>
+	<xsd:include schemaLocation="Nouns/Receivable.xsd"/>
+	<xsd:include schemaLocation="Nouns/ReceiveDelivery.xsd"/>
+	<xsd:include schemaLocation="Nouns/ReceiveItem.xsd"/>
+	<xsd:include schemaLocation="Nouns/RecoverWIP.xsd"/>
+	<xsd:include schemaLocation="Nouns/RemittanceAdvice.xsd"/>
+	<xsd:include schemaLocation="Nouns/RequireProduct.xsd"/>
+	<xsd:include schemaLocation="Nouns/Requisition.xsd"/>
+	<xsd:include schemaLocation="Nouns/RFQ.xsd"/>
+	<xsd:include schemaLocation="Nouns/RiskControlLibrary.xsd"/>
+	<xsd:include schemaLocation="Nouns/Routing.xsd"/>
+	<xsd:include schemaLocation="Nouns/SalesLead.xsd"/>
+	<xsd:include schemaLocation="Nouns/SalesOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/SequenceSchedule.xsd"/>
+	<xsd:include schemaLocation="Nouns/Shipment.xsd"/>
+	<xsd:include schemaLocation="Nouns/ShipmentSchedule.xsd"/>
+	<xsd:include schemaLocation="Nouns/ShipmentUnit.xsd"/>
+	<xsd:include schemaLocation="Nouns/ShippersExportDeclaration.xsd"/>
+	<xsd:include schemaLocation="Nouns/ShippersLetterOfInstruction.xsd"/>
+	<xsd:include schemaLocation="Nouns/SplitWIP.xsd"/>
+	<xsd:include schemaLocation="Nouns/SupplierPartyMaster.xsd"/>
+	<xsd:include schemaLocation="Nouns/WarehouseShippingAdvice.xsd"/>
+	<xsd:include schemaLocation="Nouns/WarehouseShippingOrder.xsd"/>
+	<xsd:include schemaLocation="Nouns/WarrantyClaim.xsd"/>
+	<xsd:include schemaLocation="Nouns/WIPStatus.xsd"/>
+	<xsd:element name="OAGIS10Nouns" type="OAGIS10NounsType" id="oagis-id-91034c745ebf49dcbe19229860261ae3"/>
+	<xsd:complexType name="OAGIS10NounsType" id="oagis-id-a24b594752f24a93817c8d5ee775a3bb">
+		<xsd:sequence>
+			<xsd:element ref="BOD" minOccurs="0" id="oagis-id-0a940616f8364f66a7acebd8619a7e3c"/>
+			<xsd:element ref="Field" minOccurs="0" id="oagis-id-732a78fe98cf4049b905365d1d14b0af"/>
+			<xsd:element ref="Table" minOccurs="0" id="oagis-id-ec6c51f31d014ca48bbad8068e50d551"/>
+			<xsd:element ref="UOMGroup" minOccurs="0" id="oagis-id-88d874a978834efbab78dd2f37d8d5b7"/>			
+			<xsd:element ref="ActualLedger" minOccurs="0" id="oagis-id-0837e4b33cd54e8793b68fa6d23eeac7"/>
+			<xsd:element ref="AllocateResource" minOccurs="0" id="oagis-id-ceb8ef4f7e1c492bb8683513384f2898"/>
+			<xsd:element ref="BatchCertificateOfAnalysis" minOccurs="0" id="oagis-id-ce48921ce9554fcf9e39eb5abe1b9ae8"/>
+			<xsd:element ref="BOM" minOccurs="0" id="oagis-id-d2162f03cb85410ab22bd95664b2e581"/>
+			<xsd:element ref="BudgetLedger" minOccurs="0" id="oagis-id-1db48b6129a842feaf0774aeb8b5b671"/>
+			<xsd:element ref="CarrierRoute" minOccurs="0" id="oagis-id-f3c1b93383994054a881befdcf9d343e"/>
+			<xsd:element ref="Catalog" minOccurs="0" id="oagis-id-8c30ee6d959f41f9b06110d62ed71ce2"/>
+			<xsd:element ref="ChartOfAccounts" minOccurs="0" id="oagis-id-dec26ad0de2743d98bbec242b8fc10d2"/>
+			<xsd:element ref="CommercialInvoice" minOccurs="0" id="oagis-id-1f285b863c40452282b95736d9deabfa"/>
+			<xsd:element ref="Configuration" minOccurs="0" id="oagis-id-b2a70af62d5e4e5d9b8c4774559074f4"/>
+			<xsd:element ref="ConfirmWIP" minOccurs="0" id="oagis-id-8b075345556e452ea224b590999145cb"/>
+			<xsd:element ref="CostingActivity" minOccurs="0" id="oagis-id-3a82c24f96674870a54918c2b2764dbb"/>
+			<xsd:element ref="Credit" minOccurs="0" id="oagis-id-dd5e9c50fb07444ca59fcc039affb11c"/>
+			<xsd:element ref="CreditStatus" minOccurs="0" id="oagis-id-a678f336414848a8a16297fd30443cea"/>
+			<xsd:element ref="CreditTransfer" minOccurs="0" id="oagis-id-36114b04fd994a5bbd1056668d6cfc99"/>
+			<xsd:element ref="CreditTransferIST" minOccurs="0" id="oagis-id-bbdcc2f0bfab44dea3673729d60993dd"/>
+			<xsd:element ref="CurrencyExchangeRate" minOccurs="0" id="oagis-id-01c73b3d648d44b49acd7df79dc420a1"/>
+			<xsd:element ref="CustomerPartyMaster" minOccurs="0" id="oagis-id-12c7e5c5a97f4519b17f6f7a61df12bf"/>
+			<xsd:element ref="DebitTransfer" minOccurs="0" id="oagis-id-1d02e5028d494b19a36b9c84bea68ce4"/>
+			<xsd:element ref="DebitTransferIST" minOccurs="0" id="oagis-id-7f6b9fed98c549af9d57f41150219849"/>
+			<xsd:element ref="DispatchList" minOccurs="0" id="oagis-id-b55b37eccee0439aae6e47de32add4b6"/>
+			<xsd:element ref="EmployeeWorkSchedule" minOccurs="0" id="oagis-id-5da3bdbf50e0431599b0b8c586a023e1"/>
+			<xsd:element ref="EmployeeWorkTime" minOccurs="0" id="oagis-id-9a51b366443e43cdb5ea20f8e2637ef4"/>
+			<xsd:element ref="EngineeringChangeOrder" minOccurs="0" id="oagis-id-d2e8fcf1136040a682962b260ae90751"/>
+			<xsd:element ref="EngineeringWorkDocument" minOccurs="0" id="oagis-id-92ddd6ba70ed47ae97fca4c206416be2"/>
+			<xsd:element ref="FreightInvoice" minOccurs="0" id="oagis-id-758b1406230e45a185c2eefd5b39f264"/>
+			<xsd:element ref="HazardousMaterialShipmentDocument" minOccurs="0" id="oagis-id-66037fbff3b24e23b55c15f5fefd6440"/>
+			<xsd:element ref="InspectDelivery" minOccurs="0" id="oagis-id-a946e64c38b34ae69f1b3a18fdabe070"/>
+			<xsd:element ref="InventoryBalance" minOccurs="0" id="oagis-id-cce036d70ef24a40a56c78efd0741c6f"/>
+			<xsd:element ref="InventoryConsumption" minOccurs="0" id="oagis-id-a439f0e206af44ac812f7d4d043ba02f"/>
+			<xsd:element ref="InventoryCount" minOccurs="0" id="oagis-id-3d1742f67d774f3cbef91b86317dc4c3"/>
+			<xsd:element ref="Invoice" minOccurs="0" id="oagis-id-2ff011ba9d4d4458abaafbdb4ce51f28"/>
+			<xsd:element ref="InvoiceLedgerEntry" minOccurs="0" id="oagis-id-4cda8256265f467ba4cecf2b8bc38a57"/>
+			<xsd:element ref="IssueInventory" minOccurs="0" id="oagis-id-333e486fa9df413e9b1f85f2d704ef55"/>
+			<xsd:element ref="ItemCertificateOfAnalysis" minOccurs="0" id="oagis-id-87238182799b4b85b68d1f731d1e5eda"/>
+			<xsd:element ref="ItemMaster" minOccurs="0" id="oagis-id-15b48ff5a0e14a24ae5e64829868f3c7"/>
+			<xsd:element ref="ItemNonconformance" minOccurs="0" id="oagis-id-51a7446f7cbf46129a8763beaa4ad61f"/>
+			<xsd:element ref="JournalEntry" minOccurs="0" id="oagis-id-887a7c8d9ed84339864d49b6ca9e70ad"/>
+			<xsd:element ref="Location" minOccurs="0" id="oagis-id-96feb05bfa244c66b0ee12d9a8a6d750"/>
+			<xsd:element ref="LocationService" minOccurs="0" id="oagis-id-74a54f54e3204eac999259166544e662"/>
+			<xsd:element ref="MaintenanceOrder" minOccurs="0" id="oagis-id-f286cb25a3004a218bf4bd06964cb8aa"/>
+			<xsd:element ref="MatchDocument" minOccurs="0" id="oagis-id-5f987e1fb0bd4fc3a7dedb1f039b1b54"/>
+			<xsd:element ref="MergeWIP" minOccurs="0" id="oagis-id-e243fc89c9a94875bb36d8508214d785"/>
+			<xsd:element ref="MoveInventory" minOccurs="0" id="oagis-id-e55fb653da9a4dd2ad63c09c4567f6aa"/>
+			<xsd:element ref="MoveProduct" minOccurs="0" id="oagis-id-e924a0efa3e14224923e7c75cba7adb3"/>
+			<xsd:element ref="MoveProductForecast" minOccurs="0" id="oagis-id-2dfb4b6fc6404d64806137740ba6d3eb"/>
+			<xsd:element ref="MoveWIP" minOccurs="0" id="oagis-id-78c6d115264e49fda57f3e4f6ae7dddf"/>
+			<xsd:element ref="OnlineOrder" minOccurs="0" id="oagis-id-fa4cbe8339a3406bb6373bd76cf5b756"/>
+			<xsd:element ref="OnlineSession" minOccurs="0" id="oagis-id-7cd919440a7444bbbd4a39899b2aed14"/>
+			<xsd:element ref="Operation" minOccurs="0" id="oagis-id-7b5a5451d41141928ff9a59b594c3fbb"/>
+			<xsd:element ref="Opportunity" minOccurs="0" id="oagis-id-f1c23167e41047d09ff682eb615f6220"/>
+			<xsd:element ref="PartyMaster" minOccurs="0" id="oagis-id-b217f875326b4a79ac49717369e20d8d"/>
+			<xsd:element ref="PartyScreen" minOccurs="0" id="oagis-id-4e7ad777fd9c4e3881a9ffef89ac7625"/>
+			<xsd:element ref="PartyScreenResponse" minOccurs="0" id="oagis-id-a65c8b619c844391804fce19df14217c"/>
+			<xsd:element ref="Payable" minOccurs="0" id="oagis-id-9453cb0f56294e19838a1910b6a3cb03"/>
+			<xsd:element ref="PaymentStatus" minOccurs="0" id="oagis-id-950a89376c964650b4559a936e7ebf21"/>
+			<xsd:element ref="PaymentStatusIST" minOccurs="0" id="oagis-id-52c68fb6bc0446d497c3e340256e8fdb"/>
+			<xsd:element ref="Personnel" minOccurs="0" id="oagis-id-32a4aed5fd234e9a9ffaf2fdf1793681"/>
+			<xsd:element ref="PickList" minOccurs="0" id="oagis-id-357c353be6de48b28d9061d5fe03cf81"/>
+			<xsd:element ref="PlanningSchedule" minOccurs="0" id="oagis-id-b68bca7c13224240b7a670e0fad40be8"/>
+			<xsd:element ref="PriceList" minOccurs="0" id="oagis-id-c3058d34196847fab1f228444b8dc844"/>
+			<xsd:element ref="ProductAvailability" minOccurs="0" id="oagis-id-c6740fa02faa49fbad11d4eb07e2d57a"/>
+			<xsd:element ref="ProductionOrder" minOccurs="0" id="oagis-id-419698fb6a72404994570a7742be5931"/>
+			<xsd:element ref="ProductionPerformance" minOccurs="0" id="oagis-id-d8ab63554e7749a5ae56bef86d107c1d"/>
+			<xsd:element ref="ProductionSchedule" minOccurs="0" id="oagis-id-53cc8755c6814782b2b30966d90f775e"/>
+			<xsd:element ref="ProjectAccounting" minOccurs="0" id="oagis-id-3492b26fdd014f46aa0ff68a184b59d2"/>
+			<xsd:element ref="ProjectMaster" minOccurs="0" id="oagis-id-383926e16b9b4f73886a7bb4eae52850"/>
+			<xsd:element ref="PurchaseOrder" minOccurs="0" id="oagis-id-f79c503860984ec497fd36dd6eddca2e"/>
+			<xsd:element ref="Quote" minOccurs="0" id="oagis-id-cb3b79b2da654a2db6863ccb57e3903d"/>
+			<xsd:element ref="Receivable" minOccurs="0" id="oagis-id-da1d0d34ad5745768f1d4a0ba03c236d"/>
+			<xsd:element ref="ReceiveDelivery" minOccurs="0" id="oagis-id-a380d5d743d24ef0a6a5e9e58f7c5cb9"/>
+			<xsd:element ref="ReceiveItem" minOccurs="0" id="oagis-id-44152708a2ab43bf8256c34b0afea5bc"/>
+			<xsd:element ref="RecoverWIP" minOccurs="0" id="oagis-id-f7df75fd81e44c3db60eba2fe2269283"/>
+			<xsd:element ref="RemittanceAdvice" minOccurs="0" id="oagis-id-7542651b7144420ebbcec5fae797dab2"/>
+			<xsd:element ref="RequireProduct" minOccurs="0" id="oagis-id-b9d3697f8eb14e75a9f240c3c528693b"/>
+			<xsd:element ref="Requisition" minOccurs="0" id="oagis-id-5e73e00865384305b76332686a9506e2"/>
+			<xsd:element ref="RFQ" minOccurs="0" id="oagis-id-6d9b006a489743489db7b5224314c754"/>
+			<xsd:element ref="RiskControlLibrary" minOccurs="0" id="oagis-id-3f5f50a89ee4450581076e4731fb391b"/>
+			<xsd:element ref="Routing" minOccurs="0" id="oagis-id-b0e4993f9f9d4e44a98ee8ba03820042"/>
+			<xsd:element ref="SalesLead" minOccurs="0" id="oagis-id-6dcdc7eb06014d828fe805d3219e6a3c"/>
+			<xsd:element ref="SalesOrder" minOccurs="0" id="oagis-id-c088696e6b3642ce99b2ef338ba18c48"/>
+			<xsd:element ref="SequenceSchedule" minOccurs="0" id="oagis-id-6633d4f993764ac28de90e1e1df8e768"/>
+			<xsd:element ref="Shipment" minOccurs="0" id="oagis-id-0e20e858c89b4bab8ceca76cc56cda4e"/>
+			<xsd:element ref="ShipmentSchedule" minOccurs="0" id="oagis-id-4e022f214cf245ec95bb6abb5847cdc3"/>
+			<xsd:element ref="ShipmentUnit" minOccurs="0" id="oagis-id-87bbd6c8cd284031a944566e27937b58"/>
+			<xsd:element ref="ShippersExportDeclaration" minOccurs="0" id="oagis-id-399fbbac85b145bf9d47f4cd76203a5e"/>
+			<xsd:element ref="ShippersLetterOfInstruction" minOccurs="0" id="oagis-id-1f91c91f9b7f4fee8c59f3ca7209462d"/>
+			<xsd:element ref="SplitWIP" minOccurs="0" id="oagis-id-51b414efc37a4ba680891a78085cf128"/>
+			<xsd:element ref="SupplierPartyMaster" minOccurs="0" id="oagis-id-d6f9d2d4707742c79bcfa4b84ba2a1d9"/>
+			
+			<xsd:element ref="WarehouseShippingAdvice" minOccurs="0" id="oagis-id-8810d52229e947e188f106dd6dd611b3"/>
+			<xsd:element ref="WarehouseShippingOrder" minOccurs="0" id="oagis-id-5c42cf7ad2c34896b77afbc225df5cff"/>
+			<xsd:element ref="WarrantyClaim" minOccurs="0" id="oagis-id-dba1544c0a404e48a1817418161ea18a"/>
+			<xsd:element ref="WIPStatus" minOccurs="0" id="oagis-id-9beff5f290984ad2988e296410646463"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

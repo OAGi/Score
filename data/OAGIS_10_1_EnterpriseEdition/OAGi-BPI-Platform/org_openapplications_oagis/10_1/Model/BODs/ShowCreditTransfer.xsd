@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowCreditTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CreditTransfer.xsd"/>
+        <xsd:element name="ShowCreditTransfer" type="ShowCreditTransferType" id="oagis-id-eb05b74d31d34a3dae12d64e008aa8be">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowCreditTransfer is to enable an application to request specific CreditTransfer information from another business application module.  The response to the ShowCreditTransfer is the ShowCreditTransfer.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowCreditTransferType" id="oagis-id-b46bd3d6e7fa4b6bb1a1b5ed0ba2f7a5">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowCreditTransferDataAreaType" id="oagis-id-bc7e816e2848443ab6a6a07164ae5585">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowCreditTransfer. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (CreditTransfer).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowCreditTransferDataAreaType" id="oagis-id-0668253b86e54b4cbe27ab971a33d6aa">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-8688b8c48b79404ab18dfb2474a4687a"/>
+                        <xsd:element ref="CreditTransfer" maxOccurs="unbounded" id="oagis-id-b2dd3961e1054dae93a91a5305b42d41"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>
