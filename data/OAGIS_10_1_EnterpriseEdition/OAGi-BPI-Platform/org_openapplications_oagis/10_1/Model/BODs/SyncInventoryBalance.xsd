@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncInventoryBalance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryBalance.xsd"/>
+        <xsd:element name="SyncInventoryBalance" type="SyncInventoryBalanceType" id="oagis-id-e4a07ee9633344d5852aef4dd044a923">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncInventoryBalance is to enable the synchronization of InventoryBalance data that exists on separate Item Master databases.  This data is not the master data that describes the attributes of the item such as dimensions, weight, or unit of measure.
+
+This is data that describes the ITEM as it exists at a specific location.
+
+The primary focus of this BOD is to synchronize the quantity of an item by stocking location.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncInventoryBalanceType" id="oagis-id-edd96143378f4e36882fcf60e56777eb">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncInventoryBalanceDataAreaType" id="oagis-id-6aa775731bfa4077973aec8fd78e0c59">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncInventoryBalance. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (InventoryBalance).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncInventoryBalanceDataAreaType" id="oagis-id-b6daedddf49a450fa276186455e0e10b">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-9e6d43326a2545d0a1c23a5b7a9f62bb"/>
+                        <xsd:element ref="InventoryBalance" maxOccurs="unbounded" id="oagis-id-e6ae7fcfc3aa4b3da5412f9d53df48c4"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

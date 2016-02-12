@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetShipmentUnit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ShipmentUnit.xsd"/>
+        <xsd:element name="GetShipmentUnit" type="GetShipmentUnitType" id="oagis-id-fdaca2e0ec484c92b5cb732e35b44c59">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetShipmentUnit is to enable an application to request specific ShipmentUnit information from another business application module.  The response to the GetShipmentUnit is the ShowShipmentUnit.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetShipmentUnitType" id="oagis-id-2f19640f06574d09a09aa2a6f2814465">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetShipmentUnitDataAreaType" id="oagis-id-209709ad7261491f87b79ca4d391032f">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetShipmentUnit. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (ShipmentUnit).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetShipmentUnitDataAreaType" id="oagis-id-9081284dd82346ecb058f63911247cf1">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-781ac19c4931413bbf8fe040e49dacac"/>
+                        <xsd:element ref="ShipmentUnit" maxOccurs="unbounded" id="oagis-id-ad533f1462cf420bbc9f02cd7be1f9fb"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

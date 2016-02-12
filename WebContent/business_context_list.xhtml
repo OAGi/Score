@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Context Category">
+					<p:menuitem value="Create" url="business_context_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="List" url="business_context_list.xhtml" icon="ui-icon-search" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages1" />
+			<p:panel header="Business Context List">
+				<p:dataTable id="tbl" var="BusinessContextVO" value="#{businessContextHandler.businessContexts}"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="10" style="width:700px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{BusinessContextVO.businessContextID}">
+			        <p:column selectionMode="single" style="width:16px;text-align:center"/>
+					<p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{BusinessContextVO.name}" />
+					</p:column>
+					<p:column style="width:300px">
+						<f:facet name="header">
+							<h:outputText value="GUID" />
+						</f:facet>
+						<h:outputText value="#{BusinessContextVO.businessContextGUID}" />
+					</p:column>
+					
+				</p:dataTable>
+				<p:commandButton process="tbl" update=":form:bcDetailid" icon="ui-icon-search" value="Detail" oncomplete="PF('bcDetail').show()" />
+				 
+			</p:panel>
+			<p:dialog header="Business Context Detail" widgetVar="bcDetail" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="300">
+        		<p:outputPanel id="bcDetailid">
+					<h:panelGrid id="grid" cellpadding="5">
+						<p:row>
+	        				<p:column style="width:200px"> 
+								<h:outputLabel value="Name: " style="font-weight:bold" />
+							</p:column> 
+							<p:column style="width:600px"> 
+								<h:outputText value="#{businessContextHandler.bcDetail.name}" />
+							</p:column> 
+						</p:row>
+						<p:row>
+							<p:column> 
+								<h:outputLabel for="desc" value="Business Context Value "
+									style="font-weight:bold" />
+							</p:column>
+							<p:column>
+							</p:column> 
+						</p:row>		
+						<p:row>
+							<p:column colspan="2"> 					
+								<p:dataTable id="tbl1" var="businessContextValues" value="#{businessContextHandler.bcDetails}"
+									style="width:600px; margin-bottom:20px">
+									
+									<p:column style="width:200px">
+										<f:facet name="header">
+											<h:outputText value="Context Category" />
+										</f:facet>
+										<h:outputText value="#{businessContextValues.ccVO.name}" />
+									</p:column>
+					
+									<p:column style="width:200px">
+										<f:facet name="header">
+											<h:outputText value="Context Scheme Name" />
+										</f:facet>
+										<h:outputText value="#{businessContextValues.csVO.schemeName}" />
+									</p:column>
+					
+									<p:column style="width:200px">
+										<f:facet name="header">
+											<h:outputText value="Context Scheme Value" />
+										</f:facet>
+										<h:outputText value="#{businessContextValues.csvVO.value}" />
+									</p:column>
+								</p:dataTable>
+							</p:column>
+						</p:row>
+						<p:row>
+	        				<p:column>
+							</p:column> 
+							<p:column> 
+								<p:commandButton value="Close" icon="ui-icon-check" oncomplete="PF('bcDetail').hide()"/>
+							</p:column>
+						</p:row>
+					</h:panelGrid>
+				</p:outputPanel>
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

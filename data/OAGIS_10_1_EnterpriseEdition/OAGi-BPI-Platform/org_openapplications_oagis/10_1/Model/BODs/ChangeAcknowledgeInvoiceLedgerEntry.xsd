@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downChangeAcknowledge package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgeInvoiceLedgerEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InvoiceLedgerEntry.xsd"/>
+	<xsd:element name="ChangeAcknowledgeInvoiceLedgerEntry" type="ChangeAcknowledgeInvoiceLedgerEntryType" id="oagis-id-0c2088cc29cb4b6ab951ae443e00ae9b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In certain application suites, purchase order / invoice matching functionality exists in the purchasing application, while in other suites this functionality exists in the accounts payable application.
+
+The invoice matching process may include several document types, including the following:
+·	Two way match - Purchase Order and the Invoice
+·	Three way match - Purchase Order, Invoice, and the Receipt
+·	Four way match - Purchase Order, Invoice, Receipt, and Inspection results
+
+Note:  For the four way match, it is assumed that inspection results have been updated on the Purchase Order for visibility in matching.
+
+When matching takes place in the purchasing application, the accounts payable application may have to inform the purchasing application of the unapproved supplier invoice to which purchasing transactions (purchase orders, goods receiving notes and inspection tickets) are to be matched if the invoice is initially entered into the accounts payable application. Note that in some situations, invoices are entered directly into the purchase order application or are created by the purchase order application when using evaluated receipt settlement (ERS) and in this instance, it is not necessary to perform the separate integration described in these chapters.
+
+The purpose of the ChangeAcknowledgeInvoiceLedgerEntry is to transmit data to create an unapproved open item in either a payables application or a purchasing application.
+
+The scope of the ChangeAcknowledgeInvoiceLedgerEntry indicates that the supplier's invoice has not yet been approved and the invoice is to be used as part of the invoice matching process.
+
+OAGIS has already defined the scenario for invoices that are approved for payment in a separate BOD namely ChangeAcknowledgePayable.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeInvoiceLedgerEntryType" id="oagis-id-17e60746c6fa41eea14a2031cdd422b7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeInvoiceLedgerEntryDataAreaType" id="oagis-id-26e35c0bde184d77bc148a6e5706157c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeInvoiceLedgerEntry. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (InvoiceLedgerEntry).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeInvoiceLedgerEntryDataAreaType" id="oagis-id-0ae365297d66468d9ee136bfb40f09bf">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-41c030b03dee46979493d1203152fe3f"/>
+			<xsd:element ref="InvoiceLedgerEntry" maxOccurs="unbounded" id="oagis-id-36c913c503e947bdbab433028c7079eb"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

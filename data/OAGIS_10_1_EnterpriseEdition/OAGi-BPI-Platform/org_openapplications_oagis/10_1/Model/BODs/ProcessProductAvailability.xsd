@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessProductAvailability.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProductAvailability.xsd"/>
+        <xsd:element name="ProcessProductAvailability" type="ProcessProductAvailabilityType" id="oagis-id-015fceb9b7f64f6eb790bb670a1e973a">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessProductAvailability is to enable an application or component to request the reservations for products from  another business application or component.
+
+The response to the ProcessProductAvailability is the ListProductAvailability. The ProcessProductAvailability also enables the retrieval of information across several documents by using selection fields.    This type of functionality is limited to the capabilities of the responding application and needs to be determined during the implementation project.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessProductAvailabilityType" id="oagis-id-7cda1b89d02d428499f3ce68e69ccfdd">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessProductAvailabilityDataAreaType" id="oagis-id-1716732c505444c98a754b45af48612a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessProductAvailability. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ProductAvailability ).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessProductAvailabilityDataAreaType" id="oagis-id-d4e234a9fe7d415fa3a623fc9a88eb00">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-dda24922a25e451d9f39b89cb8972a2b"/>
+                        <xsd:element ref="ProductAvailability" maxOccurs="unbounded" id="oagis-id-6927775f071c4af7865b5fe719bf1b7a"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

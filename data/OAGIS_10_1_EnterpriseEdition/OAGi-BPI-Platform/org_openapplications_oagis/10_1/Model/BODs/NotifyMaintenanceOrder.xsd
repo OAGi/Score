@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyMaintenanceOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MaintenanceOrder.xsd"/>
+        <xsd:element name="NotifyMaintenanceOrder" type="NotifyMaintenanceOrderType" id="oagis-id-6a8fe6ec630a4be5919d4dffa41b3edb">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyMaintenanceOrder is to ensure that all business software components in a specific integration instance have the current Maintenance Order information. This BOD is commonly used to publish the need to create or update a Maintenance Order in a publish and subscribe integration environment.
+
+One possible scenario is the synchronization of Maintenance Order between field devices, service trucks, etc. with a CMMS system.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyMaintenanceOrderType" id="oagis-id-5aba3cc8c7694891a1fe7e61e01cff57">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyMaintenanceOrderDataAreaType" id="oagis-id-f713e4475a9b48a993cea52475fe4c02">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyMaintenanceOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (MaintenanceOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyMaintenanceOrderDataAreaType" id="oagis-id-142ee0ee6db5432fb168c71064e283cf">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-5f35f31144944a8fbacc1b7d6f91b9ee"/>
+                        <xsd:element ref="MaintenanceOrder" maxOccurs="unbounded" id="oagis-id-6de3d2b071ed4554b93e1fcd77de69c5"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

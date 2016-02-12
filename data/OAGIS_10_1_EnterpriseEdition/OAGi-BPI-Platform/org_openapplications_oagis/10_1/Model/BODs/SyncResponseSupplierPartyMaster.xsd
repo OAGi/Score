@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseSupplierPartyMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SupplierPartyMaster.xsd"/>
+	<xsd:element name="SyncResponseSupplierPartyMaster" type="SyncResponseSupplierPartyMasterType" id="oagis-id-e37f484fba784959be9a7522c9b44135">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseSupplierPartyMaster is to facilitate keeping party information SyncResponsehronized that exists on separate data bases.  The SyncResponseSupplierPartyMaster allows the adding of new party and the modification of previously established SupplierPartyMaster.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseSupplierPartyMasterType" id="oagis-id-b7a2a7a071ac4d98bb5506a8e393b352">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseSupplierPartyMasterDataAreaType" id="oagis-id-c75d426e50a84919b85db8c4df156f8d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseSupplierPartyMaster. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (SupplierPartyMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseSupplierPartyMasterDataAreaType" id="oagis-id-8be7e40fb8634fc0b806157ceb3e5e9c">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-1676f9d0686e48efabbe6387c5ecbf97"/>
+			<xsd:element ref="SupplierPartyMaster" maxOccurs="unbounded" id="oagis-id-0b26a23b8aa64745b05b9d5a70d27fb2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyAllocateResource.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/AllocateResource.xsd"/>
+        <xsd:element name="NotifyAllocateResource" type="NotifyAllocateResourceType" id="oagis-id-ed2c08e520b144e4b618f6bad00287a2">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyAllocateResource is to supply AllocateResource information to another business application module. This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyAllocateResourceType" id="oagis-id-8843ddb785b04416860ac625f468f160">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyAllocateResourceDataAreaType" id="oagis-id-7065c403a28c41d6803b686d5837a84d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyAllocateResource. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (AllocateResource).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyAllocateResourceDataAreaType" id="oagis-id-8eb270ff652644d9a542605a36a4a0d6">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-77e697f267ac400f890251a2be3643d1"/>
+                        <xsd:element ref="AllocateResource" maxOccurs="unbounded" id="oagis-id-94226ae3b9d94459be09555a93f41d89"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyWarehouseShippingOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarehouseShippingOrder.xsd"/>
+	<xsd:element name="NotifyWarehouseShippingOrder" type="NotifyWarehouseShippingOrderType" id="oagis-id-63cc05c20ff34fc3a9a6c209793ff1c7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyWarehouseShippingOrder is to enable an application to provide  WarehouseShippingOrder information from another business application module.  The NotifyWarehouseShippingOrder is typically provided in a publish/subscribe or broadcast environment. Where the information is sent to other business applications that need to know the information.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyWarehouseShippingOrderType" id="oagis-id-7ef49a89ff90412fb120628877bc6ec6">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyWarehouseShippingOrderDataAreaType" id="oagis-id-e03e28531a304827abfaa38461fda2f4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyWarehouseShippingOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (WarehouseShippingOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyWarehouseShippingOrderDataAreaType" id="oagis-id-520c9a3a28784a57a466f7df1e91c54a">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-143b481ead7144eb9f5fbec28644e144"/>
+			<xsd:element ref="WarehouseShippingOrder" maxOccurs="unbounded" id="oagis-id-514d78060d85461f90a28231e8624017"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

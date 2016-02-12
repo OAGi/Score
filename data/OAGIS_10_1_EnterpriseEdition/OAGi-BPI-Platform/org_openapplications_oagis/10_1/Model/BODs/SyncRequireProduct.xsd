@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncRequireProduct.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RequireProduct.xsd"/>
+	<xsd:element name="SyncRequireProduct" type="SyncRequireProductType" id="oagis-id-7f10fcecef814e84ab8f7bd6b5ef644e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SyncRequireProduct provides the ability to request an application/ system to create a RequireProduct</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncRequireProductType" id="oagis-id-1221797c117148889f260f037e826bc7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncRequireProductDataAreaType" id="oagis-id-eda57c98df7547b5a9ee9fbf8ed8a93e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncRequireProduct. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (RequireProduct).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncRequireProductDataAreaType" id="oagis-id-b1a48ec6381b48f2946e6daa285540cc">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-b198c4ae80344feaba77e7545529260e"/>
+			<xsd:element ref="RequireProduct" maxOccurs="unbounded" id="oagis-id-dd5ac53874f141c98a9b95dc0cacd3e6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

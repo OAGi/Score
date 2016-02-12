@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelTable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Table.xsd"/>
+	<xsd:element name="CancelTable" type="CancelTableType" id="oagis-id-dd946175d4a442319c0e19d197b0cef8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelTable is to request that another business application component make Cancels to an existing Table communicating the full record.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelTableType" id="oagis-id-d1f9bc11a2b34c4b8060225fe52d9e97">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelTableDataAreaType" id="oagis-id-a0d555ed4f994ed3b9b908d0a7780186">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelTable. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (Table).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelTableDataAreaType" id="oagis-id-008a92aabe784d1e84693886cd1a0ad9">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-5bc64ad950774255a0d6c2c7cf44ae9d"/>
+			<xsd:element ref="Table" maxOccurs="unbounded" id="oagis-id-da956da53f76490b883eb00f284ed10e"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

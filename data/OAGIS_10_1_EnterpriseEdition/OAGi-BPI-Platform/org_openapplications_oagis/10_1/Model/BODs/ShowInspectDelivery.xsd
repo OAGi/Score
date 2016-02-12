@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowInspectDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InspectDelivery.xsd"/>
+        <xsd:element name="ShowInspectDelivery" type="ShowInspectDeliveryType" id="oagis-id-511954e0129a47dc86bf2ad2a321dbf5">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowInspectDelivery is to supply InspectDelivery information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowInspectDeliveryType" id="oagis-id-3ae859fb84504b87b6fb6c6b57fab296">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowInspectDeliveryDataAreaType" id="oagis-id-ec712578741d4056ad1aa9e4facffb46">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowInspectDelivery. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (InspectDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowInspectDeliveryDataAreaType" id="oagis-id-648bf5c8b52544ecbc6bd48e36500ef5">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-e7b16bdabb6542e18b4e8edce1d6f56f"/>
+                        <xsd:element ref="InspectDelivery" maxOccurs="unbounded" id="oagis-id-8a75731e67b549a6b7d80e2856d07a57"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

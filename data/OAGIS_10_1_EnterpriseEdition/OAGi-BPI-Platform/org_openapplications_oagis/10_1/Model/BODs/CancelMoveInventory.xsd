@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelMoveInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MoveInventory.xsd"/>
+	<xsd:element name="CancelMoveInventory" type="CancelMoveInventoryType" id="oagis-id-59f1afa9563942a794b46137235a1a44">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelMoveInventory is to give the organization the ability to do a quantity movement of materials from one organizational unit to another organizational unit. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelMoveInventoryType" id="oagis-id-9b04dbe03a9541468f7afb7c7fafbba9">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelMoveInventoryDataAreaType" id="oagis-id-adb59ab860be4d1f9981d7f55965f179">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelMoveInventory. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (MoveInventory).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelMoveInventoryDataAreaType" id="oagis-id-090b51ef979e41bfb09cc112d169090c">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-c6e2176ba6804120b60b6cdd305aaf4d"/>
+			<xsd:element ref="MoveInventory" maxOccurs="unbounded" id="oagis-id-a9c3d88c178a401495f1b3be47346331"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

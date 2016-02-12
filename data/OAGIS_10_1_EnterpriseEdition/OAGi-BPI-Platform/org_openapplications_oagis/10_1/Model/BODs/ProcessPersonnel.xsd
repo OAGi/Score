@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessPersonnel.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Personnel.xsd"/>
+	<xsd:element name="ProcessPersonnel" type="ProcessPersonnelType" id="oagis-id-047b12437c1644b68ca651af1495d297">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessPersonnel is to communicate personnel data that exists on separate data bases between manufacturing and human resource applications.  The ProcessPersonnel allows the adding of new employees and their relevant data as well as the modification of previously established employees.
+
+The ProcessPersonnel is used to facilitate the maintenance of human resource data in a manufacturing work force planning module.  This enables the workforce planning module to use current personnel information when creating finite production schedules.  The ProcessPersonnel can also be used by a project accounting application or a work order management application to assign qualified personnel or to perform resource planning.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessPersonnelType" id="oagis-id-b0f8664871dd48c9b515f6747dc83348">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessPersonnelDataAreaType" id="oagis-id-3c77babcdd684c4f9b49685040219274">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessPersonnel. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Personnel).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessPersonnelDataAreaType" id="oagis-id-065f9f543f5f4236999e4d65c6618092">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-8a9478c4e86b4d04b31d87f8ffc16cad"/>
+			<xsd:element ref="Personnel" maxOccurs="unbounded" id="oagis-id-b659b2c9cee64ee2a8f2d98c5b898548"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

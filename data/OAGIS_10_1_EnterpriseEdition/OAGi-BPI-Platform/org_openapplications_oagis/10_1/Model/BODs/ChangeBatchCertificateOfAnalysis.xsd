@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeBatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BatchCertificateOfAnalysis.xsd"/>
+        <xsd:element name="ChangeBatchCertificateOfAnalysis" type="ChangeBatchCertificateOfAnalysisType" id="oagis-id-eb20ace1e36c40bbbc4fd19a3b38825e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Change Purchaseorder is to request another business application to make changes to an existing Purchase Order.  This change must refer to the original document and/or item ordered.  The change processing assumes replacement of fields sent, with the exception the identifying fields of the Purchase Order.
+
+If any of these key fields require changing, (i.e. the BatchCertificateOfAnalysis Document Id or a LineNumber) that constitutes a cancellation of the request and/or the addition of another Purchase Order.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ChangeBatchCertificateOfAnalysisType" id="oagis-id-5cfd0de6bc314b0daf02c746e7f0d693">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ChangeBatchCertificateOfAnalysisDataAreaType" id="oagis-id-2681ee832d164e869dad6d1a9b6affce">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeBatchCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (BatchCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ChangeBatchCertificateOfAnalysisDataAreaType" id="oagis-id-c9be7e16e86f4308ae33772bc99e2deb">
+                <xsd:sequence>
+                        <xsd:element ref="Change" id="oagis-id-2c9a55d252bd40289958c1f01443fdf6"/>
+                        <xsd:element ref="BatchCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-7103bc24d7fd4effb32d8487509b6fb7"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

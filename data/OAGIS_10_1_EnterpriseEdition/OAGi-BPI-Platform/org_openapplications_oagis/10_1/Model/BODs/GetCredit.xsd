@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetCredit.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Credit.xsd"/>
+	<xsd:element name="GetCredit" type="GetCreditType" id="oagis-id-ce1856e858a74ef78bb488edc50044e5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetCredit is for the order management application to request Credit data for a trading partner from the Credit management function.  The GetCredit does not imply any update, it is only an inquiry function.  The ShowCredit discussed in the next chapter will be the response back to the order management application.
+
+Discussed in a later chapter is the UpdateCredit.  The UpdateCredit may be used in both directions between the order management and the accounts receivable application.  Its purpose is to keep order, shipment and open item amounts current.  Finally, the ChangeCreditStatus is used to update the order management application with any changes in business status for a particular trading partner.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GetCreditType" id="oagis-id-7805db4bf6cb4c1da9954d51620cb28d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="GetCreditDataAreaType" id="oagis-id-ed68b2ecaaf14121adbf0a9e68b3f462">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetCredit. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Credit).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="GetCreditDataAreaType" id="oagis-id-1085a6eed827407d988a0312b4c75f61">
+		<xsd:sequence>
+			<xsd:element ref="Get" id="oagis-id-756fdb0b6c80439193267795251c07aa"/>
+			<xsd:element ref="Credit" maxOccurs="unbounded" id="oagis-id-78d888ad6094449d84229272973c4834"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

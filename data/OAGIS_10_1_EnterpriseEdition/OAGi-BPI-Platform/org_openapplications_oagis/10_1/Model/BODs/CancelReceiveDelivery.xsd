@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ReceiveDelivery.xsd"/>
+        <xsd:element name="CancelReceiveDelivery" type="CancelReceiveDeliveryType" id="oagis-id-b265795acf9147b6af5786fdefcfb4c6">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The CancelReceiveDelivery may be used to Cancel the receiver's internal receiving and order management business applications to indicate that the requested material has arrived, including any unexpected quantity, condition or other exception discrepancies.
+
+There are many other possible business applications in several environments that may use this capability.  For example:
+1. A Purchasing application may use this BOD to notify an Accounts Payable application of a specific delivery.  This will enable the Accounts Payable application to accurately calculate the amount it needs to pay a business partner.
+
+2. A Purchasing application could use this to notify a MRP, Inventory, or Manufacturing business application that a delivery has occurred and the goods are available for use or inspection, etc.
+
+3. An MRP/Inventory system could use this BSR to communicate changes on a physical receipt in inventory to the Purchasing system.
+
+The CancelReceiveDelivery supports receipts at either the line item level and/or the ship unit level.  Intermediate transportation/logistics providers or freight forwarding partners can use this document to acknowledge the receipt of entire shipping units without detailing the corresponding contents.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="CancelReceiveDeliveryType" id="oagis-id-1401226009184437ac10407ba5ee0736">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="CancelReceiveDeliveryDataAreaType" id="oagis-id-5dd02242900c497e9e4842d0f659da3a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelReceiveDelivery. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (ReceiveDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="CancelReceiveDeliveryDataAreaType" id="oagis-id-2a9dd99646414f16b8fe81cf6173161a">
+                <xsd:sequence>
+                        <xsd:element ref="Cancel" id="oagis-id-39e3a25a87834fe8a153c43c98b906b8"/>
+                        <xsd:element ref="ReceiveDelivery" maxOccurs="unbounded" id="oagis-id-6b9f99d5a7f4498f99af96b7addcc28f"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

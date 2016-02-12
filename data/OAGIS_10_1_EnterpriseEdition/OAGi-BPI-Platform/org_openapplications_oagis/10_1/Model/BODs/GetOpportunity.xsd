@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetOpportunity.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Opportunity.xsd"/>
+        <xsd:element name="GetOpportunity" type="GetOpportunityType" id="oagis-id-81c14d9592184042bb40f2f3c2ec254e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetOpportunity is to enable an application to request a specific Opportunity information from one business application to another business application. The response to the GetOpportunity is the ShowOpportunity.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetOpportunityType" id="oagis-id-d6969bbb8b69405eadc29fda0c08e5fa">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetOpportunityDataAreaType" id="oagis-id-3b608404781d4a63ae90ad5df63295f4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetOpportunityDataAreaType" id="oagis-id-b3efc4fdf2f2436fafdc7039415218e9">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-ec17f7968e3d4546865392db0de4c5b3"/>
+                        <xsd:element ref="Opportunity" maxOccurs="unbounded" id="oagis-id-1777bf4f67774370878f064cc98a0454"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

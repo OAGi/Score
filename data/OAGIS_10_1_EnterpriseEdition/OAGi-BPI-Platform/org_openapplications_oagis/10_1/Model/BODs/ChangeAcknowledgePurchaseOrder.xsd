@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgePurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PurchaseOrder.xsd"/>
+	<xsd:element name="ChangeAcknowledgePurchaseOrder" type="ChangeAcknowledgePurchaseOrderType" id="oagis-id-6f807beab315478788f5d423e283865c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledge Purchaseorder is to request another business application to make ChangeAcknowledges to an existing Purchase Order.  This ChangeAcknowledge must refer to the original document and/or item ordered.  The ChangeAcknowledge processing assumes replacement of fields sent, with the exception the identifying fields of the Purchase Order.
+
+If any of these key fields require changing, (i.e. the PurchaseOrder Document Id or a LineNumber) that constitutes a cancellation of the request and/or the addition of another Purchase Order.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgePurchaseOrderType" id="oagis-id-f7c253e7fe9d4c108bc2aec2deeb242f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgePurchaseOrderDataAreaType" id="oagis-id-7e3e1a05c3744ea2a997f1cd0cc2b77f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgePurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgePurchaseOrderDataAreaType" id="oagis-id-4bdb47413c8e476e8e4a5f44a6aeaa75">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-ded85604769248618298a0aa79eec49e"/>
+			<xsd:element ref="PurchaseOrder" maxOccurs="unbounded" id="oagis-id-2c9b99dab6554409974191011196fbd0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
