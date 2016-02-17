@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/Payable.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="Payable" type="PayableType" id="oagis-id-8dbc58ccab904d9d98e3cd5ab7daa326">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Payable is a transaction that represents an invoice from a supplier.  A payable is an open item, approved and ready for payment, in the Accounts Payable ledger.  In some systems it may be called a voucher.  Compare to PurchaseLedgerInvoice, which represents a not yet approved supplier invoice.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PayableHeader" type="PayableHeaderType" id="oagis-id-793ec4f8b9b24711a28df745446d3f2f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Tax element contains any tax information such as the taxable amounts and the tax codes.  It is optional and used to summarize tax amounts across all the document lines. The principal intent of this data type is for use as a memo item</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PayableLine" type="PayableLineType" id="oagis-id-7dbeff8d203a447fbe5cbd7779c11154">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Lines on the payable document.  Invoice line or credit memo line are examples of a Line</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PayableType" id="oagis-id-dc0a86ee00d44972865cdd5c894edc7c">
+		<xsd:sequence>
+			<xsd:element ref="PayableHeader" id="oagis-id-b19791dccaab400f97b3c3c023e82612" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The Tax element contains any tax information such as the taxable amounts and the tax codes.  It is optional and used to summarize tax amounts across all the document lines. The principal intent of this data type is for use as a memo item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PayableLine" id="oagis-id-bc8140c2cae045e98248bfb9e3ab7950" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Lines on the payable document.  Invoice line or credit memo line are examples of a Line</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b010cd032e564fa3b544a121a3b0b79d"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-9b7c37f2bfbf4177a1f7ff1fe353a084"/>
+	</xsd:complexType>
+	<xsd:complexType name="PayableHeaderBaseType" id="oagis-id-69fc436dd71d4ea7ac5e0ba70de5090c">
+		<xsd:complexContent>
+			<xsd:extension base="LedgerEntryHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="VoucherReference" id="oagis-id-8a84563a1b824f96a9aff39a07bb38aa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a voucher document. This is typically an internal voucher, possibly created as a a payable reference against an external invoice </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RemitToParty" id="oagis-id-4a72690e622a46cf98baf4ef8ca4c6fc" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party or location that the payment is to be remitted to or sent to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PayeeParty" id="oagis-id-72aaba4d354e4e8bb5c3d52ae8283981" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is a Party that is identified as a Payee on an Accounts Payable document. The SupplierParty of the goods or services typically.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PayableHeaderType" id="oagis-id-7daf2edbd52345aaad42992020281ca8">
+		<xsd:complexContent>
+			<xsd:extension base="PayableHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PayableHeaderExtensionType" id="oagis-id-96c7915807ee41539e3b8f541ea8e965" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PayableLineType" id="oagis-id-744bd11c587b43f49788522b16559739">
+		<xsd:complexContent>
+			<xsd:extension base="LedgerEntryLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PayableLineExtensionType" id="oagis-id-110dad2d2e9e4940a6ecf4edd30aa37f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

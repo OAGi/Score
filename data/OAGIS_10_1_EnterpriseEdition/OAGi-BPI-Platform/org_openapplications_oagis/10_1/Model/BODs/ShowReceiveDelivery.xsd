@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowReceiveDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ReceiveDelivery.xsd"/>
+        <xsd:element name="ShowReceiveDelivery" type="ShowReceiveDeliveryType" id="oagis-id-7c399068715b4a3985e7e356146367f3">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ShowReceiveDelivery may be used to obtain information about a specific expected (unreceived) or previously received goods delivery.   The ShowReceiveDelivery may be issued in response to a GetReceiveDelivery request, or emitted asynchronously for notification upon some business event.
+
+For expected deliveries, the ShowReceiveDelivery document content may act as a receiving template or checklist to identify the quantity and shipping configuration of the expected goods.  In this manner the ShowReceiveDelivery may be considered logically equivalent to the Advance Ship Notice information in a ShowShipment document.   This similarity is by design, as the receiver's ShowReceiveDelivery may be directly derived from shipper's ShowShipment content after the receiver's business logic has appropriately validated the Advance Ship Notification information.
+
+The ShowReceiveDelivery supports describing shipment content at either the line item level and/or the ship unit level.  Intermediate transportation/logistics providers or freight forwarding partners can use this document to acknowledge the receipt of entire shipping units without detailing the corresponding contents.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowReceiveDeliveryType" id="oagis-id-3e607077e26545288c3d1c51e0595ec1">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowReceiveDeliveryDataAreaType" id="oagis-id-9addce0563d444b1aabee2ec58225658">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowReceiveDelivery. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ReceiveDelivery).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowReceiveDeliveryDataAreaType" id="oagis-id-83f863d69ff642ba92e1349825b8e569">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-20cbddbc7f0042dba2849f824412bf91"/>
+                        <xsd:element ref="ReceiveDelivery" maxOccurs="unbounded" id="oagis-id-fabdd0a9426d4e0b8e11b5f9ae7ecd2f"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

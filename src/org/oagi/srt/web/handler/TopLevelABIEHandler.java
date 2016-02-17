@@ -496,7 +496,7 @@ public class TopLevelABIEHandler implements Serializable {
 			asccpvo = (ASCCPVO) asccpDao.findObject(qc1, conn);
 			selected = asccpvo;
 			QueryCondition qc2 = new QueryCondition();
-			qc2.add("biz_context_id", "2");
+			qc2.add("biz_ctx_id", "1");
 			BusinessContextVO bcVO = (BusinessContextVO) daoBC.findObject(qc2, conn);
 			bCSelected = bcVO;
 			System.out.println("### Start to create a standalone "+asccpvo.getPropertyTerm());

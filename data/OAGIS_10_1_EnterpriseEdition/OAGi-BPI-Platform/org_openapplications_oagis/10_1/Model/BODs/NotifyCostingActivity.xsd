@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyCostingActivity.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CostingActivity.xsd"/>
+	<xsd:element name="NotifyCostingActivity" type="NotifyCostingActivityType" id="oagis-id-674cce4eb7824c59a454f1d9a905569d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyCostingActivity is to enable an application to request specific CostingActivity information from another business application module.  The response to the NotifyCostingActivity is the ShowCostingActivity.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyCostingActivityType" id="oagis-id-0518551d809145f997c0eb56901ba13c">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyCostingActivityDataAreaType" id="oagis-id-b58f00a703854237a80a7008f51b4d38">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyCostingActivity. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (CostingActivity).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyCostingActivityDataAreaType" id="oagis-id-cbcd94b7cfc9427bb3e765d5dad38135">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-7a6db270163b4ea6b09dcbd7365ee65e"/>
+			<xsd:element ref="CostingActivity" maxOccurs="unbounded" id="oagis-id-5fbf11e69211481cab653b4f582a0535"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

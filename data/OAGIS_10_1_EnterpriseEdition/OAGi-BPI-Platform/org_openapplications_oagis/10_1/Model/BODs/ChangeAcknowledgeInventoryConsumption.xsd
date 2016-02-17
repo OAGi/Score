@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgeInventoryConsumption.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InventoryConsumption.xsd"/>
+	<xsd:element name="ChangeAcknowledgeInventoryConsumption" type="ChangeAcknowledgeInventoryConsumptionType" id="oagis-id-7f915232518c4fe695af6fb00deb0c17">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeInventoryConsumption is to inform a seller or provider about InventoryConsumption of items.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeInventoryConsumptionType" id="oagis-id-1947de2d517a453e936cc71899d13551">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeInventoryConsumptionDataAreaType" id="oagis-id-78865b421126483ba1772c91cf5c7e2f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeInventoryConsumption. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (InventoryConsumption).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeInventoryConsumptionDataAreaType" id="oagis-id-dc7b0a691b8f40f191e894609184f6f9">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-69e11a185f674411a866cf6830d00e15"/>
+			<xsd:element ref="InventoryConsumption" maxOccurs="unbounded" id="oagis-id-ea01c2ca1d4a4431b2c277888ba4cfcd"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

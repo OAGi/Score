@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseWarrantyClaim.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarrantyClaim.xsd"/>
+	<xsd:element name="SyncResponseWarrantyClaim" type="SyncResponseWarrantyClaimType" id="oagis-id-85637c1496cb44bbb027630d7193c67e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponse WarrantyClaim is to communicate WarrantyClaim Information from the owner of a WarrantyClaim  to another business application module.  The receiver of this BOD does is expected to take the information provided and populate their information on the WarrantyClaim from this BOD.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseWarrantyClaimType" id="oagis-id-c3128927bf3d4132ab97c7fcee1dc322">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseWarrantyClaimDataAreaType" id="oagis-id-a66dd80e86124f8589ca112a055a7f59">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseWarrantyClaim. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (WarrantyClaim).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseWarrantyClaimDataAreaType" id="oagis-id-7ffbb69173c044fb8d9d27f9e6b791a0">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-6fac110fd6ae486c96870d6b66f68efc"/>
+			<xsd:element ref="WarrantyClaim" maxOccurs="unbounded" id="oagis-id-60be8040e79b4ca3972486ce8ef0d970"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

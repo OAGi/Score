@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessRequireProduct.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/RequireProduct.xsd"/>
+        <xsd:element name="ProcessRequireProduct" type="ProcessRequireProductType" id="oagis-id-1bfee8869dae468f8e7842a1ed4576f5">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The ProcessRequireProduct provides the ability to request an application/ system to create a RequireProduct</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessRequireProductType" id="oagis-id-e6665dbdbbbc4938884c6d3a815e82ef">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessRequireProductDataAreaType" id="oagis-id-231cb60f53b848a8b78a16ff59b53905">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessRequireProduct. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (RequireProduct).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessRequireProductDataAreaType" id="oagis-id-7b34e927d6b34a98b0900fb2c58e8c74">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-abd7f47394964c2b91fac58e6074e476"/>
+                        <xsd:element ref="RequireProduct" maxOccurs="unbounded" id="oagis-id-8feec06b5dbb4f078b3c0d0dfa8d5591"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncOperation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Operation.xsd"/>
+        <xsd:element name="SyncOperation" type="SyncOperationType" id="oagis-id-687ac9170eca4178b8b337352f65ec57">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncOperation is to enable an application to provide online shopping Operations from another business application module.  The SyncOperation is provided in a a publishe/subscribe or broadcast buiness exchange wher the owner or the master of the given information provides it to the other business applications that need to know the information or have expressed interest.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncOperationType" id="oagis-id-305d0fef329a478fa67dd6df9ca37024">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncOperationDataAreaType" id="oagis-id-2cf5613034134596864c6c8dde870e15">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncOperation. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (Operation).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncOperationDataAreaType" id="oagis-id-e903eefa5ce44dc394451b9c1f926db2">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-6becb099d94545018a176283127a5c48"/>
+                        <xsd:element ref="Operation" maxOccurs="unbounded" id="oagis-id-e98ea86d822b4a4fb97985d668c23c76"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

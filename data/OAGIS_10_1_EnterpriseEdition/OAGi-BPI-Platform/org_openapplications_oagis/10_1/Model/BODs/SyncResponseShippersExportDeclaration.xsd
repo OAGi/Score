@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseShippersExportDeclaration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersExportDeclaration.xsd"/>
+	<xsd:element name="SyncResponseShippersExportDeclaration" type="SyncResponseShippersExportDeclarationType" id="oagis-id-46f1b1ffe30f42e0aec5c107ab6ce449">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponse ShippersExportDeclaration is to communicate ShippersExportDeclaration Information from the owner of a ShippersExportDeclaration  to another business application module.  The receiver of this BOD does is expected to take the information provided and populate their information on the ShippersExportDeclaration from this BOD.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseShippersExportDeclarationType" id="oagis-id-b638165ca62d4b09b4e149ed6f6d02b7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseShippersExportDeclarationDataAreaType" id="oagis-id-ff0a856fd4034d808550675c17aaeba2">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseShippersExportDeclaration. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ShippersExportDeclaration).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseShippersExportDeclarationDataAreaType" id="oagis-id-28222ef08e9f43fdad270fa7d54f300c">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-ff42b95219344c5b86852a3519a3122c"/>
+			<xsd:element ref="ShippersExportDeclaration" maxOccurs="unbounded" id="oagis-id-2a7bc1e0233e4d81a7e74e15ae7edabe"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -118,13 +118,6 @@ public class P_1_7_PopulateQBDTInDT {
 			//insertDTAndBCCP(elementsFromCodeListXSD, codelist_xsd, 3);
 		}
 		
-		
-//		insertCDTSCAllowedPrimitive(elementsFromFieldsXSD, fields_xsd);
-//		insertCDTSCAllowedPrimitive(elementsFromMetaXSD, meta_xsd);
-//		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromFieldsXSD, fields_xsd);
-//		insertCDTSCAllowedPrimitiveExpressionTypeMap(elementsFromMetaXSD, meta_xsd);
-		
-		//System.out.println("### elementsFromFieldsXSD.getLength() " + elementsFromFieldsXSD.getLength());
 	}
 	
 	

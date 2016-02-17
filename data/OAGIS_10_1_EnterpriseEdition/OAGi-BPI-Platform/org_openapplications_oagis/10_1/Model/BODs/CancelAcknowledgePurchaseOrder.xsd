@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelAcknowledgePurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PurchaseOrder.xsd"/>
+	<xsd:element name="CancelAcknowledgePurchaseOrder" type="CancelAcknowledgePurchaseOrderType" id="oagis-id-758162612db84e2daa06142aa7d7393f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CancelAcknowledgePurchaseOrder is being deprecated as of OAGIS 9.0. CancelAcknowledgePurchaseOrder will be made available for the next three releases. OAGi recommend using ProcessPurchaseOrder for all new development.
+
+The purpose of the CancelAcknowledge PurchaseOrder Business Service Request is to communicate from one business application to one or more other business applications that a Purchase Order has been CancelAcknowledgeed or needs to be CancelAcknowledgeed, depending on the business case.
+
+There are many possible business applications in several environments that may use this capabilit</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgePurchaseOrderType" id="oagis-id-495930e774c2496f85463501e6a605fe">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgePurchaseOrderDataAreaType" id="oagis-id-a7bd3beceebf4bbba7837c3f3e2e8f52">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgePurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgePurchaseOrderDataAreaType" id="oagis-id-fe5d3ca5a60d4dc1a4874aaf08fefb14">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-cb5f5135e05344f78078af80391d9005"/>
+			<xsd:element ref="PurchaseOrder" maxOccurs="unbounded" id="oagis-id-098d2497310f4ce4a33bb3a9338966d3"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

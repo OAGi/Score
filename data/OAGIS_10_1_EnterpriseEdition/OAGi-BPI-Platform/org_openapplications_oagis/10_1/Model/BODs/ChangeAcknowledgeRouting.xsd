@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgeRouting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Routing.xsd"/>
+	<xsd:element name="ChangeAcknowledgeRouting" type="ChangeAcknowledgeRoutingType" id="oagis-id-7d67816703f3470ca89f2fccf62a1479">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeRouting is to communicate to a business application component or system the need to create a new Routing or to update an existing Routing structure.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, and Finished Goods business ordering scenarios in a Logistics to Manufacturing application integration scenario.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeRoutingType" id="oagis-id-fcaa9b951da94fd1be83921e6802d21e">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeRoutingDataAreaType" id="oagis-id-b500a1fa05664223bb9c2ea953ec8a7d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeRouting. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (Routing).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeRoutingDataAreaType" id="oagis-id-26a848ed4a6c4c05a37cbce1d00fc47d">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-035ba554657b4acbabd507e1b39f5732"/>
+			<xsd:element ref="Routing" maxOccurs="unbounded" id="oagis-id-0e3e017c5d3a435a86f7a18029c239eb"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowMoveProductForecast.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/MoveProductForecast.xsd"/>
+        <xsd:element name="ShowMoveProductForecast" type="ShowMoveProductForecastType" id="oagis-id-767440dd71fb49c8b35eea16b4adb3d0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Show MoveProductForecast is to supply Purchase Order Information to another business application module.  This request may be used as a response to a Get MoveProductForecast request or as a push notification of an event.
+
+There are many possible business applications in several environments that may use this capability.  Examples include:
+
+1. A Order Management application could use this BOD to send information to a Plant Data Collection application.
+
+2. An MRP, Inventory or Manufacturing business application could use this to obtain order information.
+
+3. The Order Management application can notify the MRP/Inventory application when a vendor gives or changes a promise day.
+
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowMoveProductForecastType" id="oagis-id-99035ff5388d4468b1561b3ad4b4e4a7">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowMoveProductForecastDataAreaType" id="oagis-id-04951f4c4f7941b18275ceed2701ac37">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowMoveProductForecast. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (MoveProductForecast).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowMoveProductForecastDataAreaType" id="oagis-id-0aed87836a964eb78fa6b0e7f3518bed">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-32ea44236e0849708850d68aa8459d57"/>
+                        <xsd:element ref="MoveProductForecast" maxOccurs="unbounded" id="oagis-id-27ab9a3e8b7b4ae3b6c87ac460a6d783"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

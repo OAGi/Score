@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/Requisition.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="Requisition" type="RequisitionType" id="oagis-id-e238f51d2a3c444b8db5037602c1cf99">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a request for the purchase of goods or services.  Typically, a requisition leads to the creation of a purchase order to a specific supplier.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RequisitionHeader" type="RequisitionHeaderType" id="oagis-id-5fde0c30395d4c13bad6920143004bbc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the Requisition.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RequisitionLine" type="RequisitionLineType" id="oagis-id-94aaf953ed1f4ffbba43b9dfc1d03444">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the requested item and its attributes.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RequisitionSubLine" type="RequisitionSubLineType" id="oagis-id-6c2b9bf5f1ef4192ba22fe6bd4e3a149">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Used if the item on the REQLINE needs to be divided into smaller units such as sub-components or subassemblies.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RequisitionSchedule" type="RequistionScheduldeType" id="oagis-id-f51f8d6e2b84440397e9fe5b405077f2"/>
+	<xsd:complexType name="RequisitionType" id="oagis-id-0dc94abe6f064c2aaeef85322abf188b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a request for the purchase of goods or services.  Typically, a requisition leads to the creation of a purchase order to a specific supplier.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="RequisitionHeader" id="oagis-id-028917bd4e534b97a311fe55958044f8" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the Requisition.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="RequisitionLine" id="oagis-id-d176e1f36cd046c19429dad3e9caae68" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that describes the requested item and its attributes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-de72790ff3844024afeca1218bbc9660"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-84413cd3b7a44c2a9d7bbab8433b12e8"/>
+	</xsd:complexType>
+	<xsd:complexType name="RequisitionHeaderBaseType" id="oagis-id-961682b453bb42a188c1ac7f0e2229a6">
+		<xsd:complexContent>
+			<xsd:extension base="RequestHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PurchaseOrderReference" id="oagis-id-07aadb89ecdc415f973a85df0adbe919" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a PurchaseOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BuyerParty" id="oagis-id-6ef809f9b4e64ce89ae64a83110d91e1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The entity that is responsible for Buying the document or element in which it is associacted. Additionally, the contact  may be a person or a group or department.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequesterParty" id="oagis-id-4d61109cdaf74b5abac5d0cb759b10af" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequiredDeliveryDateTime" id="oagis-id-af560fab1c1d422d883724e6072aed3e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date in which the buyer/customer requests the order to be delivered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequisitionHeaderType" id="oagis-id-f8f3c5636c834e86a994e8d41e09ea65">
+		<xsd:complexContent>
+			<xsd:extension base="RequisitionHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RequisitionHeaderExtensionType" id="oagis-id-928f57bb2914457d8c55de7f342ff7f2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequisitionLineBaseType" id="oagis-id-1fd8c8c2fe054338800d57fead73c643">
+		<xsd:complexContent>
+			<xsd:extension base="RequestLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="RequestedQuantity" id="oagis-id-425499eeec1c46e5b7cb9e7802e5481c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="RequesterParty" id="oagis-id-29f18a21fedc40268f1873ecfde819d6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequisitionSchedule" id="oagis-id-e42b32ad40814d38b216fc2fc37b7637" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequisitionLineType" id="oagis-id-e43eb2f321f747f58efaad92f356a7a7">
+		<xsd:complexContent>
+			<xsd:extension base="RequisitionLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="RequisitionSubLine" id="oagis-id-7681a1e0b5624c93b8a9741e750cae51" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Used if the item on the REQLINE needs to be divided into smaller units such as sub-components or subassemblies.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Extension" type="RequisitionLineExtensionType" id="oagis-id-01d5085539214247a66b10429dd4b2de" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequisitionSubLineType" id="oagis-id-b3439a16c2d94cc684f1a26489633952">
+		<xsd:complexContent>
+			<xsd:extension base="RequisitionLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RequisitionSubLineExtensionType" id="oagis-id-e38746c15fee4620b4a50ef424799beb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RequistionScheduldeType" id="oagis-id-904ea4ef35254096baa749c45d368b53">
+		<xsd:complexContent>
+			<xsd:extension base="ProcurementScheduleBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RequisitionScheduleExtensionType" id="oagis-id-6fad6ded8eaf4c3d917b094504439f71" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

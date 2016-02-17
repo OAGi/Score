@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncPickList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PickList.xsd"/>
+        <xsd:element name="SyncPickList" type="SyncPickListType" id="oagis-id-d3cfc59696fe421c9bb09f9aa7e5ad1f">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncPickList is to Sync the details of an individual Picking List from a plant level to an ERP system. This BOD will usually cause Syncs to occur.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncPickListType" id="oagis-id-814d9386cdb14bdba0bfe64c96e6220d">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncPickListDataAreaType" id="oagis-id-b9d58a41878b4ea9b88df926065f36e7">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncPickList. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (PickList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncPickListDataAreaType" id="oagis-id-8bd40dad44cb4b0a91ea244d4ed10140">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-11638929bc794bf0a9437a5d494c98a0"/>
+                        <xsd:element ref="PickList" maxOccurs="unbounded" id="oagis-id-d7985f1e4dee46e28c2d7f7996c7e43d"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

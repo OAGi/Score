@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowRemittanceAdvice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RemittanceAdvice.xsd"/>
+	<xsd:element name="ShowRemittanceAdvice" type="ShowRemittanceAdviceType" id="oagis-id-652a96e8c4344063aa6f164bac6ae87e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Show Remittance Advice is to supply Remittance Advice Information to another business application module.  This request may be used as a response to a Get Salesorder request or as a push notification of an event.  This BOD does not usually cause updates to occur.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowRemittanceAdviceType" id="oagis-id-760f2f38c93449adaf9e9ceae3ebac75">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowRemittanceAdviceDataAreaType" id="oagis-id-f78ad0e8d4e6457f954d60200b4b8ec4">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowRemittanceAdvice. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (RemittanceAdvice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowRemittanceAdviceDataAreaType" id="oagis-id-792c41f1cd3f4e3e97ed03092605fa47">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-96cf24a779d047ee90ec692cd2fc677f"/>
+			<xsd:element ref="RemittanceAdvice" maxOccurs="unbounded" id="oagis-id-7216ae7f020d46db8a5e1a4549cf4682"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

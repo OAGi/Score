@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetPickList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PickList.xsd"/>
+        <xsd:element name="GetPickList" type="GetPickListType" id="oagis-id-8fa50f0388ac4f93a692a32d5ba7e07f">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetPickList is to enable a request for the retrieval of a single Picking List from an ERP system.  The reply to this request is the ShowPickList.
+
+Individual lines from a Picking List are not selectable with this BOD.  Only the complete document is selected and returned. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetPickListType" id="oagis-id-aca348a014774278bf41de73e5150a7d">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetPickListDataAreaType" id="oagis-id-35400c71e1b44d62b2ea3e654d793032">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetPickList. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (PickList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetPickListDataAreaType" id="oagis-id-56b5784492ea4f37a851685c9beef077">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-5f3ced9fd06c4f8f8964953dbacd3a3e"/>
+                        <xsd:element ref="PickList" maxOccurs="unbounded" id="oagis-id-b67d0b332719421daa109519b1d69a57"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

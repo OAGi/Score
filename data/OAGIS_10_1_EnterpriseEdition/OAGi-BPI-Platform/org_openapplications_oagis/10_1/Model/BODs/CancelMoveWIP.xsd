@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelMoveWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MoveWIP.xsd"/>
+	<xsd:element name="CancelMoveWIP" type="CancelMoveWIPType" id="oagis-id-74753f55f263459ca538c6b544d10892">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelMoveWIP is to Cancel a Manufacturing Application of the progression through the production Canceling steps or operations of a product being made on a production order. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates which Canceling step the product is coming from and which step it is being moved to, along with the quantity moving and the time this event occurred.
+
+This BOD assumes that the applications involved in this business scenario will have already Cancelhronized the production item and its BOM/Routing information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelMoveWIPType" id="oagis-id-4248cd31ccf7498ca9bf286b152310cc">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelMoveWIPDataAreaType" id="oagis-id-e2af062520aa42c38f6be1729f62a8b2">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelMoveWIP. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (MoveWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelMoveWIPDataAreaType" id="oagis-id-fad1df2c659140e7a7dbc37a2c2aa889">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-798d5297089741dba95441d3af1fdd13"/>
+			<xsd:element ref="MoveWIP" maxOccurs="unbounded" id="oagis-id-c34d83750d4749249ff05ffe02423256"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

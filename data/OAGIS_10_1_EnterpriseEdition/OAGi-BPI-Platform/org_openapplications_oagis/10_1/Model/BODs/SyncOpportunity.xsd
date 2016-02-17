@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncOpportunity.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Opportunity.xsd"/>
+        <xsd:element name="SyncOpportunity" type="SyncOpportunityType" id="oagis-id-71c7d0fed43e4044b488755c2bb345d0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncOpportunity is to enable an application to provide Opportunity information from one business application to another business application. The SyncOpportunity is provided in a a publishe/subscribe or broadcast buiness exchange wher the owner or the master of the given information provides it to the other business applications that need to know the information or have expressed interest.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncOpportunityType" id="oagis-id-c264a6b7af4248d79b06fddc4e0e5984">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncOpportunityDataAreaType" id="oagis-id-485c632f8e254a058eb9314d5225ef8a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncOpportunityDataAreaType" id="oagis-id-833259ea721e4b288ae6b521dea61030">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-b82e880749dd409a8d6bfc6d514e762c"/>
+                        <xsd:element ref="Opportunity" maxOccurs="unbounded" id="oagis-id-374273c779754976bf0c277ec20335a1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

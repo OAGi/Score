@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downChange package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeProjectAccounting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProjectAccounting.xsd"/>
+	<xsd:element name="ChangeProjectAccounting" type="ChangeProjectAccountingType" id="oagis-id-9454971c8c3a45169e72d2c9394db9fb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeProjectAccounting  is to enable all relevant sub-systems that submit single sided transactions to send information to a Project Accounting Application. This would include, but not necessarily be limited to:
+·	Accounts Payable
+·	Accounts Receivable
+·	Budget
+·	Order Management
+·	Purchasing
+·	Time and Labor
+·	Travel and Expense
+
+The ChangeProjectAccounting will cause common data to be Changeed in a project accounting application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeProjectAccountingType" id="oagis-id-d50ef36543014fb48b23e647b998f1d1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeProjectAccountingDataAreaType" id="oagis-id-938e478164984b2eb1537d6ea2769bcc">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeProjectAccounting. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (ProjectAccounting).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeProjectAccountingDataAreaType" id="oagis-id-ff4426223c5842579eb61cc444694422">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-4aeff6b2bdce4f57a43bdd4185ff9ffd"/>
+			<xsd:element ref="ProjectAccounting" maxOccurs="unbounded" id="oagis-id-b4b7955ad0ea44aca36f6aad4b5ef567"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

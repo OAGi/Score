@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowSalesOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/SalesOrder.xsd"/>
+        <xsd:element name="ShowSalesOrder" type="ShowSalesOrderType" id="oagis-id-ab8e292077d641389f5a99e157e9cfa6">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Show SalesOrder is to supply Sales Order Information to another business application module.  This request may be used as a response to a Get Salesorder request or as a push notification of an event.  This BOD does not usually cause updates to occur.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowSalesOrderType" id="oagis-id-0d5ffc79e47f479bb2fe2187d391ddc9">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowSalesOrderDataAreaType" id="oagis-id-7850dc1956b6473ea4b90228281b7413">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowSalesOrder. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (SalesOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowSalesOrderDataAreaType" id="oagis-id-ee38bdf340ce46e9b2e65eecfb7633d8">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-35e0f5b5526340329b327bb3074c95d5"/>
+                        <xsd:element ref="SalesOrder" maxOccurs="unbounded" id="oagis-id-a92c3a1fe4fd4b168285f201d496c827"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

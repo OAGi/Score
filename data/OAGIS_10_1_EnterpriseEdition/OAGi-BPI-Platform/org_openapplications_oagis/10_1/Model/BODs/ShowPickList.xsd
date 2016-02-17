@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowPickList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PickList.xsd"/>
+        <xsd:element name="ShowPickList" type="ShowPickListType" id="oagis-id-9bc012f5d21343989084679394997f11">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowPickList is to show the details of an individual Picking List from an ERP system.  This BOD may be sent in response to a GetPickList or it may be initiated upon some business event. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowPickListType" id="oagis-id-05c0ea944f8e4b5ba1c41e2ba88ab0b1">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowPickListDataAreaType" id="oagis-id-a3e16c8389564a71a72d1e45cd02a238">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowPickList. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (PickList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowPickListDataAreaType" id="oagis-id-17ace4f04049457883194dd95994a971">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-857fc29c1a624cfc8bfce35357fb1ba2"/>
+                        <xsd:element ref="PickList" maxOccurs="unbounded" id="oagis-id-a4fe243b2ab347cebcfa05c0b55f1229"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

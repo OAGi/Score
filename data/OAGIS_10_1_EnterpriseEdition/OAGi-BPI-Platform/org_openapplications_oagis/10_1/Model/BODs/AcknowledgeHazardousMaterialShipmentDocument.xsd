@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/AcknowledgeHazardousMaterialShipmentDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/HazardousMaterialShipmentDocument.xsd"/>
+	<xsd:element name="AcknowledgeHazardousMaterialShipmentDocument" type="AcknowledgeHazardousMaterialShipmentDocumentType" id="oagis-id-b0fbd524780241108d55e09fcc70d32e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeHazardousMaterialShipmentDocument Business Object Document is to acknowledge receipt of the HazardousMaterialShipmentDocument</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeHazardousMaterialShipmentDocumentType" id="oagis-id-34a359d2210d4c8abc377363d9286991">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-28100e100b1246e487a7b81fd93f1831">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeHazardousMaterialShipmentDocument. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (HazardousMaterialShipmentDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-a313de71fd584481b9bfda498e686008">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-c0a0de194c5c43bc816fed487aab336f"/>
+			<xsd:element ref="HazardousMaterialShipmentDocument" maxOccurs="unbounded" id="oagis-id-d2719776094a4f33b51536bacd3dfbe1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
