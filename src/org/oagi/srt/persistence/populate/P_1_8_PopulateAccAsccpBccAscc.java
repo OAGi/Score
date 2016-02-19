@@ -147,8 +147,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 			String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDEN()));
 			int state = 3;	
-			String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
-
+			String module = bodPath.substring(bodPath.indexOf("Model"));
+			module= module.replace("\\", "/");
+			
 			ASCCPVO accpVO = new ASCCPVO();
 			accpVO.setASCCPGUID(asccpGuid);
 			accpVO.setPropertyTerm(propertyTerm);
@@ -189,8 +190,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		String den = propertyTerm + ". " + Utility.first(accVO.getDEN());
 		int state = 3;
-		String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
-
+		String module = bodPath.substring(bodPath.indexOf("Model"));
+		module= module.replace("\\", "/");
+		
 		ASCCPVO accpVO = new ASCCPVO();
 		accpVO.setASCCPGUID(asccpGuid);
 		accpVO.setPropertyTerm(propertyTerm);
@@ -544,8 +546,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			oagisComponentType = 2;
 		else if(Utility.first(den).endsWith("Group") || objectClassName.equalsIgnoreCase("Common Time Reporting"))
 			oagisComponentType = 3;
-		String module = fullFilePath.substring(fullFilePath.lastIndexOf(File.separator) + 1, fullFilePath.lastIndexOf("."));
-		
+		String module = fullFilePath.substring(fullFilePath.indexOf("Model"));
+		module= module.replace("\\", "/");
 		insertACCForGroup(bodVO, objectClassName, den, oagisComponentType, module);
 		
 		QueryCondition qc = new QueryCondition();
@@ -685,8 +687,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			oagisComponentType = 3;
 
 		int state = 3;
-		String module = fullFilePath.substring(fullFilePath.lastIndexOf(File.separator) + 1, fullFilePath.lastIndexOf("."));
-
+		String module = fullFilePath.substring(fullFilePath.indexOf("Model"));
+		module= module.replace("\\", "/");
+		
 		ACCVO aACCVO = new ACCVO();
 		aACCVO.setACCGUID(accGuid);
 		aACCVO.setObjectClassTerm(objectClassName);
