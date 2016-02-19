@@ -444,7 +444,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
 			dtVO.setDefinition(null);
 			dtVO.setContentComponentDefinition(null);
-			dtVO.setState(1);
+			dtVO.setState(3);
 			dtVO.setCreatedByUserId(1);
 			dtVO.setLastUpdatedByUserId(1);
 			dtVO.setRevisionDocumentation("");

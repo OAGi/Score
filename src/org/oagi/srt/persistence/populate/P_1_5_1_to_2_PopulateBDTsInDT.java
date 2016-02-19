@@ -69,7 +69,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setContentComponentDEN(typeName + ". Content");
 			dtVO.setDefinition(definition);
 			dtVO.setContentComponentDefinition(ccDefinition);
-			dtVO.setState(1);
+			dtVO.setState(3);
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
 			dtVO.setRevisionDocumentation("");
@@ -199,7 +199,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setBasedDTID(basedDTID);
 			dtVO.setDEN(typeName + ". Type");
 			dtVO.setContentComponentDEN(typeName + ". Content");
-			dtVO.setState(1);
+			dtVO.setState(3);
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
 			dtVO.setRevisionDocumentation("");

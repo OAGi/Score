@@ -84,7 +84,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    
 		    dtVO.setContentComponentDefinition(null);
 		    dtVO.setRevisionDocumentation(null);
-		    dtVO.setState(1);
+		    dtVO.setState(3);
 		    
 		    QueryCondition qc_02 = new QueryCondition();
 			qc.add("Name", "oagis");

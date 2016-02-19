@@ -146,7 +146,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			roleOfAccId = accVO.getACCID();
 
 			String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDEN()));
-			int state = 4;	
+			int state = 3;	
 			String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
 
 			ASCCPVO accpVO = new ASCCPVO();
@@ -567,7 +567,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aACCVO.setBasedACCID(-1);
 			aACCVO.setCreatedByUserId(1);
 			aACCVO.setLastUpdatedByUserId(1);
-			aACCVO.setState(4);
+			aACCVO.setState(3);
 			aACCVO.setModule(module);
 			aACCVO.setIs_deprecated(false);
 			aACCVO.setRevisionAction(true);
@@ -595,7 +595,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			
 			asccpVO.setRoleOfACCID(groupAccId);
 			asccpVO.setDEN(Utility.spaceSeparator(propertyTerm + ". " + Utility.first(accDen)));
-			asccpVO.setState(4);
+			asccpVO.setState(3);
 			asccpVO.setModule(module);
 			asccpVO.setCreatedByUserId(1);
 			asccpVO.setLastUpdatedByUserId(1);
