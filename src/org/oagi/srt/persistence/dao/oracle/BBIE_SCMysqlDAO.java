@@ -55,7 +55,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 		int key = -1;
 		try {
 			conn = tx.open();
-			if(bbie_scVO.getBBIESCID() == -1)
+			if(bbie_scVO.getBBIESCID() < 1)
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			else
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
@@ -86,7 +86,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 			ps.setString(10, bbie_scVO.getDefinition());
 			ps.setString(11, bbie_scVO.getRemark());
 			ps.setString(12, bbie_scVO.getBusinessTerm());			
-			if(bbie_scVO.getBBIESCID() != -1)
+			if(bbie_scVO.getBBIESCID() > 1)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
@@ -123,7 +123,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 		PreparedStatement ps = null;
 		int key = -1;
 		try {
-			if(bbie_scVO.getBBIESCID() == -1)
+			if(bbie_scVO.getBBIESCID() < 1)
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			else
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT, Statement.RETURN_GENERATED_KEYS);
@@ -155,7 +155,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 			ps.setString(11, bbie_scVO.getRemark());
 			ps.setString(12, bbie_scVO.getBusinessTerm());
 			
-			if(bbie_scVO.getBBIESCID() != -1)
+			if(bbie_scVO.getBBIESCID() > 1)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			
 			ps.executeUpdate();
@@ -454,7 +454,7 @@ public class BBIE_SCMysqlDAO extends SRTDAO {
 			ps.setString(10, bbie_scVO.getDefinition());
 			ps.setString(11, bbie_scVO.getRemark());
 			ps.setString(12, bbie_scVO.getBusinessTerm());
-			if(bbie_scVO.getBBIESCID() != -1)
+			if(bbie_scVO.getBBIESCID() > 1)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 

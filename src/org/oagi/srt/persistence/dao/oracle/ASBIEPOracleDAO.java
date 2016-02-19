@@ -93,7 +93,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 		try {
 			conn = tx.open();
 			String keys[] = {"ASBIEP_ID"};
-			if(asbiepVO.getASBIEPID() == -1)
+			if(asbiepVO.getASBIEPID() < 1)
 				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
@@ -124,7 +124,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			if(asbiepVO.getASBIEPID() != -1)
+			if(asbiepVO.getASBIEPID() > 1)
 				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
@@ -164,7 +164,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 		int key = -1;
 		try {
 			String keys[] = {"ASBIEP_ID"};
-			if(asbiepVO.getASBIEPID() == -1)
+			if(asbiepVO.getASBIEPID() < 1)
 				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
@@ -195,7 +195,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			if(asbiepVO.getASBIEPID() != -1)
+			if(asbiepVO.getASBIEPID() > 1)
 				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();

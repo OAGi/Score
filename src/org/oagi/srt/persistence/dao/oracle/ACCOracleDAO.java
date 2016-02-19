@@ -86,7 +86,7 @@ public class ACCOracleDAO extends SRTDAO {
 				ps.setString(4, s);
 			}
 
-			if(accVO.getBasedACCID() == -1)
+			if(accVO.getBasedACCID() < 1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, accVO.getBasedACCID());

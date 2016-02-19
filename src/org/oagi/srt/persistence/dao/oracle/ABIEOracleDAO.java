@@ -99,7 +99,7 @@ public class ABIEOracleDAO extends SRTDAO {
 		try {
 			String keys[] = {"ABIE_ID"};
 			conn = tx.open();
-			if(abieVO.getABIEID() == -1)
+			if(abieVO.getABIEID() < 1)
 				ps = conn.prepareStatement(_INSERT_ABIE_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_ABIE_WITH_ID_STATEMENT, keys);
@@ -122,10 +122,10 @@ public class ABIEOracleDAO extends SRTDAO {
 				ps.setNull(8, java.sql.Types.INTEGER);
 			else
 				ps.setInt(8, abieVO.getState());
-			if(abieVO.getClientID()==0)
+			if(Integer.parseInt(abieVO.getClientID())==0)
 				ps.setNull(9, java.sql.Types.INTEGER);
 			else
-				ps.setInt(9, abieVO.getClientID());
+				ps.setString(9, abieVO.getClientID().toString());
 			
 			if( abieVO.getVersion()==null ||  abieVO.getVersion().length()==0 ||  abieVO.getVersion().isEmpty() ||  abieVO.getVersion().equals(""))				
 				ps.setString(10,"\u00A0");
@@ -148,7 +148,7 @@ public class ABIEOracleDAO extends SRTDAO {
 			else 		
 				ps.setString(13, abieVO.getBusinessTerm());	
 
-			if(abieVO.getABIEID() != -1)
+			if(abieVO.getABIEID() > 1)
 				ps.setInt(14, abieVO.getABIEID());
 
 			ps.executeUpdate();
@@ -214,10 +214,10 @@ public class ABIEOracleDAO extends SRTDAO {
 				ps.setNull(8, java.sql.Types.INTEGER);
 			else
 				ps.setInt(8, abieVO.getState());
-			if(abieVO.getClientID()==0)
+			if(Integer.parseInt(abieVO.getClientID())==0)
 				ps.setNull(9, java.sql.Types.INTEGER);
 			else
-				ps.setInt(9, abieVO.getClientID());
+				ps.setString(9, abieVO.getClientID().toString());
 			
 
 			if( abieVO.getVersion()==null ||  abieVO.getVersion().length()==0 ||  abieVO.getVersion().isEmpty() ||  abieVO.getVersion().equals(""))				
@@ -309,7 +309,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getInt("Client_ID"));
+				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -361,7 +361,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getInt("Client_ID"));
+				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -423,7 +423,7 @@ public class ABIEOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(7, abieVO.getAbieGUID());
 
-			ps.setInt(8, abieVO.getClientID());
+			ps.setString(8, abieVO.getClientID());
 
 			if( abieVO.getVersion()==null ||  abieVO.getVersion().length()==0 ||  abieVO.getVersion().isEmpty() ||  abieVO.getVersion().equals(""))				
 				ps.setString(9,"\u00A0");
@@ -552,7 +552,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getInt("Client_ID"));
+				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -644,7 +644,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getInt("Client_ID"));
+				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -732,7 +732,7 @@ public class ABIEOracleDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getInt("Client_ID"));
+				abieVO.setClientID(rs.getString("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));

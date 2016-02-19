@@ -90,7 +90,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 		try {
 			conn = tx.open();
 			String keys[] = {"BBIEP_ID"};
-			if(bbiepVO.getBBIEPID() == -1)
+			if(bbiepVO.getBBIEPID() < 1)
 				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, keys);
@@ -121,7 +121,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
 			ps.setInt(7, bbiepVO.getLastUpdatedbyUserID());
 
-			if(bbiepVO.getBBIEPID() != -1)
+			if(bbiepVO.getBBIEPID() > 1)
 				ps.setInt(8, bbiepVO.getBBIEPID());
 			ps.executeUpdate();
 
@@ -160,7 +160,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 		int key = -1;
 		try {
 			String keys[] = {"BBIEP_ID"};
-			if(bbiepVO.getBBIEPID() == -1)
+			if(bbiepVO.getBBIEPID() < 1)
 				ps = conn.prepareStatement(_INSERT_BBIEP_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_BBIEP_WITH_ID_STATEMENT, keys);
@@ -190,7 +190,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
 			ps.setInt(7, bbiepVO.getLastUpdatedbyUserID());
-			if(bbiepVO.getBBIEPID() != -1)
+			if(bbiepVO.getBBIEPID() > 1)
 				ps.setInt(8, bbiepVO.getBBIEPID());
 			
 			ps.executeUpdate();

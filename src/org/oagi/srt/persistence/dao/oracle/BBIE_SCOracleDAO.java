@@ -57,7 +57,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 		try {
 			String keys[]= {"BBIE_SC_ID"};
 			conn = tx.open();
-			if(bbie_scVO.getBBIESCID() == -1)
+			if(bbie_scVO.getBBIESCID() < 1)
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT, keys);
@@ -110,7 +110,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
-			if(bbie_scVO.getBBIESCID() != -1)
+			if(bbie_scVO.getBBIESCID() > 1)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
@@ -148,7 +148,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 		int key = -1;
 		try {
 			String keys[]= {"BBIE_SC_ID"};
-			if(bbie_scVO.getBBIESCID() == -1)
+			if(bbie_scVO.getBBIESCID() < 1)
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_BBIE_SC_WITH_ID_STATEMENT, keys);
@@ -202,7 +202,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
 			
-			if(bbie_scVO.getBBIESCID() != -1)
+			if(bbie_scVO.getBBIESCID() > 1)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			
 			ps.executeUpdate();
@@ -523,7 +523,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
-			if(bbie_scVO.getBBIESCID() != -1)
+			if(bbie_scVO.getBBIESCID() > 1)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 
