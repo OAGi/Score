@@ -41,12 +41,12 @@ import org.xml.sax.SAXException;
 
 public class P_1_5_1_to_2_PopulateBDTsInDT {
 	
-	private int userId;
 	
 	public DTVO insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition, String id) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
-
+		SRTDAO daoUser = df.getDAO("User");
+		
 		QueryCondition qc = new QueryCondition();
 		qc.add("Data_Type_Term", dataTypeTerm);
 		qc.add("type", new Integer(0));
@@ -70,8 +70,13 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setDefinition(definition);
 			dtVO.setContentComponentDefinition(ccDefinition);
 			dtVO.setState(3);
+		    QueryCondition qc_02 = new QueryCondition();
+		    qc_02.add("login_id", "oagis");
+			int userId = ((UserVO)daoUser.findObject(qc_02, conn)).getUserID();
+			
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
+			dtVO.setOwnerUserId(userId);
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
@@ -179,7 +184,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 	public DTVO insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
-
+		SRTDAO daoUser = df.getDAO("User");
 		QueryCondition qc = new QueryCondition();
 		qc.add("guid", defaultGUID);
 		int basedDTID = ((DTVO)dao.findObject(qc, conn)).getDTID();
@@ -200,8 +205,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setDEN(typeName + ". Type");
 			dtVO.setContentComponentDEN(typeName + ". Content");
 			dtVO.setState(3);
+			QueryCondition qc_02 = new QueryCondition();
+			qc_02.add("login_id", "oagis");
+			int userId = ((UserVO)daoUser.findObject(qc_02, conn)).getUserID();
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
+			dtVO.setOwnerUserId(userId);
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
@@ -449,8 +458,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("User");
 		QueryCondition qc = new QueryCondition();
-		qc.add("name", "oagis");
-		userId = ((UserVO)dao.findObject(qc, conn)).getUserID();
+		qc.add("login_id", "oagis");
+		int userId = ((UserVO)dao.findObject(qc, conn)).getUserID();
 		
 		XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 		XPathHandler components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);

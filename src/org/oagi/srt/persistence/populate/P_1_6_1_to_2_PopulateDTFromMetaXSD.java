@@ -62,14 +62,14 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    //dtVO.setRevisionType(0);
 		    
 		    QueryCondition qc = new QueryCondition();
-			qc.add("guid", "oagis-id-d5cb8551edf041389893fee25a496395");
+			qc.add("den", "Text_62S0B4. Type");
 			DTVO dtVO_01 = (DTVO)dao.findObject(qc, conn);
 		    
 		    
 		    dtVO.setBasedDTID(dtVO_01.getDTID());
 		    dtVO.setDataTypeTerm(dtVO_01.getDataTypeTerm());
 		    
-		    String den = name.substring(0, name.lastIndexOf("Type")) + ". Type";
+		    String den = Utility.spaceSeparator(name).substring(0, Utility.spaceSeparator(name).lastIndexOf(" Type")) + ". Type";
 		    if(den.contains("ID")){
 		    	den = den.replace("ID", "Identifier");
 		    }
@@ -87,10 +87,11 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setState(3);
 		    
 		    QueryCondition qc_02 = new QueryCondition();
-			qc.add("Name", "oagis");
+		    qc_02.add("login_id", "oagis");
 			int userId = ((UserVO)daoUser.findObject(qc_02, conn)).getUserID();
 			dtVO.setCreatedByUserId(userId);
 			dtVO.setLastUpdatedByUserId(userId);
+			dtVO.setOwnerUserId(userId);
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);

@@ -33,6 +33,7 @@ import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
 import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.DTSCVO;
+import org.oagi.srt.persistence.dto.UserVO;
 import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Element;
@@ -69,6 +70,7 @@ public class P_1_7_PopulateQBDTInDT {
 	SRTDAO cdtSCAPMapDAO;
 	SRTDAO aCDTPrimitiveDAO;
 	SRTDAO bdtSCPRDAO;
+	SRTDAO daoUser;
 	
 	public P_1_7_PopulateQBDTInDT() throws Exception {
 		df = DAOFactory.getDAOFactory();
@@ -84,6 +86,7 @@ public class P_1_7_PopulateQBDTInDT {
 		aXSDBuiltInTypeDAO = df.getDAO("XSDBuiltInType");
 		cdtSCAPMapDAO = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
 		aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
+		daoUser = df.getDAO("User");
 		
 		fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
 		meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -444,8 +447,12 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setDefinition(null);
 			dtVO.setContentComponentDefinition(null);
 			dtVO.setState(3);
-			dtVO.setCreatedByUserId(1);
-			dtVO.setLastUpdatedByUserId(1);
+			QueryCondition qc = new QueryCondition();
+			qc.add("login_id", "oagis");
+			int userId = ((UserVO)daoUser.findObject(qc, conn)).getUserID();
+			dtVO.setCreatedByUserId(userId);
+			dtVO.setLastUpdatedByUserId(userId);
+			dtVO.setOwnerUserId(userId);
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
@@ -547,8 +554,12 @@ public class P_1_7_PopulateQBDTInDT {
 		bccpVO.setBDTID(dtVO.getDTID());
 		bccpVO.setDEN(Utility.firstToUpperCase(propertyTerm) + ". " + dtVO.getDataTypeTerm());
 		bccpVO.setDefinition(definition);
-		bccpVO.setCreatedByUserId(1);
-		bccpVO.setLastUpdatedByUserId(1);
+		QueryCondition qc = new QueryCondition();
+		qc.add("login_id", "oagis");
+		int userId = ((UserVO)daoUser.findObject(qc, conn)).getUserID();
+		dtVO.setCreatedByUserId(userId);
+		dtVO.setLastUpdatedByUserId(userId);
+		dtVO.setOwnerUserId(userId);
 		bccpDAO.insertObject(bccpVO);
 		
 	}
