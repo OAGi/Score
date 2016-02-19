@@ -188,7 +188,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		int roleOfAccId = accVO.getACCID();
 
 		String den = propertyTerm + ". " + Utility.first(accVO.getDEN());
-		int state = 4;
+		int state = 3;
 		String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
 
 		ASCCPVO accpVO = new ASCCPVO();
@@ -684,7 +684,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		else if(Utility.first(den).endsWith("Group"))
 			oagisComponentType = 3;
 
-		int state = 4;
+		int state = 3;
 		String module = fullFilePath.substring(fullFilePath.lastIndexOf(File.separator) + 1, fullFilePath.lastIndexOf("."));
 
 		ACCVO aACCVO = new ACCVO();
