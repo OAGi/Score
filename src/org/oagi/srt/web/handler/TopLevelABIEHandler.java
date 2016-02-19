@@ -1367,6 +1367,134 @@ public class TopLevelABIEHandler implements Serializable {
 		}
 	}
 	
+	private void extendABIE() throws SRTDAOException{
+		int state;
+		int userId = 0;
+		//if(Extension is selected thru ui)
+		ABIEVO abieVO = new ABIEVO();
+		if(abieVO.getState() == 1) { // Assume that 1 is editing
+			
+			ACCVO ueACC = new ACCVO(); //get ueACC
+			if(ueACC == null) {
+				//Create a New user Extension Group
+				if(ueACC.getOAGISComponentType() == 4){
+					ACCVO nueACC = new ACCVO();
+					nueACC.setACCGUID(Utility.generateGUID());
+					String objectClassTerm = "";
+					if(ueACC.getObjectClassTerm().equalsIgnoreCase("Application Area Extension"))
+						objectClassTerm = "Application Area User Extension Group";
+					else if(ueACC.getObjectClassTerm().equalsIgnoreCase("All Extension"))
+						objectClassTerm = "All User Extension Group";
+					else if(ueACC.getObjectClassTerm().equalsIgnoreCase("Attached Item Extension"))
+						objectClassTerm = "Attached  Item User Extension Group";
+					nueACC.setObjectClassTerm(objectClassTerm);
+					nueACC.setDEN(objectClassTerm+". Details");
+					nueACC.setDefinition("A system created component containing user extension to the "+ueACC.getObjectClassTerm());
+					nueACC.setObjectClassQualifier("");
+					nueACC.setOAGISComponentType(4);
+					nueACC.setState(1);
+					nueACC.setRevisionNum(0);
+					nueACC.setRevisionTrackingNum(0);
+					accDao.insertObject(nueACC);
+					
+					ASCCPVO nASCCP = new ASCCPVO();
+					nASCCP.setASCCPGUID(Utility.generateGUID());
+					nASCCP.setPropertyTerm(objectClassTerm);
+					nASCCP.setRoleOfACCID(ueACC.getACCID());
+					nASCCP.setDEN(nASCCP.getPropertyTerm()+"."+Utility.first(ueACC.getDEN()));
+					nASCCP.setState(4);
+					nASCCP.setReusableIndicator(false);
+					nASCCP.setRevisionNum(0);
+					nASCCP.setRevisionTrackingNum(0);
+					asccpDao.insertObject(nASCCP);
+					
+					ASCCVO nASCC = new ASCCVO();
+					nASCC.setASCCGUID(Utility.generateGUID());
+					nASCC.setCardinalityMin(1);
+					nASCC.setCardinalityMax(1);
+					nASCC.setAssocFromACCID(ueACC.getACCID());
+					nASCC.setAssocToASCCPID(nASCCP.getASCCPID());
+					nASCC.setDEN(ueACC.getObjectClassTerm()+". "+nASCCP.getDEN());
+					nASCC.setDefinition("System created association to the system created user extension group component");
+					nASCC.setState(4);
+					nASCC.setRevisionNum(0);
+					nASCC.setRevisionTrackingNum(0);
+					asccDao.insertObject(nASCC);
+					//here : history record population
+					
+					ASCCPVO hASCCP = new ASCCPVO(); // populate ASCCP history record
+					hASCCP.setRevisionNum(1);
+					hASCCP.setRevisionTrackingNum(1);
+					hASCCP.setRevisionAction(true);
+					asccpDao.insertObject(hASCCP);
+
+					ASCCVO hASCC = new ASCCVO(); //populate ASCC history record
+					hASCC.setRevisionNum(1);
+					hASCC.setRevisionTrackingNum(1);
+					hASCC.setRevisionAction(true);
+					asccDao.insertObject(hASCC);
+					
+					
+				}
+				
+			}
+			else {
+				if(ueACC.getState() == 1 && ueACC.getOwnerUserId() == userId) {
+					//Go to Editing user Extension Group
+				}
+				else if(ueACC.getState() == 1 && ueACC.getOwnerUserId() != userId) {
+					//Indicate to the user that the eACC is being extended by another user. 
+					//The user can acknowledge and then return to top-level BIE editing page.
+				}
+				else if(ueACC.getState() == 2 && ueACC.getOwnerUserId() == userId) {
+					//Indicate to the user that the eACC is in Candidate state and 
+					//ask whether the user wants to switch the state back to Editing thru UI.
+					boolean state_back = false;
+					if(state_back == true) {
+						ueACC.setState(1);
+						//find its association and set to Editing
+					}
+					else {
+						abieVO.setState(1);
+					}
+				}
+				else if(ueACC.getState() == 2 && ueACC.getOwnerUserId() != userId) {
+					//Indicate to the user that the eACC is being extended by another user. 
+					//The user can acknowledge and then return to top-level BIE editing page. 
+					boolean review_extension = false;
+					if(review_extension == true) {
+						//Go to Review user extension group ACC
+					}
+					else {
+						abieVO.setState(1);
+					}
+				}
+				else if(ueACC.getState() == 4) {
+					//Indicate to the user that the eACC was last extended by who. 
+					boolean create_new_revision = false;
+					//Ask the user to whether he would like to create a new revision.
+
+					if(create_new_revision)
+						;//Go to create a New User Extension Group ACC Revision
+					//, the State of the ueACC current record and all its associations (BCC and ASCC) must be updated to Editing. 
+					//Then, the corresponding history records must be created with an incremental revision_num from the latest revision.
+					
+				}
+				
+			}
+		}
+		
+	}
+	
+	private void editUserExtensionGroupACC() throws SRTDAOException{
+		//UI implementation is needed.
+		//Delete an existing association
+		//Make edit to details of existing associations
+		//The user should be able to make a new revision or modification
+		//Add an association, Create a new ACC, create a new ASCCP, create a new BCCP
+		
+		
+	}
 	public List<SRTObject> getAsccpVOs() {
 		return asccpVOs;
 	}
