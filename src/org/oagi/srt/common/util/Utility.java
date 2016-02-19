@@ -111,7 +111,10 @@ public class Utility {
 				sb.append(str.charAt(i));
 			}
 		}
-		return sb.toString();
+		String result = sb.toString();
+		if(result.endsWith(" Code Type"))
+			result = result.substring(0, result.indexOf((" Code Type"))).replaceAll(" ", "").concat(" Code Type");
+		return result;
 	}
 	
 	public static void dbSetup() throws Exception {

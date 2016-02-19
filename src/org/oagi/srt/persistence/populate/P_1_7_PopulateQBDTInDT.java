@@ -166,7 +166,6 @@ public class P_1_7_PopulateQBDTInDT {
 				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
 				if(dtVO == null) {
 					// add new QBDT
-					System.out.println("@  " +typeGuid);
 					DTVO dVO = addToDT(typeGuid, type, typeNode, fields_xsd);
 					
 					// add DT_SC
@@ -486,7 +485,7 @@ public class P_1_7_PopulateQBDTInDT {
 					}
 				}
 			}
-			theBDT_Primitive_RestrictionVO.setisDefault(true);
+			theBDT_Primitive_RestrictionVO.setisDefault(false);
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
 		} 
 		
@@ -497,7 +496,9 @@ public class P_1_7_PopulateQBDTInDT {
 				theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
 				theBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID());
 
-				if(base.endsWith("CodeContentType"))
+				if(base.endsWith("CodeContentType") && checkTokenofXBT(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID()))
+					theBDT_Primitive_RestrictionVO.setisDefault(true);
+				else if(base.endsWith("CodeContentType") && !checkTokenofXBT(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID()))
 					theBDT_Primitive_RestrictionVO.setisDefault(false);
 				else
 					theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
@@ -823,6 +824,19 @@ public class P_1_7_PopulateQBDTInDT {
 		return ((XSDBuiltInTypeVO)aXSDBuiltInTypeDAO.findObject(qc)).getXSDBuiltInTypeID();
 	}
 	
+	public boolean checkTokenofXBT(int cdt_awd_pri_xps_type_map_id) throws SRTDAOException{
+    	QueryCondition qc = new QueryCondition();
+		qc.add("cdt_awd_pri_xps_type_map_id", cdt_awd_pri_xps_type_map_id);
+		CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMapVO = (CDTAllowedPrimitiveExpressionTypeMapVO)aCDTAllowedPrimitiveExpressionTypeMapDAO.findObject(qc);
+		QueryCondition qc2 = new QueryCondition();
+		qc2.add("xbt_id", aCDTAllowedPrimitiveExpressionTypeMapVO.getXSDBuiltInTypeID());
+		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)(aXSDBuiltInTypeDAO.findObject(qc2));
+		if(aXSDBuiltInTypeVO.getName().equalsIgnoreCase("token"))
+			return true;
+		else
+			return false;
+	}
+
 	private DTVO getDTVOWithDEN(String den) throws SRTDAOException {
 		QueryCondition qc = new QueryCondition();
 		qc.add("den", den);
