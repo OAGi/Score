@@ -16,6 +16,7 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.persistence.dto.AgencyIDListValueVO;
 import org.oagi.srt.persistence.dto.CodeListVO;
 import org.oagi.srt.persistence.dto.CodeListValueVO;
 import org.oagi.srt.persistence.dto.UserVO;
@@ -72,7 +73,7 @@ public class P_1_4_PopulateCodeList {
 		   
 		    	codelistVO.setName(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")));
 		    	codelistVO.setListID(tmp.getAttribute("id"));
-		    	codelistVO.setAgencyID(agencyid);
+		    	codelistVO.setAgencyID(getAgencyID(agencyid));
 		    	
 		    	if(tmp.getAttribute("name").startsWith("oacl")) {
 		    		codelistVO.setVersionID("1");
@@ -83,7 +84,14 @@ public class P_1_4_PopulateCodeList {
 				    	if(tmp.getAttribute("name").charAt(j)>47 && tmp.getAttribute("name").charAt(j)<58) {
 				    		for(int k = j+1 ; k < tmp.getAttribute("name").length(); k++) {
 				    			if(tmp.getAttribute("name").charAt(k) == '_') {
-						    		codelistVO.setVersionID(tmp.getAttribute("name").substring(j, k));
+						    		String complicated_version = tmp.getAttribute("name").substring(j, k);
+						    		for(int l = complicated_version.length()-1 ; l >=0 ; l-- ) {
+						    			if(!(complicated_version.charAt(l) > 47 && complicated_version.charAt(l) < 58)){
+						    				complicated_version = complicated_version.substring(l+1);
+						    				break;
+						    			}
+						    		}
+				    				codelistVO.setVersionID(complicated_version);
 						    		break;
 				    			}
 				    		}
@@ -129,6 +137,9 @@ public class P_1_4_PopulateCodeList {
 	    		
 		    	dao.insertObject(codelistVO);
 		    }
+		    else
+		    	if(!tmp.getAttribute("name").endsWith("EnumerationType"))
+		    		System.out.println("Check !!  "+tmp.getAttribute("name"));
 		}
 	}
 	
@@ -136,11 +147,22 @@ public class P_1_4_PopulateCodeList {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("User");
     	QueryCondition qc = new QueryCondition();
-		qc.add("Name", new String(userName));
+		qc.add("Name", userName);
 		UserVO userVO = (UserVO)dao.findObject(qc, conn);
 		int id = userVO.getUserID();
 		return id;
 	}
+	
+	public int getAgencyID(int valueid) throws SRTDAOException{
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("AgencyIDListValue");
+    	QueryCondition qc = new QueryCondition();
+    	qc.add("value", String.valueOf(valueid));
+		AgencyIDListValueVO agencyIDListValueVO = (AgencyIDListValueVO)dao.findObject(qc);
+		int id = agencyIDListValueVO.getAgencyIDListValueID();
+		return id;
+	}
+	
 	
 	public void codeListValue(String fileinput) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		String path1 = SRTConstants.filepath("CodeList") + fileinput;

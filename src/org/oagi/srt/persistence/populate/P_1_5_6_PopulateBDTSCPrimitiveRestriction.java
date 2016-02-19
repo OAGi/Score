@@ -68,12 +68,15 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 		ArrayList<SRTObject> al = dao.findObjects(conn);
 		for(SRTObject aSRTObject : al) {
 			DTSCVO aDTSCVO = (DTSCVO)aSRTObject;
+			String tmp_guid = null;
 			if(aDTSCVO.getBasedDTSCID() != 0) {
 				
 				Node result = xh.getNode("//xsd:attribute[@id='" + aDTSCVO.getDTSCGUID() + "']");
+				tmp_guid = aDTSCVO.getDTSCGUID();
 				if(result == null) { // if result is null, then look up its based default BDT and get guid
 					DTSCVO dtscVO = getDTSC(aDTSCVO.getBasedDTSCID());
 					result = xh.getNode("//xsd:attribute[@id='" + dtscVO.getDTSCGUID() + "']");
+					tmp_guid = dtscVO.getDTSCGUID();
 				}
 				
 				Element ele = (Element)result;

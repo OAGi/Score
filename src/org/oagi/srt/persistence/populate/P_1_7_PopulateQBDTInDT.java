@@ -117,6 +117,7 @@ public class P_1_7_PopulateQBDTInDT {
 			NodeList elementsFromCodeListXSD = codelist_xsd.getNodeList("/xsd:schema/xsd:element");
 			//insertDTAndBCCP(elementsFromCodeListXSD, codelist_xsd, 3);
 		}
+		insertDTwithoutElement();
 		
 	}
 	
@@ -152,6 +153,29 @@ public class P_1_7_PopulateQBDTInDT {
 		return cdtSCAPMapDAO.findObjects(qc, conn);
 	}
 	
+	private void insertDTwithoutElement() throws SRTDAOException, XPathExpressionException{
+		NodeList complexTypesFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:complexType");
+		for(int i = 0; i < complexTypesFromFieldsXSD.getLength() ; i++) {
+			Node typeNode = complexTypesFromFieldsXSD.item(i);
+			String type = ((Element)typeNode).getAttribute("name");
+			String typeGuid = ((Element)typeNode).getAttribute("id");
+			Node simpleContent = fields_xsd.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");	
+			if(simpleContent != null) {
+				QueryCondition qc = new QueryCondition();
+				qc.add("guid", typeGuid);
+				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
+				if(dtVO == null) {
+					// add new QBDT
+					System.out.println("@  " +typeGuid);
+					DTVO dVO = addToDT(typeGuid, type, typeNode, fields_xsd);
+					
+					// add DT_SC
+					addToDTSC(fields_xsd, type, dVO);
+				} 
+			}
+				
+		}		
+	}
 	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler org_xHandler, int xsdType) throws XPathExpressionException, SRTDAOException {
 		XPathHandler xHandler = org_xHandler;
 		for(int i = 0; i < elementsFromXSD.getLength(); i++) {

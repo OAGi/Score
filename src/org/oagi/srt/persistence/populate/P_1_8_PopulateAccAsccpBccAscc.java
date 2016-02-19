@@ -64,6 +64,31 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	}
 
 	private void populate() throws Exception {
+		populate1();
+		populate2();
+	}
+	
+	private void populate1() throws Exception {
+
+		File[] listOfF1 = getBODs(f1);
+		File[] listOfF2 = getBODs(f2);
+
+		for (File file : listOfF1) {
+			if(file.getName().endsWith("AcknowledgeInvoice.xsd")){	
+				System.out.println(file.getName()+" ing...");
+				insertASCCP(file);
+			}
+		}
+
+		for (File file : listOfF2) {
+			if(file.getName().endsWith("AcknowledgeInvoice.xsd")){		
+				System.out.println(file.getName()+" ing...");
+				insertASCCP(file);
+			}
+		}
+	} 
+	
+	private void populate2() throws Exception {
 
 		File[] listOfF1 = getBODs(f1);
 		File[] listOfF2 = getBODs(f2);
@@ -121,7 +146,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			roleOfAccId = accVO.getACCID();
 
 			String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDEN()));
-			int state = 4;
+			int state = 4;	
 			String module = bodPath.substring(bodPath.lastIndexOf(File.separator) + 1, bodPath.lastIndexOf("."));
 
 			ASCCPVO accpVO = new ASCCPVO();
@@ -365,6 +390,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	
 	private void insertBCC(BODElementVO bodVO, String parentGuid, BCCPVO bccpVO) throws Exception {
 		
+		if(bccpVO == null)
+			return;
+		
 		//String bccGuid = bodVO.getId();
 		String bccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
 		int assocToBCCPID = bccpVO.getBCCPID();
@@ -404,7 +432,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 	}
 
-	private void insertBCCWithAttr(XSAttributeDecl xad, XSComplexTypeDecl complexType) throws Exception {
+	private void insertBCCWithAttr(XSAttributeDecl xad, XSComplexTypeDecl complexType) throws Exception {//check 
 		String bccGuid = xad.getFId();
 		
 		int cardinalityMin = (xad.getFUse() == null) ? 0 : (xad.getFUse().equals("optional") || xad.getFUse().equals("prohibited")) ? 0 : (xad.getFUse().equals("required")) ? 1 : 0;
@@ -419,6 +447,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		BCCPVO bccpVO = (BCCPVO)bccpDao.findObject(qc, conn);
 		if(bccpVO == null) {
 			bccpVO = insertBCCP(xad.getName(), xtd.getFId());
+		}
+		if(bccpVO == null){ 
+			System.out.println("BCCP creation is failed in BCC attriute creation, Note -> Name : "+xad.getName()+"   guid : "+xtd.getFId());
+			return;//check
 		}
 		assocToBCCPID =  bccpVO.getBCCPID();
 		
@@ -458,17 +490,20 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 		//System.out.println("### BCCP: " + name + " " + id);
 		if(id == null) {
-			id = "oagis-id-89be97039be04d6f9cfda107d75926b4"; // TODO check why dt is null and change this line
+			System.out.println("!!!! id is null where name is  = " + name);
+			//id = "oagis-id-89be97039be04d6f9cfda107d75926b4"; // TODO check why dt is null and change this line
+			return null;
 		}
 		QueryCondition qc = new QueryCondition();
 		qc.add("guid", id);
 		qc.add("type", 1);
 		DTVO dtVO = (DTVO)dtDao.findObject(qc);
 		if(dtVO == null) {
-			System.out.println("### DT is null: " + name + " " + id);
-			QueryCondition qc1 = new QueryCondition();
-			qc1.add("guid", "oagis-id-89be97039be04d6f9cfda107d75926b4"); // TODO check why dt is null and change this line
-			dtVO = (DTVO)dtDao.findObject(qc1);
+			System.out.println("!!!! DT is null where name is  = " + name+" and id is = " + id);
+			return null;
+			//QueryCondition qc1 = new QueryCondition();
+			//qc1.add("guid", "oagis-id-89be97039be04d6f9cfda107d75926b4"); // TODO check why dt is null and change this line
+			//dtVO = (DTVO)dtDao.findObject(qc1);
 		}
 
 		int bdtId = dtVO.getDTID();

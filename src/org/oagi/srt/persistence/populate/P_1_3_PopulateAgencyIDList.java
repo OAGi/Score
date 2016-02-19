@@ -50,18 +50,16 @@ public class P_1_3_PopulateAgencyIDList {
 		}
 		agencyidlistVO.setName("Agency Identification");
 		agencyidlistVO.setListID("3055");
-		//agencyidlistVO.setAgencyID(6);
-		agencyidlistVO.setVersionID("D08B");
-		agencyidlistVO.setDefinition("Schema agency:UN/CEFACT   Schema version:3.3		Schema date:15 September 2009	Code list name:Agency Identification Code   	Code list agency: UNECE    Code list version:D08B");		
+		agencyidlistVO.setVersionID("D13A");
+		agencyidlistVO.setDefinition("Schema agency:  UN/CEFACT	Schema version: 4.5	Schema date:    02 February 2014	Code list name:     Agency Identification Code	Code list agency:   UNECE	Code list version:  D13A");		
 		dao.insertObject(agencyidlistVO);
-
 	}
 	
 	public void updateAgencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("AgencyIDListValue");
 		QueryCondition qc = new QueryCondition();
-		qc.add("value", 6);
+		qc.add("value", "6");
 		AgencyIDListValueVO aAgencyIDListValueVO = ((AgencyIDListValueVO)dao.findObject(qc));
 		
 		SRTDAO dao1 = df.getDAO("AgencyIDList");
@@ -72,7 +70,7 @@ public class P_1_3_PopulateAgencyIDList {
 	}
 
 	public void agencyIDListValue() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
+		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -91,12 +89,13 @@ public class P_1_3_PopulateAgencyIDList {
 				Element enum_element = (Element)enumeration.item(i);
 				agencyidlistvalueVO.setValue(enum_element.getAttribute("value"));	
 				
-				Node name = xh.getNode("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//*[local-name()=\"ccts_Name\"]") ;
-				Node definition = xh.getNode("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration//*[local-name()=\"ccts_Definition\"]") ;
+				Node name = xh.getNode("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration[@value = '" + agencyidlistvalueVO.getValue() + "']//*[local-name()=\"ccts_Name\"]") ;
+				Node definition = xh.getNode("//xsd:simpleType[@id = '" + svo.getEnumerationTypeGUID() + "']//xsd:enumeration[@value = '" + agencyidlistvalueVO.getValue() + "']//*[local-name()=\"ccts_Definition\"]") ;
 				
 				agencyidlistvalueVO.setName(((Element)name).getTextContent());
 				agencyidlistvalueVO.setDefinition(((Element)definition).getTextContent());
 				agencyidlistvalueVO.setOwnerAgencyIDListID(svo.getAgencyIDListID());
+				//System.out.println("@@@  "+agencyidlistvalueVO.getValue()+"  th turn, name = "+agencyidlistvalueVO.getName() +",  definition = "+ agencyidlistvalueVO.getDefinition());
 				dao.insertObject(agencyidlistvalueVO);
 			}
 		}
