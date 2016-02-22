@@ -7,14 +7,14 @@ public class RunAll {
 	public static void main(String args[]) throws Exception {
 		Utility.dbSetup();
 
-		P_1_3_PopulateAgencyIDList p1 = new P_1_3_PopulateAgencyIDList();
-		p1.run();
-		
-		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
-		p2.run();
-		
-		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
-		p3.run();
+//		P_1_3_PopulateAgencyIDList p1 = new P_1_3_PopulateAgencyIDList();
+//		p1.run();
+//		
+//		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
+//		p2.run();
+//		
+//		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
+//		p3.run();
 		
 		P_1_5_3_PopulateSCInDTSC p4 = new P_1_5_3_PopulateSCInDTSC();
 		p4.run();
@@ -32,7 +32,7 @@ public class RunAll {
 		p9.run();
 	
 		P_1_7_PopulateQBDTInDT p13 = new P_1_7_PopulateQBDTInDT();
-		//p13.run();
+		p13.run();
 		
 		P_1_8_PopulateAccAsccpBccAscc p14 = new P_1_8_PopulateAccAsccpBccAscc();
 		//p14.run();

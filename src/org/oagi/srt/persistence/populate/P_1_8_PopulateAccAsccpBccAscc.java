@@ -29,6 +29,7 @@ import org.oagi.srt.persistence.dto.ASCCVO;
 import org.oagi.srt.persistence.dto.BCCPVO;
 import org.oagi.srt.persistence.dto.BCCVO;
 import org.oagi.srt.persistence.dto.DTVO;
+import org.oagi.srt.persistence.dto.UserVO;
 import org.w3c.dom.NodeList;
 
 /**
@@ -47,6 +48,8 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 	private SRTDAO bccDao;
 	private SRTDAO asccDao;
 	private SRTDAO dtDao;
+	private SRTDAO daoUser;
+	
 	private BODSchemaHandler bodSchemaHandler;
 	private String bodPath;
 
@@ -61,6 +64,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		bccpDao = df.getDAO("BCCP");
 		bccDao = df.getDAO("BCC");
 		dtDao = df.getDAO("DT");
+		daoUser = df.getDAO("User");
 	}
 
 	private void populate() throws Exception {
@@ -158,8 +162,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			accpVO.setDEN(den);
 			accpVO.setState(state);
 			accpVO.setModule(module);
-			accpVO.setCreatedByUserId(1);
-			accpVO.setLastUpdatedByUserId(1);
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("login_id", "oagis");
+			int userId = ((UserVO)daoUser.findObject(qc2, conn)).getUserID();
+			accpVO.setCreatedByUserId(userId);
+			accpVO.setLastUpdatedByUserId(userId);
+			accpVO.setOwnerUserId(userId);
 			accpVO.setIs_deprecated(false);
 			accpVO.setRevisionAction(true);
 			accpVO.setNamespaceId(1); //tmp
@@ -201,8 +209,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		accpVO.setDEN(den);
 		accpVO.setState(state);
 		accpVO.setModule(module);
-		accpVO.setCreatedByUserId(1);
-		accpVO.setLastUpdatedByUserId(1);
+		QueryCondition qc2 = new QueryCondition();
+		qc2.add("login_id", "oagis");
+		int userId = ((UserVO)daoUser.findObject(qc2, conn)).getUserID();
+		accpVO.setCreatedByUserId(userId);
+		accpVO.setLastUpdatedByUserId(userId);
+		accpVO.setOwnerUserId(userId);
 		accpVO.setIs_deprecated(false);
 		accpVO.setRevisionAction(true);
 		accpVO.setNamespaceId(1); //tmp
@@ -518,8 +530,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		bccpVO.setBDTID(bdtId);
 		bccpVO.setRepresentationTerm(representationTerm);
 		bccpVO.setDEN(den);
-		bccpVO.setCreatedByUserId(1);
-		bccpVO.setLastUpdatedByUserId(1);
+		QueryCondition qc2 = new QueryCondition();
+		qc2.add("login_id", "oagis");
+		int userId = ((UserVO)daoUser.findObject(qc2, conn)).getUserID();
+		bccpVO.setCreatedByUserId(userId);
+		bccpVO.setLastUpdatedByUserId(userId);
+		bccpVO.setOwnerUserId(userId);
 		bccpVO.setIs_deprecated(false);
 		bccpVO.setRevisionAction(true);
 		bccpVO.setReleaseId(1);//tmp
@@ -567,8 +583,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aACCVO.setDefinition("Group");
 			aACCVO.setOAGISComponentType(oagisComponentType);
 			aACCVO.setBasedACCID(-1);
-			aACCVO.setCreatedByUserId(1);
-			aACCVO.setLastUpdatedByUserId(1);
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("login_id", "oagis");
+			int userId = ((UserVO)daoUser.findObject(qc2, conn)).getUserID();
+			aACCVO.setCreatedByUserId(userId);
+			aACCVO.setLastUpdatedByUserId(userId);
+			aACCVO.setOwnerUserId(userId);
 			aACCVO.setState(3);
 			aACCVO.setModule(module);
 			aACCVO.setIs_deprecated(false);
@@ -599,8 +619,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccpVO.setDEN(Utility.spaceSeparator(propertyTerm + ". " + Utility.first(accDen)));
 			asccpVO.setState(3);
 			asccpVO.setModule(module);
-			asccpVO.setCreatedByUserId(1);
-			asccpVO.setLastUpdatedByUserId(1);
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("login_id", "oagis");
+			int userId = ((UserVO)daoUser.findObject(qc2, conn)).getUserID();
+			asccpVO.setCreatedByUserId(userId);
+			asccpVO.setLastUpdatedByUserId(userId);
+			asccpVO.setOwnerUserId(userId);
 			asccpVO.setIs_deprecated(false);
 			asccpVO.setRevisionAction(true);
 			asccpVO.setNamespaceId(1); //tmp
@@ -697,8 +721,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		aACCVO.setDefinition(definition);
 		aACCVO.setBasedACCID(basedAccId);
 		aACCVO.setOAGISComponentType(oagisComponentType);
-		aACCVO.setCreatedByUserId(1);
-		aACCVO.setLastUpdatedByUserId(1);
+		QueryCondition qc22 = new QueryCondition();
+		qc22.add("login_id", "oagis");
+		int userId = ((UserVO)daoUser.findObject(qc22, conn)).getUserID();
+		aACCVO.setCreatedByUserId(userId);
+		aACCVO.setLastUpdatedByUserId(userId);
+		aACCVO.setOwnerUserId(userId);
 		aACCVO.setState(state);
 		aACCVO.setModule(module);
 		aACCVO.setIs_deprecated(false);

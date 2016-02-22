@@ -53,7 +53,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		SRTDAO codeListDao = df.getDAO("CodeList");
 		
 		QueryCondition qc_01 = new QueryCondition();
-		qc_01.add("guid", "oagis-id-d5cb8551edf041389893fee25a496395");
+		qc_01.add("den", "Text_62S0B4. Type");
 		DTVO dtVO_01 = (DTVO)dtDao.findObject(qc_01, conn);
 		
 		QueryCondition qc_011 = new QueryCondition();
@@ -63,6 +63,10 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		QueryCondition qc_02 = new QueryCondition();
 		qc_02.add("owner_dt_id", dtVO_012.getDTID());
 		DTSCVO dtscVO_01 = (DTSCVO)dtscDao.findObject(qc_02, conn);
+		
+		QueryCondition qc_12 = new QueryCondition();
+		qc_12.add("owner_dt_id", dtVO_01.getDTID());
+		DTSCVO textBDT_dtscVO = (DTSCVO)dtscDao.findObject(qc_12, conn);
 		
 		
 		XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -77,10 +81,10 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 			DTVO dtVO_011 = (DTVO)dtDao.findObject(qc_021, conn);
 			
 			DTSCVO dtscVO_02 = new DTSCVO();
-			dtscVO_02.setBasedDTSCID(dtscVO_01.getDTSCID());
+			dtscVO_02.setBasedDTSCID(textBDT_dtscVO.getDTSCID());
 			dtscVO_02.setDefinition(dtscVO_01.getDefinition());
 			dtscVO_02.setDTSCGUID(dtscVO_01.getDTSCGUID());
-			dtscVO_02.setMaxCardinality(dtscVO_01.getMaxCardinality());
+			dtscVO_02.setMaxCardinality(0);
 			dtscVO_02.setMinCardinality(dtscVO_01.getMinCardinality());
 			dtscVO_02.setOwnerDTID(dtVO_011.getDTID());
 			dtscVO_02.setPropertyTerm(dtscVO_01.getPropertyTerm());
