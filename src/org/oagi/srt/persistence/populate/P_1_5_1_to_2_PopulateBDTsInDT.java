@@ -298,6 +298,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				if(defaultId == 0) {
 					Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
 					QueryCondition qc4 = new QueryCondition();
+					System.out.println(xsdTypeName);
 					qc4.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
 					defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc4, conn)).getXSDBuiltInTypeID();
 				}

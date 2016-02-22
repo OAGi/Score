@@ -603,7 +603,7 @@ public class P_1_7_PopulateQBDTInDT {
 			
 			String definition;
 			int min_cardinality = 0;
-			int max_cardinality = 0;
+			int max_cardinality = 1;
 			
 			for(int i = 0; i < attributeList.getLength(); i++) {
 				Node attribute = attributeList.item(i);

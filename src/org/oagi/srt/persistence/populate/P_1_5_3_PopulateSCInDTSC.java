@@ -129,8 +129,9 @@ public class P_1_5_3_PopulateSCInDTSC {
 						
 						vo.setMinCardinality(min_cardinality);
 						
+						System.out.println(denType);
 						if(denType.equals("NormalizedStringType") || denType.equals("TokenType") || denType.equals("StringType"))
-							max_cardinality = 0;
+							max_cardinality = 2;
 						vo.setMaxCardinality(max_cardinality);
 						
 
