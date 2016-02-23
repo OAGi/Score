@@ -79,82 +79,85 @@ public class P_1_5_4_to_5_PopulateCDTSCAllowedPrimitive {
 					DTVO tDTVO = (DTVO)dt_datatypelist.get(k);
 					QueryCondition qc_05 = new QueryCondition();
 					qc_05.add("CDT_ID", tDTVO.getDTID());
-					CDTAllowedPrimitiveVO aCDTAllowedPrimitiveVO = (CDTAllowedPrimitiveVO) aCDTAllowedPrimitiveDAO.findObject(qc_05);
-					if(aCDTAllowedPrimitiveVO.getCDTPrimitiveID() != 0) {
-						CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
-						aVO.setCDTSCID(aDTSCVO.getDTSCID());
-						aVO.setCDTPrimitiveID(aCDTAllowedPrimitiveVO.getCDTPrimitiveID());
-						aVO.setisDefault(aCDTAllowedPrimitiveVO.getisDefault());
-						aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
-						
-						QueryCondition qc_051 = new QueryCondition();
-						qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
-						qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-						CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
-						int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
-						
-						QueryCondition qc_06 = new QueryCondition();
-						qc_06.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-						CDTPrimitiveVO aCDTPrimitiveVO = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc_06);
-						String cdt_primitive_name = aCDTPrimitiveVO.getName();
-						ArrayList<String> xsd_builtin_type = new ArrayList<String>();
-
-						if(cdt_primitive_name.equals("Binary")){
-							xsd_builtin_type.add("xsd:base64Binary");
-							xsd_builtin_type.add("xsd:hexBinary");
-						}
-						else if(cdt_primitive_name.equals("Boolean")){
-							xsd_builtin_type.add("xsd:Boolean");
-						}
-						else if(cdt_primitive_name.equals("Decimal")){
-							xsd_builtin_type.add("xsd:decimal");
-						}
-						else if(cdt_primitive_name.equals("Double")){
-							xsd_builtin_type.add("xsd:double");
-							xsd_builtin_type.add("xsd:float");
-						}
-						else if(cdt_primitive_name.equals("Float")){
-							xsd_builtin_type.add("xsd:float");
-						}
-						else if(cdt_primitive_name.equals("Integer")){
-							xsd_builtin_type.add("xsd:integer");
-							xsd_builtin_type.add("xsd:nonNegativeInteger");
-							xsd_builtin_type.add("xsd:positiveInteger");
-						}
-						else if(cdt_primitive_name.equals("NormalizedString")){
-							xsd_builtin_type.add("xsd:normalizedString");
-						}
-						else if(cdt_primitive_name.equals("String")){
-							xsd_builtin_type.add("xsd:string");
-						}
-						else if(cdt_primitive_name.equals("TimeDuration")){
-							xsd_builtin_type.add("xsd:token");
-							xsd_builtin_type.add("xsd:duration");
-						}
-						else if(cdt_primitive_name.equals("TimePoint")){
-							xsd_builtin_type.add("xsd:token");
-							xsd_builtin_type.add("xsd:dateTime");
-							xsd_builtin_type.add("xsd:date");
-							xsd_builtin_type.add("xsd:time");
-							xsd_builtin_type.add("xsd:gYearMonth");
-							xsd_builtin_type.add("xsd:gYear");
-							xsd_builtin_type.add("xsd:gMonthDay");
-							xsd_builtin_type.add("xsd:gDay");
-							xsd_builtin_type.add("xsd:gMonth");
-						}
-						else if(cdt_primitive_name.equals("Token")){
-							xsd_builtin_type.add("xsd:token");
-						}
+					ArrayList<SRTObject> cdtawdprilist = aCDTAllowedPrimitiveDAO.findObjects(qc_05);
+					for(SRTObject acdtawdprilist : cdtawdprilist) {
+						CDTAllowedPrimitiveVO aCDTAPVO = (CDTAllowedPrimitiveVO) acdtawdprilist;
+						if(aCDTAPVO.getCDTPrimitiveID() != 0){
+							CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
+							aVO.setCDTSCID(aDTSCVO.getDTSCID());
+							aVO.setCDTPrimitiveID(aCDTAPVO.getCDTPrimitiveID());
+							aVO.setisDefault(aCDTAPVO.getisDefault());
+							aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
 							
-						for(int l = 0 ; l < xsd_builtin_type.size(); l++){
-							CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-							bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
-							QueryCondition qc_07 = new QueryCondition();
-							qc_07.add("BuiltIn_Type", xsd_builtin_type.get(l));
-							XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
-							bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
-							aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
-						}					
+							QueryCondition qc_051 = new QueryCondition();
+							qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
+							qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
+							CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
+							int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
+							
+							QueryCondition qc_06 = new QueryCondition();
+							qc_06.add("cdt_pri_id", aVO.getCDTPrimitiveID());
+							CDTPrimitiveVO aCDTPrimitiveVO = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc_06);
+							String cdt_primitive_name = aCDTPrimitiveVO.getName();
+							ArrayList<String> xsd_builtin_type = new ArrayList<String>();
+
+							if(cdt_primitive_name.equals("Binary")){
+								xsd_builtin_type.add("xsd:base64Binary");
+								xsd_builtin_type.add("xsd:hexBinary");
+							}
+							else if(cdt_primitive_name.equals("Boolean")){
+								xsd_builtin_type.add("xsd:Boolean");
+							}
+							else if(cdt_primitive_name.equals("Decimal")){
+								xsd_builtin_type.add("xsd:decimal");
+							}
+							else if(cdt_primitive_name.equals("Double")){
+								xsd_builtin_type.add("xsd:double");
+								xsd_builtin_type.add("xsd:float");
+							}
+							else if(cdt_primitive_name.equals("Float")){
+								xsd_builtin_type.add("xsd:float");
+							}
+							else if(cdt_primitive_name.equals("Integer")){
+								xsd_builtin_type.add("xsd:integer");
+								xsd_builtin_type.add("xsd:nonNegativeInteger");
+								xsd_builtin_type.add("xsd:positiveInteger");
+							}
+							else if(cdt_primitive_name.equals("NormalizedString")){
+								xsd_builtin_type.add("xsd:normalizedString");
+							}
+							else if(cdt_primitive_name.equals("String")){
+								xsd_builtin_type.add("xsd:string");
+							}
+							else if(cdt_primitive_name.equals("TimeDuration")){
+								xsd_builtin_type.add("xsd:token");
+								xsd_builtin_type.add("xsd:duration");
+							}
+							else if(cdt_primitive_name.equals("TimePoint")){
+								xsd_builtin_type.add("xsd:token");
+								xsd_builtin_type.add("xsd:dateTime");
+								xsd_builtin_type.add("xsd:date");
+								xsd_builtin_type.add("xsd:time");
+								xsd_builtin_type.add("xsd:gYearMonth");
+								xsd_builtin_type.add("xsd:gYear");
+								xsd_builtin_type.add("xsd:gMonthDay");
+								xsd_builtin_type.add("xsd:gDay");
+								xsd_builtin_type.add("xsd:gMonth");
+							}
+							else if(cdt_primitive_name.equals("Token")){
+								xsd_builtin_type.add("xsd:token");
+							}
+								
+							for(int l = 0 ; l < xsd_builtin_type.size(); l++){
+								CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+								bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
+								QueryCondition qc_07 = new QueryCondition();
+								qc_07.add("BuiltIn_Type", xsd_builtin_type.get(l));
+								XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
+								bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
+								aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
+							}
+						}
 					}
 				}
 			}
