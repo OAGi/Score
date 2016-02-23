@@ -292,9 +292,10 @@ public class P_1_7_PopulateQBDTInDT {
 				for(SRTObject mapVO : maps) {
 					CDTSCAllowedPrimitiveExpressionTypeMapVO vo = (CDTSCAllowedPrimitiveExpressionTypeMapVO)mapVO;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(vo.getCTSCAllowedPrimitiveExpressionTypeMapID());
-					
-					if(type.equalsIgnoreCase("Number_B98233")) {
-						if(svo.getCDTPrimitiveID() == getCDTPrimitiveID("Number") && vo.getXSDBuiltInTypeID() == getXSDBuiltInTypeID("xsd:integer"))
+					//System.out.println("type = "+type+"  cdt primitive id = "+svo.getCDTPrimitiveID()+"   xsd builtin type = "+vo.getXSDBuiltInTypeID());
+
+					if(type.equalsIgnoreCase("NumberType_B98233")) {
+						if(svo.getCDTPrimitiveID() == getCDTPrimitiveID("Decimal") && vo.getXSDBuiltInTypeID() == getXSDBuiltInTypeID("xsd:decimal"))
 							bdtscprimitiverestionvo.setisDefault(true);
 						else 
 							bdtscprimitiverestionvo.setisDefault(false);
@@ -496,7 +497,7 @@ public class P_1_7_PopulateQBDTInDT {
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
 		} 
 		
-		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))){
+		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))){
 			for(SRTObject aSRTObject : al) {
 				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
 				BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
@@ -512,7 +513,6 @@ public class P_1_7_PopulateQBDTInDT {
 				aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
 			}
 		}
-		
 		
 //		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
 //			for(SRTObject aSRTObject : al) {

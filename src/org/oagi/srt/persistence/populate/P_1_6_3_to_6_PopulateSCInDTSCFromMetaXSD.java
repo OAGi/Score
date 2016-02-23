@@ -110,6 +110,8 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 				bdtSCPRVO.setCodeListID(parent.getCodeListID());
 				bdtSCPRVO.setisDefault(parent.getisDefault());
 				bdtSCPRDao.insertObject(bdtSCPRVO);
+				System.out.println("bdt sc id = " + bdtSCPRVO.getBDTSCID()+" cdt sc allow pri ex type map id = "+bdtSCPRVO.getCDTSCAllowedPrimitiveExpressionTypeMapID()+"  is_default = "+bdtSCPRVO.getisDefault());
+
 			}
 			
 			// populate using attributes
