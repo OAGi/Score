@@ -432,41 +432,41 @@ Insert into cdt_allowed_primitive_expression_type_map (CDT_Allowed_Primitive_ID,
 select * from cdt_allowed_primitive_expression_type_map;
 
 */
-
+	
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'decimal'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Decimal'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:decimal'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'double'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Double'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:double'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'double'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Double'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:float'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'float'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Float'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:float'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Binary Object' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'binary'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Binary Object' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Binary'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:base64Binary'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Binary Object' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'binary'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Binary Object' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Binary'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:hexBinary'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -603,11 +603,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Measure' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Measure' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Measure' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Measure' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -616,7 +616,7 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
 	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Name' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'String'))),
-			(select xbt_id from xbt where builtIn_type = 'xsd:String'));
+			(select xbt_id from xbt where builtIn_type = 'xsd:string'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
 	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Name' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Token'))),
@@ -643,11 +643,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Number' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Number' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Number' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Number' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -655,11 +655,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ordinal' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ordinal' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ordinal' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ordinal' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -683,11 +683,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Percent' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Percent' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Percent' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Percent' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -719,11 +719,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Quantity' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Quantity' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Quantity' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Quantity' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -747,11 +747,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Rate' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Rate' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Rate' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Rate' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -775,11 +775,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ratio' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ratio' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ratio' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Ratio' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
@@ -835,11 +835,11 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 			(select xbt_id from xbt where builtIn_type = 'xsd:integer'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Value' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Value' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:positiveInteger'));
 
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
-	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Value' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'integer'))),
+	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Value' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Integer'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:nonNegativeInteger'));
 			
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 

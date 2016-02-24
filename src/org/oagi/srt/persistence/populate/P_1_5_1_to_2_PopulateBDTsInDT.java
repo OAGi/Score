@@ -295,7 +295,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				QueryCondition qc3 = new QueryCondition();
 				qc3.add("builtin_type", xsdTypeName);
 				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
-				if(defaultId == 0) {
+				if(defaultId < 1) {
 					Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
 					QueryCondition qc4 = new QueryCondition();
 					System.out.println(xsdTypeName);

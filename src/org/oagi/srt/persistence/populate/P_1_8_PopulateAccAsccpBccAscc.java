@@ -261,6 +261,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asscVO.setAssocToASCCPID(assocToASCCPId);
 			asscVO.setDEN(den);
 			asscVO.setDefinition(definition);
+			asscVO.setState(3);
 			asscVO.setIs_deprecated(false);
 			asscVO.setRevisionAction(true);
 			asscVO.setReleaseId(1);//tmp
@@ -438,6 +439,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setSequencingKey(sequenceKey);
 			aBCCVO.setEntityType(entityType);
 			aBCCVO.setDEN(den);
+			aBCCVO.setState(3);
 			aBCCVO.setIs_deprecated(false);
 			aBCCVO.setRevisionAction(true);
 			aBCCVO.setReleaseId(1);//tmp
@@ -491,6 +493,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setSequencingKey(sequenceKey);
 			aBCCVO.setEntityType(entityType);
 			aBCCVO.setDEN(den);
+			aBCCVO.setState(3);
 			aBCCVO.setIs_deprecated(false);
 			aBCCVO.setRevisionAction(true);
 			aBCCVO.setReleaseId(1);//tmp
@@ -530,6 +533,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		bccpVO.setBDTID(bdtId);
 		bccpVO.setRepresentationTerm(representationTerm);
 		bccpVO.setDEN(den);
+		bccpVO.setState(3);
 		QueryCondition qc2 = new QueryCondition();
 		qc2.add("login_id", "oagis");
 		int userId = ((UserVO)daoUser.findObject(qc2, conn)).getUserID();
@@ -660,6 +664,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
 			asscVO.setDEN(Utility.first(accVO2.getDEN()) + ". " + asccpVO1.getDEN());
 			asscVO.setDefinition("Group");
+			asscVO.setState(3);
 			asscVO.setIs_deprecated(false);
 			asscVO.setRevisionAction(true);
 			asscVO.setReleaseId(1);//tmp
