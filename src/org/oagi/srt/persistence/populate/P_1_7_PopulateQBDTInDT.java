@@ -554,6 +554,7 @@ public class P_1_7_PopulateQBDTInDT {
 		bccpVO.setBDTID(dtVO.getDTID());
 		bccpVO.setDEN(Utility.firstToUpperCase(propertyTerm) + ". " + dtVO.getDataTypeTerm());
 		bccpVO.setDefinition(definition);
+		bccpVO.setState(3);
 		QueryCondition qc = new QueryCondition();
 		qc.add("login_id", "oagis");
 		int userId = ((UserVO)daoUser.findObject(qc, conn)).getUserID();
