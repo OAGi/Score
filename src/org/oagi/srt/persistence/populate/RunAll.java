@@ -12,9 +12,9 @@ public class RunAll {
 //		
 //		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
 //		p2.run();
-//		
-//		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
-//		p3.run();
+		
+		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
+		p3.run();
 		
 		P_1_5_3_PopulateSCInDTSC p4 = new P_1_5_3_PopulateSCInDTSC();
 		p4.run();

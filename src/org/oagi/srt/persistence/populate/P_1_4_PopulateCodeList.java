@@ -113,7 +113,7 @@ public class P_1_4_PopulateCodeList {
 			    	codelistVO.setDefinitionSource(null);				    	
 		    	}
 		    	
-		    	codelistVO.setBasedCodeListID(1);//Empty
+		    	
 		    	codelistVO.setExtensibleIndicator(false); 
 		    	for(int j = 0; j < union.getLength(); j++) {
 				    Element tmp2 = (Element)union.item(j);
@@ -147,7 +147,7 @@ public class P_1_4_PopulateCodeList {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("User");
     	QueryCondition qc = new QueryCondition();
-		qc.add("Name", userName);
+		qc.add("login_id", userName);
 		UserVO userVO = (UserVO)dao.findObject(qc, conn);
 		int id = userVO.getUserID();
 		return id;
