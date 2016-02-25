@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 
 public class DataTypeTest {
 	
-	public DTVO validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition, String id) throws SRTDAOException{
+	public DTVO validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
 
@@ -141,7 +141,7 @@ public class DataTypeTest {
 					
 					typeName = tmp.getAttribute("type").replaceAll("Type", "");
 						
-					DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, (definitionElement != null) ? definitionElement.getTextContent() : null, (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+					DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, aElementBDT.getAttribute("id"));
 					
 					validateInsertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId); 
 				}
@@ -169,6 +169,80 @@ public class DataTypeTest {
 		return (DTVO)dao.findObject(qc2, conn);
 	}
 	
+	private void validateDefaultImportDataTypeList(String dataType) throws Exception {
+		String typeName = null;
+		String xsdTypeName;
+		String dataTypeTerm;
+		
+		String type = "complex";
+		
+		XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+		
+
+		for(int i = 0; i < Types.defaultDataTypeList.length ; i++){
+			if(Types.defaultDataTypeList[i].startsWith(dataType))
+				typeName = Types.defaultDataTypeList[i];
+		}
+		
+		//typeName = dataType;
+		Node aNodeTN = fields_xsd.getNode("//xsd:"+type+"Type[@name = '" + dataType + "']");
+		Element aElementTN = (Element)aNodeTN;
+		
+		//Data Type Term
+		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
+		
+		dataTypeTerm = typeName.substring(0, typeName.indexOf("Type"));
+		
+		Node aNodeBDT = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']");
+		Element aElementBDT = (Element)aNodeBDT;
+		
+		Node union = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union");
+		int defaultId = -1;
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("XSDBuiltInType");
+		if(union != null) {
+			QueryCondition qc3 = new QueryCondition();
+			qc3.add("name", "token");
+			defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
+		} else {
+			Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']//xsd:extension");
+			if(xsdTypeNameNode == null)
+				xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']//xsd:restriction");
+			if(xsdTypeNameNode != null) {
+				Element xsdTypeNameElement = (Element)xsdTypeNameNode;
+				xsdTypeName = xsdTypeNameElement.getAttribute("base");	
+				
+				QueryCondition qc3 = new QueryCondition();
+				qc3.add("builtin_type", xsdTypeName);
+				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
+				if(defaultId == 0) {
+					Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
+					QueryCondition qc4 = new QueryCondition();
+					qc4.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
+					defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc4, conn)).getXSDBuiltInTypeID();
+				}
+			} 
+		}
+		
+		typeName = typeName.replaceAll("Type", "");
+		
+		DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, aElementBDT.getAttribute("id"));
+		System.out.println(dVO1.getBasedDTID()+"  "+ dVO1.getDTID()+"  "+ defaultId);
+		validateInsertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId);
+
+		//Unqualified Type Name
+		String unQualifiedTypeName = dataType.replaceAll("Type", "");
+
+		//Unqualified Data Type Term
+		String unQualifiedDataTypeTerm = dataTypeTerm;
+		
+		DTVO dVO2 = validateInsertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"));
+		System.out.println(dVO1.getBasedDTID()+"  "+ dVO2.getDTID()+"  "+ defaultId);
+		validateInsertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO2.getDTID(), defaultId);
+	}
+	
 	private void validateImportDataTypeList(String dataType) throws Exception {
 		String typeName;
 		String xsdTypeName;
@@ -188,7 +262,6 @@ public class DataTypeTest {
 		} 
 		Element typeNameElement = (Element)typeNameNode;
 		typeName = typeNameElement.getAttribute("base");	
-		
 		Node aNodeTN = fields_xsd.getNode("//xsd:"+type+"Type[@name = '" + dataType + "']");
 		Element aElementTN = (Element)aNodeTN;
 		
@@ -207,7 +280,6 @@ public class DataTypeTest {
 		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
 			dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
 		//dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
-						
 		//Definitions
 		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
 		Element definitionElement = (Element)definitionNode;
@@ -251,7 +323,7 @@ public class DataTypeTest {
 		
 		typeName = typeName.replaceAll("Type", "");
 		
-		DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+		DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, aElementBDT.getAttribute("id"));
 		
 		validateInsertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId);
 
@@ -325,7 +397,7 @@ public class DataTypeTest {
 		
 		typeName = typeName.replaceAll("Type", "");
 		
-		DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+		DTVO dVO1 = validateInsertDefault_BDTStatement(typeName, dataTypeTerm, aElementBDT.getAttribute("id"));
 		
 		validateInsertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId);
 
@@ -987,6 +1059,117 @@ public class DataTypeTest {
 		return (DTVO)aDTDAO.findObject(qc, conn);
 	}
 	
+	private void validate_bdt_pri_resti(String datatype) throws SRTDAOException {
+		DAOFactory df;
+		df = DAOFactory.getDAOFactory();
+		SRTDAO aDTDAO = df.getDAO("DT");
+		QueryCondition qc = new QueryCondition();
+		qc.add("den", Utility.typeToDen(datatype));
+		int bdt_id = ((DTVO)aDTDAO.findObject(qc, conn)).getDTID();
+		SRTDAO aBDTPrimitiveRestrictionDAO = df.getDAO("BDTPrimitiveRestriction");
+		QueryCondition qc2 = new QueryCondition();
+		qc2.add("bdt_id", bdt_id);
+
+		List<SRTObject> bdt_pri_resti_list = aBDTPrimitiveRestrictionDAO.findObjects(qc2, conn);
+
+		ArrayList<String> bdt_pri_list = new ArrayList<String>();
+
+		if(((DTVO)aDTDAO.findObject(qc, conn)).getDEN().equals("Amount_0723C8. Type")){
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeDecimalxsd:decimal");
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeDoublexsd:double");
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeDoublexsd:float");
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeFloatxsd:float");
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeIntegerxsd:integer");
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeIntegerxsd:nonNegativeInteger");
+			bdt_pri_list.add("Amount_0723C8. TypeAmount. TypeIntegerxsd:positiveInteger");
+		}
+		
+		else if(((DTVO)aDTDAO.findObject(qc, conn)).getDEN().equals("Code_1DEB05. Type")){
+			bdt_pri_list.add("Code_1DEB05. TypeCode. TypeNormalizedStringxsd:normalizedString");
+			bdt_pri_list.add("Code_1DEB05. TypeCode. TypeStringxsd:string");
+			bdt_pri_list.add("Code_1DEB05. TypeCode. TypeTokenxsd:token");
+		}
+		
+		ArrayList<String> bdt_pri_fromDB = new ArrayList<String>();
+		
+		for(SRTObject bdtpriresti : bdt_pri_resti_list) {
+			BdtPriResti aBdtPriResti = new BdtPriResti(((BDTPrimitiveRestrictionVO)bdtpriresti).getBDTPrimitiveRestrictionID());
+			if(bdt_pri_list.indexOf(aBdtPriResti.getData()) == -1) 
+				System.out.println("Data error in bdt_pri_resti. Data is " + aBdtPriResti.getData());
+			bdt_pri_fromDB.add(aBdtPriResti.getData());
+		}
+		
+		for(String bdtpri : bdt_pri_list){
+				if(bdt_pri_fromDB.indexOf(bdtpri) == -1 ) System.out.println("Data may be missing in the bdt_pri_resti table. Data is " + bdtpri);
+		}
+	}
+	
+	class BdtPriResti {
+		int id;
+		String bdtDen;
+		String cdtDen;
+		String cdtPriTerm;
+		String xsdBuiltInType;
+		
+		public BdtPriResti(int id) throws SRTDAOException {
+			DAOFactory df;
+			df = DAOFactory.getDAOFactory();
+
+			SRTDAO aBDTPrimitiveRestriction = df.getDAO("BDTPrimitiveRestriction");
+			
+			QueryCondition qc = new QueryCondition();
+			qc.add("bdt_pri_restri_id", id);
+			BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO= (BDTPrimitiveRestrictionVO)aBDTPrimitiveRestriction.findObject(qc, conn);
+			int bdt_id;
+			bdt_id = aBDTPrimitiveRestrictionVO.getBDTID();
+			
+			SRTDAO aDT = df.getDAO("DT");
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("dt_id", bdt_id);
+			DTVO aDTVO= (DTVO)aDT.findObject(qc2, conn);
+			
+			bdtDen = aDTVO.getDEN();
+			
+			int cdt_awd_pri_xps_type_map_id = aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID();
+			
+			SRTDAO aCDTAllowedPrimitiveExpressionTypeMap = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
+			QueryCondition qc3 = new QueryCondition();
+			qc3.add("cdt_awd_pri_xps_type_map_id", cdt_awd_pri_xps_type_map_id);
+			CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMapVO= (CDTAllowedPrimitiveExpressionTypeMapVO)aCDTAllowedPrimitiveExpressionTypeMap.findObject(qc3, conn);
+			
+			int cdt_awd_pri_id = aCDTAllowedPrimitiveExpressionTypeMapVO.getCDTAllowedPrimitiveID();
+			int xbt_id = aCDTAllowedPrimitiveExpressionTypeMapVO.getXSDBuiltInTypeID();
+			
+			SRTDAO aCDTAllowedPrimitive = df.getDAO("CDTAllowedPrimitive");
+			QueryCondition qc4 = new QueryCondition();
+			qc4.add("cdt_awd_pri_id", cdt_awd_pri_id);
+			CDTAllowedPrimitiveVO cdtAllowedPrimitiveVO = (CDTAllowedPrimitiveVO)aCDTAllowedPrimitive.findObject(qc4, conn);
+			
+			SRTDAO aCDTPrimitive = df.getDAO("CDTPrimitive");
+			QueryCondition qc5 = new QueryCondition();
+			qc5.add("cdt_pri_id", cdtAllowedPrimitiveVO.getCDTPrimitiveID());
+			CDTPrimitiveVO cdtPrimitiveVO = (CDTPrimitiveVO) aCDTPrimitive.findObject(qc5, conn);
+			cdtPriTerm = cdtPrimitiveVO.getName();
+			
+			QueryCondition qc6 = new QueryCondition();
+			qc6.add("dt_id", cdtAllowedPrimitiveVO.getCDTID());
+			DTVO cdtVO = (DTVO) aDT.findObject(qc6, conn);
+			cdtDen = cdtVO.getDEN();
+			
+			SRTDAO aXbt = df.getDAO("XSDBuiltInType");
+			QueryCondition qc7 = new QueryCondition();
+			qc7.add("xbt_id", xbt_id);
+			XSDBuiltInTypeVO xsdBuiltInTypeVO = (XSDBuiltInTypeVO) aXbt.findObject(qc7, conn);
+			xsdBuiltInType = xsdBuiltInTypeVO.getBuiltInType();
+
+		}
+		
+		public String getData() {
+			return this.bdtDen + this.cdtDen + this.cdtPriTerm + this.xsdBuiltInType;
+		}
+		
+	}
+	
 	private static Connection conn = null;
 	
 	public void run() throws Exception {
@@ -999,29 +1182,39 @@ public class DataTypeTest {
 		XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 		XPathHandler components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
 			
-		for (int i = 0; i < Types.dataTypeList.length; i++){
-			validateImportDataTypeList(Types.dataTypeList[i]);
+//		for (int i = 0; i < Types.dataTypeList.length; i++){
+//			validateImportDataTypeList(Types.dataTypeList[i]);
+//		}
+		
+//		for (int i = 0; i < Types.dataTypeList.length; i++){
+//			validateImportDataTypeList(Types.dataTypeList[i]);
+//		}
+//		
+		
+		for (int i = 0; i < Types.defaultDataTypeList.length; i++){
+			validate_bdt_pri_resti(Types.defaultDataTypeList[i]);
 		}
 		
-		for (int i = 0; i < Types.simpleTypeList.length; i++){
-			validateImportDataTypeList(Types.simpleTypeList[i]);
-		}
 		
-		validatePopulateAdditionalDefault_BDTStatement(fields_xsd);
-		validatePopulateAdditionalDefault_BDTStatement(meta_xsd);
-		validatePopulateAdditionalDefault_BDTStatement(components_xsd);
-
-		File f = new File(SRTConstants.NOUNS_FILE_PATH);
-		File[] listOfFiles = f.listFiles();
-		for (File file : listOfFiles) {
-		    if (file.isFile()) {
-		    	XPathHandler nouns_xsd = new XPathHandler(SRTConstants.NOUNS_FILE_PATH + file.getName());
-		    	validatePopulateAdditionalDefault_BDTStatement(nouns_xsd);
-		    }
-		}
-		validateImportExceptionalDataTypeList("ValueType_039C44");
-		validateImportAdditionalBDT();
-		validateImportQBDT(fields_xsd);
+//		for (int i = 0; i < Types.simpleTypeList.length; i++){
+//			validateImportDataTypeList(Types.simpleTypeList[i]);
+//		}
+		
+//		validatePopulateAdditionalDefault_BDTStatement(fields_xsd);
+//		validatePopulateAdditionalDefault_BDTStatement(meta_xsd);
+//		validatePopulateAdditionalDefault_BDTStatement(components_xsd);
+//
+//		File f = new File(SRTConstants.NOUNS_FILE_PATH);
+//		File[] listOfFiles = f.listFiles();
+//		for (File file : listOfFiles) {
+//		    if (file.isFile()) {
+//		    	XPathHandler nouns_xsd = new XPathHandler(SRTConstants.NOUNS_FILE_PATH + file.getName());
+//		    	validatePopulateAdditionalDefault_BDTStatement(nouns_xsd);
+//		    }
+//		}
+//		validateImportExceptionalDataTypeList("ValueType_039C44");
+//		validateImportAdditionalBDT();
+//		validateImportQBDT(fields_xsd);
 		tx.close();
 		conn.close();
 		System.out.println("### DataType Validation End");

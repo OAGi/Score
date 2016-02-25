@@ -6,6 +6,11 @@ import java.util.List;
 
 public class Types {
 	
+	public static final String defaultDataTypeList[] = {
+		"AmountType_0723C8",
+		"CodeType_1DEB05"
+	};
+	
 	public static final String dataTypeList[] = {
 		"AmountType",
 		"BinaryObjectType",
@@ -28,21 +33,21 @@ public class Types {
 		"ValueType"
 	};
 	
-	public static final String simpleTypeList[] = {
-		"NormalizedStringType",
-		"TokenType",
-		"StringType",
-		"DayDateType",
-		"MonthDateType",
-		"MonthDayDateType",
-		"YearDateType",
-		"YearMonthDateType",
-		"URIType",
-		"DurationMeasureType",
-		"IntegerNumberType",
-		"PositiveIntegerNumberType",
-		"DayOfWeekHourMinuteUTCType"
-	};
+//	public static final String simpleTypeList[] = {
+//		"NormalizedStringType",
+//		"TokenType",
+//		"StringType",
+//		"DayDateType",
+//		"MonthDateType",
+//		"MonthDayDateType",
+//		"YearDateType",
+//		"YearMonthDateType",
+//		"URIType",
+//		"DurationMeasureType",
+//		"IntegerNumberType",
+//		"PositiveIntegerNumberType",
+//		"DayOfWeekHourMinuteUTCType"
+//	};
 	
 	public static List<String> getCorrespondingXSDBuiltType(String cdtPrimitive) {
 		List<String> res = new ArrayList<String>();

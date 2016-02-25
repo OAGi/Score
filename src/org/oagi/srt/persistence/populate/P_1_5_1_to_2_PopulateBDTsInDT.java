@@ -473,9 +473,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			importDataTypeList(Types.dataTypeList[i]);
 		}
 		
-		for (int i = 0; i < Types.simpleTypeList.length; i++){
-			importDataTypeList(Types.simpleTypeList[i]);
-		}
+//		for (int i = 0; i < Types.simpleTypeList.length; i++){
+//			importDataTypeList(Types.simpleTypeList[i]);
+//		}
 		
 		populateAdditionalDefault_BDTStatement(fields_xsd);
 		populateAdditionalDefault_BDTStatement(meta_xsd);
