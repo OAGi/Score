@@ -392,7 +392,7 @@ public class DataTypeTest {
 			qc01.add("den", den);
 			DTVO dtVO = (DTVO)dao.findObject(qc01, conn);
 			if(dtVO == null)
-				System.out.println("Error!"+new Exception().getStackTrace()[0].getLineNumber());
+				System.out.println("Error in line # "+new Exception().getStackTrace()[0].getLineNumber());
 			else {
 				;//System.out.println("Success!!");
 			    // BDT_Primitive_Restriction

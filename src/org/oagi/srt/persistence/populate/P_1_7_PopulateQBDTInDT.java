@@ -445,7 +445,17 @@ public class P_1_7_PopulateQBDTInDT {
 			String den = qualifier + "_ " + Utility.denToUnqualified(dVO.getDEN());
 			dtVO.setDEN(den);
 			dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
-			dtVO.setDefinition(null);
+			Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
+			String definition = null;
+			if(((Element)definitionNode) != null)
+				definition = ((Element)definitionNode).getTextContent();
+			else if(xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]") != null ){
+				definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+				definition = ((Element)definitionNode).getTextContent();
+			}
+			else
+				definition = null;
+			dtVO.setDefinition(definition);
 			dtVO.setContentComponentDefinition(null);
 			dtVO.setState(3);
 			QueryCondition qc = new QueryCondition();
