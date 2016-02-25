@@ -1,5 +1,4 @@
 insert into app_user (login_id, password, name, organization, oagis_developer_indicator) values ('oagis', 'oagis','Open Applications Group Developer', 'Open Applications Group', '1');
-
 insert into xbt (name, builtIn_type, subtype_of_xbt_id) values ('any type', 'xsd:anyType', null);
 
 insert into xbt (name, builtIn_type, subtype_of_xbt_id) 
@@ -70,7 +69,6 @@ insert into xbt (name, builtIn_type, subtype_of_xbt_id)
 
 insert into xbt (name, builtIn_type, subtype_of_xbt_id) 
 	Select 'any uri', 'xsd:anyURI', xbt_id from xbt where name = 'any simple type';
-	
 	
 insert into cdt_pri (name) values ('Binary');
 insert into cdt_pri (name) values ('Boolean');
@@ -166,7 +164,7 @@ value.', '', '3', app_user_id, app_user_id, app_user_id, CURRENT_TIMESTAMP, CURR
 
 insert into dt (guid, type, version_num, data_type_term, den, content_component_den, definition, content_component_definition, revision_doc, state, created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, revision_num, revision_tracking_num, revision_action, is_deprecated) 
 	select concat('oagis-id-',sys_guid()), '0', '1.0', 'Video', 'Video. Type', 'Video. Content', 'CDT V3.1. A video is a recording, reproducing or broadcasting of visual images on magnetic tape or digitally in binary notation (octets).', 'A finite sequence of binary digits (bits) for videos.', '', '3', app_user_id, app_user_id, app_user_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, '1', '0' from app_user where login_id = 'oagis' ;
-
+	
 Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
 	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
 
@@ -349,7 +347,6 @@ Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)
 Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
 	values ((select DT_ID from dt where Data_Type_Term = 'Video' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Binary'), '1'); 
 
-	
 Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id) 
 	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Amount' and Type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Decimal'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:decimal'));
@@ -780,191 +777,6 @@ Insert into cdt_awd_pri_xps_type_map (cdt_awd_pri_id, xbt_id)
 	values ((select cdt_awd_pri_id from cdt_awd_pri where cdt_id = (select dt_id from dt where data_type_term = 'Video' and type = 0) AND (cdt_pri_id = (select cdt_pri_id from cdt_pri where name = 'Binary'))),
 			(select xbt_id from xbt where builtIn_type = 'xsd:hexBinary'));
 
-	
-/*
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Amount' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Binary Object' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Binary'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Code' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'NormalizedString'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Code' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'String'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Code' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Token'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Date' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'TimePoint'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Date Time' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'TimePoint'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Duration' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'TimeDuration'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Graphic' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Binary'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Identifier' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'NormalizedString'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Identifier' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'String'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Identifier' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Token'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Indicator' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Boolean'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0'); 
-
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Measure' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Name' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'NormalizedString'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Name' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'String'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Name' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Token'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Number' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Number' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Number' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Number' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Ordinal' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Percent' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Picture' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Binary'), '1'); 
-
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0');
- 
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Quantity' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0');
- 
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Rate' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0');
- 
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Ratio' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'String'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Sound' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Binary'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Text' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'NormalizedString'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Text' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'String'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Text' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Token'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Time' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'TimePoint'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Decimal'), '1'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Double'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Float'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default)  
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Integer'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'NormalizedString'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'String'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Value' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Token'), '0'); 
-
-Insert into cdt_awd_pri (cdt_id, cdt_pri_id, is_default) 
-	values ((select DT_ID from dt where Data_Type_Term = 'Video' and Type = 0), (select cdt_pri_id from cdt_pri where name = 'Binary'), '1'); 
-*/
-	
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Currency', 'Code', 'The currency of the amount', DT_ID, 0, 1 FROM dt WHERE data_type_term ='Amount' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'MIME', 'Code', 'The Multipurpose Internet Mail Extensions(MIME) media type of the binary object', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Binary Object' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Character Set', 'Code', 'The character set of the binary object if the Multipurpose Internet Mail Extensions (MIME) type is text', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Binary Object' and type =  0;
@@ -999,214 +811,6 @@ INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_d
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'MIME', 'Code', 'The Multipurpose Internet Mail Extensions(MIME) media type of the video', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Video' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Character Set', 'Code', 'The character set of the binary object if the Multipurpose Internet Mail Extensions (MIME) type is text', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Video' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Filename', 'Name', 'The filename of the video', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Video' and type =  0;
-
-/*
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Agency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Agency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Agency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Version'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Version'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Version'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Time Zone'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Time Zone'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Time Zone'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Daylight Saving'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Boolean'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Version'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Version'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Version'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Agency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Agency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Agency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Measure' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Measure' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Measure' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Name' and dt_sc.Property_Term = 'Language'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Name' and dt_sc.Property_Term = 'Language'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Name' and dt_sc.Property_Term = 'Language'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Decimal'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Double'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Float'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Integer'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Decimal'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Double'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Float'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Integer'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Text' and dt_sc.Property_Term = 'Language'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Text' and dt_sc.Property_Term = 'Language'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Text' and dt_sc.Property_Term = 'Language'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Character Set'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0;
-
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) SELECT (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1;
-
-*/
-
 
 INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
 
@@ -1330,45 +934,45 @@ INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT D
 
 INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Decimal'), 1);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Decimal'), 1);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Double'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Double'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Float'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Float'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Integer'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Integer'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Decimal'), 1);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Decimal'), 1);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Double'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Double'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Float'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Float'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Integer'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Integer'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Unit'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
 
-INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
+INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Currency'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
 
 INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'NormalizedString'), 0);
 
@@ -1411,226 +1015,6 @@ INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT D
 INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'String'), 0);
 
 INSERT INTO cdt_sc_awd_pri (cdt_sc_id, cdt_pri_id, is_default) values ((SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename'), (SELECT cdt_pri_id FROM cdt_pri WHERE Name = 'Token'), 1);
-
-
-/*
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID = (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID = (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID = (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID = (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Binary Object' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Agency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Agency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Agency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Version') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Version') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Code' and dt_sc.Property_Term = 'List Version') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Time Zone') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Time Zone') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Time Zone') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Date Time' and dt_sc.Property_Term = 'Daylight Saving') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Boolean')), (SELECT xbt_id FROM xbt WHERE name = "boolean");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Graphic' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Version') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Version') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Version') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Agency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Agency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Identifier' and dt_sc.Property_Term = 'Scheme Agency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Measure' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Measure' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Measure' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Name' and dt_sc.Property_Term = 'Language') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Name' and dt_sc.Property_Term = 'Language') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Name' and dt_sc.Property_Term = 'Language') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Picture' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Decimal')), (SELECT xbt_id FROM xbt WHERE name = "decimal");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = "double");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = "float");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Float')), (SELECT xbt_id FROM xbt WHERE name = "float");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = "integer");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = "non negative integer");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = "positive integer");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Decimal')), (SELECT xbt_id FROM xbt WHERE name = "decimal");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = "double");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = "float");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Float')), (SELECT xbt_id FROM xbt WHERE name = "float");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = "integer");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = "non negative integer");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = "positive integer");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Text' and dt_sc.Property_Term = 'Language') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Text' and dt_sc.Property_Term = 'Language') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Text' and dt_sc.Property_Term = 'Language') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Character Set') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = "normalized string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = "string");
-
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) SELECT (SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = "token");
-*/
-
 
 INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID = (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Amount' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
 
@@ -1754,57 +1138,57 @@ INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT
 
 INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Quantity' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Decimal')), (SELECT xbt_id FROM xbt WHERE name = 'decimal'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Decimal')), (SELECT xbt_id FROM xbt WHERE name = 'decimal'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'double'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'double'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Float')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Float')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'integer'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'integer'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'non negative integer'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'non negative integer'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'positive integer'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'positive integer'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Decimal')), (SELECT xbt_id FROM xbt WHERE name = 'decimal'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Decimal')), (SELECT xbt_id FROM xbt WHERE name = 'decimal'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'double'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'double'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Double')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Float')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Float')), (SELECT xbt_id FROM xbt WHERE name = 'float'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'integer'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'integer'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'non negative integer'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'non negative integer'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'positive integer'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Multiplier') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Integer')), (SELECT xbt_id FROM xbt WHERE name = 'positive integer'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Unit') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
 
-INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Ratio' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
+INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Rate' and dt_sc.Property_Term = 'Base Currency') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
 
 INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Sound' and dt_sc.Property_Term = 'MIME') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'NormalizedString')), (SELECT xbt_id FROM xbt WHERE name = 'normalized string'));
 
@@ -1847,3 +1231,4 @@ INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT
 INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'String')), (SELECT xbt_id FROM xbt WHERE name = 'string'));
 
 INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
+
