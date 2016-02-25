@@ -7,11 +7,11 @@ public class RunAll {
 	public static void main(String args[]) throws Exception {
 		Utility.dbSetup();
 
-//		P_1_3_PopulateAgencyIDList p1 = new P_1_3_PopulateAgencyIDList();
-//		p1.run();
-//		
-//		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
-//		p2.run();
+		P_1_3_PopulateAgencyIDList p1 = new P_1_3_PopulateAgencyIDList();
+		p1.run();
+		
+		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
+		p2.run();
 		
 		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
 		p3.run();
