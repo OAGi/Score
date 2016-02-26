@@ -30,7 +30,8 @@ public class Types {
 		"QuantityType",
 		"TextType",	
 		"TimeType",
-		"ValueType"
+		"ValueType",
+		"OrdinalType"
 	};
 	
 //	public static final String simpleTypeList[] = {

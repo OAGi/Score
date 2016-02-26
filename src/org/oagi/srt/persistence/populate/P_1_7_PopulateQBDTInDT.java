@@ -224,12 +224,12 @@ public class P_1_7_PopulateQBDTInDT {
 				if(typeNode == null) {
 					typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
 				}
-				
 				QueryCondition qc = new QueryCondition();
 				String typeGuid = ((Element)typeNode).getAttribute("id");
 				qc.add("guid", typeGuid);
 				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
 				
+
 				QueryCondition qc2 = new QueryCondition();
 				qc2.add("GUID", typeGuid);
 				CodeListVO codelistVO = (CodeListVO)aCodeListDAO.findObject(qc2, conn);
@@ -292,8 +292,6 @@ public class P_1_7_PopulateQBDTInDT {
 				for(SRTObject mapVO : maps) {
 					CDTSCAllowedPrimitiveExpressionTypeMapVO vo = (CDTSCAllowedPrimitiveExpressionTypeMapVO)mapVO;
 					bdtscprimitiverestionvo.setCDTSCAllowedPrimitiveExpressionTypeMapID(vo.getCTSCAllowedPrimitiveExpressionTypeMapID());
-					//System.out.println("type = "+type+"  cdt primitive id = "+svo.getCDTPrimitiveID()+"   xsd builtin type = "+vo.getXSDBuiltInTypeID());
-
 					if(type.equalsIgnoreCase("NumberType_B98233")) {
 						if(svo.getCDTPrimitiveID() == getCDTPrimitiveID("Decimal") && vo.getXSDBuiltInTypeID() == getXSDBuiltInTypeID("xsd:decimal"))
 							bdtscprimitiverestionvo.setisDefault(true);
@@ -370,7 +368,6 @@ public class P_1_7_PopulateQBDTInDT {
 							bdtscprimitiverestionvo.setisDefault(false);
 						//bdtSCPRDAO.insertObject(bdtscprimitiverestionvo);
 						
-//						System.out.println("### Agency Id");
 //						// add agency_id_list id for this case
 //						bdtscprimitiverestionvo.setAgencyIDListID(getAgencyListID());
 //						bdtscprimitiverestionvo.setisDefault(false);

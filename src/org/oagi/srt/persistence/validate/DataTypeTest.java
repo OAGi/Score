@@ -716,7 +716,6 @@ public class DataTypeTest {
 		DAOFactory df;
 		df = DAOFactory.getDAOFactory();
 		
-		
 		if(!qbdtVO.getDEN().contains("_"))
 			qbdtVO = getDTVO(qbdtVO.getBasedDTID());
 		
@@ -1090,6 +1089,7 @@ public class DataTypeTest {
 			bdt_pri_list.add("Code_1DEB05. TypeCode. TypeTokenxsd:token");
 		}
 		
+
 		ArrayList<String> bdt_pri_fromDB = new ArrayList<String>();
 		
 		for(SRTObject bdtpriresti : bdt_pri_resti_list) {
@@ -1104,6 +1104,53 @@ public class DataTypeTest {
 		}
 	}
 	
+	private void validate_default_bdt() throws SRTDAOException{
+		DAOFactory df;
+		df = DAOFactory.getDAOFactory();
+		SRTDAO aDTDAO = df.getDAO("DT");
+		QueryCondition qc = new QueryCondition();
+		ArrayList<String> default_bdt = new ArrayList<String>();
+		default_bdt.add(Utility.typeToDen("AmountType_0723C8"));
+		default_bdt.add(Utility.typeToDen("BinaryObjectType_290B4F"));
+		default_bdt.add(Utility.typeToDen("GraphicType_CM6785"));
+		default_bdt.add(Utility.typeToDen("SoundType_697AE6"));
+		default_bdt.add(Utility.typeToDen("VideoType_539B44"));
+		default_bdt.add(Utility.typeToDen("CodeType_1DEB05"));
+		default_bdt.add(Utility.typeToDen("DateType_238C51"));
+		default_bdt.add(Utility.typeToDen("DateTimeType_AD9DD9"));
+		default_bdt.add(Utility.typeToDen("DurationType_JJ5401"));
+		default_bdt.add(Utility.typeToDen("IDType_D995CD"));
+		default_bdt.add(Utility.typeToDen("IndicatorType_CVW231"));
+		default_bdt.add(Utility.typeToDen("MeasureType_671290"));
+		default_bdt.add(Utility.typeToDen("NameType_02FC2Z"));
+		default_bdt.add(Utility.typeToDen("NumberType_BE4776"));
+		default_bdt.add(Utility.typeToDen("OrdinalType_PQALZM"));
+		default_bdt.add(Utility.typeToDen("PercentType_481002"));
+		default_bdt.add(Utility.typeToDen("QuantityType_201330"));
+		default_bdt.add(Utility.typeToDen("TextType_62S0B4"));
+		default_bdt.add(Utility.typeToDen("TimeType_100DCA"));
+		default_bdt.add(Utility.typeToDen("ValueType_D19E7B"));
+		default_bdt.add(Utility.typeToDen("CodeType_1E7368"));
+		default_bdt.add(Utility.typeToDen("IDType_B3F14E"));
+		default_bdt.add(Utility.typeToDen("ValueType_039C44"));
+		default_bdt.add(Utility.typeToDen("DateType_DB95C8"));
+		default_bdt.add(Utility.typeToDen("DateType_0C267D"));
+		default_bdt.add(Utility.typeToDen("DateType_5B057B"));
+		default_bdt.add(Utility.typeToDen("DateType_57D5E1"));
+		default_bdt.add(Utility.typeToDen("DateType_BBCC14"));
+		default_bdt.add(Utility.typeToDen("NumberType_B98233"));
+		default_bdt.add(Utility.typeToDen("NumberType_201301"));
+		default_bdt.add(Utility.typeToDen("TextType_62S0C1"));
+		default_bdt.add(Utility.typeToDen("TextType_0VCBZ5"));
+		default_bdt.add(Utility.typeToDen("TextType_0F0ZX1"));
+	
+		for(int i = 0 ; i < default_bdt.size(); i ++) {
+			qc.add("den", default_bdt.get(i));
+			if(aDTDAO.findObject(qc, conn) == null)
+				System.out.println("There is no default bdt in dt table : "+default_bdt.get(i));
+			qc = new QueryCondition();
+		}
+	}
 	class BdtPriResti {
 		int id;
 		String bdtDen;
@@ -1191,10 +1238,11 @@ public class DataTypeTest {
 //		}
 //		
 		
-		for (int i = 0; i < Types.defaultDataTypeList.length; i++){
-			validate_bdt_pri_resti(Types.defaultDataTypeList[i]);
-		}
+//		for (int i = 0; i < Types.defaultDataTypeList.length; i++){
+//			validate_bdt_pri_resti(Types.defaultDataTypeList[i]);
+//		}
 		
+		validate_default_bdt();
 		
 //		for (int i = 0; i < Types.simpleTypeList.length; i++){
 //			validateImportDataTypeList(Types.simpleTypeList[i]);
