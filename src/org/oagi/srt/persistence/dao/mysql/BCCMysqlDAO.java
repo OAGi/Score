@@ -79,7 +79,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setInt(13, bccVO.getState());
 			ps.setInt(14, bccVO.getRevisionNum());
 			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			ps.setBoolean(16, bccVO.getRevisionAction());
+			ps.setInt(16, bccVO.getRevisionAction());
 			ps.setInt(17, bccVO.getReleaseId());
 			ps.setInt(18, bccVO.getCurrentBccId());
 			ps.setBoolean(19, bccVO.getIs_deprecated());
@@ -162,7 +162,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -259,7 +259,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -317,7 +317,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -377,7 +377,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -431,7 +431,7 @@ public class BCCMysqlDAO extends SRTDAO{
 			ps.setInt(13, bccVO.getState());
 			ps.setInt(14, bccVO.getRevisionNum());
 			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			ps.setBoolean(16, bccVO.getRevisionAction());
+			ps.setInt(16, bccVO.getRevisionAction());
 			ps.setInt(17, bccVO.getReleaseId());
 			ps.setInt(18, bccVO.getCurrentBccId());
 			ps.setBoolean(19, bccVO.getIs_deprecated());
@@ -542,7 +542,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -642,7 +642,7 @@ public class BCCMysqlDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));

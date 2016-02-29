@@ -28,7 +28,7 @@ public class BCCPVO extends SRTObject {
 	private String Module;
 	private int RevisionNum;
 	private int RevisionTrackingNum;
-	private boolean RevisionAction;
+	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentBccpId;
 	private boolean Is_deprecated;
@@ -161,11 +161,11 @@ public class BCCPVO extends SRTObject {
 		RevisionTrackingNum = revisionTrackingNum;
 	}
 	
-	public boolean getRevisionAction() {
+	public int getRevisionAction() {
 		return RevisionAction;
 	}
 	
-	public void setRevisionAction(boolean revisionAction) {
+	public void setRevisionAction(int revisionAction) {
 		RevisionAction = revisionAction;
 	}
 	

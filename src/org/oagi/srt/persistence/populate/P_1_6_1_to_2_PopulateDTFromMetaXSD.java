@@ -95,7 +95,6 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
-			dtVO.setRevisionAction(true);
 			dtVO.setIs_deprecated(false);
 			
 		    dao.insertObject(dtVO);

@@ -83,7 +83,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setString(11, bccpVO.getModule());
 			ps.setInt(12, bccpVO.getRevisionNum());
 			ps.setInt(13, bccpVO.getRevisionTrackingNum());
-			ps.setBoolean(14, bccpVO.getRevisionAction());
+			ps.setInt(14, bccpVO.getRevisionAction());
 			ps.setInt(15, bccpVO.getReleaseId());
 			ps.setInt(16, bccpVO.getCurrentBccpId());
 			ps.setBoolean(17, bccpVO.getIs_deprecated());
@@ -166,7 +166,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setModule(rs.getString("Module"));
 				bccpVO.setRevisionNum(rs.getInt("revision_num"));
 				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccpVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -246,7 +246,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setModule(rs.getString("Module"));
 				bccpVO.setRevisionNum(rs.getInt("revision_num"));
 				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccpVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -306,7 +306,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setModule(rs.getString("Module"));
 				bccpVO.setRevisionNum(rs.getInt("revision_num"));
 				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccpVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -364,7 +364,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 				bccpVO.setModule(rs.getString("Module"));
 				bccpVO.setRevisionNum(rs.getInt("revision_num"));
 				bccpVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccpVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccpVO.setRevisionAction(rs.getInt("revision_action"));
 				bccpVO.setReleaseId(rs.getInt("release_id"));
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -419,7 +419,7 @@ public class BCCPMysqlDAO extends SRTDAO {
 			ps.setString(11, bccpVO.getModule());
 			ps.setInt(12, bccpVO.getRevisionNum());
 			ps.setInt(13, bccpVO.getRevisionTrackingNum());
-			ps.setBoolean(14, bccpVO.getRevisionAction());
+			ps.setInt(14, bccpVO.getRevisionAction());
 			ps.setInt(15, bccpVO.getReleaseId());
 			ps.setInt(16, bccpVO.getCurrentBccpId());
 			ps.setBoolean(17, bccpVO.getIs_deprecated());

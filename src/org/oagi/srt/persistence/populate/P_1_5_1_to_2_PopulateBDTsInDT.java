@@ -65,8 +65,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			//dtVO.setRevisionType(0);
 			dtVO.setDataTypeTerm(dataTypeTerm);
 			dtVO.setBasedDTID(basedDTID);
-			dtVO.setDEN(typeName + ". Type");
-			dtVO.setContentComponentDEN(typeName + ". Content");
+			dtVO.setDEN(Utility.typeToDen(typeName));
+			dtVO.setContentComponentDEN(Utility.typeToContent(typeName));
 			dtVO.setDefinition(definition);
 			dtVO.setContentComponentDefinition(ccDefinition);
 			dtVO.setState(3);
@@ -80,7 +80,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
-			dtVO.setRevisionAction(true);
 			dtVO.setIs_deprecated(false);
 	
 			dao.insertObject(dtVO);
@@ -101,7 +100,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			Element tmp = (Element)xsd_node.item(i);
 			String typeName = tmp.getAttribute("type");
 			
-			String den = tmp.getAttribute("type").replaceAll("Type", "") + ". Type";
+			String den = Utility.typeToDen(tmp.getAttribute("type"));
 			
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("DEN", den);
@@ -169,9 +168,11 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 						} 
 					}
 					
+					if (defaultId == -1 || defaultId == 0) System.out.println("Error getting the default BDT primitive restriction for the default BDT: " + typeName);
+					
 					//typeName = typeName.replaceAll("Type", "");
 					
-					typeName = tmp.getAttribute("type").replaceAll("Type", "");
+					typeName = tmp.getAttribute("type"); //here
 						
 					DTVO dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, (definitionElement != null) ? definitionElement.getTextContent() : null, (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
 					
@@ -202,8 +203,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			//dtVO.setRevisionType(0);
 			dtVO.setDataTypeTerm(dataTypeTerm);
 			dtVO.setBasedDTID(basedDTID);
-			dtVO.setDEN(typeName + ". Type");
-			dtVO.setContentComponentDEN(typeName + ". Content");
+			dtVO.setDEN(Utility.typeToDen(typeName));
+			dtVO.setContentComponentDEN(Utility.typeToContent(typeName));
 			dtVO.setState(3);
 			QueryCondition qc_02 = new QueryCondition();
 			qc_02.add("login_id", "oagis");
@@ -214,7 +215,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
-			dtVO.setRevisionAction(true);
 			dtVO.setIs_deprecated(false);
 			dao.insertObject(dtVO);
 		}
@@ -258,11 +258,14 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 		}
 		Element dataTypeTermElement = (Element)dataTypeTermNode;
-		dataTypeTerm = dataTypeTermElement.getTextContent();
-		if (dataTypeTerm.length() > 5) if (dataTypeTerm.substring(dataTypeTerm.length() - 6, dataTypeTerm.length()).equals(". Type"))
-			dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
-		//dataTypeTerm = dataTypeTerm.replaceAll(" Object", "");
-						
+		dataTypeTerm = "";
+		try {
+			dataTypeTerm = dataTypeTermElement.getTextContent().substring(0, dataTypeTerm.indexOf(". Type"));
+			if (dataTypeTerm == "") System.out.println("Error getting the data type term for the unqualified BDT: " + dataType);
+		} catch (Exception e){
+			System.out.println("Error getting the data type term for the unqualified BDT: " + dataType + " Stacktrace:" + e.getMessage());
+		}
+									
 		//Definitions
 		Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
 		Element definitionElement = (Element)definitionNode;
@@ -273,6 +276,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			ccDefinitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
 		Element ccDefinitionElement = (Element)ccDefinitionNode;				
 		
+		//This is the default BDT type definition node
 		Node aNodeBDT = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']");
 		Element aElementBDT = (Element)aNodeBDT;
 		
@@ -305,14 +309,14 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			} 
 		}
 		
-		typeName = typeName.replaceAll("Type", "");
+		if (defaultId == -1 || defaultId == 0) System.out.println("Error getting the default BDT primitive restriction for the default BDT: " + typeName);
 		
 		DTVO dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
 		
 		insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO1.getDTID(), defaultId);
 
 		//Unqualified Type Name
-		String unQualifiedTypeName = dataType.replaceAll("Type", "");
+		String unQualifiedTypeName = dataType;
 
 		//Unqualified Data Type Term
 		String unQualifiedDataTypeTerm = dataTypeTerm;

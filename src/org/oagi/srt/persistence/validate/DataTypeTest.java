@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -736,7 +737,6 @@ public class DataTypeTest {
 			validateInsertBDTSCPrimitiveRestriction(getDTSCVO(dtsc_vo.getDTSCGUID(), owner_dT_iD), 1, "", "");
 		}
 		
-		// new SC
 		NodeList attributeList = xHandler.getNodeList("//xsd:complexType[@id = '" + qbdtVO.getDTGUID() + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
 		
 		if(attributeList == null || attributeList.getLength() == 0) {
@@ -1217,6 +1217,45 @@ public class DataTypeTest {
 		
 	}
 	
+	private void validteDTSC() throws SRTDAOException{
+		DAOFactory df;
+		df = DAOFactory.getDAOFactory();
+		SRTDAO aDTDAO = df.getDAO("DT");
+		SRTDAO aDTSCDAO = df.getDAO("DTSC");
+		
+		ArrayList<SRTObject> DTSCList = aDTSCDAO.findObjects();
+		HashMap <SRTObject, Boolean> map = new HashMap <SRTObject, Boolean>();
+		for(SRTObject DTSC : DTSCList)
+			map.put(DTSC, false);
+		
+		for(int i = 0; i < DTSCList.size(); i++){
+			SRTObject DTSC = DTSCList.get(i);
+			if(map.get(DTSC))
+				continue;
+			DTSCVO dtscvo = (DTSCVO) DTSC;
+			if(dtscvo.getBasedDTSCID() == 0)
+				continue;
+			int dt_id = dtscvo.getOwnerDTID();
+			QueryCondition qc = new QueryCondition();
+			qc.add("dt_id", dt_id);
+			DTVO ownerDT = (DTVO) aDTDAO.findObject(qc, conn);
+			if(ownerDT.getDEN().contains("_")) {// if BDT is default BDT
+				QueryCondition qc2 = new QueryCondition();
+				qc2.add("dt_sc_id", dtscvo.getBasedDTSCID());
+				DTSCVO basedDTscvo = (DTSCVO) aDTSCDAO.findObject(qc2, conn);
+				if(basedDTscvo.getOwnerDTID() != ownerDT.getBasedDTID())
+					System.out.println("DTSC based on default BDT is wrong when dt_sc_id = "+dtscvo.getDTSCID());
+				else
+					System.out.println("good when dt_sc_id = "+dtscvo.getDTSCID());
+				map.put(DTSC, true);
+				
+			}
+			else { // if BDT is qualified BDT
+				
+			}
+		}
+		
+	}
 	private static Connection conn = null;
 	
 	public void run() throws Exception {
@@ -1232,22 +1271,17 @@ public class DataTypeTest {
 //		for (int i = 0; i < Types.dataTypeList.length; i++){
 //			validateImportDataTypeList(Types.dataTypeList[i]);
 //		}
-		
 //		for (int i = 0; i < Types.dataTypeList.length; i++){
 //			validateImportDataTypeList(Types.dataTypeList[i]);
 //		}
 //		
-		
 //		for (int i = 0; i < Types.defaultDataTypeList.length; i++){
 //			validate_bdt_pri_resti(Types.defaultDataTypeList[i]);
 //		}
-		
-		validate_default_bdt();
-		
-//		for (int i = 0; i < Types.simpleTypeList.length; i++){
-//			validateImportDataTypeList(Types.simpleTypeList[i]);
-//		}
-		
+//		
+//		validate_default_bdt();
+//		
+//
 //		validatePopulateAdditionalDefault_BDTStatement(fields_xsd);
 //		validatePopulateAdditionalDefault_BDTStatement(meta_xsd);
 //		validatePopulateAdditionalDefault_BDTStatement(components_xsd);
@@ -1263,6 +1297,7 @@ public class DataTypeTest {
 //		validateImportExceptionalDataTypeList("ValueType_039C44");
 //		validateImportAdditionalBDT();
 //		validateImportQBDT(fields_xsd);
+		validteDTSC();
 		tx.close();
 		conn.close();
 		System.out.println("### DataType Validation End");

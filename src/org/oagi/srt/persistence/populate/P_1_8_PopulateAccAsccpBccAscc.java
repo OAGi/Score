@@ -169,7 +169,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			accpVO.setLastUpdatedByUserId(userId);
 			accpVO.setOwnerUserId(userId);
 			accpVO.setIs_deprecated(false);
-			accpVO.setRevisionAction(true);
 			accpVO.setNamespaceId(1); //tmp
 			accpVO.setReleaseId(1);//tmp
 			asccpDao.insertObject(accpVO);
@@ -216,7 +215,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		accpVO.setLastUpdatedByUserId(userId);
 		accpVO.setOwnerUserId(userId);
 		accpVO.setIs_deprecated(false);
-		accpVO.setRevisionAction(true);
 		accpVO.setNamespaceId(1); //tmp
 		accpVO.setReleaseId(1);//tmp
 		asccpDao.insertObject(accpVO);
@@ -263,7 +261,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asscVO.setDefinition(definition);
 			asscVO.setState(3);
 			asscVO.setIs_deprecated(false);
-			asscVO.setRevisionAction(true);
 			asscVO.setReleaseId(1);//tmp
 			asccDao.insertObject(asscVO);
 			
@@ -441,7 +438,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setDEN(den);
 			aBCCVO.setState(3);
 			aBCCVO.setIs_deprecated(false);
-			aBCCVO.setRevisionAction(true);
 			aBCCVO.setReleaseId(1);//tmp
 			bccDao.insertObject(aBCCVO);
 		}
@@ -495,7 +491,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aBCCVO.setDEN(den);
 			aBCCVO.setState(3);
 			aBCCVO.setIs_deprecated(false);
-			aBCCVO.setRevisionAction(true);
 			aBCCVO.setReleaseId(1);//tmp
 			bccDao.insertObject(aBCCVO);
 		}
@@ -541,7 +536,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		bccpVO.setLastUpdatedByUserId(userId);
 		bccpVO.setOwnerUserId(userId);
 		bccpVO.setIs_deprecated(false);
-		bccpVO.setRevisionAction(true);
 		bccpVO.setReleaseId(1);//tmp
 		bccpDao.insertObject(bccpVO);
 
@@ -596,7 +590,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			aACCVO.setState(3);
 			aACCVO.setModule(module);
 			aACCVO.setIs_deprecated(false);
-			aACCVO.setRevisionAction(true);
 			aACCVO.setNamespaceId(1); //tmp
 			aACCVO.setReleaseId(1);//tmp
 			accDao.insertObject(aACCVO);
@@ -630,7 +623,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asccpVO.setLastUpdatedByUserId(userId);
 			asccpVO.setOwnerUserId(userId);
 			asccpVO.setIs_deprecated(false);
-			asccpVO.setRevisionAction(true);
 			asccpVO.setNamespaceId(1); //tmp
 			asccpVO.setReleaseId(1);//tmp
 			asccpDao.insertObject(asccpVO);
@@ -666,7 +658,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 			asscVO.setDefinition("Group");
 			asscVO.setState(3);
 			asscVO.setIs_deprecated(false);
-			asscVO.setRevisionAction(true);
 			asscVO.setReleaseId(1);//tmp
 			asccDao.insertObject(asscVO);
 		//}
@@ -735,7 +726,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 		aACCVO.setState(state);
 		aACCVO.setModule(module);
 		aACCVO.setIs_deprecated(false);
-		aACCVO.setRevisionAction(true);
 		aACCVO.setNamespaceId(1); //tmp
 		aACCVO.setReleaseId(1);//tmp
 		accDao.insertObject(aACCVO);

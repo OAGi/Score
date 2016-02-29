@@ -11,7 +11,7 @@ public class Types {
 		"CodeType_1DEB05"
 	};
 	
-	public static final String dataTypeList[] = {
+	public static final String old_dataTypeList[] = {
 		"AmountType",
 		"BinaryObjectType",
 		"GraphicType",
@@ -33,6 +33,45 @@ public class Types {
 		"ValueType",
 		"OrdinalType"
 	};
+	
+	public static final String dataTypeList[] = {
+		"NormalizedStringType",
+		"TokenType",
+		"StringType",
+		"AmountType",
+		"BinaryObjectType",
+		"GraphicType",
+		"SoundType",
+		"VideoType",
+		"CodeType",
+		"DayDateType",
+		"MonthDateType",
+		"MonthDayDateType",
+		"YearDateType",
+		"YearMonthDateType",
+		"URIType",
+		"DateType",
+		"DateTimeType",
+		"DurationType",
+		"DurationMeasureType",
+		"IDType",
+		"IndicatorType",
+		"IntegerNumberType",
+		"PositiveIntegerNumberType",
+		"MeasureType",
+		"NameType",
+		"NumberType",
+		"PercentType",
+		"QuantityType",
+		"TextType",	
+		"TimeType",
+		"ValueType",
+		"OrdinalType",
+		"DayOfWeekHourMinuteUTCType",
+		"CodeContentType",
+		"IDContentType"
+	};
+	
 	
 //	public static final String simpleTypeList[] = {
 //		"NormalizedStringType",

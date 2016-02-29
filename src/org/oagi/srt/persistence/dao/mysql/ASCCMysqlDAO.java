@@ -81,7 +81,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(12, asccVO.getState());
 			ps.setInt(13, asccVO.getRevisionNum());
 			ps.setInt(14, asccVO.getRevisionTrackingNum());
-			ps.setBoolean(15, asccVO.getRevisionAction());
+			ps.setInt(15, asccVO.getRevisionAction());
 			ps.setInt(16, asccVO.getReleaseId());
 			ps.setInt(17, asccVO.getCurrentAsccId());
 			ps.setBoolean(18, asccVO.getIs_deprecated());
@@ -168,7 +168,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setState(rs.getInt("State"));
 				asccVO.setRevisionNum(rs.getInt("revision_num"));
 				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -248,7 +248,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setState(rs.getInt("State"));
 				asccVO.setRevisionNum(rs.getInt("revision_num"));
 				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -307,7 +307,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setState(rs.getInt("State"));
 				asccVO.setRevisionNum(rs.getInt("revision_num"));
 				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -368,7 +368,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setState(rs.getInt("State"));
 				asccVO.setRevisionNum(rs.getInt("revision_num"));
 				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -422,7 +422,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 			ps.setInt(12, asccVO.getState());
 			ps.setInt(13, asccVO.getRevisionNum());
 			ps.setInt(14, asccVO.getRevisionTrackingNum());
-			ps.setBoolean(15, asccVO.getRevisionAction());
+			ps.setInt(15, asccVO.getRevisionAction());
 			ps.setInt(16, asccVO.getReleaseId());
 			ps.setInt(17, asccVO.getCurrentAsccId());
 			ps.setBoolean(18, asccVO.getIs_deprecated());
@@ -534,7 +534,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setState(rs.getInt("State"));
 				asccVO.setRevisionNum(rs.getInt("revision_num"));
 				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -634,7 +634,7 @@ public class ASCCMysqlDAO extends SRTDAO {
 				asccVO.setState(rs.getInt("State"));
 				asccVO.setRevisionNum(rs.getInt("revision_num"));
 				asccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				asccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				asccVO.setRevisionAction(rs.getInt("revision_action"));
 				asccVO.setReleaseId(rs.getInt("release_id"));
 				asccVO.setCurrentAsccId(rs.getInt("current_ascc_id"));
 				asccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));

@@ -81,7 +81,7 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(13, accVO.getState());
 			ps.setInt(14, accVO.getRevisionNum());
 			ps.setInt(15, accVO.getRevisionTrackingNum());
-			ps.setBoolean(16, accVO.getRevisionAction());
+			ps.setInt(16, accVO.getRevisionAction());
 			ps.setInt(17, accVO.getReleaseId());
 			ps.setInt(18, accVO.getCurrentAccId());
 			ps.setBoolean(19, accVO.getIs_deprecated());
@@ -167,7 +167,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setState(rs.getInt("State"));
 				accVO.setRevisionNum(rs.getInt("revision_num"));
 				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				accVO.setRevisionAction(rs.getBoolean("revision_action"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -249,7 +249,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setState(rs.getInt("State"));
 				accVO.setRevisionNum(rs.getInt("revision_num"));
 				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				accVO.setRevisionAction(rs.getBoolean("revision_action"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -311,7 +311,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setState(rs.getInt("State"));
 				accVO.setRevisionNum(rs.getInt("revision_num"));
 				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				accVO.setRevisionAction(rs.getBoolean("revision_action"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -371,7 +371,7 @@ public class ACCMysqlDAO extends SRTDAO {
 				accVO.setState(rs.getInt("State"));
 				accVO.setRevisionNum(rs.getInt("revision_num"));
 				accVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				accVO.setRevisionAction(rs.getBoolean("revision_action"));
+				accVO.setRevisionAction(rs.getInt("revision_action"));
 				accVO.setReleaseId(rs.getInt("release_id"));
 				accVO.setCurrentAccId(rs.getInt("current_acc_id"));
 				accVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -425,7 +425,7 @@ public class ACCMysqlDAO extends SRTDAO {
 			ps.setInt(13, accVO.getState());
 			ps.setInt(14, accVO.getRevisionNum());
 			ps.setInt(15, accVO.getRevisionTrackingNum());
-			ps.setBoolean(16, accVO.getRevisionAction());
+			ps.setInt(16, accVO.getRevisionAction());
 			ps.setInt(17, accVO.getReleaseId());
 			ps.setInt(18, accVO.getCurrentAccId());
 			ps.setBoolean(19, accVO.getIs_deprecated());

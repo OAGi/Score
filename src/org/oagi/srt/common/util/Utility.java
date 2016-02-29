@@ -76,12 +76,25 @@ public class Utility {
 		if(type.contains("_")){
 			String part1 = type.substring(0, type.indexOf("Type"));
 			String part2 = type.substring(type.indexOf("_"), type.length());
-			den = part1 + part2 + ". Type";
+			den = spaceSeparator(part1) + part2 + ". Type";
 		}
 		else
 			den = type.substring(0, type.indexOf("Type"))+". Type";
 		return den;
 	}
+	
+	public static String typeToContent(String type) {
+		String den;
+		if(type.contains("_")){
+			String part1 = type.substring(0, type.indexOf("Type"));
+			String part2 = type.substring(type.indexOf("_"), type.length());
+			den = spaceSeparator(part1) + part2 + ". Type";
+		}
+		else
+			den = type.substring(0, type.indexOf("Type"))+". Content";
+		return den;
+	}
+	
 	
 	public static String firstToUpperCase(String str) {
 		String prefix = str.substring(0, 1);

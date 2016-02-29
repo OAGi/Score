@@ -86,7 +86,7 @@ public class DTMysqlDAO extends SRTDAO {
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
 			ps.setInt(17, dtVO.getRevisionNum());
 			ps.setInt(18, dtVO.getRevisionTrackingNum());
-			ps.setBoolean(19, dtVO.getRevisionAction());
+			ps.setInt(19, dtVO.getRevisionAction());
 			ps.setInt(20, dtVO.getReleaseId());
 			ps.setInt(21, dtVO.getCurrentBdtId());
 			ps.setBoolean(22, dtVO.getIs_deprecated());
@@ -186,7 +186,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				dtVO.setRevisionNum(rs.getInt("revision_num"));
 				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setRevisionAction(rs.getInt("revision_action"));
 				dtVO.setReleaseId(rs.getInt("release_id"));
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -289,7 +289,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				dtVO.setRevisionNum(rs.getInt("revision_num"));
 				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setRevisionAction(rs.getInt("revision_action"));
 				dtVO.setReleaseId(rs.getInt("release_id"));
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -365,7 +365,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				dtVO.setRevisionNum(rs.getInt("revision_num"));
 				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setRevisionAction(rs.getInt("revision_action"));
 				dtVO.setReleaseId(rs.getInt("release_id"));
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -426,7 +426,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				dtVO.setRevisionNum(rs.getInt("revision_num"));
 				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setRevisionAction(rs.getInt("revision_action"));
 				dtVO.setReleaseId(rs.getInt("release_id"));
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -481,7 +481,7 @@ public class DTMysqlDAO extends SRTDAO {
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
 			ps.setInt(17, dtVO.getRevisionNum());
 			ps.setInt(18, dtVO.getRevisionTrackingNum());
-			ps.setBoolean(19, dtVO.getRevisionAction());
+			ps.setInt(19, dtVO.getRevisionAction());
 			ps.setInt(20, dtVO.getReleaseId());
 			ps.setInt(21, dtVO.getCurrentBdtId());
 			ps.setBoolean(22, dtVO.getIs_deprecated());
@@ -611,7 +611,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				dtVO.setRevisionNum(rs.getInt("revision_num"));
 				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setRevisionAction(rs.getInt("revision_action"));
 				dtVO.setReleaseId(rs.getInt("release_id"));
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -669,7 +669,7 @@ public class DTMysqlDAO extends SRTDAO {
 				dtVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				dtVO.setRevisionNum(rs.getInt("revision_num"));
 				dtVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				dtVO.setRevisionAction(rs.getBoolean("revision_action"));
+				dtVO.setRevisionAction(rs.getInt("revision_action"));
 				dtVO.setReleaseId(rs.getInt("release_id"));
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));

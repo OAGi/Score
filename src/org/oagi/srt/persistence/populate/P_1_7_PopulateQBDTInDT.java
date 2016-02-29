@@ -464,7 +464,6 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setRevisionDocumentation("");
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
-			dtVO.setRevisionAction(true);
 			dtVO.setIs_deprecated(false);
 			aDTDAO.insertObject(dtVO);
 			

@@ -32,7 +32,7 @@ public class ASCCPVO extends SRTObject implements Serializable {
 	private int OwnerUserId;
 	private int RevisionNum;
 	private int RevisionTrackingNum;
-	private boolean RevisionAction;
+	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentAsccpId;
 	private boolean Is_deprecated;
@@ -172,11 +172,11 @@ public class ASCCPVO extends SRTObject implements Serializable {
 		RevisionTrackingNum = revisionTrackingNum;
 	}
 	
-	public boolean getRevisionAction() {
+	public int getRevisionAction() {
 		return RevisionAction;
 	}
 	
-	public void setRevisionAction(boolean revisionAction) {
+	public void setRevisionAction(int revisionAction) {
 		RevisionAction = revisionAction;
 	}
 	

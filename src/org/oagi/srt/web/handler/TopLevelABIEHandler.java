@@ -1425,13 +1425,13 @@ public class TopLevelABIEHandler implements Serializable {
 					ASCCPVO hASCCP = new ASCCPVO(); // populate ASCCP history record
 					hASCCP.setRevisionNum(1);
 					hASCCP.setRevisionTrackingNum(1);
-					hASCCP.setRevisionAction(true);
+					
 					asccpDao.insertObject(hASCCP);
 
 					ASCCVO hASCC = new ASCCVO(); //populate ASCC history record
 					hASCC.setRevisionNum(1);
 					hASCC.setRevisionTrackingNum(1);
-					hASCC.setRevisionAction(true);
+					
 					asccDao.insertObject(hASCC);
 					
 					

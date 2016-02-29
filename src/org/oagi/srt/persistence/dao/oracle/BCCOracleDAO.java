@@ -95,11 +95,7 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(13, bccVO.getState());
 			ps.setInt(14, bccVO.getRevisionNum());
 			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			if( bccVO.getRevisionAction())				
-				ps.setInt(16,1);
-			else 	
-				ps.setInt(16,0);
-
+			ps.setInt(16, bccVO.getRevisionAction());
 			ps.setInt(17, bccVO.getReleaseId());
 			ps.setInt(18, bccVO.getCurrentBccId());
 			if( bccVO.getIs_deprecated())				
@@ -186,7 +182,7 @@ public class BCCOracleDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -283,7 +279,7 @@ public class BCCOracleDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -341,7 +337,7 @@ public class BCCOracleDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -401,7 +397,7 @@ public class BCCOracleDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -469,11 +465,7 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(13, bccVO.getState());
 			ps.setInt(14, bccVO.getRevisionNum());
 			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			if( bccVO.getRevisionAction())				
-				ps.setInt(16,1);
-			else 	
-				ps.setInt(16,0);
-
+			ps.setInt(16,bccVO.getRevisionAction());
 			ps.setInt(17, bccVO.getReleaseId());
 			ps.setInt(18, bccVO.getCurrentBccId());
 			if( bccVO.getIs_deprecated())				
@@ -588,7 +580,7 @@ public class BCCOracleDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
@@ -688,7 +680,7 @@ public class BCCOracleDAO extends SRTDAO{
 				bccVO.setState(rs.getInt("State"));
 				bccVO.setRevisionNum(rs.getInt("revision_num"));
 				bccVO.setRevisionTrackingNum(rs.getInt("revision_tracking_num"));
-				bccVO.setRevisionAction(rs.getBoolean("revision_action"));
+				bccVO.setRevisionAction(rs.getInt("revision_action"));
 				bccVO.setReleaseId(rs.getInt("release_id"));
 				bccVO.setCurrentBccId(rs.getInt("current_bcc_id"));
 				bccVO.setIs_deprecated(rs.getBoolean("is_deprecated"));

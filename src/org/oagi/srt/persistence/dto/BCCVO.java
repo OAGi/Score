@@ -31,7 +31,7 @@ public class BCCVO extends SRTObject {
 	private int State;
 	private int RevisionNum;
 	private int RevisionTrackingNum;
-	private boolean RevisionAction;
+	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentBccId;
 	private boolean Is_deprecated;
@@ -181,11 +181,11 @@ public class BCCVO extends SRTObject {
 		RevisionTrackingNum = revisionTrackingNum;
 	}
 	
-	public boolean getRevisionAction() {
+	public int getRevisionAction() {
 		return RevisionAction;
 	}
 	
-	public void setRevisionAction(boolean revisionAction) {
+	public void setRevisionAction(int revisionAction) {
 		RevisionAction = revisionAction;
 	}
 	

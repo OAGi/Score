@@ -32,7 +32,7 @@ public class DTVO extends SRTObject {
 	private Timestamp LastUpdateTimestamp;
 	private int RevisionNum;
 	private int RevisionTrackingNum;
-	private boolean RevisionAction;
+	private int RevisionAction;
 	private int ReleaseId;
 	private int CurrentBdtId;
 	private boolean Is_deprecated;
@@ -205,11 +205,11 @@ public class DTVO extends SRTObject {
 		RevisionTrackingNum = revisionTrackingNum;
 	}
 	
-	public boolean getRevisionAction() {
+	public int getRevisionAction() {
 		return RevisionAction;
 	}
 	
-	public void setRevisionAction(boolean revisionAction) {
+	public void setRevisionAction(int revisionAction) {
 		RevisionAction = revisionAction;
 	}
 	
