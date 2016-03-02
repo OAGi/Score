@@ -299,13 +299,13 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				xsdTypeName = xsdTypeNameElement.getAttribute("base");	
 				
 				QueryCondition qc3 = new QueryCondition();
-				qc3.add("builtin_type", xsdTypeName);
+				qc3.add("builtIn_type", xsdTypeName);
 				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
 				if(defaultId < 1) {
 					Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
 					QueryCondition qc4 = new QueryCondition();
 					System.out.println(xsdTypeName);
-					qc4.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
+					qc4.add("builtIn_type", ((Element)xbtNode).getAttribute("base"));
 					defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc4, conn)).getXSDBuiltInTypeID();
 				}
 			} 
@@ -374,12 +374,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				xsdTypeName = xsdTypeNameElement.getAttribute("base");	
 				
 				QueryCondition qc3 = new QueryCondition();
-				qc3.add("builtin_type", xsdTypeName);
+				qc3.add("builtIn_type", xsdTypeName);
 				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
 				if(defaultId == 0) {
 					Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
 					QueryCondition qc4 = new QueryCondition();
-					qc4.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
+					qc4.add("builtIn_type", ((Element)xbtNode).getAttribute("base"));
 					defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc4, conn)).getXSDBuiltInTypeID();
 				}
 			} 

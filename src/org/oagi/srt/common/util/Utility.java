@@ -24,6 +24,18 @@ public class Utility {
 		return den;
 	}
 	
+	public static String parseUppercase(String str) {
+		int index = 0;
+		str = str.replaceAll("ID", "Identifier");
+		for(int i = str.length() - 1 ; i > -1 ; i--) {
+			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
+				index = i;
+				break;
+			}
+		}
+		return str.substring(0,index).toLowerCase();
+	}
+	
 	public static String first(String den) {
 		den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ","").replaceAll("Identifier","ID");
 		return den;
@@ -58,7 +70,7 @@ public class Utility {
 	public static String denToTypeName(String den) {
 		String part1 = den.substring(0, den.indexOf("_"));
 		String part2 = den.substring(den.indexOf("_"), den.indexOf("."));
-		return part1 + "Type" + part2;
+		return part1.replaceAll(" ", "") + "Type" + part2;
 	}
 	
 	public static String denToUnqualified(String den) {
@@ -79,7 +91,7 @@ public class Utility {
 			den = spaceSeparator(part1) + part2 + ". Type";
 		}
 		else
-			den = type.substring(0, type.indexOf("Type"))+". Type";
+			den = spaceSeparator(type.substring(0, type.indexOf("Type")))+". Type";
 		return den;
 	}
 	
@@ -88,13 +100,42 @@ public class Utility {
 		if(type.contains("_")){
 			String part1 = type.substring(0, type.indexOf("Type"));
 			String part2 = type.substring(type.indexOf("_"), type.length());
-			den = spaceSeparator(part1) + part2 + ". Type";
+			den = spaceSeparator(part1) + part2 + ". Content";
 		}
 		else
-			den = type.substring(0, type.indexOf("Type"))+". Content";
+			den = spaceSeparator(type.substring(0, type.indexOf("Type")))+". Content";
 		return den;
 	}
 	
+	public static String getLastToken(String str) {
+		StringBuffer sb = new StringBuffer();
+		
+		if(str.contains("_")) {
+			int underscore = str.indexOf("_");
+			str = str.substring(0, underscore)+str.substring(underscore+1, underscore+2).toUpperCase()+str.substring(underscore+2, str.length());
+		}
+		
+		for(int i = 0; i < str.length(); i++) {
+			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
+				if(Character.isUpperCase(str.charAt(i - 1)))
+					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)) && (str.charAt(i) != 'D' && str.charAt(i-1) != 'I'))
+						sb.append(" " + str.charAt(i));
+					else
+						sb.append(str.charAt(i));
+				else 
+					sb.append(" " + str.charAt(i));
+			} else if(Character.isLowerCase(str.charAt(i)) && i == 0) {
+				sb.append(String.valueOf(str.charAt(i)).toUpperCase());
+			} else {
+				sb.append(str.charAt(i));
+			}
+		}
+
+		String result = sb.toString();
+		if(result.endsWith(" Code Type"))
+			result = result.substring(0, result.indexOf((" Code Type"))).replaceAll(" ", "").concat(" Code Type");
+		return result.substring(result.lastIndexOf(" ")+1);
+	}
 	
 	public static String firstToUpperCase(String str) {
 		String prefix = str.substring(0, 1);

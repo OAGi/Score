@@ -16,11 +16,8 @@ public class RunAll {
 		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
 		p3.run();
 		
-		P_1_5_3_PopulateSCInDTSC p4 = new P_1_5_3_PopulateSCInDTSC();
+		P_1_5_3_to_5_PopulateSCInDTSC p4 = new P_1_5_3_to_5_PopulateSCInDTSC();
 		p4.run();
-		
-		P_1_5_4_to_5_PopulateCDTSCAllowedPrimitive p5 = new P_1_5_4_to_5_PopulateCDTSCAllowedPrimitive();
-		p5.run();
 		
 		P_1_5_6_PopulateBDTSCPrimitiveRestriction p6 = new P_1_5_6_PopulateBDTSCPrimitiveRestriction();
 		p6.run();
