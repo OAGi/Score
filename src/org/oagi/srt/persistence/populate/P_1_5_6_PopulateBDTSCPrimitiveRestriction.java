@@ -78,9 +78,15 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 					result = xh.getNode("//xsd:attribute[@id='" + dtscVO.getDTSCGUID() + "']");
 					tmp_guid = dtscVO.getDTSCGUID();
 				}
-				
+				if(result == null){
+					System.out.println(aDTSCVO.getDTSCGUID()+" is inherited bdt from cdt");
+					continue;
+				}
+				else
+					System.out.println("BDT SC Primitive restriction for "+aDTSCVO.getDTSCGUID()+" is populated");
 				Element ele = (Element)result;
 				QueryCondition qc_00 = new QueryCondition();
+				
 				qc_00.add("name", ele.getAttribute("type").replaceAll("ContentType", ""));
 				int codeListId = ((CodeListVO)aCodeListDAO.findObject(qc_00, conn)).getCodeListID();
 				

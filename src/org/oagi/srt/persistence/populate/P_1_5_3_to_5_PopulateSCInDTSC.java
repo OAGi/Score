@@ -97,7 +97,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					vo.setRepresentationTerm(cdtscvo.getRepresentationTerm());
 					vo.setDefinition(cdtscvo.getDefinition());
 					vo.setOwnerDTID(dtVO.getDTID());
-					vo.setBasedDTSCID(cdtscvo.getBasedDTSCID());
+					vo.setBasedDTSCID(cdtscvo.getDTSCID());
 					CDTSCPropertyTermList.add(cdtscvo.getPropertyTerm().replaceAll(" ", "").toLowerCase());
 					int min_cardinality = 0, max_cardinality = 0;
 
@@ -287,7 +287,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					daoDTSC.insertObject(vo);
 					
 					QueryCondition qc_04 = new QueryCondition();
-					qc_04.add("Data_Type_Term", dtVO.getDataTypeTerm());
+					qc_04.add("Data_Type_Term", vo.getRepresentationTerm());
 					qc_04.add("Type", 0);
 					DTVO cdtVO = (DTVO) aDTDAO.findObject(qc_04, conn);
 					QueryCondition qc_05 = new QueryCondition();
@@ -372,6 +372,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 								qc_07.add("BuiltIn_Type", xsd_builtin_type.get(l));
 								XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
 								bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
+								System.out.println("Inserting CDT SC Allowed Primitive Expresssion Typemap for new SC whose property term = "+vo.getPropertyTerm()+", expression type map = "+xsd_builtin_type.get(l));
 								aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
 							}
 						}
@@ -387,7 +388,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 	}
 	
 	public void run() throws Exception {
-		System.out.println("### 1.5.3 Start");
+		System.out.println("### 1.5.3-5 Start");
 		
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
@@ -396,7 +397,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 		
 		tx.close();
 		conn.close();
-		System.out.println("### 1.5.3 End");
+		System.out.println("### 1.5.3-5 End");
 		
 	}
 	
