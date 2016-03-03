@@ -62,11 +62,11 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		
 		QueryCondition qc_02 = new QueryCondition();
 		qc_02.add("owner_dt_id", dtVO_012.getDTID());
-		DTSCVO dtscVO_01 = (DTSCVO)dtscDao.findObject(qc_02, conn);
+		DTSCVO dtscVO_01 = (DTSCVO)dtscDao.findObject(qc_02, conn); //cdt
 		
 		QueryCondition qc_12 = new QueryCondition();
 		qc_12.add("owner_dt_id", dtVO_01.getDTID());
-		DTSCVO textBDT_dtscVO = (DTSCVO)dtscDao.findObject(qc_12, conn);
+		DTSCVO textBDT_dtscVO = (DTSCVO)dtscDao.findObject(qc_12, conn); //bdt
 		
 		
 		XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -74,7 +74,8 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		for(int i = 0; i < complexTypes.getLength(); i++) {
 			Element ele = (Element)complexTypes.item(i);
 		    String eleGuid = ele.getAttribute("id");
-		    
+		    System.out.println("");
+		    System.out.println("Populating DT SCs from complextype whose name is "+ele.getAttribute("name"));
 			// inherit all values from default Text BDT with two exceptions (max cardinality and based DTSC Id)
 			QueryCondition qc_021 = new QueryCondition();
 			qc_021.add("guid", eleGuid);
@@ -96,10 +97,10 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 			qc_0211.add("guid", dtscVO_01.getDTSCGUID());
 			qc_0211.add("owner_dt_id", dtVO_011.getDTID());
 			int bdtSCId = ((DTSCVO)dtscDao.findObject(qc_0211, conn)).getDTSCID();
-			
 			// populate BDT_SC_Primitive_Restriction table for language code
 			QueryCondition qc_022 = new QueryCondition();
-			qc_022.add("bdt_sc_id", dtscVO_01.getDTSCID());
+			qc_022.add("bdt_sc_id", textBDT_dtscVO.getDTSCID());
+			System.out.println("Inherit BDT SC which is "+textBDT_dtscVO.getPropertyTerm()+textBDT_dtscVO.getRepresentationTerm());
 			List<SRTObject> bdtscs = bdtSCPRDao.findObjects(qc_022, conn);
 			for(SRTObject obj : bdtscs) {
 				BDTSCPrimitiveRestrictionVO parent = (BDTSCPrimitiveRestrictionVO)obj;
@@ -110,7 +111,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 				bdtSCPRVO.setCodeListID(parent.getCodeListID());
 				bdtSCPRVO.setisDefault(parent.getisDefault());
 				bdtSCPRDao.insertObject(bdtSCPRVO);
-				System.out.println("bdt sc id = " + bdtSCPRVO.getBDTSCID()+" cdt sc allow pri ex type map id = "+bdtSCPRVO.getCDTSCAllowedPrimitiveExpressionTypeMapID()+"  is_default = "+bdtSCPRVO.getisDefault());
+				System.out.println("bdt sc id = " + bdtSCPRVO.getBDTSCID()+" cdt sc allow pri ex type map id = "+bdtSCPRVO.getCDTSCAllowedPrimitiveExpressionTypeMapID()+" code list id = "+  bdtSCPRVO.getCodeListID()+ " is_default = "+bdtSCPRVO.getisDefault());
 
 			}
 			
@@ -138,7 +139,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 		    	dtscVO_03.setOwnerDTID(dtVO_02.getDTID());
 		    	dtscVO_03.setPropertyTerm(Utility.spaceSeparator(attrName));
 		    	dtscVO_03.setRepresentationTerm((attrName.equalsIgnoreCase("expressionLanguage")) ? "Text" : "Code");
-				
+				System.out.println("Populating xsd:attribute [@name = "+attrName+"]");
 				dtscDao.insertObject(dtscVO_03);
 				
 				// populate CDT_SC for this new dt_sc
@@ -155,6 +156,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 					int cdtPrimitiveID = getCDTPrimitiveID(name[k]);
 					aCDTSCAllowedPrimitiveVO.setCDTPrimitiveID(cdtPrimitiveID);
 					aCDTSCAllowedPrimitiveVO.setisDefault((name[k].equalsIgnoreCase("Token")) ? true : false);
+					System.out.println("Populating CDT SC Primitives... cdt sc id = " + aCDTSCAllowedPrimitiveVO.getCDTSCID() +" cdt primitive = " + name[k] + " is_default = " + aCDTSCAllowedPrimitiveVO.getisDefault());
 					cdtSCAPDao.insertObject(aCDTSCAllowedPrimitiveVO);
 					
 					QueryCondition qc_05 = new QueryCondition();
@@ -171,6 +173,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 						qc_06.add("builtin_type", xbt);
 						int xdtBuiltTypeId = ((XSDBuiltInTypeVO)xbtDao.findObject(qc_06, conn)).getXSDBuiltInTypeID();
 						mapVO.setXSDBuiltInTypeID(xdtBuiltTypeId);
+						System.out.println("Populating CDT SC Allowed Primitive Expression Type map .. xdt built in type id = "+xdtBuiltTypeId+ " cdt sc id = " + aCDTSCAllowedPrimitiveVO.getCDTSCID() +" cdt primitive = " + name[k] + " is_default = " + aCDTSCAllowedPrimitiveVO.getisDefault());
 						cdtSCAPMapDao.insertObject(mapVO);
 						
 						QueryCondition qc_07 = new QueryCondition();
@@ -187,6 +190,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 						} else if(attrName.equalsIgnoreCase("actionCode")) {
 							bdtSCPRVO.setisDefault(false);
 						}
+						System.out.println("Populating BDT SC Allowed Primitive Expression Type map for "+attrName);
 						bdtSCPRDao.insertObject(bdtSCPRVO);
 					}
 			    }
