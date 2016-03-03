@@ -109,6 +109,10 @@ public class P_1_7_PopulateQBDTInDT {
 		NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
 		NodeList elementsFromMetaXSD = meta_xsd.getNodeList("/xsd:schema/xsd:element");
 		NodeList elementsFromComponentsXSD = component_xsd.getNodeList("/xsd:schema/xsd:element");
+		
+		insertCodeContentTypeDT();
+		insertIDContentTypeDT();
+		
 		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd, 0);
 		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd, 1); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
 		//insertDTAndBCCP(elementsFromComponentsXSD, component_xsd, 2);
@@ -416,7 +420,7 @@ public class P_1_7_PopulateQBDTInDT {
 			if(base.endsWith("CodeContentType")) {
 				dVO = getDTVOWithDEN("Code. Type");
 			} else {
-				String den = Utility.createDENFormat(base);
+				String den = Utility.createDENFormat(Utility.spaceSeparator(base));
 				dVO = getDTVOWithDEN(den);
 				
 				// QBDT is based on another QBDT
@@ -436,10 +440,12 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setBasedDTID(dVO.getDTID());
 			dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
 			
-			String tmp = Utility.spaceSeparator(type);
-			String qualifier = tmp.substring(0, tmp.indexOf(" "));
+			String qualifier = Utility.qualifier(type, dVO.getDEN());
+			if(qualifier.length()==0 || qualifier.isEmpty() || qualifier==null){
+				System.out.println("!!Null Qualifier Detected During Import QBDT " + type + " based on DEN:" + dVO.getDEN());
+			}
 			dtVO.setQualifier(qualifier);
-			String den = qualifier + "_ " + Utility.denToUnqualified(dVO.getDEN());
+			String den = Utility.denWithQualifier(qualifier, dVO.getDEN());
 			dtVO.setDEN(den);
 			dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
 			Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
@@ -873,6 +879,149 @@ public class P_1_7_PopulateQBDTInDT {
 		QueryCondition qc = new QueryCondition();
 		qc.add("guid", guid);
 		return (DTVO)aDTDAO.findObject(qc, conn);
+	}
+	
+	private void insertCodeContentTypeDT() throws SRTDAOException, XPathExpressionException{
+		String dataType = "CodeContentType";
+		NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
+
+		for(int i = 0; i < simpleTypesFromFieldsXSD.getLength() ; i++) {
+			Node typeNode = simpleTypesFromFieldsXSD.item(i);
+			String type = ((Element)typeNode).getAttribute("name");
+			if(type.endsWith(dataType) && !type.equals(dataType)) {
+				String typeGuid = ((Element)typeNode).getAttribute("id");				
+				QueryCondition qc = new QueryCondition();
+				qc.add("guid", typeGuid);
+				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
+				if(dtVO == null) {
+					// add new QBDT
+					DTVO dVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
+					
+					// add DT_SC
+					addToDTSCForContentType(fields_xsd, type, dVO);	
+				}
+			}
+		}		
+	}
+	
+	private void insertIDContentTypeDT() throws SRTDAOException, XPathExpressionException{
+		String dataType = "IDContentType";
+		NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
+
+		for(int i = 0; i < simpleTypesFromFieldsXSD.getLength() ; i++) {
+			Node typeNode = simpleTypesFromFieldsXSD.item(i);
+			String type = ((Element)typeNode).getAttribute("name");
+			if(type.endsWith(dataType) && !type.equals(dataType)) {
+				String typeGuid = ((Element)typeNode).getAttribute("id");				
+				QueryCondition qc = new QueryCondition();
+				qc.add("guid", typeGuid);
+				DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
+				if(dtVO == null) {
+					// add new QBDT
+					DTVO dVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
+					
+					// add DT_SC
+					addToDTSCForContentType(fields_xsd, type, dVO);	
+				}
+			}
+		}		
+	}
+	
+	private DTVO addToDTForContentType(String guid, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
+		DTVO dVO = new DTVO();
+		
+		DTVO dtVO = new DTVO();
+		dtVO.setDTGUID(guid);
+		dtVO.setDTType(1);
+		dtVO.setVersionNumber("1.0");
+		//dtVO.setRevisionType(0);
+		
+		//System.out.println("### type: " + type);
+		
+		Element extension = (Element)((Element)typeNode).getElementsByTagName("xsd:restriction").item(0);
+		String base = extension.getAttribute("base");
+
+		if(base.endsWith("CodeContentType")) {
+			dVO = getDTVOWithDEN("Code Content. Type");
+		} 
+		else { //else if (base.endsWith("IDContentType")){
+			dVO = getDTVOWithDEN("ID Content. Type");
+		}
+		
+		dtVO.setBasedDTID(dVO.getDTID());
+		dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
+		
+		String qualifier = Utility.qualifier(type, dVO.getDEN());
+		if(qualifier.length()==0 || qualifier.isEmpty() || qualifier==null){
+			System.out.println("!!Null Qualifier Detected During Import QBDT " + type + " based on DEN: " + dVO.getDEN());
+		}
+		
+		dtVO.setQualifier(qualifier);
+		String den = Utility.denWithQualifier(qualifier, dVO.getDEN());
+		dtVO.setDEN(den);
+		dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
+		Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
+		String definition = null;
+		if(((Element)definitionNode) != null)
+			definition = ((Element)definitionNode).getTextContent();
+		else if(xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]") != null ){
+			definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+			definition = ((Element)definitionNode).getTextContent();
+		}
+		else
+			definition = null;
+		dtVO.setDefinition(definition);
+		dtVO.setContentComponentDefinition(null);
+		dtVO.setState(3);
+		QueryCondition qc = new QueryCondition();
+		qc.add("login_id", "oagis");
+		int userId = ((UserVO)daoUser.findObject(qc, conn)).getUserID();
+		dtVO.setCreatedByUserId(userId);
+		dtVO.setLastUpdatedByUserId(userId);
+		dtVO.setOwnerUserId(userId);
+		dtVO.setRevisionDocumentation("");
+		dtVO.setRevisionNum(0);
+		dtVO.setRevisionTrackingNum(0);
+		dtVO.setIs_deprecated(false);
+		aDTDAO.insertObject(dtVO);
+		
+		QueryCondition qc1 = new QueryCondition();
+		qc1.add("guid", guid);
+		
+		DTVO res = (DTVO)aDTDAO.findObject(qc1, conn);
+		// add to BDTPrimitiveRestriction
+		insertBDTPrimitiveRestriction(res, base);
+		
+		return res;
+	}
+	
+	private void addToDTSCForContentType(XPathHandler xHandler, String typeName, DTVO qbdtVO) throws SRTDAOException, XPathExpressionException {
+		
+		// inherit from the base BDT
+		QueryCondition qc = new QueryCondition();
+		qc.add("owner_dt_iD", qbdtVO.getBasedDTID());
+		
+		int owner_dT_iD = qbdtVO.getDTID();
+		
+		ArrayList<SRTObject> dtsc_vos = aDTSCDAO.findObjects(qc, conn);
+		for(SRTObject sObj : dtsc_vos) {
+			DTSCVO dtsc_vo = (DTSCVO)sObj;
+			
+			DTSCVO vo = new DTSCVO();
+			vo.setDTSCGUID(dtsc_vo.getDTSCGUID());
+			vo.setPropertyTerm(dtsc_vo.getPropertyTerm());
+			vo.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
+			vo.setOwnerDTID(owner_dT_iD);
+			
+			vo.setMinCardinality(dtsc_vo.getMinCardinality());
+			//vo.setMaxCardinality(dtsc_vo.getMaxCardinality());
+			vo.setMaxCardinality(0);
+			vo.setBasedDTSCID(dtsc_vo.getDTSCID());
+			
+			aDTSCDAO.insertObject(vo);	
+			
+			insertBDTSCPrimitiveRestriction(getDTSCVO(dtsc_vo.getDTSCGUID(), owner_dT_iD), 1, "", "");
+		}
 	}
 	
 	public void run() throws Exception {

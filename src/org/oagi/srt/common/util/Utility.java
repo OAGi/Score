@@ -171,6 +171,98 @@ public class Utility {
 		return result;
 	}
 	
+	public static String spaceSeparatorWithoutStr(String str, String except) {
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i < str.length(); i++) {
+			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
+				if(Character.isUpperCase(str.charAt(i - 1)))
+					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)) && (str.charAt(i) != 'D' && str.charAt(i-1) != 'I'))
+						sb.append(" " + str.charAt(i));
+					else
+						sb.append(str.charAt(i));
+				else 
+					sb.append(" " + str.charAt(i));
+			} else if(Character.isLowerCase(str.charAt(i)) && i == 0) {
+				sb.append(String.valueOf(str.charAt(i)).toUpperCase());
+			} else {
+				sb.append(str.charAt(i));
+			}
+		}
+		String result = sb.toString();
+		//if(result.endsWith(" Code Type"))
+		//	result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
+		result = result.replace(except, "");
+		result = result.trim();
+		return result;
+	}
+	
+	public static String denWithoutUUID(String den){
+		
+		int uuidCheck = den.indexOf("_");
+		int qualifiedCheck = den.indexOf("_ ");//Qualified should not have UUID den
+		
+		if(qualifiedCheck == -1){//if not qualified
+			if(uuidCheck != -1){// if it has "_"
+				String part1 = den.substring(0, uuidCheck);
+				return part1+". Type";
+			}
+		}
+		
+		return den;
+	}
+	
+	public static String firstDenWithoutUUID(String den){
+		
+		String denXUUID = denWithoutUUID(den);
+		denXUUID = denXUUID.replaceAll("_", "");
+		denXUUID = denXUUID.substring(0, denXUUID.indexOf(". Type"));
+		return denXUUID;
+		
+	}
+	
+	public static String denWithQualifier(String qualifier, String baseDen){
+		String denWithQualifier = "";
+		baseDen = Utility.denWithoutUUID(baseDen);
+		denWithQualifier =qualifier +"_ "+baseDen;
+		
+		return denWithQualifier;
+	}
+	
+	public static String toQualifiedCodeContentDen(String den){
+		
+		String QCCDen = "";
+		int posCodeContent = den.indexOf("Code Content");
+		String part1 = den.substring(0, posCodeContent);
+		String part2 = den.substring(posCodeContent+12);
+		
+		return part1+"_ "+part2;
+	}
+	
+	public static String qualifier(String type, String baseDen){
+		
+		String qualifier = "";
+		String p1 = Utility.spaceSeparatorWithoutStr(type, "Type");
+		//System.out.print(p1);
+		String p2 = Utility.firstDenWithoutUUID(baseDen);
+		//System.out.print("\t"+p2);
+		
+		int pos = p1.indexOf(p2);
+		
+		if(p2.endsWith("Code Content")){
+			pos = p1.indexOf("Code");
+		}
+		
+		if(pos == -1){
+			qualifier= p1;
+		}
+		else {
+			qualifier= p1.substring(0, pos);
+		}
+		qualifier = qualifier.trim();
+		//System.out.println("\t\t"+qualifier);
+		return qualifier;
+	}
+	
 	public static void dbSetup() throws Exception {
 		ServerProperties props = ServerProperties.getInstance();
 		String _propFile = SRTConstants.SRT_PROPERTIES_FILE_NAME;

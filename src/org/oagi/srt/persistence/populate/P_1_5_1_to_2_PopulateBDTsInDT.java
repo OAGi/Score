@@ -436,7 +436,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			System.out.println("Importing "+dataType+" now in the exception ");
 			Element typeNameElement = (Element)typeNameNode;
 			typeName = typeNameElement.getAttribute("base");	
-			
+						
 			Node aNodeTN = fields_xsd.getNode("//xsd:"+type+"Type[@name = '" + dataType + "']");
 			Element aElementTN = (Element)aNodeTN;
 			
@@ -606,6 +606,135 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		return ((XSDBuiltInTypeVO)(daoXSD.findObject(qc, conn))).getXSDBuiltInTypeID();		
 	}
 	
+	private void importCodeContentType() throws Exception {
+
+		String dataType = "CodeContentType";
+		
+		String typeName;
+		String xsdTypeName;
+		String baseDataTypeTerm;
+		String baseGUID;
+		String id;
+		int defaultId=-1;
+	
+		XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+		
+		
+		Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
+		Element aElementTN = (Element)aNodeTN;
+		id = aElementTN.getAttribute("id");
+		aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']/xsd:restriction");
+		aElementTN = (Element)aNodeTN;
+		typeName = aElementTN.getAttribute("base");
+		
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("DT");
+		QueryCondition qc5 = new QueryCondition();
+		String den = typeName.replace("Type", "");
+		den = den + ". Type";
+		qc5.add("den", den);
+		DTVO dVO1 = (DTVO) dao.findObject(qc5, conn);
+		baseDataTypeTerm = dVO1.getDataTypeTerm();
+		baseGUID = dVO1.getDTGUID();
+		
+		
+		
+		//Unqualified Type Name
+		String unQualifiedTypeName = dataType.replaceAll("Type", "");
+
+		//Unqualified Data Type Term
+		String unQualifiedDataTypeTerm = baseDataTypeTerm;
+			
+		dao = df.getDAO("XSDBuiltInType");
+		
+		Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:extension");
+		if(xsdTypeNameNode == null)
+			xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:restriction");
+		if(xsdTypeNameNode != null) {
+			Element xsdTypeNameElement = (Element)xsdTypeNameNode;
+			xsdTypeName = xsdTypeNameElement.getAttribute("base");	
+			
+			QueryCondition qc3 = new QueryCondition();
+			qc3.add("builtin_type", xsdTypeName);
+			defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
+			if(defaultId < 1) {
+				Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
+				QueryCondition qc4 = new QueryCondition();
+				System.out.println(xsdTypeName);
+				qc4.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
+				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc4, conn)).getXSDBuiltInTypeID();
+			}
+		} 		
+		DTVO dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
+		insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO2.getDTID(), defaultId);
+	}
+	
+	private void importIDContentType() throws Exception {
+
+		String dataType = "IDContentType";
+		
+		String typeName;
+		String xsdTypeName;
+		String baseDataTypeTerm;
+		String baseGUID;
+		String id;
+		int defaultId=-1;
+	
+		XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+		
+		
+		Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
+		Element aElementTN = (Element)aNodeTN;
+		id = aElementTN.getAttribute("id");
+		aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']/xsd:restriction");
+		aElementTN = (Element)aNodeTN;
+		typeName = aElementTN.getAttribute("base");
+		
+		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO dao = df.getDAO("DT");
+		QueryCondition qc = new QueryCondition();
+		String den = typeName.replace("Type", "");
+		den = den + ". Type";
+		qc.add("den", den);
+		DTVO dVO1 = (DTVO) dao.findObject(qc, conn);
+		baseDataTypeTerm = dVO1.getDataTypeTerm();
+		baseGUID = dVO1.getDTGUID();
+		
+
+		//Unqualified Type Name
+		String unQualifiedTypeName = dataType.replaceAll("Type", "");
+
+		//Unqualified Data Type Term
+		String unQualifiedDataTypeTerm = baseDataTypeTerm;
+			
+		dao = df.getDAO("XSDBuiltInType");
+		
+		Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:extension");
+		if(xsdTypeNameNode == null)
+			xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:restriction");
+		if(xsdTypeNameNode != null) {
+			Element xsdTypeNameElement = (Element)xsdTypeNameNode;
+			xsdTypeName = xsdTypeNameElement.getAttribute("base");	
+			
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("builtin_type", xsdTypeName);
+			defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc2, conn)).getXSDBuiltInTypeID();
+			if(defaultId < 1) {
+				Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
+				QueryCondition qc3 = new QueryCondition();
+				System.out.println(xsdTypeName);
+				qc3.add("builtin_type", ((Element)xbtNode).getAttribute("base"));
+				defaultId = ((XSDBuiltInTypeVO)dao.findObject(qc3, conn)).getXSDBuiltInTypeID();
+			}
+		} 		
+		DTVO dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
+		insertBDTPrimitiveRestriction(dVO1.getBasedDTID(), dVO2.getDTID(), defaultId);
+	}
+	
 	private static Connection conn = null;
 	
 	public void run() throws Exception {
@@ -628,7 +757,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		File[] listOfFiles = f.listFiles();
 			
 		for (int i = 0; i < Types.dataTypeList.length; i++){
-			importDataTypeList(Types.dataTypeList[i]);
+			//importDataTypeList(Types.dataTypeList[i]);
 		}
 		
 //		for (int i = 0; i < Types.simpleTypeList.length; i++){
@@ -645,7 +774,11 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 //		    }
 //		}
 		importExceptionalDataTypeList();
-		importExceptionalDataTypeList2("ValueType_039C44");
+		//importExceptionalDataTypeList2("ValueType_039C44");
+		
+		//importCodeContentType();
+		//importIDContentType();
+		
 		tx.close();
 		conn.close();
 		System.out.println("### 1.5.1-2 End");
