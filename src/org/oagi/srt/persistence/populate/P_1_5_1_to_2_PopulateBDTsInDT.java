@@ -402,7 +402,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		if(check_BDT(aElementBDT.getAttribute("id"))){
 			System.out.println("Default BDT is already existing");
 			QueryCondition qc = new QueryCondition();
-			qc.add("id", aElementBDT.getAttribute("id"));
+			qc.add("guid", aElementBDT.getAttribute("id"));
 			dVO1 = (DTVO)dao.findObject(qc, conn);
 		}
 		else {
@@ -522,7 +522,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			if(check_BDT(aElementBDT.getAttribute("id"))){
 				System.out.println("Default BDT is already existing");
 				QueryCondition qc = new QueryCondition();
-				qc.add("id", aElementBDT.getAttribute("id"));
+				qc.add("guid", aElementBDT.getAttribute("id"));
 				dVO1 = (DTVO)DTDao.findObject(qc, conn);
 			}
 			else {
