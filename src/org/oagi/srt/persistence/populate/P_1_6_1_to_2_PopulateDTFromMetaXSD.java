@@ -96,7 +96,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 			dtVO.setRevisionNum(0);
 			dtVO.setRevisionTrackingNum(0);
 			dtVO.setIs_deprecated(false);
-			
+			System.out.println("Populating additonal BDTs from meta whose name is "+ name);
 		    dao.insertObject(dtVO);
 		    
 		    // BDT_Primitive_Restriction
@@ -121,7 +121,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 			theBDT_Primitive_RestrictionVO.setBDTID(bdtId);
 			theBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID());
 			theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
-			
+			System.out.println("Populating BDT Primitive Restriction for bdt id = " + bdtId+ " cdt primitive expression type map = "+theBDT_Primitive_RestrictionVO.getCDTPrimitiveExpressionTypeMapID()+" is_default = " + theBDT_Primitive_RestrictionVO.getisDefault());
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
 		}
 	}
