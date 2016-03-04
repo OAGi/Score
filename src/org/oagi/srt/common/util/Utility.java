@@ -60,6 +60,7 @@ public class Utility {
 
 	public static String DenToName(String den) {
 			den = den.substring(0, den.indexOf(". Type")).replaceAll(" ", "")+"Type";
+			den = den.replace("Identifier", "ID");
 		return den;
 	}
 	
@@ -168,7 +169,8 @@ public class Utility {
 		}
 		String result = sb.toString();
 		if(result.endsWith(" Code Type"))
-			result = result.substring(0, result.indexOf((" Code Type"))).replaceAll(" ", "").concat(" Code Type");
+			result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
+		result=result.replace("ID", "Identifier");
 		return result;
 	}
 	
@@ -195,8 +197,9 @@ public class Utility {
 			}
 		}
 		String result = sb.toString();
-		//if(result.endsWith(" Code Type"))
-		//	result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
+		if(result.endsWith(" Code Type"))
+			result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
+		result=result.replace("ID", "Identifier");
 		result = result.trim();
 		return result;
 	}
