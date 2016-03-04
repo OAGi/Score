@@ -264,7 +264,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					}
 					if(baseddtscid == 0)
 						System.out.println("based dt sc is not found when owner dt id is " + dtVO2.getDTID());
-					vo.setBasedDTSCID(baseddtscid);
+					//vo.setBasedDTSCID(baseddtscid);
 					qc = new QueryCondition();
 					qc.add("dt_sc_id", baseddtscid);
 					DTSCVO dtVO4 = (DTSCVO)daoDTSC.findObject(qc, conn);

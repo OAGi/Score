@@ -69,12 +69,8 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setBasedDTID(dtVO_01.getDTID());
 		    dtVO.setDataTypeTerm(dtVO_01.getDataTypeTerm());
 		    
-		    String den = Utility.spaceSeparator(name).substring(0, Utility.spaceSeparator(name).lastIndexOf(" Type")) + ". Type";
-		    if(den.contains("ID")){
-		    	den = den.replace("ID", "Identifier");
-		    }
-		    dtVO.setDEN(den);
-		    dtVO.setContentComponentDEN(den + ". Content");
+		    dtVO.setDEN(Utility.typeToDen(name));
+		    dtVO.setContentComponentDEN(Utility.typeToContent(name));
 		    
 		    Element definition = (Element)ele.getElementsByTagName("xsd:documentation").item(0);
 		    if(definition != null) 
