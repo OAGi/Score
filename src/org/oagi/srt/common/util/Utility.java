@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.chanchan.common.persistence.db.ConnectionPoolManager;
 import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.web.startup.SRTInitializer;
 import org.oagi.srt.web.startup.SRTInitializerException;
 
@@ -171,7 +172,12 @@ public class Utility {
 		return result;
 	}
 	
-	public static String spaceSeparatorWithoutStr(String str, String except) {
+	public static String spaceSeparatorBeforeStr(String str, String beforeStr) {
+		int pos = str.indexOf(beforeStr);
+		if(pos!=-1){
+			str=str.substring(0,pos);
+		}
+		
 		StringBuffer sb = new StringBuffer();
 		for(int i = 0; i < str.length(); i++) {
 			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
@@ -191,7 +197,6 @@ public class Utility {
 		String result = sb.toString();
 		//if(result.endsWith(" Code Type"))
 		//	result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
-		result = result.replace(except, "");
 		result = result.trim();
 		return result;
 	}
@@ -238,26 +243,46 @@ public class Utility {
 		return part1+"_ "+part2;
 	}
 	
-	public static String qualifier(String type, String baseDen){
+	public static String qualifier(String type, DTVO baseDT){
 		
 		String qualifier = "";
-		String p1 = Utility.spaceSeparatorWithoutStr(type, "Type");
-		//System.out.print(p1);
-		String p2 = Utility.firstDenWithoutUUID(baseDen);
-		//System.out.print("\t"+p2);
-		
-		int pos = p1.indexOf(p2);
-		
-		if(p2.endsWith("Code Content")){
-			pos = p1.indexOf("Code");
+		String baseDen = baseDT.getDEN();
+				
+		if(baseDT.getDataTypeTerm().equals("Text")){
+			qualifier= Utility.spaceSeparatorBeforeStr(type, "Type");
 		}
-		
-		if(pos == -1){
-			qualifier= p1;
+		else if(baseDen.equals("Code Content. Type")){
+			qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeContentType");
+		}
+		else if(baseDen.endsWith("Code Content. Type")){
+			qualifier= Utility.spaceSeparatorBeforeStr(type, "CodeType");
 		}
 		else {
-			qualifier= p1.substring(0, pos);
+			String p1 = Utility.firstDenWithoutUUID(baseDen);
+			p1 = Utility.toCamelCase(p1);
+			int pos = type.indexOf("Type");
+			if(pos!=-1){
+				type=type.substring(0,pos);
+			}
+			qualifier = Utility.spaceSeparatorBeforeStr(type, p1);
 		}
+//		String p1 = Utility.spaceSeparatorWithoutStr(type, "Type");
+//		//System.out.print(p1);
+//		String p2 = Utility.firstDenWithoutUUID(baseDen);
+//		//System.out.print("\t"+p2);
+//		
+//		int pos = p1.indexOf(p2);
+//		
+//		if(p2.endsWith("Code Content")){
+//			pos = p1.indexOf("Code");
+//		}
+//		
+//		if(pos == -1){
+//			qualifier= p1;
+//		}
+//		else {
+//			qualifier= p1.substring(0, pos);
+//		}
 		qualifier = qualifier.trim();
 		//System.out.println("\t\t"+qualifier);
 		return qualifier;

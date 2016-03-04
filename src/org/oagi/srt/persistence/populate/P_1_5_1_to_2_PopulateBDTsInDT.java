@@ -670,9 +670,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			
 		dao = df.getDAO("XSDBuiltInType");
 		
-		Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:extension");
-		if(xsdTypeNameNode == null)
-			xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:restriction");
+		Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:restriction");
 		if(xsdTypeNameNode != null) {
 			Element xsdTypeNameElement = (Element)xsdTypeNameNode;
 			xsdTypeName = xsdTypeNameElement.getAttribute("base");	

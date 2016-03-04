@@ -440,7 +440,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dtVO.setBasedDTID(dVO.getDTID());
 			dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
 			
-			String qualifier = Utility.qualifier(type, dVO.getDEN());
+			String qualifier = Utility.qualifier(type, dVO);
 			if(qualifier.length()==0 || qualifier.isEmpty() || qualifier==null){
 				System.out.println("!!Null Qualifier Detected During Import QBDT " + type + " based on DEN:" + dVO.getDEN());
 			}
@@ -951,7 +951,7 @@ public class P_1_7_PopulateQBDTInDT {
 		dtVO.setBasedDTID(dVO.getDTID());
 		dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
 		
-		String qualifier = Utility.qualifier(type, dVO.getDEN());
+		String qualifier = Utility.qualifier(type, dVO);
 		if(qualifier.length()==0 || qualifier.isEmpty() || qualifier==null){
 			System.out.println("!!Null Qualifier Detected During Import QBDT " + type + " based on DEN: " + dVO.getDEN());
 		}
