@@ -24,17 +24,17 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 	private final String _tableName = "bdt_pri_restri";
 
 	private final String _FIND_ALL_BDT_Primitive_Restriction_STATEMENT = 
-			"SELECT bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default FROM " + _tableName;
+			"SELECT bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default, agency_id_list_id FROM " + _tableName;
 
 	private final String _FIND_BDT_Primitive_Restriction_STATEMENT = 
-			"SELECT bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default FROM " + _tableName;
+			"SELECT bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default, agency_id_list_id FROM " + _tableName;
 
 	private final String _INSERT_BDT_Primitive_Restriction_STATEMENT = 
-			"INSERT INTO " + _tableName + " (bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default) VALUES (?, ?, ?, ?)";
+			"INSERT INTO " + _tableName + " (bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, is_default, agency_id_list_id) VALUES (?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BDT_Primitive_Restriction_STATEMENT = 
 			"UPDATE " + _tableName
-			+ " SET bdt_pri_restri_id = ?, bdt_id = ?, cdt_awd_pri_xps_type_map_id = ?, code_list_id = ?, is_default = ? WHERE bdt_pri_restri_id = ?";
+			+ " SET bdt_pri_restri_id = ?, bdt_id = ?, cdt_awd_pri_xps_type_map_id = ?, code_list_id = ?, is_default = ?, agency_id_list_id = ? WHERE bdt_pri_restri_id = ?";
 
 	private final String _DELETE_BDT_Primitive_Restriction_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE bdt_pri_restri_id = ?";
@@ -68,7 +68,10 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				ps.setInt(4,1);
 			else 	
 				ps.setInt(4,0);
-
+			if(bdtprimitiverestrictionVO.getAgencyIDListID() == 0)
+				ps.setNull(5, java.sql.Types.INTEGER);
+			else 
+				ps.setInt(5, bdtprimitiverestrictionVO.getAgencyIDListID());
 			
 			ps.executeUpdate();
 
@@ -124,6 +127,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
 				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
 				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
+				bdtprimitiverestrictionVO.setAgencyIDListID(rs.getInt("agency_id_list_id"));
 			}
 			tx.commit();
 			conn.close();
@@ -182,6 +186,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
 				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
 				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
+				bdtprimitiverestrictionVO.setAgencyIDListID(rs.getInt("agency_id_list_id"));
 			}
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
@@ -218,6 +223,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
 				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
 				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
+				bdtprimitiverestrictionVO.setAgencyIDListID(rs.getInt("agency_id_list_id"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 			tx.commit();
@@ -279,6 +285,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
 				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
 				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
+				bdtprimitiverestrictionVO.setAgencyIDListID(rs.getInt("agency_id_list_id"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 			tx.commit();
@@ -320,6 +327,8 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
 				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
 				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
+				bdtprimitiverestrictionVO.setAgencyIDListID(rs.getInt("agency_id_list_id"));
+				
 				list.add(bdtprimitiverestrictionVO);
 			}
 		} catch (SQLException e) {
@@ -374,6 +383,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				bdtprimitiverestrictionVO.setCDTPrimitiveExpressionTypeMapID(rs.getInt("cdt_awd_pri_xps_type_map_id"));
 				bdtprimitiverestrictionVO.setCodeListID(rs.getInt("code_list_id"));
 				bdtprimitiverestrictionVO.setisDefault(rs.getBoolean("is_default"));
+				bdtprimitiverestrictionVO.setAgencyIDListID(rs.getInt("agency_id_list_id"));
 				list.add(bdtprimitiverestrictionVO);
 			}
 		} catch (SQLException e) {
@@ -404,12 +414,23 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_BDT_Primitive_Restriction_STATEMENT);
 			
 			ps.setInt(1, bdtprimitiverestrictionVO.getBDTID());
-			ps.setInt(2, bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID());
-			ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
+			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID()==0)
+				ps.setNull(2, java.sql.Types.INTEGER);
+			else
+				ps.setInt(2, bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID());
+			if(bdtprimitiverestrictionVO.getCodeListID()==0)
+				ps.setNull(3, java.sql.Types.INTEGER);
+			else
+				ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
 			if( bdtprimitiverestrictionVO.getisDefault())				
 				ps.setInt(4,1);
 			else 	
 				ps.setInt(4,0);
+			if(bdtprimitiverestrictionVO.getAgencyIDListID()==0){
+				ps.setNull(5, java.sql.Types.INTEGER);
+			}
+			else 
+				ps.setInt(5, bdtprimitiverestrictionVO.getAgencyIDListID());
 
 			ps.executeUpdate();
 

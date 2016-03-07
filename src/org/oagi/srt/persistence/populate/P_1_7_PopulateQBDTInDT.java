@@ -65,6 +65,7 @@ public class P_1_7_PopulateQBDTInDT {
 	SRTDAO aCDTAllowedPrimitiveDAO;
 	SRTDAO aCDTSCAllowedPrimitiveDAO;
 	SRTDAO aCodeListDAO;
+	SRTDAO aAgencyIDListDAO;
 	SRTDAO aDTSCDAO;
 	SRTDAO aXSDBuiltInTypeDAO;
 	SRTDAO cdtSCAPMapDAO;
@@ -267,7 +268,7 @@ public class P_1_7_PopulateQBDTInDT {
 		}
 		return bdtscs;
 	}
-	
+		
 	private void insertBDTSCPrimitiveRestriction(DTSCVO dtscVO, int mode, String name, String type)  throws XPathExpressionException, SRTDAOException {
 		List<SRTObject> cdtscallowedprimitivelist = new ArrayList<SRTObject>();
 		// if (SC = inherit from the base BDT)
@@ -507,7 +508,14 @@ public class P_1_7_PopulateQBDTInDT {
 			}
 			theBDT_Primitive_RestrictionVO.setisDefault(false);
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
-		} 
+		}
+		if(dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IdentificationContentType")){
+			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
+			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
+			theBDT_Primitive_RestrictionVO.setAgencyIDListID(getAgencyListID());
+			theBDT_Primitive_RestrictionVO.setisDefault(false);
+			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+		}
 		
 		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))){
 			for(SRTObject aSRTObject : al) {
@@ -945,7 +953,7 @@ public class P_1_7_PopulateQBDTInDT {
 			dVO = getDTVOWithDEN("Code Content. Type");
 		} 
 		else { //else if (base.endsWith("IDContentType")){
-			dVO = getDTVOWithDEN("ID Content. Type");
+			dVO = getDTVOWithDEN("Identifier Content. Type");
 		}
 		
 		dtVO.setBasedDTID(dVO.getDTID());
@@ -1021,6 +1029,7 @@ public class P_1_7_PopulateQBDTInDT {
 			aDTSCDAO.insertObject(vo);	
 			
 			insertBDTSCPrimitiveRestriction(getDTSCVO(dtsc_vo.getDTSCGUID(), owner_dT_iD), 1, "", "");
+			
 		}
 	}
 	

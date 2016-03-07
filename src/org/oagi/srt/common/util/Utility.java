@@ -66,6 +66,7 @@ public class Utility {
 	
 	public static String createDENFormat(String str) {
 		String pre = str.substring(0, str.indexOf("Type"));
+		pre = pre.trim();
 		return pre + ". Type";
 	}
 	
@@ -150,10 +151,11 @@ public class Utility {
 		return c + r.nextInt(Integer.MAX_VALUE - c);
 	}
 	
-	public static String spaceSeparator(String str) {
+	public static String spaceSeparator(String str) {//Assume that we only take into account TypeName
 		StringBuffer sb = new StringBuffer();
+		boolean appendOnly = false;
 		for(int i = 0; i < str.length(); i++) {
-			if(Character.isUpperCase(str.charAt(i)) && i != 0) {
+			if(Character.isUpperCase(str.charAt(i)) && i != 0 && !appendOnly) {
 				if(Character.isUpperCase(str.charAt(i - 1)))
 					if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)) && (str.charAt(i) != 'D' && str.charAt(i-1) != 'I'))
 						sb.append(" " + str.charAt(i));
@@ -161,9 +163,15 @@ public class Utility {
 						sb.append(str.charAt(i));
 				else 
 					sb.append(" " + str.charAt(i));
-			} else if(Character.isLowerCase(str.charAt(i)) && i == 0) {
+			} 
+			else if(Character.isLowerCase(str.charAt(i)) && i == 0 && !appendOnly) {
 				sb.append(String.valueOf(str.charAt(i)).toUpperCase());
-			} else {
+			} 
+			else if(str.charAt(i)=='_' && !appendOnly){
+				appendOnly=true;
+				sb.append(str.charAt(i));
+			}
+			else {
 				sb.append(str.charAt(i));
 			}
 		}
@@ -340,7 +348,7 @@ public class Utility {
 	    		word = word.substring(0, 1);
 	    	if(word.equalsIgnoreCase("identifier"))
 	        	ret.append("ID");      	
-	        if (!word.isEmpty()) {
+	    	else if (!word.isEmpty()) {
 	            ret.append(word.substring(0, 1).toUpperCase());
 	            ret.append(word.substring(1));
 	        }
