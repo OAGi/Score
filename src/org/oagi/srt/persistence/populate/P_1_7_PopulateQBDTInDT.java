@@ -509,7 +509,7 @@ public class P_1_7_PopulateQBDTInDT {
 			theBDT_Primitive_RestrictionVO.setisDefault(false);
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
 		}
-		if(dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IdentificationContentType")){
+		else if(dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IdentificationContentType")){
 			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
 			theBDT_Primitive_RestrictionVO.setAgencyIDListID(getAgencyListID());
@@ -765,10 +765,21 @@ public class P_1_7_PopulateQBDTInDT {
 	
 
 	public int getCodeListID(String codeName) throws SRTDAOException{
-    	QueryCondition qc = new QueryCondition();
+    	
+		QueryCondition qc = new QueryCondition();
 		qc.addLikeClause("Name", "%" + codeName.trim() + "%");
-		CodeListVO codelistVO = (CodeListVO)aCodeListDAO.findObject(qc, conn);
-		return codelistVO.getCodeListID();
+		
+		ArrayList<SRTObject> al = aCodeListDAO.findObjects(qc, conn);
+		int minStrLen = Integer.MAX_VALUE;
+		int minInd = -1;
+		for(SRTObject aCodeList : al){
+			CodeListVO codelistVO = (CodeListVO) aCodeList;
+			if(minStrLen > codelistVO.getName().length()){
+				minStrLen = codelistVO.getName().length();
+				minInd = codelistVO.getCodeListID();
+			}
+		}
+		return minInd;
 	}
 	
 	public int getAgencyListID() throws SRTDAOException{
@@ -776,7 +787,7 @@ public class P_1_7_PopulateQBDTInDT {
 		SRTDAO dao = df.getDAO("AgencyIDList");
     	QueryCondition qc = new QueryCondition();
 		qc.add("name", "Agency Identification");
-		AgencyIDListVO agencyidlistVO = (AgencyIDListVO)dao.findObject(qc);
+		AgencyIDListVO agencyidlistVO = (AgencyIDListVO) dao.findObject(qc);
 		return agencyidlistVO.getAgencyIDListID();
 	}
 	
