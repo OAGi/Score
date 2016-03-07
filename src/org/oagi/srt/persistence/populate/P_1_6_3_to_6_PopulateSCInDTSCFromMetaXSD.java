@@ -111,8 +111,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 				bdtSCPRVO.setCodeListID(parent.getCodeListID());
 				bdtSCPRVO.setisDefault(parent.getisDefault());
 				bdtSCPRDao.insertObject(bdtSCPRVO);
-				System.out.println("bdt sc id = " + bdtSCPRVO.getBDTSCID()+" cdt sc allow pri ex type map id = "+bdtSCPRVO.getCDTSCAllowedPrimitiveExpressionTypeMapID()+" code list id = "+  bdtSCPRVO.getCodeListID()+ " is_default = "+bdtSCPRVO.getisDefault());
-
+				System.out.println("bdt sc id = " + bdtSCPRVO.getBDTSCID()+" cdt sc allow pri ex type map id = "+bdtSCPRVO.getCDTSCAllowedPrimitiveExpressionTypeMapID()+" code list id = "+  bdtSCPRVO.getCodeListID()+ " is_default = "+bdtSCPRVO.getisDefault()+" max cardinality of dt_sc = "+((DTSCVO)dtscDao.findObject(qc_0211, conn)).getMaxCardinality()+" min cardinality of dt_sc = "+((DTSCVO)dtscDao.findObject(qc_0211, conn)).getMinCardinality());
 			}
 			
 			// populate using attributes
@@ -190,7 +189,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 						} else if(attrName.equalsIgnoreCase("actionCode")) {
 							bdtSCPRVO.setisDefault(false);
 						}
-						System.out.println("Populating BDT SC Allowed Primitive Expression Type map for "+attrName);
+						System.out.println("Populating BDT SC Primitive for "+attrName);
 						bdtSCPRDao.insertObject(bdtSCPRVO);
 					}
 			    }
@@ -203,7 +202,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 					QueryCondition qc = new QueryCondition();
 					qc.add("name", "oacl_ActionCode");
 					bdtSCPRVO.setCodeListID(((CodeListVO)codeListDao.findObject(qc, conn)).getCodeListID());
-					
+					System.out.println("Populating BDT SC Primitive for "+attrName);
 					bdtSCPRDao.insertObject(bdtSCPRVO);
 			    }
 		    }

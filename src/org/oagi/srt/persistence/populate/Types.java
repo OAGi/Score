@@ -34,6 +34,32 @@ public class Types {
 		"OrdinalType"
 	};
 	
+	public static final String allowed_Representation_Term_List[] = {
+		"Amount",
+		"BinaryObject",
+		"Code",
+		"Date",
+		"DateTime",
+		"Duration",
+		"Graphic",
+		"Identifier",
+		"Indicator",
+		"Measure",
+		"Name",
+		"Number",
+		"Ordinal",
+		"Percent",
+		"Picture",
+		"Quantity",
+		"Rate",
+		"Ratio",
+		"Sound",
+		"Text",	
+		"Time",
+		"Value",
+		"Video",
+	};
+	
 	public static final String dataTypeList[] = {
 		//"NormalizedStringType",
 		//"TokenType",

@@ -29,6 +29,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.oagi.srt.persistence.populate.P_1_5_3_to_5_PopulateSCInDTSC;
+import org.oagi.srt.persistence.populate.P_1_5_6_PopulateBDTSCPrimitiveRestriction;
 
 /**
 *
@@ -42,9 +44,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 	
 	private static Connection conn = null;
 	
-	public void importAdditionalBDT() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-		
+	public void importAdditionalBDT(XPathHandler xh) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("DT");
 		SRTDAO daoUser = df.getDAO("User");
@@ -61,8 +61,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setVersionNumber("1.0");
 		    //dtVO.setRevisionType(0);
 		    
+		    Node extension = xh.getNode("//xsd:complexType[@name = '" + name + "']/xsd:simpleContent/xsd:extension");
+		    String base = Utility.typeToDen(((Element)extension).getAttribute("base"));
 		    QueryCondition qc = new QueryCondition();
-			qc.add("den", "Text_62S0B4. Type");
+			qc.add("den", base);
 			DTVO dtVO_01 = (DTVO)dao.findObject(qc, conn);
 		    
 		    
@@ -123,16 +125,24 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 	}
 	
 	public void run() throws Exception {
-		System.out.println("### 1.6.1-2 Start");
+		System.out.println("### 1.6. Start");
 		
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
 		
-		importAdditionalBDT();
+		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+		//importAdditionalBDT(meta_xsd);
+		
+		P_1_5_3_to_5_PopulateSCInDTSC dtsc = new P_1_5_3_to_5_PopulateSCInDTSC();
+		dtsc.populateDTSCforUnqualifiedBDT(businessDataType_xsd, meta_xsd, conn, false);
+		
+		P_1_5_6_PopulateBDTSCPrimitiveRestriction bdtscpri = new P_1_5_6_PopulateBDTSCPrimitiveRestriction();
+		bdtscpri.populateBDTSCPrimitiveRestriction(businessDataType_xsd, meta_xsd, false);
 		
 		tx.close();
 		conn.close();
-		System.out.println("### 1.6.1-2 End");
+		System.out.println("### 1.6. End");
 	}
 	
 	public static void main (String args[]) throws Exception {
