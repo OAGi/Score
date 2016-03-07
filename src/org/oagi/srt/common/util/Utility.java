@@ -10,6 +10,7 @@ import org.chanchan.common.persistence.db.ConnectionPoolManager;
 import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.persistence.dto.DTVO;
+import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.web.startup.SRTInitializer;
 import org.oagi.srt.web.startup.SRTInitializerException;
 
@@ -140,6 +141,20 @@ public class Utility {
 		return result.substring(result.lastIndexOf(" ")+1);
 	}
 	
+	public static String getRepresentationTerm(String str){
+		String lastToken = getLastToken(str);
+		String representationTerm = null;
+		for(int i = 0 ; i < Types.allowed_Representation_Term_List.length; i++){
+			if(lastToken.equalsIgnoreCase(Types.allowed_Representation_Term_List[i])){
+				representationTerm = lastToken;
+				break;
+			}
+			
+		}
+		if(representationTerm == null)
+			representationTerm = "Text";
+		return representationTerm;
+	}
 	public static String firstToUpperCase(String str) {
 		String prefix = str.substring(0, 1);
 		String suffix = str.substring(1);
