@@ -666,7 +666,7 @@ public class P_1_7_PopulateQBDTInDT {
 				} else if(attrName.endsWith("ID")) {
 					representation_term = "Identifier";
 				} else if(attrName.endsWith("DateTime")) {
-					representation_term = "Date Time";
+					representation_term = "DateTime";
 				} else if(attrName.endsWith("Value")) {
 					representation_term = "Value";
 				} else if(attrName.endsWith("Name") || attrName.endsWith("name")) {
