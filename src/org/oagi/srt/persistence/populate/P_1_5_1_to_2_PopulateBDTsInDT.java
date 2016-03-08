@@ -605,7 +605,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMapVO = (CDTAllowedPrimitiveExpressionTypeMapVO)aSRTObject4;
 				int idOfXsdToken = getXSDBuiltIntypeId("xsd:token");
 				
-				if(defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXSDBuiltInTypeID()) {
+				if(defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXSDBuiltInTypeID()) { // default
 					BDTPrimitiveRestrictionVO aBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 					aBDT_Primitive_RestrictionVO.setBDTID(bdtID);
 					aBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aCDTAllowedPrimitiveExpressionTypeMapVO.getCDTPrimitiveExpressionTypeMapID());
@@ -797,8 +797,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		
 		importExceptionalDataTypeList();
 		importExceptionalDataTypeList2("ValueType_039C44");
-		//importCodeContentType();
-		//importIDContentType();
+		
 		tx.close();
 		conn.close();
 		System.out.println("### 1.5.1-2 End");

@@ -8,10 +8,10 @@ public class RunAll {
 		Utility.dbSetup();
 
 		P_1_3_PopulateAgencyIDList p1 = new P_1_3_PopulateAgencyIDList();
-		p1.run();
+		//p1.run();
 		
 		P_1_4_PopulateCodeList p2 = new P_1_4_PopulateCodeList();
-		p2.run();
+		//p2.run();
 		
 		P_1_5_1_to_2_PopulateBDTsInDT p3 = new P_1_5_1_to_2_PopulateBDTsInDT();
 		p3.run();
@@ -26,7 +26,7 @@ public class RunAll {
 		p7.run();
 
 		P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD p9 = new P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD();
-		p9.run();
+		//p9.run();
 	
 //		P_1_7_PopulateQBDTInDT p13 = new P_1_7_PopulateQBDTInDT();
 //		p13.run();

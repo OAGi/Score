@@ -236,6 +236,43 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					daoDTSC.insertObject(vo);
 					if(attrElement.getAttribute("type").endsWith("CodeContentType")){
 						
+						QueryCondition qc_04 = new QueryCondition();
+						qc_04.add("Data_Type_Term", vo.getRepresentationTerm());
+						qc_04.add("Type", 0);
+						DTVO cdtVO = (DTVO) aDTDAO.findObject(qc_04, conn);
+						QueryCondition qc_05 = new QueryCondition();
+						qc_05.add("CDT_ID", cdtVO.getDTID()); 
+						qc_05.add("is_default", 1);
+						ArrayList<SRTObject> cdtawdprilist = aCDTAllowedPrimitiveDAO.findObjects(qc_05);
+						for(SRTObject acdtawdprilist : cdtawdprilist) {
+							CDTAllowedPrimitiveVO aCDTAPVO = (CDTAllowedPrimitiveVO) acdtawdprilist;
+							if(aCDTAPVO.getCDTPrimitiveID() != 0){
+								CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
+								QueryCondition qc_055 = new QueryCondition();
+								qc_055.add("guid", vo.getDTSCGUID());
+								int cdt_sc_id = ((DTSCVO)daoDTSC.findObject(qc_055, conn)).getDTSCID();
+								
+								aVO.setCDTSCID(cdt_sc_id);
+								aVO.setCDTPrimitiveID(aCDTAPVO.getCDTPrimitiveID());
+								aVO.setisDefault(aCDTAPVO.getisDefault());
+								aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
+								QueryCondition qc_051 = new QueryCondition();
+								qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
+								qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
+								CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
+								int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
+
+								String xsd_builtin_type = "xsd:token";
+								CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+								bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
+								QueryCondition qc_07 = new QueryCondition();
+								qc_07.add("BuiltIn_Type", xsd_builtin_type);
+								XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
+								bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
+								System.out.println("Inserting CDT SC Allowed Primitive Expresssion Typemap for new SC whose property term = "+vo.getPropertyTerm()+", expression type map = "+xsd_builtin_type);
+								aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
+							}
+						}
 					}
 					else {
 						QueryCondition qc_04 = new QueryCondition();
