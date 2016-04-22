@@ -81,13 +81,13 @@ public class BCCOracleDAO extends SRTDAO{
 			else 
 				ps.setString(8, bccVO.getDEN());
 			
-			if(bccVO.getDefinition()==null || bccVO.getDefinition().length()==0 || bccVO.getDefinition().isEmpty() || bccVO.getDefinition().equals("")){
-				ps.setString(9, "\u00A0");
-			}
-			else {
+//			if(bccVO.getDefinition()==null || bccVO.getDefinition().length()==0 || bccVO.getDefinition().isEmpty() || bccVO.getDefinition().equals("")){
+//				ps.setString(9, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(bccVO.getDefinition(), 4000);
 				ps.setString(9, s);
-			}
+//			}
 			ps.setInt(10, bccVO.getCreatedByUserId());
 			ps.setInt(11, bccVO.getOwnerUserId());
 			ps.setInt(12, bccVO.getLastUpdatedByUserId());
@@ -451,12 +451,12 @@ public class BCCOracleDAO extends SRTDAO{
 			else 	
 				ps.setString(8, bccVO.getDEN());
 
-			if( bccVO.getDefinition()==null ||  bccVO.getDefinition().length()==0 ||  bccVO.getDefinition().isEmpty() ||  bccVO.getDefinition().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	{
+//			if( bccVO.getDefinition()==null ||  bccVO.getDefinition().length()==0 ||  bccVO.getDefinition().isEmpty() ||  bccVO.getDefinition().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(bccVO.getDefinition(), 4000);
 				ps.setString(9, s);
-			}
+//			}
 
 			ps.setInt(10, bccVO.getCreatedByUserId());
 			ps.setInt(11, bccVO.getOwnerUserId());

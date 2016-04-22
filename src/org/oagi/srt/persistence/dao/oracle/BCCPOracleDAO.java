@@ -89,19 +89,19 @@ public class BCCPOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(5, bccpVO.getDEN());
 
-			if(bccpVO.getDefinition() == null || bccpVO.getDefinition().isEmpty() || bccpVO.getDefinition().equals("") || bccpVO.getDefinition().length()==0)   
-				ps.setString(6, "\u00A0");
-			else {
+//			if(bccpVO.getDefinition() == null || bccpVO.getDefinition().isEmpty() || bccpVO.getDefinition().equals("") || bccpVO.getDefinition().length()==0)   
+//				ps.setString(6, "\u00A0");
+//			else {
 				String s = StringUtils.abbreviate(bccpVO.getDefinition(), 4000);
 				ps.setString(6, s);
-			}
+//			}
 			ps.setInt(7, bccpVO.getCreatedByUserId());
 			ps.setInt(8, bccpVO.getOwnerUserId());
 			ps.setInt(9, bccpVO.getLastUpdatedByUserId());
 			ps.setInt(10, bccpVO.getState());
-			if( bccpVO.getModule()==null ||  bccpVO.getModule().length()==0 ||  bccpVO.getModule().isEmpty() ||  bccpVO.getModule().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			if( bccpVO.getModule()==null ||  bccpVO.getModule().length()==0 ||  bccpVO.getModule().isEmpty() ||  bccpVO.getModule().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, bccpVO.getModule());
 
 			ps.setInt(12, bccpVO.getRevisionNum());
@@ -450,20 +450,20 @@ public class BCCPOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(5, bccpVO.getDEN());
 
-			if(bccpVO.getDefinition() == null)
-				ps.setString(6, "");
-			else {
+//			if(bccpVO.getDefinition() == null)
+//				ps.setString(6, "");
+//			else {
 				String s = StringUtils.abbreviate(bccpVO.getDefinition(), 4000);
 				ps.setString(6, s);
-			}
+//			}
 			ps.setInt(7, bccpVO.getCreatedByUserId());
 			ps.setInt(8, bccpVO.getOwnerUserId());
 			ps.setInt(9, bccpVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(10, bccpVO.getCreationTimestamp());
 			ps.setInt(10, bccpVO.getState());
-			if( bccpVO.getModule()==null ||  bccpVO.getModule().length()==0 ||  bccpVO.getModule().isEmpty() ||  bccpVO.getModule().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			if( bccpVO.getModule()==null ||  bccpVO.getModule().length()==0 ||  bccpVO.getModule().isEmpty() ||  bccpVO.getModule().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, bccpVO.getModule());
 
 			ps.setInt(12, bccpVO.getRevisionNum());

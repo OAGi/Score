@@ -78,27 +78,27 @@ public class ACCOracleDAO extends SRTDAO {
 			}
 			else 
 				ps.setString(3, accVO.getDEN());
-			if(accVO.getDefinition()==null || accVO.getDefinition().length()==0 || accVO.getDefinition().isEmpty() || accVO.getDefinition().equals("")){
-				ps.setString(4, "\u00A0");
-			}
-			else {
+//			if(accVO.getDefinition()==null || accVO.getDefinition().length()==0 || accVO.getDefinition().isEmpty() || accVO.getDefinition().equals("")){
+//				ps.setString(4, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(accVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
+//			}
 
 			if(accVO.getBasedACCID() < 1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, accVO.getBasedACCID());
-			if( accVO.getObjectClassQualifier()==null ||  accVO.getObjectClassQualifier().length()==0 ||  accVO.getObjectClassQualifier().isEmpty() ||  accVO.getObjectClassQualifier().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( accVO.getObjectClassQualifier()==null ||  accVO.getObjectClassQualifier().length()==0 ||  accVO.getObjectClassQualifier().isEmpty() ||  accVO.getObjectClassQualifier().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, accVO.getObjectClassQualifier());
 
 			ps.setInt(7, accVO.getOAGISComponentType());
-			if( accVO.getModule()==null ||  accVO.getModule().length()==0 ||  accVO.getModule().isEmpty() ||  accVO.getModule().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			if( accVO.getModule()==null ||  accVO.getModule().length()==0 ||  accVO.getModule().isEmpty() ||  accVO.getModule().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, accVO.getModule());
 
 			ps.setInt(9, accVO.getNamespaceId());
@@ -455,23 +455,23 @@ public class ACCOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(3, accVO.getDEN());
 
-			if( accVO.getDefinition()==null ||  accVO.getDefinition().length()==0 ||  accVO.getDefinition().isEmpty() ||  accVO.getDefinition().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	{
+//			if( accVO.getDefinition()==null ||  accVO.getDefinition().length()==0 ||  accVO.getDefinition().isEmpty() ||  accVO.getDefinition().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(accVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
+//			}
 
 			ps.setInt(5, accVO.getBasedACCID());
-			if( accVO.getObjectClassQualifier()==null ||  accVO.getObjectClassQualifier().length()==0 ||  accVO.getObjectClassQualifier().isEmpty() ||  accVO.getObjectClassQualifier().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( accVO.getObjectClassQualifier()==null ||  accVO.getObjectClassQualifier().length()==0 ||  accVO.getObjectClassQualifier().isEmpty() ||  accVO.getObjectClassQualifier().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, accVO.getObjectClassQualifier());
 
 			ps.setInt(7, accVO.getOAGISComponentType());
-			if( accVO.getModule()==null ||  accVO.getModule().length()==0 ||  accVO.getModule().isEmpty() ||  accVO.getModule().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			if( accVO.getModule()==null ||  accVO.getModule().length()==0 ||  accVO.getModule().isEmpty() ||  accVO.getModule().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, accVO.getModule());
 
 			ps.setInt(9, accVO.getNamespaceId());

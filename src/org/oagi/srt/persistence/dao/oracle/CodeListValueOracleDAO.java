@@ -134,21 +134,21 @@ public class CodeListValueOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, codelistvalueVO.getValue());
 
-			if( codelistvalueVO.getName()==null ||  codelistvalueVO.getName().length()==0 ||  codelistvalueVO.getName().isEmpty() ||  codelistvalueVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( codelistvalueVO.getName()==null ||  codelistvalueVO.getName().length()==0 ||  codelistvalueVO.getName().isEmpty() ||  codelistvalueVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, codelistvalueVO.getName());
 
-			if(codelistvalueVO.getDefinition()==null || codelistvalueVO.getDefinition().length()==0 || codelistvalueVO.getDefinition().isEmpty() || codelistvalueVO.getDefinition().equals("")){
-				ps.setString(4, "\u00A0");
-			}
-			else {
+//			if(codelistvalueVO.getDefinition()==null || codelistvalueVO.getDefinition().length()==0 || codelistvalueVO.getDefinition().isEmpty() || codelistvalueVO.getDefinition().equals("")){
+//				ps.setString(4, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(codelistvalueVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
-			if( codelistvalueVO.getDefinitionSource()==null ||  codelistvalueVO.getDefinitionSource().length()==0 ||  codelistvalueVO.getDefinitionSource().isEmpty() ||  codelistvalueVO.getDefinitionSource().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			}
+//			if( codelistvalueVO.getDefinitionSource()==null ||  codelistvalueVO.getDefinitionSource().length()==0 ||  codelistvalueVO.getDefinitionSource().isEmpty() ||  codelistvalueVO.getDefinitionSource().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, codelistvalueVO.getDefinitionSource());
 
 			if( codelistvalueVO.getUsedIndicator())				
@@ -316,20 +316,20 @@ public class CodeListValueOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, codelistvalueVO.getValue());
 
-			if( codelistvalueVO.getName()==null ||  codelistvalueVO.getName().length()==0 ||  codelistvalueVO.getName().isEmpty() ||  codelistvalueVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( codelistvalueVO.getName()==null ||  codelistvalueVO.getName().length()==0 ||  codelistvalueVO.getName().isEmpty() ||  codelistvalueVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, codelistvalueVO.getName());
 
-			if( codelistvalueVO.getDefinition()==null ||  codelistvalueVO.getDefinition().length()==0 ||  codelistvalueVO.getDefinition().isEmpty() ||  codelistvalueVO.getDefinition().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	{
+//			if( codelistvalueVO.getDefinition()==null ||  codelistvalueVO.getDefinition().length()==0 ||  codelistvalueVO.getDefinition().isEmpty() ||  codelistvalueVO.getDefinition().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(codelistvalueVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
-			if( codelistvalueVO.getDefinitionSource()==null ||  codelistvalueVO.getDefinitionSource().length()==0 ||  codelistvalueVO.getDefinitionSource().isEmpty() ||  codelistvalueVO.getDefinitionSource().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			}
+//			if( codelistvalueVO.getDefinitionSource()==null ||  codelistvalueVO.getDefinitionSource().length()==0 ||  codelistvalueVO.getDefinitionSource().isEmpty() ||  codelistvalueVO.getDefinitionSource().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, codelistvalueVO.getDefinitionSource());
 
 			if( codelistvalueVO.getUsedIndicator())				

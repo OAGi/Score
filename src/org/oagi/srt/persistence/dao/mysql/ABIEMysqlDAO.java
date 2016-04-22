@@ -112,7 +112,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				ps.setNull(8, java.sql.Types.INTEGER);
 			else
 				ps.setInt(8, abieVO.getState());
-			ps.setString(9, abieVO.getClientID());
+			ps.setInt(9, abieVO.getClientID());
 			ps.setString(10, abieVO.getVersion());
 			ps.setString(11, abieVO.getStatus());
 			ps.setString(12, abieVO.getRemark());
@@ -170,7 +170,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps.setInt(6, abieVO.getCreatedByUserID());
 			ps.setInt(7, abieVO.getLastUpdatedByUserID());
 			ps.setInt(8, abieVO.getState());
-			ps.setString(9, abieVO.getClientID());
+			ps.setInt(9, abieVO.getClientID());
 			ps.setString(10, abieVO.getVersion());
 			ps.setString(11, abieVO.getStatus());
 			ps.setString(12, abieVO.getRemark());
@@ -243,7 +243,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -295,7 +295,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -348,7 +348,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 			ps.setString(5, abieVO.getDefinition());
 			ps.setInt(6, abieVO.getLastUpdatedByUserID());
 			ps.setInt(7, abieVO.getState());
-			ps.setString(8, abieVO.getClientID());
+			ps.setInt(8, abieVO.getClientID());
 			ps.setString(9, abieVO.getVersion());
 			ps.setString(10, abieVO.getStatus());
 			ps.setString(11, abieVO.getRemark());
@@ -460,7 +460,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -552,7 +552,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));
@@ -640,7 +640,7 @@ public class ABIEMysqlDAO extends SRTDAO {
 				abieVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				abieVO.setState(rs.getInt("State"));	
 				abieVO.setAbieGUID(rs.getString("GUID"));
-				abieVO.setClientID(rs.getString("Client_ID"));
+				abieVO.setClientID(rs.getInt("Client_ID"));
 				abieVO.setVersion(rs.getString("Version"));
 				abieVO.setStatus(rs.getString("Status"));
 				abieVO.setRemark(rs.getString("Remark"));

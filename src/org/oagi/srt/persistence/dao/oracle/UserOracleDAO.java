@@ -61,14 +61,14 @@ public class UserOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, userVO.getPassword());
 
-			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, userVO.getName());
 
-			if( userVO.getOrganization()==null ||  userVO.getOrganization().length()==0 ||  userVO.getOrganization().isEmpty() ||  userVO.getOrganization().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			if( userVO.getOrganization()==null ||  userVO.getOrganization().length()==0 ||  userVO.getOrganization().isEmpty() ||  userVO.getOrganization().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, userVO.getOrganization());
 
 			if( userVO.getOagis_developer_indicator())				
@@ -189,6 +189,7 @@ public class UserOracleDAO extends SRTDAO {
 				userVO.setName(rs.getString("Name"));
 				userVO.setOrganization(rs.getString("Organization"));
 				userVO.setOagis_developer_indicator(rs.getBoolean("oagis_developer_indicator"));
+
 
 			}
 		} catch (SQLException e) {
@@ -426,14 +427,14 @@ public class UserOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, userVO.getPassword());
 
-			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, userVO.getName());
 
-			if( userVO.getOrganization()==null ||  userVO.getOrganization().length()==0 ||  userVO.getOrganization().isEmpty() ||  userVO.getOrganization().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			if( userVO.getOrganization()==null ||  userVO.getOrganization().length()==0 ||  userVO.getOrganization().isEmpty() ||  userVO.getOrganization().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, userVO.getOrganization());
 
 			if( userVO.getOagis_developer_indicator())				

@@ -116,15 +116,16 @@ public class P_1_7_PopulateQBDTInDT {
 		
 		insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd, 0);
 		insertDTAndBCCP(elementsFromMetaXSD, meta_xsd, 1); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
-		//insertDTAndBCCP(elementsFromComponentsXSD, component_xsd, 2);
-		File[] listOfF1 = getBODs(f1);
+		insertDTAndBCCP(elementsFromComponentsXSD, component_xsd, 2);
+		
+		/*File[] listOfF1 = getBODs(f1);
 		
 		for (File file : listOfF1) {
 			System.out.println(file.getName()+" ing...");
 			XPathHandler codelist_xsd = new XPathHandler(SRTConstants.CODE_LIST_FILE_PATH + file.getName());
 			NodeList elementsFromCodeListXSD = codelist_xsd.getNodeList("/xsd:schema/xsd:element");
-			//insertDTAndBCCP(elementsFromCodeListXSD, codelist_xsd, 3);
-		}
+			insertDTAndBCCP(elementsFromCodeListXSD, codelist_xsd, 3);
+		}//this part is not used at all*/
 		insertDTwithoutElement();
 		
 	}

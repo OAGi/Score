@@ -198,23 +198,23 @@ public class DTSCOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, dtscVO.getDTSCGUID());
 
-			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, dtscVO.getPropertyTerm());
 
-			if( dtscVO.getRepresentationTerm()==null ||  dtscVO.getRepresentationTerm().length()==0 ||  dtscVO.getRepresentationTerm().isEmpty() ||  dtscVO.getRepresentationTerm().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( dtscVO.getRepresentationTerm()==null ||  dtscVO.getRepresentationTerm().length()==0 ||  dtscVO.getRepresentationTerm().isEmpty() ||  dtscVO.getRepresentationTerm().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, dtscVO.getRepresentationTerm());
 
-			if(dtscVO.getDefinition()==null || dtscVO.getDefinition().length()==0 || dtscVO.getDefinition().isEmpty() || dtscVO.getDefinition().equals("")){
-				ps.setString(4, "\u00A0");
-			}
-			else {
+//			if(dtscVO.getDefinition()==null || dtscVO.getDefinition().length()==0 || dtscVO.getDefinition().isEmpty() || dtscVO.getDefinition().equals("")){
+//				ps.setString(4, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(dtscVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
+//			}
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
@@ -481,22 +481,22 @@ public class DTSCOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, dtscVO.getDTSCGUID());
 
-			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, dtscVO.getPropertyTerm());
 
-			if( dtscVO.getRepresentationTerm()==null ||  dtscVO.getRepresentationTerm().length()==0 ||  dtscVO.getRepresentationTerm().isEmpty() ||  dtscVO.getRepresentationTerm().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( dtscVO.getRepresentationTerm()==null ||  dtscVO.getRepresentationTerm().length()==0 ||  dtscVO.getRepresentationTerm().isEmpty() ||  dtscVO.getRepresentationTerm().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, dtscVO.getRepresentationTerm());
 
-			if( dtscVO.getDefinition()==null ||  dtscVO.getDefinition().length()==0 ||  dtscVO.getDefinition().isEmpty() ||  dtscVO.getDefinition().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	{
+//			if( dtscVO.getDefinition()==null ||  dtscVO.getDefinition().length()==0 ||  dtscVO.getDefinition().isEmpty() ||  dtscVO.getDefinition().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(dtscVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
+//			}
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());

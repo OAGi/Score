@@ -23,7 +23,7 @@ public class ABIEVO extends SRTObject {
 	private Timestamp CreationTimestamp;
 	private Timestamp LastUpdateTimestamp;
 	private int State;
-	private String clientID;
+	private int clientID;
 	private String version;
 	private String status;
 	private String remark;
@@ -125,11 +125,11 @@ public class ABIEVO extends SRTObject {
 		this.abieGUID = abieGUID;
 	}
 
-	public String getClientID() {
+	public int getClientID() {
 		return clientID;
 	}
 
-	public void setClientID(String clientID) {
+	public void setClientID(int clientID) {
 		this.clientID = clientID;
 	}
 

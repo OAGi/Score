@@ -72,22 +72,22 @@ public class ASCCPOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, asccpVO.getASCCPGUID());
 
-			if( asccpVO.getPropertyTerm()==null ||  asccpVO.getPropertyTerm().length()==0 ||  asccpVO.getPropertyTerm().isEmpty() ||  asccpVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( asccpVO.getPropertyTerm()==null ||  asccpVO.getPropertyTerm().length()==0 ||  asccpVO.getPropertyTerm().isEmpty() ||  asccpVO.getPropertyTerm().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, asccpVO.getPropertyTerm());
 
-			if( asccpVO.getDefinition()==null ||  asccpVO.getDefinition().length()==0 ||  asccpVO.getDefinition().isEmpty() ||  asccpVO.getDefinition().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	{
+//			if( asccpVO.getDefinition()==null ||  asccpVO.getDefinition().length()==0 ||  asccpVO.getDefinition().isEmpty() ||  asccpVO.getDefinition().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(asccpVO.getDefinition(), 4000);
 				ps.setString(3, s);
-			}
+//			}
 			ps.setInt(4, asccpVO.getRoleOfACCID());
-			if(asccpVO.getDEN()==null || asccpVO.getDEN().length()==0 || asccpVO.getDEN().isEmpty() || asccpVO.getDEN().equals("")){
-				ps.setString(5, "\u00A0");
-			}
-			else 
+//			if(asccpVO.getDEN()==null || asccpVO.getDEN().length()==0 || asccpVO.getDEN().isEmpty() || asccpVO.getDEN().equals("")){
+//				ps.setString(5, "\u00A0");
+//			}
+//			else 
 				ps.setString(5, asccpVO.getDEN());
 			
 			ps.setInt(6, asccpVO.getCreatedByUserId());
@@ -95,9 +95,9 @@ public class ASCCPOracleDAO extends SRTDAO {
 			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
 			ps.setInt(9, asccpVO.getState());
-			if( asccpVO.getModule()==null ||  asccpVO.getModule().length()==0 ||  asccpVO.getModule().isEmpty() ||  asccpVO.getModule().equals(""))				
-				ps.setString(10,"\u00A0");
-			else 	
+//			if( asccpVO.getModule()==null ||  asccpVO.getModule().length()==0 ||  asccpVO.getModule().isEmpty() ||  asccpVO.getModule().equals(""))				
+//				ps.setString(10,"\u00A0");
+//			else 	
 				ps.setString(10, asccpVO.getModule());
 
 			ps.setInt(11, asccpVO.getNamespaceId());
@@ -690,22 +690,22 @@ public class ASCCPOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, asccpVO.getASCCPGUID());
 
-			if( asccpVO.getPropertyTerm()==null ||  asccpVO.getPropertyTerm().length()==0 ||  asccpVO.getPropertyTerm().isEmpty() ||  asccpVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( asccpVO.getPropertyTerm()==null ||  asccpVO.getPropertyTerm().length()==0 ||  asccpVO.getPropertyTerm().isEmpty() ||  asccpVO.getPropertyTerm().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, asccpVO.getPropertyTerm());
 
-			if( asccpVO.getDefinition()==null ||  asccpVO.getDefinition().length()==0 ||  asccpVO.getDefinition().isEmpty() ||  asccpVO.getDefinition().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	{
+//			if( asccpVO.getDefinition()==null ||  asccpVO.getDefinition().length()==0 ||  asccpVO.getDefinition().isEmpty() ||  asccpVO.getDefinition().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(asccpVO.getDefinition(), 4000);
 				ps.setString(3, s);
-			}
+//			}
 
 			ps.setInt(4, asccpVO.getRoleOfACCID());
-			if( asccpVO.getDEN()==null ||  asccpVO.getDEN().length()==0 ||  asccpVO.getDEN().isEmpty() ||  asccpVO.getDEN().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			if( asccpVO.getDEN()==null ||  asccpVO.getDEN().length()==0 ||  asccpVO.getDEN().isEmpty() ||  asccpVO.getDEN().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, asccpVO.getDEN());
 
 			ps.setInt(6, asccpVO.getCreatedByUserId());
@@ -713,9 +713,9 @@ public class ASCCPOracleDAO extends SRTDAO {
 			ps.setInt(8, asccpVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(9, asccpVO.getLastUpdateTimestamp());
 			ps.setInt(9, asccpVO.getState());
-			if( asccpVO.getModule()==null ||  asccpVO.getModule().length()==0 ||  asccpVO.getModule().isEmpty() ||  asccpVO.getModule().equals(""))				
-				ps.setString(10,"\u00A0");
-			else 	
+//			if( asccpVO.getModule()==null ||  asccpVO.getModule().length()==0 ||  asccpVO.getModule().isEmpty() ||  asccpVO.getModule().equals(""))				
+//				ps.setString(10,"\u00A0");
+//			else 	
 				ps.setString(10, asccpVO.getModule());
 
 			ps.setInt(11, asccpVO.getNamespaceId());

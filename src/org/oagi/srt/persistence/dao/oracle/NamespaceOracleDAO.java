@@ -65,14 +65,14 @@ public class NamespaceOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, namespaceVO.getUri());
 
-			if( namespaceVO.getPrefix()==null ||  namespaceVO.getPrefix().length()==0 ||  namespaceVO.getPrefix().isEmpty() ||  namespaceVO.getPrefix().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( namespaceVO.getPrefix()==null ||  namespaceVO.getPrefix().length()==0 ||  namespaceVO.getPrefix().isEmpty() ||  namespaceVO.getPrefix().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, namespaceVO.getPrefix());
 
-			if( namespaceVO.getPrescription()==null ||  namespaceVO.getPrescription().length()==0 ||  namespaceVO.getPrescription().isEmpty() ||  namespaceVO.getPrescription().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( namespaceVO.getPrescription()==null ||  namespaceVO.getPrescription().length()==0 ||  namespaceVO.getPrescription().isEmpty() ||  namespaceVO.getPrescription().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, namespaceVO.getPrescription());
 
 			ps.setInt(4, namespaceVO.getOwneruserID());
@@ -392,14 +392,14 @@ public class NamespaceOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, namespaceVO.getUri());
 
-			if( namespaceVO.getPrefix()==null ||  namespaceVO.getPrefix().length()==0 ||  namespaceVO.getPrefix().isEmpty() ||  namespaceVO.getPrefix().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( namespaceVO.getPrefix()==null ||  namespaceVO.getPrefix().length()==0 ||  namespaceVO.getPrefix().isEmpty() ||  namespaceVO.getPrefix().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, namespaceVO.getPrefix());
 
-			if( namespaceVO.getPrescription()==null ||  namespaceVO.getPrescription().length()==0 ||  namespaceVO.getPrescription().isEmpty() ||  namespaceVO.getPrescription().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( namespaceVO.getPrescription()==null ||  namespaceVO.getPrescription().length()==0 ||  namespaceVO.getPrescription().isEmpty() ||  namespaceVO.getPrescription().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, namespaceVO.getPrescription());
 
 			ps.setInt(4, namespaceVO.getOwneruserID());

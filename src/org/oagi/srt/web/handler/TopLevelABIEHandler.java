@@ -607,10 +607,22 @@ public class TopLevelABIEHandler implements Serializable {
 		ArrayList<SRTObject> tmp_assoc = getBCC(accVO.getACCID());
 		tmp_assoc.addAll(getASCC(accVO.getACCID()));
 		ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
+		for(int i = 0 ; i < tmp_assoc.size(); i ++){//
+			SRTObject srt = tmp_assoc.get(i);//
+			if(srt instanceof ASCCVO && groupcheck(srt)){//
+				ASCCVO ascc = (ASCCVO)srt;//
+				QueryCondition qc = new QueryCondition();//
+				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());//
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);//
+				QueryCondition qc2 = new QueryCondition();//
+				qc2.add("ACC_ID", asccp.getRoleOfACCID());//
+				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);//
+				tmp_assoc = handleNestedGroup(acc, tmp_assoc, i);//
+			}//
+		}//	
 		SRTObject a = new SRTObject(); 
 		for(int i = 0 ; i < tmp_assoc.size() ; i++)
 			assoc.add(a);
-		
 		int attribute_cnt = 0;
 		for(SRTObject srt : tmp_assoc){
 			if(srt instanceof BCCVO){
@@ -626,64 +638,85 @@ public class TopLevelABIEHandler implements Serializable {
 			if(srt instanceof BCCVO){
 				BCCVO bcc = (BCCVO) srt;
 				if(bcc.getSequencingKey() > 0)
+					System.out.println("BCC: "+bcc.getAssocFromACCID()+" ~ "+bcc.getAssocToBCCPID() +" ("+bcc.getSequencingKey()+")");
 					assoc.set(bcc.getSequencingKey()-1+attribute_cnt, bcc);
 			}
 			else {
 				ASCCVO ascc = (ASCCVO) srt;
+				System.out.println("ASCC: "+ascc.getAssocFromACCID()+" ~ "+ascc.getAssocToASCCPID() +" ("+ascc.getSequencingKey()+")");
 				assoc.set(ascc.getSequencingKey()-1+attribute_cnt, ascc);
 			}				
 		}
 		
 		assoc.trimToSize();
-		for(int i = 0 ; i < assoc.size(); i ++){
-			SRTObject srt = assoc.get(i);
-			if(srt instanceof ASCCVO && groupcheck(srt)){
-				ASCCVO ascc = (ASCCVO)srt;
-				QueryCondition qc = new QueryCondition();
-				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
-				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
-				QueryCondition qc2 = new QueryCondition();
-				qc2.add("ACC_ID", asccp.getRoleOfACCID());
-				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
-				assoc = handleNestedGroup(acc, assoc, i);
-			}
-		}
+//		for(int i = 0 ; i < assoc.size(); i ++){
+//			SRTObject srt = assoc.get(i);
+//			if(srt instanceof ASCCVO && groupcheck(srt)){
+//				ASCCVO ascc = (ASCCVO)srt;
+//				QueryCondition qc = new QueryCondition();
+//				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+//				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+//				QueryCondition qc2 = new QueryCondition();
+//				qc2.add("ACC_ID", asccp.getRoleOfACCID());
+//				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
+//				assoc = handleNestedGroup(acc, assoc, i);
+//			}
+//		}
 		return assoc;
 	}
 	private ArrayList<SRTObject> queryNestedChildAssoc_wo_attribute(ACCVO accVO) throws SRTDAOException {
+//		if(accVO.getACCID()==250){
+//			int a = 30;
+//		}
 		ArrayList<SRTObject> tmp_assoc = getBCCwoAttribute(accVO.getACCID());
 		tmp_assoc.addAll(getASCC(accVO.getACCID()));
+		for(int i = 0 ; i < tmp_assoc.size(); i ++){//
+			SRTObject srt = tmp_assoc.get(i);//
+			if(srt instanceof ASCCVO && groupcheck(srt)){//
+				ASCCVO ascc = (ASCCVO)srt;//
+				QueryCondition qc = new QueryCondition();//
+				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());//
+				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);//
+				QueryCondition qc2 = new QueryCondition();//
+				qc2.add("ACC_ID", asccp.getRoleOfACCID());//
+				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);//
+				tmp_assoc = handleNestedGroup(acc, tmp_assoc, i);//
+			}//
+		}//
 		ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
 		SRTObject a = new SRTObject(); 
 		for(int i = 0 ; i < tmp_assoc.size() ; i++)
 			assoc.add(a);
-		
+
 		for(SRTObject srt : tmp_assoc){
 			if(srt instanceof BCCVO){
 				BCCVO bcc = (BCCVO) srt;
 				if(bcc.getSequencingKey() > 0)
+					System.out.println("BCC: "+bcc.getAssocFromACCID()+" ~ "+bcc.getAssocToBCCPID() +" ("+bcc.getSequencingKey()+")");
 					assoc.set(bcc.getSequencingKey()-1, bcc);
 			}
 			else {
 				ASCCVO ascc = (ASCCVO) srt;
+				System.out.println("ASCC: "+ascc.getAssocFromACCID()+" ~ "+ascc.getAssocToASCCPID() +" ("+ascc.getSequencingKey()+")");
 				assoc.set(ascc.getSequencingKey()-1, ascc);
+				
 			}				
 		}
 		
 		assoc.trimToSize();
-		for(int i = 0 ; i < assoc.size(); i ++){
-			SRTObject srt = assoc.get(i);
-			if(srt instanceof ASCCVO && groupcheck(srt)){
-				ASCCVO ascc = (ASCCVO)srt;
-				QueryCondition qc = new QueryCondition();
-				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
-				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
-				QueryCondition qc2 = new QueryCondition();
-				qc2.add("ACC_ID", asccp.getRoleOfACCID());
-				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
-				assoc = handleNestedGroup(acc, assoc, i);
-			}
-		}
+//		for(int i = 0 ; i < assoc.size(); i ++){
+//			SRTObject srt = assoc.get(i);
+//			if(srt instanceof ASCCVO && groupcheck(srt)){
+//				ASCCVO ascc = (ASCCVO)srt;
+//				QueryCondition qc = new QueryCondition();
+//				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+//				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+//				QueryCondition qc2 = new QueryCondition();
+//				qc2.add("ACC_ID", asccp.getRoleOfACCID());
+//				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
+//				assoc = handleNestedGroup(acc, assoc, i);
+//			}
+//		}
 		return assoc;
 	}
 	
@@ -771,8 +804,7 @@ public class TopLevelABIEHandler implements Serializable {
 		
 		while(!accList.isEmpty()) {
 			ACCVO accVO = accList.pollFirst();
-			int skb = 0;
-			
+			int skb = 0;			
 			for(ACCVO cnt_acc : accList){
 				skb += queryNestedChildAssoc_wo_attribute(cnt_acc).size(); //here
 			}
@@ -1846,7 +1878,7 @@ public class TopLevelABIEHandler implements Serializable {
     
     private int getUserId() throws SRTDAOException {
     	QueryCondition qc = new QueryCondition();
-    	qc.add("name", "oagis");
+    	qc.add("login_id", "oagis");
     	return ((UserVO)userDao.findObject(qc, conn)).getUserID();
     }
     

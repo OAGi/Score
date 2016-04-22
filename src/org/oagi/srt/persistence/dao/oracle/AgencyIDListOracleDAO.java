@@ -69,30 +69,30 @@ public class AgencyIDListOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, agencyidlistVO.getEnumerationTypeGUID());
 
-			if( agencyidlistVO.getName()==null ||  agencyidlistVO.getName().length()==0 ||  agencyidlistVO.getName().isEmpty() ||  agencyidlistVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( agencyidlistVO.getName()==null ||  agencyidlistVO.getName().length()==0 ||  agencyidlistVO.getName().isEmpty() ||  agencyidlistVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, agencyidlistVO.getName());
 
-			if( agencyidlistVO.getListID()==null ||  agencyidlistVO.getListID().length()==0 ||  agencyidlistVO.getListID().isEmpty() ||  agencyidlistVO.getListID().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			if( agencyidlistVO.getListID()==null ||  agencyidlistVO.getListID().length()==0 ||  agencyidlistVO.getListID().isEmpty() ||  agencyidlistVO.getListID().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, agencyidlistVO.getListID());
 
 			//ps.setInt(5, agencyidlistVO.getAgencyID());
 			ps.setNull(5, java.sql.Types.INTEGER);
-			if( agencyidlistVO.getVersionID()==null ||  agencyidlistVO.getVersionID().length()==0 ||  agencyidlistVO.getVersionID().isEmpty() ||  agencyidlistVO.getVersionID().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( agencyidlistVO.getVersionID()==null ||  agencyidlistVO.getVersionID().length()==0 ||  agencyidlistVO.getVersionID().isEmpty() ||  agencyidlistVO.getVersionID().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, agencyidlistVO.getVersionID());
 
-			if(agencyidlistVO.getDefinition()==null || agencyidlistVO.getDefinition().length()==0 || agencyidlistVO.getDefinition().isEmpty() || agencyidlistVO.getDefinition().equals("")){
-				ps.setString(7, "\u00A0");
-			}
-			else {
+//			if(agencyidlistVO.getDefinition()==null || agencyidlistVO.getDefinition().length()==0 || agencyidlistVO.getDefinition().isEmpty() || agencyidlistVO.getDefinition().equals("")){
+//				ps.setString(7, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(agencyidlistVO.getDefinition(), 4000);
 				ps.setString(7, s);
-			}
+//			}
 			ps.executeUpdate();
 //			ResultSet tableKeys = ps.getGeneratedKeys();
 //			tableKeys.next();
@@ -240,27 +240,27 @@ public class AgencyIDListOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, agencyidlistVO.getEnumerationTypeGUID());
 
-			if( agencyidlistVO.getName()==null ||  agencyidlistVO.getName().length()==0 ||  agencyidlistVO.getName().isEmpty() ||  agencyidlistVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( agencyidlistVO.getName()==null ||  agencyidlistVO.getName().length()==0 ||  agencyidlistVO.getName().isEmpty() ||  agencyidlistVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, agencyidlistVO.getName());
 
-			if( agencyidlistVO.getListID()==null ||  agencyidlistVO.getListID().length()==0 ||  agencyidlistVO.getListID().isEmpty() ||  agencyidlistVO.getListID().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			if( agencyidlistVO.getListID()==null ||  agencyidlistVO.getListID().length()==0 ||  agencyidlistVO.getListID().isEmpty() ||  agencyidlistVO.getListID().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, agencyidlistVO.getListID());
 
 			ps.setInt(5, agencyidlistVO.getAgencyID());
-			if( agencyidlistVO.getVersionID()==null ||  agencyidlistVO.getVersionID().length()==0 ||  agencyidlistVO.getVersionID().isEmpty() ||  agencyidlistVO.getVersionID().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( agencyidlistVO.getVersionID()==null ||  agencyidlistVO.getVersionID().length()==0 ||  agencyidlistVO.getVersionID().isEmpty() ||  agencyidlistVO.getVersionID().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, agencyidlistVO.getVersionID());
-			if( agencyidlistVO.getDefinition()==null ||  agencyidlistVO.getDefinition().length()==0 ||  agencyidlistVO.getDefinition().isEmpty() ||  agencyidlistVO.getDefinition().equals(""))				
-				ps.setString(7,"\u00A0");
-			else 	{
+//			if( agencyidlistVO.getDefinition()==null ||  agencyidlistVO.getDefinition().length()==0 ||  agencyidlistVO.getDefinition().isEmpty() ||  agencyidlistVO.getDefinition().equals(""))				
+//				ps.setString(7,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(agencyidlistVO.getDefinition(), 4000);
 				ps.setString(7, s);
-			}
+//			}
 			ps.setInt(8, agencyidlistVO.getAgencyIDListID());
 			ps.executeUpdate();
 

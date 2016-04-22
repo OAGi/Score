@@ -74,19 +74,19 @@ public class ASBIEOracleDAO extends SRTDAO{
 			ps.setInt(2, asbievo.getAssocFromABIEID());
 			ps.setInt(3, asbievo.getAssocToASBIEPID());
 			ps.setInt(4, asbievo.getBasedASCC());
-			if(asbievo.getDefinition()==null || asbievo.getDefinition().length()==0 || asbievo.getDefinition().isEmpty() || asbievo.getDefinition().equals("")){
-				ps.setString(5, "\u00A0");
-			}
-			else {
+//			if(asbievo.getDefinition()==null || asbievo.getDefinition().length()==0 || asbievo.getDefinition().isEmpty() || asbievo.getDefinition().equals("")){
+//				ps.setString(5, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(asbievo.getDefinition(), 4000);
 				ps.setString(5, s);
-			}
+//			}
 			ps.setInt(6, asbievo.getCardinalityMin());
 			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
-			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, asbievo.getRemark());
 
 			ps.setInt(10, asbievo.getCreatedByUserId());
@@ -139,19 +139,19 @@ public class ASBIEOracleDAO extends SRTDAO{
 			ps.setInt(2, asbievo.getAssocFromABIEID());
 			ps.setInt(3, asbievo.getAssocToASBIEPID());
 			ps.setInt(4, asbievo.getBasedASCC());
-			if(asbievo.getDefinition()==null || asbievo.getDefinition().length()==0 || asbievo.getDefinition().isEmpty() || asbievo.getDefinition().equals("")){
-				ps.setString(5, "\u00A0");
-			}
-			else {
+//			if(asbievo.getDefinition()==null || asbievo.getDefinition().length()==0 || asbievo.getDefinition().isEmpty() || asbievo.getDefinition().equals("")){
+//				ps.setString(5, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(asbievo.getDefinition(), 4000);
 				ps.setString(5, s);
-			}
+//			}
 			ps.setInt(6, asbievo.getCardinalityMin());
 			ps.setInt(7, asbievo.getCardinalityMax());
 			ps.setInt(8, asbievo.getNillable());
-			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, asbievo.getRemark());
 
 			ps.setInt(10, asbievo.getCreatedByUserId());
@@ -308,12 +308,12 @@ public class ASBIEOracleDAO extends SRTDAO{
 			ps.setInt(1, asbievo.getAssocFromABIEID());
 			ps.setInt(2, asbievo.getAssocToASBIEPID());
 			ps.setInt(3, asbievo.getBasedASCC());
-			if( asbievo.getDefinition()==null ||  asbievo.getDefinition().length()==0 ||  asbievo.getDefinition().isEmpty() ||  asbievo.getDefinition().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	{
+//			if( asbievo.getDefinition()==null ||  asbievo.getDefinition().length()==0 ||  asbievo.getDefinition().isEmpty() ||  asbievo.getDefinition().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(asbievo.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
+//			}
 			ps.setInt(5, asbievo.getCardinalityMin());
 			ps.setInt(6, asbievo.getCardinalityMax());
 			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
@@ -322,9 +322,9 @@ public class ASBIEOracleDAO extends SRTDAO{
 				ps.setString(7, asbievo.getAsbieGuid());
 
 			ps.setInt(8, asbievo.getNillable());
-			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( asbievo.getRemark()==null ||  asbievo.getRemark().length()==0 ||  asbievo.getRemark().isEmpty() ||  asbievo.getRemark().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, asbievo.getRemark());
 
 			ps.setInt(10, asbievo.getLastUpdatedByUserId());

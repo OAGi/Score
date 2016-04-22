@@ -39,7 +39,7 @@ public class BBIEPOracleDAO extends SRTDAO {
 	
 	private final String _INSERT_BBIEP_STATEMENT = "INSERT INTO " + _tableName
 			+ " (GUID, Based_BCCP_ID, Definition, remark, biz_term, Created_By, Last_Updated_by, "
-			+ "Creation_Timestamp, Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+			+ "Creation_Timestamp, Last_Update_Timestamp) VALUES (?, ?, ?, ?, ?,?,?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 	
 	private final String _INSERT_BBIEP_WITH_ID_STATEMENT = "INSERT INTO " + _tableName
 			+ " (GUID, Based_BCCP_ID, Definition, remark, biz_term, Created_By, Last_Updated_by, "
@@ -101,21 +101,21 @@ public class BBIEPOracleDAO extends SRTDAO {
 				ps.setString(1, bbiepVO.getBBIEPGUID());
 
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
-			if(bbiepVO.getDefinition()==null || bbiepVO.getDefinition().length()==0 || bbiepVO.getDefinition().isEmpty() || bbiepVO.getDefinition().equals("")){
-				ps.setString(3, "\u00A0");
-			}
-			else {
+//			if(bbiepVO.getDefinition()==null || bbiepVO.getDefinition().length()==0 || bbiepVO.getDefinition().isEmpty() || bbiepVO.getDefinition().equals("")){
+//				ps.setString(3, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(bbiepVO.getDefinition(), 4000);
 				ps.setString(3, s);	
-			}
-			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			}
+//			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, bbiepVO.getRemark());
 
-			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, bbiepVO.getBusinessTerm());
 
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
@@ -171,21 +171,21 @@ public class BBIEPOracleDAO extends SRTDAO {
 				ps.setString(1, bbiepVO.getBBIEPGUID());
 
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
-			if(bbiepVO.getDefinition()==null || bbiepVO.getDefinition().length()==0 || bbiepVO.getDefinition().isEmpty() || bbiepVO.getDefinition().equals("")){
-				ps.setString(3, "\u00A0");
-			}
-			else {
+//			if(bbiepVO.getDefinition()==null || bbiepVO.getDefinition().length()==0 || bbiepVO.getDefinition().isEmpty() || bbiepVO.getDefinition().equals("")){
+//				ps.setString(3, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(bbiepVO.getDefinition(), 4000);
 				ps.setString(3, s);
-			}
-			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			}
+//			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, bbiepVO.getRemark());
 
-			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, bbiepVO.getBusinessTerm());
 
 			ps.setInt(6, bbiepVO.getCreatedByUserID());
@@ -345,21 +345,21 @@ public class BBIEPOracleDAO extends SRTDAO {
 				ps.setString(1, bbiepVO.getBBIEPGUID());
 
 			ps.setInt(2, bbiepVO.getBasedBCCPID());
-			if( bbiepVO.getDefinition()==null ||  bbiepVO.getDefinition().length()==0 ||  bbiepVO.getDefinition().isEmpty() ||  bbiepVO.getDefinition().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	{
+//			if( bbiepVO.getDefinition()==null ||  bbiepVO.getDefinition().length()==0 ||  bbiepVO.getDefinition().isEmpty() ||  bbiepVO.getDefinition().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(bbiepVO.getDefinition(), 4000);
 				ps.setString(3,s);
-			}
+//			}
 
-			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	
+//			if( bbiepVO.getRemark()==null ||  bbiepVO.getRemark().length()==0 ||  bbiepVO.getRemark().isEmpty() ||  bbiepVO.getRemark().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	
 				ps.setString(4, bbiepVO.getRemark());
 
-			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			if( bbiepVO.getBusinessTerm()==null ||  bbiepVO.getBusinessTerm().length()==0 ||  bbiepVO.getBusinessTerm().isEmpty() ||  bbiepVO.getBusinessTerm().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, bbiepVO.getBusinessTerm());
 
 			ps.setInt(6, bbiepVO.getCreatedByUserID());

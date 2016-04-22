@@ -64,18 +64,18 @@ public class AgencyIDListValueOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, agencyidlistvalueVO.getValue());
 
-			if( agencyidlistvalueVO.getName()==null ||  agencyidlistvalueVO.getName().length()==0 ||  agencyidlistvalueVO.getName().isEmpty() ||  agencyidlistvalueVO.getName().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( agencyidlistvalueVO.getName()==null ||  agencyidlistvalueVO.getName().length()==0 ||  agencyidlistvalueVO.getName().isEmpty() ||  agencyidlistvalueVO.getName().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, agencyidlistvalueVO.getName());
 
-			if(agencyidlistvalueVO.getDefinition()==null || agencyidlistvalueVO.getDefinition().length()==0 || agencyidlistvalueVO.getDefinition().isEmpty() || agencyidlistvalueVO.getDefinition().equals("")){
-				ps.setString(3, "\u00A0");
-			}
-			else {
+//			if(agencyidlistvalueVO.getDefinition()==null || agencyidlistvalueVO.getDefinition().length()==0 || agencyidlistvalueVO.getDefinition().isEmpty() || agencyidlistvalueVO.getDefinition().equals("")){
+//				ps.setString(3, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(agencyidlistvalueVO.getDefinition(), 4000);
 				ps.setString(3, s);
-			}
+//			}
 			
 			ps.setInt(4, agencyidlistvalueVO.getOwnerAgencyIDListID());
 			ps.executeUpdate();
@@ -216,17 +216,17 @@ public class AgencyIDListValueOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, agencyidlistvalueVO.getValue());
 
-			if( agencyidlistvalueVO.getName()==null ||  agencyidlistvalueVO.getName().length()==0 ||  agencyidlistvalueVO.getName().isEmpty() ||  agencyidlistvalueVO.getName().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( agencyidlistvalueVO.getName()==null ||  agencyidlistvalueVO.getName().length()==0 ||  agencyidlistvalueVO.getName().isEmpty() ||  agencyidlistvalueVO.getName().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, agencyidlistvalueVO.getName());
 
-			if( agencyidlistvalueVO.getDefinition()==null ||  agencyidlistvalueVO.getDefinition().length()==0 ||  agencyidlistvalueVO.getDefinition().isEmpty() ||  agencyidlistvalueVO.getDefinition().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	{
+//			if( agencyidlistvalueVO.getDefinition()==null ||  agencyidlistvalueVO.getDefinition().length()==0 ||  agencyidlistvalueVO.getDefinition().isEmpty() ||  agencyidlistvalueVO.getDefinition().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(agencyidlistvalueVO.getDefinition(), 4000);
 				ps.setString(3, s);
-			}
+//			}
 
 			ps.setInt(4, agencyidlistvalueVO.getOwnerAgencyIDListID());
 			ps.executeUpdate();

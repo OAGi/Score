@@ -135,9 +135,9 @@ public class ClientOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Client_STATEMENT);
-			if( clientVO.getName()==null ||  clientVO.getName().length()==0 ||  clientVO.getName().isEmpty() ||  clientVO.getName().equals(""))				
-				ps.setString(1,"\u00A0");
-			else 	
+//			if( clientVO.getName()==null ||  clientVO.getName().length()==0 ||  clientVO.getName().isEmpty() ||  clientVO.getName().equals(""))				
+//				ps.setString(1,"\u00A0");
+//			else 	
 				ps.setString(1, clientVO.getName());
 
 			ps.executeUpdate();
@@ -395,9 +395,9 @@ public class ClientOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_Client_STATEMENT);
 			
-			if( clientVO.getName()==null ||  clientVO.getName().length()==0 ||  clientVO.getName().isEmpty() ||  clientVO.getName().equals(""))				
-				ps.setString(1,"\u00A0");
-			else 	
+//			if( clientVO.getName()==null ||  clientVO.getName().length()==0 ||  clientVO.getName().isEmpty() ||  clientVO.getName().equals(""))				
+//				ps.setString(1,"\u00A0");
+//			else 	
 				ps.setString(1, clientVO.getName());
 
 

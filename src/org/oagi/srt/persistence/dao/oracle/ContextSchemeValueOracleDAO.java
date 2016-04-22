@@ -152,9 +152,9 @@ public class ContextSchemeValueOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, context_scheme_valueVO.getValue());
 
-			if( context_scheme_valueVO.getMeaning()==null ||  context_scheme_valueVO.getMeaning().length()==0 ||  context_scheme_valueVO.getMeaning().isEmpty() ||  context_scheme_valueVO.getMeaning().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( context_scheme_valueVO.getMeaning()==null ||  context_scheme_valueVO.getMeaning().length()==0 ||  context_scheme_valueVO.getMeaning().isEmpty() ||  context_scheme_valueVO.getMeaning().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, context_scheme_valueVO.getMeaning());
 
 			ps.setInt(4, context_scheme_valueVO.getOwnerContextSchemeID());
@@ -296,9 +296,9 @@ public class ContextSchemeValueOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, context_scheme_valueVO.getValue());
 
-			if( context_scheme_valueVO.getMeaning()==null ||  context_scheme_valueVO.getMeaning().length()==0 ||  context_scheme_valueVO.getMeaning().isEmpty() ||  context_scheme_valueVO.getMeaning().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( context_scheme_valueVO.getMeaning()==null ||  context_scheme_valueVO.getMeaning().length()==0 ||  context_scheme_valueVO.getMeaning().isEmpty() ||  context_scheme_valueVO.getMeaning().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, context_scheme_valueVO.getMeaning());
 
 			ps.setInt(4, context_scheme_valueVO.getOwnerContextSchemeID());

@@ -60,9 +60,9 @@ public class BusinessContextOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, business_contextVO.getBusinessContextGUID());
 
-			if( business_contextVO.getName()==null ||  business_contextVO.getName().length()==0 ||  business_contextVO.getName().isEmpty() ||  business_contextVO.getName().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( business_contextVO.getName()==null ||  business_contextVO.getName().length()==0 ||  business_contextVO.getName().isEmpty() ||  business_contextVO.getName().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, business_contextVO.getName());
 
 			ps.setInt(3,  business_contextVO.getCreatedByUserId());
@@ -206,9 +206,9 @@ public class BusinessContextOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, business_contextVO.getBusinessContextGUID());
 
-			if( business_contextVO.getName()==null ||  business_contextVO.getName().length()==0 ||  business_contextVO.getName().isEmpty() ||  business_contextVO.getName().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( business_contextVO.getName()==null ||  business_contextVO.getName().length()==0 ||  business_contextVO.getName().isEmpty() ||  business_contextVO.getName().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, business_contextVO.getName());
 
 			ps.setInt(3,  business_contextVO.getCreatedByUserId());

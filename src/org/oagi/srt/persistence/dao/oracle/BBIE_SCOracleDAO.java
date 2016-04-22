@@ -34,7 +34,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_SC_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
-			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "DT_SC_ID, DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	private final String _INSERT_BBIE_SC_WITH_ID_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
 			+ "DT_SC_ID, DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term, BBIE_SC_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -83,31 +83,31 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 
 			ps.setInt(6, bbie_scVO.getMinCardinality());
 			ps.setInt(7, bbie_scVO.getMaxCardinality());
-			if( bbie_scVO.getDefaultText()==null ||  bbie_scVO.getDefaultText().length()==0 ||  bbie_scVO.getDefaultText().isEmpty() ||  bbie_scVO.getDefaultText().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			if( bbie_scVO.getDefaultText()==null ||  bbie_scVO.getDefaultText().length()==0 ||  bbie_scVO.getDefaultText().isEmpty() ||  bbie_scVO.getDefaultText().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, bbie_scVO.getDefaultText());
 
-			if( bbie_scVO.getFixedValue()==null ||  bbie_scVO.getFixedValue().length()==0 ||  bbie_scVO.getFixedValue().isEmpty() ||  bbie_scVO.getFixedValue().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( bbie_scVO.getFixedValue()==null ||  bbie_scVO.getFixedValue().length()==0 ||  bbie_scVO.getFixedValue().isEmpty() ||  bbie_scVO.getFixedValue().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, bbie_scVO.getFixedValue());
 
-			if(bbie_scVO.getDefinition()==null || bbie_scVO.getDefinition().length()==0 || bbie_scVO.getDefinition().isEmpty() || bbie_scVO.getDefinition().equals("")){
-				ps.setString(10, "\u00A0");
-			}
-			else {
+//			if(bbie_scVO.getDefinition()==null || bbie_scVO.getDefinition().length()==0 || bbie_scVO.getDefinition().isEmpty() || bbie_scVO.getDefinition().equals("")){
+//				ps.setString(10, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(bbie_scVO.getDefinition(), 4000);
 				ps.setString(10, s);
-			}
-			if( bbie_scVO.getRemark()==null ||  bbie_scVO.getRemark().length()==0 ||  bbie_scVO.getRemark().isEmpty() ||  bbie_scVO.getRemark().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			}
+//			if( bbie_scVO.getRemark()==null ||  bbie_scVO.getRemark().length()==0 ||  bbie_scVO.getRemark().isEmpty() ||  bbie_scVO.getRemark().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, bbie_scVO.getRemark());
 
-			if( bbie_scVO.getBusinessTerm()==null ||  bbie_scVO.getBusinessTerm().length()==0 ||  bbie_scVO.getBusinessTerm().isEmpty() ||  bbie_scVO.getBusinessTerm().equals(""))				
-				ps.setString(12,"\u00A0");
-			else 	
+//			if( bbie_scVO.getBusinessTerm()==null ||  bbie_scVO.getBusinessTerm().length()==0 ||  bbie_scVO.getBusinessTerm().isEmpty() ||  bbie_scVO.getBusinessTerm().equals(""))				
+//				ps.setString(12,"\u00A0");
+//			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
 			if(bbie_scVO.getBBIESCID() > 1)
@@ -174,31 +174,31 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 
 			ps.setInt(6, bbie_scVO.getMinCardinality());
 			ps.setInt(7, bbie_scVO.getMaxCardinality());
-			if( bbie_scVO.getDefaultText()==null ||  bbie_scVO.getDefaultText().length()==0 ||  bbie_scVO.getDefaultText().isEmpty() ||  bbie_scVO.getDefaultText().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			if( bbie_scVO.getDefaultText()==null ||  bbie_scVO.getDefaultText().length()==0 ||  bbie_scVO.getDefaultText().isEmpty() ||  bbie_scVO.getDefaultText().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, bbie_scVO.getDefaultText());
 
-			if( bbie_scVO.getFixedValue()==null ||  bbie_scVO.getFixedValue().length()==0 ||  bbie_scVO.getFixedValue().isEmpty() ||  bbie_scVO.getFixedValue().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( bbie_scVO.getFixedValue()==null ||  bbie_scVO.getFixedValue().length()==0 ||  bbie_scVO.getFixedValue().isEmpty() ||  bbie_scVO.getFixedValue().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, bbie_scVO.getFixedValue());
 
-			if(bbie_scVO.getDefinition()==null || bbie_scVO.getDefinition().length()==0 || bbie_scVO.getDefinition().isEmpty() || bbie_scVO.getDefinition().equals("")){
-				ps.setString(10, "\u00A0");
-			}
-			else {
+//			if(bbie_scVO.getDefinition()==null || bbie_scVO.getDefinition().length()==0 || bbie_scVO.getDefinition().isEmpty() || bbie_scVO.getDefinition().equals("")){
+//				ps.setString(10, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(bbie_scVO.getDefinition(), 4000);
 				ps.setString(10, s);
-			}
-			if( bbie_scVO.getRemark()==null ||  bbie_scVO.getRemark().length()==0 ||  bbie_scVO.getRemark().isEmpty() ||  bbie_scVO.getRemark().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			}
+//			if( bbie_scVO.getRemark()==null ||  bbie_scVO.getRemark().length()==0 ||  bbie_scVO.getRemark().isEmpty() ||  bbie_scVO.getRemark().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, bbie_scVO.getRemark());
 
-			if( bbie_scVO.getBusinessTerm()==null ||  bbie_scVO.getBusinessTerm().length()==0 ||  bbie_scVO.getBusinessTerm().isEmpty() ||  bbie_scVO.getBusinessTerm().equals(""))				
-				ps.setString(12,"\u00A0");
-			else 	
+//			if( bbie_scVO.getBusinessTerm()==null ||  bbie_scVO.getBusinessTerm().length()==0 ||  bbie_scVO.getBusinessTerm().isEmpty() ||  bbie_scVO.getBusinessTerm().equals(""))				
+//				ps.setString(12,"\u00A0");
+//			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
 			
@@ -496,31 +496,31 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 
 			ps.setInt(6, bbie_scVO.getMinCardinality());
 			ps.setInt(7, bbie_scVO.getMaxCardinality());
-			if( bbie_scVO.getDefaultText()==null ||  bbie_scVO.getDefaultText().length()==0 ||  bbie_scVO.getDefaultText().isEmpty() ||  bbie_scVO.getDefaultText().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			if( bbie_scVO.getDefaultText()==null ||  bbie_scVO.getDefaultText().length()==0 ||  bbie_scVO.getDefaultText().isEmpty() ||  bbie_scVO.getDefaultText().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, bbie_scVO.getDefaultText());
 
-			if( bbie_scVO.getFixedValue()==null ||  bbie_scVO.getFixedValue().length()==0 ||  bbie_scVO.getFixedValue().isEmpty() ||  bbie_scVO.getFixedValue().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( bbie_scVO.getFixedValue()==null ||  bbie_scVO.getFixedValue().length()==0 ||  bbie_scVO.getFixedValue().isEmpty() ||  bbie_scVO.getFixedValue().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, bbie_scVO.getFixedValue());
 
-			if( bbie_scVO.getDefinition()==null ||  bbie_scVO.getDefinition().length()==0 ||  bbie_scVO.getDefinition().isEmpty() ||  bbie_scVO.getDefinition().equals(""))				
-				ps.setString(10,"\u00A0");
-			else 	{
+//			if( bbie_scVO.getDefinition()==null ||  bbie_scVO.getDefinition().length()==0 ||  bbie_scVO.getDefinition().isEmpty() ||  bbie_scVO.getDefinition().equals(""))				
+//				ps.setString(10,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(bbie_scVO.getDefinition(), 4000);
 				ps.setString(10, s);
-			}
+//			}
 
-			if( bbie_scVO.getRemark()==null ||  bbie_scVO.getRemark().length()==0 ||  bbie_scVO.getRemark().isEmpty() ||  bbie_scVO.getRemark().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			if( bbie_scVO.getRemark()==null ||  bbie_scVO.getRemark().length()==0 ||  bbie_scVO.getRemark().isEmpty() ||  bbie_scVO.getRemark().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, bbie_scVO.getRemark());
 
-			if( bbie_scVO.getBusinessTerm()==null ||  bbie_scVO.getBusinessTerm().length()==0 ||  bbie_scVO.getBusinessTerm().isEmpty() ||  bbie_scVO.getBusinessTerm().equals(""))				
-				ps.setString(12,"\u00A0");
-			else 	
+//			if( bbie_scVO.getBusinessTerm()==null ||  bbie_scVO.getBusinessTerm().length()==0 ||  bbie_scVO.getBusinessTerm().isEmpty() ||  bbie_scVO.getBusinessTerm().equals(""))				
+//				ps.setString(12,"\u00A0");
+//			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
 			if(bbie_scVO.getBBIESCID() > 1)

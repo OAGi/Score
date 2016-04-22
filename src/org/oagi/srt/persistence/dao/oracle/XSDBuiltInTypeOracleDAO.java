@@ -61,14 +61,14 @@ public class XSDBuiltInTypeOracleDAO extends SRTDAO {
 			Connection conn = tx.open();
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_XSD_BuiltIn_Type_STATEMENT);
-			if( xsdbuiltintypeVO.getName()==null ||  xsdbuiltintypeVO.getName().length()==0 ||  xsdbuiltintypeVO.getName().isEmpty() ||  xsdbuiltintypeVO.getName().equals(""))				
-				ps.setString(1,"\u00A0");
-			else 	
+//			if( xsdbuiltintypeVO.getName()==null ||  xsdbuiltintypeVO.getName().length()==0 ||  xsdbuiltintypeVO.getName().isEmpty() ||  xsdbuiltintypeVO.getName().equals(""))				
+//				ps.setString(1,"\u00A0");
+//			else 	
 				ps.setString(1, xsdbuiltintypeVO.getName());
 
-			if( xsdbuiltintypeVO.getBuiltInType()==null ||  xsdbuiltintypeVO.getBuiltInType().length()==0 ||  xsdbuiltintypeVO.getBuiltInType().isEmpty() ||  xsdbuiltintypeVO.getBuiltInType().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( xsdbuiltintypeVO.getBuiltInType()==null ||  xsdbuiltintypeVO.getBuiltInType().length()==0 ||  xsdbuiltintypeVO.getBuiltInType().isEmpty() ||  xsdbuiltintypeVO.getBuiltInType().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, xsdbuiltintypeVO.getBuiltInType());
 
 			ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
@@ -256,14 +256,14 @@ public class XSDBuiltInTypeOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_XSD_BuiltIn_Type_STATEMENT);
 
-			if( xsdbuiltintypeVO.getName()==null ||  xsdbuiltintypeVO.getName().length()==0 ||  xsdbuiltintypeVO.getName().isEmpty() ||  xsdbuiltintypeVO.getName().equals(""))				
-				ps.setString(1,"\u00A0");
-			else 	
+//			if( xsdbuiltintypeVO.getName()==null ||  xsdbuiltintypeVO.getName().length()==0 ||  xsdbuiltintypeVO.getName().isEmpty() ||  xsdbuiltintypeVO.getName().equals(""))				
+//				ps.setString(1,"\u00A0");
+//			else 	
 				ps.setString(1, xsdbuiltintypeVO.getName());
 
-			if( xsdbuiltintypeVO.getBuiltInType()==null ||  xsdbuiltintypeVO.getBuiltInType().length()==0 ||  xsdbuiltintypeVO.getBuiltInType().isEmpty() ||  xsdbuiltintypeVO.getBuiltInType().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( xsdbuiltintypeVO.getBuiltInType()==null ||  xsdbuiltintypeVO.getBuiltInType().length()==0 ||  xsdbuiltintypeVO.getBuiltInType().isEmpty() ||  xsdbuiltintypeVO.getBuiltInType().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, xsdbuiltintypeVO.getBuiltInType());
 
 			ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());

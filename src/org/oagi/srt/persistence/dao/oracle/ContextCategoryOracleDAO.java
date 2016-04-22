@@ -148,14 +148,14 @@ public class ContextCategoryOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, context_categoryVO.getContextCategoryGUID());
 
-			if( context_categoryVO.getName()==null ||  context_categoryVO.getName().length()==0 ||  context_categoryVO.getName().isEmpty() ||  context_categoryVO.getName().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( context_categoryVO.getName()==null ||  context_categoryVO.getName().length()==0 ||  context_categoryVO.getName().isEmpty() ||  context_categoryVO.getName().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, context_categoryVO.getName());
 
-			if( context_categoryVO.getDescription()==null ||  context_categoryVO.getDescription().length()==0 ||  context_categoryVO.getDescription().isEmpty() ||  context_categoryVO.getDescription().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( context_categoryVO.getDescription()==null ||  context_categoryVO.getDescription().length()==0 ||  context_categoryVO.getDescription().isEmpty() ||  context_categoryVO.getDescription().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, context_categoryVO.getDescription());
 
 			
@@ -289,14 +289,14 @@ public class ContextCategoryOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, context_categoryVO.getContextCategoryGUID());
 
-			if( context_categoryVO.getName()==null ||  context_categoryVO.getName().length()==0 ||  context_categoryVO.getName().isEmpty() ||  context_categoryVO.getName().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( context_categoryVO.getName()==null ||  context_categoryVO.getName().length()==0 ||  context_categoryVO.getName().isEmpty() ||  context_categoryVO.getName().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, context_categoryVO.getName());
 
-			if( context_categoryVO.getDescription()==null ||  context_categoryVO.getDescription().length()==0 ||  context_categoryVO.getDescription().isEmpty() ||  context_categoryVO.getDescription().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( context_categoryVO.getDescription()==null ||  context_categoryVO.getDescription().length()==0 ||  context_categoryVO.getDescription().isEmpty() ||  context_categoryVO.getDescription().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, context_categoryVO.getDescription());
 
 			ps.setInt(4, context_categoryVO.getContextCategoryID());

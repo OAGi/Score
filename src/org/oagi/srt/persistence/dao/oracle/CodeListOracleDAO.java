@@ -169,9 +169,9 @@ public class CodeListOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, codelistVO.getEnumerationTypeGUID());
 
-			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, codelistVO.getName());
 
 			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
@@ -185,21 +185,21 @@ public class CodeListOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(6, codelistVO.getVersionID());
 
-			if(codelistVO.getDefinition()==null || codelistVO.getDefinition().length()==0 || codelistVO.getDefinition().isEmpty() || codelistVO.getDefinition().equals("")){
-				ps.setString(7, "\u00A0");
-			}
-			else {
+//			if(codelistVO.getDefinition()==null || codelistVO.getDefinition().length()==0 || codelistVO.getDefinition().isEmpty() || codelistVO.getDefinition().equals("")){
+//				ps.setString(7, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(codelistVO.getDefinition(), 4000);
 				ps.setString(7, s);
-			}
-			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			}
+//			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, codelistVO.getRemark());
 
-			if( codelistVO.getDefinitionSource()==null ||  codelistVO.getDefinitionSource().length()==0 ||  codelistVO.getDefinitionSource().isEmpty() ||  codelistVO.getDefinitionSource().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( codelistVO.getDefinitionSource()==null ||  codelistVO.getDefinitionSource().length()==0 ||  codelistVO.getDefinitionSource().isEmpty() ||  codelistVO.getDefinitionSource().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, codelistVO.getDefinitionSource());
 
 			if(codelistVO.getBasedCodeListID() > 0)
@@ -545,9 +545,9 @@ public class CodeListOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(2, codelistVO.getEnumerationTypeGUID());
 
-			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
-				ps.setString(3,"\u00A0");
-			else 	
+//			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
+//				ps.setString(3,"\u00A0");
+//			else 	
 				ps.setString(3, codelistVO.getName());
 
 			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
@@ -561,18 +561,21 @@ public class CodeListOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(6, codelistVO.getVersionID());
 
-			if( codelistVO.getDefinition()==null ||  codelistVO.getDefinition().length()==0 ||  codelistVO.getDefinition().isEmpty() ||  codelistVO.getDefinition().equals(""))				
-				ps.setString(7,"\u00A0");
-			else 	{
+//			if( codelistVO.getDefinition()==null ||  codelistVO.getDefinition().length()==0 ||  codelistVO.getDefinition().isEmpty() ||  codelistVO.getDefinition().equals(""))				
+//				ps.setString(7,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(codelistVO.getDefinition(), 4000);
 				ps.setString(7, s);
-			}
-			if( codelistVO.getDefinitionSource()==null ||  codelistVO.getDefinitionSource().length()==0 ||  codelistVO.getDefinitionSource().isEmpty() ||  codelistVO.getDefinitionSource().equals(""))				
-				ps.setString(8,"\u00A0");
-			else 	
+//			}
+//			if( codelistVO.getDefinitionSource()==null ||  codelistVO.getDefinitionSource().length()==0 ||  codelistVO.getDefinitionSource().isEmpty() ||  codelistVO.getDefinitionSource().equals(""))				
+//				ps.setString(8,"\u00A0");
+//			else 	
 				ps.setString(8, codelistVO.getDefinitionSource());
-
-			ps.setInt(9, codelistVO.getBasedCodeListID());
+			if(codelistVO.getBasedCodeListID() < 1)
+				ps.setNull(9, java.sql.Types.INTEGER);
+			else
+				ps.setInt(9, codelistVO.getBasedCodeListID());
+			
 			if( codelistVO.getExtensibleIndicator())				
 				ps.setInt(10,1);
 			else 	
@@ -584,9 +587,9 @@ public class CodeListOracleDAO extends SRTDAO {
 				ps.setString(13,"\u00A0");
 			else 	
 				ps.setString(13, codelistVO.getState());
-			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
-				ps.setString(14,"\u00A0");
-			else 	
+//			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
+//				ps.setString(14,"\u00A0");
+//			else 	
 				ps.setString(14, codelistVO.getRemark());
 			ps.setInt(15, codelistVO.getCodeListID());
 			ps.executeUpdate();

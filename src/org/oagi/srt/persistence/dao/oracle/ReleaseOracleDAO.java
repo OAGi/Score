@@ -61,9 +61,9 @@ public class ReleaseOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, releaseVO.getReleaseNum());
 
-			if( releaseVO.getReleaseNote()==null ||  releaseVO.getReleaseNote().length()==0 ||  releaseVO.getReleaseNote().isEmpty() ||  releaseVO.getReleaseNote().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( releaseVO.getReleaseNote()==null ||  releaseVO.getReleaseNote().length()==0 ||  releaseVO.getReleaseNote().isEmpty() ||  releaseVO.getReleaseNote().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, releaseVO.getReleaseNote());
 
 			ps.setInt(3, releaseVO.getNamespaceID());
@@ -357,9 +357,9 @@ public class ReleaseOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(1, releaseVO.getReleaseNum());
 
-			if( releaseVO.getReleaseNote()==null ||  releaseVO.getReleaseNote().length()==0 ||  releaseVO.getReleaseNote().isEmpty() ||  releaseVO.getReleaseNote().equals(""))				
-				ps.setString(2,"\u00A0");
-			else 	
+//			if( releaseVO.getReleaseNote()==null ||  releaseVO.getReleaseNote().length()==0 ||  releaseVO.getReleaseNote().isEmpty() ||  releaseVO.getReleaseNote().equals(""))				
+//				ps.setString(2,"\u00A0");
+//			else 	
 				ps.setString(2, releaseVO.getReleaseNote());
 
 			ps.setInt(3, releaseVO.getNamespaceID());

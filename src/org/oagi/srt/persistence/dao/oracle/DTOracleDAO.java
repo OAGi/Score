@@ -81,14 +81,14 @@ public class DTOracleDAO extends SRTDAO {
 				ps.setString(3, dtVO.getVersionNumber());
 
 			ps.setInt(4, dtVO.getPreviousVersionDTID());
-			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, dtVO.getDataTypeTerm());
 
-			if( dtVO.getQualifier()==null ||  dtVO.getQualifier().length()==0 ||  dtVO.getQualifier().isEmpty() ||  dtVO.getQualifier().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( dtVO.getQualifier()==null ||  dtVO.getQualifier().length()==0 ||  dtVO.getQualifier().isEmpty() ||  dtVO.getQualifier().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, dtVO.getQualifier());
 
 			ps.setInt(7, dtVO.getBasedDTID());
@@ -98,21 +98,21 @@ public class DTOracleDAO extends SRTDAO {
 			else 
 				ps.setString(8, dtVO.getDEN());
 			ps.setString(9, dtVO.getContentComponentDEN());
-			if(dtVO.getDefinition()==null || dtVO.getDefinition().length()==0 || dtVO.getDefinition().isEmpty() || dtVO.getDefinition().equals("")){
-				ps.setString(10, "\u00A0");
-			}
-			else {
+//			if(dtVO.getDefinition()==null || dtVO.getDefinition().length()==0 || dtVO.getDefinition().isEmpty() || dtVO.getDefinition().equals("")){
+//				ps.setString(10, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(dtVO.getDefinition(), 4000);
 				ps.setString(10, s);
-			}
-			if( dtVO.getContentComponentDefinition()==null ||  dtVO.getContentComponentDefinition().length()==0 ||  dtVO.getContentComponentDefinition().isEmpty() ||  dtVO.getContentComponentDefinition().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			}
+//			if( dtVO.getContentComponentDefinition()==null ||  dtVO.getContentComponentDefinition().length()==0 ||  dtVO.getContentComponentDefinition().isEmpty() ||  dtVO.getContentComponentDefinition().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, dtVO.getContentComponentDefinition());
 
-			if( dtVO.getRevisionDocumentation()==null ||  dtVO.getRevisionDocumentation().length()==0 ||  dtVO.getRevisionDocumentation().isEmpty() ||  dtVO.getRevisionDocumentation().equals(""))				
-				ps.setString(12,"\u00A0");
-			else 	
+//			if( dtVO.getRevisionDocumentation()==null ||  dtVO.getRevisionDocumentation().length()==0 ||  dtVO.getRevisionDocumentation().isEmpty() ||  dtVO.getRevisionDocumentation().equals(""))				
+//				ps.setString(12,"\u00A0");
+//			else 	
 				ps.setString(12, dtVO.getRevisionDocumentation());
 
 			ps.setInt(13, dtVO.getState());
@@ -514,14 +514,14 @@ public class DTOracleDAO extends SRTDAO {
 				ps.setString(3, dtVO.getVersionNumber());
 
 			ps.setInt(4, dtVO.getPreviousVersionDTID());
-			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, dtVO.getDataTypeTerm());
 
-			if( dtVO.getQualifier()==null ||  dtVO.getQualifier().length()==0 ||  dtVO.getQualifier().isEmpty() ||  dtVO.getQualifier().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( dtVO.getQualifier()==null ||  dtVO.getQualifier().length()==0 ||  dtVO.getQualifier().isEmpty() ||  dtVO.getQualifier().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, dtVO.getQualifier());
 
 			ps.setInt(7, dtVO.getBasedDTID());
@@ -530,25 +530,25 @@ public class DTOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(8, dtVO.getDEN());
 
-			if( dtVO.getContentComponentDEN()==null ||  dtVO.getContentComponentDEN().length()==0 ||  dtVO.getContentComponentDEN().isEmpty() ||  dtVO.getContentComponentDEN().equals(""))				
-				ps.setString(9,"\u00A0");
-			else 	
+//			if( dtVO.getContentComponentDEN()==null ||  dtVO.getContentComponentDEN().length()==0 ||  dtVO.getContentComponentDEN().isEmpty() ||  dtVO.getContentComponentDEN().equals(""))				
+//				ps.setString(9,"\u00A0");
+//			else 	
 				ps.setString(9, dtVO.getContentComponentDEN());
 
-			if( dtVO.getDefinition()==null ||  dtVO.getDefinition().length()==0 ||  dtVO.getDefinition().isEmpty() ||  dtVO.getDefinition().equals(""))				
-				ps.setString(10,"\u00A0");
-			else 	{
+//			if( dtVO.getDefinition()==null ||  dtVO.getDefinition().length()==0 ||  dtVO.getDefinition().isEmpty() ||  dtVO.getDefinition().equals(""))				
+//				ps.setString(10,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(dtVO.getDefinition(), 4000);
 				ps.setString(10, s);
-			}
-			if( dtVO.getContentComponentDefinition()==null ||  dtVO.getContentComponentDefinition().length()==0 ||  dtVO.getContentComponentDefinition().isEmpty() ||  dtVO.getContentComponentDefinition().equals(""))				
-				ps.setString(11,"\u00A0");
-			else 	
+//			}
+//			if( dtVO.getContentComponentDefinition()==null ||  dtVO.getContentComponentDefinition().length()==0 ||  dtVO.getContentComponentDefinition().isEmpty() ||  dtVO.getContentComponentDefinition().equals(""))				
+//				ps.setString(11,"\u00A0");
+//			else 	
 				ps.setString(11, dtVO.getContentComponentDefinition());
 
-			if( dtVO.getRevisionDocumentation()==null ||  dtVO.getRevisionDocumentation().length()==0 ||  dtVO.getRevisionDocumentation().isEmpty() ||  dtVO.getRevisionDocumentation().equals(""))				
-				ps.setString(12,"\u00A0");
-			else 	
+//			if( dtVO.getRevisionDocumentation()==null ||  dtVO.getRevisionDocumentation().length()==0 ||  dtVO.getRevisionDocumentation().isEmpty() ||  dtVO.getRevisionDocumentation().equals(""))				
+//				ps.setString(12,"\u00A0");
+//			else 	
 				ps.setString(12, dtVO.getRevisionDocumentation());
 
 			ps.setInt(13, dtVO.getState());

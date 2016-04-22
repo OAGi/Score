@@ -105,21 +105,21 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
-			if(asbiepVO.getDefinition()==null || asbiepVO.getDefinition().length()==0 || asbiepVO.getDefinition().isEmpty() || asbiepVO.getDefinition().equals("")){
-				ps.setString(4, "\u00A0");
-			}
-			else {
+//			if(asbiepVO.getDefinition()==null || asbiepVO.getDefinition().length()==0 || asbiepVO.getDefinition().isEmpty() || asbiepVO.getDefinition().equals("")){
+//				ps.setString(4, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(asbiepVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
-			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			}
+//			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, asbiepVO.getRemark());
 
-			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, asbiepVO.getBusinessTerm());
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
@@ -176,21 +176,21 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
-			if(asbiepVO.getDefinition()==null || asbiepVO.getDefinition().length()==0 || asbiepVO.getDefinition().isEmpty() || asbiepVO.getDefinition().equals("")){
-				ps.setString(4, "\u00A0");
-			}
-			else {
+//			if(asbiepVO.getDefinition()==null || asbiepVO.getDefinition().length()==0 || asbiepVO.getDefinition().isEmpty() || asbiepVO.getDefinition().equals("")){
+//				ps.setString(4, "\u00A0");
+//			}
+//			else {
 				String s = StringUtils.abbreviate(asbiepVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
-			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			}
+//			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, asbiepVO.getRemark());
 
-			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, asbiepVO.getBusinessTerm());
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
@@ -334,7 +334,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 	}
 
 	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
-			" SET GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Remark = ?, biz_term = ?, Created_By = ?, Last_Updated_By = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP, "
+			" SET GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Remark = ?, biz_term = ?, Created_By = ?, Last_Updated_By = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP "
 			+ "WHERE ASBIEP_ID = ?";
 	
 	@Override
@@ -354,20 +354,20 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
 			ps.setInt(3, asbiepVO.getRoleOfABIEID());
-			if( asbiepVO.getDefinition()==null ||  asbiepVO.getDefinition().length()==0 ||  asbiepVO.getDefinition().isEmpty() ||  asbiepVO.getDefinition().equals(""))				
-				ps.setString(4,"\u00A0");
-			else 	{
+//			if( asbiepVO.getDefinition()==null ||  asbiepVO.getDefinition().length()==0 ||  asbiepVO.getDefinition().isEmpty() ||  asbiepVO.getDefinition().equals(""))				
+//				ps.setString(4,"\u00A0");
+//			else 	{
 				String s = StringUtils.abbreviate(asbiepVO.getDefinition(), 4000);
 				ps.setString(4, s);
-			}
-			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
-				ps.setString(5,"\u00A0");
-			else 	
+//			}
+//			if( asbiepVO.getRemark()==null ||  asbiepVO.getRemark().length()==0 ||  asbiepVO.getRemark().isEmpty() ||  asbiepVO.getRemark().equals(""))				
+//				ps.setString(5,"\u00A0");
+//			else 	
 				ps.setString(5, asbiepVO.getRemark());
 
-			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
-				ps.setString(6,"\u00A0");
-			else 	
+//			if( asbiepVO.getBusinessTerm()==null ||  asbiepVO.getBusinessTerm().length()==0 ||  asbiepVO.getBusinessTerm().isEmpty() ||  asbiepVO.getBusinessTerm().equals(""))				
+//				ps.setString(6,"\u00A0");
+//			else 	
 				ps.setString(6, asbiepVO.getBusinessTerm());
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
