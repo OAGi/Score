@@ -265,6 +265,34 @@
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
+									<h:panelGrid columns="1" cellpadding="5">
+										<h:outputLabel rows="10" value="BDT SC Primitive Restriction" style="font-weight:bold; color:red" />
+									</h:panelGrid>
+									<h:panelGrid columns="2" cellpadding="5">
+										<h:outputLabel rows="10" value="BDT SC Name:" style="font-weight:bold" />
+										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtscName}" style="font-weight:bold; color: blue;" />
+									</h:panelGrid>
+									<h:panelGrid columns="4" cellpadding="5">
+										<p:radioButton id="optBDTSCRestrictionPrimitive" for="customRadio" itemIndex="0" selected="true" />
+										<h:outputLabel rows="10" value="Primitive:" style="font-weight:bold" />
+										<p:selectOneMenu value="#{topLevelABIEHandler.aABIEView.bdtscPrimitiveRestrictionId}" required="true" requiredMessage="Select one of the options">
+											<p:ajax listener="#{topLevelABIEHandler.aABIEView.onBDTSCPrimitiveChange}" />
+											<f:selectItems value="#{topLevelABIEHandler.aABIEView.bdtscPrimitiveRestrictions}" />
+										</p:selectOneMenu>
+										<h:outputLabel rows="10" value="(#{topLevelABIEHandler.aABIEView.primitiveType})" style="font-weight:bold; color: green" />
+									</h:panelGrid>
+									<h:panelGrid columns="5" cellpadding="5">
+										<p:radioButton id="optBDTSCRestrictionCodeList" for="customRadio" itemIndex="1" />
+										<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
+										<h:outputLabel id="codeSelectedForBDTSCRestriction" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
+
+										<p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
+										</p:commandButton>
+
+										<p:commandButton process="tbl" update=":form:derivedCodeListId" value="Derived Code List" icon="ui-icon-extlink" oncomplete="PF('derivedCodeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'true' : 'false'}" >
+										</p:commandButton>
+									</h:panelGrid>
+									<p:separator />
 							    </ui:fragment>
 							    <p:commandButton value="Save" icon="ui-icon-extlink" actionListener="#{topLevelABIEHandler.saveChanges}" />
 								

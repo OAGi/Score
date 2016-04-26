@@ -1,40 +1,25 @@
 package org.oagi.srt.web.handler;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.component.UIComponent;
 
-import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
@@ -44,28 +29,7 @@ import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ACCVO;
-import org.oagi.srt.persistence.dto.ASBIEPVO;
-import org.oagi.srt.persistence.dto.ASBIEVO;
-import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.ASCCVO;
-import org.oagi.srt.persistence.dto.BBIEPVO;
-import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.BBIE_SCVO;
-import org.oagi.srt.persistence.dto.BCCPVO;
-import org.oagi.srt.persistence.dto.BCCVO;
-import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.BusinessContextVO;
-import org.oagi.srt.persistence.dto.BusinessContextValueVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.UserVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.persistence.dto.*;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
@@ -104,6 +68,7 @@ public class TopLevelABIEHandler implements Serializable {
 	private SRTDAO daoBCV;
 	private SRTDAO userDao;
 	private SRTDAO bdtPrimitiveRestrictionDao;
+	private SRTDAO bdtscPrimitiveRestrictionDao;
 	private SRTDAO daoCL;
 	
 	private int abieCount = 0;
@@ -153,6 +118,7 @@ public class TopLevelABIEHandler implements Serializable {
 			daoBCV = df.getDAO("BusinessContextValue");
 			userDao = df.getDAO("User");
 			bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
+			bdtscPrimitiveRestrictionDao = df.getDAO("BDTSCPrimitiveRestriction");
 			daoCL = df.getDAO("CodeList");
 			
 			maxABIEId = asbieDao.findMaxId();
@@ -1728,10 +1694,20 @@ public class TopLevelABIEHandler implements Serializable {
 				QueryCondition qc_02 = new QueryCondition();
 				qc_02.add("dt_sc_id", bbiescVO.getDTSCID());
 				DTSCVO dtscVO = (DTSCVO)dtscDao.findObject(qc_02);
+
+				QueryCondition qc_03 = new QueryCondition();
+				qc_03.add("dt_id", dtscVO.getOwnerDTID());
+				DTVO dtVO = (DTVO) dtDao.findObject(qc_03);
+
+				String bdtscDEN =
+						dtVO.getDataTypeTerm() + ". " +
+						dtscVO.getPropertyTerm() + ". " +
+						dtscVO.getRepresentationTerm();
 				
 				ABIEView av_01 = new ABIEView(dtscVO.getPropertyTerm(), bbiescVO.getBBIESCID(), "BBIESC");
 				av_01.setDtscVO(dtscVO);
 				av_01.setBbiescVO(bbiescVO);
+				av_01.setBdtscName(bdtscDEN);
 				String sc_name = "";
 				if(dtscVO.getRepresentationTerm().equalsIgnoreCase("Text"))
 					sc_name = Utility.toLowerCamelCase(dtscVO.getPropertyTerm());
@@ -1768,15 +1744,29 @@ public class TopLevelABIEHandler implements Serializable {
 			if(aABIEView.getType().equalsIgnoreCase("BBIE")) {
 				try {
 					aABIEView.getBdtPrimitiveRestrictions();
-					
+
 					QueryCondition qc_01 = new QueryCondition();
 					qc_01.add("bdt_pri_restri_id", aABIEView.getBdtPrimitiveRestrictionId());
 					BDTPrimitiveRestrictionVO  aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)bdtPrimitiveRestrictionDao.findObject(qc_01);
-					
+
 					QueryCondition qc = new QueryCondition();
-			        qc.add("code_list_id", aBDTPrimitiveRestrictionVO.getCodeListID());
-			        codeLists = daoCL.findObjects(qc);
-			        
+					qc.add("code_list_id", aBDTPrimitiveRestrictionVO.getCodeListID());
+					codeLists = daoCL.findObjects(qc);
+
+				} catch (SRTDAOException e) {
+					e.printStackTrace();
+				}
+			} else if (aABIEView.getType().equalsIgnoreCase("BBIESC")) {
+				try {
+					aABIEView.getBdtscPrimitiveRestrictions();
+
+					QueryCondition qc_01 = new QueryCondition();
+					qc_01.add("bdt_sc_pri_restri_id", aABIEView.getBdtscPrimitiveRestrictionId());
+					BDTSCPrimitiveRestrictionVO  aBDTSCPrimitiveRestrictionVO = (BDTSCPrimitiveRestrictionVO)bdtscPrimitiveRestrictionDao.findObject(qc_01);
+
+					QueryCondition qc = new QueryCondition();
+					qc.add("code_list_id", aBDTSCPrimitiveRestrictionVO.getCodeListID());
+					codeLists = daoCL.findObjects(qc);
 				} catch (SRTDAOException e) {
 					e.printStackTrace();
 				}
