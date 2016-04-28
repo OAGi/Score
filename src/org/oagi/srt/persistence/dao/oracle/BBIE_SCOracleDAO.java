@@ -66,17 +66,17 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 			ps.setInt(1, bbie_scVO.getBBIEID());
 			ps.setInt(2, bbie_scVO.getDTSCID());
 
-			if(bbie_scVO.getDTSCPrimitiveRestrictionID() == 0)
+			if(bbie_scVO.getDTSCPrimitiveRestrictionID() < 1)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bbie_scVO.getDTSCPrimitiveRestrictionID());
 			
-			if(bbie_scVO.getCodeListId() == 0)
+			if(bbie_scVO.getCodeListId() < 1)
 				ps.setNull(4, java.sql.Types.INTEGER);
 			else
 				ps.setInt(4, bbie_scVO.getCodeListId());
 			
-			if(bbie_scVO.getAgencyIdListId() == 0)
+			if(bbie_scVO.getAgencyIdListId() < 1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbie_scVO.getAgencyIdListId());
@@ -110,7 +110,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
-			if(bbie_scVO.getBBIESCID() > 1)
+			if(bbie_scVO.getBBIESCID() > 0)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
@@ -157,17 +157,17 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 			ps.setInt(1, bbie_scVO.getBBIEID());
 			ps.setInt(2, bbie_scVO.getDTSCID());
 
-			if(bbie_scVO.getDTSCPrimitiveRestrictionID() == 0)
+			if(bbie_scVO.getDTSCPrimitiveRestrictionID() <1)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bbie_scVO.getDTSCPrimitiveRestrictionID());
 			
-			if(bbie_scVO.getCodeListId() == 0)
+			if(bbie_scVO.getCodeListId() <1)
 				ps.setNull(4, java.sql.Types.INTEGER);
 			else
 				ps.setInt(4, bbie_scVO.getCodeListId());
 			
-			if(bbie_scVO.getAgencyIdListId() == 0)
+			if(bbie_scVO.getAgencyIdListId() <1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbie_scVO.getAgencyIdListId());
@@ -202,7 +202,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
 			
-			if(bbie_scVO.getBBIESCID() > 1)
+			if(bbie_scVO.getBBIESCID() > 0)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			
 			ps.executeUpdate();
@@ -479,17 +479,17 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 			ps.setInt(1, bbie_scVO.getBBIEID());
 			ps.setInt(2, bbie_scVO.getDTSCID());
 
-			if(bbie_scVO.getDTSCPrimitiveRestrictionID() == 0)
+			if(bbie_scVO.getDTSCPrimitiveRestrictionID() <1)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bbie_scVO.getDTSCPrimitiveRestrictionID());
 			
-			if(bbie_scVO.getCodeListId() == 0)
+			if(bbie_scVO.getCodeListId() <1)
 				ps.setNull(4, java.sql.Types.INTEGER);
 			else
 				ps.setInt(4, bbie_scVO.getCodeListId());
 			
-			if(bbie_scVO.getAgencyIdListId() == 0)
+			if(bbie_scVO.getAgencyIdListId() <1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbie_scVO.getAgencyIdListId());
@@ -523,7 +523,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
-			if(bbie_scVO.getBBIESCID() > 1)
+			if(bbie_scVO.getBBIESCID() > 0)
 				ps.setInt(13, bbie_scVO.getBBIESCID());
 			ps.executeUpdate();
 

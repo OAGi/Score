@@ -40,7 +40,7 @@ public class ACCVO extends SRTObject {
 	}
 	
 	public void setACCID(int aCCID) {
-		ACCID = aCCID;
+		ACCID = aCCID;//Not Null
 	}
 	
 	public String getACCGUID() {
@@ -48,7 +48,7 @@ public class ACCVO extends SRTObject {
 	}
 	
 	public void setACCGUID(String aCCGUID) {
-		ACCGUID = aCCGUID;
+		ACCGUID = aCCGUID;//Not Null
 	}
 	
 	public String getObjectClassTerm() {
@@ -56,7 +56,7 @@ public class ACCVO extends SRTObject {
 	}
 	
 	public void setObjectClassTerm(String objectClassTerm) {
-		ObjectClassTerm = objectClassTerm;
+		ObjectClassTerm = objectClassTerm;//Not Null
 	}
 	
 	public String getDEN() {
@@ -64,7 +64,7 @@ public class ACCVO extends SRTObject {
 	}
 	
 	public void setDEN(String dEN) {
-		DEN = dEN;
+		DEN = dEN;//Not Null
 	}
 	
 	public String getDefinition() {
@@ -72,7 +72,9 @@ public class ACCVO extends SRTObject {
 	}
 	
 	public void setDefinition(String definition) {
+		
 		Definition = definition;
+		
 	}
 	
 	public int getBasedACCID() {
@@ -88,7 +90,9 @@ public class ACCVO extends SRTObject {
 	}
 	
 	public void setObjectClassQualifier(String objectClassQualifier) {
+		
 		ObjectClassQualifier = objectClassQualifier;
+		
 	}
 	
 	public int getOAGISComponentType() {

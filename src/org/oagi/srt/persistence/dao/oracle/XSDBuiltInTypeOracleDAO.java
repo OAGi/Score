@@ -71,8 +71,12 @@ public class XSDBuiltInTypeOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(2, xsdbuiltintypeVO.getBuiltInType());
 
-			ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
-
+			if(xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId() < 1){
+				ps.setNull(3, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
+			}
 			ps.executeUpdate();
 
 			ResultSet tableKeys = ps.getGeneratedKeys();
@@ -266,7 +270,12 @@ public class XSDBuiltInTypeOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(2, xsdbuiltintypeVO.getBuiltInType());
 
-			ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
+			if(xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId() < 1){
+				ps.setNull(3, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(3, xsdbuiltintypeVO.getSubtypeOfXSDBuiltinTypeId());
+			}
 			ps.setInt(4, xsdbuiltintypeVO.getXSDBuiltInTypeID());
 			ps.executeUpdate();
 

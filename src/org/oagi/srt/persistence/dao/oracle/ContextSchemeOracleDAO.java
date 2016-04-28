@@ -153,12 +153,12 @@ public class ContextSchemeOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_CONTEXT_SCHEME_STATEMENT);
 			if( context_schemeVO.getSchemeGUID()==null ||  context_schemeVO.getSchemeGUID().length()==0 ||  context_schemeVO.getSchemeGUID().isEmpty() ||  context_schemeVO.getSchemeGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, context_schemeVO.getSchemeGUID());
 
 			if( context_schemeVO.getSchemeID()==null ||  context_schemeVO.getSchemeID().length()==0 ||  context_schemeVO.getSchemeID().isEmpty() ||  context_schemeVO.getSchemeID().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, context_schemeVO.getSchemeID());
 
@@ -173,12 +173,12 @@ public class ContextSchemeOracleDAO extends SRTDAO {
 				ps.setString(4, context_schemeVO.getDescription());
 
 			if( context_schemeVO.getSchemeAgencyID()==null ||  context_schemeVO.getSchemeAgencyID().length()==0 ||  context_schemeVO.getSchemeAgencyID().isEmpty() ||  context_schemeVO.getSchemeAgencyID().equals(""))				
-				ps.setString(5,"\u00A0");
+				ps.setString(5,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(5, context_schemeVO.getSchemeAgencyID());
 
 			if( context_schemeVO.getSchemeVersion()==null ||  context_schemeVO.getSchemeVersion().length()==0 ||  context_schemeVO.getSchemeVersion().isEmpty() ||  context_schemeVO.getSchemeVersion().equals(""))				
-				ps.setString(6,"\u00A0");
+				ps.setString(6,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(6, context_schemeVO.getSchemeVersion());
 
@@ -331,12 +331,12 @@ public class ContextSchemeOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_SCHEME_STATEMENT);
 
 			if( context_schemeVO.getSchemeGUID()==null ||  context_schemeVO.getSchemeGUID().length()==0 ||  context_schemeVO.getSchemeGUID().isEmpty() ||  context_schemeVO.getSchemeGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, context_schemeVO.getSchemeGUID());
 
 			if( context_schemeVO.getSchemeID()==null ||  context_schemeVO.getSchemeID().length()==0 ||  context_schemeVO.getSchemeID().isEmpty() ||  context_schemeVO.getSchemeID().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, context_schemeVO.getSchemeID());
 
@@ -351,12 +351,12 @@ public class ContextSchemeOracleDAO extends SRTDAO {
 				ps.setString(4, context_schemeVO.getDescription());
 
 			if( context_schemeVO.getSchemeAgencyID()==null ||  context_schemeVO.getSchemeAgencyID().length()==0 ||  context_schemeVO.getSchemeAgencyID().isEmpty() ||  context_schemeVO.getSchemeAgencyID().equals(""))				
-				ps.setString(5,"\u00A0");
+				ps.setString(5,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(5, context_schemeVO.getSchemeAgencyID());
 
 			if( context_schemeVO.getSchemeVersion()==null ||  context_schemeVO.getSchemeVersion().length()==0 ||  context_schemeVO.getSchemeVersion().isEmpty() ||  context_schemeVO.getSchemeVersion().equals(""))				
-				ps.setString(6,"\u00A0");
+				ps.setString(6,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(6, context_schemeVO.getSchemeVersion());
 

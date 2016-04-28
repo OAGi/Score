@@ -160,12 +160,12 @@ public class CodeListOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Code_List_STATEMENT);
 			if( codelistVO.getCodeListGUID()==null ||  codelistVO.getCodeListGUID().length()==0 ||  codelistVO.getCodeListGUID().isEmpty() ||  codelistVO.getCodeListGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, codelistVO.getCodeListGUID());
 
 			if( codelistVO.getEnumerationTypeGUID()==null ||  codelistVO.getEnumerationTypeGUID().length()==0 ||  codelistVO.getEnumerationTypeGUID().isEmpty() ||  codelistVO.getEnumerationTypeGUID().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, codelistVO.getEnumerationTypeGUID());
 
@@ -175,13 +175,13 @@ public class CodeListOracleDAO extends SRTDAO {
 				ps.setString(3, codelistVO.getName());
 
 			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
-				ps.setString(4,"\u00A0");
+				ps.setString(4,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(4, codelistVO.getListID());
 
 			ps.setInt(5, codelistVO.getAgencyID());
 			if( codelistVO.getVersionID()==null ||  codelistVO.getVersionID().length()==0 ||  codelistVO.getVersionID().isEmpty() ||  codelistVO.getVersionID().equals(""))				
-				ps.setString(6,"\u00A0");
+				ps.setString(6,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(6, codelistVO.getVersionID());
 
@@ -205,7 +205,7 @@ public class CodeListOracleDAO extends SRTDAO {
 			if(codelistVO.getBasedCodeListID() > 0)
 				ps.setInt(10, codelistVO.getBasedCodeListID());
 			else
-				ps.setNull(10, codelistVO.getBasedCodeListID());
+				ps.setNull(10, java.sql.Types.INTEGER);
 			if( codelistVO.getExtensibleIndicator())				
 				ps.setInt(11,1);
 			else 	
@@ -215,7 +215,7 @@ public class CodeListOracleDAO extends SRTDAO {
 			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
 			if( codelistVO.getState()==null ||  codelistVO.getState().length()==0 ||  codelistVO.getState().isEmpty() ||  codelistVO.getState().equals(""))				
-				ps.setString(14,"\u00A0");
+				ps.setString(14,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(14, codelistVO.getState());
 
@@ -536,12 +536,12 @@ public class CodeListOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_Code_List_STATEMENT);
 			
 			if( codelistVO.getCodeListGUID()==null ||  codelistVO.getCodeListGUID().length()==0 ||  codelistVO.getCodeListGUID().isEmpty() ||  codelistVO.getCodeListGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, codelistVO.getCodeListGUID());
 
 			if( codelistVO.getEnumerationTypeGUID()==null ||  codelistVO.getEnumerationTypeGUID().length()==0 ||  codelistVO.getEnumerationTypeGUID().isEmpty() ||  codelistVO.getEnumerationTypeGUID().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, codelistVO.getEnumerationTypeGUID());
 
@@ -551,13 +551,13 @@ public class CodeListOracleDAO extends SRTDAO {
 				ps.setString(3, codelistVO.getName());
 
 			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
-				ps.setString(4,"\u00A0");
+				ps.setString(4,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(4, codelistVO.getListID());
 
 			ps.setInt(5, codelistVO.getAgencyID());
 			if( codelistVO.getVersionID()==null ||  codelistVO.getVersionID().length()==0 ||  codelistVO.getVersionID().isEmpty() ||  codelistVO.getVersionID().equals(""))				
-				ps.setString(6,"\u00A0");
+				ps.setString(6,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(6, codelistVO.getVersionID());
 
@@ -584,7 +584,7 @@ public class CodeListOracleDAO extends SRTDAO {
 			ps.setInt(11, codelistVO.getCreatedByUserID());
 			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
 			if( codelistVO.getState()==null ||  codelistVO.getState().length()==0 ||  codelistVO.getState().isEmpty() ||  codelistVO.getState().equals(""))				
-				ps.setString(13,"\u00A0");
+				ps.setString(13,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(13, codelistVO.getState());
 //			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				

@@ -53,12 +53,12 @@ public class BDTSCPrimitiveRestrictionOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_BDT_SC_Primitive_Restriction_STATEMENT);
 			ps.setInt(1, bdtscprimitiverestrictionVO.getBDTSCID());
-			if(bdtscprimitiverestrictionVO.getCDTSCAllowedPrimitiveExpressionTypeMapID() == 0)
+			if(bdtscprimitiverestrictionVO.getCDTSCAllowedPrimitiveExpressionTypeMapID() <1)
 				ps.setNull(2, java.sql.Types.INTEGER);
 			else
 				ps.setInt(2, bdtscprimitiverestrictionVO.getCDTSCAllowedPrimitiveExpressionTypeMapID());
 			
-			if(bdtscprimitiverestrictionVO.getCodeListID() == 0)
+			if(bdtscprimitiverestrictionVO.getCodeListID() <1)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bdtscprimitiverestrictionVO.getCodeListID());
@@ -69,7 +69,7 @@ public class BDTSCPrimitiveRestrictionOracleDAO extends SRTDAO {
 				ps.setInt(4,0);
 
 			
-			if(bdtscprimitiverestrictionVO.getAgencyIDListID() == 0)
+			if(bdtscprimitiverestrictionVO.getAgencyIDListID() <1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bdtscprimitiverestrictionVO.getAgencyIDListID());

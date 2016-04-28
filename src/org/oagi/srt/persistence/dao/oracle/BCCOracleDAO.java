@@ -65,7 +65,7 @@ public class BCCOracleDAO extends SRTDAO{
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BCC_STATEMENT);
 			if( bccVO.getBCCGUID()==null ||  bccVO.getBCCGUID().length()==0 ||  bccVO.getBCCGUID().isEmpty() ||  bccVO.getBCCGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bccVO.getBCCGUID());
 
@@ -76,7 +76,7 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
 			if(bccVO.getDEN()==null || bccVO.getDEN().length()==0 || bccVO.getDEN().isEmpty() || bccVO.getDEN().equals("")){
-				ps.setString(8, "\u00A0");
+				ps.setString(8, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			}
 			else 
 				ps.setString(8, bccVO.getDEN());
@@ -93,15 +93,44 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(12, bccVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(13, bccVO.getLastUpdateTimestamp());
 			ps.setInt(13, bccVO.getState());
-			ps.setInt(14, bccVO.getRevisionNum());
-			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			ps.setInt(16, bccVO.getRevisionAction());
-			ps.setInt(17, bccVO.getReleaseId());
-			ps.setInt(18, bccVO.getCurrentBccId());
+			
+			if(bccVO.getRevisionNum() < 0){
+				ps.setNull(14, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(14, bccVO.getRevisionNum());
+			}			
+			if(bccVO.getRevisionTrackingNum() < 0){
+				ps.setNull(15, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(15, bccVO.getRevisionTrackingNum());
+			}			
+			if(bccVO.getRevisionAction() < 1){
+				ps.setNull(16, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(16, bccVO.getRevisionAction());
+			}			
+			if(bccVO.getReleaseId() < 1){
+				ps.setNull(17, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(17, bccVO.getReleaseId());
+			}
+			if(bccVO.getCurrentBccId() < 1){
+				ps.setNull(18, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(18, bccVO.getCurrentBccId());
+			}
 			if( bccVO.getIs_deprecated())				
 				ps.setInt(19,1);
 			else 	
 				ps.setInt(19,0);
+			
+			
+			
 
 			ps.executeUpdate();
 
@@ -436,7 +465,7 @@ public class BCCOracleDAO extends SRTDAO{
 			ps = conn.prepareStatement(_UPDATE_BCC_STATEMENT);
 
 			if( bccVO.getBCCGUID()==null ||  bccVO.getBCCGUID().length()==0 ||  bccVO.getBCCGUID().isEmpty() ||  bccVO.getBCCGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bccVO.getBCCGUID());
 
@@ -447,7 +476,7 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(6, bccVO.getSequencingKey());
 			ps.setInt(7, bccVO.getEntityType());
 			if( bccVO.getDEN()==null ||  bccVO.getDEN().length()==0 ||  bccVO.getDEN().isEmpty() ||  bccVO.getDEN().equals(""))				
-				ps.setString(8,"\u00A0");
+				ps.setString(8,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(8, bccVO.getDEN());
 
@@ -463,15 +492,42 @@ public class BCCOracleDAO extends SRTDAO{
 			ps.setInt(12, bccVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(13, bccVO.getLastUpdateTimestamp());
 			ps.setInt(13, bccVO.getState());
-			ps.setInt(14, bccVO.getRevisionNum());
-			ps.setInt(15, bccVO.getRevisionTrackingNum());
-			ps.setInt(16,bccVO.getRevisionAction());
-			ps.setInt(17, bccVO.getReleaseId());
-			ps.setInt(18, bccVO.getCurrentBccId());
+			
+			if(bccVO.getRevisionNum() < 0){
+				ps.setNull(14, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(14, bccVO.getRevisionNum());
+			}			
+			if(bccVO.getRevisionTrackingNum() < 0){
+				ps.setNull(15, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(15, bccVO.getRevisionTrackingNum());
+			}			
+			if(bccVO.getRevisionAction() < 1){
+				ps.setNull(16, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(16, bccVO.getRevisionAction());
+			}			
+			if(bccVO.getReleaseId() < 1){
+				ps.setNull(17, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(17, bccVO.getReleaseId());
+			}
+			if(bccVO.getCurrentBccId() < 1){
+				ps.setNull(18, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(18, bccVO.getCurrentBccId());
+			}
 			if( bccVO.getIs_deprecated())				
 				ps.setInt(19,1);
 			else 	
 				ps.setInt(19,0);
+			
 
 			ps.setInt(20, bccVO.getBCCID());
 			ps.executeUpdate();

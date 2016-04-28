@@ -422,7 +422,7 @@ public class P_1_7_PopulateQBDTInDT {
 			if(base.endsWith("CodeContentType")) {
 				dVO = getDTVOWithDEN("Code. Type");
 			} else {
-				String den = Utility.createDENFormat(Utility.spaceSeparator(base));
+				String den = Utility.typeToDen(base);
 				dVO = getDTVOWithDEN(den);
 				
 				// QBDT is based on another QBDT
@@ -493,6 +493,7 @@ public class P_1_7_PopulateQBDTInDT {
 		qc.add("bdt_id", dVO.getBasedDTID());
 		ArrayList<SRTObject> al = aBDTPrimitiveRestrictionDAO.findObjects(qc, conn);
 		
+		//if 
 		if(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && !(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
 			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
@@ -510,7 +511,8 @@ public class P_1_7_PopulateQBDTInDT {
 			theBDT_Primitive_RestrictionVO.setisDefault(false);
 			aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
 		}
-		else if(dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IdentificationContentType")){
+		
+		if(dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")){
 			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
 			theBDT_Primitive_RestrictionVO.setAgencyIDListID(getAgencyListID());
@@ -979,9 +981,9 @@ public class P_1_7_PopulateQBDTInDT {
 		dtVO.setQualifier(qualifier);
 		String den = Utility.denWithQualifier(qualifier, dVO.getDEN());
 		dtVO.setDEN(den);
-		dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");
-		Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
+		dtVO.setContentComponentDEN(den.substring(0, den.indexOf(".")) + ". Content");	
 		String definition = null;
+		Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
 		if(((Element)definitionNode) != null)
 			definition = ((Element)definitionNode).getTextContent();
 		else if(xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]") != null ){

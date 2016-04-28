@@ -194,7 +194,7 @@ public class DTSCOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_DT_SC_STATEMENT);
 			if( dtscVO.getDTSCGUID()==null ||  dtscVO.getDTSCGUID().length()==0 ||  dtscVO.getDTSCGUID().isEmpty() ||  dtscVO.getDTSCGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, dtscVO.getDTSCGUID());
 
@@ -219,7 +219,7 @@ public class DTSCOracleDAO extends SRTDAO {
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
 
-			if(dtscVO.getBasedDTSCID()!=0){
+			if(dtscVO.getBasedDTSCID()>0){
 				ps.setInt(8, dtscVO.getBasedDTSCID());
 			}
 			else {
@@ -477,7 +477,7 @@ public class DTSCOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_DT_SC_STATEMENT);
 
 			if( dtscVO.getDTSCGUID()==null ||  dtscVO.getDTSCGUID().length()==0 ||  dtscVO.getDTSCGUID().isEmpty() ||  dtscVO.getDTSCGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, dtscVO.getDTSCGUID());
 
@@ -500,7 +500,7 @@ public class DTSCOracleDAO extends SRTDAO {
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
-			if(dtscVO.getBasedDTSCID() != 0){
+			if(dtscVO.getBasedDTSCID() > 0){
 				ps.setInt(8, dtscVO.getBasedDTSCID());
 			}
 			else {

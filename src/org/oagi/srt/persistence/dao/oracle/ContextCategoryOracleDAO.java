@@ -144,7 +144,7 @@ public class ContextCategoryOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_CONTEXT_CATEGORY_STATEMENT);
 			if( context_categoryVO.getContextCategoryGUID()==null ||  context_categoryVO.getContextCategoryGUID().length()==0 ||  context_categoryVO.getContextCategoryGUID().isEmpty() ||  context_categoryVO.getContextCategoryGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, context_categoryVO.getContextCategoryGUID());
 
@@ -285,7 +285,7 @@ public class ContextCategoryOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_CATEGORY_STATEMENT);
 
 			if( context_categoryVO.getContextCategoryGUID()==null ||  context_categoryVO.getContextCategoryGUID().length()==0 ||  context_categoryVO.getContextCategoryGUID().isEmpty() ||  context_categoryVO.getContextCategoryGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, context_categoryVO.getContextCategoryGUID());
 

@@ -118,11 +118,11 @@ public class ABIEOracleDAO extends SRTDAO {
 //			}
 			ps.setInt(6, abieVO.getCreatedByUserID());
 			ps.setInt(7, abieVO.getLastUpdatedByUserID());
-			if(abieVO.getState() == 0)
+			if(abieVO.getState() < 1)
 				ps.setNull(8, java.sql.Types.INTEGER);
 			else
 				ps.setInt(8, abieVO.getState());
-			if(abieVO.getClientID()==0)
+			if(abieVO.getClientID() < 1)
 				ps.setNull(9, java.sql.Types.INTEGER);
 			else
 				ps.setInt(9, abieVO.getClientID());
@@ -148,7 +148,7 @@ public class ABIEOracleDAO extends SRTDAO {
 //			else 		
 				ps.setString(13, abieVO.getBusinessTerm());	
 
-			if(abieVO.getABIEID() > 1)
+			if(abieVO.getABIEID() > 0)
 				ps.setInt(14, abieVO.getABIEID());
 
 			ps.executeUpdate();
@@ -210,11 +210,11 @@ public class ABIEOracleDAO extends SRTDAO {
 //			}
 			ps.setInt(6, abieVO.getCreatedByUserID());
 			ps.setInt(7, abieVO.getLastUpdatedByUserID());
-			if(abieVO.getState()==0)
+			if(abieVO.getState()<1)
 				ps.setNull(8, java.sql.Types.INTEGER);
 			else
 				ps.setInt(8, abieVO.getState());
-			if(abieVO.getClientID()==0)
+			if(abieVO.getClientID()<1)
 				ps.setNull(9, java.sql.Types.INTEGER);
 			else
 				ps.setInt(9, abieVO.getClientID());
@@ -240,7 +240,7 @@ public class ABIEOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(13, abieVO.getBusinessTerm());
 
-			if(abieVO.getABIEID() != 0)
+			if(abieVO.getABIEID() > 0)
 				ps.setInt(14, abieVO.getABIEID());
 
 
@@ -424,7 +424,7 @@ public class ABIEOracleDAO extends SRTDAO {
 			else 	
 				ps.setString(7, abieVO.getAbieGUID());
 			
-			if(abieVO.getClientID()!=0)
+			if(abieVO.getClientID() < 1)
 				ps.setInt(8, abieVO.getClientID());
 			else 
 				ps.setNull(8, java.sql.Types.INTEGER);

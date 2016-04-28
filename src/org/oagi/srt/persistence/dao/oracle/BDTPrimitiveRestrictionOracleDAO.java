@@ -54,12 +54,12 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_INSERT_BDT_Primitive_Restriction_STATEMENT);
 			ps.setInt(1, bdtprimitiverestrictionVO.getBDTID());
 			
-			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID() == 0)
+			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID() <1)
 				ps.setNull(2, java.sql.Types.INTEGER);
 			else
 				ps.setInt(2, bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID());
 			
-			if(bdtprimitiverestrictionVO.getCodeListID() == 0)
+			if(bdtprimitiverestrictionVO.getCodeListID() <1)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
@@ -68,7 +68,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				ps.setInt(4,1);
 			else 	
 				ps.setInt(4,0);
-			if(bdtprimitiverestrictionVO.getAgencyIDListID() == 0)
+			if(bdtprimitiverestrictionVO.getAgencyIDListID() <1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else 
 				ps.setInt(5, bdtprimitiverestrictionVO.getAgencyIDListID());
@@ -414,11 +414,11 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_BDT_Primitive_Restriction_STATEMENT);
 			
 			ps.setInt(1, bdtprimitiverestrictionVO.getBDTID());
-			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID()==0)
+			if(bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID()<1)
 				ps.setNull(2, java.sql.Types.INTEGER);
 			else
 				ps.setInt(2, bdtprimitiverestrictionVO.getCDTPrimitiveExpressionTypeMapID());
-			if(bdtprimitiverestrictionVO.getCodeListID()==0)
+			if(bdtprimitiverestrictionVO.getCodeListID()<1)
 				ps.setNull(3, java.sql.Types.INTEGER);
 			else
 				ps.setInt(3, bdtprimitiverestrictionVO.getCodeListID());
@@ -426,7 +426,7 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 				ps.setInt(4,1);
 			else 	
 				ps.setInt(4,0);
-			if(bdtprimitiverestrictionVO.getAgencyIDListID()==0){
+			if(bdtprimitiverestrictionVO.getAgencyIDListID()<1){
 				ps.setNull(5, java.sql.Types.INTEGER);
 			}
 			else 

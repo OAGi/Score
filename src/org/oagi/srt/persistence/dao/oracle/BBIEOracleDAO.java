@@ -62,18 +62,18 @@ public class BBIEOracleDAO extends SRTDAO{
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
 			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bbieVO.getBbieGuid());
 
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+			if(bbieVO.getBdtPrimitiveRestrictionId() < 1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
+			if(bbieVO.getCodeListId() < 1)
 				ps.setNull(6, java.sql.Types.INTEGER);
 			else
 				ps.setInt(6, bbieVO.getCodeListId());
@@ -146,18 +146,18 @@ public class BBIEOracleDAO extends SRTDAO{
 			String[] keys = {"BBIE_ID"};
 			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
 			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bbieVO.getBbieGuid());
 
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+			if(bbieVO.getBdtPrimitiveRestrictionId() <1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
+			if(bbieVO.getCodeListId() <1)
 				ps.setNull(6, java.sql.Types.INTEGER);
 			else
 				ps.setInt(6, bbieVO.getCodeListId());
@@ -359,18 +359,18 @@ public class BBIEOracleDAO extends SRTDAO{
 			ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
 			
 			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bbieVO.getBbieGuid());
 
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+			if(bbieVO.getBdtPrimitiveRestrictionId() <1)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
+			if(bbieVO.getCodeListId() <1)
 				ps.setNull(6, java.sql.Types.INTEGER);
 			else
 				ps.setInt(6, bbieVO.getCodeListId());

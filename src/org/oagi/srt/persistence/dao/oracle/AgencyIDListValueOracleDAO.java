@@ -60,7 +60,7 @@ public class AgencyIDListValueOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_Agency_ID_Value_List_STATEMENT);
 			if( agencyidlistvalueVO.getValue()==null ||  agencyidlistvalueVO.getValue().length()==0 ||  agencyidlistvalueVO.getValue().isEmpty() ||  agencyidlistvalueVO.getValue().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, agencyidlistvalueVO.getValue());
 
@@ -212,7 +212,7 @@ public class AgencyIDListValueOracleDAO extends SRTDAO {
 
 			ps = conn.prepareStatement(_UPDATE_Agency_ID_Value_List_STATEMENT);
 			if( agencyidlistvalueVO.getValue()==null ||  agencyidlistvalueVO.getValue().length()==0 ||  agencyidlistvalueVO.getValue().isEmpty() ||  agencyidlistvalueVO.getValue().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, agencyidlistvalueVO.getValue());
 

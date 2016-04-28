@@ -99,7 +99,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
 			
 			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asbiepVO.getASBIEPGUID());
 
@@ -124,7 +124,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			if(asbiepVO.getASBIEPID() > 1)
+			if(asbiepVO.getASBIEPID() > 0)
 				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
@@ -170,7 +170,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
 			
 			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asbiepVO.getASBIEPGUID());
 
@@ -195,7 +195,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			if(asbiepVO.getASBIEPID() > 1)
+			if(asbiepVO.getASBIEPID() > 0)
 				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
@@ -348,7 +348,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_ASBIEP_STATEMENT);
 
 			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asbiepVO.getASBIEPGUID());
 

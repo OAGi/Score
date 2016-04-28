@@ -64,17 +64,17 @@ public class ACCOracleDAO extends SRTDAO {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ACC_STATEMENT);
 			if( accVO.getACCGUID()==null ||  accVO.getACCGUID().length()==0 ||  accVO.getACCGUID().isEmpty() ||  accVO.getACCGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, accVO.getACCGUID());
 
 			if(accVO.getObjectClassTerm()==null || accVO.getObjectClassTerm().length()==0 || accVO.getObjectClassTerm().isEmpty() || accVO.getObjectClassTerm().equals("")){
-				ps.setString(2, "\u00A0");
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			}
 			else 
 				ps.setString(2, accVO.getObjectClassTerm());
 			if(accVO.getDEN()==null || accVO.getDEN().length()==0 || accVO.getDEN().isEmpty() || accVO.getDEN().equals("")){
-				ps.setString(3, "\u00A0");
+				ps.setString(3, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			}
 			else 
 				ps.setString(3, accVO.getDEN());
@@ -107,11 +107,31 @@ public class ACCOracleDAO extends SRTDAO {
 			ps.setInt(12, accVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(13, accVO.getLastUpdateTimestamp());
 			ps.setInt(13, accVO.getState());
-			ps.setInt(14, accVO.getRevisionNum());
-			ps.setInt(15, accVO.getRevisionTrackingNum());
-			ps.setInt(16, accVO.getRevisionAction());
-			ps.setInt(17, accVO.getReleaseId());
-			ps.setInt(18, accVO.getCurrentAccId());
+			if(accVO.getRevisionNum() < 0) {
+				ps.setNull(14, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(14, accVO.getRevisionNum());
+			}
+			if(accVO.getRevisionTrackingNum() < 0) {
+				ps.setNull(15, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(15, accVO.getRevisionTrackingNum());
+			}
+			if(accVO.getRevisionAction() < 1) {
+				ps.setNull(16, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(16, accVO.getRevisionAction());
+			}
+			if(accVO.getReleaseId() < 1) {
+				ps.setNull(17, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(17, accVO.getReleaseId());
+			}
+			if(accVO.getCurrentAccId() < 1) {
+				ps.setNull(18, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(18, accVO.getCurrentAccId());
+			}
 			if(accVO.getIs_deprecated())
 				ps.setInt(19,1);
 			else
@@ -441,17 +461,17 @@ public class ACCOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_ACC_STATEMENT);
 
 			if( accVO.getACCGUID()==null ||  accVO.getACCGUID().length()==0 ||  accVO.getACCGUID().isEmpty() ||  accVO.getACCGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, accVO.getACCGUID());
 
 			if( accVO.getObjectClassTerm()==null ||  accVO.getObjectClassTerm().length()==0 ||  accVO.getObjectClassTerm().isEmpty() ||  accVO.getObjectClassTerm().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, accVO.getObjectClassTerm());
 
 			if( accVO.getDEN()==null ||  accVO.getDEN().length()==0 ||  accVO.getDEN().isEmpty() ||  accVO.getDEN().equals(""))				
-				ps.setString(3,"\u00A0");
+				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(3, accVO.getDEN());
 
@@ -480,16 +500,40 @@ public class ACCOracleDAO extends SRTDAO {
 			ps.setInt(12, accVO.getLastUpdatedByUserId());
 			//ps.setTimestamp(13, accVO.getLastUpdateTimestamp());
 			ps.setInt(13, accVO.getState());
-			ps.setInt(14, accVO.getRevisionNum());
-			ps.setInt(15, accVO.getRevisionTrackingNum());
-			ps.setInt(16, accVO.getRevisionAction());
-			ps.setInt(17, accVO.getReleaseId());
-			ps.setInt(18, accVO.getCurrentAccId());
-			if( accVO.getIs_deprecated())				
-				ps.setInt(19,1);
-			else 	
-				ps.setInt(19,0);
 
+
+			if(accVO.getRevisionNum() < 0) {
+				ps.setNull(14, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(14, accVO.getRevisionNum());
+			}
+			if(accVO.getRevisionTrackingNum() < 0) {
+				ps.setNull(15, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(15, accVO.getRevisionTrackingNum());
+			}
+			if(accVO.getRevisionAction() < 1) {
+				ps.setNull(16, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(16, accVO.getRevisionAction());
+			}
+			if(accVO.getReleaseId() < 1) {
+				ps.setNull(17, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(17, accVO.getReleaseId());
+			}
+			if(accVO.getCurrentAccId() < 1) {
+				ps.setNull(18, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(18, accVO.getCurrentAccId());
+			}
+			if(accVO.getIs_deprecated())
+				ps.setInt(19,1);
+			else
+				ps.setInt(19,0);
+			
+			
+			
 			ps.setInt(20, accVO.getACCID());
 			ps.executeUpdate();
 

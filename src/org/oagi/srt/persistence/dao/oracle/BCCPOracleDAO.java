@@ -41,14 +41,14 @@ public class BCCPOracleDAO extends SRTDAO {
 	private final String _INSERT_BCCP_STATEMENT = 
 			"INSERT INTO " + _tableName + " (GUID, Property_Term, Representation_Term, BDT_ID, "
 					+ "Den, Definition, Created_By, owner_user_id, Last_Updated_By, "
-					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module, "
-					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id, is_deprecated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
+					+ "Creation_Timestamp, Last_Update_Timestamp, State, Module,"
+					+ "revision_num, revision_tracking_num, revision_action, release_id, current_bccp_id, is_deprecated) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private final String _UPDATE_BCCP_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Property_Term = ?, Representation_Term = ?, BDT_ID = ?, "
 			+ "Den = ?, Definition = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
-			+ "State = ?, Module = ?,"
+			+ "State = ?, Module = ?, "
 			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bccp_id = ?, is_deprecated = ? WHERE BCCP_ID = ?";
 
 	private final String _DELETE_BCCP_STATEMENT = 
@@ -69,23 +69,23 @@ public class BCCPOracleDAO extends SRTDAO {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BCCP_STATEMENT);
 			if( bccpVO.getBCCPGUID()==null ||  bccpVO.getBCCPGUID().length()==0 ||  bccpVO.getBCCPGUID().isEmpty() ||  bccpVO.getBCCPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bccpVO.getBCCPGUID());
 
 			if( bccpVO.getPropertyTerm()==null ||  bccpVO.getPropertyTerm().length()==0 ||  bccpVO.getPropertyTerm().isEmpty() ||  bccpVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, bccpVO.getPropertyTerm());
 
 			if( bccpVO.getRepresentationTerm()==null ||  bccpVO.getRepresentationTerm().length()==0 ||  bccpVO.getRepresentationTerm().isEmpty() ||  bccpVO.getRepresentationTerm().equals(""))				
-				ps.setString(3,"\u00A0");
+				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(3, bccpVO.getRepresentationTerm());
 
 			ps.setInt(4, bccpVO.getBDTID());
 			if( bccpVO.getDEN()==null ||  bccpVO.getDEN().length()==0 ||  bccpVO.getDEN().isEmpty() ||  bccpVO.getDEN().equals(""))				
-				ps.setString(5,"\u00A0");
+				ps.setString(5,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(5, bccpVO.getDEN());
 
@@ -103,12 +103,44 @@ public class BCCPOracleDAO extends SRTDAO {
 //				ps.setString(11,"\u00A0");
 //			else 	
 				ps.setString(11, bccpVO.getModule());
+				
+			
 
-			ps.setInt(12, bccpVO.getRevisionNum());
-			ps.setInt(13, bccpVO.getRevisionTrackingNum());
-			ps.setInt(14, bccpVO.getRevisionAction());
-			ps.setInt(15, bccpVO.getReleaseId());
-			ps.setInt(16, bccpVO.getCurrentBccpId());
+			if(bccpVO.getRevisionNum()<0){
+				ps.setNull(12, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(12, bccpVO.getRevisionNum());
+			}
+			
+			if(bccpVO.getRevisionTrackingNum()<0){
+				ps.setNull(13, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(13, bccpVO.getRevisionTrackingNum());
+			}
+			
+			if(bccpVO.getRevisionAction()<1){
+				ps.setNull(14, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(14, bccpVO.getRevisionAction());
+			}
+			
+			if(bccpVO.getReleaseId()<1){
+				ps.setNull(15, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(15, bccpVO.getReleaseId());
+			}
+			
+			if(bccpVO.getCurrentBccpId()<1){
+				ps.setNull(16, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(16, bccpVO.getCurrentBccpId());
+			}
+			
 			if( bccpVO.getIs_deprecated())				
 				ps.setInt(17,1);
 			else 	
@@ -430,23 +462,23 @@ public class BCCPOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_BCCP_STATEMENT);
 
 			if( bccpVO.getBCCPGUID()==null ||  bccpVO.getBCCPGUID().length()==0 ||  bccpVO.getBCCPGUID().isEmpty() ||  bccpVO.getBCCPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, bccpVO.getBCCPGUID());
 
 			if( bccpVO.getPropertyTerm()==null ||  bccpVO.getPropertyTerm().length()==0 ||  bccpVO.getPropertyTerm().isEmpty() ||  bccpVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, bccpVO.getPropertyTerm());
 
 			if( bccpVO.getRepresentationTerm()==null ||  bccpVO.getRepresentationTerm().length()==0 ||  bccpVO.getRepresentationTerm().isEmpty() ||  bccpVO.getRepresentationTerm().equals(""))				
-				ps.setString(3,"\u00A0");
+				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(3, bccpVO.getRepresentationTerm());
 
 			ps.setInt(4, bccpVO.getBDTID());
 			if( bccpVO.getDEN()==null ||  bccpVO.getDEN().length()==0 ||  bccpVO.getDEN().isEmpty() ||  bccpVO.getDEN().equals(""))				
-				ps.setString(5,"\u00A0");
+				ps.setString(5,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(5, bccpVO.getDEN());
 
@@ -466,11 +498,42 @@ public class BCCPOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(11, bccpVO.getModule());
 
-			ps.setInt(12, bccpVO.getRevisionNum());
-			ps.setInt(13, bccpVO.getRevisionTrackingNum());
-			ps.setInt(14, bccpVO.getRevisionAction());
-			ps.setInt(15, bccpVO.getReleaseId());
-			ps.setInt(16, bccpVO.getCurrentBccpId());
+
+			if(bccpVO.getRevisionNum()<0){
+				ps.setNull(12, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(12, bccpVO.getRevisionNum());
+			}
+			
+			if(bccpVO.getRevisionTrackingNum()<0){
+				ps.setNull(13, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(13, bccpVO.getRevisionTrackingNum());
+			}
+			
+			if(bccpVO.getRevisionAction()<1){
+				ps.setNull(14, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(14, bccpVO.getRevisionAction());
+			}
+			
+			if(bccpVO.getReleaseId()<1){
+				ps.setNull(15, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(15, bccpVO.getReleaseId());
+			}
+			
+			if(bccpVO.getCurrentBccpId()<1){
+				ps.setNull(16, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(16, bccpVO.getCurrentBccpId());
+			}
+			
 			if( bccpVO.getIs_deprecated())				
 				ps.setInt(17,1);
 			else 	

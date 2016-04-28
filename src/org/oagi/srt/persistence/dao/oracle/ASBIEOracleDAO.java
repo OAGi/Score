@@ -67,7 +67,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, keys);
 			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asbievo.getAsbieGuid());
 
@@ -132,7 +132,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 			String keys[] = {"ASBIE_ID"};
 			ps = conn.prepareStatement(_INSERT_ASBIE_STATEMENT, keys);
 			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asbievo.getAsbieGuid());
 
@@ -317,7 +317,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 			ps.setInt(5, asbievo.getCardinalityMin());
 			ps.setInt(6, asbievo.getCardinalityMax());
 			if( asbievo.getAsbieGuid()==null ||  asbievo.getAsbieGuid().length()==0 ||  asbievo.getAsbieGuid().isEmpty() ||  asbievo.getAsbieGuid().equals(""))				
-				ps.setString(7,"\u00A0");
+				ps.setString(7,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(7, asbievo.getAsbieGuid());
 

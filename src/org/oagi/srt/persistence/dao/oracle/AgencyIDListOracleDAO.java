@@ -80,7 +80,12 @@ public class AgencyIDListOracleDAO extends SRTDAO {
 				ps.setString(4, agencyidlistVO.getListID());
 
 			//ps.setInt(5, agencyidlistVO.getAgencyID());
-			ps.setNull(5, java.sql.Types.INTEGER);
+			if(agencyidlistVO.getAgencyID() < 1){
+				ps.setNull(5, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(5, agencyidlistVO.getAgencyID());
+			}
 //			if( agencyidlistVO.getVersionID()==null ||  agencyidlistVO.getVersionID().length()==0 ||  agencyidlistVO.getVersionID().isEmpty() ||  agencyidlistVO.getVersionID().equals(""))				
 //				ps.setString(6,"\u00A0");
 //			else 	
@@ -249,8 +254,12 @@ public class AgencyIDListOracleDAO extends SRTDAO {
 //				ps.setString(4,"\u00A0");
 //			else 	
 				ps.setString(4, agencyidlistVO.getListID());
-
-			ps.setInt(5, agencyidlistVO.getAgencyID());
+			if(agencyidlistVO.getAgencyID() < 1){
+				ps.setNull(5, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(5, agencyidlistVO.getAgencyID());
+			}
 //			if( agencyidlistVO.getVersionID()==null ||  agencyidlistVO.getVersionID().length()==0 ||  agencyidlistVO.getVersionID().isEmpty() ||  agencyidlistVO.getVersionID().equals(""))				
 //				ps.setString(6,"\u00A0");
 //			else 	

@@ -70,17 +70,22 @@ public class DTOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_DT_STATEMENT);
 			if( dtVO.getDTGUID()==null ||  dtVO.getDTGUID().length()==0 ||  dtVO.getDTGUID().isEmpty() ||  dtVO.getDTGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, dtVO.getDTGUID());
 
 			ps.setInt(2, dtVO.getDTType());
 			if( dtVO.getVersionNumber()==null ||  dtVO.getVersionNumber().length()==0 ||  dtVO.getVersionNumber().isEmpty() ||  dtVO.getVersionNumber().equals(""))				
-				ps.setString(3,"\u00A0");
+				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(3, dtVO.getVersionNumber());
 
-			ps.setInt(4, dtVO.getPreviousVersionDTID());
+			if(dtVO.getPreviousVersionDTID() < 1){
+				ps.setNull(4, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(4, dtVO.getPreviousVersionDTID());
+			}
 //			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
 //				ps.setString(5,"\u00A0");
 //			else 	
@@ -91,9 +96,15 @@ public class DTOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(6, dtVO.getQualifier());
 
-			ps.setInt(7, dtVO.getBasedDTID());
+			if(dtVO.getBasedDTID() < 1){
+				ps.setNull(7, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(7, dtVO.getBasedDTID());
+			}
+			
 			if(dtVO.getDEN()==null || dtVO.getDEN().length()==0 || dtVO.getDEN().isEmpty() || dtVO.getDEN().equals("")){
-				ps.setString(8, "\u00A0");
+				ps.setString(8, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			}
 			else 
 				ps.setString(8, dtVO.getDEN());
@@ -119,11 +130,39 @@ public class DTOracleDAO extends SRTDAO {
 			ps.setInt(14, dtVO.getCreatedByUserId());
 			ps.setInt(15, dtVO.getOwnerUserId());
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
-			ps.setInt(17, dtVO.getRevisionNum());
-			ps.setInt(18, dtVO.getRevisionTrackingNum());
-			ps.setInt(19, dtVO.getRevisionAction());
-			ps.setInt(20, dtVO.getReleaseId());
-			ps.setInt(21, dtVO.getCurrentBdtId());
+			
+			
+			if(dtVO.getRevisionNum() < 0){
+				ps.setNull(17, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(17, dtVO.getRevisionNum());
+			}
+			if(dtVO.getRevisionTrackingNum() < 0){
+				ps.setNull(18, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(18, dtVO.getRevisionTrackingNum());
+			}
+			if(dtVO.getRevisionAction() < 1){
+				ps.setNull(19, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(19, dtVO.getRevisionAction());
+			}
+			if(dtVO.getReleaseId() < 1){
+				ps.setNull(20, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(20, dtVO.getReleaseId());
+			}
+			if(dtVO.getCurrentBdtId() < 1){
+				ps.setNull(21, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(21, dtVO.getCurrentBdtId());
+			}
+			
 			if( dtVO.getIs_deprecated())				
 				ps.setInt(22,1);
 			else 	
@@ -215,7 +254,7 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setDEN(rs.getString("DEN"));
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
-				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setContentComponentDefinition(rs.getString("Content_Component_Definition"));
 				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
 				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
@@ -318,7 +357,7 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setDEN(rs.getString("DEN"));
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
-				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setContentComponentDefinition(rs.getString("Content_Component_Definition"));
 				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
 				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
@@ -394,7 +433,7 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setDEN(rs.getString("DEN"));
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
-				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setContentComponentDefinition(rs.getString("Content_Component_Definition"));
 				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
 				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
@@ -455,7 +494,7 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setDEN(rs.getString("DEN"));
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
-				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setContentComponentDefinition(rs.getString("Content_Component_Definition"));
 				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
 				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
@@ -503,17 +542,23 @@ public class DTOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_DT_STATEMENT);
 
 			if( dtVO.getDTGUID()==null ||  dtVO.getDTGUID().length()==0 ||  dtVO.getDTGUID().isEmpty() ||  dtVO.getDTGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, dtVO.getDTGUID());
 
 			ps.setInt(2, dtVO.getDTType());
 			if( dtVO.getVersionNumber()==null ||  dtVO.getVersionNumber().length()==0 ||  dtVO.getVersionNumber().isEmpty() ||  dtVO.getVersionNumber().equals(""))				
-				ps.setString(3,"\u00A0");
+				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(3, dtVO.getVersionNumber());
 
-			ps.setInt(4, dtVO.getPreviousVersionDTID());
+			if(dtVO.getPreviousVersionDTID() < 1){
+				ps.setNull(4, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(4, dtVO.getPreviousVersionDTID());
+			}
+			
 //			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
 //				ps.setString(5,"\u00A0");
 //			else 	
@@ -524,9 +569,15 @@ public class DTOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(6, dtVO.getQualifier());
 
-			ps.setInt(7, dtVO.getBasedDTID());
+			if(dtVO.getBasedDTID() < 1){
+				ps.setNull(7, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(7, dtVO.getBasedDTID());
+			}
+			
 			if( dtVO.getDEN()==null ||  dtVO.getDEN().length()==0 ||  dtVO.getDEN().isEmpty() ||  dtVO.getDEN().equals(""))				
-				ps.setString(8,"\u00A0");
+				ps.setString(8,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(8, dtVO.getDEN());
 
@@ -555,11 +606,38 @@ public class DTOracleDAO extends SRTDAO {
 			ps.setInt(14, dtVO.getCreatedByUserId());
 			ps.setInt(15, dtVO.getOwnerUserId());
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
-			ps.setInt(17, dtVO.getRevisionNum());
-			ps.setInt(18, dtVO.getRevisionTrackingNum());
-			ps.setInt(19, dtVO.getRevisionAction());
-			ps.setInt(20, dtVO.getReleaseId());
-			ps.setInt(21, dtVO.getCurrentBdtId());
+			
+			if(dtVO.getRevisionNum() < 0){
+				ps.setNull(17, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(17, dtVO.getRevisionNum());
+			}
+			if(dtVO.getRevisionTrackingNum() < 0){
+				ps.setNull(18, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(18, dtVO.getRevisionTrackingNum());
+			}
+			if(dtVO.getRevisionAction() < 1){
+				ps.setNull(19, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(19, dtVO.getRevisionAction());
+			}
+			if(dtVO.getReleaseId() < 1){
+				ps.setNull(20, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(20, dtVO.getReleaseId());
+			}
+			if(dtVO.getCurrentBdtId() < 1){
+				ps.setNull(21, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(21, dtVO.getCurrentBdtId());
+			}
+			
 			if( dtVO.getIs_deprecated())				
 				ps.setInt(22,1);
 			else 	
@@ -681,7 +759,7 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setDEN(rs.getString("DEN"));
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
-				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setContentComponentDefinition(rs.getString("Content_Component_Definition"));
 				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
 				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));
@@ -739,7 +817,7 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setDEN(rs.getString("DEN"));
 				dtVO.setContentComponentDEN(rs.getString("Content_Component_DEN"));
 				dtVO.setDefinition(rs.getString("Definition"));
-				dtVO.setContentComponentDefinition("Content_Component_Definition");
+				dtVO.setContentComponentDefinition(rs.getString("Content_Component_Definition"));
 				dtVO.setRevisionDocumentation(rs.getString("Revision_Doc"));
 				dtVO.setState(rs.getInt("State"));
 				dtVO.setCreatedByUserId(rs.getInt("Created_By"));

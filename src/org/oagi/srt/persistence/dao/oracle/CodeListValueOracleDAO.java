@@ -130,7 +130,7 @@ public class CodeListValueOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_INSERT_Code_List_Value_STATEMENT);
 			ps.setInt(1, codelistvalueVO.getOwnerCodeListID());
 			if( codelistvalueVO.getValue()==null ||  codelistvalueVO.getValue().length()==0 ||  codelistvalueVO.getValue().isEmpty() ||  codelistvalueVO.getValue().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, codelistvalueVO.getValue());
 
@@ -312,7 +312,7 @@ public class CodeListValueOracleDAO extends SRTDAO {
 
 			ps.setInt(1, codelistvalueVO.getOwnerCodeListID());
 			if( codelistvalueVO.getValue()==null ||  codelistvalueVO.getValue().length()==0 ||  codelistvalueVO.getValue().isEmpty() ||  codelistvalueVO.getValue().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, codelistvalueVO.getValue());
 

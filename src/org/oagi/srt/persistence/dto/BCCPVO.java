@@ -26,6 +26,7 @@ public class BCCPVO extends SRTObject {
 	private int OwnerUserId;
 	private int State;
 	private String Module;
+	private int NamespaceId;
 	private int RevisionNum;
 	private int RevisionTrackingNum;
 	private int RevisionAction;
@@ -191,5 +192,13 @@ public class BCCPVO extends SRTObject {
 	
 	public void setIs_deprecated(boolean is_deprecated) {
 		Is_deprecated = is_deprecated;
+	}
+
+	public int getNamespaceID() {
+		return NamespaceId;
+	}
+
+	public void setNamespaceID(int namespaceId) {
+		NamespaceId = namespaceId;
 	}
 }

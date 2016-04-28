@@ -34,7 +34,7 @@ public class ABIEVO extends SRTObject {
 	}
 
 	public void setBusinessContextName(String businessContextName) {
-		this.businessContextName = businessContextName;
+		this.businessContextName = businessContextName;//Not Used
 	}
 
 	public int getABIEID(){
@@ -42,7 +42,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setABIEID(int abieID){
-		ABIEID = abieID;
+		ABIEID = abieID;//Not Null
 	}
 	
 	public int getBasedACCID(){
@@ -50,7 +50,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setBasedACCID(int basedACCID){
-		BasedACCID = basedACCID;
+		BasedACCID = basedACCID;//Not Null
 	}
 	
 	public int getIsTopLevel(){
@@ -58,7 +58,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setIsTopLevel(int isTopLevel){
-		IsTopLevel = isTopLevel;
+		IsTopLevel = isTopLevel;//Not Null
 	}
 	
 	public int getBusinessContextID(){
@@ -66,7 +66,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setBusinessContextID(int businessContextID){
-		BusinessContextID = businessContextID;
+		BusinessContextID = businessContextID;//Not Null
 	}
 	
 	public String getDefinition(){
@@ -74,7 +74,10 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setDefinition(String definition){
-		Definition = definition;
+		
+		
+			Definition = definition;
+		
 	}
 	
 	public int getCreatedByUserID(){
@@ -82,7 +85,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setCreatedByUserID(int createdByUserID){
-		CreatedByUserID = createdByUserID;
+		CreatedByUserID = createdByUserID;// Not Null
 	}
 	
 	public int getLastUpdatedByUserID(){
@@ -90,7 +93,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setLastUpdatedByUserID(int lastUpdatedByUserID){
-		LastUpdatedByUserID = lastUpdatedByUserID;
+		LastUpdatedByUserID = lastUpdatedByUserID; // Not Null
 	}
 	
 	public Timestamp getCreationTimestamp(){
@@ -114,7 +117,7 @@ public class ABIEVO extends SRTObject {
 	}
 	
 	public void setState(int state){
-		State = state;
+		State = state; // Not Null
 	}
 
 	public String getAbieGUID() {
@@ -122,7 +125,7 @@ public class ABIEVO extends SRTObject {
 	}
 
 	public void setAbieGUID(String abieGUID) {
-		this.abieGUID = abieGUID;
+		this.abieGUID = abieGUID; // Not Null
 	}
 
 	public int getClientID() {
@@ -138,7 +141,9 @@ public class ABIEVO extends SRTObject {
 	}
 
 	public void setVersion(String version) {
-		this.version = version;
+		
+			this.version = version;
+		
 	}
 
 	public String getStatus() {
@@ -146,7 +151,9 @@ public class ABIEVO extends SRTObject {
 	}
 
 	public void setStatus(String status) {
-		this.status = status;
+		
+			this.status = status;
+		
 	}
 
 	public String getRemark() {
@@ -154,7 +161,9 @@ public class ABIEVO extends SRTObject {
 	}
 
 	public void setRemark(String remark) {
-		this.remark = remark;
+		
+			this.remark = remark;
+		
 	}
 
 	public String getBusinessTerm() {
@@ -162,7 +171,9 @@ public class ABIEVO extends SRTObject {
 	}
 
 	public void setBusinessTerm(String businessTerm) {
+		
 		this.businessTerm = businessTerm;
+		
 	}	
 	
 }

@@ -68,7 +68,7 @@ public class ASCCPOracleDAO extends SRTDAO {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_ASCCP_STATEMENT);
 			if( asccpVO.getASCCPGUID()==null ||  asccpVO.getASCCPGUID().length()==0 ||  asccpVO.getASCCPGUID().isEmpty() ||  asccpVO.getASCCPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asccpVO.getASCCPGUID());
 
@@ -105,16 +105,43 @@ public class ASCCPOracleDAO extends SRTDAO {
 				ps.setInt(12,1);
 			else 	
 				ps.setInt(12,0);
-
-			ps.setInt(13, asccpVO.getRevisionNum());
-			ps.setInt(14, asccpVO.getRevisionTrackingNum());
-			ps.setInt(15, asccpVO.getRevisionAction());
-			ps.setInt(16, asccpVO.getReleaseId());
-			ps.setInt(17, asccpVO.getCurrentAsccpId());
+			
+			if(asccpVO.getRevisionNum() < 0){
+				ps.setNull(13, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(13, asccpVO.getRevisionNum());
+			}			
+			if(asccpVO.getRevisionTrackingNum() < 0){
+				ps.setNull(14, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(14, asccpVO.getRevisionTrackingNum());
+			}			
+			if(asccpVO.getRevisionAction() < 1){
+				ps.setNull(15, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(15, asccpVO.getRevisionAction());
+			}			
+			if(asccpVO.getReleaseId() < 1){
+				ps.setNull(16, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(16, asccpVO.getReleaseId());
+			}
+			if(asccpVO.getCurrentAsccpId() < 1){
+				ps.setNull(17, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(17, asccpVO.getCurrentAsccpId());
+			}
 			if( asccpVO.getIs_deprecated())				
 				ps.setInt(18,1);
 			else 	
 				ps.setInt(18,0);
+			
+
 
 			ps.executeUpdate();
 
@@ -686,7 +713,7 @@ public class ASCCPOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_ASCCP_STATEMENT);
 
 			if( asccpVO.getASCCPGUID()==null ||  asccpVO.getASCCPGUID().length()==0 ||  asccpVO.getASCCPGUID().isEmpty() ||  asccpVO.getASCCPGUID().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, asccpVO.getASCCPGUID());
 
@@ -724,15 +751,41 @@ public class ASCCPOracleDAO extends SRTDAO {
 			else 	
 				ps.setInt(12,0);
 
-			ps.setInt(13, asccpVO.getRevisionNum());
-			ps.setInt(14, asccpVO.getRevisionTrackingNum());
-			ps.setInt(15, asccpVO.getRevisionAction());
-			ps.setInt(16, asccpVO.getReleaseId());
-			ps.setInt(17, asccpVO.getCurrentAsccpId());
+			if(asccpVO.getRevisionNum() < 0){
+				ps.setNull(13, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(13, asccpVO.getRevisionNum());
+			}			
+			if(asccpVO.getRevisionTrackingNum() < 0){
+				ps.setNull(14, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(14, asccpVO.getRevisionTrackingNum());
+			}			
+			if(asccpVO.getRevisionAction() < 1){
+				ps.setNull(15, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(15, asccpVO.getRevisionAction());
+			}			
+			if(asccpVO.getReleaseId() < 1){
+				ps.setNull(16, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(16, asccpVO.getReleaseId());
+			}
+			if(asccpVO.getCurrentAsccpId() < 1){
+				ps.setNull(17, java.sql.Types.INTEGER);
+			}
+			else {
+				ps.setInt(17, asccpVO.getCurrentAsccpId());
+			}
 			if( asccpVO.getIs_deprecated())				
 				ps.setInt(18,1);
 			else 	
 				ps.setInt(18,0);
+			
 
 			ps.setInt(19, asccpVO.getASCCPID());
 			ps.executeUpdate();

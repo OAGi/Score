@@ -52,12 +52,12 @@ public class UserOracleDAO extends SRTDAO {
 			PreparedStatement ps = null;
 			ps = conn.prepareStatement(_INSERT_USER_STATEMENT);
 			if( userVO.getUserName()==null ||  userVO.getUserName().length()==0 ||  userVO.getUserName().isEmpty() ||  userVO.getUserName().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, userVO.getUserName());
 
 			if( userVO.getPassword()==null ||  userVO.getPassword().length()==0 ||  userVO.getPassword().isEmpty() ||  userVO.getPassword().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, userVO.getPassword());
 
@@ -418,12 +418,12 @@ public class UserOracleDAO extends SRTDAO {
 			ps = conn.prepareStatement(_UPDATE_USER_STATEMENT);
 
 			if( userVO.getUserName()==null ||  userVO.getUserName().length()==0 ||  userVO.getUserName().isEmpty() ||  userVO.getUserName().equals(""))				
-				ps.setString(1,"\u00A0");
+				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(1, userVO.getUserName());
 
 			if( userVO.getPassword()==null ||  userVO.getPassword().length()==0 ||  userVO.getPassword().isEmpty() ||  userVO.getPassword().equals(""))				
-				ps.setString(2,"\u00A0");
+				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
 			else 	
 				ps.setString(2, userVO.getPassword());
 
