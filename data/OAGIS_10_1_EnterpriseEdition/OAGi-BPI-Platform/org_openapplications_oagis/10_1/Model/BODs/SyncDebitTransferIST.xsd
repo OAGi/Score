@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncDebitTransferIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.008.001.04" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/DebitTransferIST.xsd"/>
+	<xsd:element name="SyncDebitTransferIST" type="SyncDebitTransferISTType" id="oagis-id-607e1d7b44fa4efcbca464a1735917b7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncDebitTransferIST is to enable an application to request specific DebitTransferIST information from another business application module.  The response to the SyncDebitTransferIST is the ShowDebitTransferIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncDebitTransferISTType" id="oagis-id-7db43bfa53254bbca727b4d4dbf6dba5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncDebitTransferISTDataAreaType" id="oagis-id-6c68276781b64948baec2a142732a7c2">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncDebitTransferIST. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (DebitTransferIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncDebitTransferISTDataAreaType" id="oagis-id-e06abc923b914a6cbf3c36a4c77c0346">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-6c5849c73c5a4a5f8cf79806bfd17680"/>
+			<xsd:element ref="DebitTransferIST" maxOccurs="unbounded" id="oagis-id-b876e9a68806439da90d99e06ddb2d1a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

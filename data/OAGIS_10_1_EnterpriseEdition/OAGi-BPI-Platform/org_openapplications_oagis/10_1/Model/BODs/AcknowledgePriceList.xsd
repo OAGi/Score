@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/AcknowledgePriceList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PriceList.xsd"/>
+	<xsd:element name="AcknowledgePriceList" type="AcknowledgePriceListType" id="oagis-id-406ebe47423e4842bd2f75a8785610b8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgePriceList is to communicate to a business application module or system the need to initiate the creation of product price list information as well as update existing price lists.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
+
+There are many possible business applications in several environments that may use this capability. For example, a Manufacturing, distributor or reseller business application could use this to communicate the price change or request a price list.
+
+It may also be necessary to support Component Supplier Management (CSM) scenarios.  In this scenario a company will provide a service of sourcing and codifying the products of many companies and publishing a consolidated catalog.  A customer purchases the product from the Catalog provider.  They have the capability to do comparison shopping from the catalog.  Supplier Certification may be provided by the Catalog provider.
+
+This definition of price list is intended to support simple pricing scenario, especially pricing that may accompany a published price list. It is not intended to support complex pricing environments that may be needed to support features such as;
+·	Deals and Promotions
+·	Coupons and Sales Incentives
+·	Rebates and Accruals
+
+This functionality will be addressed in a subsequent release. It is a working assumption that the representation of complex qualifications, coupons and sales incentives are rarely communicated between systems.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgePriceListType" id="oagis-id-3fb640c5c6e0465e9433124966b3a3ae">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgePriceListDataAreaType" id="oagis-id-c65fcf406d7c4a1ab7e424e5223c10ec">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgePriceList. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (PriceList).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgePriceListDataAreaType" id="oagis-id-dc5acd73512947c480c81692239b9422">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-de3aef69fd714c60a915a55337d840a8"/>
+			<xsd:element ref="PriceList" maxOccurs="unbounded" id="oagis-id-1223b93aec6f4d31851e083fc5b0d724"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

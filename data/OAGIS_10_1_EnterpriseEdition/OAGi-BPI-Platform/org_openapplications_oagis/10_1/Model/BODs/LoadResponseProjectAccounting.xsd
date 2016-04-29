@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downLoadResponse package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/LoadResponseProjectAccounting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProjectAccounting.xsd"/>
+	<xsd:element name="LoadResponseProjectAccounting" type="LoadResponseProjectAccountingType" id="oagis-id-b7f32e6f320248b99f03434788f0cd20">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadResponseProjectAccounting  is to enable all relevant sub-systems that submit single sided transactions to send information to a Project Accounting Application. This would include, but not necessarily be limited to:
+·	Accounts Payable
+·	Accounts Receivable
+·	Budget
+·	Order Management
+·	Purchasing
+·	Time and Labor
+·	Travel and Expense
+
+The LoadResponseProjectAccounting will cause common data to be LoadResponseed in a project accounting application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LoadResponseProjectAccountingType" id="oagis-id-bf41fd154d7345de98442af19f4fffa2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="LoadResponseProjectAccountingDataAreaType" id="oagis-id-0357c43ae4944ca8a58f4d202bacbf1e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadResponseProjectAccounting. The information consists of a Verb and one or more Nouns. The verb (LoadResponse) indicates the action to be performed on the Noun (ProjectAccounting).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LoadResponseProjectAccountingDataAreaType" id="oagis-id-d73c6bf73cf54c3e9b4c2983b57f58e7">
+		<xsd:sequence>
+			<xsd:element ref="LoadResponse" id="oagis-id-55f18f254ac54ff8be6af1087b488fc6"/>
+			<xsd:element ref="ProjectAccounting" maxOccurs="unbounded" id="oagis-id-ffdca7715f5241d7abe05b14d664d4cf"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

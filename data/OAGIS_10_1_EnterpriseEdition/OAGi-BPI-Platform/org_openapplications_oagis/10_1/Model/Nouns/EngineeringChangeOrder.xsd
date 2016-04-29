@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/EngineeringChangeOrder.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="EngineeringChangeOrder" type="EngineeringChangeOrderType" id="oagis-id-4cb2003484bb4c249e3f4057c892097e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">An EngineeringChangeOrder can be used to request a change to an manufactured item. This document allows the Change to progress through the different states from being a request and going through the review process to becoming an approved EngineeringChangeOrder.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RevisedBOMComponent" type="RevisedBOMComponentType" id="oagis-id-b624650b4ac34a55a6aca00dee3a48ba">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes any Bill of Material that may be impacted by a given Engineering Change</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RevisedItemRevision" type="RevisedItemRevisionType" id="oagis-id-f138941528f94e78bc27b976c5d98616"/>
+	<xsd:element name="RevisedSubstituteItem" type="RevisedSubstituteItemType" id="oagis-id-04bb6cd3256245af881ea7f90e656e5d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the changes to valid substitution that can be made for any Bill of Material Component.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RevisedReferenceDesignator" type="RevisedReferenceDesignatorType" id="oagis-id-3d40da468cc54de58b250c0aebe58de5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the Location on the Drawing or Blueprint that the Bill of Material Component item is used. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringChangeHeader" type="EngineeringChangeHeaderType" id="oagis-id-d35f5c64a04049788cfed620f32fae26">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Engineering Change Header information.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringChangeDetail" type="EngineeringChangeLineType" id="oagis-id-2b700773bccb4297ae537e9fd2db6f8f"/>
+	<xsd:element name="EngineeringChangeRevision" type="EngineeringChangeRevisionType" id="oagis-id-08043f02fdc9449b849c1482fe37e7b2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Engineering Change Revision information.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringChangeReviewer" type="EngineeringChangeReviewType" id="oagis-id-fb79e3eff6954482bd67cb9d2624b5aa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the reviewers of the engineering change. It is their responsiblity to either approve or reject the engineering change document.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringChangeRevisedBOM" type="RevisedBOMType" id="oagis-id-ffe914318af34d8287d4e950d3c9de3d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the components of a Bill of Material that will be effected by a given engineering Change. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringChangeRevisedRoute" type="RevisedRouteType" id="oagis-id-3bd283de18454ee996f287ba4ec5ef5b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that generally describes the routing. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringChangeRevisedRouteOperation" type="RevisedRouteOperationType" id="oagis-id-b0b7759d82e3403fb69a6f3087ac8812">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying the operations and there order for the specified routing.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RevisedItemStatus" type="StatusType" id="oagis-id-f819793d53094673ad3d574d080815fc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is a classification you can use to track and control a revised item's life cycle. Revised item statuses include Open, Released, Scheduled, Hold, Implemented and Cancelled.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="EngineeringChangeOrderType" id="oagis-id-a6234e7ccb5c4e468d6323f9d9389247">
+		<xsd:sequence>
+			<xsd:element ref="EngineeringChangeHeader" id="oagis-id-728481edcb5c4cd2a8243a61ade52f6b" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Engineering Change Header information.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="EngineeringChangeDetail" id="oagis-id-937e5a45c0f540f7a58f21eae6ea7102" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f115509e816a454f91a7c420b1efa379"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-e7195a425b7c41bfb0febd7dbafab6f6"/>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeHeaderBaseType" id="oagis-id-385aaef799de4689bd3a12ee2f58ac19">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PriorityCode" id="oagis-id-0d0e2a94a1c144deabd7b92dfa7bfebb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ApprovalDateTime" id="oagis-id-af5513ab2dd14703b78ef88add56d107" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date in which the order is approved.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedEngineeringCostAmount" id="oagis-id-a91c7aebeaa44ff2b7045c76f28e0987" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The esitmated cost to engineering to make the proposed change.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EstimatedManufacturingCostAmount" id="oagis-id-5e6a0ccef49c4caa81d54fa35566f84c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The estimated cost to manufacturing to make the proposed change.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-582f5aa8b23a4bab8c9389a1bce17c69" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="EffectiveDateTime" id="oagis-id-c4928d5ea09b47e7bd2534d90998d938" minOccurs="0"/>
+					<xsd:element ref="ApprovalRequiredByDateTime" id="oagis-id-cdd8452adc8c470a92a0676bf2ae1130" minOccurs="0"/>
+					<xsd:element ref="RequesterParty" id="oagis-id-d17181fae11e4a5ebbf896692e0e3e99" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReviewerParty" id="oagis-id-510739fdceb140808bf9a92b7a5cbd41" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that is responsible for reviewing and approving the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" minOccurs="0" maxOccurs="unbounded" id="oagis-id-510739fdceb140808bf9a92b7a5cbd42"/>
+					<xsd:element ref="SiteLocation" id="oagis-id-3d77e616c3b24a66acada11bbadc0d76" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeHeaderType" id="oagis-id-c4279258c3a944b89e6cec5a649c88a6">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringChangeHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringChangeHeaderExtensionType" id="oagis-id-1a92124855e94b26a78526dc41c41a29" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeLineBaseType" id="oagis-id-ae583c3922934d14a046772150ec8fc5">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="EngineeringChangeRevision" id="oagis-id-f1e5649f624b41aca559519ec74a3916" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Engineering Change Revision information.  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EngineeringChangeReviewer" id="oagis-id-dcf98df971874ce091a0d6d1b6b1b605" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the reviewers of the engineering change. It is their responsiblity to either approve or reject the engineering change document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EngineeringChangeRevisedBOM" id="oagis-id-75da093ef43e4cc8aa0694c21010b6ba" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the components of a Bill of Material that will be effected by a given engineering Change. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EngineeringChangeRevisedRoute" id="oagis-id-f8056e3a19f04ef08ca34bd8e1e054b5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that generally describes the routing. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeLineType" id="oagis-id-4f48e2e42a8e416c9216a2d92230737b">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringChangeLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringChangeLineExtensionType" id="oagis-id-3956a10c32224f5b95dd25025503cb39" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeRevisionBaseType" id="oagis-id-3d5929b6d15a4770a99307cfb15a4ec0">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="RevisionID" id="oagis-id-b7a1439840f3418981c03ea3802ff763" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the revision of the semantically named document. The combination of the ID and its revision uniquely identifies the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequesterParty" id="oagis-id-78b98d474446426cbbb25428a9c407b1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Location" id="oagis-id-58db09c9dfdd4410bcebe8405b77fe48" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The location of a thing, as captured by an address (or addresses), GPS Coordinates, and/or in relation to other locations.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CreationDateTime" id="oagis-id-b948d602191c476aa02711009c6ee95c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">is the date time stamp that the given instance of the Business Object Document was created.  This date must not be modified during the life of the Business Object Document.
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ApprovalDateTime" id="oagis-id-5647312cdc90473c8219054967481843" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date in which the order is approved.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RejectedDateTime" id="oagis-id-09ee368f50a7417aaf8198d4d6e01603" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Timestamp indicating when the revision was rejected.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-7afcce117dd2480ca8b0e744a4b79234" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeRevisionType" id="oagis-id-376128cd6cf847739313a7716c7b590f">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringChangeRevisionBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringChangeRevisionExtensionType" id="oagis-id-b3fba1b022ed47beb44fe478cbac3561" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeReviewBaseType" id="oagis-id-b3533d71532440a1a0542746547d280a">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="EngineeringChangeRevisionID" id="oagis-id-76893e2287164fab867a3db3dc12a3a6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the engineering change revision that this entity addresses.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReviewerParty" id="oagis-id-e1202700cb514668832ae4db509a3da8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that is responsible for reviewing and approving the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ApprovalEffectiveTimePeriod" id="oagis-id-5e2217fc7a614745a24ef547520a69db" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the time period in which the approval is valid.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-7e6eb5da96954e50a97a48736de949ad" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-a32ed76f4c8347aea44de2a179b94736" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringChangeReviewType" id="oagis-id-1c8643404f5842a2bd56bfd0e05d17e0">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringChangeReviewBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringChangeReviewExtensionType" id="oagis-id-20ec2bcfb04245c6ac85adf2b2214b61" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedRouteBaseType" id="oagis-id-e2ef124b388a4158b42b41436142998e">
+		<xsd:complexContent>
+			<xsd:extension base="DocumentReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Effectivity" id="oagis-id-11ff668b0b594561b0a29c73246fd1d8" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-508fa6af65c0410aa1fbb67e16cdaced" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ImplementationDateTime" id="oagis-id-e9dde7cdfcc14bb3bf585a2cc5df0d17" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date on which the changes will be implemented,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EngineeringChangeRevisedRouteOperation" id="oagis-id-0b0787807d564391b906cdbc892f1e5c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Information specifying the operations and there order for the specified routing.  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedRouteType" id="oagis-id-e0069f7f121a445d90f8babc3856f6e5">
+		<xsd:complexContent>
+			<xsd:extension base="RevisedRouteBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedRouteExtensionType" id="oagis-id-e05e39413f13421680e5519746d3171a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedRouteOperationBaseType" id="oagis-id-11e4900d655c432aab19bbf1f461969d">
+		<xsd:complexContent>
+			<xsd:extension base="OperationReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-4d358b91ff0442b1aa2ea53a215611aa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ImplementationDateTime" id="oagis-id-bc69213b69a7439a9e52d9c50c286b22" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date on which the changes will be implemented,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedRouteOperationType" id="oagis-id-ba1714813c6d4be39067e9a17de4a367">
+		<xsd:complexContent>
+			<xsd:extension base="RevisedRouteOperationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedRouteOperationExtensionType" id="oagis-id-1abf052199b74232b7979feddeb18a3f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedBOMBaseType" id="oagis-id-264a9c5975c64b9f8fbe796651d5fc62">
+		<xsd:complexContent>
+			<xsd:extension base="BOMReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ImplementationDateTime" id="oagis-id-36387f9fbcb94ac99c79d8e85bb34f3c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date on which the changes will be implemented,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CancelDateTime" id="oagis-id-147d0dd35cea4fdfa0c75234cd3e874a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date and tme in which the Bill-Of-Material was canceled.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Disposition" id="oagis-id-68ad37e9f08c4ef7831bba79968f4a39" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether an item is active, inactive, or in other various states.  Examples of values for this field include:	Active, Inactive, Hold, Deleted, Obsolete</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InMRPPlanIndicator" id="oagis-id-e505eb9519f54528a90ea0adbac5823a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that the changed BOM is in the MRP system plan or not.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="IncludeInPlanIndicator" id="oagis-id-5faebba74e384296be7b95cd8e250749" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the MRP planning process should plan for an EngineeringChangeO revised item. This lets you order material and plan resources that you need to build a future revision in advance.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UpdateWIPIndicator" id="oagis-id-0d6c1520ac7f454bb3cba5a343628e92" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicate whether to update WIP requirements for unreleased jobs or schedules when the revised item is implemented.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="NewRevisionIndicator" id="oagis-id-debb87349a7642a492f1d9f68be11c87" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to indicate that whether this change represents a new revision on the BOM.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UseUpInventoryIndicator" id="oagis-id-80ad8140effd428ab02f6251eda05098" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether it is possible to use up the existing inventory before replaceing with items for the new revision of the BOM and resulting Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OldItemRevisionIndicator" id="oagis-id-484ba43a668a45a39eab7694ab434bdd" minOccurs="0"/>
+					<xsd:element ref="NewItemRevisionIndicator" id="oagis-id-c4400db9064e40c0a0a1e25e1db1f932" minOccurs="0"/>
+					<xsd:element ref="UseUpItem" id="oagis-id-29af656a33184ddcac2074a4cf89f34c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Used in Engineering to indicat the Item that is to be used prior to the new Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SiteLocation" id="oagis-id-1502614ea952408cae5acb37931e457f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RevisedBOMComponent" id="oagis-id-16e66ff01964461c800685e808b10d5b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes any Bill of Material that may be impacted by a given Engineering Change</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedBOMType" id="oagis-id-a9cf6fb451944c8ea183153c7bc6b280">
+		<xsd:complexContent>
+			<xsd:extension base="RevisedBOMBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedBOMExtensionType" id="oagis-id-e795965ef22c4fb4b6d6ca7c7524f77b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedBOMComponentBaseType" id="oagis-id-10ec9e693b694f1aaf1411e641a4e9fe">
+		<xsd:complexContent>
+			<xsd:extension base="ItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="SequenceCode" id="oagis-id-63308b57ac164821b1259bee3494eb99" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the sequence in which the associated entity is to occur with in a given operation, step or business process..</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-f3bf056d824346e9a6e9141b5ccf714a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ImplementationDateTime" id="oagis-id-2aa3ae8ad0144e10bb9c9ef8498f8e0f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date on which the changes will be implemented,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RevisedItemRevision" id="oagis-id-50d07636ac6245a7a34c589a4a3e875c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="RevisedSubstituteItem" id="oagis-id-78b7bfba99ef428eb338cefa387cc062" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the changes to valid substitution that can be made for any Bill of Material Component.  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RevisedReferenceDesignator" id="oagis-id-cecc1835d89c434391a451ef75767c63" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the Location on the Drawing or Blueprint that the Bill of Material Component item is used. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedBOMComponentType" id="oagis-id-e9cc54a08332400992a4ad05c03c9b91">
+		<xsd:complexContent>
+			<xsd:extension base="RevisedBOMComponentBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedBOMComponentExtensionType" id="oagis-id-0c08422697cf4bfa9489bc3308feac3d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedItemRevisionBaseType" id="oagis-id-f3a0fd3387f44fb094aef5a592b91dcd">
+		<xsd:complexContent>
+			<xsd:extension base="ItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="SequenceCode" id="oagis-id-3d96b12ac9384280af4ae5fc19affb67" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the sequence in which the associated entity is to occur with in a given operation, step or business process..</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-921b3488c12b4bccb6debf12a7c70be1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ImplementationDateTime" id="oagis-id-38d63240af164390a5192dccfdac3b41" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the date on which the changes will be implemented,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedItemRevisionType" id="oagis-id-f0957a79cb4142e6be55d87b1646ca87">
+		<xsd:complexContent>
+			<xsd:extension base="RevisedItemRevisionBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedItemRevisionExtensionType" id="oagis-id-9057cf4b7e314285944ff305ffb56d7b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedSubstituteItemBaseType" id="oagis-id-8984b4b1e05d43e3a0d30ddf0d99fd33">
+		<xsd:complexContent>
+			<xsd:extension base="ItemBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemQuantity" id="oagis-id-5e4f1bd325fc48d2a85a756e6f736941" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-c7fedf223a9e4f2489896ce9892393c8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedSubstituteItemType" id="oagis-id-29882b94ecba4dcab24ec93c260a2159">
+		<xsd:complexContent>
+			<xsd:extension base="RevisedSubstituteItemBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedSubstituteItemExtensionType" id="oagis-id-8f3f0f63e69d40248a452971fc2e087b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedReferenceDesignatorBaseType" id="oagis-id-d8c3ffd4e9b746a49a51362a1dd5e140">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the Location on the Drawing or Blueprint that the Bill of Material Component item is used. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ReferenceDesignatorID" id="oagis-id-b0af457f55534b009c20d0b46ad9e804" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference designator on a Drawing or BluePrint where the BOM is used.
+
+ Is an identifier used to refer to an instance of the  Item (part number) in manufacturing instructions, engineering drawings and/or CAD models. ReferenceDesignator is also often known as an installation point. There will be a single distinct ReferenceDesignatorID for each instance of an Item, however multiple distinct ItemIDs could have the same ReferenceDesignatorID value within a BOM, such as for alternate parts or parts selected from a test-fit-and-select processes. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-cb91a01d90d44351a50109dbecc8a679"/>
+					<xsd:group ref="ReferencesGroup" id="oagis-id-f04ee5a53b18464f96a721f94531125a"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RevisedReferenceDesignatorType" id="oagis-id-ff76664b452e40acb0528f7dfbca0996">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Describes the Location on the Drawing or Blueprint that the Bill of Material Component item is used. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="RevisedReferenceDesignatorBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RevisedReferenceDesignatorExtensionType" id="oagis-id-77aee12b012b4b1694c17e807e0ba9f8" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessShippersExportDeclaration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersExportDeclaration.xsd"/>
+	<xsd:element name="ProcessShippersExportDeclaration" type="ProcessShippersExportDeclarationType" id="oagis-id-ba375500f32d484191cf2bda9d2edbb3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessShippersExportDeclaration is to transmit an ShippersExportDeclaration from a supplier to a customer. Indicating that the receiver of the ShippersExportDeclaration is to Process the ShippersExportDeclaration for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessShippersExportDeclarationType" id="oagis-id-cbc939f0468b4e72a89a88ea02b84593">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessShippersExportDeclarationDataAreaType" id="oagis-id-a2fb0212dd124d10ba4b3586c9e16a94">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessShippersExportDeclaration. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (ShippersExportDeclaration).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessShippersExportDeclarationDataAreaType" id="oagis-id-5d0f3b4b17f1403083cc28d96a04fc9f">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-36b7a5d016a64315a020a6db311ecc67"/>
+			<xsd:element ref="ShippersExportDeclaration" maxOccurs="unbounded" id="oagis-id-82053f48a5f94d2db1a84c399c99f553"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

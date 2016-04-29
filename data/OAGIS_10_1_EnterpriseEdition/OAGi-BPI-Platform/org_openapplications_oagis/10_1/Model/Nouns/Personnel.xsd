@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/Personnel.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="Personnel" type="PersonnelType" id="oagis-id-42df8fe701cb43a580b1ad249a07668a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Personnel information is the human resource information maintained for each employee.  It includes such data as job code, employee status, department or place in the organization, and job-related skills.  Although generally maintained in a Human Resource Management System (HRMS), this information may also be needed and updated by manufacturing applications (workforce scheduling) or project management (resource allocation).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PersonnelBaseType" id="oagis-id-8edb7bc42a7a4704924efa08666546e6">
+		<xsd:complexContent>
+			<xsd:extension base="EmployeeBaseType">
+				<xsd:sequence>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-29f2ee9d6fbf4ab09ea586d10abd0907" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PasswordEncryptedBinaryObject" id="oagis-id-76783f31bae044088a13eab25fd89c8e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Used to carry an encrypted password.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="HROrganizationIDs" id="oagis-id-7d57fc7564a64c0088012eaf1deb26ba" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the organization level that personnel are assigned</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Facility" id="oagis-id-820e581380304810b8842b43afbaccf1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A Facility identifies a location within an entity. The facility may have sub-locators identified using a sequenced identification notation e.g. Warehouse A100 Sub-Location 11, Row R10 would be represented as an array of three Facility elements with values as A100, 11, R10, name attribute as Warehouse, Sub-Location and Row and sequence attribute as 1,2 and 3 respectively.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GLEntityID" id="oagis-id-fef6335c30cc4fc0819f38e2d27a4c40" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
+
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+
+Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CostCenterID" id="oagis-id-1793f9a13aa74ef9b1b0f471f4b5c673" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Cost Center is an accumulator of cost information that may be an organizational unit or area of responsibility.  It is an organization code that allows a grouping of expenses and costs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WorkCenterID" id="oagis-id-17f2d57876304cfbb6f00ffac175ab85" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies an area consisting of one or more resources where production takes place.  It is used to identify a specific Work Center on a Shop Floor or other manufacturing facility</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="JobRestrictionCodes" id="oagis-id-067abc89c4414798ad7b9c8ccd0eb027" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This indicates any limitations to complete a job assignment based on physical, mental, legal or any other conditions</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScheduleTypeCode" id="oagis-id-a588705e69bd438e8b4846c21ee3fb00" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">ScheduleType is a code or identifier that describes the specific schedule and can be used in a variety of contexts. When used in the context of employee, ScheduleType refers to the specific schedule for the employee or worker.
+
+When used in the context of a Schedule, ScheduleType indicates whether the Schedule is a demand schedule from a customer or a supply schedule from a supplier. Valid values for this context are: “Demand”, “Supplier”</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WorkShiftID" id="oagis-id-9e7b68791a0e4734b95ac7b2635f0deb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the Employee Shift Identifier. ShiftID describes the regular or standard authorized work time for the employee</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WageTypeCode" id="oagis-id-b7f3120ef93241439d7e407f6a73e794" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is a code that describes the specific type a wage an employee or worker is paid. Examples include: codes that represent: Exempt from Overtime, Non-Exempt from Overtime</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WageGroupCode" id="oagis-id-30c2db8d105540a3947841f558517d5e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to clategorize an employee’s wage.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OvertimeEligibleIndicator" id="oagis-id-59a5d1bd325347e1a26a353bdeeb1fde" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This indicates if the associated person or work is eligible to work overtime</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ContractReference" id="oagis-id-b60c459be3544a48b59a7fc40fb8e1d7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a contract</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PersonnelType" id="oagis-id-0236f2243df3465ab7d7cca2891f0d43">
+		<xsd:complexContent>
+			<xsd:extension base="PersonnelBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PersonnelExtensionType" id="oagis-id-3a137e1e5e5c4f388a4f554222b58108" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

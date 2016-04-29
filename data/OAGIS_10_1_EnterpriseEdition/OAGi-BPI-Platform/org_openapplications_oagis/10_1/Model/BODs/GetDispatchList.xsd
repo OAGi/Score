@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetDispatchList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/DispatchList.xsd"/>
+        <xsd:element name="GetDispatchList" type="GetDispatchListType" id="oagis-id-bda60a2e9eeb4e0ca582ca83546b34ba">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetDispatchList is to enable a business application module to request this information from another business application.  The reply to this BOD is the ShowDispatchList.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetDispatchListType" id="oagis-id-f3022549b2df4cfcba68a9ab22295392">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetDispatchListDataAreaType" id="oagis-id-1dd330f05b6e48f594bc050baf4f18f4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetDispatchList. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (DispatchList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetDispatchListDataAreaType" id="oagis-id-a82a716b42ef4a61baa973ab0acc267a">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-e3d9b3f125ea4f8fa8abdf87e5b78424"/>
+                        <xsd:element ref="DispatchList" maxOccurs="unbounded" id="oagis-id-c8a0bc04dea144fd8027d3af5d6b1000"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetCreditTransferIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.001.001.05" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CreditTransferIST.xsd"/>
+	<xsd:element name="GetCreditTransferIST" type="GetCreditTransferISTType" id="oagis-id-25e4a1e9e5464cda81f46436e18bf27f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetCreditTransferIST is to enable an application to request specific CreditTransferIST information from another business application module.  The response to the GetCreditTransferIST is the ShowCreditTransferIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GetCreditTransferISTType" id="oagis-id-c404bd9484514a07ad801e727370315c">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="GetCreditTransferISTDataAreaType" id="oagis-id-b559ffb2742d40f49438aafb738c3d4c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetCreditTransferIST. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (CreditTransferIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="GetCreditTransferISTDataAreaType" id="oagis-id-cc719d210a74402ba51244afc5ee9782">
+		<xsd:sequence>
+			<xsd:element ref="Get" id="oagis-id-5ddfb0bfecc94dd6998096ada5367651"/>
+			<xsd:element ref="CreditTransferIST" maxOccurs="unbounded" id="oagis-id-8d071965e0e545b5a5376f3fde76ac7d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

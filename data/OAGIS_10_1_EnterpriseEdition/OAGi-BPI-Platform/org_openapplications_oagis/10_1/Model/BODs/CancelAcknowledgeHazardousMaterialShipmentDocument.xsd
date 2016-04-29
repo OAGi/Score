@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelAcknowledgeHazardousMaterialShipmentDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/HazardousMaterialShipmentDocument.xsd"/>
+	<xsd:element name="CancelAcknowledgeHazardousMaterialShipmentDocument" type="CancelAcknowledgeHazardousMaterialShipmentDocumentType" id="oagis-id-6693f71b303e4e5d9e105ae6f1dcc23a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeHazardousMaterialShipmentDocument Business Object Document is to acknowledge receipt of the HazardousMaterialShipmentDocument</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeHazardousMaterialShipmentDocumentType" id="oagis-id-f7435514449349749b94187c69a2adf0">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-c656bb0452274a3fb416ba066eb7a882">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeHazardousMaterialShipmentDocument. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (HazardousMaterialShipmentDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeHazardousMaterialShipmentDocumentDataAreaType" id="oagis-id-a0c007a5968041abbd827eb62dded3dc">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-6752a137fae7436c935782c95f849401"/>
+			<xsd:element ref="HazardousMaterialShipmentDocument" maxOccurs="unbounded" id="oagis-id-ec711a7dfa0647d7985551a6fabc3e92"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

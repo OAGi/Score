@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelAllocateResource.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/AllocateResource.xsd"/>
+	<xsd:element name="CancelAllocateResource" type="CancelAllocateResourceType" id="oagis-id-349fcf1e8b574b199e85a227c70916cc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAllocateResource is to notify a Manufacturing Application of the use of required labor or machine time on a production order making a product. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates what machine was utilized or which person performed the work and their labor skill class, along with the amount of time worked and at what time this event occurred.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAllocateResourceType" id="oagis-id-ddf9d166bc2c4194883f8188e924dacf">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAllocateResourceDataAreaType" id="oagis-id-2d2ee18e9acd42c29b83b7b46ddda8ed">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAllocateResource. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (AllocateResource).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAllocateResourceDataAreaType" id="oagis-id-06f56cd7b7a146f7a8df4a1d256ffd08">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-7b9250c13bea49ecb203577f5af84f57"/>
+			<xsd:element ref="AllocateResource" maxOccurs="unbounded" id="oagis-id-125c76b61c5c46eba0785f269e4c6864"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

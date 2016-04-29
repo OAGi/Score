@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgePaymentStatusIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.002.001.05" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PaymentStatusIST.xsd"/>
+	<xsd:element name="ChangeAcknowledgePaymentStatusIST" type="ChangeAcknowledgePaymentStatusISTType" id="oagis-id-148b1f79ed4f4e2e81b5a9c9e59c0af0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgePaymentStatusIST is to provide the results of an application to process specific PaymentStatusIST information by the ProcessPaymentStatusIST.
+
+This typically a transaction that occurs between a company and a Bank in order to remit payment to company that has provided goods or services.  
+
+This is the response to the ProcessPaymentStatusIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgePaymentStatusISTType" id="oagis-id-fef1bfd4dfb94017984eb09a7e7171e6">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgePaymentStatusISTDataAreaType" id="oagis-id-da411503321142c7b0499ffa9949fa0d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgePaymentStatusIST. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (PaymentStatusIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgePaymentStatusISTDataAreaType" id="oagis-id-6d0b6507b72646dc9b1c9382fb1eee8e">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-d8a9a2268bc949ebaa1ee431a4798c1e"/>
+			<xsd:element ref="PaymentStatusIST" maxOccurs="unbounded" id="oagis-id-bace400c7bc8468ebf47b6b3d376c907"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponsePlanningSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PlanningSchedule.xsd"/>
+	<xsd:element name="SyncResponsePlanningSchedule" type="SyncResponsePlanningScheduleType" id="oagis-id-8240e0c238394344a84fa09afd16cbb7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Since collaboration between a customer and a supplier can potentially go through several rounds of negotiations, both parties can use the same BOD to communicate their current demand or supply schedule in response to what they received from the other party.  Either party can indicate detailed exception descriptions along with reason code and action code to the other party why the original demand/supply requirements need to be adjusted using the optional component PlanningScheduleException
+.
+The purpose of the SyncResponsePlanningSchedule is to communicate requirement information (part number, quantity, etc.) between a customer and their supplier on a regular basis, for example daily, weekly etc, or for a user-defined time bucket type definition (Component FexibileBucket) that is sent as part of this PlanningSchedule.  
+
+SyncResponsePlanningSchedule allows the adding of new requirements and the modification of previously established requirements.  
+
+Customers can use this PlanningSchedule to communicate demand requirement in three different ways.  It can be as specific as the Item level or at the Commodity code level, which is higher than item.  Furthermore, it can be required simply by functional specification via feature identifiers and values using the optional component FeatureValue.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponsePlanningScheduleType" id="oagis-id-639a41cbc0394c4494612d02e7897b1b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Allows the adding of new requirements and the modification of previously established requirements through various SyncResponse Indicator values.
+Customers can use PlanningSchedule to communicate demand requirement in three different ways.  It can be as specific as the Item level or at the Commodity code level, which is higher than item.  Furthermore, it can be required simply by functional specification via feature identifiers and values using the optional Data Type FeatureValueData.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponsePlanningScheduleDataAreaType" id="oagis-id-6094a878a8d144df98dec71a70492ccb">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponsePlanningSchedule. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (PlanningSchedule).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponsePlanningScheduleDataAreaType" id="oagis-id-66f402caf8c74c75abe799ffe1dd9b45">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-5d1077839c904be9af5b231af268bd9c"/>
+			<xsd:element ref="PlanningSchedule" maxOccurs="unbounded" id="oagis-id-39cda5195c0d4c9689f14ec489a0cffa"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

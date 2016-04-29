@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyConfiguration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Configuration.xsd"/>
+	<xsd:element name="NotifyConfiguration" type="NotifyConfigurationType" id="oagis-id-1d291683decd461fb47002baf55b2936">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyConfiguration is to enable an application to provide Configuration information from one business application to another business application. The NotifyConfiguration is  to communicate the request to Notify a Configuration. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyConfigurationType" id="oagis-id-1b087a530a884f47ad834dbe12e49404">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyConfigurationDataAreaType" id="oagis-id-70bf6a548e22475abef673be820bf503">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyConfigurationDataAreaType" id="oagis-id-9d9c5508dc5e48a49a3a7c1570064816">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-4b903db37a66406a957434ac3d6c0605"/>
+			<xsd:element ref="Configuration" maxOccurs="unbounded" id="oagis-id-94af42ca3fc6414bb7073cada97bf149"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

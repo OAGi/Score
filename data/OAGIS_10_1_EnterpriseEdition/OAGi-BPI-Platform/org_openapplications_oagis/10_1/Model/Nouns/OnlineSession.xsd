@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/OnlineSession.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="OnlineSession" type="OnlineSessionType" id="oagis-id-1d2ee7e3aec948b89e0b69a5ba5eb021"/>
+	<xsd:element name="SearchTerm" type="SearchTermType" id="oagis-id-2637cd9eccf5435c92ec91787298813d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SEARCHTERM data type contains information that can be used to perform an initial search on the destination’s application.  For example, a requester might wish to view a supplier’s catalog but restrict the result set for only ‘ballpoint pens’.  The requester would use this data type to perform this initial query.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OnlineSessionBaseType" id="oagis-id-b579634ca895409a9ad1e486b4e5c3e7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This includes all the parameters necessary to request and identify a session between two applications.  Information within this component includes information like the userid, account, usergroup, URLs to which the reply/ cart should be redirected and so on.
+
+This also includes the ReturnURL tag to identify the result URL that is returned by the target system as a result of processing the Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="SessionID" id="oagis-id-e5eb9b384b8741e4a5973fcd46227d9f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The SessionID uniquely identifies a client session with a server e.g. a user logging in to an application or a buyer session with a marketplace</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="User" id="oagis-id-ff282b37b7034d8f8a9b949a1d59dadb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the user of a given system.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequestDateTime" id="oagis-id-9a1b6fe017404dc084aefe56f0bbdca7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the datetime at which a request is made for something e.g. an item, a service, a person or a transaction entity like a session </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ResponseDateTime" id="oagis-id-5c299ade4c314963a0f8d0f280edc5ff" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is the datetime at which a response was made for a request</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReplyURL" id="oagis-id-316f2ff5ebe641e19965f1be5757006e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ReplyURL is used to specify a URL that can be used by the provider to post any information collected by the requester in the session. An example of usage of this is to post the contents of a cart created by a buying application user from an external catalog.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RedirectURL" id="oagis-id-ced1abb187ac4b41b6b7c082c3c0ad10" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The RedirectURL can be used to indicate a URL to which the Requesting application can be re-directed once the session initiated by this connection is completed. The session completion event is not recorded in this transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReturnURL" id="oagis-id-d54d7388c4e646e6b8ab1e703a650c50" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ReturnURL element is specified in the Show ECatalogURL by the target application. It contains a URL reference to which the requesting application is pointed. This will not have a value in the Request (Get) Message</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequestLanguageCode" id="oagis-id-e14a626e13f04e1b9b204fdcd423355a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The RequestLanguage element can be used by the requesting system to indicate the desired language of the catalog or application to which session will be initiated upon receipt of the Show URL transaction.  For instance, application A wishes to ‘punch out’ to external system B’s online Dutch-language catalog.  System B supports numerous languages, but will validate the value of the 'RequestLanguage' element and return the appropriate URL to direct application A to the Dutch site</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-a435bbbe494643918fefab4202cad776"/>
+					<xsd:element ref="OriginatorParty" id="oagis-id-ed5f11c0f54c4ffdbb35d437afa702a8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that originated the purchase of the goods, service or payment.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RecipientParty" id="oagis-id-3cf3987ebd6d49c8a22db676b4a62eac" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the recipient of the goods or services.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CatalogParty" id="oagis-id-16d38b578bc442c89b4d1a9997fd50cb" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party whose catalog is used to purchase the goods or services.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-e2d8a6764c8b490c9cc50b7c033aecb7" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SearchTerm" id="oagis-id-c0cf3e66173341fba5ab4ce48d17b6a4" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The SEARCHTERM data type contains information that can be used to perform an initial search on the destination’s application.  For example, a requester might wish to view a supplier’s catalog but restrict the result set for only ‘ballpoint pens’.  The requester would use this data type to perform this initial query.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OnlineSessionType" id="oagis-id-caf29ab92e564493bdf585f2fb26fd11">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This includes all the parameters necessary to request and identify a session between two applications.  Information within this component includes information like the userid, account, usergroup, URLs to which the reply/ cart should be redirected and so on.
+
+This also includes the ReturnURL tag to identify the result URL that is returned by the target system as a result of processing the Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="OnlineSessionBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="OnlineSessionExtensionType" id="oagis-id-75bd407d2705436c96d0985af86d2742" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SearchTermBaseType" id="oagis-id-3933d5659bba44c89935ae5f9d83b64a">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="SearchValueText" id="oagis-id-9eba4a872e874546b829b3b2898b6975" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The SearchValue is the element that identifies the search value the catalog provider (destination system or context) should query for.  As in the previous example, if the user wishes to query for a result set of only ballpoint pens, the SearchValue for this might be ‘Ballpoint.’  The catalog provider will then take this SearchValue and query for this match.  The Show URL transaction would then redirect the originating system to a URL that contains this result set</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InclusiveIndicator" id="oagis-id-ff0f9789cb51457a92089188e9f7eda1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The InclusiveIndicator element is used to identify whether the SearchValue should be an included or excluded component of the result set.  For example, if a user was looking for ballpoint pens, but NOT red ballpoint pens, the transaction would contain two instances of the SearchTerm data type one containing a SearchValue of ‘Ballpoint’ and an SearchValueInclusive of 'Inclusive' and one containing a SearchValue of ‘Red’ and an SearchValueInclusive of 'Exclusive'</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ExactMatchIndicator" id="oagis-id-04ce6871739c415b81bb0dec62d4efe5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ExactMatch element is used to define the type of search the external system should perform.  If the ExactMatch is true then the external system should (if supported) search using this criterion and return only the data that exactly matches the search criteria.  A false value would mean that the external system should use this search criterion and return a ‘fuzzy’ match of data that contains the search criteria but not necessarily an explicit match.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Operator" id="oagis-id-a8f7fd66235046239beb1bc2d22fd5eb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The Operator element defines operator criteria for the SearchValue. For instance if the requester wishes to return a result set of all prices &gt; $600, the transaction would contain a SearchTerm data type with a SearchValue of ‘600’, an SearchValueInclusive of ‘0’ and an OPERATOR value of ‘&gt;.’
+The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equals, Less Then or Equals, Equals</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SearchQualifier" id="oagis-id-ef07398b60dc43f9abce2ec7d05c2ca1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">The SearchQualifier element is an additional element to identify how the SearchValue should be utilized for the search in the catalog provider’s system.  The SearchQualifier could be used to indicate that the SearchValue should be searched for in Item Descriptions, or categories, etc.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SearchTermType" id="oagis-id-38b7f22af8fe4956aa4e94fe5e2f460e">
+		<xsd:complexContent>
+			<xsd:extension base="SearchTermBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="SearchTermExtensionType" id="oagis-id-bf981de636bc4dba9dd402b96215df80" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyEngineeringChangeOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/EngineeringChangeOrder.xsd"/>
+        <xsd:element name="NotifyEngineeringChangeOrder" type="NotifyEngineeringChangeOrderType" id="oagis-id-7d2c341f47ba4c5e8c2975eba8235639">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyEngineeringChangeOrder is to communicate to a business application module or system the need to initiate the creation of an Engineering Change Document.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
+
+There are many possible business applications in several environments that may use this capability. For example, a PDM, MRP, Inventory, or Manufacturing business application could use this to communicate the requirement updates to a Engineering Change Document.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyEngineeringChangeOrderType" id="oagis-id-8be5162a12864f808bd95627e82eff54">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyEngineeringChangeOrderDataAreaType" id="oagis-id-ff48143cf3144931a88b17db52bf2f96">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyEngineeringChangeOrder. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (EngineeringChangeOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyEngineeringChangeOrderDataAreaType" id="oagis-id-82ad41f864dc4537a31cf02c8812a612">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-a260da92fac749ab9158d58b8dc9b0e6"/>
+                        <xsd:element ref="EngineeringChangeOrder" maxOccurs="unbounded" id="oagis-id-6ae3708cba25480695d4ab7f382cb23f"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

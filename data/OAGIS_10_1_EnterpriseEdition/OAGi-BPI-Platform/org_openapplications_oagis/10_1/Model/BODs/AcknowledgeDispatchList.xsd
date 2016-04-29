@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/AcknowledgeDispatchList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/DispatchList.xsd"/>
+        <xsd:element name="AcknowledgeDispatchList" type="AcknowledgeDispatchListType" id="oagis-id-7177ae26f53944d0bc63f798ee1961fc">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeDispatchList Business Object Document is to acknowledge receipt of the DispatchList</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="AcknowledgeDispatchListType" id="oagis-id-17e85d9f089e4a8bb3be0b1a58edf906">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="AcknowledgeDispatchListDataAreaType" id="oagis-id-44e3f60f8c8a48c0966d4672ecd470c4">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeDispatchList. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (DispatchList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="AcknowledgeDispatchListDataAreaType" id="oagis-id-ea5f3387f62c4dbb9ce862978c1fe10a">
+                <xsd:sequence>
+                        <xsd:element ref="Acknowledge" id="oagis-id-b8cce77a45044460bdc4ead3815fa264"/>
+                        <xsd:element ref="DispatchList" maxOccurs="unbounded" id="oagis-id-ce3987a683ab46f08ba506babf7ee5b1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>
