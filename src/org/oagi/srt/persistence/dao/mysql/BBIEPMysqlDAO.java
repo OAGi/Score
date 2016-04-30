@@ -290,7 +290,7 @@ public class BBIEPMysqlDAO extends SRTDAO {
 	
 	private final String _UPDATE_BBIEP_STATEMENT = "UPDATE " + _tableName + " SET "
 			+ "Last_Update_Timestamp = CURRENT_TIMESTAMP, GUID = ?, Based_BCCP_ID = ?, Definition = ?, "
-			+ "remark = ?, biz_term = ?, Created_By = ?, Last_Updated_by = ?, WHERE BBIEP_ID = ?";
+			+ "remark = ?, biz_term = ?, Created_By = ?, Last_Updated_by = ? WHERE BBIEP_ID = ?";
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
