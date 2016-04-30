@@ -10,6 +10,7 @@ import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
+import org.oagi.srt.persistence.PersistenceUtils;
 import org.oagi.srt.persistence.dto.ASCCPVO;
 
 /**
@@ -43,21 +44,11 @@ public abstract class SRTDAO {
 	public abstract int findMaxId() throws SRTDAOException;
 
 	public final void closeQuietly(DBAgent txAgent) {
-		if (txAgent != null) {
-			try {
-				txAgent.close();
-			} catch (Throwable ignore) {
-			}
-		}
+		PersistenceUtils.closeQuietly(txAgent);
 	}
 
 	public final void closeQuietly(AutoCloseable closeable) {
-		if (closeable != null) {
-			try {
-				closeable.close();
-			} catch (Exception ignore) {
-			}
-		}
+		PersistenceUtils.closeQuietly(closeable);
 	}
 
 	public int getASCCCount(int accId) throws SRTDAOException {

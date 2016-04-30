@@ -41,6 +41,7 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
+import org.oagi.srt.persistence.PersistenceUtils;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
@@ -198,13 +199,8 @@ public class TopLevelABIEHandler implements Serializable {
 			e.printStackTrace();
 			tx.rollback();
 		} finally {
-			try {
-				if(t.conn != null)
-					t.conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			tx.close();
+			PersistenceUtils.closeQuietly(t.conn);
+			PersistenceUtils.closeQuietly(tx);
 		}
 		
 	}
@@ -452,13 +448,8 @@ public class TopLevelABIEHandler implements Serializable {
 				e.printStackTrace();
 				tx.rollback();
 			} finally {
-				try {
-					if(conn != null)
-						conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				tx.close();
+				PersistenceUtils.closeQuietly(conn);
+				PersistenceUtils.closeQuietly(tx);
 			}
 		} 
 		
@@ -466,9 +457,10 @@ public class TopLevelABIEHandler implements Serializable {
 	}
 	
 	public String macro(String bodname) throws Exception {
-			Utility.dbSetup();
-			DBAgent tx = new DBAgent();
-			conn = tx.open();
+		Utility.dbSetup();
+		DBAgent tx = new DBAgent();
+		conn = tx.open();
+		try {
 			df = DAOFactory.getDAOFactory();
 			dao = df.getDAO("ASCCP");
 			asccDao = df.getDAO("ASCC");
@@ -489,7 +481,7 @@ public class TopLevelABIEHandler implements Serializable {
 			userDao = df.getDAO("User");
 			bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
 			daoCL = df.getDAO("CodeList");
-			
+
 			ASCCPVO asccpvo = new ASCCPVO();
 			QueryCondition qc1 = new QueryCondition();
 			qc1.add("Property_Term", bodname);
@@ -507,9 +499,6 @@ public class TopLevelABIEHandler implements Serializable {
 			int abieId = topAbieVO.getABIEID();
 			asbiepVO = createASBIEP(selected, abieId, -1);
 			createBIEs(selected.getRoleOfACCID(), abieId, -1);
-			
-			tx.commit();
-			conn.close();
 				
 			System.out.println("### Finish creating a standalone "+asccpvo.getPropertyTerm());
 			
@@ -521,6 +510,10 @@ public class TopLevelABIEHandler implements Serializable {
 			System.out.println("### Finish generating a schema of "+asccpvo.getPropertyTerm());
 			
 			return filepath;
+		} finally {
+			PersistenceUtils.closeQuietly(conn);
+			PersistenceUtils.closeQuietly(tx);
+		}
 	}
 	
 	public String onFlowProcess_Copy(FlowEvent event) {
@@ -566,13 +559,8 @@ public class TopLevelABIEHandler implements Serializable {
 				e.printStackTrace();
 				tx.rollback();
 			} finally {
-				try {
-					if(conn != null)
-						conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				tx.close();
+				PersistenceUtils.closeQuietly(conn);
+				PersistenceUtils.closeQuietly(tx);
 			}
 		} 
 		
