@@ -1,12 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
@@ -15,7 +8,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ASBIEPVO;
-import org.oagi.srt.persistence.dto.DTVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -52,55 +50,51 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 	public int findMaxId() throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		int max = 1;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_MAX_ID_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
-			if(rs.next())
+			if (rs.next())
 				max = rs.getInt("max");
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return max;
 	}
 	
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		ASBIEPVO asbiepVO = (ASBIEPVO) obj;
 		int key = -1;
 		try {
 			conn = tx.open();
 			String keys[] = {"ASBIEP_ID"};
-			if(asbiepVO.getASBIEPID() < 1)
+			if (asbiepVO.getASBIEPID() < 1)
 				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
-			
-			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+
+			if (asbiepVO.getASBIEPGUID() == null || asbiepVO.getASBIEPGUID().length() == 0 || asbiepVO.getASBIEPGUID().isEmpty() || asbiepVO.getASBIEPGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, asbiepVO.getASBIEPGUID());
 
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
@@ -124,54 +118,47 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			if(asbiepVO.getASBIEPID() > 0)
+			if (asbiepVO.getASBIEPID() > 0)
 				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
-			
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()){
-			    key = (int) rs.getLong(1);
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				key = (int) rs.getLong(1);
 			}
-			rs.close();
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return key;
 	}
-	
+
 	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
-		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
 		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		ASBIEPVO asbiepVO = (ASBIEPVO) obj;
 		int key = -1;
 		try {
 			String keys[] = {"ASBIEP_ID"};
-			if(asbiepVO.getASBIEPID() < 1)
+			if (asbiepVO.getASBIEPID() < 1)
 				ps = conn.prepareStatement(_INSERT_ASBIEP_STATEMENT, keys);
 			else
 				ps = conn.prepareStatement(_INSERT_ASBIEP_WITH_ID_STATEMENT, keys);
-			
-			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+
+			if (asbiepVO.getASBIEPGUID() == null || asbiepVO.getASBIEPGUID().length() == 0 || asbiepVO.getASBIEPGUID().isEmpty() || asbiepVO.getASBIEPGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, asbiepVO.getASBIEPGUID());
 
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
@@ -195,37 +182,33 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 			ps.setInt(7, asbiepVO.getCreatedByUserID());
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
-			if(asbiepVO.getASBIEPID() > 0)
+			if (asbiepVO.getASBIEPID() > 0)
 				ps.setInt(9, asbiepVO.getASBIEPID());
 
 			ps.executeUpdate();
-			
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()){
-			    key = (int) rs.getLong(1);
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				key = (int) rs.getLong(1);
 			}
-			rs.close();
-			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return key;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ASBIEPVO asbiepVO = new ASBIEPVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ASBIEP_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -241,9 +224,9 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -263,35 +246,28 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return asbiepVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_ASBIEP_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -311,23 +287,15 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				list.add(asbiepVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;		
@@ -336,20 +304,22 @@ public class ASBIEPOracleDAO extends SRTDAO {
 	private final String _UPDATE_ASBIEP_STATEMENT = "UPDATE " + _tableName + 
 			" SET GUID = ?, Based_ASCCP_ID = ?, Role_Of_ABIE_ID = ?, Definition = ?, Remark = ?, biz_term = ?, Created_By = ?, Last_Updated_By = ?, Last_Update_Timestamp = CURRENT_TIMESTAMP "
 			+ "WHERE ASBIEP_ID = ?";
-	
+
 	@Override
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		ASBIEPVO asbiepVO = (ASBIEPVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_ASBIEP_STATEMENT);
 
-			if( asbiepVO.getASBIEPGUID()==null ||  asbiepVO.getASBIEPGUID().length()==0 ||  asbiepVO.getASBIEPGUID().isEmpty() ||  asbiepVO.getASBIEPGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (asbiepVO.getASBIEPGUID() == null || asbiepVO.getASBIEPGUID().length() == 0 || asbiepVO.getASBIEPGUID().isEmpty() || asbiepVO.getASBIEPGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, asbiepVO.getASBIEPGUID());
 
 			ps.setInt(2, asbiepVO.getBasedASCCPID());
@@ -374,11 +344,10 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			ps.setInt(8, asbiepVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(9, asbiepVO.getCreationTimestamp());
 			ps.setInt(9, asbiepVO.getASBIEPID());
-			
+
 			ps.executeUpdate();
 
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
@@ -386,12 +355,9 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
@@ -399,19 +365,19 @@ public class ASBIEPOracleDAO extends SRTDAO {
 
 	@Override
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
-		
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		ASBIEPVO asbiepVO = (ASBIEPVO)obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_ASBIEP_STATEMENT);
 			ps.setInt(1, asbiepVO.getASBIEPID());
 			ps.executeUpdate();
 
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);
@@ -419,17 +385,12 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
-
-
 	}
 
 	@Override
@@ -444,8 +405,9 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ASBIEPVO asbiepVO = null;
-		
+
 		try {
 			String sql = _FIND_ASBIEP_STATEMENT;
 
@@ -457,7 +419,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -465,19 +427,19 @@ public class ASBIEPOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -504,23 +466,14 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				asbiepVO.setCreationTimestamp(rs.getTimestamp("Creation_Timestamp"));
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return asbiepVO;
-
 	}
 
 	@Override
@@ -528,6 +481,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 			throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ASBIEP_STATEMENT;
@@ -540,7 +494,7 @@ public class ASBIEPOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -548,19 +502,19 @@ public class ASBIEPOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -588,20 +542,12 @@ public class ASBIEPOracleDAO extends SRTDAO {
 				asbiepVO.setLastUpdateTimestamp(rs.getTimestamp("Last_Update_Timestamp"));
 				list.add(asbiepVO);
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return list;
 	}

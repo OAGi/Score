@@ -41,7 +41,25 @@ public abstract class SRTDAO {
 	public abstract boolean deleteObject(SRTObject obj) throws SRTDAOException;
 	
 	public abstract int findMaxId() throws SRTDAOException;
-	
+
+	public final void closeQuietly(DBAgent txAgent) {
+		if (txAgent != null) {
+			try {
+				txAgent.close();
+			} catch (Throwable ignore) {
+			}
+		}
+	}
+
+	public final void closeQuietly(AutoCloseable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (Exception ignore) {
+			}
+		}
+	}
+
 	public int getASCCCount(int accId) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
@@ -64,20 +82,23 @@ public abstract class SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
+			if (ps != null) {
 				try {
 					ps.close();
-				} catch (SQLException e) {}
+				} catch (SQLException e) {
+				}
 			}
-			if(rs != null) {
+			if (rs != null) {
 				try {
 					rs.close();
-				} catch (SQLException e) {}
+				} catch (SQLException e) {
+				}
 			}
 			try {
-				if(conn != null && !conn.isClosed())
+				if (conn != null && !conn.isClosed())
 					conn.close();
-			} catch (SQLException e) {}
+			} catch (SQLException e) {
+			}
 			tx.close();
 		}
 		return count;

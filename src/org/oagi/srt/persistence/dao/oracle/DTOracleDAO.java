@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
@@ -14,6 +8,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.DTVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -64,26 +64,27 @@ public class DTOracleDAO extends SRTDAO {
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		DTVO dtVO = (DTVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		DTVO dtVO = (DTVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_DT_STATEMENT);
-			if( dtVO.getDTGUID()==null ||  dtVO.getDTGUID().length()==0 ||  dtVO.getDTGUID().isEmpty() ||  dtVO.getDTGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (dtVO.getDTGUID() == null || dtVO.getDTGUID().length() == 0 || dtVO.getDTGUID().isEmpty() || dtVO.getDTGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, dtVO.getDTGUID());
 
 			ps.setInt(2, dtVO.getDTType());
-			if( dtVO.getVersionNumber()==null ||  dtVO.getVersionNumber().length()==0 ||  dtVO.getVersionNumber().isEmpty() ||  dtVO.getVersionNumber().equals(""))				
-				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (dtVO.getVersionNumber() == null || dtVO.getVersionNumber().length() == 0 || dtVO.getVersionNumber().isEmpty() || dtVO.getVersionNumber().equals(""))
+				ps.setString(3, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(3, dtVO.getVersionNumber());
 
-			if(dtVO.getPreviousVersionDTID() < 1){
+			if (dtVO.getPreviousVersionDTID() < 1) {
 				ps.setNull(4, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(4, dtVO.getPreviousVersionDTID());
 			}
 //			if( dtVO.getDataTypeTerm()==null ||  dtVO.getDataTypeTerm().length()==0 ||  dtVO.getDataTypeTerm().isEmpty() ||  dtVO.getDataTypeTerm().equals(""))				
@@ -96,17 +97,15 @@ public class DTOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(6, dtVO.getQualifier());
 
-			if(dtVO.getBasedDTID() < 1){
+			if (dtVO.getBasedDTID() < 1) {
 				ps.setNull(7, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(7, dtVO.getBasedDTID());
 			}
-			
-			if(dtVO.getDEN()==null || dtVO.getDEN().length()==0 || dtVO.getDEN().isEmpty() || dtVO.getDEN().equals("")){
+
+			if (dtVO.getDEN() == null || dtVO.getDEN().length() == 0 || dtVO.getDEN().isEmpty() || dtVO.getDEN().equals("")) {
 				ps.setString(8, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			}
-			else 
+			} else
 				ps.setString(8, dtVO.getDEN());
 			ps.setString(9, dtVO.getContentComponentDEN());
 //			if(dtVO.getDefinition()==null || dtVO.getDefinition().length()==0 || dtVO.getDefinition().isEmpty() || dtVO.getDefinition().equals("")){
@@ -130,43 +129,38 @@ public class DTOracleDAO extends SRTDAO {
 			ps.setInt(14, dtVO.getCreatedByUserId());
 			ps.setInt(15, dtVO.getOwnerUserId());
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
-			
-			
-			if(dtVO.getRevisionNum() < 0){
+
+
+			if (dtVO.getRevisionNum() < 0) {
 				ps.setNull(17, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(17, dtVO.getRevisionNum());
 			}
-			if(dtVO.getRevisionTrackingNum() < 0){
+			if (dtVO.getRevisionTrackingNum() < 0) {
 				ps.setNull(18, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(18, dtVO.getRevisionTrackingNum());
 			}
-			if(dtVO.getRevisionAction() < 1){
+			if (dtVO.getRevisionAction() < 1) {
 				ps.setNull(19, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(19, dtVO.getRevisionAction());
 			}
-			if(dtVO.getReleaseId() < 1){
+			if (dtVO.getReleaseId() < 1) {
 				ps.setNull(20, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(20, dtVO.getReleaseId());
 			}
-			if(dtVO.getCurrentBdtId() < 1){
+			if (dtVO.getCurrentBdtId() < 1) {
 				ps.setNull(21, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(21, dtVO.getCurrentBdtId());
 			}
-			
-			if( dtVO.getIs_deprecated())				
-				ps.setInt(22,1);
-			else 	
-				ps.setInt(22,0);
+
+			if (dtVO.getIs_deprecated())
+				ps.setInt(22, 1);
+			else
+				ps.setInt(22, 0);
 
 			ps.executeUpdate();
 
@@ -174,28 +168,28 @@ public class DTOracleDAO extends SRTDAO {
 			//tableKeys.next();
 			//int autoGeneratedID = tableKeys.getInt(1);
 
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		DTVO dtVO = null;
-		Connection conn = null;
-		
 		try {
 			conn = tx.open();
 			String sql = _FIND_DT_STATEMENT;
@@ -208,7 +202,7 @@ public class DTOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -216,19 +210,19 @@ public class DTOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -269,37 +263,25 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
-			
-			conn.close();
+
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return dtVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		DTVO dtVO = null;
-		
 		try {
 			String sql = _FIND_DT_STATEMENT;
 
@@ -311,7 +293,7 @@ public class DTOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -319,19 +301,19 @@ public class DTOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -372,31 +354,25 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setCurrentBdtId(rs.getInt("current_bdt_id"));
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return dtVO;
 	}
-	
+
 	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_DT_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -412,9 +388,9 @@ public class DTOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -449,35 +425,28 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return list;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_DT_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -510,23 +479,15 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
@@ -534,28 +495,30 @@ public class DTOracleDAO extends SRTDAO {
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		DTVO dtVO = (DTVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		DTVO dtVO = (DTVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_DT_STATEMENT);
 
-			if( dtVO.getDTGUID()==null ||  dtVO.getDTGUID().length()==0 ||  dtVO.getDTGUID().isEmpty() ||  dtVO.getDTGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (dtVO.getDTGUID() == null || dtVO.getDTGUID().length() == 0 || dtVO.getDTGUID().isEmpty() || dtVO.getDTGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, dtVO.getDTGUID());
 
 			ps.setInt(2, dtVO.getDTType());
-			if( dtVO.getVersionNumber()==null ||  dtVO.getVersionNumber().length()==0 ||  dtVO.getVersionNumber().isEmpty() ||  dtVO.getVersionNumber().equals(""))				
-				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (dtVO.getVersionNumber() == null || dtVO.getVersionNumber().length() == 0 || dtVO.getVersionNumber().isEmpty() || dtVO.getVersionNumber().equals(""))
+				ps.setString(3, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(3, dtVO.getVersionNumber());
 
-			if(dtVO.getPreviousVersionDTID() < 1){
+			if (dtVO.getPreviousVersionDTID() < 1) {
 				ps.setNull(4, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(4, dtVO.getPreviousVersionDTID());
 			}
 			
@@ -569,16 +532,15 @@ public class DTOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(6, dtVO.getQualifier());
 
-			if(dtVO.getBasedDTID() < 1){
+			if (dtVO.getBasedDTID() < 1) {
 				ps.setNull(7, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(7, dtVO.getBasedDTID());
 			}
-			
-			if( dtVO.getDEN()==null ||  dtVO.getDEN().length()==0 ||  dtVO.getDEN().isEmpty() ||  dtVO.getDEN().equals(""))				
-				ps.setString(8,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+
+			if (dtVO.getDEN() == null || dtVO.getDEN().length() == 0 || dtVO.getDEN().isEmpty() || dtVO.getDEN().equals(""))
+				ps.setString(8, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(8, dtVO.getDEN());
 
 //			if( dtVO.getContentComponentDEN()==null ||  dtVO.getContentComponentDEN().length()==0 ||  dtVO.getContentComponentDEN().isEmpty() ||  dtVO.getContentComponentDEN().equals(""))				
@@ -606,42 +568,37 @@ public class DTOracleDAO extends SRTDAO {
 			ps.setInt(14, dtVO.getCreatedByUserId());
 			ps.setInt(15, dtVO.getOwnerUserId());
 			ps.setInt(16, dtVO.getLastUpdatedByUserId());
-			
-			if(dtVO.getRevisionNum() < 0){
+
+			if (dtVO.getRevisionNum() < 0) {
 				ps.setNull(17, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(17, dtVO.getRevisionNum());
 			}
-			if(dtVO.getRevisionTrackingNum() < 0){
+			if (dtVO.getRevisionTrackingNum() < 0) {
 				ps.setNull(18, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(18, dtVO.getRevisionTrackingNum());
 			}
-			if(dtVO.getRevisionAction() < 1){
+			if (dtVO.getRevisionAction() < 1) {
 				ps.setNull(19, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(19, dtVO.getRevisionAction());
 			}
-			if(dtVO.getReleaseId() < 1){
+			if (dtVO.getReleaseId() < 1) {
 				ps.setNull(20, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(20, dtVO.getReleaseId());
 			}
-			if(dtVO.getCurrentBdtId() < 1){
+			if (dtVO.getCurrentBdtId() < 1) {
 				ps.setNull(21, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(21, dtVO.getCurrentBdtId());
 			}
-			
-			if( dtVO.getIs_deprecated())				
-				ps.setInt(22,1);
-			else 	
-				ps.setInt(22,0);
+
+			if (dtVO.getIs_deprecated())
+				ps.setInt(22, 1);
+			else
+				ps.setInt(22, 0);
 
 			ps.setInt(23, dtVO.getDTID());
 			ps.executeUpdate();
@@ -654,24 +611,23 @@ public class DTOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		DTVO dtVO = (DTVO)obj;
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		DTVO dtVO = (DTVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_DT_STATEMENT);
 			ps.setInt(1, dtVO.getDTID());
@@ -685,12 +641,9 @@ public class DTOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
@@ -701,6 +654,7 @@ public class DTOracleDAO extends SRTDAO {
 			throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_DT_STATEMENT;
@@ -713,7 +667,7 @@ public class DTOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -721,19 +675,19 @@ public class DTOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -775,20 +729,12 @@ public class DTOracleDAO extends SRTDAO {
 				dtVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(dtVO);
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return list;
 	}
@@ -798,8 +744,8 @@ public class DTOracleDAO extends SRTDAO {
 			throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-		
 		try {
 			String sql = _FIND_ALL_DT_STATEMENT;
 			ps = conn.prepareStatement(sql);
@@ -836,16 +782,8 @@ public class DTOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return list;
 	}
