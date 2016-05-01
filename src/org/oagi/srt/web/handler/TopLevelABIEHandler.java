@@ -1169,8 +1169,7 @@ public class TopLevelABIEHandler implements Serializable {
 			
 			ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), nBBIEVO.getBBIEID(), "BBIE");
 			av.setBbiepVO(nBBIEPVO);
-			av.setBbieVO(nBBIEVO);
-			av.setBccpVO(bccpVO);
+			av.setBccpVO_BbieVO(bccpVO, nBBIEVO);
 			
 			QueryCondition qc_13 = new QueryCondition();
 			qc_13.add("dt_id", bccpVO.getBDTID());
@@ -1660,8 +1659,7 @@ public class TopLevelABIEHandler implements Serializable {
 		ABIEView av = new ABIEView(bccpVO.getPropertyTerm(), bbieVO.getBBIEID(), "BBIE");
 		av.setBccVO(bccVO);
 		av.setBbiepVO(bbiepVO);
-		av.setBbieVO(bbieVO);
-		av.setBccpVO(bccpVO);
+		av.setBccpVO_BbieVO(bccpVO, bbieVO);
 		
 		QueryCondition qc_05 = new QueryCondition();
 		qc_05.add("dt_id", bccpVO.getBDTID());

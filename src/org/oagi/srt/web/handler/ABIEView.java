@@ -111,7 +111,10 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 			qc_02.add("bdt_id", bccpVO.getBDTID());
 			
 			List<SRTObject> ccs = bdtPrimitiveRestrictionDao.findObjects(qc_02);
-			bdtPrimitiveRestrictionId = ((BDTPrimitiveRestrictionVO)ccs.get(0)).getBDTPrimitiveRestrictionID();
+			// Implicitly declaration. Why does it need to be here?
+			// Because of this code, Add 'setBccpVO_BbieVO' method.
+			// TODO: Fix me.
+			bdtPrimitiveRestrictionId = bbieVO.getBdtPrimitiveRestrictionId();
 			for(SRTObject obj : ccs) {
 				BDTPrimitiveRestrictionVO cc = (BDTPrimitiveRestrictionVO)obj;
 				
@@ -238,8 +241,13 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 		return bccpVO;
 	}
 
-	public void setBccpVO(BCCPVO bccpVO) {
+	private void setBccpVO(BCCPVO bccpVO) {
 		this.bccpVO = bccpVO;
+	}
+
+	public void setBccpVO_BbieVO(BCCPVO bccpVO, BBIEVO bbieVO) {
+		setBccpVO(bccpVO);
+		setBbieVO(bbieVO);
 	}
 
 	public DTSCVO getDtscVO() {
