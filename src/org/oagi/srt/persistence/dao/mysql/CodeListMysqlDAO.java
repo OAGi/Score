@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.dao.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -13,7 +7,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
 *
@@ -29,42 +28,43 @@ public class CodeListMysqlDAO extends SRTDAO {
 			"SELECT code_list_id, guid, enum_type_guid, Name, List_ID, "
 			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
 			+ "Last_Update_Timestamp, State FROM " + _tableName + " order by Creation_Timestamp desc";
-	
+
 	private final String _FIND_Code_List_STATEMENT =
 			"SELECT code_list_id, guid, enum_type_guid, Name, List_ID, "
 			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
 			+ "Last_Update_Timestamp, State FROM " + _tableName ;
-	
-	private final String _INSERT_Code_List_STATEMENT = 
+
+	private final String _INSERT_Code_List_STATEMENT =
 			"INSERT INTO " + _tableName + " (guid, enum_type_guid, Name, List_ID, "
 			+ "Agency_ID, Version_ID, Definition, remark, Definition_Source, Based_Code_List_ID, Extensible_Indicator, Created_By, Last_Updated_By, Creation_Timestamp, "
 			+ "Last_Update_Timestamp, State) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
-	
-	private final String _UPDATE_Code_List_STATEMENT = 
+
+	private final String _UPDATE_Code_List_STATEMENT =
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, guid = ?,"
 			+ " enum_type_guid = ?, Name = ?, List_ID = ?, Agency_ID = ?, Version_ID = ?, Definition = ?, Definition_Source = ?, Based_Code_List_ID = ?, Extensible_Indicator = ?, Created_By = ?,"
 			+ " Last_Updated_By = ?, Creation_Timestamp = ?, Last_Update_Timestamp = ?, State = ?, remark = ? WHERE Code_List_ID = ?";
-	
-	private final String _DELETE_Code_List_STATEMENT = 
+
+	private final String _DELETE_Code_List_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE Code_List_ID = ?";
-	
+
 	@Override
 	public int findMaxId() throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_Code_List_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -75,7 +75,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -83,19 +83,19 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -129,34 +129,28 @@ public class CodeListMysqlDAO extends SRTDAO {
 				list.add(codelistVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CodeListVO codelistVO = (CodeListVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		CodeListVO codelistVO = (CodeListVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_Code_List_STATEMENT);
 			ps.setString(1, codelistVO.getCodeListGUID());
 			ps.setString(2, codelistVO.getEnumerationTypeGUID());
@@ -167,7 +161,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 			ps.setString(7, codelistVO.getDefinition());
 			ps.setString(8, codelistVO.getRemark());
 			ps.setString(9, codelistVO.getDefinitionSource());
-			if(codelistVO.getBasedCodeListID() > 0)
+			if (codelistVO.getBasedCodeListID() > 0)
 				ps.setInt(10, codelistVO.getBasedCodeListID());
 			else
 				ps.setNull(10, codelistVO.getBasedCodeListID());
@@ -183,17 +177,17 @@ public class CodeListMysqlDAO extends SRTDAO {
 			//tableKeys.next();
 			//int autoGeneratedID = tableKeys.getInt(1);
 
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 
@@ -201,11 +195,13 @@ public class CodeListMysqlDAO extends SRTDAO {
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		CodeListVO codelistVO = new CodeListVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_Code_List_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -216,7 +212,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -224,19 +220,19 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -247,7 +243,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 					}
 				}
 			}
-			
+
 			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
@@ -271,30 +267,23 @@ public class CodeListMysqlDAO extends SRTDAO {
 				codelistVO.setState(rs.getString("State"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return codelistVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		CodeListVO codelistVO = new CodeListVO();
 		try {
 			String sql = _FIND_Code_List_STATEMENT;
@@ -307,7 +296,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -315,19 +304,19 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -338,7 +327,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 					}
 				}
 			}
-			
+
 			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
@@ -364,28 +353,21 @@ public class CodeListMysqlDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return codelistVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_Code_List_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -411,34 +393,26 @@ public class CodeListMysqlDAO extends SRTDAO {
 				list.add(codelistVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
-			
-	}
-	
-	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
+	}
+
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ALL_Code_List_STATEMENT;
 			ps = conn.prepareStatement(sql);
@@ -467,31 +441,25 @@ public class CodeListMysqlDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
-			
+
 	}
-	
+
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CodeListVO codelistVO = (CodeListVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		CodeListVO codelistVO = (CodeListVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_Code_List_STATEMENT);
-			
+
 			ps.setString(1, codelistVO.getCodeListGUID());
 			ps.setString(2, codelistVO.getEnumerationTypeGUID());
 			ps.setString(3, codelistVO.getName());
@@ -519,25 +487,23 @@ public class CodeListMysqlDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
-	
+
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		CodeListVO codelistVO = (CodeListVO)obj;
-		
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		CodeListVO codelistVO = (CodeListVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_Code_List_STATEMENT);
 			ps.setInt(1, codelistVO.getCodeListID());
@@ -551,17 +517,12 @@ public class CodeListMysqlDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
-
-
 	}
 
 	@Override
@@ -569,6 +530,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 			throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_Code_List_STATEMENT;
@@ -581,7 +543,7 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -589,19 +551,19 @@ public class CodeListMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -635,20 +597,12 @@ public class CodeListMysqlDAO extends SRTDAO {
 				codelistVO.setState(rs.getString("State"));
 				list.add(codelistVO);
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return list;
 	}

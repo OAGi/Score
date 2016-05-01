@@ -1,19 +1,18 @@
 package org.oagi.srt.persistence.dao.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ASCCPVO;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -25,20 +24,20 @@ import org.oagi.srt.persistence.dto.ContextCategoryVO;
 public class ContextCategoryMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "ctx_category";
-	
-	private final String _FIND_ALL_CONTEXT_CATEGORY_STATEMENT = 
+
+	private final String _FIND_ALL_CONTEXT_CATEGORY_STATEMENT =
 			"SELECT ctx_category_id, guid, Name, Description FROM " + _tableName + " order by ctx_category_id desc";
-	
-	private final String _FIND_CONTEXT_CATEGORY_STATEMENT = 
+
+	private final String _FIND_CONTEXT_CATEGORY_STATEMENT =
 			"SELECT ctx_category_id, guid, Name, Description FROM " + _tableName;
-	
-	private final String _INSERT_CONTEXT_CATEGORY_STATEMENT = 
+
+	private final String _INSERT_CONTEXT_CATEGORY_STATEMENT =
 			"INSERT INTO " + _tableName + " (guid, Name, Description) VALUES (?, ?, ?)";
-	
+
 	private final String _UPDATE_CONTEXT_CATEGORY_STATEMENT =
 			"UPDATE " + _tableName + " SET guid = ?, Name = ?, Description = ? WHERE ctx_category_id = ?";
-	
-	private final String _DELETE_CONTEXT_CATEGORY_STATEMENT = 
+
+	private final String _DELETE_CONTEXT_CATEGORY_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE ctx_category_id = ?";
 
 	@Override
@@ -46,15 +45,15 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
-		
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Connection conn = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			conn = tx.open();
 			String sql = _FIND_CONTEXT_CATEGORY_STATEMENT;
@@ -67,7 +66,7 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -75,21 +74,21 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			sql += " order by name asc";
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -107,69 +106,62 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 				context_categoryVO.setContextCategoryID(rs.getInt("ctx_category_id"));
 				context_categoryVO.setContextCategoryGUID(rs.getString("guid"));
 				context_categoryVO.setName(rs.getString("Name"));
-				context_categoryVO.setDescription(rs.getString("Description"));	
+				context_categoryVO.setDescription(rs.getString("Description"));
 				list.add(context_categoryVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return list;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ContextCategoryVO context_categoryVO = (ContextCategoryVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		ContextCategoryVO context_categoryVO = (ContextCategoryVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_CONTEXT_CATEGORY_STATEMENT);
 			ps.setString(1, context_categoryVO.getContextCategoryGUID());
 			ps.setString(2, context_categoryVO.getName());
 			ps.setString(3, context_categoryVO.getDescription());
-			
+
 			ps.executeUpdate();
-			ps.close();
+
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ContextCategoryVO context_categoryVO = new ContextCategoryVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_CONTEXT_CATEGORY_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -185,9 +177,9 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -197,38 +189,31 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 				context_categoryVO.setContextCategoryID(rs.getInt("ctx_category_id"));
 				context_categoryVO.setContextCategoryGUID("guid");
 				context_categoryVO.setName(rs.getString("Name"));
-				context_categoryVO.setDescription(rs.getString("Description"));				
+				context_categoryVO.setDescription(rs.getString("Description"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return context_categoryVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_CONTEXT_CATEGORY_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -237,27 +222,19 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 				context_categoryVO.setContextCategoryID(rs.getInt("ctx_category_id"));
 				context_categoryVO.setContextCategoryGUID(rs.getString("guid"));
 				context_categoryVO.setName(rs.getString("Name"));
-				context_categoryVO.setDescription(rs.getString("Description"));	
+				context_categoryVO.setDescription(rs.getString("Description"));
 				list.add(context_categoryVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
@@ -265,10 +242,12 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		ContextCategoryVO context_categoryVO = (ContextCategoryVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		ContextCategoryVO context_categoryVO = (ContextCategoryVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_CONTEXT_CATEGORY_STATEMENT);
 
@@ -286,24 +265,22 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		ContextCategoryVO context_categoryVO = (ContextCategoryVO)obj;
-		
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		ContextCategoryVO context_categoryVO = (ContextCategoryVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_CONTEXT_CATEGORY_STATEMENT);
 			ps.setInt(1, context_categoryVO.getContextCategoryID());
@@ -317,12 +294,9 @@ public class ContextCategoryMysqlDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
