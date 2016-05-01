@@ -115,7 +115,6 @@ public class ASCCPBusinessTermOracleDAO extends SRTDAO{
 				asccp_business_termVO.setidASCCPBusinessTerm(rs.getInt("idASCCP_Business_Term"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {

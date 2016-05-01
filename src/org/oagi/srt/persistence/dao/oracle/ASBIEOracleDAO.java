@@ -255,7 +255,6 @@ public class ASBIEOracleDAO extends SRTDAO{
 				list.add(asbievo);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {

@@ -200,7 +200,6 @@ public class AgencyIDListOracleDAO extends SRTDAO {
                 list.add(agencyidlistVO);
             }
             tx.commit();
-            conn.close();
         } catch (BfPersistenceException e) {
             throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
         } catch (SQLException e) {
