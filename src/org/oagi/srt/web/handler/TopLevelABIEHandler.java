@@ -1,41 +1,7 @@
 package org.oagi.srt.web.handler;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.Vector;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ApplicationScoped;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.component.UIComponent;
-
-import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
+import org.ehcache.Cache;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
@@ -45,29 +11,9 @@ import org.oagi.srt.persistence.PersistenceUtils;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ACCVO;
-import org.oagi.srt.persistence.dto.ASBIEPVO;
-import org.oagi.srt.persistence.dto.ASBIEVO;
-import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.ASCCVO;
-import org.oagi.srt.persistence.dto.BBIEPVO;
-import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.BBIE_SCVO;
-import org.oagi.srt.persistence.dto.BCCPVO;
-import org.oagi.srt.persistence.dto.BCCVO;
-import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.BusinessContextVO;
-import org.oagi.srt.persistence.dto.BusinessContextValueVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.UserVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.persistence.dto.*;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
+import org.oagi.srt.web.startup.CacheContextListener;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.ItemSelectEvent;
@@ -79,10 +25,23 @@ import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.util.*;
 
 @ManagedBean
 @ViewScoped
 public class TopLevelABIEHandler implements Serializable {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final long serialVersionUID = -2650693005373031742L;
 
@@ -410,40 +369,49 @@ public class TopLevelABIEHandler implements Serializable {
         } else if (event.getNewStep().equals(SRTConstants.TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE)) {
             // TODO if go back from the confirmation page? avoid that situation
 
-            DBAgent tx = new DBAgent();
-            Connection conn = null;
+            int abieId;
+            TreeNode toplevelNode;
             try {
-                conn = tx.open();
+                DBAgent tx = new DBAgent();
+                Connection conn = null;
+                try {
+                    conn = tx.open();
 
-                QueryCondition qc = new QueryCondition();
-                qc.add("acc_id", selected.getRoleOfACCID());
-                ACCVO accVO = (ACCVO) accDao.findObject(qc, conn);
-                topAbieVO = createABIE(accVO, bCSelected.getBusinessContextID(), 1, 0, conn);
-                // int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
-                int abieId = topAbieVO.getABIEID();
+                    QueryCondition qc = new QueryCondition();
+                    qc.add("acc_id", selected.getRoleOfACCID());
+                    ACCVO accVO = (ACCVO) accDao.findObject(qc, conn);
+                    topAbieVO = createABIE(accVO, bCSelected.getBusinessContextID(), 1, 0, conn);
+                    // int abieId = getABIEID("abie_guid", abieVO.getAbieGUID());
+                    abieId = topAbieVO.getABIEID();
 
-                ABIEView rootABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
-                rootABIEView.setAbieVO(topAbieVO);
-                root = new DefaultTreeNode(rootABIEView, null);
+                    ABIEView rootABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
+                    rootABIEView.setAbieVO(topAbieVO);
+                    root = new DefaultTreeNode(rootABIEView, null);
 
-                asbiepVO = createASBIEP(selected, abieId, -1, conn);
+                    asbiepVO = createASBIEP(selected, abieId, -1, conn);
 
-                aABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
-                aABIEView.setAbieVO(topAbieVO);
-                aABIEView.setColor("blue");
-                aABIEView.setAccVO(accVO);
-                aABIEView.setAsbiepVO(asbiepVO);
-                TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
-                createBIEs(selected.getRoleOfACCID(), abieId, -1, conn);
+                    aABIEView = new ABIEView(selected.getPropertyTerm(), abieId, "ABIE");
+                    aABIEView.setAbieVO(topAbieVO);
+                    aABIEView.setColor("blue");
+                    aABIEView.setAccVO(accVO);
+                    aABIEView.setAsbiepVO(asbiepVO);
+
+                    toplevelNode = new DefaultTreeNode(aABIEView, root);
+                    createBIEs(selected.getRoleOfACCID(), abieId, -1, conn);
+
+                    tx.commit();
+                } catch (Exception e) {
+                    tx.rollback();
+                    throw e;
+                } finally {
+                    PersistenceUtils.closeQuietly(conn);
+                    PersistenceUtils.closeQuietly(tx);
+                }
+
                 createBIEChildren(abieId, toplevelNode);
                 createBarModel();
-                tx.commit();
             } catch (Exception e) {
                 e.printStackTrace();
-                tx.rollback();
-            } finally {
-                PersistenceUtils.closeQuietly(conn);
-                PersistenceUtils.closeQuietly(tx);
             }
         }
 
@@ -487,7 +455,7 @@ public class TopLevelABIEHandler implements Serializable {
             qc2.add("biz_ctx_id", "1");
             BusinessContextVO bcVO = (BusinessContextVO) daoBC.findObject(qc2, conn);
             bCSelected = bcVO;
-            System.out.println("### Start to create a standalone " + asccpvo.getPropertyTerm());
+            logger.debug("### Start to create a standalone " + asccpvo.getPropertyTerm());
             QueryCondition qc = new QueryCondition();
             qc.add("acc_id", selected.getRoleOfACCID());
             ACCVO accVO = (ACCVO) accDao.findObject(qc, conn);
@@ -496,14 +464,14 @@ public class TopLevelABIEHandler implements Serializable {
             asbiepVO = createASBIEP(selected, abieId, -1, conn);
             createBIEs(selected.getRoleOfACCID(), abieId, -1, conn);
 
-            System.out.println("### Finish creating a standalone " + asccpvo.getPropertyTerm());
+            logger.debug("### Finish creating a standalone " + asccpvo.getPropertyTerm());
 
-            System.out.println("### Start to generate a schema of " + asccpvo.getPropertyTerm());
+            logger.debug("### Start to generate a schema of " + asccpvo.getPropertyTerm());
             StandaloneXMLSchema test = new StandaloneXMLSchema();
             ArrayList<Integer> abies = new ArrayList<Integer>();
             abies.add(abieId);
             String filepath = test.generateXMLSchema(abies, true);
-            System.out.println("### Finish generating a schema of " + asccpvo.getPropertyTerm());
+            logger.debug("### Finish generating a schema of " + asccpvo.getPropertyTerm());
 
             return filepath;
         } finally {
@@ -587,26 +555,44 @@ public class TopLevelABIEHandler implements Serializable {
         this.progress = progress;
     }
 
+    private ArrayList<SRTObject> getAssocList(ArrayList<SRTObject> list, Connection conn) throws SRTDAOException {
+        for (int i = 0; i < list.size(); i++) {
+            SRTObject srt = list.get(i);
+            if (srt instanceof ASCCVO && groupcheck(srt, conn)) {
+                ASCCVO ascc = (ASCCVO) srt;
+                QueryCondition qc = new QueryCondition();
+                qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
+                ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
+                QueryCondition qc2 = new QueryCondition();
+                qc2.add("ACC_ID", asccp.getRoleOfACCID());
+                ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
+                list = handleNestedGroup(acc, list, i, conn);
+            }
+        }
+        return list;
+    }
+
     private ArrayList<SRTObject> queryNestedChildAssoc(ACCVO accVO, Connection conn) throws SRTDAOException {
-        ArrayList<SRTObject> tmp_assoc = getBCC(accVO.getACCID(), conn);
-        tmp_assoc.addAll(getASCC(accVO.getACCID(), conn));
-        ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
-        for (int i = 0; i < tmp_assoc.size(); i++) {//
-            SRTObject srt = tmp_assoc.get(i);//
-            if (srt instanceof ASCCVO && groupcheck(srt, conn)) {//
-                ASCCVO ascc = (ASCCVO) srt;//
-                QueryCondition qc = new QueryCondition();//
-                qc.add("ASCCP_ID", ascc.getAssocToASCCPID());//
-                ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);//
-                QueryCondition qc2 = new QueryCondition();//
-                qc2.add("ACC_ID", asccp.getRoleOfACCID());//
-                ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);//
-                tmp_assoc = handleNestedGroup(acc, tmp_assoc, i, conn);//
-            }//
-        }//
+        logger.debug("enter queryNestedChildAssoc(" + accVO.getACCID() + ")");
+        long currentTimeMillis = System.currentTimeMillis();
+
+        ArrayList<BCCVO> bcc_tmp_assoc = getBCCwoAttribute(accVO.getACCID(), conn);
+        ArrayList<ASCCVO> ascc_tmp_assoc = getASCC(accVO.getACCID(), conn);
+
+        int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
+        ArrayList<SRTObject> tmp_assoc = new ArrayList<SRTObject>(size);
+        tmp_assoc.addAll(bcc_tmp_assoc);
+        tmp_assoc.addAll(ascc_tmp_assoc);
+
+        ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(size);
         SRTObject a = new SRTObject();
-        for (int i = 0; i < tmp_assoc.size(); i++)
+        for (int i = 0; i < size; i++)
             assoc.add(a);
+
+        if (SRTConstants.getDBType() == SRTConstants.DB_TYPE_ORACLE) {
+            tmp_assoc = getAssocList(tmp_assoc, conn);
+        }
+
         int attribute_cnt = 0;
         for (SRTObject srt : tmp_assoc) {
             if (srt instanceof BCCVO) {
@@ -622,93 +608,77 @@ public class TopLevelABIEHandler implements Serializable {
             if (srt instanceof BCCVO) {
                 BCCVO bcc = (BCCVO) srt;
                 if (bcc.getSequencingKey() > 0)
-                    System.out.println("BCC: " + bcc.getAssocFromACCID() + " ~ " + bcc.getAssocToBCCPID() + " (" + bcc.getSequencingKey() + ")");
+                    logger.debug("BCC: " + bcc.getAssocFromACCID() + " ~ " + bcc.getAssocToBCCPID() + " (" + bcc.getSequencingKey() + ")");
                 assoc.set(bcc.getSequencingKey() - 1 + attribute_cnt, bcc);
             } else {
                 ASCCVO ascc = (ASCCVO) srt;
-                System.out.println("ASCC: " + ascc.getAssocFromACCID() + " ~ " + ascc.getAssocToASCCPID() + " (" + ascc.getSequencingKey() + ")");
+                logger.debug("ASCC: " + ascc.getAssocFromACCID() + " ~ " + ascc.getAssocToASCCPID() + " (" + ascc.getSequencingKey() + ")");
                 assoc.set(ascc.getSequencingKey() - 1 + attribute_cnt, ascc);
             }
         }
 
         assoc.trimToSize();
-//		for(int i = 0 ; i < assoc.size(); i ++){
-//			SRTObject srt = assoc.get(i);
-//			if(srt instanceof ASCCVO && groupcheck(srt)){
-//				ASCCVO ascc = (ASCCVO)srt;
-//				QueryCondition qc = new QueryCondition();
-//				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
-//				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
-//				QueryCondition qc2 = new QueryCondition();
-//				qc2.add("ACC_ID", asccp.getRoleOfACCID());
-//				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
-//				assoc = handleNestedGroup(acc, assoc, i);
-//			}
-//		}
+        if (SRTConstants.getDBType() == SRTConstants.DB_TYPE_MYSQL) {
+            assoc = getAssocList(assoc, conn);
+        }
+
+        logger.debug("leave queryNestedChildAssoc(" + accVO.getACCID() + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
         return assoc;
     }
 
     private ArrayList<SRTObject> queryNestedChildAssoc_wo_attribute(ACCVO accVO, Connection conn) throws SRTDAOException {
+        logger.debug("enter queryNestedChildAssoc_wo_attribute(" + accVO.getACCID() + ")");
+        long currentTimeMillis = System.currentTimeMillis();
+
 //		if(accVO.getACCID()==250){
 //			int a = 30;
 //		}
-        ArrayList<SRTObject> tmp_assoc = getBCCwoAttribute(accVO.getACCID(), conn);
-        tmp_assoc.addAll(getASCC(accVO.getACCID(), conn));
-        for (int i = 0; i < tmp_assoc.size(); i++) {//
-            SRTObject srt = tmp_assoc.get(i);//
-            if (srt instanceof ASCCVO && groupcheck(srt, conn)) {//
-                ASCCVO ascc = (ASCCVO) srt;//
-                QueryCondition qc = new QueryCondition();//
-                qc.add("ASCCP_ID", ascc.getAssocToASCCPID());//
-                ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);//
-                QueryCondition qc2 = new QueryCondition();//
-                qc2.add("ACC_ID", asccp.getRoleOfACCID());//
-                ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);//
-                tmp_assoc = handleNestedGroup(acc, tmp_assoc, i, conn);//
-            }//
-        }//
-        ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
+        ArrayList<BCCVO> bcc_tmp_assoc = getBCCwoAttribute(accVO.getACCID(), conn);
+        ArrayList<ASCCVO> ascc_tmp_assoc = getASCC(accVO.getACCID(), conn);
+        int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
+        ArrayList<SRTObject> tmp_assoc = new ArrayList<SRTObject>(size);
+        tmp_assoc.addAll(bcc_tmp_assoc);
+        tmp_assoc.addAll(ascc_tmp_assoc);
+
+        ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(size);
         SRTObject a = new SRTObject();
-        for (int i = 0; i < tmp_assoc.size(); i++)
+        for (int i = 0; i < size; i++)
             assoc.add(a);
 
         for (SRTObject srt : tmp_assoc) {
             if (srt instanceof BCCVO) {
                 BCCVO bcc = (BCCVO) srt;
                 if (bcc.getSequencingKey() > 0)
-                    System.out.println("BCC: " + bcc.getAssocFromACCID() + " ~ " + bcc.getAssocToBCCPID() + " (" + bcc.getSequencingKey() + ")");
+                    logger.debug("BCC: " + bcc.getAssocFromACCID() + " ~ " + bcc.getAssocToBCCPID() + " (" + bcc.getSequencingKey() + ")");
                 assoc.set(bcc.getSequencingKey() - 1, bcc);
             } else {
                 ASCCVO ascc = (ASCCVO) srt;
-                System.out.println("ASCC: " + ascc.getAssocFromACCID() + " ~ " + ascc.getAssocToASCCPID() + " (" + ascc.getSequencingKey() + ")");
+                logger.debug("ASCC: " + ascc.getAssocFromACCID() + " ~ " + ascc.getAssocToASCCPID() + " (" + ascc.getSequencingKey() + ")");
                 assoc.set(ascc.getSequencingKey() - 1, ascc);
 
             }
         }
 
         assoc.trimToSize();
-//		for(int i = 0 ; i < assoc.size(); i ++){
-//			SRTObject srt = assoc.get(i);
-//			if(srt instanceof ASCCVO && groupcheck(srt)){
-//				ASCCVO ascc = (ASCCVO)srt;
-//				QueryCondition qc = new QueryCondition();
-//				qc.add("ASCCP_ID", ascc.getAssocToASCCPID());
-//				ASCCPVO asccp = (ASCCPVO) asccpDao.findObject(qc, conn);
-//				QueryCondition qc2 = new QueryCondition();
-//				qc2.add("ACC_ID", asccp.getRoleOfACCID());
-//				ACCVO acc = (ACCVO) accDao.findObject(qc2, conn);
-//				assoc = handleNestedGroup(acc, assoc, i);
-//			}
-//		}
+        if (SRTConstants.getDBType() == SRTConstants.DB_TYPE_MYSQL) {
+            assoc = getAssocList(assoc, conn);
+        }
+
+        logger.debug("leave queryNestedChildAssoc_wo_attribute(" + accVO.getACCID() + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
         return assoc;
     }
 
     private ArrayList<SRTObject> queryChildAssoc(ACCVO accVO, Connection conn) throws SRTDAOException {
-        ArrayList<SRTObject> tmp_assoc = getBCC(accVO.getACCID(), conn);
-        tmp_assoc.addAll(getASCC(accVO.getACCID(), conn));
-        ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(tmp_assoc.size());
+        ArrayList<BCCVO> bcc_tmp_assoc = getBCC(accVO.getACCID(), conn);
+        ArrayList<ASCCVO> ascc_tmp_assoc = getASCC(accVO.getACCID(), conn);
+        int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
+        ArrayList<SRTObject> tmp_assoc = new ArrayList<SRTObject>(size);
+        tmp_assoc.addAll(bcc_tmp_assoc);
+        tmp_assoc.addAll(ascc_tmp_assoc);
+
+        ArrayList<SRTObject> assoc = new ArrayList<SRTObject>(size);
         SRTObject a = new SRTObject();
-        for (int i = 0; i < tmp_assoc.size(); i++)
+        for (int i = 0; i < size; i++)
             assoc.add(a);
 
         int attribute_cnt = 0;
@@ -732,16 +702,22 @@ public class TopLevelABIEHandler implements Serializable {
                 assoc.set(ascc.getSequencingKey() - 1 + attribute_cnt, ascc);
             }
         }
+
         assoc.trimToSize();
+
         return assoc;
     }
 
-    private ArrayList<SRTObject> handleNestedGroup(ACCVO acc, ArrayList<SRTObject> aList, int gPosition, Connection conn) throws SRTDAOException {
+    private ArrayList<SRTObject> handleNestedGroup(ACCVO acc, ArrayList<? extends SRTObject> aList, int gPosition, Connection conn) throws SRTDAOException {
+        ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+        list.addAll(aList);
+
         ArrayList<SRTObject> bList = queryChildAssoc(acc, conn);
-        aList.addAll(gPosition, bList);
-        aList.remove(gPosition + bList.size());
-        for (int i = 0; i < aList.size(); i++) {
-            SRTObject srt = aList.get(i);
+        list.addAll(gPosition, bList);
+        list.remove(gPosition + bList.size());
+
+        for (int i = 0; i < list.size(); i++) {
+            SRTObject srt = list.get(i);
             if (srt instanceof ASCCVO && groupcheck(srt, conn)) {
                 ASCCVO ascc = (ASCCVO) srt;
                 QueryCondition qc = new QueryCondition();
@@ -750,10 +726,11 @@ public class TopLevelABIEHandler implements Serializable {
                 QueryCondition qc2 = new QueryCondition();
                 qc2.add("ACC_ID", asccp.getRoleOfACCID());
                 ACCVO re_acc = (ACCVO) accDao.findObject(qc2, conn);
-                aList = handleNestedGroup(re_acc, aList, i, conn);
+                list = handleNestedGroup(re_acc, list, i, conn);
             }
         }
-        return aList;
+
+        return list;
     }
 
     private boolean groupcheck(SRTObject srt, Connection conn) {
@@ -777,6 +754,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     private void createBIEs(int accId, int abie, double groupPosition, Connection conn)
             throws SRTDAOException, InstantiationException, IllegalAccessException {
+        logger.debug("enter createBIEs(" + accId + ", " + abie + ")");
+        long currentTimeMillis = System.currentTimeMillis();
+
         LinkedList<ACCVO> accList = new LinkedList<ACCVO>();
         ACCVO acc = getACC(accId, conn);
         accList.add(acc);
@@ -815,6 +795,8 @@ public class TopLevelABIEHandler implements Serializable {
                 }
             }
         }
+
+        logger.debug("leave createBIEs(" + accId + ", " + abie + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
     class ValueComparator implements Comparator<SRTObject> {
@@ -837,6 +819,9 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private void createBBIETree(BCCVO bccVO, int abie, double seqKey, Connection conn) throws SRTDAOException {
+        logger.debug("enter createBBIETree(" + bccVO.getBCCID() + ", " + abie + ", " + seqKey + ")");
+        long currentTimeMillis = System.currentTimeMillis();
+
         QueryCondition qc = new QueryCondition();
         qc.add("bccp_id", bccVO.getAssocToBCCPID());
         qc.add("revision_num", 0);
@@ -858,10 +843,16 @@ public class TopLevelABIEHandler implements Serializable {
 
         int bbieID = bbieVO.getBBIEID();
         createBBIESC(bbieID, bccpVO.getBDTID(), conn);
+
+        logger.debug("leave createBBIETree(" + bccVO.getBCCID() + ", " + abie + ", " + seqKey +
+                "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
     private void createASBIETree(ASCCVO asccVO, int abie, double seqKey, int seq_base, Connection conn)
             throws SRTDAOException, InstantiationException, IllegalAccessException {
+        logger.debug("enter createASBIETree(" + asccVO.getASCCID() + ", " + abie + ", " + seqKey + ")");
+        long currentTimeMillis = System.currentTimeMillis();
+
         ASCCPVO asccpVO = getASCCP(asccVO.getAssocToASCCPID(), conn);
         ACCVO accVOFromASCCP = getACC(asccpVO.getRoleOfACCID(), conn);
 //		if(accVOFromASCCP.getOAGISComponentType() == 3) {
@@ -875,50 +866,68 @@ public class TopLevelABIEHandler implements Serializable {
 
         createBIEs(accVOFromASCCP.getACCID(), abieVO.getABIEID(), -1, conn);
 //		}
+
+        logger.debug("leave createASBIETree(" + asccVO.getASCCID() + ", " + abie + ", " + seqKey +
+                "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
+    private ArrayList<BCCVO> getBCC(int accId, Connection conn) {
+        Class<Integer> keyType = Integer.class;
+        Class<ArrayList<BCCVO>> valueType = (Class) ArrayList.class;
+        Cache<Integer, ArrayList<BCCVO>> cache =
+                CacheContextListener.getChcheManager().getCache("bcc", keyType, valueType);
 
-    private ArrayList<SRTObject> getBCC(int accId, Connection conn) {
-        QueryCondition qc = new QueryCondition();
-        qc.add("from_acc_id", accId);
-        ArrayList<SRTObject> res = new ArrayList<SRTObject>();
-        try {
-            res = bccDao.findObjects(qc, conn);
-        } catch (SRTDAOException e) {
-            e.printStackTrace();
+        if (cache.containsKey(accId)) {
+            return cache.get(accId);
+        } else {
+            QueryCondition qc = new QueryCondition();
+            qc.add("from_acc_id", accId);
+            ArrayList<BCCVO> list = new ArrayList<BCCVO>();
+            try {
+                for (SRTObject obj : bccDao.findObjects(qc, conn)) {
+                    list.add((BCCVO) obj);
+                }
+                cache.put(accId, list);
+            } catch (SRTDAOException e) {
+                e.printStackTrace();
+            }
+            return list;
         }
-        return res;
     }
 
-    private ArrayList<SRTObject> getBCCwoAttribute(int accId, Connection conn) {
-        QueryCondition qc = new QueryCondition();
-        qc.add("from_acc_id", accId);
-        ArrayList<SRTObject> res = new ArrayList<SRTObject>();
-        try {
-            res = bccDao.findObjects(qc, conn);
-        } catch (SRTDAOException e) {
-            e.printStackTrace();
-        }
+    private ArrayList<BCCVO> getBCCwoAttribute(int accId, Connection conn) {
+        ArrayList<BCCVO> res = getBCC(accId, conn);
 
-        ArrayList<SRTObject> res2 = new ArrayList<SRTObject>();
-        for (SRTObject obj : res) {
-            BCCVO bcc = (BCCVO) obj;
+        ArrayList<BCCVO> res2 = new ArrayList<BCCVO>();
+        for (BCCVO bcc : res) {
             if (bcc.getSequencingKey() > 0)
-                res2.add(obj);
+                res2.add(bcc);
         }
         return res2;
     }
 
-    private ArrayList<SRTObject> getASCC(int accId, Connection conn) {
-        QueryCondition qc = new QueryCondition();
-        qc.add("from_acc_id", accId);
-        ArrayList<SRTObject> res = new ArrayList<SRTObject>();
-        try {
-            res = asccDao.findObjects(qc, conn);
-        } catch (SRTDAOException e) {
-            e.printStackTrace();
+    private ArrayList<ASCCVO> getASCC(int accId, Connection conn) {
+        Class<Integer> keyType = Integer.class;
+        Class<ArrayList<ASCCVO>> valueType = (Class) ArrayList.class;
+        Cache<Integer, ArrayList<ASCCVO>> cache =
+                CacheContextListener.getChcheManager().getCache("ascc", keyType, valueType);
+
+        if (cache.containsKey(accId)) {
+            return cache.get(accId);
+        } else {
+            QueryCondition qc = new QueryCondition();
+            qc.add("from_acc_id", accId);
+            ArrayList<ASCCVO> list = new ArrayList<ASCCVO>();
+            try {
+                for (SRTObject obj : asccDao.findObjects(qc, conn)) {
+                    list.add((ASCCVO) obj);
+                }
+                cache.put(accId, list);
+            } catch (SRTDAOException e) {
+                e.printStackTrace();
+            }
+            return list;
         }
-        return res;
     }
 
 
@@ -936,16 +945,26 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private ACCVO getACC(int accId, Connection conn) {
-        QueryCondition qc = new QueryCondition();
-        qc.add("ACC_ID", accId);
-        qc.add("revision_num", 0);
-        ACCVO accVO = null;
-        try {
-            accVO = (ACCVO) accDao.findObject(qc, conn);
-        } catch (SRTDAOException e) {
-            e.printStackTrace();
+        Cache<Integer, ACCVO> cache =
+                CacheContextListener.getChcheManager().getCache("acc", Integer.class, ACCVO.class);
+
+        if (cache.containsKey(accId)) {
+            return cache.get(accId);
+        } else {
+            QueryCondition qc = new QueryCondition();
+            qc.add("ACC_ID", accId);
+            qc.add("revision_num", 0);
+            ACCVO accVO = null;
+            try {
+                accVO = (ACCVO) accDao.findObject(qc, conn);
+                if (accVO != null) {
+                    cache.put(accId, accVO);
+                }
+            } catch (SRTDAOException e) {
+                e.printStackTrace();
+            }
+            return accVO;
         }
-        return accVO;
     }
 
     private ArrayList<SRTObject> getASBIEsFromABIE(int abieid, Connection conn) {
@@ -1577,7 +1596,7 @@ public class TopLevelABIEHandler implements Serializable {
         selectedBod = (ABIEView) event.getObject();
         //root = new DefaultTreeNode(selectedBod, null);
 
-        System.out.println("#### " + selectedBod.getName());
+        logger.debug("#### " + selectedBod.getName());
         ABIEView rootABIEView = new ABIEView(selectedBod.getName(), selectedBod.getId(), "ROOT");
         rootABIEView.setAbieVO(selectedBod.getAbieVO());
         root = new DefaultTreeNode(rootABIEView, null);
@@ -1765,11 +1784,11 @@ public class TopLevelABIEHandler implements Serializable {
     public void onEdit() {
         FacesContext context = FacesContext.getCurrentInstance();
         String objectId = context.getExternalContext().getRequestParameterMap().get("objectId");
-        System.out.println("###objectId " + objectId);
+        logger.debug("###objectId " + objectId);
 //
 //	    ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 //		try {
-//			System.out.println("### " + selectedBod.getName());
+//			logger.debug("### " + selectedBod.getName());
 //
 //			ABIEView av = new ABIEView("AAA", 1, "ABIE");
 //			root = new DefaultTreeNode(av, null);
@@ -1784,7 +1803,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void onBCRowSelect(SelectEvent event) {
-        System.out.println(((BusinessContextVO) event.getObject()).getBusinessContextID() + "Business context Selected");
+        logger.debug(((BusinessContextVO) event.getObject()).getBusinessContextID() + "Business context Selected");
     }
 
 
@@ -1792,7 +1811,7 @@ public class TopLevelABIEHandler implements Serializable {
         bCSelected = bcVO;
         FacesMessage msg = new FacesMessage(bCSelected.getName(), bCSelected.getName());
         FacesContext.getCurrentInstance().addMessage(null, msg);
-        System.out.println(bCSelected.getBusinessContextID() + " is selected");
+        logger.debug(bCSelected.getBusinessContextID() + " is selected");
     }
 
     public void onBCSelect(BusinessContextHandler bcH) {
@@ -1896,7 +1915,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     public void updateTree() {
         ABIEView aABIEView = (ABIEView) selectedTreeNode.getData();
-        System.out.println("### " + aABIEView.getName());
+        logger.debug("### " + aABIEView.getName());
     }
 
     public void showDetails() {
@@ -2004,7 +2023,7 @@ public class TopLevelABIEHandler implements Serializable {
             qc.add("code_list_id", aBDTPrimitiveRestrictionVO.getCodeListID());
             codeLists = daoCL.findObjects(qc);
 
-            System.out.println("##### " + codeLists);
+            logger.debug("##### " + codeLists);
         } catch (SRTDAOException e) {
             e.printStackTrace();
         }
@@ -2028,7 +2047,7 @@ public class TopLevelABIEHandler implements Serializable {
         FacesMessage msg = new FacesMessage(((CodeListVO) event.getObject()).getName(), String.valueOf(((CodeListVO) event.getObject()).getCodeListID()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
         codeListVO = (CodeListVO) event.getObject();
-        System.out.println("######## " + codeListVO.getName());
+        logger.debug("######## " + codeListVO.getName());
     }
 
     public void onCodeListRowUnselect(UnselectEvent event) {
@@ -2048,7 +2067,7 @@ public class TopLevelABIEHandler implements Serializable {
     public void onCodeListChosen(SelectEvent event) {
         CodeListHandler ch = (CodeListHandler) event.getObject();
         codeListVO = (CodeListVO) ch.getSelected();
-        System.out.println(codeListVO.getName());
+        logger.debug(codeListVO.getName());
     }
 
     public void onDerivedCodeListChosen(SelectEvent event) {
