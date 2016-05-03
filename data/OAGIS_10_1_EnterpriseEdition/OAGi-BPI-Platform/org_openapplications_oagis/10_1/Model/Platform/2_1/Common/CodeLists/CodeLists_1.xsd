@@ -239,7 +239,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ControlCodeContentType" id="oagis-id-f01cb1632cbd4ae89cf1b9841c40e2f0">
-		<xsd:union memberTypes="xsd:token oacl_CountryCodeEnumerationType"/>
+		<xsd:union memberTypes="xsd:token oacl_ControlCodeEnumerationType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ControlComponentCodeEnumerationType" id="oagis-id-af274f44caad4162804061f2342a3715">
 		<xsd:restriction base="xsd:token">
@@ -569,7 +569,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_EngineeringWorkRequestStatusCodeContentType" id="oagis-id-0073c51b321e42e795d1b48116a7620f">
-		<xsd:union memberTypes="oacl_EngineeringWorkRequestCodeEnumerationType xsd:token"/>
+		<xsd:union memberTypes="oacl_EngineeringWorkRequestStatusCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_FinalAgentInstructionCodeEnumerationType" id="oagis-id-ff46417e01b640a78776bd03ec58fc8f">
 		<xsd:restriction base="xsd:token">
@@ -659,7 +659,7 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_MatchCodeContentType" id="oagis-id-0a1384322190497499cf2ca6b26d8934">
 		<xsd:union memberTypes="oacl_MatchCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_MatchDocumentEnumerationType" id="oagis-id-7c9d9573d51546f89f0b7f09566acc7a">
+	<xsd:simpleType name="oacl_MatchDocumentCodeEnumerationType" id="oagis-id-7c9d9573d51546f89f0b7f09566acc7a">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Invoice"/>
 			<xsd:enumeration value="Purchase Order"/>
@@ -668,7 +668,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_MatchDocumentCodeContentType" id="oagis-id-f516abfd2be844d3acf481ed8b1399c3">
-		<xsd:union memberTypes="oacl_MatchDocumentEnumerationType xsd:token"/>
+		<xsd:union memberTypes="oacl_MatchDocumentCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_MIMECodeContentType" id="oagis-id-51ed08216606417b9b9266b464c204f7">
 		<xsd:union memberTypes="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeContentType xsd:token"/>
@@ -939,7 +939,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:union memberTypes="oacl_ResponseCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_RiskTypeEnumerationType" id="oagis-id-4f337a2efc5c409b9af300a8a359ce89">
+	<xsd:simpleType name="oacl_RiskCodeEnumerationType" id="oagis-id-4f337a2efc5c409b9af300a8a359ce89">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Compliance with applicable laws and regulations"/>
 			<xsd:enumeration value="Effectiveness and efficiency of operations"/>
@@ -947,7 +947,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_RiskCodeContentType" id="oagis-id-ba592aa0ac6e4b75a4079327b9e988c4">
-		<xsd:union memberTypes="xsd:token oacl_RiskTypeEnumerationType"/>
+		<xsd:union memberTypes="xsd:token oacl_RiskCodeEnumerationType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_SalesActivityCodeEnumerationType" id="oagis-id-85c9478b650b454cb1b787b2f73c5bd3">
 		<xsd:restriction base="xsd:token">
