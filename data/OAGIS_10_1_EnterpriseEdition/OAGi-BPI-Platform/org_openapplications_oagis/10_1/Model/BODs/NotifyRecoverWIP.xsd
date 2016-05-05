@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyRecoverWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RecoverWIP.xsd"/>
+	<xsd:element name="NotifyRecoverWIP" type="NotifyRecoverWIPType" id="oagis-id-8b48b57c8b25409b87fabc6d4337010b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyRecoverWIP is to notify a Manufacturing Application of the creation of usable production materials from material previously considered to be unsuitable for production use. This is most often likely to represent a return to production of scrap material. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates what is being recovered, the quantity being recovered, and the Notifying step at which the recovered material is to re-enter the production Notify, along with the time at which this event occurred.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyRecoverWIPType" id="oagis-id-b5fe34dd50ec47fc9f3a28ef42b70234">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyRecoverWIPDataAreaType" id="oagis-id-4f9c0ef834a24b96a705f34c76b767b6">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyRecoverWIP. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (RecoverWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyRecoverWIPDataAreaType" id="oagis-id-bff0911bf7d54a41a95bc46fe79f6b19">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-294b476048c0448a9b960fbabe9d74c9"/>
+			<xsd:element ref="RecoverWIP" maxOccurs="unbounded" id="oagis-id-567f1e87162f47b28fb14af7e296f6ef"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncCarrierRoute.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CarrierRoute.xsd"/>
+        <xsd:element name="SyncCarrierRoute" type="SyncCarrierRouteType" id="oagis-id-8f5f538033c348cfaac5419708e02e48">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncCarrierRoute is to enable an application to provide  Carrier Route information from another business application module.  The SyncCarrierRoute is typiically provided in a publish/subscribe or broadcast environment. Where the sending system is the master application of the information being provided, where the information is sent to other business applications that need to know the information.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncCarrierRouteType" id="oagis-id-4f71f981df604b3484c37e4dcb52cdd8">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncCarrierRouteDataAreaType" id="oagis-id-50c93a37cc054eb6bdde4dfbf78cff3c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncCarrierRoute. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (CarrierRoute).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncCarrierRouteDataAreaType" id="oagis-id-26d1fe93c0da4505abbaeb65fbc760d4">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-f59ad8e8a59540fc98a6648ad77f4020"/>
+                        <xsd:element ref="CarrierRoute" maxOccurs="unbounded" id="oagis-id-3a3718021add4aa5af879e2bb1b78c27"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

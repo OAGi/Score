@@ -1,12 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
@@ -15,7 +8,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.DTVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
 *
@@ -50,35 +48,37 @@ public class BBIEOracleDAO extends SRTDAO{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	public int insertObject(SRTObject obj) throws SRTDAOException {
-		DBAgent tx = new DBAgent();
-		BBIEVO bbieVO = (BBIEVO)obj;
-		Connection conn = null;
-		PreparedStatement ps = null;
-		int key = -1;
-		try {
-			String keys[] = {"BBIE_ID"};
-			conn = tx.open();
-			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
-			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
-				ps.setString(1, bbieVO.getBbieGuid());
 
-			ps.setInt(2, bbieVO.getBasedBCCID());
-			ps.setInt(3, bbieVO.getAssocFromABIEID());
-			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() < 1)
-				ps.setNull(5, java.sql.Types.INTEGER);
-			else
-				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() < 1)
-				ps.setNull(6, java.sql.Types.INTEGER);
-			else
-				ps.setInt(6, bbieVO.getCodeListId());
-			ps.setInt(7, bbieVO.getCardinalityMin());
-			ps.setInt(8, bbieVO.getCardinalityMax());
+    public int insertObject(SRTObject obj) throws SRTDAOException {
+        DBAgent tx = new DBAgent();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        BBIEVO bbieVO = (BBIEVO) obj;
+        int key = -1;
+        try {
+            String keys[] = {"BBIE_ID"};
+            conn = tx.open();
+            ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
+            if (bbieVO.getBbieGuid() == null || bbieVO.getBbieGuid().length() == 0 || bbieVO.getBbieGuid().isEmpty() || bbieVO.getBbieGuid().equals(""))
+                ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+            else
+                ps.setString(1, bbieVO.getBbieGuid());
+
+            ps.setInt(2, bbieVO.getBasedBCCID());
+            ps.setInt(3, bbieVO.getAssocFromABIEID());
+            ps.setInt(4, bbieVO.getAssocToBBIEPID());
+            if (bbieVO.getBdtPrimitiveRestrictionId() < 1)
+                ps.setNull(5, java.sql.Types.INTEGER);
+            else
+                ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
+            if (bbieVO.getCodeListId() < 1)
+                ps.setNull(6, java.sql.Types.INTEGER);
+            else
+                ps.setInt(6, bbieVO.getCodeListId());
+            ps.setInt(7, bbieVO.getCardinalityMin());
+            ps.setInt(8, bbieVO.getCardinalityMax());
 //			if( bbieVO.getDefaultText()==null ||  bbieVO.getDefaultText().length()==0 ||  bbieVO.getDefaultText().isEmpty() ||  bbieVO.getDefaultText().equals(""))				
 //				ps.setString(9,"\u00A0");
 //			else 	
@@ -104,65 +104,59 @@ public class BBIEOracleDAO extends SRTDAO{
 //			else 	
 				ps.setString(14, bbieVO.getRemark());
 
-			ps.setInt(15, bbieVO.getCreatedByUserId());
-			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
-			ps.setDouble(17, bbieVO.getSequencing_key());
-			ps.executeUpdate();
-			
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()){
-			    key = (int) rs.getLong(1);
-			}
-			rs.close();
-			ps.close();
-			tx.commit();
-		} catch (BfPersistenceException e) {
-			tx.rollback();
-			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			tx.rollback();
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
-		}
-		return key;
-	}
-	
-	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
-		BBIEVO bbieVO = (BBIEVO)obj;
-		PreparedStatement ps = null;
-		int key = -1;
-		try {
-			String[] keys = {"BBIE_ID"};
-			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
-			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
-				ps.setString(1, bbieVO.getBbieGuid());
+            ps.setInt(15, bbieVO.getCreatedByUserId());
+            ps.setInt(16, bbieVO.getLastUpdatedByUserId());
+            ps.setDouble(17, bbieVO.getSequencing_key());
+            ps.executeUpdate();
 
-			ps.setInt(2, bbieVO.getBasedBCCID());
-			ps.setInt(3, bbieVO.getAssocFromABIEID());
-			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() <1)
-				ps.setNull(5, java.sql.Types.INTEGER);
-			else
-				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() <1)
-				ps.setNull(6, java.sql.Types.INTEGER);
-			else
-				ps.setInt(6, bbieVO.getCodeListId());
-			ps.setInt(7, bbieVO.getCardinalityMin());
-			ps.setInt(8, bbieVO.getCardinalityMax());
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                key = (int) rs.getLong(1);
+            }
+
+            tx.commit();
+        } catch (BfPersistenceException e) {
+            tx.rollback();
+            throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
+        } catch (SQLException e) {
+            tx.rollback();
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(rs);
+            closeQuietly(ps);
+            closeQuietly(conn);
+            closeQuietly(tx);
+        }
+        return key;
+    }
+
+    public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        BBIEVO bbieVO = (BBIEVO) obj;
+        int key = -1;
+        try {
+            String[] keys = {"BBIE_ID"};
+            ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, keys);
+            if (bbieVO.getBbieGuid() == null || bbieVO.getBbieGuid().length() == 0 || bbieVO.getBbieGuid().isEmpty() || bbieVO.getBbieGuid().equals(""))
+                ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+            else
+                ps.setString(1, bbieVO.getBbieGuid());
+
+            ps.setInt(2, bbieVO.getBasedBCCID());
+            ps.setInt(3, bbieVO.getAssocFromABIEID());
+            ps.setInt(4, bbieVO.getAssocToBBIEPID());
+            if (bbieVO.getBdtPrimitiveRestrictionId() < 1)
+                ps.setNull(5, java.sql.Types.INTEGER);
+            else
+                ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
+            if (bbieVO.getCodeListId() < 1)
+                ps.setNull(6, java.sql.Types.INTEGER);
+            else
+                ps.setInt(6, bbieVO.getCodeListId());
+            ps.setInt(7, bbieVO.getCardinalityMin());
+            ps.setInt(8, bbieVO.getCardinalityMax());
 //			if( bbieVO.getDefaultText()==null ||  bbieVO.getDefaultText().length()==0 ||  bbieVO.getDefaultText().isEmpty() ||  bbieVO.getDefaultText().equals(""))				
 //				ps.setString(9,"\u00A0");
 //			else 	
@@ -188,160 +182,141 @@ public class BBIEOracleDAO extends SRTDAO{
 //			else 	
 				ps.setString(14, bbieVO.getRemark());
 
-			ps.setInt(15, bbieVO.getCreatedByUserId());
-			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
-			ps.setDouble(17, bbieVO.getSequencing_key());
+            ps.setInt(15, bbieVO.getCreatedByUserId());
+            ps.setInt(16, bbieVO.getLastUpdatedByUserId());
+            ps.setDouble(17, bbieVO.getSequencing_key());
 
-			ps.executeUpdate();
-			
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()){
-			    key = (int) rs.getLong(1);
-			}
-			rs.close();
-			ps.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-		}
-		return key;
-	}
+            ps.executeUpdate();
 
-	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
-		DBAgent tx = new DBAgent();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		BBIEVO bbieVO = new BBIEVO();
-		try {
-			Connection conn = tx.open();
-			String sql = _FIND_BBIE_STATEMENT;
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                key = (int) rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(rs);
+            closeQuietly(ps);
+        }
+        return key;
+    }
 
-			String WHERE_OR_AND = " WHERE ";
-			int nCond = qc.getSize();
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
-					WHERE_OR_AND = " AND ";
-				}
-			}
-			ps = conn.prepareStatement(sql);
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					Object value = qc.getValue(n);
-					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
-					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
-					}
-				}
-			}
+    public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
+        DBAgent tx = new DBAgent();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
-				bbieVO.setBbieGuid(rs.getString("GUID"));
-				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
-				bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
-				bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
-				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
-				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
-				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				bbieVO.setDefaultText(rs.getString("Default_Value"));
-				bbieVO.setNillable(rs.getInt("is_Nillable"));
-				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setIsNull(rs.getInt("is_Null"));
-				bbieVO.setDefinition(rs.getString("Definition"));
-				bbieVO.setRemark(rs.getString("Remark"));
-				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
-				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
-				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
-				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
-			}
-			tx.commit();
-			conn.close();
-		} catch (BfPersistenceException e) {
-			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
-		} catch (SQLException e) {
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
-		}
-		return bbieVO;
-	}
+        BBIEVO bbieVO = new BBIEVO();
+        try {
+            conn = tx.open();
+            String sql = _FIND_BBIE_STATEMENT;
 
-	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+            String WHERE_OR_AND = " WHERE ";
+            int nCond = qc.getSize();
+            if (nCond > 0) {
+                for (int n = 0; n < nCond; n++) {
+                    sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+                    WHERE_OR_AND = " AND ";
+                }
+            }
+            ps = conn.prepareStatement(sql);
+            if (nCond > 0) {
+                for (int n = 0; n < nCond; n++) {
+                    Object value = qc.getValue(n);
+                    if (value instanceof String) {
+                        ps.setString(n + 1, (String) value);
+                    } else if (value instanceof Integer) {
+                        ps.setInt(n + 1, ((Integer) value).intValue());
+                    }
+                }
+            }
 
-		DBAgent tx = new DBAgent();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			Connection conn = tx.open();
-			String sql = _FIND_ALL_BBIE_STATEMENT;
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				BBIEVO bbieVO = new BBIEVO();
-				bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
-				bbieVO.setBbieGuid(rs.getString("GUID"));
-				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
-				bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
-				bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
-				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
-				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
-				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				bbieVO.setDefaultText(rs.getString("Default_Value"));
-				bbieVO.setNillable(rs.getInt("is_Nillable"));
-				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setIsNull(rs.getInt("is_Null"));
-				bbieVO.setDefinition(rs.getString("Definition"));
-				bbieVO.setRemark(rs.getString("Remark"));
-				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
-				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
-				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
-				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
-				list.add(bbieVO);
-			}
-			tx.commit();
-			conn.close();
-		} catch (BfPersistenceException e) {
-			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
-		} catch (SQLException e) {
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
-		}
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
+                bbieVO.setBbieGuid(rs.getString("GUID"));
+                bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
+                bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+                bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
+                bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
+                bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
+                bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+                bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+                bbieVO.setDefaultText(rs.getString("Default_Value"));
+                bbieVO.setNillable(rs.getInt("is_Nillable"));
+                bbieVO.setFixedValue(rs.getString("Fixed_Value"));
+                bbieVO.setIsNull(rs.getInt("is_Null"));
+                bbieVO.setDefinition(rs.getString("Definition"));
+                bbieVO.setRemark(rs.getString("Remark"));
+                bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
+                bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
+                bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+                bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
+            }
+            tx.commit();
+        } catch (BfPersistenceException e) {
+            throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+        } catch (SQLException e) {
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(rs);
+            closeQuietly(ps);
+            closeQuietly(conn);
+            closeQuietly(tx);
+        }
+        return bbieVO;
+    }
 
-		return list;
-	}
+    public ArrayList<SRTObject> findObjects() throws SRTDAOException {
+        DBAgent tx = new DBAgent();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+        try {
+            conn = tx.open();
+            String sql = _FIND_ALL_BBIE_STATEMENT;
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                BBIEVO bbieVO = new BBIEVO();
+                bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
+                bbieVO.setBbieGuid(rs.getString("GUID"));
+                bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
+                bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+                bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
+                bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
+                bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
+                bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+                bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+                bbieVO.setDefaultText(rs.getString("Default_Value"));
+                bbieVO.setNillable(rs.getInt("is_Nillable"));
+                bbieVO.setFixedValue(rs.getString("Fixed_Value"));
+                bbieVO.setIsNull(rs.getInt("is_Null"));
+                bbieVO.setDefinition(rs.getString("Definition"));
+                bbieVO.setRemark(rs.getString("Remark"));
+                bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
+                bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
+                bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+                bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
+                list.add(bbieVO);
+            }
+            tx.commit();
+        } catch (BfPersistenceException e) {
+            throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+        } catch (SQLException e) {
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(rs);
+            closeQuietly(ps);
+            closeQuietly(conn);
+            closeQuietly(tx);
+        }
+
+        return list;
+    }
 
 	private final String _UPDATE_BBIE_STATEMENT = 
 			"UPDATE " + _tableName
@@ -352,32 +327,34 @@ public class BBIEOracleDAO extends SRTDAO{
 
 	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
-		DBAgent tx = new DBAgent();
-		BBIEVO bbieVO = (BBIEVO)obj;
-		PreparedStatement ps = null;
-		try {
-			Connection conn = tx.open();
+        DBAgent tx = new DBAgent();
+        Connection conn = null;
+        PreparedStatement ps = null;
 
-			ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
-			
-			if( bbieVO.getBbieGuid()==null ||  bbieVO.getBbieGuid().length()==0 ||  bbieVO.getBbieGuid().isEmpty() ||  bbieVO.getBbieGuid().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
-				ps.setString(1, bbieVO.getBbieGuid());
+        BBIEVO bbieVO = (BBIEVO) obj;
+        try {
+            conn = tx.open();
 
-			ps.setInt(2, bbieVO.getBasedBCCID());
-			ps.setInt(3, bbieVO.getAssocFromABIEID());
-			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() <1)
-				ps.setNull(5, java.sql.Types.INTEGER);
-			else
-				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() <1)
-				ps.setNull(6, java.sql.Types.INTEGER);
-			else
-				ps.setInt(6, bbieVO.getCodeListId());
-			ps.setInt(7, bbieVO.getCardinalityMin());
-			ps.setInt(8, bbieVO.getCardinalityMax());
+            ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
+
+            if (bbieVO.getBbieGuid() == null || bbieVO.getBbieGuid().length() == 0 || bbieVO.getBbieGuid().isEmpty() || bbieVO.getBbieGuid().equals(""))
+                ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+            else
+                ps.setString(1, bbieVO.getBbieGuid());
+
+            ps.setInt(2, bbieVO.getBasedBCCID());
+            ps.setInt(3, bbieVO.getAssocFromABIEID());
+            ps.setInt(4, bbieVO.getAssocToBBIEPID());
+            if (bbieVO.getBdtPrimitiveRestrictionId() < 1)
+                ps.setNull(5, java.sql.Types.INTEGER);
+            else
+                ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
+            if (bbieVO.getCodeListId() < 1)
+                ps.setNull(6, java.sql.Types.INTEGER);
+            else
+                ps.setInt(6, bbieVO.getCodeListId());
+            ps.setInt(7, bbieVO.getCardinalityMin());
+            ps.setInt(8, bbieVO.getCardinalityMax());
 //			if( bbieVO.getDefaultText()==null ||  bbieVO.getDefaultText().length()==0 ||  bbieVO.getDefaultText().isEmpty() ||  bbieVO.getDefaultText().equals(""))				
 //				ps.setString(9,"\u00A0");
 //			else 	
@@ -402,147 +379,131 @@ public class BBIEOracleDAO extends SRTDAO{
 //			else 	
 				ps.setString(14, bbieVO.getRemark());
 
-			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
-			ps.setDouble(16, bbieVO.getSequencing_key());
-			ps.setInt(17, bbieVO.isUsed() ? 1 : 0);
-			ps.setInt(18, bbieVO.getBBIEID());
-			
-			ps.executeUpdate();
+            ps.setInt(15, bbieVO.getLastUpdatedByUserId());
+            ps.setDouble(16, bbieVO.getSequencing_key());
+            ps.setInt(17, bbieVO.getBBIEID());
 
-			tx.commit();
-			conn.close();
-		} catch (BfPersistenceException e) {
-			tx.rollback(e);
-			throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
-		} catch (SQLException e) {
-			tx.rollback(e);
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
-		}
+            ps.executeUpdate();
 
-		return true;
-	}
+            tx.commit();
+        } catch (BfPersistenceException e) {
+            tx.rollback(e);
+            throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
+        } catch (SQLException e) {
+            tx.rollback(e);
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(ps);
+            closeQuietly(conn);
+            closeQuietly(tx);
+        }
 
-	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		BBIEVO bbieVO = (BBIEVO)obj;
+        return true;
+    }
 
-		DBAgent tx = new DBAgent();
-		PreparedStatement ps = null;
-		try {
-			Connection conn = tx.open();
+    public boolean deleteObject(SRTObject obj) throws SRTDAOException {
+        DBAgent tx = new DBAgent();
+        Connection conn = null;
+        PreparedStatement ps = null;
 
-			ps = conn.prepareStatement(_DELETE_BBIE_STATEMENT);
-			ps.setInt(1, bbieVO.getBBIEID());
-			ps.executeUpdate();
+        BBIEVO bbieVO = (BBIEVO) obj;
+        try {
+            conn = tx.open();
 
-			tx.commit();
-			conn.close();
-		} catch (BfPersistenceException e) {
-			tx.rollback(e);
-			throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);
-		} catch (SQLException e) {
-			tx.rollback(e);
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
-		}
+            ps = conn.prepareStatement(_DELETE_BBIE_STATEMENT);
+            ps.setInt(1, bbieVO.getBBIEID());
+            ps.executeUpdate();
 
-		return true;
+            tx.commit();
+        } catch (BfPersistenceException e) {
+            tx.rollback(e);
+            throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);
+        } catch (SQLException e) {
+            tx.rollback(e);
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(ps);
+            closeQuietly(conn);
+            closeQuietly(tx);
+        }
 
-	}
+        return true;
+    }
 
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+    @Override
+    public ArrayList<SRTObject> findObjects(QueryCondition qc)
+            throws SRTDAOException {
+        DBAgent tx = new DBAgent();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-		DBAgent tx = new DBAgent();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			Connection conn = tx.open();
-			String sql = _FIND_BBIE_STATEMENT;
+        ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+        try {
+            conn = tx.open();
+            String sql = _FIND_BBIE_STATEMENT;
 
-			String WHERE_OR_AND = " WHERE ";
-			int nCond = qc.getSize();
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
-					WHERE_OR_AND = " AND ";
-				}
-			}
-			ps = conn.prepareStatement(sql);
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					Object value = qc.getValue(n);
-					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
-					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
-					}
-				}
-			}
+            String WHERE_OR_AND = " WHERE ";
+            int nCond = qc.getSize();
+            if (nCond > 0) {
+                for (int n = 0; n < nCond; n++) {
+                    sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+                    WHERE_OR_AND = " AND ";
+                }
+            }
+            ps = conn.prepareStatement(sql);
+            if (nCond > 0) {
+                for (int n = 0; n < nCond; n++) {
+                    Object value = qc.getValue(n);
+                    if (value instanceof String) {
+                        ps.setString(n + 1, (String) value);
+                    } else if (value instanceof Integer) {
+                        ps.setInt(n + 1, ((Integer) value).intValue());
+                    }
+                }
+            }
 
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				BBIEVO bbieVO = new BBIEVO();
-				bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
-				bbieVO.setBbieGuid(rs.getString("GUID"));
-				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
-				bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
-				bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
-				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
-				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
-				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				bbieVO.setDefaultText(rs.getString("Default_Value"));
-				bbieVO.setNillable(rs.getInt("is_Nillable"));
-				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setIsNull(rs.getInt("is_Null"));
-				bbieVO.setDefinition(rs.getString("Definition"));
-				bbieVO.setRemark(rs.getString("Remark"));
-				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
-				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
-				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
-				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
-				list.add(bbieVO);
-			}
-			tx.commit();
-			conn.close();
-		} catch (BfPersistenceException e) {
-			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
-		} catch (SQLException e) {
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
-		}
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                BBIEVO bbieVO = new BBIEVO();
+                bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
+                bbieVO.setBbieGuid(rs.getString("GUID"));
+                bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
+                bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+                bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
+                bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
+                bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
+                bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+                bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+                bbieVO.setDefaultText(rs.getString("Default_Value"));
+                bbieVO.setNillable(rs.getInt("is_Nillable"));
+                bbieVO.setFixedValue(rs.getString("Fixed_Value"));
+                bbieVO.setIsNull(rs.getInt("is_Null"));
+                bbieVO.setDefinition(rs.getString("Definition"));
+                bbieVO.setRemark(rs.getString("Remark"));
+                bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
+                bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
+                bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+                bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
+                list.add(bbieVO);
+            }
+            tx.commit();
+        } catch (BfPersistenceException e) {
+            throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
+        } catch (SQLException e) {
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(rs);
+            closeQuietly(ps);
+            closeQuietly(conn);
+            closeQuietly(tx);
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
+    @Override
+    public SRTObject findObject(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
 		// TODO Auto-generated method stub
 		return null;
@@ -551,95 +512,86 @@ public class BBIEOracleDAO extends SRTDAO{
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-		try {
-			String sql = _FIND_BBIE_STATEMENT;
+        ArrayList<SRTObject> list = new ArrayList<SRTObject>();
+        try {
+            String sql = _FIND_BBIE_STATEMENT;
 
-			String WHERE_OR_AND = " WHERE ";
-			int nCond = qc.getSize();
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					sql += WHERE_OR_AND + qc.getField(n) + " = ?";
-					WHERE_OR_AND = " AND ";
-				}
-			}
-			
-			int nCond2 = qc.getLikeSize();
-			if (nCond2 > 0) {
-				for (int n = 0; n < nCond2; n++) {
-					sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
-					WHERE_OR_AND = " AND ";
-				}
-			}
-			
-			ps = conn.prepareStatement(sql);
-			if (nCond > 0) {
-				for (int n = 0; n < nCond; n++) {
-					Object value = qc.getValue(n);
-					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
-					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
-					}
-				}
-			}
-			
-			if (nCond2 > 0) {
-				for (int n = 0; n < nCond2; n++) {
-					Object value = qc.getLikeValue(n);
-					if (value instanceof String) {
-						ps.setString(nCond + n + 1, (String) value);
-					} else if (value instanceof Integer) {
-						ps.setInt(nCond + n + 1, ((Integer) value).intValue());
-					}
-				}
-			}
+            String WHERE_OR_AND = " WHERE ";
+            int nCond = qc.getSize();
+            if (nCond > 0) {
+                for (int n = 0; n < nCond; n++) {
+                    sql += WHERE_OR_AND + qc.getField(n) + " = ?";
+                    WHERE_OR_AND = " AND ";
+                }
+            }
 
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				BBIEVO bbieVO = new BBIEVO();
-				bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
-				bbieVO.setBbieGuid(rs.getString("GUID"));
-				bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
-				bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
-				bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
-				bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
-				bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
-				bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
-				bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
-				bbieVO.setDefaultText(rs.getString("Default_Value"));
-				bbieVO.setNillable(rs.getInt("is_Nillable"));
-				bbieVO.setFixedValue(rs.getString("Fixed_Value"));
-				bbieVO.setIsNull(rs.getInt("is_Null"));
-				bbieVO.setDefinition(rs.getString("Definition"));
-				bbieVO.setRemark(rs.getString("Remark"));
-				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
-				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
-				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
-				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
-				list.add(bbieVO);
-			}
-			
-		} catch (SQLException e) {
-			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
-		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-		}
-		return list;
-		
-	}
+            int nCond2 = qc.getLikeSize();
+            if (nCond2 > 0) {
+                for (int n = 0; n < nCond2; n++) {
+                    sql += WHERE_OR_AND + qc.getLikeField(n) + " like ?";
+                    WHERE_OR_AND = " AND ";
+                }
+            }
+
+            ps = conn.prepareStatement(sql);
+            if (nCond > 0) {
+                for (int n = 0; n < nCond; n++) {
+                    Object value = qc.getValue(n);
+                    if (value instanceof String) {
+                        ps.setString(n + 1, (String) value);
+                    } else if (value instanceof Integer) {
+                        ps.setInt(n + 1, ((Integer) value).intValue());
+                    }
+                }
+            }
+
+            if (nCond2 > 0) {
+                for (int n = 0; n < nCond2; n++) {
+                    Object value = qc.getLikeValue(n);
+                    if (value instanceof String) {
+                        ps.setString(nCond + n + 1, (String) value);
+                    } else if (value instanceof Integer) {
+                        ps.setInt(nCond + n + 1, ((Integer) value).intValue());
+                    }
+                }
+            }
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                BBIEVO bbieVO = new BBIEVO();
+                bbieVO.setBBIEID(rs.getInt("BBIE_ID"));
+                bbieVO.setBbieGuid(rs.getString("GUID"));
+                bbieVO.setBasedBCCID(rs.getInt("Based_BCC_ID"));
+                bbieVO.setAssocFromABIEID(rs.getInt("From_ABIE_ID"));
+                bbieVO.setAssocToBBIEPID(rs.getInt("To_BBIEP_ID"));
+                bbieVO.setBdtPrimitiveRestrictionId(rs.getInt("bdt_pri_restri_id"));
+                bbieVO.setCodeListId(rs.getInt("Code_List_ID"));
+                bbieVO.setCardinalityMin(rs.getInt("Cardinality_Min"));
+                bbieVO.setCardinalityMax(rs.getInt("Cardinality_Max"));
+                bbieVO.setDefaultText(rs.getString("Default_Value"));
+                bbieVO.setNillable(rs.getInt("is_Nillable"));
+                bbieVO.setFixedValue(rs.getString("Fixed_Value"));
+                bbieVO.setIsNull(rs.getInt("is_Null"));
+                bbieVO.setDefinition(rs.getString("Definition"));
+                bbieVO.setRemark(rs.getString("Remark"));
+                bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
+                bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
+                bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+                bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
+                list.add(bbieVO);
+            }
+
+        } catch (SQLException e) {
+            throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
+        } finally {
+            closeQuietly(rs);
+            closeQuietly(ps);
+        }
+        return list;
+    }
 
 	@Override
 	public ArrayList<SRTObject> findObjects(Connection conn)

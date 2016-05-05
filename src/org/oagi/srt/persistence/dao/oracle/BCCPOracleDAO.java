@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
@@ -14,6 +8,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BCCPVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -59,34 +59,35 @@ public class BCCPOracleDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		BCCPVO bccpVO = (BCCPVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+
+		BCCPVO bccpVO = (BCCPVO) obj;
 		try {
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BCCP_STATEMENT);
-			if( bccpVO.getBCCPGUID()==null ||  bccpVO.getBCCPGUID().length()==0 ||  bccpVO.getBCCPGUID().isEmpty() ||  bccpVO.getBCCPGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getBCCPGUID() == null || bccpVO.getBCCPGUID().length() == 0 || bccpVO.getBCCPGUID().isEmpty() || bccpVO.getBCCPGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, bccpVO.getBCCPGUID());
 
-			if( bccpVO.getPropertyTerm()==null ||  bccpVO.getPropertyTerm().length()==0 ||  bccpVO.getPropertyTerm().isEmpty() ||  bccpVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getPropertyTerm() == null || bccpVO.getPropertyTerm().length() == 0 || bccpVO.getPropertyTerm().isEmpty() || bccpVO.getPropertyTerm().equals(""))
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(2, bccpVO.getPropertyTerm());
 
-			if( bccpVO.getRepresentationTerm()==null ||  bccpVO.getRepresentationTerm().length()==0 ||  bccpVO.getRepresentationTerm().isEmpty() ||  bccpVO.getRepresentationTerm().equals(""))				
-				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getRepresentationTerm() == null || bccpVO.getRepresentationTerm().length() == 0 || bccpVO.getRepresentationTerm().isEmpty() || bccpVO.getRepresentationTerm().equals(""))
+				ps.setString(3, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(3, bccpVO.getRepresentationTerm());
 
 			ps.setInt(4, bccpVO.getBDTID());
-			if( bccpVO.getDEN()==null ||  bccpVO.getDEN().length()==0 ||  bccpVO.getDEN().isEmpty() ||  bccpVO.getDEN().equals(""))				
-				ps.setString(5,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getDEN() == null || bccpVO.getDEN().length() == 0 || bccpVO.getDEN().isEmpty() || bccpVO.getDEN().equals(""))
+				ps.setString(5, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(5, bccpVO.getDEN());
 
 //			if(bccpVO.getDefinition() == null || bccpVO.getDefinition().isEmpty() || bccpVO.getDefinition().equals("") || bccpVO.getDefinition().length()==0)   
@@ -103,48 +104,42 @@ public class BCCPOracleDAO extends SRTDAO {
 //				ps.setString(11,"\u00A0");
 //			else 	
 				ps.setString(11, bccpVO.getModule());
-				
-			
 
-			if(bccpVO.getRevisionNum()<0){
+
+			if (bccpVO.getRevisionNum() < 0) {
 				ps.setNull(12, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(12, bccpVO.getRevisionNum());
 			}
-			
-			if(bccpVO.getRevisionTrackingNum()<0){
+
+			if (bccpVO.getRevisionTrackingNum() < 0) {
 				ps.setNull(13, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(13, bccpVO.getRevisionTrackingNum());
 			}
-			
-			if(bccpVO.getRevisionAction()<1){
+
+			if (bccpVO.getRevisionAction() < 1) {
 				ps.setNull(14, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(14, bccpVO.getRevisionAction());
 			}
-			
-			if(bccpVO.getReleaseId()<1){
+
+			if (bccpVO.getReleaseId() < 1) {
 				ps.setNull(15, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(15, bccpVO.getReleaseId());
 			}
-			
-			if(bccpVO.getCurrentBccpId()<1){
+
+			if (bccpVO.getCurrentBccpId() < 1) {
 				ps.setNull(16, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(16, bccpVO.getCurrentBccpId());
 			}
-			
-			if( bccpVO.getIs_deprecated())				
-				ps.setInt(17,1);
-			else 	
-				ps.setInt(17,0);
+
+			if (bccpVO.getIs_deprecated())
+				ps.setInt(17, 1);
+			else
+				ps.setInt(17, 0);
 
 			ps.executeUpdate();
 
@@ -152,36 +147,28 @@ public class BCCPOracleDAO extends SRTDAO {
 			//tableKeys.next();
 			//int autoGeneratedID = tableKeys.getInt(1);
 
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		BCCPVO bccpVO = null;
-		Connection conn = null;
 		try {
 			conn = tx.open();
 			String sql = _FIND_BCCP_STATEMENT;
@@ -199,9 +186,9 @@ public class BCCPOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -231,39 +218,25 @@ public class BCCPOracleDAO extends SRTDAO {
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return bccpVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
-		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		BCCPVO bccpVO = null;
-		//Connection conn = null;
 		try {
-			//conn = tx.open();
 			String sql = _FIND_BCCP_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -279,9 +252,9 @@ public class BCCPOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -310,40 +283,24 @@ public class BCCPOracleDAO extends SRTDAO {
 				bccpVO.setCurrentBccpId(rs.getInt("current_bccp_id"));
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 			}
-			//tx.commit();
-			//conn.close();
-		//} catch (BfPersistenceException e) {
-		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			//try {
-			//	if(conn != null && !conn.isClosed())
-			//		conn.close();
-			//} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return bccpVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_BCCP_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -372,36 +329,26 @@ public class BCCPOracleDAO extends SRTDAO {
 				list.add(bccpVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
-	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
-		DBAgent tx = new DBAgent();
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			//Connection conn = tx.open();
 			String sql = _FIND_ALL_BCCP_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -429,24 +376,11 @@ public class BCCPOracleDAO extends SRTDAO {
 				bccpVO.setIs_deprecated(rs.getBoolean("is_deprecated"));
 				list.add(bccpVO);
 			}
-			//tx.commit();
-			//conn.close();
-		//} catch (BfPersistenceException e) {
-		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
@@ -454,32 +388,34 @@ public class BCCPOracleDAO extends SRTDAO {
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		BCCPVO bccpVO = (BCCPVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		BCCPVO bccpVO = (BCCPVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_BCCP_STATEMENT);
 
-			if( bccpVO.getBCCPGUID()==null ||  bccpVO.getBCCPGUID().length()==0 ||  bccpVO.getBCCPGUID().isEmpty() ||  bccpVO.getBCCPGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getBCCPGUID() == null || bccpVO.getBCCPGUID().length() == 0 || bccpVO.getBCCPGUID().isEmpty() || bccpVO.getBCCPGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, bccpVO.getBCCPGUID());
 
-			if( bccpVO.getPropertyTerm()==null ||  bccpVO.getPropertyTerm().length()==0 ||  bccpVO.getPropertyTerm().isEmpty() ||  bccpVO.getPropertyTerm().equals(""))				
-				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getPropertyTerm() == null || bccpVO.getPropertyTerm().length() == 0 || bccpVO.getPropertyTerm().isEmpty() || bccpVO.getPropertyTerm().equals(""))
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(2, bccpVO.getPropertyTerm());
 
-			if( bccpVO.getRepresentationTerm()==null ||  bccpVO.getRepresentationTerm().length()==0 ||  bccpVO.getRepresentationTerm().isEmpty() ||  bccpVO.getRepresentationTerm().equals(""))				
-				ps.setString(3,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getRepresentationTerm() == null || bccpVO.getRepresentationTerm().length() == 0 || bccpVO.getRepresentationTerm().isEmpty() || bccpVO.getRepresentationTerm().equals(""))
+				ps.setString(3, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(3, bccpVO.getRepresentationTerm());
 
 			ps.setInt(4, bccpVO.getBDTID());
-			if( bccpVO.getDEN()==null ||  bccpVO.getDEN().length()==0 ||  bccpVO.getDEN().isEmpty() ||  bccpVO.getDEN().equals(""))				
-				ps.setString(5,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (bccpVO.getDEN() == null || bccpVO.getDEN().length() == 0 || bccpVO.getDEN().isEmpty() || bccpVO.getDEN().equals(""))
+				ps.setString(5, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(5, bccpVO.getDEN());
 
 //			if(bccpVO.getDefinition() == null)
@@ -499,45 +435,40 @@ public class BCCPOracleDAO extends SRTDAO {
 				ps.setString(11, bccpVO.getModule());
 
 
-			if(bccpVO.getRevisionNum()<0){
+			if (bccpVO.getRevisionNum() < 0) {
 				ps.setNull(12, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(12, bccpVO.getRevisionNum());
 			}
-			
-			if(bccpVO.getRevisionTrackingNum()<0){
+
+			if (bccpVO.getRevisionTrackingNum() < 0) {
 				ps.setNull(13, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(13, bccpVO.getRevisionTrackingNum());
 			}
-			
-			if(bccpVO.getRevisionAction()<1){
+
+			if (bccpVO.getRevisionAction() < 1) {
 				ps.setNull(14, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(14, bccpVO.getRevisionAction());
 			}
-			
-			if(bccpVO.getReleaseId()<1){
+
+			if (bccpVO.getReleaseId() < 1) {
 				ps.setNull(15, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(15, bccpVO.getReleaseId());
 			}
-			
-			if(bccpVO.getCurrentBccpId()<1){
+
+			if (bccpVO.getCurrentBccpId() < 1) {
 				ps.setNull(16, java.sql.Types.INTEGER);
-			}
-			else {
+			} else {
 				ps.setInt(16, bccpVO.getCurrentBccpId());
 			}
-			
-			if( bccpVO.getIs_deprecated())				
-				ps.setInt(17,1);
-			else 	
-				ps.setInt(17,0);
+
+			if (bccpVO.getIs_deprecated())
+				ps.setInt(17, 1);
+			else
+				ps.setInt(17, 0);
 
 			ps.setInt(18, bccpVO.getBCCPID());
 			ps.executeUpdate();
@@ -550,24 +481,22 @@ public class BCCPOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		BCCPVO bccpVO = (BCCPVO)obj;
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		BCCPVO bccpVO = (BCCPVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_BCCP_STATEMENT);
 			ps.setInt(1, bccpVO.getBCCPID());
@@ -581,12 +510,9 @@ public class BCCPOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;

@@ -10,6 +10,7 @@ import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
+import org.oagi.srt.persistence.PersistenceUtils;
 import org.oagi.srt.persistence.dto.ASCCPVO;
 
 /**
@@ -41,7 +42,15 @@ public abstract class SRTDAO {
 	public abstract boolean deleteObject(SRTObject obj) throws SRTDAOException;
 	
 	public abstract int findMaxId() throws SRTDAOException;
-	
+
+	public final void closeQuietly(DBAgent txAgent) {
+		PersistenceUtils.closeQuietly(txAgent);
+	}
+
+	public final void closeQuietly(AutoCloseable closeable) {
+		PersistenceUtils.closeQuietly(closeable);
+	}
+
 	public int getASCCCount(int accId) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
@@ -64,20 +73,23 @@ public abstract class SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
+			if (ps != null) {
 				try {
 					ps.close();
-				} catch (SQLException e) {}
+				} catch (SQLException e) {
+				}
 			}
-			if(rs != null) {
+			if (rs != null) {
 				try {
 					rs.close();
-				} catch (SQLException e) {}
+				} catch (SQLException e) {
+				}
 			}
 			try {
-				if(conn != null && !conn.isClosed())
+				if (conn != null && !conn.isClosed())
 					conn.close();
-			} catch (SQLException e) {}
+			} catch (SQLException e) {
+			}
 			tx.close();
 		}
 		return count;

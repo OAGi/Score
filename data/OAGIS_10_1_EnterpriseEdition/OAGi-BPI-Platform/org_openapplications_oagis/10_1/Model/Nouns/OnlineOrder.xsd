@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/OnlineOrder.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="OnlineOrder" type="OnlineOrderType" id="oagis-id-5fcf55ce1c404ef38ab086a19f64ffbc"/>
+	<xsd:element name="OnlineOrderHeader" type="OnlineOrderHeaderType" id="oagis-id-12b2ecb391dc4aba857b5656cbd0d689">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Header information applies to the OnlineOrder as a whole, including the creator of the OnlineOrder, who it is intended for, effectivity of the OnlineOrder and so on.
+
+The status field on the OnlineOrder header is used in third party buying scenarios. Typically, in these scenarios, the OnlineOrder is created by a buyer on behalf of another entity or organization. Once the OnlineOrder is created by the buyer, the party for whocm the OnlineOrder is intended approves or rejects the OnlineOrder, and sets the status accordingly.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="OnlineOrderLine" type="OnlineOrderLineType" id="oagis-id-81193acf23cb49c29eef998f6ae4e50f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Line represents the specific line items in the shopping OnlineOrder</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OnlineOrderType" id="oagis-id-7620f22b70904e55a3378630c3eb4a87">
+		<xsd:sequence>
+			<xsd:element ref="OnlineOrderHeader" id="oagis-id-b086116bb3714a778460c9e32a291081" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The Header information applies to the OnlineOrder as a whole, including the creator of the OnlineOrder, who it is intended for, effectivity of the OnlineOrder and so on.
+
+The status field on the OnlineOrder header is used in third party buying scenarios. Typically, in these scenarios, the OnlineOrder is created by a buyer on behalf of another entity or organization. Once the OnlineOrder is created by the buyer, the party for whocm the OnlineOrder is intended approves or rejects the OnlineOrder, and sets the status accordingly.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="OnlineOrderLine" id="oagis-id-f1acfbc93bb646dcad398110ac366a61" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">The Line represents the specific line items in the shopping OnlineOrder</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-0e803f3f12db4eb097b346b48bbff03b"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-d6f6892f04ab466a8e9da8bf3c683769"/>
+	</xsd:complexType>
+	<xsd:complexType name="OnlineOrderHeaderBaseType" id="oagis-id-05bc9dc72b974ac09272f74ddd46e05a">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="SessionID" id="oagis-id-c68807181ce74ee88d19622012a00f88" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The SessionID uniquely identifies a client session with a server e.g. a user logging in to an application or a buyer session with a marketplace</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-1dc67c4592d34e5893054383254550b6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CreatedByParty" id="oagis-id-258cd0efc5704cce86414e77cff20e5b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the  organization that created the cart. In a third party buying scenario, this will identify the Party that created the cart on behalf of another Party</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CreatedForParty" id="oagis-id-33d9544d23484cea91f4d5c708a1edd3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This identifies the organization/ entity for whom the cart was created. This is also used in the context of third party buying, where this will identify the entity or organization for whom the cart is intended</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-d921c169e07d4f35a7240ad58fe8803c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-91c54eab9dfb453588fa1aae51750c51" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OnlineOrderHeaderType" id="oagis-id-c108d8561d6c49d5a712d26ea2bd47e8">
+		<xsd:complexContent>
+			<xsd:extension base="OnlineOrderHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="OnlineOrderHeaderExtensionType" id="oagis-id-7d34a3217447469f9ff34a9fe5209033" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OnlineOrderLineBaseType" id="oagis-id-6ff1e486c1f34acaa5afd6cdc0f39c69">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="OrderDateTime" id="oagis-id-dc88a585525e4008abac3c03cecd348a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Datetime the order was placed</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Item" id="oagis-id-b70575c12e6943c9b53e72bbffd96aab" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-6bf13f5cd86842a09472914455ecb736" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Facility" id="oagis-id-a8e7e6f10b32435aa6f4a3f763ce3a61" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A Facility identifies a location within an entity. The facility may have sub-locators identified using a sequenced identification notation e.g. Warehouse A100 Sub-Location 11, Row R10 would be represented as an array of three Facility elements with values as A100, 11, R10, name attribute as Warehouse, Sub-Location and Row and sequence attribute as 1,2 and 3 respectively.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UnitPrice" id="oagis-id-61534cb1af8b4df08c437a5da2b80048" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Unit price of the item for the number of items in the unitCode specified in the PerQuantity elements.
+
+In most cases the unitCode of the PerQuantity is the same as the unitCode of the Quantity element above.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-fe8810a3b9a44c1781902abbe0a6de6e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-439408aba57f46c0b2653dffb56e135c" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PriceBreak" id="oagis-id-20c590f11cca431e8a86b81168121923" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This defines the prices and modifiers to the price for buying a given quantity or value of an item or item category on a price list line. For Price List Lines that specify Items the price breaks can be specified in terms of quantity or amount. For Price list lines that specify commodity, price breaks can only be specified in terms of currency amount</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OnlineOrderLineType" id="oagis-id-5a11bf5c9f5a451ab3f7dbeee2310a18">
+		<xsd:complexContent>
+			<xsd:extension base="OnlineOrderLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="OnlineOrderLineExtensionType" id="oagis-id-dc47f085f6424f5fb15cae1fb5cb75c6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,5 +1,6 @@
 package org.oagi.srt.common;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
 
@@ -9,7 +10,7 @@ import org.chanchan.common.system.BfObject;
  * @author Yunsu Lee
  * @version 1.1
  */
-public class SRTObject extends BfObject {
+public class SRTObject extends BfObject implements Serializable {
 	protected int _createdBy;
 	protected Timestamp _createdOn;
 	protected int _modifiedBy;

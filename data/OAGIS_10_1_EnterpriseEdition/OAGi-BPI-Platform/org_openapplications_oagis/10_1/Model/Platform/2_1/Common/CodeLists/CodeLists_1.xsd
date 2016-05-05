@@ -1,0 +1,1017 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
+<!--
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10.1 Platform 2_1
+   Date:               27 Jun 2014 
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Components/CodeLists_1.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="CodeList_CurrencyCode_ISO_7_04.xsd"/>
+	<xsd:include schemaLocation="CodeList_LanguageCode_ISO_7_04.xsd"/>
+	<xsd:include schemaLocation="CodeList_CharacterSetCode_IANA_20070514.xsd"/>
+	<xsd:include schemaLocation="CodeList_MIMEMediaTypeCode_IANA_7_04.xsd"/>
+	<xsd:include schemaLocation="CodeList_UnitCode_UNECE_7_04.xsd"/>
+	<xsd:include schemaLocation="CodeList_TimeZoneCode_1.xsd"/>
+	<xsd:include schemaLocation="CodeList_TimeFormatCode_1.xsd"/>
+	<xsd:simpleType name="oacl_ActionCodeEnumerationType" id="oagis-id-f63f1d0aa3c34e7cab8efee204f61cf7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The action values that OAGi defines for OAGIS.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Add"/>
+			<xsd:enumeration value="Change"/>
+			<xsd:enumeration value="Delete"/>
+			<xsd:enumeration value="Replace"/>
+			<xsd:enumeration value="UpSert"/>
+			<xsd:enumeration value="Accepted"/>
+			<xsd:enumeration value="Modified"/>
+			<xsd:enumeration value="Rejected"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ActionCodeContentType" id="oagis-id-49c1788460864e99b0872d0a6e58bddb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_ActionCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_AgencyRoleCodeEnumerationType" id="oagis-id-1cfb7a2e0cc04586a6732f3871d670ec">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The roles in which an organization may participate in a transaction..  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Customer"/>
+			<xsd:enumeration value="Supplier"/>
+			<xsd:enumeration value="Manufacturer"/>
+			<xsd:enumeration value="Broker"/>
+			<xsd:enumeration value="Carrier"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_AgencyRoleCodeContentType" id="oagis-id-a9ee4e537bde4e2ba96fa1d0aa04dba7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_AgencyRoleCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CategoryCodeEnumerationType" id="oagis-id-ae69554cc74b4fc6a57977bb382b5f5a">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CategoryCodeContentType" id="oagis-id-ec3ae69ddf6046f09b906caf951f4f35">
+		<xsd:union memberTypes="oacl_CategoryCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ChargeBearerCodeEnumerationType" id="oagis-id-a355da7ff7e444aa8b27a4d3323eba08">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="OUR">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">All transaction charges are to be borne by the debtor.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="BEN">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">All transaction charges are to be borne by the creditor.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="SHA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Transaction charges on the Sender's side are to be borne by the ordering customer. Transaction charges on the Receiver's side are to be
+borne by the beneficiary customer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ChargeBearerCodeContentType" id="oagis-id-c6716c40af4d4f0c926b975dd5918270">
+		<xsd:union memberTypes="xsd:token oacl_ChargeBearerCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ChargeCodeEnumerationType" id="oagis-id-dbf83a334fa84d7992a7db76d70cf5a0">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ChargeCodeContentType" id="oagis-id-f0dfec16cc4d44a198e4bfbf72a37b81">
+		<xsd:union memberTypes="oacl_ChargeCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ClassificationCodeEnumerationType" id="oagis-id-d260cb0d1ce44dadbb736059bb284e72">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ClassificationCodeContentType" id="oagis-id-18a04d1b4f124693bc4272463e701755">
+		<xsd:union memberTypes="oacl_ClassificationCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CharacterSetCodeContentType" id="oagis-id-8274b2e56a8941a6a235bb1faf227e74">
+		<xsd:union memberTypes="clmIANACharacterSetCode20070514_CharacterSetCodeContentType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CheckDeliveryMethodCodeEnumerationType" id="oagis-id-e7eeecddd9544535a9a89fc1276bb494">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="MLDB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Mail to Debitor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MLCD">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Mail to Creditor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MLFA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Mail to Final agent</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CRDB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Courier to debtor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CRCD">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Courier to creditor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CRFA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Courier to final agent</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="PUDB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Pickup by debtor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="PUCD">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Pickup by creditor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="PUFA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Pickup by final agent</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RGDB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Registered mail to debtor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RGCD">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Registered mail to creditor</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RGFA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Registered mail to final agent</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CheckDeliveryMethodCodeContentType" id="oagis-id-08040659d66c4591a1353cc431c50c4a">
+		<xsd:union memberTypes="xsd:token oacl_CheckDeliveryMethodCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CheckInstructionCodeEnumerationType" id="oagis-id-b8553ba514c64ad68b49bd5f83a6ef72">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="CCHQ"/>
+			<xsd:enumeration value="CCCH"/>
+			<xsd:enumeration value="BCHQ"/>
+			<xsd:enumeration value="DFFT"/>
+			<xsd:enumeration value="ELDR"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CheckInstructionCodeContentType" id="oagis-id-25f1e4ef171045f0be4e9e6785dbbb70">
+		<xsd:union memberTypes="xsd:token oacl_CheckInstructionCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ConfirmationCodeEnumerationType" id="oagis-id-7ec2195e70294a13bfb9414de9f14473">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The acknowledge values that OAGi defines for OAGIS.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Always"/>
+			<xsd:enumeration value="OnError"/>
+			<xsd:enumeration value="OnModification"/>
+			<xsd:enumeration value="OnRejection"/>
+			<xsd:enumeration value="Never"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ConfirmationCodeContentType" id="oagis-id-a19867f6ebe5426d99fe4808b11e23c4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_ConfirmationCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ContactLocationCodeEnumerationType" id="oagis-id-fc8d4b561faa47ff94fffdeb12566aea">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Home"/>
+			<xsd:enumeration value="Work"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ContactLocationCodeContentType" id="oagis-id-6233008ff5874c15a76000e186e0130d">
+		<xsd:union memberTypes="oacl_ContactLocationCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ControlAssertionCodeEnumerationType" id="oagis-id-64ffe9653e934bee80d9051818bf3b94">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Completeness"/>
+			<xsd:enumeration value="Existence or Occurance"/>
+			<xsd:enumeration value="Presentation and Disclosure"/>
+			<xsd:enumeration value="Rights and Obligations"/>
+			<xsd:enumeration value="Valuation or Measurement"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ControlAssertionCodeContentType" id="oagis-id-46dded6e75894d85a7e772090cb42c5b">
+		<xsd:union memberTypes="xsd:token oacl_ControlAssertionCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ControlCodeEnumerationType" id="oagis-id-58a748fc51eb421a862db5fcfcf85c3b">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Trigger"/>
+			<xsd:enumeration value="Workflow"/>
+			<xsd:enumeration value="Measurement"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ControlCodeContentType" id="oagis-id-f01cb1632cbd4ae89cf1b9841c40e2f0">
+		<xsd:union memberTypes="xsd:token oacl_ControlCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ControlComponentCodeEnumerationType" id="oagis-id-af274f44caad4162804061f2342a3715">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Risk Assessment"/>
+			<xsd:enumeration value="Monitoring"/>
+			<xsd:enumeration value="Control Environment"/>
+			<xsd:enumeration value="Control Activities"/>
+			<xsd:enumeration value="Information and Communication"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ControlComponentCodeContentType" id="oagis-id-be54304dfda44246aa554217f5be5124">
+		<xsd:union memberTypes="xsd:token oacl_ControlComponentCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CountryCodeEnumerationType" id="oagis-id-e28b4633be8e480480706595baaa42f2">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CountryCodeContentType" id="oagis-id-bac4c638149847478d35fa6c377b9f13">
+		<xsd:union memberTypes="oacl_CountryCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CountrySubdivisionCodeEnumerationType" id="oagis-id-b7e948384e9348a2b2e6ff50ddf84d5b">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CountrySubdivisionCodeContentType" id="oagis-id-d954fa8d2aef4e6d93ff9f1841bad5f6">
+		<xsd:union memberTypes="oacl_CountrySubdivisionCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CreditTransferCodeEnumerationType" id="oagis-id-5482a811ea5047d38ea6082e02b076b0">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="CASH">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Cash management transfer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CORT">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Payment made in settlement of a trade</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DIVI">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Dividend.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="GOVT">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Government payment.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="HEDG">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Hedging</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="INTC">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Intra-company payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="INTE">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Interest</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="LOAN">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Loan. Transfer of loan to borrower.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="PENS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Pension payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="SALA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Salary payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="SECU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Securities.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="SSBE">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Social security benefit. Payment made by government to support individuals.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="SUPP">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Supplier payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="TAXS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Tax payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="TRAD">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Trade.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="TREA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Treasury payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="VATX">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Value added Tax payment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CreditTransferCodeContentType" id="oagis-id-e64591fa9a2a46009b0e1142710d8793">
+		<xsd:union memberTypes="oacl_CreditTransferCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_CurrencyCodeContentType" id="oagis-id-c4c7892ab835480895b142ca41930292">
+		<xsd:union memberTypes="clm542173A20090305_ISO3AlphaCurrencyCodeContentType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_DayOfWeekCodeEnumerationType" id="oagis-id-8314d4295c1b48c3864a47504e464952">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Sunday"/>
+			<xsd:enumeration value="Monday"/>
+			<xsd:enumeration value="Tuesday"/>
+			<xsd:enumeration value="Wednesday"/>
+			<xsd:enumeration value="Thursday"/>
+			<xsd:enumeration value="Friday"/>
+			<xsd:enumeration value="Saturday"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_DayOfWeekCodeContentType" id="oagis-id-ed55866d4a3e4c9eb00d0928e14cbbf4">
+		<xsd:union memberTypes="oacl_DayOfWeekCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_DebitCreditCodeEnumerationType" id="oagis-id-ca797f68a80c4475a4e67713ca79db8d">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Debit"/>
+			<xsd:enumeration value="Credit"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_DebitCreditCodeContentType" id="oagis-id-69e1317dc2f24edcb1847f34f66be977">
+		<xsd:union memberTypes="oacl_DebitCreditCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_DeliveryPointCodeEnumerationType" id="oagis-id-b04bbef96ed34fd1a155323a38d74cfa">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_DeliveryPointCodeContentType" id="oagis-id-da0b3fdfca0d48a0aa4017c5e71eaecf">
+		<xsd:union memberTypes="oacl_DeliveryPointCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EMailFormatCodeEnumerationType" id="oagis-id-9d182f28e99840318c9757dab3177019">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="HTML"/>
+			<xsd:enumeration value="Rich Text"/>
+			<xsd:enumeration value="Plain Text"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EMailFormatCodeContentType" id="oagis-id-428bb44db16241faa4813f779ffff26e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the perferred format in which to send eMail.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_EMailFormatCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringActivityCodeEnumerationType" id="oagis-id-10eb52c5181f419ea5f52cf501d86708">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="amendment">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to add information to product data</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="analysis">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to determine the behavior of an element under certain physical circumstances</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="cancellation">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to delete an element from the bill of material or to cancel he whole bill of material</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="deliveryChange">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An actity to change the delivery schedule of an element</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="designChange">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to change the design of an item or an assembly; this might include changes to the geometry or to the properties of the object</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="design">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity concerning the development of a design of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="mockUpCreation">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to create an experimental model or replica of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="protoypeBuilding">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to manufacture a preliminary version of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="rectification">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to correct the data, documentation or structure associated wih an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="restructuring">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to create an new structure or position within a bill of material without changin the data associated with the items in the bill of material</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="sparePartCreation">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to design a spare part or to classify an item as a spare part</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="stopNotice">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to stop the manufacturing process of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="testing">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An activity to test an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringActivityCodeContentType" id="oagis-id-8deb90f1405a4a7e98caa6817b9b2ef1">
+		<xsd:union memberTypes="oacl_EngineeringActivityCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringWorkOrderCodeEnumerationType" id="oagis-id-aa71419c1d7842819c3baaa28926393c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the type of Engineering Work Order.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="designDeviationPermit">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An authorization for a deviation from the approved design data</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="designRelease">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An auhorization for the design of a product or of an item or o create a bill of material</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="managementResolution">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An authorization by a committee, such as the board of directos, to design or change an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="manufacturingRelease">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An authorization for the manufacturing process of a product or of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="productionDeviationPermit">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An authorization for a deviation from the approved manufacturing process</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringWorkOrderCodeContentType" id="oagis-id-97ffe643788648c096ea981c32c2a3dd">
+		<xsd:union memberTypes="oacl_EngineeringWorkOrderCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringWorkRequestCodeEnumerationType" id="oagis-id-482e2957e4bc4346ad1f94d2f3c56bb5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the type of Engineering Work Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="ChangeOfStandard">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A request to translate a change to a standard into action</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CostReduction">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A request aimed at reducing the engineering and manufacturing costs of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CustomerRejection">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A request resulting from a rejection by a customer</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CustomerRequest">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A request for an activity that is necessary to solve the request of a customer</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DurabilityImprovement">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A request aimed at extending the life time of an item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="GovernmentRegulation">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A request resulting from legal requirements</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="ProcurementAlignment"/>
+			<xsd:enumeration value="ProductionAlignment"/>
+			<xsd:enumeration value="ProductionRelief"/>
+			<xsd:enumeration value="ProductionRequirement"/>
+			<xsd:enumeration value="QualityImprovement"/>
+			<xsd:enumeration value="SecuriyReason"/>
+			<xsd:enumeration value="Standardization"/>
+			<xsd:enumeration value="SupplierRequest"/>
+			<xsd:enumeration value="TechnicalImprovement"/>
+			<xsd:enumeration value="ToolImprovement"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringWorkRequestCodeContentType" id="oagis-id-cc80f54e299048859c47c0046f7c7e36">
+		<xsd:union memberTypes="oacl_EngineeringWorkRequestCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringWorkRequestStatusCodeEnumerationType" id="oagis-id-a0d4ca19498b42a1af3219d8e6dd4213">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the status of Engineering Work Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="inWork"/>
+			<xsd:enumeration value="issued"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_EngineeringWorkRequestStatusCodeContentType" id="oagis-id-0073c51b321e42e795d1b48116a7620f">
+		<xsd:union memberTypes="oacl_EngineeringWorkRequestStatusCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_FinalAgentInstructionCodeEnumerationType" id="oagis-id-ff46417e01b640a78776bd03ec58fc8f">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="CHQB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Pay creditor only by check. The creditor's account number must not be specified.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="HOLD">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Hold cash for creditor. Creditor will call; pay upon identification.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="PHOB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Please advise/contact beneficiary/claimant by phone.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="TELB">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Please advise/contact beneficiary/claimant by the most efficient means of telecommunication.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_FinalAgentInstructionCodeContentType" id="oagis-id-1dd922a4b7e348e7af93870e7ab75d4c">
+		<xsd:union memberTypes="xsd:token oacl_FinalAgentInstructionCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_FreightTermCodeEnumerationType" id="oagis-id-67c5a58be44e43df854e397c0691d6d4">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_FreightTermCodeContentType" id="oagis-id-0da859f6357b4769aab010637c2724ad">
+		<xsd:union memberTypes="oacl_FreightTermCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_GenderCodeEnumerationType" id="oagis-id-54bb202e31294a098faf49ba2767c4bc">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Male"/>
+			<xsd:enumeration value="Female"/>
+			<xsd:enumeration value="Unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_GenderCodeContentType" id="oagis-id-58bcc34f61284f4580e706506453fc3d">
+		<xsd:union memberTypes="oacl_GenderCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_IncotermsCodeEnumerationType" id="oagis-id-610f796fb0e246809299f9c8ccd5e307">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_IncotermsCodeContentType" id="oagis-id-c9060a9151244e2d883bfabbb779a165">
+		<xsd:union memberTypes="oacl_IncotermsCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_LanguageCodeContentType" id="oagis-id-7f23d96ea25c443fbdcd5411159ff377">
+		<xsd:union memberTypes="xsd:token clm56392A20081107_LanguageCodeContentType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_LicenseTypeCodeEnumerationType" id="oagis-id-7414ab2c016b40439184fcd587097a2f">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Import"/>
+			<xsd:enumeration value="Export"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_LicenseTypeCodeContentType" id="oagis-id-608c4f0fe09d45529dfa723d5406c5a0">
+		<xsd:union memberTypes="oacl_LicenseTypeCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MaritalStatusCodeEnumerationType" id="oagis-id-2e3438031b844929a9cf868e997a32ad">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Divorced"/>
+			<xsd:enumeration value="Married"/>
+			<xsd:enumeration value="NeverMarried"/>
+			<xsd:enumeration value="Separated"/>
+			<xsd:enumeration value="SignificantOther"/>
+			<xsd:enumeration value="Widowed"/>
+			<xsd:enumeration value="Unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MaritalStatusCodeContentType" id="oagis-id-33c77e39087143f088565de1a0ebee77">
+		<xsd:union memberTypes="oacl_MaritalStatusCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MatchCodeEnumerationType" id="oagis-id-f35c6ed188224281a8073d355b94d44f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Standard List of Invoice Matching Types. 2 stands for two way matching (Invoice, PO). 3 stands for three way matching (Invoice, PO, Receipt). 4 stands for four way matching (Invoice, PO, Receipt, Invoice)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="2"/>
+			<xsd:enumeration value="3"/>
+			<xsd:enumeration value="4"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MatchCodeContentType" id="oagis-id-0a1384322190497499cf2ca6b26d8934">
+		<xsd:union memberTypes="oacl_MatchCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MatchDocumentCodeEnumerationType" id="oagis-id-7c9d9573d51546f89f0b7f09566acc7a">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Invoice"/>
+			<xsd:enumeration value="Purchase Order"/>
+			<xsd:enumeration value="Receipt"/>
+			<xsd:enumeration value="Inspection"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MatchDocumentCodeContentType" id="oagis-id-f516abfd2be844d3acf481ed8b1399c3">
+		<xsd:union memberTypes="oacl_MatchDocumentCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_MIMECodeContentType" id="oagis-id-51ed08216606417b9b9266b464c204f7">
+		<xsd:union memberTypes="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeContentType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PartyCategoryCodeEnumerationType" id="oagis-id-f0eaec1e35124594afc96b1ed82559fa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This list of Party Categories.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Organization"/>
+			<xsd:enumeration value="Individual"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PartyCategoryCodeContentType" id="oagis-id-dbcb006c92754ed7a064ea0c8dc5940c">
+		<xsd:union memberTypes="oacl_PartyCategoryCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PartyRoleCodeEnumerationType" id="oagis-id-3605aaeb18704d60bd2d3f57671bfaa1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This list is the agreed to Party Roles.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PartyRoleCodeContentType" id="oagis-id-9f78cba9c3b04b60877b2e0217f8c2fa">
+		<xsd:union memberTypes="oacl_PartyRoleCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentBasisCodeEnumerationType" id="oagis-id-6ebb4957a88d403bb99dba8bc7a8018f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This list is the agreed to sub set of Payment Term Basis Codes from X12 Element 333.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="InvoiceDate"/>
+			<xsd:enumeration value="ShippingDate"/>
+			<xsd:enumeration value="DeliveryDate"/>
+			<xsd:enumeration value="PurchaseOrderDate"/>
+			<xsd:enumeration value="ReceiptOfGoodsDate"/>
+			<xsd:enumeration value="AcceptanceOfGoodsDate"/>
+			<xsd:enumeration value="AcceptanceOfOrderDate"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentBasisCodeContentType" id="oagis-id-7e62e27dbcc94a9d9667ddcf219e2855">
+		<xsd:union memberTypes="oacl_PaymentBasisCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentPurposeCodeEnumerationType" id="oagis-id-13c5b880367d4bd3aa50abfa3ce32b27">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="ADVA"/>
+			<xsd:enumeration value="AGRT"/>
+			<xsd:enumeration value="ALMY"/>
+			<xsd:enumeration value="BECH"/>
+			<xsd:enumeration value="BENE"/>
+			<xsd:enumeration value="BONU"/>
+			<xsd:enumeration value="CASH"/>
+			<xsd:enumeration value="CBFF"/>
+			<xsd:enumeration value="CHAR"/>
+			<xsd:enumeration value="CMDT"/>
+			<xsd:enumeration value="COLL"/>
+			<xsd:enumeration value="COMC"/>
+			<xsd:enumeration value="COMM"/>
+			<xsd:enumeration value="CONS"/>
+			<xsd:enumeration value="COST"/>
+			<xsd:enumeration value="CPYR"/>
+			<xsd:enumeration value="DBTC"/>
+			<xsd:enumeration value="DIVI"/>
+			<xsd:enumeration value="FREX"/>
+			<xsd:enumeration value="GDDS"/>
+			<xsd:enumeration value="GOVT"/>
+			<xsd:enumeration value="HEDG"/>
+			<xsd:enumeration value="IHRP"/>
+			<xsd:enumeration value="INSU"/>
+			<xsd:enumeration value="INTC"/>
+			<xsd:enumeration value="INTE"/>
+			<xsd:enumeration value="LICF"/>
+			<xsd:enumeration value="LOAN"/>
+			<xsd:enumeration value="LOAR"/>
+			<xsd:enumeration value="NETT"/>
+			<xsd:enumeration value="PAYR"/>
+			<xsd:enumeration value="PENS"/>
+			<xsd:enumeration value="REFU"/>
+			<xsd:enumeration value="RENT"/>
+			<xsd:enumeration value="ROYA"/>
+			<xsd:enumeration value="SALA"/>
+			<xsd:enumeration value="SCVE"/>
+			<xsd:enumeration value="SECU"/>
+			<xsd:enumeration value="SSBE"/>
+			<xsd:enumeration value="SUBS"/>
+			<xsd:enumeration value="TAXS"/>
+			<xsd:enumeration value="TREA"/>
+			<xsd:enumeration value="VATX"/>
+			<xsd:enumeration value="VENP"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentPurposeCodeContentType" id="oagis-id-f6ae1fdc206843468def6e636ce34384">
+		<xsd:union memberTypes="xsd:token oacl_PaymentPurposeCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentMethodCodeEnumerationType" id="oagis-id-ae52455e984342199e5c9dea82f2378a">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Cash"/>
+			<xsd:enumeration value="Check"/>
+			<xsd:enumeration value="CreditCard"/>
+			<xsd:enumeration value="DebitCard"/>
+			<xsd:enumeration value="ElectronicFundsTransfer"/>
+			<xsd:enumeration value="ProcurementCard"/>
+			<xsd:enumeration value="BankDraft"/>
+			<xsd:enumeration value="PurchaseOrder"/>
+			<xsd:enumeration value="CreditTransfer"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentMethodCodeContentType" id="oagis-id-4c19009d16f248d9aad9deec2d4a075d">
+		<xsd:union memberTypes="oacl_PaymentMethodCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentSchemeCodeEnumerationType" id="oagis-id-6d8ec6bef55048bba69cfad67771a195">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="ACH">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Payment has to be executed through an Automated Clearing House</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RTGS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Payment has to be executed through Real time gross settlement system.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Fednet">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Payment has to be executed through FedNet</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CHIPS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Payment has to be executed through CHIPS. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentSchemeCodeContentType" id="oagis-id-985a704ce00b4f8791f436f638d85ea1">
+		<xsd:union memberTypes="xsd:token oacl_PaymentSchemeCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentTermCodeEnumerationType" id="oagis-id-0400aa29d86742bc84546d30a6bc6f5a">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Net20"/>
+			<xsd:enumeration value="Net30"/>
+			<xsd:enumeration value="Net45"/>
+			<xsd:enumeration value="Net60"/>
+			<xsd:enumeration value="10Percent30"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_PaymentTermCodeContentType" id="oagis-id-b9d13739f3fc4fbfa790ebd62972bcfd">
+		<xsd:union memberTypes="oacl_PaymentTermCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ProcessCategoryCodeEnumerationType" id="oagis-id-87ad6a845d3349528d261df0517bf2aa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Processes may be categorized as Routine, Non-Routine or Estimating.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Routine Process is recording costs of goods sold.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Non-Routine Process is recording Inventory Adjustments.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of an Estimating Process is determining Inventory Obsolsence.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Estimating Processes give wide lattitude to move the profit figure and attract a high degree of scrutiny.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Non Routine Processes tend to have fewer controls in place and are exposed to more risks.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Routine"/>
+			<xsd:enumeration value="Non-Routine"/>
+			<xsd:enumeration value="Estimating"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ProcessCategoryCodeContentType" id="oagis-id-1bb1a4c4d6784b558be0f40d43404424">
+		<xsd:union memberTypes="xsd:token oacl_ProcessCategoryCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ProcessConfirmationCodeEnumerationType" id="oagis-id-c398ee4caace4d398d80156f8362af00">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The acknowledge values that OAGi defines for OAGIS.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="OnReceipt"/>
+			<xsd:enumeration value="OnValidation"/>
+			<xsd:enumeration value="OnCompletion"/>
+			<xsd:enumeration value="OnAll"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ProcessConfirmationCodeContentType" id="oagis-id-bb1cc4dc481a477fa2674e52e3a90cfb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_ProcessConfirmationCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ReasonCodeEnumerationType" id="oagis-id-a5e28051f66c4cd2849f3ef9288a57b4">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ReasonCodeContentType" id="oagis-id-60dde524708b4b7db304686fd159d2cb">
+		<xsd:union memberTypes="oacl_ReasonCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_RecurrencePatternCodeEnumerationType" id="oagis-id-5b37f382148b4d64bffe7407d921ea9a">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Daily"/>
+			<xsd:enumeration value="Weekly"/>
+			<xsd:enumeration value="Monthly"/>
+			<xsd:enumeration value="Yearly"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_RecurrencePatternCodeContentType" id="oagis-id-472dbebea6be484b9a9e3a90612b96ce">
+		<xsd:union memberTypes="oacl_RecurrencePatternCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_RemitLocationMethodCodeEnumerationType" id="oagis-id-3bef37aca5e448d0a5dd2812c3be1b58">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="FAX">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Remittance advice information needs to be faxed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="EDI">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Remittance advice information needs to be sent through Electronic Data Interchange.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="URI">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Remittance advice information needs to be sent to a Uniform Resource Identifier (URI). URI is a compact string of characters that uniquely identify an abstract or physical resource. URI's are the super-set of identifiers, such as URLs, email addresses, ftp sites, etc, and as such, provide the syntax for all of the identification schemes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="EML"/>
+			<xsd:enumeration value="PST"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_RemitLocationMethodCodeContentType" id="oagis-id-c04686cc6c254869b51ea7ff39d860e5">
+		<xsd:union memberTypes="xsd:token oacl_RemitLocationMethodCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ResourceTypeCodeEnumerationType" id="oagis-id-00f33231374b490bbc0b4838209fa50d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The action values that OAGi defines for OAGIS.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ResourceTypeCodeContentType" id="oagis-id-02d26533df40477583a3fea53f90e0e8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_ResourceTypeCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ResponseActionCodeEnumerationType" id="oagis-id-fd277fa2c7c74b2db8a98d6bacdd6cb5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The action values that OAGi defines for OAGIS.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Accepted"/>
+			<xsd:enumeration value="Modified"/>
+			<xsd:enumeration value="Rejected"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ResponseActionCodeContentType" id="oagis-id-ecd22496e9d245e09a3851e71fe3ee18">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_ResponseActionCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ResponseCodeEnumerationType" id="oagis-id-3be828e40dbb4386873ff1db0e38efc2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The acknowledge values that OAGi defines for OAGIS.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Always"/>
+			<xsd:enumeration value="OnError"/>
+			<xsd:enumeration value="OnModification"/>
+			<xsd:enumeration value="OnRejection"/>
+			<xsd:enumeration value="Never"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_ResponseCodeContentType" id="oagis-id-73c93d58425945a0a0a6abfe4cf53274">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_ResponseCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_RiskCodeEnumerationType" id="oagis-id-4f337a2efc5c409b9af300a8a359ce89">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Compliance with applicable laws and regulations"/>
+			<xsd:enumeration value="Effectiveness and efficiency of operations"/>
+			<xsd:enumeration value="Reliability of Financial Statements"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_RiskCodeContentType" id="oagis-id-ba592aa0ac6e4b75a4079327b9e988c4">
+		<xsd:union memberTypes="xsd:token oacl_RiskCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SalesActivityCodeEnumerationType" id="oagis-id-85c9478b650b454cb1b787b2f73c5bd3">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="LiteratureRequest"/>
+			<xsd:enumeration value="NewLead"/>
+			<xsd:enumeration value="DeadContent"/>
+			<xsd:enumeration value="TrafficReport"/>
+			<xsd:enumeration value="Sold"/>
+			<xsd:enumeration value="EMail"/>
+			<xsd:enumeration value="Letter"/>
+			<xsd:enumeration value="Fax"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SalesActivityCodeContentType" id="oagis-id-4ecd86e940f44dc7bc53eee193cc2fb6">
+		<xsd:union memberTypes="oacl_SalesActivityCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SalesTaskCodeEnumerationType" id="oagis-id-ca9c8d90e3c44affa4d629e7f27b10cf">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Meeting"/>
+			<xsd:enumeration value="ConferenceCall"/>
+			<xsd:enumeration value="FollowUp"/>
+			<xsd:enumeration value="EMail"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SalesTaskCodeContentType" id="oagis-id-902eea339f974afb94840f4aef4e1d8f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">List of SalesTasks.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="xsd:token oacl_SalesTaskCodeEnumerationType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_StateCodeEnumerationType" id="oagis-id-757cc95940474bdb8cd363e747481562">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_StateCodeContentType" id="oagis-id-5d83970fc7a14264960da8e6c9fca3e4">
+		<xsd:union memberTypes="oacl_StateCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SystemEnvironmentCodeEnumerationType" id="oagis-id-ecd5459a46b64a18a8e231007a66c2ef">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Production"/>
+			<xsd:enumeration value="Test"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SystemEnvironmentCodeContentType" id="oagis-id-9aa6992a44c349b5b9a2ab7dbc51e939">
+		<xsd:union memberTypes="oacl_SystemEnvironmentCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TimeZoneCodeContentType" id="oagis-id-9aa6992a44c349b5b9a2ab7dbc51e945">
+		<xsd:union memberTypes="clm6TimeZoneCode1_TimeZoneCodeContentType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TaxCodeEnumerationType" id="oagis-id-df190df7a6324876a806c1dba81abc17">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TaxCodeContentType" id="oagis-id-19df69be3a5b4080a693730044647de3">
+		<xsd:union memberTypes="oacl_TaxCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TransferCodeEnumerationType" id="oagis-id-8fe94a19fa2f4efbab618ac7acd8f094">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="Complete"/>
+			<xsd:enumeration value="Return"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TransferCodeContentType" id="oagis-id-a1aef967e9644d8f92024d518b2adc09">
+		<xsd:union memberTypes="oacl_TransferCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_UnitCodeContentType" id="oagis-id-832d7dc7e6fb4020afd7edc99bb16742">
+		<xsd:union memberTypes="clm6Recommendation205_MeasurementUnitCommonCodeContentType xsd:token"/>
+	</xsd:simpleType>
+</xsd:schema>

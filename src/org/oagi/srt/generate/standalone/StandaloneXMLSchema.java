@@ -27,6 +27,7 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
+import org.oagi.srt.persistence.PersistenceUtils;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
@@ -1190,14 +1191,14 @@ public class StandaloneXMLSchema {
 		return aASBIEPVO;
 	}
 	
-	public ArrayList<SRTObject> receiveABIE(ArrayList<Integer> abie_id) throws SRTDAOException{
+	public ArrayList<SRTObject> receiveABIE(ArrayList<Integer> abie_ids) throws SRTDAOException{
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("ABIE");
 		
 		ArrayList<SRTObject> aABIEVO = new ArrayList<SRTObject>();
-		for(int i = 0; i < abie_id.size() ; i++) {
+		for(int i = 0; i < abie_ids.size() ; i++) {
 			QueryCondition qc = new QueryCondition();
-			qc.add("ABIE_ID", abie_id.get(i));
+			qc.add("ABIE_ID", abie_ids.get(i));
 			aABIEVO.addAll(dao.findObjects(qc, conn));
 		}
 		return aABIEVO;
@@ -1394,46 +1395,50 @@ public class StandaloneXMLSchema {
 		return false;
 	}
 
-	public String generateXMLSchema (ArrayList<Integer> abie_ids, boolean schema_package_flag) throws Exception {
+	public String generateXMLSchema(ArrayList<Integer> abie_ids, boolean schema_package_flag) throws Exception {
 		Utility.dbSetup();
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
+		try {
+			ArrayList<SRTObject> gABIE = receiveABIE(abie_ids);
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.newDocument();
 
-		ArrayList<SRTObject> gABIEs = receiveABIE(abie_ids);
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		Document doc = docBuilder.newDocument();
-
-		Element schemaNode = generateSchema(doc);
-		String filepath = null, filename = null;
-		if(schema_package_flag == true) {
-			for(SRTObject gABIESRTObject : gABIEs){
-				ABIEVO aABIEVO = (ABIEVO)gABIESRTObject;
-				ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
-				System.out.println("Generating Top Level ABIE w/ given ASBIEPVO ID: "+ aASBIEPVO.getASBIEPID());
-				doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
-				DAOFactory df = DAOFactory.getDAOFactory();
-				SRTDAO asccpDao = df.getDAO("ASCCP");
-		    	QueryCondition qc = new QueryCondition();
-				qc.add("ASCCP_ID", aASBIEPVO.getBasedASCCPID());
-				ASCCPVO asccpvo = (ASCCPVO)asccpDao.findObject(qc, conn);
-				filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
+			Element schemaNode = generateSchema(doc);
+			String filepath = null, filename = null;
+			if(schema_package_flag == true) {
+				for(SRTObject aSRTObject : gABIE){
+					ABIEVO aABIEVO = (ABIEVO)aSRTObject;
+					ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
+					System.out.println("Generating Top Level ABIE w/ given ASBIEPVO ID: "+ aASBIEPVO.getASBIEPID());
+					doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
+					DAOFactory df = DAOFactory.getDAOFactory();
+					SRTDAO dao = df.getDAO("ASCCP");
+					QueryCondition qc = new QueryCondition();
+					qc.add("ASCCP_ID", aASBIEPVO.getBasedASCCPID());
+					ASCCPVO asccpvo = (ASCCPVO)dao.findObject(qc, conn);
+					filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
+				}
+				filepath = writeXSDFile(doc, filename+"_standalone");
 			}
-			filepath = writeXSDFile(doc, filename+"_standalone");
-		}
-		else {
-			for(SRTObject gABIESRTObject : gABIEs){
-				ABIEVO aABIEVO = (ABIEVO)gABIESRTObject;
-				ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
-				doc = docBuilder.newDocument();
-				schemaNode = generateSchema(doc);
-				doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
-				writeXSDFile(doc, "Package/" + aABIEVO.getAbieGUID());
+			else {
+				for(SRTObject aSRTObject : gABIE){
+					ABIEVO aABIEVO = (ABIEVO)aSRTObject;
+					ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
+					doc = docBuilder.newDocument();
+					schemaNode = generateSchema(doc);
+					doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
+					writeXSDFile(doc, "Package/" + aABIEVO.getAbieGUID());
+				}
+				filepath = Zip.compression(Utility.generateGUID());
 			}
-			filepath = Zip.compression(Utility.generateGUID());
+			
+			return filepath;
+		} finally {
+			PersistenceUtils.closeQuietly(conn);
+			PersistenceUtils.closeQuietly(tx);
 		}
-		
-		return filepath;
 	}
 	
 	public static void main(String args[]) throws Exception {

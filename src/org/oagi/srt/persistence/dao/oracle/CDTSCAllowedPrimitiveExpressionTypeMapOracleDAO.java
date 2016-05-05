@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -13,6 +7,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -47,19 +47,20 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
-			
+
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
 			if (nCond > 0) {
@@ -73,13 +74,13 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
@@ -90,37 +91,29 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
+
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
-			
+
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
 			if (nCond > 0) {
@@ -134,13 +127,13 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
@@ -153,28 +146,22 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
+		PreparedStatement ps = null;
+
 		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
+				(CDTSCAllowedPrimitiveExpressionTypeMapVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
 			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCDTSCAllowedPrimitive());
 			ps.setInt(2, cdt_sc_allowed_primitive_expression_type_mapVO.getXSDBuiltInTypeID());
@@ -185,29 +172,31 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 			//tableKeys.next();
 			//int autoGeneratedID = tableKeys.getInt(1);
 
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-		new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+				new CDTSCAllowedPrimitiveExpressionTypeMapVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -223,9 +212,9 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -237,32 +226,25 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				cdt_sc_allowed_primitive_expression_type_mapVO.setXSDBuiltInTypeID(rs.getInt("xbt_id"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return cdt_sc_allowed_primitive_expression_type_mapVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-		new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+				new CDTSCAllowedPrimitiveExpressionTypeMapVO();
 		try {
 			String sql = _FIND_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
 
@@ -279,9 +261,9 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -295,28 +277,21 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return cdt_sc_allowed_primitive_expression_type_mapVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -329,33 +304,25 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 				list.add(cdt_sc_allowed_primitive_expression_type_mapVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
-	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ALL_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT;
 			ps = conn.prepareStatement(sql);
@@ -371,16 +338,8 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
@@ -388,11 +347,13 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+				(CDTSCAllowedPrimitiveExpressionTypeMapVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
 
@@ -408,24 +369,23 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
-				(CDTSCAllowedPrimitiveExpressionTypeMapVO)obj;
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		CDTSCAllowedPrimitiveExpressionTypeMapVO cdt_sc_allowed_primitive_expression_type_mapVO =
+				(CDTSCAllowedPrimitiveExpressionTypeMapVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT);
 			ps.setInt(1, cdt_sc_allowed_primitive_expression_type_mapVO.getCTSCAllowedPrimitiveExpressionTypeMapID());
@@ -439,12 +399,9 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;

@@ -44,19 +44,19 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 	private Map<String, Integer> bdtPrimitiveRestrictions = new HashMap<String, Integer>();
 	private String bdtName;
 	private BDTPrimitiveRestrictionVO bdtPrimitiveRestrictionVO;
-    private String name;
-    private int id;
-    private String color;
-    private String type;
-    private String primitiveType;
-    private int bdtPrimitiveRestrictionId;
-    private int codeListId;
-    private String restrictionType;
+	private String name;
+	private int id;
+	private String color;
+	private String type;
+	private String primitiveType;
+	private int bdtPrimitiveRestrictionId;
+	private int codeListId;
+	private String restrictionType;
 
 	public ABIEView() {
-		
+
 	}
-	
+
 	public int getCodeListId() {
 		return codeListId;
 	}
@@ -76,7 +76,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 	public void onBDTPrimitiveChange() {
 		System.out.println(bdtPrimitiveRestrictionId);
 	}
-	
+
 	public int getBdtPrimitiveRestrictionId() {
 		return bdtPrimitiveRestrictionId;
 	}
@@ -106,35 +106,38 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 		try {
 			DAOFactory df = DAOFactory.getDAOFactory();
 			SRTDAO bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
-			
+
 			QueryCondition qc_02 = new QueryCondition();
 			qc_02.add("bdt_id", bccpVO.getBDTID());
-			
+
 			List<SRTObject> ccs = bdtPrimitiveRestrictionDao.findObjects(qc_02);
-			bdtPrimitiveRestrictionId = ((BDTPrimitiveRestrictionVO)ccs.get(0)).getBDTPrimitiveRestrictionID();
-			for(SRTObject obj : ccs) {
-				BDTPrimitiveRestrictionVO cc = (BDTPrimitiveRestrictionVO)obj;
-				
-				if(cc.getCDTPrimitiveExpressionTypeMapID() > 0) {
+			// Implicitly declaration. Why does it need to be here?
+			// Because of this code, Add 'setBccpVO_BbieVO' method.
+			// TODO: Fix me.
+			bdtPrimitiveRestrictionId = bbieVO.getBdtPrimitiveRestrictionId();
+			for (SRTObject obj : ccs) {
+				BDTPrimitiveRestrictionVO cc = (BDTPrimitiveRestrictionVO) obj;
+
+				if (cc.getCDTPrimitiveExpressionTypeMapID() > 0) {
 					primitiveType = "XSD Builtin Type";
-					
+
 					SRTDAO cdtAllowedPrimitiveExpressionTypeMapDao = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 					QueryCondition qc_03 = new QueryCondition();
 					qc_03.add("cdt_awd_pri_xps_type_map_id", cc.getCDTPrimitiveExpressionTypeMapID());
-					CDTAllowedPrimitiveExpressionTypeMapVO vo = (CDTAllowedPrimitiveExpressionTypeMapVO)cdtAllowedPrimitiveExpressionTypeMapDao.findObject(qc_03);
-					
+					CDTAllowedPrimitiveExpressionTypeMapVO vo = (CDTAllowedPrimitiveExpressionTypeMapVO) cdtAllowedPrimitiveExpressionTypeMapDao.findObject(qc_03);
+
 					SRTDAO xsdBuiltInTypeDao = df.getDAO("XSDBuiltInType");
 					QueryCondition qc_04 = new QueryCondition();
 					qc_04.add("xbt_id", vo.getXSDBuiltInTypeID());
-					XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO)xsdBuiltInTypeDao.findObject(qc_04);
+					XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO) xsdBuiltInTypeDao.findObject(qc_04);
 					bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBDTPrimitiveRestrictionID());
 				} else {
 					primitiveType = "Code List";
-					
+
 					SRTDAO codeListDao = df.getDAO("CodeList");
 					QueryCondition qc_04 = new QueryCondition();
 					qc_04.add("code_list_id", cc.getCodeListID());
-					CodeListVO code = (CodeListVO)codeListDao.findObject(qc_04);
+					CodeListVO code = (CodeListVO) codeListDao.findObject(qc_04);
 					bdtPrimitiveRestrictions.put(code.getName(), cc.getBDTPrimitiveRestrictionID());
 				}
 			}
@@ -143,7 +146,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 		}
 		return bdtPrimitiveRestrictions;
 	}
-	
+
 	public void setBdtPrimitiveRestrictions(Map<String, Integer> bdtPrimitiveRestrictions) {
 		this.bdtPrimitiveRestrictions = bdtPrimitiveRestrictions;
 	}
@@ -157,10 +160,10 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 	}
 
 	public ABIEView(String name, int id, String type) {
-        this.name = name;
-        this.id = id;
-        this.type = type;
-    }
+		this.name = name;
+		this.id = id;
+		this.type = type;
+	}
 
 	public ASBIEVO getAsbieVO() {
 		return asbieVO;
@@ -238,8 +241,13 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 		return bccpVO;
 	}
 
-	public void setBccpVO(BCCPVO bccpVO) {
+	private void setBccpVO(BCCPVO bccpVO) {
 		this.bccpVO = bccpVO;
+	}
+
+	public void setBccpVO_BbieVO(BCCPVO bccpVO, BBIEVO bbieVO) {
+		setBccpVO(bccpVO);
+		setBbieVO(bbieVO);
 	}
 
 	public DTSCVO getDtscVO() {
@@ -267,21 +275,21 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 	}
 
 	public String getName() {
-        return name;
-    }
- 
-    public void setName(String name) {
-        this.name = name;
-    }
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public String getType() {
-        return type;
-    }
- 
-    public void setType(String type) {
-        this.type = type;
-    }
- 
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public String getColor() {
 		return color;
 	}
@@ -291,43 +299,43 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 	}
 
 	//Eclipse Generated hashCode and equals
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((String.valueOf(id) == null) ? 0 : String.valueOf(id).hashCode());
-        return result;
-    }
- 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ABIEView other = (ABIEView) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (id <= 0) {
-            if (other.id > 0)
-                return false;
-        } else if (id != other.id)
-            return false;
-        return true;
-    }
- 
-    @Override
-    public String toString() {
-        return name;
-    }
- 
-    public int compareTo(ABIEView document) {
-        return this.getName().compareTo(document.getName());
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((String.valueOf(id) == null) ? 0 : String.valueOf(id).hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ABIEView other = (ABIEView) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (id <= 0) {
+			if (other.id > 0)
+				return false;
+		} else if (id != other.id)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	public int compareTo(ABIEView document) {
+		return this.getName().compareTo(document.getName());
+	}
 } 

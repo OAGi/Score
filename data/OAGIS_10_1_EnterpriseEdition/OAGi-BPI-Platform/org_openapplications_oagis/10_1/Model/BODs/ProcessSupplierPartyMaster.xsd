@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessSupplierPartyMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SupplierPartyMaster.xsd"/>
+	<xsd:element name="ProcessSupplierPartyMaster" type="ProcessSupplierPartyMasterType" id="oagis-id-b3f259059b9e4ddc82efcf098cb9fe4d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ProcessSupplerPartyMaster is used to Processhronize SupplierPartyMaster data across systems. Using the Process indicates that the sender of the Process is the owner of the date and the receiver of the Process is a sub-system that must accept the data as provided.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessSupplierPartyMasterType" id="oagis-id-2404288e2c3f42598cb375bec40d70c8">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessSupplierPartyMasterDataAreaType" id="oagis-id-4e3c4c4ebfb24f9483e001c2e72711fe">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessSupplierPartyMaster. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (SupplierPartyMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessSupplierPartyMasterDataAreaType" id="oagis-id-889ccf7c064642829511bb4d6b0a62e5">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-ce4137216ad6470da98cb41d45d52d5f"/>
+			<xsd:element ref="SupplierPartyMaster" maxOccurs="unbounded" id="oagis-id-8bbaa94a8794476aae80b64ff5fdf6ef"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

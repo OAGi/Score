@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/AcknowledgeInventoryConsumption.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InventoryConsumption.xsd"/>
+        <xsd:element name="AcknowledgeInventoryConsumption" type="AcknowledgeInventoryConsumptionType" id="oagis-id-27e7f21b918447e99bbeffcdfff251aa">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeInventoryConsumption is to inform a seller or provider about InventoryConsumption of items.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="AcknowledgeInventoryConsumptionType" id="oagis-id-a5c137ac01aa48b6982212208852a0dc">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="AcknowledgeInventoryConsumptionDataAreaType" id="oagis-id-0ff83b1ab3d940b9a4cad0a0c5403b6c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeInventoryConsumption. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (InventoryConsumption).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="AcknowledgeInventoryConsumptionDataAreaType" id="oagis-id-1dc81621cdae4884b598df2cb7f92b4e">
+                <xsd:sequence>
+                        <xsd:element ref="Acknowledge" id="oagis-id-3109b2f99d894dac86baf21cbe89fc22"/>
+                        <xsd:element ref="InventoryConsumption" maxOccurs="unbounded" id="oagis-id-d9c74e08615947ddaac88e426fe0c4d1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

@@ -1,9 +1,4 @@
 package org.oagi.srt.persistence.dao.oracle;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
@@ -13,6 +8,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.DTSCVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -48,17 +49,18 @@ public class DTSCOracleDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_DT_SC_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -74,9 +76,9 @@ public class DTSCOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -96,37 +98,28 @@ public class DTSCOracleDAO extends SRTDAO {
 				list.add(dtscVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
+
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
-		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			//Connection conn = tx.open();
+			//conn = tx.open();
 			String sql = _FIND_DT_SC_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -142,9 +135,9 @@ public class DTSCOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -163,39 +156,28 @@ public class DTSCOracleDAO extends SRTDAO {
 				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
 				list.add(dtscVO);
 			}
-			//tx.commit();
-			//conn.close();
-		//} catch (BfPersistenceException e) {
-		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		DTSCVO dtscVO = (DTSCVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		DTSCVO dtscVO = (DTSCVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_DT_SC_STATEMENT);
-			if( dtscVO.getDTSCGUID()==null ||  dtscVO.getDTSCGUID().length()==0 ||  dtscVO.getDTSCGUID().isEmpty() ||  dtscVO.getDTSCGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (dtscVO.getDTSCGUID() == null || dtscVO.getDTSCGUID().length() == 0 || dtscVO.getDTSCGUID().isEmpty() || dtscVO.getDTSCGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, dtscVO.getDTSCGUID());
 
 //			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
@@ -219,10 +201,9 @@ public class DTSCOracleDAO extends SRTDAO {
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
 
-			if(dtscVO.getBasedDTSCID()>0){
+			if (dtscVO.getBasedDTSCID() > 0) {
 				ps.setInt(8, dtscVO.getBasedDTSCID());
-			}
-			else {
+			} else {
 				ps.setNull(8, java.sql.Types.INTEGER);
 			}
 
@@ -231,28 +212,30 @@ public class DTSCOracleDAO extends SRTDAO {
 			//ResultSet tableKeys = ps.getGeneratedKeys();
 			//tableKeys.next();
 			//int autoGeneratedID = tableKeys.getInt(1);
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		DTSCVO dtscVO = new DTSCVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_DT_SC_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -268,9 +251,9 @@ public class DTSCOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -288,34 +271,25 @@ public class DTSCOracleDAO extends SRTDAO {
 				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return dtscVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
-		DBAgent tx = new DBAgent();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		DTSCVO dtscVO = null;
 		try {
-			//Connection conn = tx.open();
 			String sql = _FIND_DT_SC_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -331,9 +305,9 @@ public class DTSCOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -351,36 +325,24 @@ public class DTSCOracleDAO extends SRTDAO {
 				dtscVO.setMaxCardinality(rs.getInt("Max_Cardinality"));
 				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
 			}
-			//tx.commit();
-			//conn.close();
-		//} catch (BfPersistenceException e) {
-		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return dtscVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_DT_SC_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -398,36 +360,26 @@ public class DTSCOracleDAO extends SRTDAO {
 				list.add(dtscVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
-	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
-		DBAgent tx = new DBAgent();
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			//Connection conn = tx.open();
 			String sql = _FIND_ALL_DT_SC_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -444,24 +396,11 @@ public class DTSCOracleDAO extends SRTDAO {
 				dtscVO.setBasedDTSCID(rs.getInt("Based_DT_SC_ID"));
 				list.add(dtscVO);
 			}
-			//tx.commit();
-			//conn.close();
-		//} catch (BfPersistenceException e) {
-		//	throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
@@ -469,16 +408,18 @@ public class DTSCOracleDAO extends SRTDAO {
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		DTSCVO dtscVO = (DTSCVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		DTSCVO dtscVO = (DTSCVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_DT_SC_STATEMENT);
 
-			if( dtscVO.getDTSCGUID()==null ||  dtscVO.getDTSCGUID().length()==0 ||  dtscVO.getDTSCGUID().isEmpty() ||  dtscVO.getDTSCGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (dtscVO.getDTSCGUID() == null || dtscVO.getDTSCGUID().length() == 0 || dtscVO.getDTSCGUID().isEmpty() || dtscVO.getDTSCGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, dtscVO.getDTSCGUID());
 
 //			if( dtscVO.getPropertyTerm()==null ||  dtscVO.getPropertyTerm().length()==0 ||  dtscVO.getPropertyTerm().isEmpty() ||  dtscVO.getPropertyTerm().equals(""))				
@@ -500,10 +441,9 @@ public class DTSCOracleDAO extends SRTDAO {
 			ps.setInt(5, dtscVO.getOwnerDTID());
 			ps.setInt(6, dtscVO.getMinCardinality());
 			ps.setInt(7, dtscVO.getMaxCardinality());
-			if(dtscVO.getBasedDTSCID() > 0){
+			if (dtscVO.getBasedDTSCID() > 0) {
 				ps.setInt(8, dtscVO.getBasedDTSCID());
-			}
-			else {
+			} else {
 				ps.setNull(8, java.sql.Types.INTEGER);
 			}
 			ps.setInt(9, dtscVO.getDTSCID());
@@ -518,24 +458,22 @@ public class DTSCOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		DTSCVO dtscVO = (DTSCVO)obj;
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		DTSCVO dtscVO = (DTSCVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_DT_SC_STATEMENT);
 			ps.setInt(1, dtscVO.getDTSCID());
@@ -549,12 +487,9 @@ public class DTSCOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;

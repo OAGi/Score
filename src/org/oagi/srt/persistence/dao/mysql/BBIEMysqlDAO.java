@@ -1,12 +1,5 @@
 package org.oagi.srt.persistence.dao.mysql;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -14,7 +7,9 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.DTVO;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
 *
@@ -26,22 +21,22 @@ import org.oagi.srt.persistence.dto.DTVO;
 public class BBIEMysqlDAO extends SRTDAO{
 	private final String _tableName = "bbie";
 
-	private final String _FIND_ALL_BBIE_STATEMENT = 
+	private final String _FIND_ALL_BBIE_STATEMENT =
 			"SELECT BBIE_ID, GUID, Based_BCC_ID, From_ABIE_ID, To_BBIEP_ID, bdt_pri_restri_Id, code_list_id, Cardinality_Min, Cardinality_Max, default_value, is_Nillable, Fixed_Value,  "
 					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key"
 					+ " FROM " + _tableName;
 
-	private final String _FIND_BBIE_STATEMENT = 
+	private final String _FIND_BBIE_STATEMENT =
 			"SELECT BBIE_ID, GUID, Based_BCC_ID, From_ABIE_ID, To_BBIEP_ID, bdt_pri_restri_Id, code_list_id, Cardinality_Min, Cardinality_Max, default_value, is_Nillable, Fixed_Value,  "
 					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key"
 					+ " FROM " + _tableName;
-	
-	private final String _INSERT_BBIE_STATEMENT = 
+
+	private final String _INSERT_BBIE_STATEMENT =
 			"INSERT INTO " + _tableName + " (GUID, Based_BCC_ID, From_ABIE_ID, To_BBIEP_ID, bdt_pri_restri_Id, code_list_id, Cardinality_Min, Cardinality_Max, default_value, is_Nillable, Fixed_Value,  "
 					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key)"
 					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
 
-	private final String _DELETE_BBIE_STATEMENT = 
+	private final String _DELETE_BBIE_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE BBIE_ID = ?";
 
 	@Override
@@ -49,26 +44,28 @@ public class BBIEMysqlDAO extends SRTDAO{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		BBIEVO bbieVO = (BBIEVO)obj;
 		Connection conn = null;
 		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		BBIEVO bbieVO = (BBIEVO) obj;
 		int key = -1;
 		try {
-			
+
 			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, bbieVO.getBbieGuid());
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+			if (bbieVO.getBdtPrimitiveRestrictionId() == 0)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
+			if (bbieVO.getCodeListId() == 0)
 				ps.setNull(6, java.sql.Types.INTEGER);
 			else
 				ps.setInt(6, bbieVO.getCodeListId());
@@ -84,39 +81,32 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(16, bbieVO.getLastUpdatedByUserId());
 			ps.setDouble(17, bbieVO.getSequencing_key());
 			ps.executeUpdate();
-			
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()){
-			    key = rs.getInt(1);
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				key = rs.getInt(1);
 			}
-			rs.close();
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			try {
-				if(conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return key;
 	}
-	
+
 	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
-		BBIEVO bbieVO = (BBIEVO)obj;
 		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		BBIEVO bbieVO = (BBIEVO) obj;
 		int key = -1;
 		try {
 			ps = conn.prepareStatement(_INSERT_BBIE_STATEMENT, Statement.RETURN_GENERATED_KEYS);
@@ -124,11 +114,11 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+			if (bbieVO.getBdtPrimitiveRestrictionId() == 0)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
+			if (bbieVO.getCodeListId() == 0)
 				ps.setNull(6, java.sql.Types.INTEGER);
 			else
 				ps.setInt(6, bbieVO.getCodeListId());
@@ -145,33 +135,29 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setDouble(17, bbieVO.getSequencing_key());
 
 			ps.executeUpdate();
-			
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()){
-			    key = rs.getInt(1);
+
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				key = rs.getInt(1);
 			}
-			rs.close();
-			ps.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return key;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		BBIEVO bbieVO = new BBIEVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_BBIE_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -187,9 +173,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -216,35 +202,28 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return bbieVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_BBIE_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -271,54 +250,48 @@ public class BBIEMysqlDAO extends SRTDAO{
 				list.add(bbieVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
 
-	private final String _UPDATE_BBIE_STATEMENT = 
+	private final String _UPDATE_BBIE_STATEMENT =
 			"UPDATE " + _tableName
-			+ " SET GUID = ?, Based_BCC_ID = ?,  From_ABIE_ID = ?, To_BBIEP_ID = ?, bdt_pri_restri_id = ?, code_list_id = ?, "
-			+ "Cardinality_Min = ?, Cardinality_Max = ?, default_value = ?, is_Nillable = ?, Fixed_Value = ?,"
-			+ "is_null = ?, Definition = ?, remark = ?, "
-			+ "last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where bbie_id = ?";
+					+ " SET GUID = ?, Based_BCC_ID = ?,  From_ABIE_ID = ?, To_BBIEP_ID = ?, bdt_pri_restri_id = ?, code_list_id = ?, "
+					+ "Cardinality_Min = ?, Cardinality_Max = ?, default_value = ?, is_Nillable = ?, Fixed_Value = ?,"
+					+ "is_null = ?, Definition = ?, remark = ?, "
+					+ "last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where bbie_id = ?";
 
-	
+
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		BBIEVO bbieVO = (BBIEVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		BBIEVO bbieVO = (BBIEVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_BBIE_STATEMENT);
-			
+
 			ps.setString(1, bbieVO.getBbieGuid());
 			ps.setInt(2, bbieVO.getBasedBCCID());
 			ps.setInt(3, bbieVO.getAssocFromABIEID());
 			ps.setInt(4, bbieVO.getAssocToBBIEPID());
-			if(bbieVO.getBdtPrimitiveRestrictionId() == 0)
+			if (bbieVO.getBdtPrimitiveRestrictionId() == 0)
 				ps.setNull(5, java.sql.Types.INTEGER);
 			else
 				ps.setInt(5, bbieVO.getBdtPrimitiveRestrictionId());
-			if(bbieVO.getCodeListId() == 0)
+			if (bbieVO.getCodeListId() == 0)
 				ps.setNull(6, java.sql.Types.INTEGER);
 			else
 				ps.setInt(6, bbieVO.getCodeListId());
@@ -333,11 +306,10 @@ public class BBIEMysqlDAO extends SRTDAO{
 			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 			ps.setDouble(16, bbieVO.getSequencing_key());
 			ps.setInt(17, bbieVO.getBBIEID());
-			
+
 			ps.executeUpdate();
 
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_UPDATE_ERROR, e);
@@ -345,31 +317,28 @@ public class BBIEMysqlDAO extends SRTDAO{
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		BBIEVO bbieVO = (BBIEVO)obj;
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		BBIEVO bbieVO = (BBIEVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_BBIE_STATEMENT);
 			ps.setInt(1, bbieVO.getBBIEID());
 			ps.executeUpdate();
 
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.DAO_DELETE_ERROR, e);
@@ -377,12 +346,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
@@ -392,13 +358,14 @@ public class BBIEMysqlDAO extends SRTDAO{
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_BBIE_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -414,9 +381,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -445,23 +412,15 @@ public class BBIEMysqlDAO extends SRTDAO{
 				list.add(bbieVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
@@ -477,9 +436,9 @@ public class BBIEMysqlDAO extends SRTDAO{
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
-
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_BBIE_STATEMENT;
@@ -492,7 +451,7 @@ public class BBIEMysqlDAO extends SRTDAO{
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -500,19 +459,19 @@ public class BBIEMysqlDAO extends SRTDAO{
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -547,23 +506,15 @@ public class BBIEMysqlDAO extends SRTDAO{
 				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
 				list.add(bbieVO);
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return list;
-		
+
 	}
 
 	@Override

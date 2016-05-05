@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.commons.lang.StringUtils;
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
@@ -14,7 +8,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
 *
@@ -55,17 +54,18 @@ public class CodeListOracleDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
 			throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_Code_List_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -76,7 +76,7 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -84,19 +84,19 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -130,43 +130,37 @@ public class CodeListOracleDAO extends SRTDAO {
 				list.add(codelistVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CodeListVO codelistVO = (CodeListVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		CodeListVO codelistVO = (CodeListVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_Code_List_STATEMENT);
-			if( codelistVO.getCodeListGUID()==null ||  codelistVO.getCodeListGUID().length()==0 ||  codelistVO.getCodeListGUID().isEmpty() ||  codelistVO.getCodeListGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getCodeListGUID() == null || codelistVO.getCodeListGUID().length() == 0 || codelistVO.getCodeListGUID().isEmpty() || codelistVO.getCodeListGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, codelistVO.getCodeListGUID());
 
-			if( codelistVO.getEnumerationTypeGUID()==null ||  codelistVO.getEnumerationTypeGUID().length()==0 ||  codelistVO.getEnumerationTypeGUID().isEmpty() ||  codelistVO.getEnumerationTypeGUID().equals(""))				
-				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getEnumerationTypeGUID() == null || codelistVO.getEnumerationTypeGUID().length() == 0 || codelistVO.getEnumerationTypeGUID().isEmpty() || codelistVO.getEnumerationTypeGUID().equals(""))
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(2, codelistVO.getEnumerationTypeGUID());
 
 //			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
@@ -174,15 +168,15 @@ public class CodeListOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(3, codelistVO.getName());
 
-			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
-				ps.setString(4,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getListID() == null || codelistVO.getListID().length() == 0 || codelistVO.getListID().isEmpty() || codelistVO.getListID().equals(""))
+				ps.setString(4, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(4, codelistVO.getListID());
 
 			ps.setInt(5, codelistVO.getAgencyID());
-			if( codelistVO.getVersionID()==null ||  codelistVO.getVersionID().length()==0 ||  codelistVO.getVersionID().isEmpty() ||  codelistVO.getVersionID().equals(""))				
-				ps.setString(6,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getVersionID() == null || codelistVO.getVersionID().length() == 0 || codelistVO.getVersionID().isEmpty() || codelistVO.getVersionID().equals(""))
+				ps.setString(6, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(6, codelistVO.getVersionID());
 
 //			if(codelistVO.getDefinition()==null || codelistVO.getDefinition().length()==0 || codelistVO.getDefinition().isEmpty() || codelistVO.getDefinition().equals("")){
@@ -202,21 +196,21 @@ public class CodeListOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(9, codelistVO.getDefinitionSource());
 
-			if(codelistVO.getBasedCodeListID() > 0)
+			if (codelistVO.getBasedCodeListID() > 0)
 				ps.setInt(10, codelistVO.getBasedCodeListID());
 			else
 				ps.setNull(10, java.sql.Types.INTEGER);
-			if( codelistVO.getExtensibleIndicator())				
-				ps.setInt(11,1);
-			else 	
-				ps.setInt(11,0);
+			if (codelistVO.getExtensibleIndicator())
+				ps.setInt(11, 1);
+			else
+				ps.setInt(11, 0);
 
 			ps.setInt(12, codelistVO.getCreatedByUserID());
 			ps.setInt(13, codelistVO.getLastUpdatedByUserID());
 			//ps.setTimestamp(14, codelistVO.getLastUpdateTimestamp());
-			if( codelistVO.getState()==null ||  codelistVO.getState().length()==0 ||  codelistVO.getState().isEmpty() ||  codelistVO.getState().equals(""))				
-				ps.setString(14,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getState() == null || codelistVO.getState().length() == 0 || codelistVO.getState().isEmpty() || codelistVO.getState().equals(""))
+				ps.setString(14, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(14, codelistVO.getState());
 
 
@@ -226,17 +220,17 @@ public class CodeListOracleDAO extends SRTDAO {
 			//tableKeys.next();
 			//int autoGeneratedID = tableKeys.getInt(1);
 
-			ps.close();
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.DAO_INSERT_ERROR, e);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 
@@ -244,11 +238,13 @@ public class CodeListOracleDAO extends SRTDAO {
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		CodeListVO codelistVO = new CodeListVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_Code_List_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -259,7 +255,7 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -267,19 +263,19 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -290,7 +286,7 @@ public class CodeListOracleDAO extends SRTDAO {
 					}
 				}
 			}
-			
+
 			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
@@ -314,30 +310,23 @@ public class CodeListOracleDAO extends SRTDAO {
 				codelistVO.setState(rs.getString("State"));
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return codelistVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		CodeListVO codelistVO = new CodeListVO();
 		try {
 			String sql = _FIND_Code_List_STATEMENT;
@@ -350,7 +339,7 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -358,19 +347,19 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -381,7 +370,7 @@ public class CodeListOracleDAO extends SRTDAO {
 					}
 				}
 			}
-			
+
 			//System.out.println("##### SQL: " + sql);
 
 			rs = ps.executeQuery();
@@ -407,28 +396,21 @@ public class CodeListOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return codelistVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_Code_List_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -454,34 +436,26 @@ public class CodeListOracleDAO extends SRTDAO {
 				list.add(codelistVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
-			
-	}
-	
-	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
+	}
+
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ALL_Code_List_STATEMENT;
 			ps = conn.prepareStatement(sql);
@@ -510,39 +484,33 @@ public class CodeListOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
-			
+
 	}
-	
+
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		CodeListVO codelistVO = (CodeListVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		CodeListVO codelistVO = (CodeListVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_Code_List_STATEMENT);
-			
-			if( codelistVO.getCodeListGUID()==null ||  codelistVO.getCodeListGUID().length()==0 ||  codelistVO.getCodeListGUID().isEmpty() ||  codelistVO.getCodeListGUID().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+
+			if (codelistVO.getCodeListGUID() == null || codelistVO.getCodeListGUID().length() == 0 || codelistVO.getCodeListGUID().isEmpty() || codelistVO.getCodeListGUID().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, codelistVO.getCodeListGUID());
 
-			if( codelistVO.getEnumerationTypeGUID()==null ||  codelistVO.getEnumerationTypeGUID().length()==0 ||  codelistVO.getEnumerationTypeGUID().isEmpty() ||  codelistVO.getEnumerationTypeGUID().equals(""))				
-				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getEnumerationTypeGUID() == null || codelistVO.getEnumerationTypeGUID().length() == 0 || codelistVO.getEnumerationTypeGUID().isEmpty() || codelistVO.getEnumerationTypeGUID().equals(""))
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(2, codelistVO.getEnumerationTypeGUID());
 
 //			if( codelistVO.getName()==null ||  codelistVO.getName().length()==0 ||  codelistVO.getName().isEmpty() ||  codelistVO.getName().equals(""))				
@@ -550,15 +518,15 @@ public class CodeListOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(3, codelistVO.getName());
 
-			if( codelistVO.getListID()==null ||  codelistVO.getListID().length()==0 ||  codelistVO.getListID().isEmpty() ||  codelistVO.getListID().equals(""))				
-				ps.setString(4,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getListID() == null || codelistVO.getListID().length() == 0 || codelistVO.getListID().isEmpty() || codelistVO.getListID().equals(""))
+				ps.setString(4, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(4, codelistVO.getListID());
 
 			ps.setInt(5, codelistVO.getAgencyID());
-			if( codelistVO.getVersionID()==null ||  codelistVO.getVersionID().length()==0 ||  codelistVO.getVersionID().isEmpty() ||  codelistVO.getVersionID().equals(""))				
-				ps.setString(6,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getVersionID() == null || codelistVO.getVersionID().length() == 0 || codelistVO.getVersionID().isEmpty() || codelistVO.getVersionID().equals(""))
+				ps.setString(6, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(6, codelistVO.getVersionID());
 
 //			if( codelistVO.getDefinition()==null ||  codelistVO.getDefinition().length()==0 ||  codelistVO.getDefinition().isEmpty() ||  codelistVO.getDefinition().equals(""))				
@@ -571,21 +539,21 @@ public class CodeListOracleDAO extends SRTDAO {
 //				ps.setString(8,"\u00A0");
 //			else 	
 				ps.setString(8, codelistVO.getDefinitionSource());
-			if(codelistVO.getBasedCodeListID() < 1)
+			if (codelistVO.getBasedCodeListID() < 1)
 				ps.setNull(9, java.sql.Types.INTEGER);
 			else
 				ps.setInt(9, codelistVO.getBasedCodeListID());
-			
-			if( codelistVO.getExtensibleIndicator())				
-				ps.setInt(10,1);
-			else 	
-				ps.setInt(10,0);
+
+			if (codelistVO.getExtensibleIndicator())
+				ps.setInt(10, 1);
+			else
+				ps.setInt(10, 0);
 
 			ps.setInt(11, codelistVO.getCreatedByUserID());
 			ps.setInt(12, codelistVO.getLastUpdatedByUserID());
-			if( codelistVO.getState()==null ||  codelistVO.getState().length()==0 ||  codelistVO.getState().isEmpty() ||  codelistVO.getState().equals(""))				
-				ps.setString(13,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (codelistVO.getState() == null || codelistVO.getState().length() == 0 || codelistVO.getState().isEmpty() || codelistVO.getState().equals(""))
+				ps.setString(13, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(13, codelistVO.getState());
 //			if( codelistVO.getRemark()==null ||  codelistVO.getRemark().length()==0 ||  codelistVO.getRemark().isEmpty() ||  codelistVO.getRemark().equals(""))				
 //				ps.setString(14,"\u00A0");
@@ -602,25 +570,23 @@ public class CodeListOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
 	}
 
-	
+
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		CodeListVO codelistVO = (CodeListVO)obj;
-		
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		CodeListVO codelistVO = (CodeListVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_Code_List_STATEMENT);
 			ps.setInt(1, codelistVO.getCodeListID());
@@ -634,12 +600,9 @@ public class CodeListOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
@@ -652,6 +615,7 @@ public class CodeListOracleDAO extends SRTDAO {
 			throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_Code_List_STATEMENT;
@@ -664,7 +628,7 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			int nCond2 = qc.getLikeSize();
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
@@ -672,19 +636,19 @@ public class CodeListOracleDAO extends SRTDAO {
 					WHERE_OR_AND = " AND ";
 				}
 			}
-			
+
 			ps = conn.prepareStatement(sql);
 			if (nCond > 0) {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
-			
+
 			if (nCond2 > 0) {
 				for (int n = 0; n < nCond2; n++) {
 					Object value = qc.getLikeValue(n);
@@ -718,20 +682,12 @@ public class CodeListOracleDAO extends SRTDAO {
 				codelistVO.setState(rs.getString("State"));
 				list.add(codelistVO);
 			}
-			
+
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return list;
 	}

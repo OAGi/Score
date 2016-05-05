@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
@@ -13,6 +7,12 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.UserVO;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -43,22 +43,24 @@ public class UserOracleDAO extends SRTDAO {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		UserVO userVO = (UserVO)obj;
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		UserVO userVO = (UserVO) obj;
 		try {
-			Connection conn = tx.open();
-			PreparedStatement ps = null;
+			conn = tx.open();
 			ps = conn.prepareStatement(_INSERT_USER_STATEMENT);
-			if( userVO.getUserName()==null ||  userVO.getUserName().length()==0 ||  userVO.getUserName().isEmpty() ||  userVO.getUserName().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (userVO.getUserName() == null || userVO.getUserName().length() == 0 || userVO.getUserName().isEmpty() || userVO.getUserName().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, userVO.getUserName());
 
-			if( userVO.getPassword()==null ||  userVO.getPassword().length()==0 ||  userVO.getPassword().isEmpty() ||  userVO.getPassword().equals(""))				
-				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (userVO.getPassword() == null || userVO.getPassword().length() == 0 || userVO.getPassword().isEmpty() || userVO.getPassword().equals(""))
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(2, userVO.getPassword());
 
 //			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
@@ -71,14 +73,14 @@ public class UserOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(4, userVO.getOrganization());
 
-			if( userVO.getOagis_developer_indicator())				
-				ps.setInt(5,1);
-			else 	
-				ps.setInt(5,0);
+			if (userVO.getOagis_developer_indicator())
+				ps.setInt(5, 1);
+			else
+				ps.setInt(5, 0);
 
 
 			ps.executeUpdate();
-			ps.close();
+
 			tx.commit();
 		} catch (BfPersistenceException e) {
 			tx.rollback();
@@ -88,18 +90,22 @@ public class UserOracleDAO extends SRTDAO {
 			tx.rollback();
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return 1;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		UserVO userVO = new UserVO();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_USER_STATEMENT;
 
 			String WHERE_OR_AND = " WHERE ";
@@ -115,9 +121,9 @@ public class UserOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -133,30 +139,23 @@ public class UserOracleDAO extends SRTDAO {
 
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return userVO;
 	}
-	
+
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
 		UserVO userVO = new UserVO();
 		try {
 			String sql = _FIND_USER_STATEMENT;
@@ -174,9 +173,9 @@ public class UserOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -195,28 +194,21 @@ public class UserOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 		return userVO;
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_USER_STATEMENT;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -231,36 +223,29 @@ public class UserOracleDAO extends SRTDAO {
 				list.add(userVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
+
 	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
-
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 			String sql = _FIND_ALL_USER_STATEMENT;
 			String WHERE_OR_AND = " WHERE ";
 			int nCond = qc.getSize();
@@ -275,9 +260,9 @@ public class UserOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -293,33 +278,25 @@ public class UserOracleDAO extends SRTDAO {
 				list.add(userVO);
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return list;
 	}
-	
-	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ALL_USER_STATEMENT;
 			ps = conn.prepareStatement(sql);
@@ -337,26 +314,18 @@ public class UserOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
 	}
-	
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException {
-		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+
+		ArrayList<SRTObject> list = new ArrayList<SRTObject>();
 		try {
 			String sql = _FIND_ALL_USER_STATEMENT;
 			String WHERE_OR_AND = " WHERE ";
@@ -372,9 +341,9 @@ public class UserOracleDAO extends SRTDAO {
 				for (int n = 0; n < nCond; n++) {
 					Object value = qc.getValue(n);
 					if (value instanceof String) {
-						ps.setString(n+1, (String) value);
+						ps.setString(n + 1, (String) value);
 					} else if (value instanceof Integer) {
-						ps.setInt(n+1, ((Integer) value).intValue());
+						ps.setInt(n + 1, ((Integer) value).intValue());
 					}
 				}
 			}
@@ -393,16 +362,8 @@ public class UserOracleDAO extends SRTDAO {
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			if(rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
+			closeQuietly(rs);
+			closeQuietly(ps);
 		}
 
 		return list;
@@ -410,21 +371,23 @@ public class UserOracleDAO extends SRTDAO {
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
-		UserVO userVO = (UserVO)obj;
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		UserVO userVO = (UserVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_UPDATE_USER_STATEMENT);
 
-			if( userVO.getUserName()==null ||  userVO.getUserName().length()==0 ||  userVO.getUserName().isEmpty() ||  userVO.getUserName().equals(""))				
-				ps.setString(1,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (userVO.getUserName() == null || userVO.getUserName().length() == 0 || userVO.getUserName().isEmpty() || userVO.getUserName().equals(""))
+				ps.setString(1, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(1, userVO.getUserName());
 
-			if( userVO.getPassword()==null ||  userVO.getPassword().length()==0 ||  userVO.getPassword().isEmpty() ||  userVO.getPassword().equals(""))				
-				ps.setString(2,"**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
-			else 	
+			if (userVO.getPassword() == null || userVO.getPassword().length() == 0 || userVO.getPassword().isEmpty() || userVO.getPassword().equals(""))
+				ps.setString(2, "**SOMETHING WRONG THIS VALUE CANNOT BE NULL**");
+			else
 				ps.setString(2, userVO.getPassword());
 
 //			if( userVO.getName()==null ||  userVO.getName().length()==0 ||  userVO.getName().isEmpty() ||  userVO.getName().equals(""))				
@@ -437,10 +400,10 @@ public class UserOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(4, userVO.getOrganization());
 
-			if( userVO.getOagis_developer_indicator())				
-				ps.setInt(5,1);
-			else 	
-				ps.setInt(5,0);
+			if (userVO.getOagis_developer_indicator())
+				ps.setInt(5, 1);
+			else
+				ps.setInt(5, 0);
 
 			ps.executeUpdate();
 
@@ -452,12 +415,9 @@ public class UserOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;
@@ -465,11 +425,13 @@ public class UserOracleDAO extends SRTDAO {
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		UserVO userVO = (UserVO)obj;
 		DBAgent tx = new DBAgent();
+		Connection conn = null;
 		PreparedStatement ps = null;
+
+		UserVO userVO = (UserVO) obj;
 		try {
-			Connection conn = tx.open();
+			conn = tx.open();
 
 			ps = conn.prepareStatement(_DELETE_USER_STATEMENT);
 			ps.setInt(1, userVO.getUserID());
@@ -483,12 +445,9 @@ public class UserOracleDAO extends SRTDAO {
 			tx.rollback(e);
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if(ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {}
-			}
-			tx.close();
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 
 		return true;

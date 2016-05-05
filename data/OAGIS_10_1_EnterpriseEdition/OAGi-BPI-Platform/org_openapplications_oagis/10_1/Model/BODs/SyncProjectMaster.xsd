@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncProjectMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProjectMaster.xsd"/>
+        <xsd:element name="SyncProjectMaster" type="SyncProjectMasterType" id="oagis-id-095e4e4aa2704188b0b70c57357609ae">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncProjectMaster is to enable all relevant sub-systems that submit transactions to the project accounting application to maintain valid values for the key project fields.  The target applications for this update would include, but not necessarily be limited to:
+·	Accounts Payable
+·	Accounts Receivable
+·	Budget
+·	Order Management
+·	Purchasing
+·	Time and Labor
+·	Travel and Expense
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncProjectMasterType" id="oagis-id-aae85635fe874736bde0fc7c2ca2b3c1">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncProjectMasterDataAreaType" id="oagis-id-b2a24621726144859f9b4c2f603b2fc9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncProjectMaster. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (ProjectMaster).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncProjectMasterDataAreaType" id="oagis-id-f88a77d07bc64b40882f87953b4074c4">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-150bf10fbaef4014a332a81e703e4d3d"/>
+                        <xsd:element ref="ProjectMaster" maxOccurs="unbounded" id="oagis-id-045a403c8cc24b458eef92eb3e9a4385"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

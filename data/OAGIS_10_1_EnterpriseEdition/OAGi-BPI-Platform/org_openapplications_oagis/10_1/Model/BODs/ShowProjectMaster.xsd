@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowProjectMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProjectMaster.xsd"/>
+        <xsd:element name="ShowProjectMaster" type="ShowProjectMasterType" id="oagis-id-9d87d06f35b949a2b50f3dcb191e5998">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowProjectMaster is to supply ProjectMaster information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowProjectMasterType" id="oagis-id-70586f95da5342f3b1a6286e2972ad42">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowProjectMasterDataAreaType" id="oagis-id-edb5bc52b308498eb4880e96be1ea089">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowProjectMaster. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ProjectMaster).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowProjectMasterDataAreaType" id="oagis-id-9976a65490304fdc8f3f3ddc4dfdce3e">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-92395640bf68466b8e59c758994627b1"/>
+                        <xsd:element ref="ProjectMaster" maxOccurs="unbounded" id="oagis-id-0418b2ee9242413ab0cec3eb4cf9ba70"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

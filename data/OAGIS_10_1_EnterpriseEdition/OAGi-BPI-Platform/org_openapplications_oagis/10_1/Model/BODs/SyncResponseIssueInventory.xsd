@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseIssueInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/IssueInventory.xsd"/>
+	<xsd:element name="SyncResponseIssueInventory" type="SyncResponseIssueInventoryType" id="oagis-id-b6dd52b607464cd7baae8bf0a571bb90">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseIssueInventory is to respond to a ProcessIssueInventor, where an unplanned issue of an item to a miscellaneous location.
+
+Possible reasons for this include:
+
+1. The material is defective and needs replacing, 
+2. The material is used up and needs replenishment.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseIssueInventoryType" id="oagis-id-0112371dab4e44e9951173158108f6e0">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseIssueInventoryDataAreaType" id="oagis-id-a45cbfb88f8a4fb18c562cfb5ea4a607">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseIssueInventory. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (IssueInventory).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseIssueInventoryDataAreaType" id="oagis-id-916c275c9fc74e21979e20c819337f9d">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-eebddbc993114d018a8fcd4ab18d735a"/>
+			<xsd:element ref="IssueInventory" maxOccurs="unbounded" id="oagis-id-c40856a21ad0426da26b5c6c10d24bc6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncPlanningSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PlanningSchedule.xsd"/>
+        <xsd:element name="SyncPlanningSchedule" type="SyncPlanningScheduleType" id="oagis-id-39840b4b67f74942a6a280e8b9a00b53">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Since collaboration between a customer and a supplier can potentially go through several rounds of negotiations, both parties can use the same BOD to communicate their current demand or supply schedule in response to what they received from the other party.  Either party can indicate detailed exception descriptions along with reason code and action code to the other party why the original demand/supply requirements need to be adjusted using the optional component PlanningScheduleException
+.
+The purpose of the SyncPlanningSchedule is to communicate requirement information (part number, quantity, etc.) between a customer and their supplier on a regular basis, for example daily, weekly etc, or for a user-defined time bucket type definition (Component FexibileBucket) that is sent as part of this PlanningSchedule.  
+
+SyncPlanningSchedule allows the adding of new requirements and the modification of previously established requirements.  
+
+Customers can use this PlanningSchedule to communicate demand requirement in three different ways.  It can be as specific as the Item level or at the Commodity code level, which is higher than item.  Furthermore, it can be required simply by functional specification via feature identifiers and values using the optional component FeatureValue.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncPlanningScheduleType" id="oagis-id-b8ff5207f380450abdd2db252aee3b44">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Allows the adding of new requirements and the modification of previously established requirements through various Sync Indicator values.
+Customers can use PlanningSchedule to communicate demand requirement in three different ways.  It can be as specific as the Item level or at the Commodity code level, which is higher than item.  Furthermore, it can be required simply by functional specification via feature identifiers and values using the optional Data Type FeatureValueData.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncPlanningScheduleDataAreaType" id="oagis-id-1d53ae66b9884525ba9e6777f4198dc9">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncPlanningSchedule. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (PlanningSchedule).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncPlanningScheduleDataAreaType" id="oagis-id-7d33feb5e4244a208185df4b447cbba3">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-625aa8ee686c47f5b3c89a9bd0771b09"/>
+                        <xsd:element ref="PlanningSchedule" maxOccurs="unbounded" id="oagis-id-b83aa9819e224985826dfd6968fad733"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

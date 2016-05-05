@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downNotify package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyReceivable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Receivable.xsd"/>
+	<xsd:element name="NotifyReceivable" type="NotifyReceivableType" id="oagis-id-61d8f5ea87484915829ba7591a5503ea">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyReceiveable is to transmit data to create a receivable open item in a receivable application from the billing information generated in an order management application.  The NotifyReceiveable may also update the General Ledger, depending on the specific architecture of the accounting application.
+
+The scope of the NotifyReceiveable is to create a BOD to recognize customer obligation (accounts receivable asset).  Specific transactions include:
+1.	Sales Invoice
+2.	Credit Memo
+3.	Debit Memo
+4.	Charge Back
+
+The NotifyReceiveable may also be used for transaction that do not originate from an order management application.
+
+The following two models illustrate that the NotifyReceiveable may, in some cases, be adequate to update the financial applications, i.e., Receivables and General Ledger, and in other cases, will also require the PostJournal Business Object Document (BOD) to assure the General Ledger account balances are updated.
+</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">In the model above, the receivable application is a sub-ledger of the general ledger.  Updates to G/L balances occur via the receivables module, therefore the Notify Receivable contains both receivable and general ledger transaction information.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This other model illustrates the environment that sometime exists when General Ledger updates occur directly from the Order Management application.  The reconciliation between the receivable and general ledger is a function within the financial applications and not of the integration space.  This model allows the G/L balances to be updated in either detail or summarized form.
+
+The scope of the role of the receivable application includes functions such as:
+·	Allowing Cash Application
+·	Dunning
+·	Dispute management
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyReceivableType" id="oagis-id-3088ac80bd6b4a10a5c892b8ecbecb25">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyReceivableDataAreaType" id="oagis-id-056948bfd36447ea94d8a922db10e8af">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyReceivable. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (Receivable).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyReceivableDataAreaType" id="oagis-id-2a1d85da3cff4d05806cf2dc52c049a4">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-cf7f4d3e32a14c8aa355d211867ff45d"/>
+			<xsd:element ref="Receivable" maxOccurs="unbounded" id="oagis-id-ea95cc1e97a549cb92f3acd94a523b1d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
