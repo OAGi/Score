@@ -80,7 +80,7 @@
 						        <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ABIE'}">
 									<h:panelGrid columns="2" cellpadding="5">
 							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
-										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
+										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" /> 
 									</h:panelGrid>
 									<p:separator />
 									<h:panelGrid columns="1" cellpadding="5">
@@ -101,9 +101,12 @@
 								</ui:fragment>
 							
 								<ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE'}">
-									<h:panelGrid columns="2" cellpadding="5">
+									<h:panelGrid columns="4" cellpadding="5">
 							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
+										
+										<h:outputLabel rows="10" value="Used: " style="font-weight:bold;" />
+										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.asbieVO.used}"/>
 									</h:panelGrid>
 									<p:separator />
 									<h:panelGrid columns="1" cellpadding="5">
@@ -161,9 +164,12 @@
 								</ui:fragment>
 							
 							    <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'BBIE'}">  
-							    	<h:panelGrid columns="2" cellpadding="5">
+							    	<h:panelGrid columns="4" cellpadding="5">
 							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:green" />
+										
+										<h:outputLabel rows="10" value="Used: " style="font-weight:bold;" />
+										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.bbieVO.used}"/>
 									</h:panelGrid>
 									<p:separator />
 							    	<h:panelGrid columns="1" cellpadding="5">
@@ -236,9 +242,12 @@
 							    </ui:fragment>
 							    
 							    <ui:fragment rendered="#{topLevelABIEHandler.aABIEView.type eq 'BBIESC'}">   
-							    	<h:panelGrid columns="2" cellpadding="5">
+							    	<h:panelGrid columns="4" cellpadding="5">
 							    		<h:outputLabel rows="10" value="Name: " style="font-weight:bold;" />
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:orange" />
+										
+										<h:outputLabel rows="10" value="Used: " style="font-weight:bold;" />
+										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.bbiescVO.used}"/>
 									</h:panelGrid>
 									<p:separator />
 							    	<h:panelGrid columns="1" cellpadding="5">

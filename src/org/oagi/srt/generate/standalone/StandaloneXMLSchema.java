@@ -102,6 +102,8 @@ public class StandaloneXMLSchema {
 	public Element generateTopLevelASBIEP(ASBIEPVO tlASBIEP, Element gSchemaNode) throws Exception {
 		
 		ASCCPVO asccpVO = queryBasedASCCP(tlASBIEP);
+		
+		//serm: What does this do?
 		if(isCCStored(tlASBIEP.getASBIEPGUID()))
 			return gSchemaNode;
 		
@@ -117,18 +119,21 @@ public class StandaloneXMLSchema {
 		rootEleNode.appendChild(annotation);
 		annotation.appendChild(documentation);
 		
+		//serm: what does this do?
 		StoredCC.add(tlASBIEP.getASBIEPGUID());
 		
 		return rootEleNode;
 	}
-		
+	
 	public Element generateABIE (ABIEVO gABIE, Element gElementNode, Element gSchemaNode) throws Exception {
 		//ACCVO gACC = queryBasedACC(gABIE);
 		
 		if(isCCStored(gABIE.getAbieGUID()))
 			return gElementNode;
 		Element complexType = gElementNode.getOwnerDocument().createElement("xsd:complexType");
+		complexType.setAttribute("id", gABIE.getAbieGUID());
 		gElementNode.appendChild(complexType);
+		//serm: why is this one called generateACC - the function name is not sensible.
 		Element PNode = generateACC(gABIE, complexType, gElementNode);
 		return PNode;
 	}
@@ -137,8 +142,7 @@ public class StandaloneXMLSchema {
 
 		ACCVO gACC = queryBasedACC(gABIE);
 		Element PNode = complexType.getOwnerDocument().createElement("xsd:sequence");
-		//complexType.setAttribute("name", gACC.getObjectClassTerm().replaceAll(" ", "")+"Type"); 
-		complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", gACC.getACCGUID());
+		//***complexType.setAttribute("id", Utility.generateGUID()); 		
 		StoredCC.add(gACC.getACCGUID());
 		Element annotation = gElementNode.getOwnerDocument().createElement("xsd:annotation"); 
 		Element documentation = gElementNode.getOwnerDocument().createElement("xsd:documentation");
@@ -1275,6 +1279,7 @@ public class StandaloneXMLSchema {
 		return abieVO;
 	}
 	
+	//Get only Child BIEs whose is_used flag is true
 	public ArrayList<SRTObject> queryChildBIEs(ABIEVO gABIE) throws SRTDAOException {
 		HashMap<SRTObject, Double> sequence = new HashMap<SRTObject, Double>();
 		ValueComparator bvc =  new ValueComparator(sequence);
@@ -1284,10 +1289,12 @@ public class StandaloneXMLSchema {
 		SRTDAO dao = df.getDAO("ASBIE");
     	QueryCondition qc = new QueryCondition();
 		qc.add("From_ABIE_ID", gABIE.getABIEID());
+		qc.add("is_used", 1);
 		ArrayList<SRTObject> asbievo = dao.findObjects(qc, conn);
 		SRTDAO dao2 = df.getDAO("BBIE");
     	QueryCondition qc2 = new QueryCondition();
 		qc2.add("From_ABIE_ID", gABIE.getABIEID());
+		qc2.add("is_used", 1);
 		ArrayList<SRTObject> bbievo = dao2.findObjects(qc2, conn);
 		ArrayList<SRTObject> result = new ArrayList<SRTObject>();
 
@@ -1359,11 +1366,13 @@ public class StandaloneXMLSchema {
 		return aBDT;
 	}
 	
+	//Get only SCs whose is_used is true.
 	public ArrayList<SRTObject> queryBBIESCs(BBIEVO gBBIE) throws SRTDAOException {
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("BBIE_SC");
     	QueryCondition qc = new QueryCondition();
     	qc.add("BBIE_ID", gBBIE.getBBIEID());
+    	qc.add("is_used", 1);
  		ArrayList<SRTObject> bbiescVO = dao.findObjects(qc, conn);
 		return bbiescVO;
 	}
@@ -1385,12 +1394,12 @@ public class StandaloneXMLSchema {
 		return false;
 	}
 
-	public String generateXMLSchema (ArrayList<Integer> abie_id, boolean schema_package_flag) throws Exception {
+	public String generateXMLSchema (ArrayList<Integer> abie_ids, boolean schema_package_flag) throws Exception {
 		Utility.dbSetup();
 		DBAgent tx = new DBAgent();
 		conn = tx.open();
 
-		ArrayList<SRTObject> gABIE = receiveABIE(abie_id);
+		ArrayList<SRTObject> gABIEs = receiveABIE(abie_ids);
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		Document doc = docBuilder.newDocument();
@@ -1398,23 +1407,23 @@ public class StandaloneXMLSchema {
 		Element schemaNode = generateSchema(doc);
 		String filepath = null, filename = null;
 		if(schema_package_flag == true) {
-			for(SRTObject aSRTObject : gABIE){
-				ABIEVO aABIEVO = (ABIEVO)aSRTObject;
+			for(SRTObject gABIESRTObject : gABIEs){
+				ABIEVO aABIEVO = (ABIEVO)gABIESRTObject;
 				ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
 				System.out.println("Generating Top Level ABIE w/ given ASBIEPVO ID: "+ aASBIEPVO.getASBIEPID());
 				doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
 				DAOFactory df = DAOFactory.getDAOFactory();
-				SRTDAO dao = df.getDAO("ASCCP");
+				SRTDAO asccpDao = df.getDAO("ASCCP");
 		    	QueryCondition qc = new QueryCondition();
 				qc.add("ASCCP_ID", aASBIEPVO.getBasedASCCPID());
-				ASCCPVO asccpvo = (ASCCPVO)dao.findObject(qc, conn);
+				ASCCPVO asccpvo = (ASCCPVO)asccpDao.findObject(qc, conn);
 				filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
 			}
 			filepath = writeXSDFile(doc, filename+"_standalone");
 		}
 		else {
-			for(SRTObject aSRTObject : gABIE){
-				ABIEVO aABIEVO = (ABIEVO)aSRTObject;
+			for(SRTObject gABIESRTObject : gABIEs){
+				ABIEVO aABIEVO = (ABIEVO)gABIESRTObject;
 				ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
 				doc = docBuilder.newDocument();
 				schemaNode = generateSchema(doc);

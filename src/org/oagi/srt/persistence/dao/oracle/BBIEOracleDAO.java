@@ -29,12 +29,12 @@ public class BBIEOracleDAO extends SRTDAO{
 
 	private final String _FIND_ALL_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, GUID, Based_BCC_ID, From_ABIE_ID, To_BBIEP_ID, bdt_pri_restri_Id, code_list_id, Cardinality_Min, Cardinality_Max, default_value, is_Nillable, Fixed_Value,  "
-					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key"
+					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key, is_used"
 					+ " FROM " + _tableName;
 
 	private final String _FIND_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, GUID, Based_BCC_ID, From_ABIE_ID, To_BBIEP_ID, bdt_pri_restri_Id, code_list_id, Cardinality_Min, Cardinality_Max, default_value, is_Nillable, Fixed_Value,  "
-					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key"
+					+ "is_Null, Definition, Remark, Created_by, Last_updated_by, Creation_timestamp, Last_update_timestamp, Seq_Key, is_used"
 					+ " FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_STATEMENT = 
@@ -262,6 +262,7 @@ public class BBIEOracleDAO extends SRTDAO{
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
 				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 			}
 			tx.commit();
 			conn.close();
@@ -316,6 +317,7 @@ public class BBIEOracleDAO extends SRTDAO{
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
 				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbieVO);
 			}
 			tx.commit();
@@ -346,7 +348,7 @@ public class BBIEOracleDAO extends SRTDAO{
 			+ " SET GUID = ?, Based_BCC_ID = ?,  From_ABIE_ID = ?, To_BBIEP_ID = ?, bdt_pri_restri_id = ?, code_list_id = ?, "
 			+ "Cardinality_Min = ?, Cardinality_Max = ?, default_value = ?, is_Nillable = ?, Fixed_Value = ?,"
 			+ "is_null = ?, Definition = ?, remark = ?, "
-			+ "last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where bbie_id = ?";
+			+ "last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ?, is_used = ? where bbie_id = ?";
 
 	
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
@@ -402,7 +404,8 @@ public class BBIEOracleDAO extends SRTDAO{
 
 			ps.setInt(15, bbieVO.getLastUpdatedByUserId());
 			ps.setDouble(16, bbieVO.getSequencing_key());
-			ps.setInt(17, bbieVO.getBBIEID());
+			ps.setInt(17, bbieVO.isUsed() ? 1 : 0);
+			ps.setInt(18, bbieVO.getBBIEID());
 			
 			ps.executeUpdate();
 
@@ -512,6 +515,7 @@ public class BBIEOracleDAO extends SRTDAO{
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
 				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbieVO);
 			}
 			tx.commit();
@@ -615,6 +619,7 @@ public class BBIEOracleDAO extends SRTDAO{
 				bbieVO.setCreatedByUserId(rs.getInt("Created_by"));
 				bbieVO.setLastUpdatedByUserId(rs.getInt("Last_updated_by"));
 				bbieVO.setSequencing_key(rs.getDouble("Seq_Key"));
+				bbieVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbieVO);
 			}
 			

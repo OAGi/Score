@@ -24,6 +24,8 @@ public class BBIE_SCVO extends SRTObject {
 	private String Remark;
 	private String BusinessTerm;
 	
+	private boolean used;
+	
 	public int getBBIESCID() {  
 		return BBIESCID;
 	}
@@ -105,5 +107,13 @@ public class BBIE_SCVO extends SRTObject {
 	}
 	public void setBusinessTerm(String businessTerm) {
 		this.BusinessTerm = businessTerm;
+	}
+
+	public boolean isUsed() {
+		return used;
+	}
+
+	public void setUsed(boolean used) {
+		this.used = used;
 	}
 }

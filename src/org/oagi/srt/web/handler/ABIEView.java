@@ -273,8 +273,8 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     public void setName(String name) {
         this.name = name;
     }
- 
-    public String getType() {
+
+	public String getType() {
         return type;
     }
  

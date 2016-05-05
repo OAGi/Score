@@ -28,6 +28,7 @@ public class ASBIEVO extends SRTObject {
 	private Timestamp creationTimestamp;
 	private Timestamp lastUpdateTimestamp;
 	private double sequencingKey;
+	private boolean used;
 
 	public double getSequencingKey() {
 		return sequencingKey;
@@ -149,6 +150,14 @@ public class ASBIEVO extends SRTObject {
 
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
 		this.lastUpdateTimestamp = lastUpdateTimestamp;
+	}
+
+	public boolean isUsed() {
+		return used;
+	}
+
+	public void setUsed(boolean used) {
+		this.used = used;
 	}
 	
 }

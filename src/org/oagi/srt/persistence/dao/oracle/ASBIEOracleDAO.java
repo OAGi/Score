@@ -29,12 +29,12 @@ public class ASBIEOracleDAO extends SRTDAO{
 
 	private final String _FIND_ALL_ASBIE_STATEMENT = 
 			"SELECT ASBIE_ID, guid, From_ABIE_ID, To_ASBIEP_ID, Based_ASCC, definition, Cardinality_Min, Cardinality_Max, "
-			+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key FROM "
+			+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key, is_used FROM "
 					+ _tableName;
 
 	private final String _FIND_ASBIE_STATEMENT = 
 			"SELECT ASBIE_ID, guid, From_ABIE_ID, To_ASBIEP_ID, Based_ASCC, definition, Cardinality_Min, Cardinality_Max, "
-			+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key FROM "
+			+ "is_nillable, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, seq_key, is_used FROM "
 					+ _tableName;
 	
 	private final String _INSERT_ASBIE_STATEMENT = 
@@ -45,7 +45,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 	private final String _UPDATE_ASBIE_STATEMENT = 
 			"UPDATE " + _tableName
 			+ " SET From_ABIE_ID = ?, To_ASBIEP_ID = ?, Based_ASCC = ?, definition = ?, Cardinality_Min = ?, "
-			+ "Cardinality_Max = ?, guid = ?, is_nillable = ?, remark = ?, last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ? where ASBIE_ID = ?";
+			+ "Cardinality_Max = ?, guid = ?, is_nillable = ?, remark = ?, last_updated_by = ?, last_update_timestamp = CURRENT_TIMESTAMP, seq_key = ?, is_used = ? where ASBIE_ID = ?";
 
 	private final String _DELETE_ASBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ASBIE_ID = ?";
@@ -222,6 +222,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 				asbievo.setCreatedByUserId(rs.getInt("created_by"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
 				asbievo.setSequencingKey(rs.getDouble("seq_key"));
+				asbievo.setUsed(rs.getInt("is_used") == 1 ? true : false);
 			}
 			tx.commit();
 			conn.close();
@@ -271,6 +272,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 				asbievo.setCreatedByUserId(rs.getInt("created_by"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
 				asbievo.setSequencingKey(rs.getDouble("seq_key"));
+				asbievo.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(asbievo);
 			}
 			tx.commit();
@@ -329,7 +331,8 @@ public class ASBIEOracleDAO extends SRTDAO{
 
 			ps.setInt(10, asbievo.getLastUpdatedByUserId());
 			ps.setDouble(11, asbievo.getSequencingKey());
-			ps.setInt(12, asbievo.getASBIEID());
+			ps.setInt(12, asbievo.isUsed() ? 1 : 0);
+			ps.setInt(13, asbievo.getASBIEID());
 			
 			ps.executeUpdate();
 
@@ -434,6 +437,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 				asbievo.setCreatedByUserId(rs.getInt("created_by"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
 				asbievo.setSequencingKey(rs.getDouble("seq_key"));
+				asbievo.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(asbievo);
 			}
 			tx.commit();
@@ -525,6 +529,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 				asbievo.setCreatedByUserId(rs.getInt("created_by"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
 				asbievo.setSequencingKey(rs.getDouble("seq_key"));
+				asbievo.setUsed(rs.getInt("is_used") == 1 ? true : false);
 			}
 			
 		} catch (SQLException e) {
@@ -610,6 +615,7 @@ public class ASBIEOracleDAO extends SRTDAO{
 				asbievo.setCreatedByUserId(rs.getInt("created_by"));
 				asbievo.setLastUpdatedByUserId(rs.getInt("last_updated_by"));
 				asbievo.setSequencingKey(rs.getDouble("seq_key"));
+				asbievo.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(asbievo);
 			}
 			

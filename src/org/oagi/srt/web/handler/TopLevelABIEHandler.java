@@ -1965,11 +1965,11 @@ public class TopLevelABIEHandler implements Serializable {
 		BBIEVO bbieVO = aABIEView.getBbieVO();
 		BBIEPVO bbiepVO = aABIEView.getBbiepVO();
 		try {
-			
-			if(aABIEView.getRestrictionType().equalsIgnoreCase("Primitive")) {
+			String restrictionType = aABIEView.getRestrictionType();
+			if("Primitive".equalsIgnoreCase(restrictionType)) {
 				bbieVO.setBdtPrimitiveRestrictionId(aABIEView.getBdtPrimitiveRestrictionId());
 				bbieVO.setCodeListId(0);
-			} else if(aABIEView.getRestrictionType().equalsIgnoreCase("Code")) {
+			} else if("Code".equalsIgnoreCase(restrictionType)) {
 				if(codeListVO != null) {
 					bbieVO.setCodeListId(codeListVO.getCodeListID());
 					bbieVO.setBdtPrimitiveRestrictionId(0);

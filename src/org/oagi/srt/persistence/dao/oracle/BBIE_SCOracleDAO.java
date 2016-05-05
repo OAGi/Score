@@ -28,10 +28,10 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 	private final String _tableName = "bbie_sc";
 
 	private final String _FIND_ALL_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term FROM " + _tableName;
+			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term, is_used FROM " + _tableName;
 	
 	private final String _FIND_BBIE_SC_STATEMENT = "SELECT BBIE_SC_ID, BBIE_ID, DT_SC_ID, "
-			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term FROM " + _tableName;
+			+ "DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term, is_used FROM " + _tableName;
 	
 	private final String _INSERT_BBIE_SC_STATEMENT = "INSERT INTO " + _tableName + " (BBIE_ID, "
 			+ "DT_SC_ID, DT_SC_Pri_Restri_ID, Code_List_ID, Agency_ID_List_ID, Min_Cardinality, Max_Cardinality, Default_value, Fixed_Value, Definition, Remark, biz_Term) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -269,7 +269,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
 				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
-
+				bbie_scVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 			}
 			tx.commit();
 			conn.close();
@@ -337,6 +337,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
 				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
+				bbie_scVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 			}
 			//tx.commit();
 			//conn.close();
@@ -387,6 +388,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
 				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
+				bbie_scVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbie_scVO);
 			}
 			tx.commit();
@@ -438,6 +440,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
 				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
+				bbie_scVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbie_scVO);
 			}
 			//tx.commit();
@@ -465,7 +468,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 	
 	private final String _UPDATE_BBIE_SC_STATEMENT = "UPDATE " + _tableName + " SET BBIE_ID = ?, "
 			+ "DT_SC_ID = ?, DT_SC_Pri_Restri_ID = ?, Code_List_ID = ?, Agency_ID_List_ID = ?, Min_Cardinality = ?, Max_Cardinality = ?,  "
-			+ "Default_Value = ?, Fixed_Value = ?, Definition = ?, Remark = ?, biz_term = ? WHERE BBIE_SC_ID = ?";
+			+ "Default_Value = ?, Fixed_Value = ?, Definition = ?, Remark = ?, biz_term = ?, is_used = ? WHERE BBIE_SC_ID = ?";
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -523,8 +526,11 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 //			else 	
 				ps.setString(12, bbie_scVO.getBusinessTerm());
 
+			ps.setInt(13, bbie_scVO.isUsed() ? 1 : 0);
+			
 			if(bbie_scVO.getBBIESCID() > 0)
-				ps.setInt(13, bbie_scVO.getBBIESCID());
+				ps.setInt(14, bbie_scVO.getBBIESCID());			
+			
 			ps.executeUpdate();
 
 			tx.commit();
@@ -626,6 +632,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
 				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
+				bbie_scVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbie_scVO);
 			}
 			conn.close();
@@ -714,6 +721,7 @@ public class BBIE_SCOracleDAO extends SRTDAO {
 				bbie_scVO.setDefinition(rs.getString("Definition"));
 				bbie_scVO.setRemark(rs.getString("Remark"));
 				bbie_scVO.setBusinessTerm(rs.getString("biz_term"));
+				bbie_scVO.setUsed(rs.getInt("is_used") == 1 ? true : false);
 				list.add(bbie_scVO);
 			}
 			
