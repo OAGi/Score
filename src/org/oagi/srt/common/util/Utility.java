@@ -71,10 +71,23 @@ public class Utility {
 		return pre + ". Type";
 	}
 	
+
 	public static String denToTypeName(String den) {
-		String part1 = den.substring(0, den.indexOf("_"));
-		String part2 = den.substring(den.indexOf("_"), den.indexOf("."));
-		return part1.replaceAll(" ", "") + "Type" + part2;
+		
+		int pos = den.indexOf("_");
+		
+		if(pos>=0){
+			String part1 = den.substring(0, den.indexOf("_"));
+			String part2 = den.substring(den.indexOf("_"), den.indexOf("."));
+			return part1.replaceAll(" ", "") + "Type" + part2;
+		}
+		else
+		{
+			den = den.replaceAll(" ", "");
+			den = den.replace(".", "");
+			return den ;
+		}
+		
 	}
 	
 	public static String denToUnqualified(String den) {
@@ -275,7 +288,13 @@ public class Utility {
 		String baseDen = baseDT.getDEN();
 				
 		if(baseDT.getDataTypeTerm().equals("Text")){
-			qualifier= Utility.spaceSeparatorBeforeStr(type, "Type");
+			
+			if(type.contains("Text")){
+				qualifier= Utility.spaceSeparatorBeforeStr(type, "Text");
+			}
+			else {
+				qualifier= Utility.spaceSeparatorBeforeStr(type, "Type");
+			}
 		}
 		else if(baseDen.equals("Code Content. Type")){
 			qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeContentType");
@@ -286,7 +305,7 @@ public class Utility {
 		else {
 			String p1 = Utility.firstDenWithoutUUID(baseDen);
 			p1 = Utility.toCamelCase(p1);
-			int pos = type.indexOf("Type");
+			int pos = type.lastIndexOf("Type");
 			if(pos!=-1){
 				type=type.substring(0,pos);
 			}

@@ -3463,14 +3463,14 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-<xsd:complexType name="OpenFieldValueType" id="oagis-id-a443aea7aa634ae8aa57bfad38762ef1">
-    <xsd:simpleContent>
-        <xsd:extension base="ValueType">
-            <xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-9034f3521cc84e0e93b4b10e54bb46a3"/>
-            <xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c736ced2c5d24d85a2fb47f608a85a95"/>
-        </xsd:extension>
-    </xsd:simpleContent>
-</xsd:complexType>
+	<xsd:complexType name="OpenFieldValueType" id="oagis-id-a443aea7aa634ae8aa57bfad38762ef1">
+		<xsd:simpleContent>
+			<xsd:extension base="ValueType">
+				<xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-9034f3521cc84e0e93b4b10e54bb46a3"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c736ced2c5d24d85a2fb47f608a85a95"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
 	<!--=======================-->
 	<!--Qualified Data Types-->
 	<!--=======================-->
@@ -3501,7 +3501,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Description_ Text. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Text</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Description</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -3513,18 +3513,18 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="NoteType" id="oagis-id-8d9b4b5c8b284fd0b59b246262bcafa2">
-    <xsd:annotation>
-        <xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A free form note. The lang attribute identifies the language that the note is in. The author identifies the author of the note. The enrtyDate indicates the date the note was entered or last modified.</xsd:documentation>
-    </xsd:annotation>
-    <xsd:simpleContent>
-        <xsd:extension base="TextType">
-            <xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749bc10a7f28"/>
-            <xsd:attribute name="author" type="StringType" use="optional" id="oagis-id-08c23257569347caa798f07620e38923"/>
-            <xsd:attribute name="entryDateTime" type="DateTimeType" use="optional" id="oagis-id-8b0a10d59d3647d89e0819516c1aeaca"/>
-            <xsd:attribute name="status" type="StringType" use="optional" id="oagis-id-893aac10c6724803ad4e1496ce5d0027"/>
-        </xsd:extension>
-    </xsd:simpleContent>
-</xsd:complexType>
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A free form note. The lang attribute identifies the language that the note is in. The author identifies the author of the note. The enrtyDate indicates the date the note was entered or last modified.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="TextType">
+				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749bc10a7f28"/>
+				<xsd:attribute name="author" type="StringType" use="optional" id="oagis-id-08c23257569347caa798f07620e38923"/>
+				<xsd:attribute name="entryDateTime" type="DateTimeType" use="optional" id="oagis-id-8b0a10d59d3647d89e0819516c1aeaca"/>
+				<xsd:attribute name="status" type="StringType" use="optional" id="oagis-id-893aac10c6724803ad4e1496ce5d0027"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
 	<xsd:complexType name="TemperatureMeasureType" id="oagis-id-4a641b3b6a074d5b909b425aeec9caaa">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TemperatureMeasureType is logically derived from UN/CEFACT TBG17 ABIE TemperatureType as defined in the Reusable Aggregate Business Information Entity (RUABIE) XML Schema file.
@@ -3960,7 +3960,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Encrypted_ Binary Object. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>Indicates that any element or attribute that makes use of this is to be or is recommended to be encrypted by the applications sharing this information.</ccts_DefinitionText>
+				<ccts_Definition>Indicates that any element or attribute that makes use of this is to be or is recommended to be encrypted by the applications sharing this information.</ccts_Definition>
 				<ccts_RepresentationTermName>Binary Object</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Encrypted</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4038,7 +4038,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Category_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Category</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4163,7 +4163,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Charge_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Charge</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4345,7 +4345,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Classification_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Classification</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4418,7 +4418,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Contact_ Location_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Contact_ Location</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4657,7 +4657,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Country_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Country</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4725,9 +4725,9 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Country Subdivision_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange 
+				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange 
 independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
-supplementary information.</ccts_DefinitionText>
+supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Country Subdivision</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4853,7 +4853,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Currency_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Currency</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -4921,7 +4921,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Day Of Week_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Day Of Week</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5058,9 +5058,9 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Delivery Point_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange 
+				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange 
 independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
-supplementary information.</ccts_DefinitionText>
+supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Delivery Point</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5128,7 +5128,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Email Format_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Email Format</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5481,7 +5481,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Freight Terms_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Freight Terms</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5549,9 +5549,9 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Gender_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange 
+				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange 
 independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
-supplementary information.</ccts_DefinitionText>
+supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Gender</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5619,7 +5619,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Incoterms_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Incoterms</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5744,7 +5744,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>License Type_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>License Type</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5926,7 +5926,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Marital Status_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Marital Status</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5999,7 +5999,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Payment Basis_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Payment Basis</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6067,7 +6067,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Payment Method_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Payment Method</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6249,7 +6249,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Payment Term_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Payment Term</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6379,7 +6379,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Reason_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Reason</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6447,7 +6447,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Recurrence Pattern_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Recurrence Pattern</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6577,7 +6577,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Response_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Response</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6816,7 +6816,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>State_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>State</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6884,7 +6884,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>System Environment_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>System Environment</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -6952,7 +6952,7 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Tax_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText/>
+				<ccts_Definition/>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Tax</ccts_QualifierTerm>
 			</xsd:documentation>
