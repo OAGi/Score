@@ -186,7 +186,7 @@ public class P_1_7_PopulateQBDTInDT {
 	}
 	private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler org_xHandler, int xsdType) throws XPathExpressionException, SRTDAOException {
 		XPathHandler xHandler = org_xHandler;
-		for(int i = 0; i < elementsFromXSD.getLength(); i++) {
+		for(int i = 0; i < elementsFromXSD.getLength(); i++) {//ElementsFromXSD don't have CodeContentType, IDContentType 
 			xHandler = org_xHandler;
 			String bccp = ((Element)elementsFromXSD.item(i)).getAttribute("name");
 			String guid = ((Element)elementsFromXSD.item(i)).getAttribute("id");
@@ -493,13 +493,16 @@ public class P_1_7_PopulateQBDTInDT {
 		qc.add("bdt_id", dVO.getBasedDTID());
 		ArrayList<SRTObject> al = aBDTPrimitiveRestrictionDAO.findObjects(qc, conn);
 		
-		//if 
+//		//the previous condition below cannot classify the cases correctly.
+//		//we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
+//		if(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && !(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
 		if(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && !(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
+			//same as (DataTypeTerm = "Code") & (base != "CodeType")
 			BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 			theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
 			if(base.endsWith("CodeContentType")) {
 				theBDT_Primitive_RestrictionVO.setCodeListID(getCodeListID(base.substring(0, base.indexOf("CodeContentType"))));
-			} else {
+			} else {//MatchCodeType, ResponseCodeType
 				for(SRTObject aSRTObject : al) {
 					BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
 					if(aBDTPrimitiveRestrictionVO.getCodeListID() > 0) {
@@ -521,19 +524,27 @@ public class P_1_7_PopulateQBDTInDT {
 		}
 		
 		if(!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))){
+			//
+			//third or condition is not fine because we might apply this code to base = "CodeContentType" not only end-with "CodeContentType"
 			for(SRTObject aSRTObject : al) {
 				BDTPrimitiveRestrictionVO aBDTPrimitiveRestrictionVO = (BDTPrimitiveRestrictionVO)aSRTObject;
 				BDTPrimitiveRestrictionVO theBDT_Primitive_RestrictionVO = new BDTPrimitiveRestrictionVO();
 				theBDT_Primitive_RestrictionVO.setBDTID(dVO.getDTID());
 				theBDT_Primitive_RestrictionVO.setCDTPrimitiveExpressionTypeMapID(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID());
 
-				if(base.endsWith("CodeContentType") && checkTokenofXBT(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID()))
-					theBDT_Primitive_RestrictionVO.setisDefault(true);
-				else if(base.endsWith("CodeContentType") && !checkTokenofXBT(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID()))
-					theBDT_Primitive_RestrictionVO.setisDefault(false);
-				else
-					theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
+//				//Previous Code re-assign isDefault value, but design-doc said just copy it's base DT's
+				//So i make change
+//				if(base.endsWith("CodeContentType") && checkTokenofXBT(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID()))
+//					theBDT_Primitive_RestrictionVO.setisDefault(true);
+//				else if(base.endsWith("CodeContentType") && !checkTokenofXBT(aBDTPrimitiveRestrictionVO.getCDTPrimitiveExpressionTypeMapID()))
+//					theBDT_Primitive_RestrictionVO.setisDefault(false);
+//				else
+//					theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
+//				aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+				
+				theBDT_Primitive_RestrictionVO.setisDefault(aBDTPrimitiveRestrictionVO.getisDefault());
 				aBDTPrimitiveRestrictionDAO.insertObject(theBDT_Primitive_RestrictionVO);
+				
 			}
 		}
 		
@@ -968,6 +979,7 @@ public class P_1_7_PopulateQBDTInDT {
 		} 
 		else { //else if (base.endsWith("IDContentType")){
 			dVO = getDTVOWithDEN("Identifier Content. Type");
+			base = "IDContentType";
 		}
 		
 		dtVO.setBasedDTID(dVO.getDTID());

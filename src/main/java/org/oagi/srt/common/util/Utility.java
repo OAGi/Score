@@ -369,6 +369,79 @@ public class Utility {
 	
 	}
 	
+	public static boolean checkCorrespondingTypes(String xbtName, String CDTPriName){
+		if(CDTPriName.equals("Binary")){
+			if(xbtName.equals("xsd:base64Binary") || xbtName.equals("xsd:hexBinary") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Boolean")){
+			if(xbtName.equals("xsd:boolean") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Decimal")){
+			if(xbtName.equals("xsd:decimal")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Double")){
+			if(xbtName.equals("xsd:double") || xbtName.equals("xsd:float") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Float")){
+			if(xbtName.equals("xsd:float") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Integer")){
+			if(xbtName.equals("xsd:integer") || xbtName.equals("xsd:nonNegativeInteger") || xbtName.equals("xsd:positiveInteger")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("NormalizedString")){
+			if(xbtName.equals("xsd:normalizedString") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("String")){
+			if(xbtName.equals("xsd:string") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("TimeDuration")){
+			if(xbtName.equals("xsd:token") || xbtName.equals("xsd:duration")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("TimePoint")){
+			if(xbtName.equals("xsd:token") || xbtName.equals("xsd:dateTime") || xbtName.equals("xsd:date") || xbtName.equals("xsd:time")
+			|| xbtName.equals("xsd:gYear") || xbtName.equals("xsd:gYearMonth") || xbtName.equals("xsd:gMonthDay") || xbtName.equals("xsd:gDay") || xbtName.equals("xsd:gMonth")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Token")){
+			if(xbtName.equals("xsd:token") ){
+				return true;
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	public static String toCamelCase(final String init) {
 	    if (init==null)
 	        return null;

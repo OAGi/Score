@@ -162,7 +162,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 					qc_05.add("cdt_sc_id", dt_sc_id);
 					qc_05.add("cdt_pri_id", cdtPrimitiveID);
 					int cdtSCAllowedPrimitiveId = ((CDTSCAllowedPrimitiveVO)cdtSCAPDao.findObject(qc_05, conn)).getCDTSCAllowedPrimitiveID();
-
+					
 					// populate CDT_SC_Allowed_Primitive_Expression_Type_Map 
 					List<String> xsdbs = Types.getCorrespondingXSDBuiltType(name[k]);
 					for(String xbt : xsdbs) {

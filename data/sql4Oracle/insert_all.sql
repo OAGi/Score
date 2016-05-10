@@ -798,12 +798,12 @@ INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_d
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Character Set', 'Code', 'The character set of the binary object if the Multipurpose Internet Mail Extensions (MIME) type is text', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Picture' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Filename', 'Name', 'The filename of the picture', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Picture' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Unit', 'Code', 'The unit of measure in which the quantity is expressed', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Quantity' and type =  0;
-INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Multiplier', 'Value', 'The multiplier of the Rate. Unit. Code or Rate. Currency. Code', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Ratio' and type =  0;
-INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Unit', 'Code', 'The unit of measure of the numerator', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Ratio' and type =  0;
-INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Currency', 'Code', 'The currency of the numerator', DT_ID, 0, 1 FROM dt WHERE data_type_term ='Ratio' and type =  0;
-INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Base Multiplier', 'Value', 'The multiplier of the Rate. Base Unit. Code or Rate. Base Currency. Code', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Ratio' and type =  0;
-INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Base Unit', 'Code', 'The unit of measure of the denominator', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Ratio' and type =  0;
-INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Base Currency', 'Code', 'The currency of the denominator', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Ratio' and type =  0;
+INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Multiplier', 'Value', 'The multiplier of the Rate. Unit. Code or Rate. Currency. Code', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Rate' and type =  0;
+INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Unit', 'Code', 'The unit of measure of the numerator', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Rate' and type =  0;
+INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Currency', 'Code', 'The currency of the numerator', DT_ID, 0, 1 FROM dt WHERE data_type_term ='Rate' and type =  0;
+INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Base Multiplier', 'Value', 'The multiplier of the Rate. Base Unit. Code or Rate. Base Currency. Code', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Rate' and type =  0;
+INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Base Unit', 'Code', 'The unit of measure of the denominator', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Rate' and type =  0;
+INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Base Currency', 'Code', 'The currency of the denominator', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Rate' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'MIME', 'Code', 'The Multipurpose Internet Mail Extensions(MIME) media type of the sound', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Sound' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Character Set', 'Code', 'The character set of the binary object if the Multipurpose Internet Mail Extensions (MIME) type is text', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Sound' and type =  0;
 INSERT INTO dt_sc (guid, property_term, representation_term, definition, owner_dt_id, min_cardinality, max_cardinality) SELECT CONCAT('oagis-id-', sys_guid()), 'Filename', 'Name', 'The filename of the sound', DT_ID, 0, 1 FROM dt WHERE data_type_term = 'Sound' and type =  0;
@@ -1232,3 +1232,58 @@ INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT
 
 INSERT INTO cdt_sc_awd_pri_xps_type_map (cdt_sc_awd_pri, xbt_id) VALUES ((SELECT cdt_sc_awd_pri_id FROM cdt_sc_awd_pri WHERE CDT_SC_ID =  (SELECT DT_SC_ID FROM dt_sc join dt on dt.dt_id = dt_sc.Owner_DT_ID where dt.Data_Type_Term = 'Video' and dt_sc.Property_Term = 'Filename') AND cdt_pri_id = (SELECT cdt_pri_id FROM cdt_pri WHERE name = 'Token')), (SELECT xbt_id FROM xbt WHERE name = 'token'));
 
+insert into namespace (namespace_id, uri, prefix, description, owner_user_id, created_by, last_updated_by, creation_timestamp, last_updated_timestamp) values (1, 'http://www.openapplications.org/oagis/10', '', 'OAGIS release 10 namespace', 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);  
+
+insert into release (release_num, release_note, namespace_id) select '10.1', 'Open Applications Group
+Interface Specification XMLSchemas and Sample XML Files
+
+OAGIS Release 10_1  
+
+27 June 2014
+
+
+OAGIS Release 10_1 is a general availability release of OAGIS the release
+date is 27 June 2014. 
+
+This release is the continuation of the focus on enabling integration that 
+the Open Applications Group and its members are known.
+
+Please provide all feedback to the OAGI Architecture Team via the Feedback 
+Forum at: oagis@openapplications.org
+
+These XML reference files continue to evolve.  Please feel
+free to use them, but check www.openapplications.org for the most 
+recent updates.
+
+OAGIS Release 10_1 includes:
+
+  - Addition of more Open Parties and Quantities from implementation feedback.
+  - Updates to the ConfirmBOD to make easier to use.
+  - Addtion of DocumentReferences and Attachments for PartyMaster 
+  - Support for UN/CEFACT Core Components 3.0.
+  - Support for UN/CEFACT XML Naming and Design Rules 3.0
+  - Support for UN/CEFACT Data Type Catalog 3.1
+  - Support for Standalone BODs using Local elements.
+
+
+NOTICE: We recommend that you install on your root directory drive as the 
+paths may be too long otherwise.
+	
+As with all OAGIS releases OAGIS Release 10_1 contains XML Schema. To view 
+XML Schema it is recommended that you use an XML IDE, as the complete structure 
+of the Business Object Documents are not viewable from a single file.
+
+Note that the sample files were used to verify the XMLSchema 
+development, and do not necessarily reflect actual business 
+transactions.  In many cases,the data entered in the XML files are just 
+placeholder text.  Real-world examples for each transaction will be 
+provided as they become available. If you are interested in providing 
+real-world examples please contact oagis@openapplications.org
+
+Please send suggestions or bug reports to oagis@openapplications.org
+
+Thank you for your interest and support.
+
+Best Regards,
+The Open Applications Group Architecture Council
+' , namespace_id from namespace where prescription = 'OAGIS release 10 namespace';
