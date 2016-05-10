@@ -22,6 +22,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 
+import org.springframework.stereotype.Service;
+
+@Service
 @ManagedBean(name="themeService", eager = true)
 @ApplicationScoped
 public class ThemeService {

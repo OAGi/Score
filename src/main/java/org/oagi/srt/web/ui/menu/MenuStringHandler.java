@@ -10,13 +10,17 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Yunsu Lee
  * @version 1.0
  *
  */
-
+@Component("termType")
+@Scope("session")
 @ManagedBean(name="termType")
 @SessionScoped
 public class MenuStringHandler implements Serializable{

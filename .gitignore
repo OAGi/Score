@@ -10,3 +10,4 @@ tmp/*
 .classpath
 .project
 docker-compose.yml
+/target/

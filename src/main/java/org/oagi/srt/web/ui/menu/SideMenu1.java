@@ -4,10 +4,12 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
+
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.DefaultSubMenu;
 import org.primefaces.model.menu.MenuModel;
+import org.springframework.stereotype.Component;
 
 /**
 *
@@ -15,6 +17,7 @@ import org.primefaces.model.menu.MenuModel;
 * @version 1.0
 *
 */
+@Component
 @ManagedBean
 public class SideMenu1 {
 
