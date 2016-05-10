@@ -1,26 +1,25 @@
 package org.oagi.srt.web.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.servlet.http.HttpServletResponse;
-
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
+@Scope("session")
 @ManagedBean
 public class ContextCategoryHandler extends UIHandler {
 

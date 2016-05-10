@@ -28,7 +28,11 @@ import org.oagi.srt.persistence.dto.UserVO;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class ContextSchemeHandler {

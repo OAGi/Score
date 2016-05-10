@@ -27,6 +27,8 @@ import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -37,6 +39,8 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.util.*;
 
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class TopLevelABIEHandler implements Serializable {

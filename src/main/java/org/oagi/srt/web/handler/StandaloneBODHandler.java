@@ -44,7 +44,11 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class StandaloneBODHandler extends UIHandler implements Serializable {

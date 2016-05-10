@@ -21,7 +21,11 @@ import org.oagi.srt.persistence.dto.ContextCategoryVO;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class CodeListHandler extends UIHandler {
