@@ -5,13 +5,17 @@ import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.PersistenceUtils;
-import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -19,7 +23,13 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
-public class SRTDAO {
+@Repository
+public class SRTDAO extends NamedParameterJdbcDaoSupport {
+
+	@Autowired
+	public void init(JdbcTemplate jdbcTemplate) {
+		setJdbcTemplate(jdbcTemplate);
+	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		throw new UnsupportedOperationException();
