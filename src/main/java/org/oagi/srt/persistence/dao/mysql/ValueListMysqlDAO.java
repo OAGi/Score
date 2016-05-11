@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ValueListVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
-
+@Repository
 public class ValueListMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "value_list";
@@ -53,19 +54,6 @@ public class ValueListMysqlDAO extends SRTDAO {
 
 	private final String _DELETE_VALUE_LIST_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE Value_List_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -297,34 +285,5 @@ public class ValueListMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

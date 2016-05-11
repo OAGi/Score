@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ReleaseVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class ReleaseOracleDAO extends SRTDAO {
 
 	private final String _tableName = "release";
@@ -42,12 +44,6 @@ public class ReleaseOracleDAO extends SRTDAO {
 
 	private final String _DELETE_RELEASE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE release_id = ?";
-	
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -475,12 +471,5 @@ public class ReleaseOracleDAO extends SRTDAO {
 			closeQuietly(ps);
 		}
 		return list;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

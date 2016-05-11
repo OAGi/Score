@@ -8,6 +8,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ACCVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class ACCOracleDAO extends SRTDAO {
 
 	private final String _tableName = "acc";
@@ -48,12 +50,6 @@ public class ACCOracleDAO extends SRTDAO {
 
 	private final String _DELETE_ACC_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE ACC_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 	
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -521,25 +517,4 @@ public class ACCOracleDAO extends SRTDAO {
 
         return true;
     }
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }

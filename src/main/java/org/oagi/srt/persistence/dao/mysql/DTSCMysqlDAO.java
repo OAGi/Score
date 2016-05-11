@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.DTSCVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class DTSCMysqlDAO extends SRTDAO {
 	private final String _tableName = "dt_sc";
 
@@ -42,12 +44,6 @@ public class DTSCMysqlDAO extends SRTDAO {
 
 	private final String _DELETE_DT_SC_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE DT_SC_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
@@ -458,14 +454,5 @@ public class DTSCMysqlDAO extends SRTDAO {
 		}
 
 		return true;
-
 	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

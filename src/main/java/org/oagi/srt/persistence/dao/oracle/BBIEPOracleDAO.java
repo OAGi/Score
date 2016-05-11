@@ -8,6 +8,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIEPVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class BBIEPOracleDAO extends SRTDAO {
 	private final String _tableName = "bbiep";
 
@@ -521,18 +523,4 @@ public class BBIEPOracleDAO extends SRTDAO {
         }
         return bbiepVO;
     }
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -1,17 +1,17 @@
 package org.oagi.srt.persistence.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.PersistenceUtils;
-import org.oagi.srt.persistence.dto.ASCCPVO;
+import org.springframework.web.bind.ServletRequestDataBinder;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,29 +19,51 @@ import org.oagi.srt.persistence.dto.ASCCPVO;
  * @version 1.0
  *
  */
-public abstract class SRTDAO {
+public class SRTDAO {
 
-	//public abstract boolean insertObject(SRTObject obj) throws SRTDAOException;
-	
-	public abstract int insertObject(SRTObject obj) throws SRTDAOException;
-	
-	public abstract int insertObject(SRTObject obj, Connection conn) throws SRTDAOException;
-	
-	public abstract SRTObject findObject(QueryCondition qc)	throws SRTDAOException;
-	
-	public abstract SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException;
-	
-	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc)	throws SRTDAOException;
-	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException;
+	public int insertObject(SRTObject obj) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
 
-	public abstract ArrayList<SRTObject> findObjects() throws SRTDAOException;
-	public abstract ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException;
-	
-	public abstract boolean updateObject(SRTObject obj) throws SRTDAOException;
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
 
-	public abstract boolean deleteObject(SRTObject obj) throws SRTDAOException;
-	
-	public abstract int findMaxId() throws SRTDAOException;
+	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean updateObject(SRTObject obj) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
+
+	public int findMaxId() throws SRTDAOException {
+		throw new UnsupportedOperationException();
+	}
 
 	public final void closeQuietly(DBAgent txAgent) {
 		PersistenceUtils.closeQuietly(txAgent);

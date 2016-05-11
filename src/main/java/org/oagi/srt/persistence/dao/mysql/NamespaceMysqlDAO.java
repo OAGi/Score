@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.NamespaceVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class NamespaceMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "namespace";
@@ -43,12 +45,6 @@ public class NamespaceMysqlDAO extends SRTDAO {
 			"UPDATE " + _tableName
 			+ " SET Last_Update_Timestamp = CURRENT_TIMESTAMP, uri = ?, prefix = ?, prescription = ?, owner_user_id = ?, "
 			+ "created_by = ?, last_updated_by = ? WHERE namespace_id = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	private final String _DELETE_NAMESPACE_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE namespace_id = ?";
@@ -505,12 +501,5 @@ public class NamespaceMysqlDAO extends SRTDAO {
 			closeQuietly(ps);
 		}
 		return list;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

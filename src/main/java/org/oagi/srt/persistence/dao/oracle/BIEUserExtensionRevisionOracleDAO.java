@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BIEUserExtensionRevisionVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
-
+@Repository
 public class BIEUserExtensionRevisionOracleDAO extends SRTDAO{
 	private final String _tableName = "bie_user_ext_revision";
 
@@ -43,12 +44,6 @@ public class BIEUserExtensionRevisionOracleDAO extends SRTDAO{
 
 	private final String _DELETE_BIEUserExtensionRevision_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE bie_user_ext_revision_id = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -422,12 +417,5 @@ public class BIEUserExtensionRevisionOracleDAO extends SRTDAO{
 		}
 		return list;
 
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
