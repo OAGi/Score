@@ -132,10 +132,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		
 		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 		XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-		importAdditionalBDT(meta_xsd);
+		//importAdditionalBDT(meta_xsd);
 		
 		P_1_5_3_to_5_PopulateSCInDTSC dtsc = new P_1_5_3_to_5_PopulateSCInDTSC();
-		dtsc.populateDTSCforUnqualifiedBDT(businessDataType_xsd, meta_xsd, conn, false);
+		//dtsc.populateDTSCforUnqualifiedBDT(businessDataType_xsd, meta_xsd, conn, false);
 		
 		P_1_5_6_PopulateBDTSCPrimitiveRestriction bdtscpri = new P_1_5_6_PopulateBDTSCPrimitiveRestriction();
 		bdtscpri.populateBDTSCPrimitiveRestriction(businessDataType_xsd, meta_xsd, false);

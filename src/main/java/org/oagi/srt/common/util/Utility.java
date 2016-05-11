@@ -108,7 +108,7 @@ public class Utility {
 			den = spaceSeparator(part1) + part2 + ". Type";
 		}
 		else
-			den = spaceSeparator(type.substring(0, type.indexOf("Type")))+". Type";
+			den = spaceSeparator(type.substring(0, type.lastIndexOf("Type")))+". Type";
 		return den;
 	}
 	
@@ -180,6 +180,10 @@ public class Utility {
 	}
 	
 	public static String spaceSeparator(String str) {//Assume that we only take into account TypeName
+		if(str.equals("mimeCode")){
+			return "MIME Code";
+		}
+		
 		StringBuffer sb = new StringBuffer();
 		boolean appendOnly = false;
 		for(int i = 0; i < str.length(); i++) {

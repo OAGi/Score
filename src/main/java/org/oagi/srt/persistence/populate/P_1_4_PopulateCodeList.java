@@ -51,8 +51,6 @@ public class P_1_4_PopulateCodeList {
 		CodeListVO codelistVO = new CodeListVO();
 
 		NodeList result = xh.getNodeList("//xsd:simpleType");
-	    NodeList definition = xh.getNodeList("//xsd:simpleType[xsd:annotation[xsd:documentation]]");	
-    	NodeList union = xh.getNodeList("//xsd:simpleType[xsd:union]");
     	
 		Timestamp current_stamp = new Timestamp (System.currentTimeMillis());
     	
@@ -122,18 +120,16 @@ public class P_1_4_PopulateCodeList {
 			    	}		    		
 		    	}
 		    	
-		    	for(int j = 0 ; j < definition.getLength(); j++) {
-		    		Element definition_element = (Element)definition.item(j);
-		    		if(definition_element.getAttribute("id") == tmp.getAttribute("id")) {
-		    			Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:annotation//xsd:documentation");	
-		    			Element definition_element2 = (Element)definition_node;
-		    			codelistVO.setDefinition(definition_element2.getTextContent());
-				    	codelistVO.setDefinitionSource(definition_element2.getAttribute("source"));
-				    	break;
-		    		}
-	    			codelistVO.setDefinition(null);
-			    	codelistVO.setDefinitionSource(null);				    	
-		    	}
+		    	Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']/xsd:annotation/xsd:documentation");	
+    			if(definition_node!=null){
+	    			Element definition_element2 = (Element)definition_node;
+	    			codelistVO.setDefinition(definition_element2.getTextContent());
+			    	codelistVO.setDefinitionSource(definition_element2.getAttribute("source"));
+    			}
+    			else{
+    				codelistVO.setDefinition(null);
+			    	codelistVO.setDefinitionSource(null);
+    			}
 		    		    	
 		    	codelistVO.setExtensibleIndicator(true);  //logic changed. extensible indicator is always TRUE.
 		    	

@@ -130,17 +130,17 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 				
 				if((aDTSCVO.getRepresentationTerm().contains("Code") && codeListId > 0) || ele_name.contains("AgencyID")) { 
 					
-//					BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
-//					bVO.setBDTSCID(aDTSCVO.getDTSCID());
-//					bVO.setisDefault(false);
-//					
-//					if(ele.getAttribute("name").contains("AgencyID")) {
-//						bVO.setAgencyIDListID(getAgencyListID());
-//					} else {
-//						bVO.setCodeListID(codeListId);
-//					}
-//					System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bVO.getCodeListID()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.getisDefault());
-//					aBDTSCPrimitiveRestrictionDAO.insertObject(bVO);
+					BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
+					bVO.setBDTSCID(aDTSCVO.getDTSCID());
+					bVO.setisDefault(false);
+					
+					if(ele.getAttribute("name").contains("AgencyID")) {
+						bVO.setAgencyIDListID(getAgencyListID());
+					} else {
+						bVO.setCodeListID(codeListId);
+					}
+					System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bVO.getCodeListID()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.getisDefault());
+					aBDTSCPrimitiveRestrictionDAO.insertObject(bVO);
 					
 					QueryCondition qc01 = new QueryCondition();
 					qc01.add("name", "Token");
@@ -155,7 +155,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 					qc021.add("dt_sc_id", aDTSCVO.getBasedDTSCID());
 					DTSCVO stscVO = (DTSCVO)dao.findObject(qc021, conn);
 					int cdt_id = 0;
-					if(stscVO == null){
+					if(stscVO == null){ //New
 						QueryCondition qc031 = new QueryCondition();
 						qc031.add("name", ele.getAttribute("type").substring(0, ele.getAttribute("type").lastIndexOf("ContentType")));
 						CodeListVO codelistVO = (CodeListVO)aCodeListDAO.findObject(qc031, conn);
@@ -167,7 +167,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 						aBDTSCPrimitiveRestrictionDAO.insertObject(bVO1);
 					}
 					else {
-						if(stscVO.getBasedDTSCID() == 0)
+						if(stscVO.getBasedDTSCID() < 1)
 							cdt_id = aDTSCVO.getBasedDTSCID();
 						else
 							cdt_id = stscVO.getBasedDTSCID();
@@ -180,24 +180,24 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 						QueryCondition qc04 = new QueryCondition();
 						qc04.add("CDT_SC_awd_pri", cdt_sc_awd_pri_id);
 						qc04.add("xbt_id", xbt_id);
-						int CDTAllowedPrimitiveExpressionTypeMapID = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc04, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
+						int CDTSCAllowedPrimitiveExpressionTypeMapID = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc04, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
 						
 						BDTSCPrimitiveRestrictionVO bVO1 = new BDTSCPrimitiveRestrictionVO();
 						bVO1.setBDTSCID(aDTSCVO.getDTSCID());
 						
-						bVO1.setCDTSCAllowedPrimitiveExpressionTypeMapID(CDTAllowedPrimitiveExpressionTypeMapID);
+						bVO1.setCDTSCAllowedPrimitiveExpressionTypeMapID(CDTSCAllowedPrimitiveExpressionTypeMapID);
 						bVO1.setisDefault(true); 
 						System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" cdt_sc_allowed_pri_xps_type_map_id = "+bVO1.getCDTSCAllowedPrimitiveExpressionTypeMapID()+"  is default = "+bVO1.getisDefault());
 						aBDTSCPrimitiveRestrictionDAO.insertObject(bVO1);
 					}
 				} else {
 					ArrayList<SRTObject> al3 = new ArrayList<SRTObject>();
-					if(aDTSCVO.getBasedDTSCID() == 0) { //new attributes SC
+					if(aDTSCVO.getBasedDTSCID() < 1) { //new attributes SC
 						QueryCondition qc = new QueryCondition();
 						qc.add("cdt_sc_id", aDTSCVO.getDTSCID());
 						al3 = aCDTSCAllowedPrimitiveDAO.findObjects(qc, conn);
 					}
-					else { // default BDT or unqualified BDT
+					else { // DTSC is based on other dt_sc
 						QueryCondition qc = new QueryCondition();
 						qc.add("cdt_sc_id", aDTSCVO.getBasedDTSCID());
 						
@@ -212,7 +212,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 							al3 = aCDTSCAllowedPrimitiveDAO.findObjects(qc, conn);
 						}
 					}
-					for(SRTObject aSRTObject3 : al3) {
+					for(SRTObject aSRTObject3 : al3) {//Loop retrieved cdt_sc_awd_pri
 						CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO)aSRTObject3;
 						
 						QueryCondition qc1 = new QueryCondition();
@@ -297,7 +297,10 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 		SRTDAO aDTDAO = df.getDAO("DT");
     	QueryCondition qc = new QueryCondition();
 		qc.add("dt_id",  id);
-		if(((DTVO)aDTDAO.findObject(qc, conn)).getDTType() == 1)
+		
+		DTVO tmp = (DTVO)aDTDAO.findObject(qc, conn);
+		
+		if(tmp!=null && tmp.getDTType() == 1)
 			return true;
 		return false;
 	}
