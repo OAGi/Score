@@ -9,13 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
 
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
@@ -24,26 +22,13 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ACCVO;
 import org.oagi.srt.persistence.dto.ASBIEPVO;
-import org.oagi.srt.persistence.dto.ASBIEVO;
 import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.ASCCVO;
-import org.oagi.srt.persistence.dto.BBIEPVO;
-import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.BCCPVO;
-import org.oagi.srt.persistence.dto.BCCVO;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -51,7 +36,7 @@ import org.springframework.stereotype.Controller;
 @Scope("view")
 @ManagedBean
 @ViewScoped
-public class StandaloneBODHandler extends UIHandler implements Serializable {
+public class ProfileBODHandler extends UIHandler implements Serializable {
 
 	private static final long serialVersionUID = 4424008438705914095L;
 
@@ -87,7 +72,7 @@ public class StandaloneBODHandler extends UIHandler implements Serializable {
     }
 	
 	public void onABIEChosen(SelectEvent event) {
-		StandaloneBODHandler bh = (StandaloneBODHandler) event.getObject();
+		ProfileBODHandler bh = (ProfileBODHandler) event.getObject();
 		abieViewList.add(bh.getSelected());
 		
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Top-level ABIEs are added", "Top-level ABIEs are added");
