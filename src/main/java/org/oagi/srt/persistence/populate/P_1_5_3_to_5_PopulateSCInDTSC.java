@@ -1,52 +1,27 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.chanchan.common.persistence.db.ConnectionPoolManager;
 import org.chanchan.common.persistence.db.DBAgent;
-import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
-import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
-import org.oagi.srt.web.startup.SRTInitializer;
-import org.oagi.srt.web.startup.SRTInitializerException;
-import org.w3c.dom.Document;
+import org.oagi.srt.persistence.dto.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
 *

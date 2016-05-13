@@ -17,17 +17,9 @@
 
 package org.apache.xerces.impl.xs.traversers;
 
-import java.util.Locale;
-
 import org.apache.xerces.impl.dv.ValidatedInfo;
 import org.apache.xerces.impl.dv.XSSimpleType;
-import org.apache.xerces.impl.xs.SchemaGrammar;
-import org.apache.xerces.impl.xs.SchemaSymbols;
-import org.apache.xerces.impl.xs.XSAnnotationImpl;
-import org.apache.xerces.impl.xs.XSComplexTypeDecl;
-import org.apache.xerces.impl.xs.XSConstraints;
-import org.apache.xerces.impl.xs.XSElementDecl;
-import org.apache.xerces.impl.xs.XSParticleDecl;
+import org.apache.xerces.impl.xs.*;
 import org.apache.xerces.impl.xs.util.XInt;
 import org.apache.xerces.impl.xs.util.XSObjectListImpl;
 import org.apache.xerces.util.DOMUtil;
@@ -40,6 +32,8 @@ import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+
+import java.util.Locale;
 
 /**
  * The element declaration schema component traverser.

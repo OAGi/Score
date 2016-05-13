@@ -4,6 +4,7 @@ import org.oagi.srt.common.SRTConstants;
 
 import java.sql.Date;
 
+
 public class CodeList {
 
     private int codeListId;

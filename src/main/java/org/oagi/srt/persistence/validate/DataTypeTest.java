@@ -1,17 +1,5 @@
 package org.oagi.srt.persistence.validate;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
@@ -21,24 +9,22 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.AgencyIDListVO;
-import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.persistence.dto.*;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DataTypeTest {
 	
@@ -512,7 +498,7 @@ public class DataTypeTest {
 		XPathHandler xHandler = org_xHandler;
 		
 		//specify Code Content Type QBDT
-		//the xsd:simpleType whose names end with ‘CodeContentType’, except the ‘CodeContentType’ itself. 
+		//the xsd:simpleType whose names end with ï¿½CodeContentTypeï¿½, except the ï¿½CodeContentTypeï¿½ itself. 
 		
 		for(int i = 0; i < simpleTypesFromFieldXSD.getLength(); i++) {
 			xHandler = org_xHandler;
@@ -548,7 +534,7 @@ public class DataTypeTest {
 		XPathHandler xHandler = org_xHandler;
 		
 		//specify ID Content Type QBDT
-		//the xsd:simpleType whose names end with ‘IDContentType’ 
+		//the xsd:simpleType whose names end with ï¿½IDContentTypeï¿½ 
 		
 		for(int i = 0; i < simpleTypesFromFieldXSD.getLength(); i++) {
 			xHandler = org_xHandler;
@@ -911,7 +897,7 @@ public class DataTypeTest {
 //			}
 //			//Most QBDT has no definition. 
 //			//Later on we want to come back and modify this to take definition from an element with the same name. 
-//			//Right now let’s leave it blank so that it is easier to validate the import.
+//			//Right now letï¿½s leave it blank so that it is easier to validate the import.
 			
 			String baseTypeGUIDFromXSD = "";
 			String basdTypeDataTypeTerm = "";

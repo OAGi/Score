@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.oracle;
 
-import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.impl.CodeListValueRepositoryImpl;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

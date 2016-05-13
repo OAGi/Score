@@ -2,7 +2,6 @@ package org.oagi.srt.repository.oracle;
 
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.impl.CodeListRepositoryImpl;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;

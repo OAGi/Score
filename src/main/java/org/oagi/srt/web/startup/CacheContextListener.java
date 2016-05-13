@@ -1,12 +1,10 @@
 package org.oagi.srt.web.startup;
 
-import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dto.ACCVO;
 import org.oagi.srt.persistence.dto.ASCCVO;
 import org.oagi.srt.persistence.dto.BCCVO;

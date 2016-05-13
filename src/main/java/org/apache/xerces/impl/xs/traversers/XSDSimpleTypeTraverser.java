@@ -17,13 +17,8 @@
 
 package org.apache.xerces.impl.xs.traversers;
 
-import java.util.ArrayList;
-import java.util.Vector;
-
 import org.apache.xerces.impl.dv.InvalidDatatypeFacetException;
-import org.apache.xerces.impl.dv.SchemaDVFactory;
 import org.apache.xerces.impl.dv.XSSimpleType;
-import org.apache.xerces.impl.dv.xs.SchemaDVFactoryImpl;
 import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
 import org.apache.xerces.impl.xs.SchemaGrammar;
 import org.apache.xerces.impl.xs.SchemaSymbols;
@@ -36,6 +31,9 @@ import org.apache.xerces.xs.XSConstants;
 import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.w3c.dom.Element;
+
+import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * The simple type definition schema component traverser.

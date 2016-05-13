@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.mapper.CodeListValueFindAllMapper;
 import org.springframework.beans.factory.annotation.Autowired;

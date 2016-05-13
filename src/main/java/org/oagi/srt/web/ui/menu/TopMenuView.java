@@ -1,10 +1,10 @@
 package org.oagi.srt.web.ui.menu;
 
+import org.springframework.stereotype.Component;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
-
-import org.springframework.stereotype.Component;
 
 /**
  *

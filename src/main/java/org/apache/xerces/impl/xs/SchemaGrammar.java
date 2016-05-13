@@ -17,21 +17,13 @@
 
 package org.apache.xerces.impl.xs;
 
-import java.lang.ref.SoftReference;
-import java.util.Vector;
-
 import org.apache.xerces.impl.Constants;
 import org.apache.xerces.impl.dv.SchemaDVFactory;
 import org.apache.xerces.impl.dv.ValidatedInfo;
 import org.apache.xerces.impl.dv.XSSimpleType;
 import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
 import org.apache.xerces.impl.xs.identity.IdentityConstraint;
-import org.apache.xerces.impl.xs.util.ObjectListImpl;
-import org.apache.xerces.impl.xs.util.SimpleLocator;
-import org.apache.xerces.impl.xs.util.StringListImpl;
-import org.apache.xerces.impl.xs.util.XSNamedMap4Types;
-import org.apache.xerces.impl.xs.util.XSNamedMapImpl;
-import org.apache.xerces.impl.xs.util.XSObjectListImpl;
+import org.apache.xerces.impl.xs.util.*;
 import org.apache.xerces.parsers.DOMParser;
 import org.apache.xerces.parsers.SAXParser;
 import org.apache.xerces.parsers.XML11Configuration;
@@ -40,24 +32,12 @@ import org.apache.xerces.util.SymbolTable;
 import org.apache.xerces.xni.NamespaceContext;
 import org.apache.xerces.xni.grammars.XMLGrammarDescription;
 import org.apache.xerces.xni.grammars.XSGrammar;
-import org.apache.xerces.xs.StringList;
-import org.apache.xerces.xs.XSAnnotation;
-import org.apache.xerces.xs.XSAttributeDeclaration;
-import org.apache.xerces.xs.XSAttributeGroupDefinition;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSElementDeclaration;
-import org.apache.xerces.xs.XSIDCDefinition;
-import org.apache.xerces.xs.XSModel;
-import org.apache.xerces.xs.XSModelGroupDefinition;
-import org.apache.xerces.xs.XSNamedMap;
-import org.apache.xerces.xs.XSNamespaceItem;
-import org.apache.xerces.xs.XSNotationDeclaration;
-import org.apache.xerces.xs.XSObjectList;
-import org.apache.xerces.xs.XSParticle;
-import org.apache.xerces.xs.XSTypeDefinition;
-import org.apache.xerces.xs.XSWildcard;
+import org.apache.xerces.xs.*;
 import org.apache.xerces.xs.datatypes.ObjectList;
 import org.xml.sax.SAXException;
+
+import java.lang.ref.SoftReference;
+import java.util.Vector;
 
 /**
  * This class is to hold all schema component declaration that are declared

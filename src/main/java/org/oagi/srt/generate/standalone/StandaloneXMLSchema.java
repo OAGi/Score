@@ -1,27 +1,6 @@
 package org.oagi.srt.generate.standalone;
 
-import java.io.File;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.chanchan.common.persistence.db.DBAgent;
-import org.chanchan.common.persistence.file.BfFileSaveStrategy;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.SRTObject;
@@ -31,32 +10,20 @@ import org.oagi.srt.persistence.PersistenceUtils;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ACCVO;
-import org.oagi.srt.persistence.dto.ASBIEPVO;
-import org.oagi.srt.persistence.dto.ASBIEVO;
-import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.ASCCVO;
-import org.oagi.srt.persistence.dto.AgencyIDListVO;
-import org.oagi.srt.persistence.dto.AgencyIDListValueVO;
-import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.BBIE_SCVO;
-import org.oagi.srt.persistence.dto.BCCPVO;
-import org.oagi.srt.persistence.dto.BCCVO;
-import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.CodeListValueVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
-import org.w3c.dom.Attr;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.oagi.srt.persistence.dto.*;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.sql.Connection;
+import java.util.*;
 
 public class StandaloneXMLSchema {
 

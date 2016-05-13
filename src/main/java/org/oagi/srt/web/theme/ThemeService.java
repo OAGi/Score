@@ -15,14 +15,13 @@
  */
 package org.oagi.srt.web.theme;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-
-import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @ManagedBean(name="themeService", eager = true)

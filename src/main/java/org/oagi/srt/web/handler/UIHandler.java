@@ -1,16 +1,8 @@
 package org.oagi.srt.web.handler;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dto.BusinessContextVO;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.oagi.srt.persistence.dto.ContextSchemeVO;
-import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
 import org.oagi.srt.persistence.dto.UserVO;
 import org.primefaces.context.RequestContext;
 

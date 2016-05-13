@@ -1,11 +1,5 @@
 package org.oagi.srt.common.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.util.Random;
-import java.util.UUID;
-
 import org.chanchan.common.persistence.db.ConnectionPoolManager;
 import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.SRTConstants;
@@ -13,6 +7,12 @@ import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.web.startup.SRTInitializer;
 import org.oagi.srt.web.startup.SRTInitializerException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.util.Random;
+import java.util.UUID;
 
 public class Utility {
 	public static String generateGUID(){

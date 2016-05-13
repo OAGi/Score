@@ -21,15 +21,7 @@ import org.apache.xerces.impl.dv.ValidatedInfo;
 import org.apache.xerces.impl.dv.XSSimpleType;
 import org.apache.xerces.impl.xs.util.XSObjectListImpl;
 import org.apache.xerces.xni.QName;
-import org.apache.xerces.xs.ShortList;
-import org.apache.xerces.xs.XSAnnotation;
-import org.apache.xerces.xs.XSAttributeDeclaration;
-import org.apache.xerces.xs.XSComplexTypeDefinition;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSNamespaceItem;
-import org.apache.xerces.xs.XSObjectList;
-import org.apache.xerces.xs.XSSimpleTypeDefinition;
-import org.apache.xerces.xs.XSValue;
+import org.apache.xerces.xs.*;
 
 /**
  * The XML representation for an attribute declaration

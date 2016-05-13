@@ -1,26 +1,15 @@
 package org.oagi.srt.common.util;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
-import org.apache.xerces.impl.xs.XSAttributeDecl;
 import org.apache.xerces.impl.xs.XSComplexTypeDecl;
 import org.apache.xerces.impl.xs.XSElementDecl;
 import org.apache.xerces.impl.xs.XSParticleDecl;
-import org.apache.xerces.xs.XSAnnotation;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSImplementation;
-import org.apache.xerces.xs.XSLoader;
-import org.apache.xerces.xs.XSModel;
-import org.apache.xerces.xs.XSModelGroup;
-import org.apache.xerces.xs.XSObjectList;
-import org.apache.xerces.xs.XSParticle;
-import org.apache.xerces.xs.XSTerm;
+import org.apache.xerces.xs.*;
 import org.oagi.srt.common.SRTConstants;
-import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class BODSchemaHandler {
 

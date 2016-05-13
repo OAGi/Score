@@ -1,9 +1,9 @@
 package org.oagi.srt.persistence.dto;
 
+import org.oagi.srt.common.SRTObject;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
-
-import org.oagi.srt.common.SRTObject;
 
 /**
  *

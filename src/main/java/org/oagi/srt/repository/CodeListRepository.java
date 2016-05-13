@@ -1,7 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.common.QueryCondition;
-import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.repository.entity.CodeList;
 
 import java.util.List;

@@ -1,8 +1,6 @@
 package org.oagi.srt.config;
 
-import org.oagi.srt.persistence.dao.OracleDAOFactory;
 import org.oagi.srt.repository.RepositoryFactory;
-import org.oagi.srt.repository.mysql.MysqlCodeListRepository;
 import org.oagi.srt.repository.mysql.MysqlRepositoryFactory;
 import org.oagi.srt.repository.oracle.OracleRepositoryFactory;
 import org.springframework.beans.factory.annotation.Value;

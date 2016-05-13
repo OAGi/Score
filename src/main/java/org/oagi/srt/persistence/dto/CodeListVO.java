@@ -1,9 +1,9 @@
 package org.oagi.srt.persistence.dto;
 
-import java.sql.Timestamp;
-
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.repository.entity.CodeList;
+
+import java.sql.Timestamp;
 
 /**
  * @author Jaehun Lee

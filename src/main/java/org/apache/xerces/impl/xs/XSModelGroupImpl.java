@@ -18,11 +18,7 @@
 package org.apache.xerces.impl.xs;
 
 import org.apache.xerces.impl.xs.util.XSObjectListImpl;
-import org.apache.xerces.xs.XSAnnotation;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSModelGroup;
-import org.apache.xerces.xs.XSNamespaceItem;
-import org.apache.xerces.xs.XSObjectList;
+import org.apache.xerces.xs.*;
 
 /**
  * Store schema model group declaration.

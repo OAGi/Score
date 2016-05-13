@@ -1,11 +1,13 @@
 package org.oagi.srt.generate.samplexml;
 
-import jlibs.xml.*;
-import jlibs.xml.dom.*;
-import jlibs.xml.sax.*;
-import jlibs.xml.xsd.*;
-
+import jlibs.xml.Namespaces;
+import jlibs.xml.dom.DOMUtil;
+import jlibs.xml.sax.XMLDocument;
+import jlibs.xml.xsd.XSInstance;
+import jlibs.xml.xsd.XSParser;
 import org.apache.xerces.xs.*;
+import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.util.Utility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,21 +17,15 @@ import org.xml.sax.InputSource;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.StringReader;
-
-import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.Utility;
 
 public class XmlTest implements XSInstance.SampleValueGenerator{
     public String generateSampleValue(XSElementDeclaration elem, XSSimpleTypeDefinition xsSimpleTypeDefinition){
