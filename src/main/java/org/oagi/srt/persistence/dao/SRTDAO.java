@@ -5,9 +5,6 @@ import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.PersistenceUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -15,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -24,55 +20,50 @@ import java.util.List;
  *
  */
 @Repository
-public class SRTDAO extends NamedParameterJdbcDaoSupport {
-
-	@Autowired
-	public void init(JdbcTemplate jdbcTemplate) {
-		setJdbcTemplate(jdbcTemplate);
-	}
+public class SRTDAO {
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return 0;
 	}
 
 	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return 0;
 	}
 
 	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return new ArrayList();
 	}
 
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return new ArrayList();
 	}
 
 	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return new ArrayList();
 	}
 
 	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return new ArrayList();
 	}
 
 	public boolean updateObject(SRTObject obj) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	public int findMaxId() throws SRTDAOException {
-		throw new UnsupportedOperationException();
+		return 0;
 	}
 
 	public final void closeQuietly(DBAgent txAgent) {
@@ -99,30 +90,15 @@ public class SRTDAO extends NamedParameterJdbcDaoSupport {
 				count = rs.getInt("num");
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if (ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {
-				}
-			}
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-				}
-			}
-			try {
-				if (conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return count;
 	}
