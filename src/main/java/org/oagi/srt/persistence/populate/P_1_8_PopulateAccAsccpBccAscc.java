@@ -1,10 +1,5 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.sql.Connection;
-import java.util.ArrayList;
-
 import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
 import org.apache.xerces.impl.xs.XSAttributeDecl;
 import org.apache.xerces.impl.xs.XSAttributeUseImpl;
@@ -19,18 +14,15 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.BODElementVO;
 import org.oagi.srt.common.util.BODSchemaHandler;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ACCVO;
-import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.ASCCVO;
-import org.oagi.srt.persistence.dto.BCCPVO;
-import org.oagi.srt.persistence.dto.BCCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.UserVO;
-import org.w3c.dom.NodeList;
+import org.oagi.srt.persistence.dto.*;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.sql.Connection;
+import java.util.ArrayList;
 
 /**
  *

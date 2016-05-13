@@ -1,13 +1,5 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
@@ -17,19 +9,17 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
-import org.oagi.srt.web.startup.SRTInitializerException;
+import org.oagi.srt.persistence.dto.*;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
 
 /**
 *
@@ -162,7 +152,7 @@ public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
 					qc_05.add("cdt_sc_id", dt_sc_id);
 					qc_05.add("cdt_pri_id", cdtPrimitiveID);
 					int cdtSCAllowedPrimitiveId = ((CDTSCAllowedPrimitiveVO)cdtSCAPDao.findObject(qc_05, conn)).getCDTSCAllowedPrimitiveID();
-
+					
 					// populate CDT_SC_Allowed_Primitive_Expression_Type_Map 
 					List<String> xsdbs = Types.getCorrespondingXSDBuiltType(name[k]);
 					for(String xbt : xsdbs) {

@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
+@Repository
 public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 	private final String _tableName = "bdt_pri_restri";
 
@@ -38,12 +40,6 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 
 	private final String _DELETE_BDT_Primitive_Restriction_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE bdt_pri_restri_id = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -435,14 +431,5 @@ public class BDTPrimitiveRestrictionOracleDAO extends SRTDAO {
 		}
 
 		return true;
-
 	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

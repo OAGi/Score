@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ASCCPBusinessTermVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,8 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
-public class ASCCPBusinessTermOracleDAO extends SRTDAO{
+@Repository
+public class ASCCPBusinessTermOracleDAO extends SRTDAO {
 	private final String _tableName = "asccp_business_term";
 
 	private final String _FIND_ALL_ASCCP_BUSINESS_TERM_STATEMENT = 
@@ -37,12 +39,6 @@ public class ASCCPBusinessTermOracleDAO extends SRTDAO{
 	
 	private final String _DELETE_ASCCP_BUSINESS_TERM_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE idASCCP_Business_Term = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -217,40 +213,5 @@ public class ASCCPBusinessTermOracleDAO extends SRTDAO{
 		}
 
 		return true;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

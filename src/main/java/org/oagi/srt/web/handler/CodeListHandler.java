@@ -1,428 +1,376 @@
 package org.oagi.srt.web.handler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.SRTObject;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.CodeListRepository;
+import org.oagi.srt.repository.CodeListValueRepository;
+import org.oagi.srt.repository.RepositoryFactory;
+import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListValue;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.UnselectEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.oagi.srt.common.QueryCondition;
-import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
-import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.CodeListValueVO;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.UnselectEvent;
-
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class CodeListHandler extends UIHandler {
 
-	private List<SRTObject> codeLists = new ArrayList<SRTObject>();
-	private List<SRTObject> codeListsForList = new ArrayList<SRTObject>();
-	private List<SRTObject> codeListValues = new ArrayList<SRTObject>();
-	private List<SRTObject> newCodeListsWOBase = new ArrayList<SRTObject>();
-	private CodeListVO codeListVO = new CodeListVO();
-	private CodeListValueVO codeListValueVO = new CodeListValueVO();
-	private boolean extensible; 
-	private String basedCodeListName;
-	private CodeListVO selected;
-	private List<CodeListValueVO> selectedCodeListValue;
-	
-	public CodeListValueVO getCodeListValueVO() {
-		return codeListValueVO;
-	}
+    @Autowired
+    private RepositoryFactory repositoryFactory;
 
-	public void setCodeListValueVO(CodeListValueVO codeListValueVO) {
-		this.codeListValueVO = codeListValueVO;
-	}
+    private List<CodeList> codeLists = Collections.emptyList();
+    private List<CodeList> codeListsForList = Collections.emptyList();
+    private List<CodeListValue> codeListValues = Collections.emptyList();
+    private List<SRTObject> newCodeListsWOBase = Collections.emptyList();
 
-	public List<SRTObject> getCodeListsForList() {
-		try {
-			codeListsForList = daoCL.findObjects();
-			for(SRTObject obj : codeListsForList) {
-				CodeListVO cVO = (CodeListVO)obj;
-				if(cVO.getState().equals(SRTConstants.CODE_LIST_STATE_EDITING)) {
-					cVO.setEditDisabled(false);
-					cVO.setDiscardDisabled(false);
-					cVO.setDeleteDisabled(true);
-				} else if(cVO.getState().equals(SRTConstants.CODE_LIST_STATE_PUBLISHED)) {
-					cVO.setEditDisabled(true);
-					cVO.setDiscardDisabled(true);
-					cVO.setDeleteDisabled(false);
-				} else {
-					cVO.setEditDisabled(true);
-					cVO.setDiscardDisabled(true);
-					cVO.setDeleteDisabled(true);
-				}
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return codeListsForList;
-	}
+    private CodeList codeList = new CodeList();
+    private CodeListValue codeListValueVO = new CodeListValue();
+    private boolean extensible;
+    private String basedCodeListName;
 
-	public void setCodeListsForList(List<SRTObject> codeListsForList) {
-		this.codeListsForList = codeListsForList;
-	}
+    private CodeList selected;
+    private List<CodeListValue> selectedCodeListValue;
 
-	public List<CodeListValueVO> getSelectedCodeListValue() {
-		return selectedCodeListValue;
-	}
+    public CodeListValue getCodeListValue() {
+        return codeListValueVO;
+    }
 
-	public void setSelectedCodeListValue(List<CodeListValueVO> selectedCodeListValue) {
-		this.selectedCodeListValue = selectedCodeListValue;
-	}
+    public void setCodeListValue(CodeListValue codeListValueVO) {
+        this.codeListValueVO = codeListValueVO;
+    }
 
-	public List<SRTObject> getCodeListValues() {
-		return codeListValues;
-	}
+    public List<CodeList> getCodeListsForList() {
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListsForList = codeListRepository.findAll();
+        return codeListsForList;
+    }
 
-	public void setCodeListValues(List<SRTObject> codeListValues) {
-		this.codeListValues = codeListValues;
-	}
+    public void setCodeListsForList(List<CodeList> codeListsForList) {
+        this.codeListsForList = codeListsForList;
+    }
 
-	public List<SRTObject> getCodeLists() {
-		return codeLists;
-	}
+    public List<CodeListValue> getSelectedCodeListValue() {
+        return selectedCodeListValue;
+    }
 
-	public void setCodeLists(List<SRTObject> codeLists) {
-		this.codeLists = codeLists;
-	}
+    public void setSelectedCodeListValue(List<CodeListValue> selectedCodeListValue) {
+        this.selectedCodeListValue = selectedCodeListValue;
+    }
 
-	public CodeListVO getCodeListVO() {
-		return codeListVO;
-	}
+    public List<CodeListValue> getCodeListValues() {
+        return codeListValues;
+    }
 
-	public void setCodeListVO(CodeListVO codeListVO) {
-		this.codeListVO = codeListVO;
-	}
+    public void setCodeListValues(List<CodeListValue> codeListValues) {
+        this.codeListValues = codeListValues;
+    }
 
-	public boolean isExtensible() {
-		return extensible;
-	}
+    public List<CodeList> getCodeLists() {
+        return codeLists;
+    }
 
-	public void setExtensible(boolean extensible) {
-		this.extensible = extensible;
-	}
+    public void setCodeLists(List<CodeList> codeLists) {
+        this.codeLists = codeLists;
+    }
 
-	public List<SRTObject> getNewCodeListsWOBase() {
-		return newCodeListsWOBase;
-	}
+    public CodeList getCodeList() {
+        return codeList;
+    }
 
-	public void setNewCodeListsWOBase(List<SRTObject> newCodeListsWOBase) {
-		this.newCodeListsWOBase = newCodeListsWOBase;
-	}
-	
-	public String getBasedCodeListName() {
-		return basedCodeListName;
-	}
+    public void setCodeList(CodeList codeList) {
+        this.codeList = codeList;
+    }
 
-	public void setBasedCodeListName(String basedCodeListName) {
-		this.basedCodeListName = basedCodeListName;
-	}
+    public boolean isExtensible() {
+        return extensible;
+    }
 
-	public void chooseBasedCode() {
-		Map<String, Object> options = new HashMap<String, Object>();
+    public void setExtensible(boolean extensible) {
+        this.extensible = extensible;
+    }
+
+    public List<SRTObject> getNewCodeListsWOBase() {
+        return newCodeListsWOBase;
+    }
+
+    public void setNewCodeListsWOBase(List<SRTObject> newCodeListsWOBase) {
+        this.newCodeListsWOBase = newCodeListsWOBase;
+    }
+
+    public String getBasedCodeListName() {
+        return basedCodeListName;
+    }
+
+    public void setBasedCodeListName(String basedCodeListName) {
+        this.basedCodeListName = basedCodeListName;
+    }
+
+    public void chooseBasedCode() {
+        Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
         options.put("draggable", true);
         options.put("resizable", true);
         options.put("contentHeight", 800);
         RequestContext.getCurrentInstance().openDialog("code_list_create_select", options, null);
     }
-	
-	public void addCodeListValue() {
-		Map<String, Object> options = new HashMap<String, Object>();
+
+    public void addCodeListValue() {
+        Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
         options.put("draggable", true);
         options.put("resizable", true);
         options.put("contentHeight", 300);
         RequestContext.getCurrentInstance().openDialog("code_list_add_code_list_value", options, null);
     }
-	
-	public void addNewCodeListValue() {
-		codeListValueVO.setExtensionIndicator(true);
-		codeListValueVO.setUsedIndicator(true);
-		codeListValueVO.setDisabled(false);
-		codeListValueVO.setColor("green");
-		closeDialog();
-	}
-	
-	public void onCodeListValueAdded(SelectEvent event) {
-		CodeListHandler ch = (CodeListHandler) event.getObject();
-		
-		codeListValues.add(ch.getCodeListValueVO());
-		
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Code Values are loaded", "Code Values are loaded");
-        FacesContext.getCurrentInstance().addMessage(null, message);
-    }
-	
-	public void onBasedCodeChosen(SelectEvent event) {
-		CodeListHandler ch = (CodeListHandler) event.getObject();
-		if(ch.getSelected() != null) {
-			QueryCondition qc = new QueryCondition();
-			qc.add("code_list_id", ((CodeListVO)ch.getSelected()).getCodeListID());
-			selected = (CodeListVO)ch.getSelected();
-			try {
-				codeListValues = daoCLV.findObjects(qc);
-				for(SRTObject vo : codeListValues) {
-					CodeListValueVO codelistvalueVO = (CodeListValueVO)vo;
-					if(codelistvalueVO.getUsedIndicator() && !codelistvalueVO.getLockedIndicator())
-						codelistvalueVO.setColor("blue");
-					else if((!codelistvalueVO.getUsedIndicator() && !codelistvalueVO.getLockedIndicator()) || (codelistvalueVO.getLockedIndicator()))
-						codelistvalueVO.setColor("red");
-				}
-			} catch (SRTDAOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Code Values are loaded", "Code Values are loaded");
-        FacesContext.getCurrentInstance().addMessage(null, message);
-    }
-	
-	public void onEdit(SRTObject obj) {
-		codeListVO = (CodeListVO)obj;
-		QueryCondition qc = new QueryCondition();
-		qc.add("code_list_id", codeListVO.getCodeListID());
-		try {
-			codeListValues = daoCLV.findObjects(qc);
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-    }
-	
-	public void onDiscard(SRTObject obj) {
-		codeListVO = (CodeListVO)obj;
-		codeListVO.setState(SRTConstants.CODE_LIST_STATE_DISCARDED);
-		try {
-			daoCL.updateObject(codeListVO);
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-    }
-	
-	public void onDelete(SRTObject obj) {
-		codeListVO = (CodeListVO)obj;
-		codeListVO.setState(SRTConstants.CODE_LIST_STATE_DELETED);
-		try {
-			daoCL.updateObject(codeListVO);
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-    }
-	
-	public List<String> completeInput(String query) {
-		List<String> results = new ArrayList<String>();
 
-		try {
-			QueryCondition qc = new QueryCondition();
-			qc.addLikeClause("name", "%" + query + "%");
-			codeLists = daoCL.findObjects(qc);
-			for(SRTObject obj : codeLists) {
-				CodeListVO clVO = (CodeListVO)obj;
-				results.add(clVO.getName());
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return results;
-	}
-	
-	public void search() {
-		try {
-			QueryCondition qc = new QueryCondition();
-			qc.addLikeClause("name", "%" + getBasedCodeListName() + "%");
-			qc.add("state", SRTConstants.CODE_LIST_STATE_PUBLISHED);
-			qc.add("extensible_indicator", 1);
-			codeLists = daoCL.findObjects(qc);
-			if(codeLists.size() == 0) {
-				FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists or not yet published or not extensible", "[" + getBasedCodeListName() + "] No such Code List exists or not yet published or not extensible");
-		        FacesContext.getCurrentInstance().addMessage(null, msg);
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void searchDerived(String id) {
-		try {
-			QueryCondition qc = new QueryCondition();
-			qc.add("code_list_id", id);
-			codeLists = daoCL.findObjects(qc);
-			if(codeLists.size() == 0) {
-				FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists.", "[" + getBasedCodeListName() + "] No such Code List exists.");
-		        FacesContext.getCurrentInstance().addMessage(null, msg);
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void onRowSelect(SelectEvent event) {
-        FacesMessage msg = new FacesMessage(((CodeListVO) event.getObject()).getName(), String.valueOf(((CodeListVO) event.getObject()).getCodeListID()));
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-        selected = (CodeListVO) event.getObject();
-        QueryCondition qc = new QueryCondition();
-		qc.add("code_list_id", selected.getCodeListID());
-		try {
-			codeListValues = daoCLV.findObjects(qc);
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+    public void addNewCodeListValue() {
+        codeListValueVO.setExtensionIndicator(true);
+        codeListValueVO.setUsedIndicator(true);
+        codeListValueVO.setDisabled(false);
+        codeListValueVO.setColor("green");
+        closeDialog();
     }
- 
+
+    public void onCodeListValueAdded(SelectEvent event) {
+        CodeListHandler ch = (CodeListHandler) event.getObject();
+        codeListValues.add(ch.getCodeListValue());
+
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Code Values are loaded", "Code Values are loaded");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void onBasedCodeChosen(SelectEvent event) {
+        CodeListHandler ch = (CodeListHandler) event.getObject();
+        if (ch.getSelected() != null) {
+            selected = (CodeList) ch.getSelected();
+            CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+            codeListValues = codeListValueRepository.findByCodeListId(selected.getCodeListId());
+
+            for (CodeListValue codeListValue : codeListValues) {
+                if (codeListValue.isUsedIndicator() && !codeListValue.isLockedIndicator())
+                    codeListValue.setColor("blue");
+                else if ((!codeListValue.isUsedIndicator() && !codeListValue.isLockedIndicator()) || (codeListValue.isLockedIndicator()))
+                    codeListValue.setColor("red");
+            }
+        }
+
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Code Values are loaded", "Code Values are loaded");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void onEdit(CodeList obj) {
+        codeList = obj;
+
+        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+        codeListValues = codeListValueRepository.findByCodeListId(codeList.getCodeListId());
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void onDiscard(CodeList obj) {
+        codeList = obj;
+        codeList.setState(SRTConstants.CODE_LIST_STATE_DISCARDED);
+
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListRepository.updateStateByCodeListId(codeList.getState(), codeList.getCodeListId());
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void onDelete(CodeList obj) {
+        codeList = obj;
+        codeList.setState(SRTConstants.CODE_LIST_STATE_DELETED);
+
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListRepository.updateStateByCodeListId(codeList.getState(), codeList.getCodeListId());
+    }
+
+    public List<String> completeInput(String query) {
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeLists = codeListRepository.findByNameContaining(query);
+
+        return codeLists.stream().map(codeList -> {
+            return codeList.getName();
+        }).collect(Collectors.toList());
+    }
+
+    public void search() {
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeLists =
+                codeListRepository.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(getBasedCodeListName());
+        if (codeLists.isEmpty()) {
+            FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists or not yet published or not extensible", "[" + getBasedCodeListName() + "] No such Code List exists or not yet published or not extensible");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+    }
+
+    public void searchDerived(String id) {
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeLists = codeListRepository.findByCodeListId(Integer.parseInt(id));
+        if (codeLists.isEmpty()) {
+            FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists.", "[" + getBasedCodeListName() + "] No such Code List exists.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+    }
+
+    public void onRowSelect(SelectEvent event) {
+        selected = (CodeList) event.getObject();
+
+        FacesMessage msg = new FacesMessage(selected.getName(), String.valueOf(selected.getCodeListId()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+
+        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+        codeListValues = codeListValueRepository.findByCodeListId(selected.getCodeListId());
+    }
+
     public void onRowUnselect(UnselectEvent event) {
-        FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((CodeListVO) event.getObject()).getCodeListID()));
+        CodeList codeList = (CodeList) event.getObject();
+        FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(codeList.getCodeListId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
         selected = null;
     }
-    
+
+    @Transactional(rollbackFor = Throwable.class)
     public void save() {
-    	try {
-    		codeListVO.setExtensibleIndicator(extensible);
-    		codeListVO.setCodeListGUID(Utility.generateGUID());
-    		codeListVO.setEnumerationTypeGUID(Utility.generateGUID());
-    		if(selected!=null)
-    			codeListVO.setBasedCodeListID(selected.getCodeListID());
-    		else 
-    			codeListVO.setBasedCodeListID(-1);
-    		codeListVO.setState(SRTConstants.CODE_LIST_STATE_EDITING);
-    		codeListVO.setCreatedByUserID(userId);
-    		codeListVO.setLastUpdatedByUserID(userId);
-			daoCL.insertObject(codeListVO);
-			
-			QueryCondition qc = new QueryCondition();
-			qc.add("guid", codeListVO.getCodeListGUID());
-			qc.add("enum_type_guid", codeListVO.getEnumerationTypeGUID());
-			qc.add("name", codeListVO.getName());
-			qc.add("definition", codeListVO.getDefinition());
-			int clId = ((CodeListVO)daoCL.findObject(qc)).getCodeListID();
-			for(SRTObject vo : codeListValues) {
-				CodeListValueVO cVO = (CodeListValueVO)vo;
-				cVO.setOwnerCodeListID(clId);
-				setIndicators(cVO);
-				daoCLV.insertObject(cVO);
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+        codeList.setExtensibleIndicator(extensible);
+        codeList.setGuid(Utility.generateGUID());
+        codeList.setEnumTypeGuid(Utility.generateGUID());
+        if (selected != null) {
+            codeList.setBasedCodeListId(selected.getCodeListId());
+        } else {
+            codeList.setBasedCodeListId(-1);
+        }
+        codeList.setState(SRTConstants.CODE_LIST_STATE_EDITING);
+        codeList.setCreatedBy(userId);
+        codeList.setLastUpdatedBy(userId);
+
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListRepository.save(codeList);
+
+        int codeListId = codeList.getCodeListId();
+
+        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+        for (CodeListValue codeListValue : codeListValues) {
+            setIndicators(codeListValue);
+            codeListValue.setCodeListId(codeListId);
+            codeListValueRepository.save(codeListValue);
+        }
     }
-    
-    private void setIndicators(CodeListValueVO cVO) {
-    	if(cVO.getColor().equalsIgnoreCase("blue")) {
-			cVO.setUsedIndicator(true);
-			cVO.setLockedIndicator(false);
-			cVO.setExtensionIndicator(false);
-		} else if(cVO.getColor().equalsIgnoreCase("red")) {
-			cVO.setUsedIndicator(false);
-			cVO.setLockedIndicator(true);
-			cVO.setExtensionIndicator(false);
-		} else if(cVO.getColor().equalsIgnoreCase("orange")) {
-			cVO.setUsedIndicator(false);
-			cVO.setLockedIndicator(false);
-			cVO.setExtensionIndicator(false);
-		} else if(cVO.getColor().equalsIgnoreCase("green")) {
-			cVO.setUsedIndicator(true);
-			cVO.setLockedIndicator(false);
-			cVO.setExtensionIndicator(true);
-		}
+
+    private void setIndicators(CodeListValue codeListValue) {
+        switch (codeListValue.getColor()) {
+            case "blue":
+                codeListValue.setUsedIndicator(true);
+                codeListValue.setLockedIndicator(false);
+                codeListValue.setExtensionIndicator(false);
+                break;
+            case "red":
+                codeListValue.setUsedIndicator(false);
+                codeListValue.setLockedIndicator(true);
+                codeListValue.setExtensionIndicator(false);
+                break;
+            case "orange":
+                codeListValue.setUsedIndicator(false);
+                codeListValue.setLockedIndicator(false);
+                codeListValue.setExtensionIndicator(false);
+                break;
+            case "green":
+                codeListValue.setUsedIndicator(true);
+                codeListValue.setLockedIndicator(false);
+                codeListValue.setExtensionIndicator(true);
+                break;
+        }
     }
-    
+
+    @Transactional(rollbackFor = Throwable.class)
     public void updateSave() {
-    	try {
-			daoCL.updateObject(codeListVO);
-			
-			for(SRTObject vo : codeListValues) {
-				CodeListValueVO cVO = (CodeListValueVO)vo;
-				setIndicators(cVO);
-				cVO.setOwnerCodeListID(codeListVO.getCodeListID());
-				daoCLV.deleteObject(cVO);
-				daoCLV.insertObject(cVO);
-			}
-			selected = codeListVO;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListRepository.update(codeList);
+
+        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+        for (CodeListValue codeListValue : codeListValues) {
+            setIndicators(codeListValue);
+            codeListValue.setCodeListId(codeList.getCodeListId());
+            codeListValueRepository.updateCodeListIdByCodeListValueId(
+                    codeListValue.getCodeListId(), codeListValue.getCodeListValueId());
+        }
+
+        selected = codeList;
     }
-    
+
+    @Transactional(rollbackFor = Throwable.class)
     public void updatePublish() {
-    	try {
-    		codeListVO.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-			daoCL.updateObject(codeListVO);
-			
-			for(SRTObject vo : codeListValues) {
-				CodeListValueVO cVO = (CodeListValueVO)vo;
-				setIndicators(cVO);
-				cVO.setOwnerCodeListID(codeListVO.getCodeListID());
-				daoCLV.deleteObject(cVO);
-				daoCLV.insertObject(cVO);
-			}
-			selected = codeListVO;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListRepository.updateStateByCodeListId(SRTConstants.CODE_LIST_STATE_PUBLISHED, codeList.getCodeListId());
+
+        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+        for (CodeListValue codeListValue : codeListValues) {
+            setIndicators(codeListValue);
+            codeListValue.setCodeListId(codeList.getCodeListId());
+            codeListValueRepository.updateCodeListIdByCodeListValueId(
+                    codeListValue.getCodeListId(), codeListValue.getCodeListValueId());
+        }
     }
-    
+
+    @Transactional(rollbackFor = Throwable.class)
     public void publish() {
-    	try {
-    		codeListVO.setExtensibleIndicator(extensible);
-    		codeListVO.setCodeListGUID(Utility.generateGUID());
-    		codeListVO.setEnumerationTypeGUID(Utility.generateGUID());
-    		if(selected!=null)
-    			codeListVO.setBasedCodeListID(selected.getCodeListID());
-    		else 
-    			codeListVO.setBasedCodeListID(-1);
-    		codeListVO.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-    		codeListVO.setCreatedByUserID(userId);
-    		codeListVO.setLastUpdatedByUserID(userId);
-			daoCL.insertObject(codeListVO);
-			
-			QueryCondition qc = new QueryCondition();
-			qc.add("guid", codeListVO.getCodeListGUID());
-			qc.add("enum_type_guid", codeListVO.getEnumerationTypeGUID());
-			qc.add("code_list_id", codeListVO.getBasedCodeListID());
-			qc.add("name", codeListVO.getName());
-			qc.add("definition", codeListVO.getDefinition());
-			int clId = ((CodeListVO)daoCL.findObject(qc)).getCodeListID();
-			for(SRTObject vo : codeListValues) {
-				CodeListValueVO cVO = (CodeListValueVO)vo;
-				cVO.setOwnerCodeListID(clId);
-				setIndicators(cVO);
-				daoCLV.insertObject(cVO);
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
+        codeList.setExtensibleIndicator(extensible);
+        codeList.setGuid(Utility.generateGUID());
+        codeList.setEnumTypeGuid(Utility.generateGUID());
+        if (selected != null)
+            codeList.setBasedCodeListId(selected.getCodeListId());
+        else
+            codeList.setBasedCodeListId(-1);
+        codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
+        codeList.setCreatedBy(userId);
+        codeList.setLastUpdatedBy(userId);
+
+        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+        codeListRepository.save(codeList);
+
+        int codeListId = codeList.getCodeListId();
+
+        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+        for (CodeListValue codeListValue : codeListValues) {
+            setIndicators(codeListValue);
+            codeListValue.setCodeListId(codeListId);
+            codeListValueRepository.save(codeListValue);
+        }
     }
-    
+
     public void cancel() {
-    	this.selected = null;
+        this.selected = null;
     }
 
-	public CodeListVO getSelected() {
-		return selected;
-	}
+    public CodeList getSelected() {
+        return selected;
+    }
 
-	public void setSelected(CodeListVO selected) {
-		this.selected = selected;
-	}
-	
-	public void updateCodeListValue(int codeListValueId) {
-		for(SRTObject vo : codeListValues) {
-			CodeListValueVO cVO = (CodeListValueVO)vo;
-			if(cVO.getCodeListValueID() == codeListValueId) {
-				cVO.setColor((cVO.getColor().equals("blue")) ? "orange" : "blue"); 
-			} 
-		}
-	}
-    
+    public void setSelected(CodeList selected) {
+        this.selected = selected;
+    }
+
+    public void updateCodeListValue(int codeListValueId) {
+        for (CodeListValue codeListValue : codeListValues) {
+            if (codeListValue.getCodeListValueId() == codeListValueId) {
+                codeListValue.setColor((codeListValue.getColor().equals("blue")) ? "orange" : "blue");
+            }
+        }
+    }
+
 }

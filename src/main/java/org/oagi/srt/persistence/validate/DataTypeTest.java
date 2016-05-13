@@ -1,17 +1,5 @@
 package org.oagi.srt.persistence.validate;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
@@ -21,24 +9,22 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.AgencyIDListVO;
-import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.persistence.dto.*;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DataTypeTest {
 	
@@ -512,7 +498,7 @@ public class DataTypeTest {
 		XPathHandler xHandler = org_xHandler;
 		
 		//specify Code Content Type QBDT
-		//the xsd:simpleType whose names end with ‘CodeContentType’, except the ‘CodeContentType’ itself. 
+		//the xsd:simpleType whose names end with ï¿½CodeContentTypeï¿½, except the ï¿½CodeContentTypeï¿½ itself. 
 		
 		for(int i = 0; i < simpleTypesFromFieldXSD.getLength(); i++) {
 			xHandler = org_xHandler;
@@ -533,9 +519,9 @@ public class DataTypeTest {
 					DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
 
 					if(dtVO != null) {
-						DTVO dVO = validateAddCodeContentQBDTToDT(dtVO, name, typeNode, xHandler);
+						DTVO dVO = validateAddToDTForCodeContentQBDT(dtVO, name, typeNode, xHandler);
 						if(dVO != null)
-							validateAddToDTSC(xHandler, name, dVO);
+							validateAddToDTSCForContentType(xHandler, name, dVO);
 					} else {
 						System.out.println("Error! Qualified Code Content Type: " + name +" is not exist in Database");
 					}
@@ -548,7 +534,7 @@ public class DataTypeTest {
 		XPathHandler xHandler = org_xHandler;
 		
 		//specify ID Content Type QBDT
-		//the xsd:simpleType whose names end with ‘IDContentType’ 
+		//the xsd:simpleType whose names end with ï¿½IDContentTypeï¿½ 
 		
 		for(int i = 0; i < simpleTypesFromFieldXSD.getLength(); i++) {
 			xHandler = org_xHandler;
@@ -569,9 +555,9 @@ public class DataTypeTest {
 					DTVO dtVO = (DTVO)aDTDAO.findObject(qc, conn);
 
 					if(dtVO != null) {
-						DTVO dVO = validateAddIDContentQBDTToDT(dtVO, name, typeNode, xHandler);
+						DTVO dVO = validateAddToDTForIDContentQBDT(dtVO, name, typeNode, xHandler);
 						if(dVO != null)
-							validateAddToDTSC(xHandler, name, dVO);
+							validateAddToDTSCForContentType(xHandler, name, dVO);
 					} else {
 						System.out.println("Error! Qualified ID Content Type: " + name +" is not exist in Database");
 					}
@@ -630,7 +616,7 @@ public class DataTypeTest {
 						}
 						
 						if(!checkAlready){
-							DTVO dVO = validateAddOtherQBDTToDT(dtVO, type, typeNode, xHandler);
+							DTVO dVO = validateAddToDTForOtherQBDT(dtVO, type, typeNode, xHandler);
 							if(dVO != null){
 								validateAddToDTSC(xHandler, type, dVO);
 							}
@@ -658,7 +644,7 @@ public class DataTypeTest {
 		df = DAOFactory.getDAOFactory();
 		SRTDAO bdtSCPRDAO = df.getDAO("BDTSCPrimitiveRestriction");
 		List<SRTObject> cdtscallowedprimitivelist = new ArrayList<SRTObject>();
-		if(mode == 1) {
+		if(mode == 1) {//inherited
 			List<SRTObject> bdtscs = getBDTSCPrimitiveRestriction(dtscVO);
 			for(SRTObject obj : bdtscs) {
 				BDTSCPrimitiveRestrictionVO parent = (BDTSCPrimitiveRestrictionVO)obj;
@@ -669,7 +655,7 @@ public class DataTypeTest {
 				qc1.add("code_list_id", parent.getCodeListID());
 				qc1.add("agency_id_list_id", parent.getAgencyIDListID());
 				if(bdtSCPRDAO.findObject(qc1, conn) == null)
-					System.out.println("Error!"+new Exception().getStackTrace()[0].getLineNumber());
+					System.out.println("#######BDT_SC_PRIMITIVE_RESTRICTION FROM BASE IS NOT POPULATED!! Check DT_SC_ID: "+dtscVO.getDTSCID());
 				else
 					;//System.out.println("Success!!");
 			}
@@ -686,7 +672,7 @@ public class DataTypeTest {
 					CDTSCAllowedPrimitiveExpressionTypeMapVO vo = (CDTSCAllowedPrimitiveExpressionTypeMapVO)mapVO;
 					qc1.add("cdt_sc_awd_pri_xps_type_map_id", vo.getCTSCAllowedPrimitiveExpressionTypeMapID());
 					if(bdtSCPRDAO.findObject(qc1, conn) == null)
-						System.out.println("Error!"+new Exception().getStackTrace()[0].getLineNumber());
+						System.out.println("#######BDT_SC_PRIMITIVE_RESTRICTION FROM ATTRIBUTES IS NOT POPULATED!! Check DT_SC_ID: "+dtscVO.getDTSCID());
 					else
 						;//System.out.println("Success!!");
 					
@@ -715,7 +701,7 @@ public class DataTypeTest {
 		}		
 	}
 	
-	private DTVO validateAddCodeContentQBDTToDT(DTVO queriedQBDTVO, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {		
+	private DTVO validateAddToDTForCodeContentQBDT(DTVO queriedQBDTVO, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {		
 		
 		String fromDTVO = "";
 		String fromXSD = "";
@@ -730,7 +716,7 @@ public class DataTypeTest {
 		fromXSD = fromXSD + "type=1 version_number=1.0 previous_version_dt_id=0 data_type_term=Code den="+type
 				+ " baseTypeGuid=oagis-id-5646bf52a97b48adb50ded6ff8c38354 definition="+definitionFromXSD+
 				" content_component_definition=null revision_doc=null state=3 created_by=1 owner_user_id=1" +
-				"last_updated_by=1 revision_num=0 revision_tracking_num=0 revision_action_id=0 release_id=0 current_bdt_id=0 is_deprecated=false";
+				" last_updated_by=1 revision_num=0 revision_tracking_num=0 revision_action_id=0 release_id=0 current_bdt_id=0 is_deprecated=false";
 		//0 in id value means null in database
 		
 		//get from the VO
@@ -795,7 +781,7 @@ public class DataTypeTest {
 		return queriedQBDTVO;
 	}
 	
-	private DTVO validateAddIDContentQBDTToDT(DTVO queriedQBDTVO, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {		
+	private DTVO validateAddToDTForIDContentQBDT(DTVO queriedQBDTVO, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {		
 		
 		String fromDTVO = "";
 		String fromXSD = "";
@@ -810,7 +796,7 @@ public class DataTypeTest {
 		fromXSD = fromXSD + "type=1 version_number=1.0 previous_version_dt_id=0 data_type_term=Identifier den="+type
 				+ " baseTypeGuid=oagis-id-08d6ade226fd42488b53c0815664e246 definition="+definitionFromXSD+
 				" content_component_definition=null revision_doc=null state=3 created_by=1 owner_user_id=1" +
-				"last_updated_by=1 revision_num=0 revision_tracking_num=0 revision_action_id=0 release_id=0 current_bdt_id=0 is_deprecated=false";
+				" last_updated_by=1 revision_num=0 revision_tracking_num=0 revision_action_id=0 release_id=0 current_bdt_id=0 is_deprecated=false";
 		//0 in id value means null in database
 		
 		//get from the VO
@@ -869,7 +855,7 @@ public class DataTypeTest {
 		return queriedQBDTVO;
 	}
 		
-	private DTVO validateAddOtherQBDTToDT(DTVO queriedQBDTVO, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
+	private DTVO validateAddToDTForOtherQBDT(DTVO queriedQBDTVO, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
 			
 //			Element extension = (Element)((Element)typeNode).getElementsByTagName("xsd:extension").item(0);
 //			if(extension == null || extension.getAttribute("base") == null)
@@ -904,9 +890,15 @@ public class DataTypeTest {
 			}
 			
 			String definitionFromXSD =null;
-			if(nodeForDef!=null){
-				definitionFromXSD = nodeForDef.getTextContent();
-			}
+			
+			
+//			if(nodeForDef!=null){
+//				definitionFromXSD = nodeForDef.getTextContent();
+//			}
+//			//Most QBDT has no definition. 
+//			//Later on we want to come back and modify this to take definition from an element with the same name. 
+//			//Right now letï¿½s leave it blank so that it is easier to validate the import.
+			
 			String baseTypeGUIDFromXSD = "";
 			String basdTypeDataTypeTerm = "";
 			
@@ -915,7 +907,18 @@ public class DataTypeTest {
 				baseNameNode = xHandler.getNode("//xsd:complexType[@name='"+type+"']//@base");
 			}
 			String baseTypeNodeName = baseNameNode.getTextContent();
-			String dataTypeTerm = Utility.spaceSeparatorBeforeStr(baseTypeNodeName, "Type");
+			String dataTypeTerm = "";
+			if(baseTypeNodeName.contains("Code")){
+				dataTypeTerm = "Code";
+			}
+			else if(baseTypeNodeName.contains("String")){
+				dataTypeTerm = "Text";
+			}
+			else {
+				dataTypeTerm = Utility.spaceSeparatorBeforeStr(baseTypeNodeName, "Type");
+			}
+			
+			
 			
 //			Node baseTypeNode = xHandler.getNode("//xsd:simpleType[@name='"+baseTypeNodeName+"']");
 //			if(baseTypeNode==null){
@@ -923,12 +926,16 @@ public class DataTypeTest {
 //			}
 //			
 //			baseTypeGUIDFromXSD = ((Element)baseTypeNode).getAttribute("id");
+			
+			if(baseTypeNodeName.endsWith("CodeContentType")){
+				baseTypeNodeName="CodeType";
+			}
 					
 			fromXSD = fromXSD + "type=1 version_number=1.0 previous_version_dt_id=0 data_type_term="+dataTypeTerm
 					+" den="+type
 					+ " baseTypeName="+baseTypeNodeName+ " definition="+definitionFromXSD+
 					" content_component_definition=null revision_doc=null state=3 created_by=1 owner_user_id=1" +
-					"last_updated_by=1 revision_num=0 revision_tracking_num=0 revision_action_id=0 release_id=0 current_bdt_id=0 is_deprecated=false";
+					" last_updated_by=1 revision_num=0 revision_tracking_num=0 revision_action_id=0 release_id=0 current_bdt_id=0 is_deprecated=false";
 			
 			//0 in id value means null in database
 					
@@ -937,6 +944,13 @@ public class DataTypeTest {
 			denFromDTVO=denFromDTVO.replaceAll("Identifier", "ID");
 			denFromDTVO=denFromDTVO.replaceAll(" ", "");
 			denFromDTVO=denFromDTVO.replace(".Content", "Type");
+			
+			if(!denFromDTVO.equals("OpenTextType")){
+				denFromDTVO=denFromDTVO.replaceFirst("Text", "");
+			}
+			if(denFromDTVO.contains("String")){
+				denFromDTVO=denFromDTVO.replace("String", "");
+			}
 			
 			DAOFactory df = DAOFactory.getDAOFactory();
 			SRTDAO aDTDAO = df.getDAO("DT");
@@ -1002,7 +1016,7 @@ public class DataTypeTest {
 		
 		//if CodeContentType QBDT-->inherit from CodeContentType & add codeListID  
 		//if IDContentType QBDT-->inherit from IDContentType & add agencyIDListID 
-		//Assume there is no qualified CodeContentType is based on another qualifed CodeContentType.
+		//Assume there is no qualified CodeContentType is based on another qualified CodeContentType.
 		
 		if(dVO.getDataTypeTerm().equals("Code")
 		&& base.equals("CodeContentType")){
@@ -1026,9 +1040,8 @@ public class DataTypeTest {
 						if(BDT_pri_restriVO.getisDefault()){
 							isDefaultCnt++;
 						}
-					}
-					if(!exist){
-						addedIndex = j;
+						thisBDTPriRestriList.remove(j);
+						j=0;
 					}
 				}
 				
@@ -1041,13 +1054,12 @@ public class DataTypeTest {
 				if(isDefaultCnt > 1){
 					System.out.println("There are "+isDefaultCnt+ " defaults. Check DT_ID:"+dVO.getDTID());
 				}
-				
-				if(addedIndex > -1){
-
+			}
+			if(thisBDTPriRestriList.size() > 0){					
+				System.out.println("CodeContentType QBDT: "+dVO.getDTID()+" has added record in bdt_pri_restri");
+				for(int j=0; j<thisBDTPriRestriList.size(); j++){
 					BDTPrimitiveRestrictionVO addedRecord = new BDTPrimitiveRestrictionVO();
-					addedRecord = (BDTPrimitiveRestrictionVO) thisBDTPriRestriList.get(addedIndex);
-					
-					System.out.println("CodeContentType QBDT: "+addedRecord.getBDTID()+" has added record in bdt_pri_restri");
+					addedRecord = (BDTPrimitiveRestrictionVO) thisBDTPriRestriList.get(j);
 					System.out.println(addedRecord.getCDTPrimitiveExpressionTypeMapID()+" "
 									+addedRecord.getCodeListID() +" "
 									+addedRecord.getAgencyIDListID() + " "
@@ -1077,9 +1089,8 @@ public class DataTypeTest {
 						if(BDT_pri_restriVO.getisDefault()){
 							isDefaultCnt++;
 						}
-					}
-					if(!exist){
-						addedIndex = j;
+						thisBDTPriRestriList.remove(j);
+						j=0;
 					}
 				}
 				
@@ -1092,17 +1103,16 @@ public class DataTypeTest {
 				if(isDefaultCnt > 1){
 					System.out.println("There are "+isDefaultCnt+ " defaults. Check DT_ID:"+dVO.getDTID());
 				}
-				
-				if(addedIndex > -1){
-	
+			}
+			if(thisBDTPriRestriList.size() > 0){					
+				System.out.println("IDContentType QBDT: "+dVO.getDTID()+" has added record in bdt_pri_restri");
+				for(int j=0; j<thisBDTPriRestriList.size(); j++){
 					BDTPrimitiveRestrictionVO addedRecord = new BDTPrimitiveRestrictionVO();
-					addedRecord = (BDTPrimitiveRestrictionVO) thisBDTPriRestriList.get(addedIndex);
-					
-					System.out.println("IDContentType QBDT: "+addedRecord.getBDTID()+" has added record in bdt_pri_restri");
+					addedRecord = (BDTPrimitiveRestrictionVO) thisBDTPriRestriList.get(j);
 					System.out.println(addedRecord.getCDTPrimitiveExpressionTypeMapID()+" "
-							+addedRecord.getCodeListID() +" "
-							+addedRecord.getAgencyIDListID() + " "
-							+addedRecord.getisDefault());
+									+addedRecord.getCodeListID() +" "
+									+addedRecord.getAgencyIDListID() + " "
+									+addedRecord.getisDefault());
 				}
 			}
 		}
@@ -1127,9 +1137,8 @@ public class DataTypeTest {
 						if(BDT_pri_restriVO.getisDefault()){
 							isDefaultCnt++;
 						}
-					}
-					if(!exist){
-						addedIndex = j;
+						thisBDTPriRestriList.remove(j);
+						j=0;
 					}
 				}
 				
@@ -1142,17 +1151,16 @@ public class DataTypeTest {
 				if(isDefaultCnt > 1){
 					System.out.println("There are "+isDefaultCnt+ " defaults. Check DT_ID:"+dVO.getDTID());
 				}
-				
-				if(addedIndex > -1){
-				
+			}
+			if(thisBDTPriRestriList.size() > 0){					
+				System.out.println("Other QBDT: "+dVO.getDTID()+" has added record in bdt_pri_restri");
+				for(int j=0; j<thisBDTPriRestriList.size(); j++){
 					BDTPrimitiveRestrictionVO addedRecord = new BDTPrimitiveRestrictionVO();
-					addedRecord = (BDTPrimitiveRestrictionVO) thisBDTPriRestriList.get(addedIndex);
-					
-					System.out.println("Other QBDT: "+addedRecord.getBDTID()+" has added record in bdt_pri_restri");
+					addedRecord = (BDTPrimitiveRestrictionVO) thisBDTPriRestriList.get(j);
 					System.out.println(addedRecord.getCDTPrimitiveExpressionTypeMapID()+" "
-							+addedRecord.getCodeListID() +" "
-							+addedRecord.getAgencyIDListID() + " "
-							+addedRecord.getisDefault());
+									+addedRecord.getCodeListID() +" "
+									+addedRecord.getAgencyIDListID() + " "
+									+addedRecord.getisDefault());
 				}
 			}
 		}
@@ -1251,24 +1259,59 @@ public class DataTypeTest {
 //		}
 //	}
 	
+	private void validateAddToDTSCForContentType(XPathHandler xHandler, String typeName, DTVO qbdtVO) throws SRTDAOException, XPathExpressionException {
+		DAOFactory df;
+		df = DAOFactory.getDAOFactory();
+		
+		
+		//if QBDT is based on CodeContentType or IDContentType, check inherit sc of base & sc max card = 0
+		
+		if(!qbdtVO.getDEN().contains("_"))
+			qbdtVO = getDTVO(qbdtVO.getBasedDTID());
+		
+		SRTDAO aDTSCDAO = df.getDAO("DTSC");
+		SRTDAO aXSDBuiltInTypeDAO = df.getDAO("XSDBuiltInType");
+		SRTDAO cdtSCAPMapDAO = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
+		QueryCondition qc = new QueryCondition();
+		qc.add("owner_dt_iD", qbdtVO.getBasedDTID());
+		int owner_dT_iD = qbdtVO.getDTID();
+		
+		ArrayList<SRTObject> basedtsc_vos = aDTSCDAO.findObjects(qc, conn);
+		for(SRTObject sObj : basedtsc_vos) {
+			DTSCVO basedtsc_vo = (DTSCVO)sObj;
+			
+			QueryCondition qc2 = new QueryCondition();
+			qc2.add("owner_dt_iD", qbdtVO.getDTID());	
+			qc2.add("Base_dt_sc_id", basedtsc_vo.getDTSCID());
+			DTSCVO thisdtsc_vo = (DTSCVO) aDTSCDAO.findObject(qc2, conn);
+			
+			String fromBaseDTSCStr="";
+			String thisDTSCStr="";
+			
+			fromBaseDTSCStr = fromBaseDTSCStr+basedtsc_vo.getDTSCGUID()+basedtsc_vo.getPropertyTerm()
+			+basedtsc_vo.getRepresentationTerm()+basedtsc_vo.getDefinition()+basedtsc_vo.getMinCardinality()+"0"//max card = 0 for contentType
+			+basedtsc_vo.getDTSCID();//Based_dt_sc_id is dt_sc_id of base 
+			
+			thisDTSCStr=thisDTSCStr+thisdtsc_vo.getDTSCGUID()+thisdtsc_vo.getPropertyTerm()
+			+thisdtsc_vo.getRepresentationTerm()+thisdtsc_vo.getDefinition()+thisdtsc_vo.getMinCardinality()+thisdtsc_vo.getMaxCardinality()
+			+thisdtsc_vo.getBasedDTSCID();
+			
+			if(!fromBaseDTSCStr.equals(thisDTSCStr)){
+				System.out.println("############DTSC IS NOT GENERATED! Check DT_ID: "+thisdtsc_vo.getOwnerDTID()+" & its base DT_SC_ID: "+ thisdtsc_vo.getBasedDTSCID());;
+			}
+			
+			validateInsertBDTSCPrimitiveRestriction(getDTSCVO(basedtsc_vo.getDTSCGUID(), owner_dT_iD), 1, "", "");
+			
+		}
+	}
+	
 	private void validateAddToDTSC(XPathHandler xHandler, String typeName, DTVO qbdtVO) throws SRTDAOException, XPathExpressionException {
 		DAOFactory df;
 		df = DAOFactory.getDAOFactory();
 		
 		
-		//if QBDT from CodeContentType, check inherit sc from base & sc max card = 0
-		//if QBDT from IDContentType, check inherit sc from base & sc max card = 0
-		//otherwise, check inherit sc from base & added from attributes
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		if(!qbdtVO.getDEN().contains("_"))
+		//check inherit sc of base & added from attributes
+			if(!qbdtVO.getDEN().contains("_"))
 			qbdtVO = getDTVO(qbdtVO.getBasedDTID());
 		
 		SRTDAO aDTSCDAO = df.getDAO("DTSC");

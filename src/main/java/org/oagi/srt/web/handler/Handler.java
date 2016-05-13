@@ -1,15 +1,13 @@
 package org.oagi.srt.web.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ContextCategoryVO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Handler {
 	

@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ClientVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
-
+@Repository
 public class ClientOracleDAO extends SRTDAO {
 
 	private final String _tableName = "client";
@@ -39,13 +40,7 @@ public class ClientOracleDAO extends SRTDAO {
 			+ " SET client_id = ?, name = ? WHERE client_id = ?";
 
 	private final String _DELETE_Client_STATEMENT = 
-			"DELETE FROM " + _tableName + " WHERE client_id = ?";	
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+			"DELETE FROM " + _tableName + " WHERE client_id = ?";
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
@@ -485,12 +480,5 @@ public class ClientOracleDAO extends SRTDAO {
 			closeQuietly(ps);
 		}
 		return list;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

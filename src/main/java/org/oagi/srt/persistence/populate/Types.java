@@ -1,7 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Types {

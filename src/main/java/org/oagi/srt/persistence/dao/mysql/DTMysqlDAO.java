@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.DTVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class DTMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "dt";
@@ -51,12 +53,6 @@ public class DTMysqlDAO extends SRTDAO {
 			+ "Data_Type_Term = ?, Qualifier = ?, Based_DT_ID = ?, DEN = ?, Content_Component_DEN = ?, "
 			+ "Definition = ?, Content_Component_Definition = ?, Revision_Doc = ?, State = ?, Created_By = ?, owner_user_id = ?, Last_Updated_By = ?, "
 			+ "revision_num = ?, revision_tracking_num = ?, revision_action = ?, release_id = ?, current_bdt_id = ?, is_deprecated = ? WHERE DT_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	private final String _DELETE_DT_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE DT_ID = ?";
@@ -640,12 +636,5 @@ public class DTMysqlDAO extends SRTDAO {
 			closeQuietly(ps);
 		}
 		return list;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

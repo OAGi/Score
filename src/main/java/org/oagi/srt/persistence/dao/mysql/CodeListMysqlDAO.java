@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CodeListVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
-
+@Repository
 public class CodeListMysqlDAO extends SRTDAO {
 
 	private final String _tableName = "code_list";
@@ -47,12 +48,6 @@ public class CodeListMysqlDAO extends SRTDAO {
 
 	private final String _DELETE_Code_List_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE Code_List_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
@@ -605,12 +600,5 @@ public class CodeListMysqlDAO extends SRTDAO {
 			closeQuietly(ps);
 		}
 		return list;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

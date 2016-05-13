@@ -1,17 +1,17 @@
 package org.oagi.srt.persistence.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.chanchan.common.persistence.db.BfPersistenceException;
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.PersistenceUtils;
-import org.oagi.srt.persistence.dto.ASCCPVO;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,29 +19,52 @@ import org.oagi.srt.persistence.dto.ASCCPVO;
  * @version 1.0
  *
  */
-public abstract class SRTDAO {
+@Repository
+public class SRTDAO {
 
-	//public abstract boolean insertObject(SRTObject obj) throws SRTDAOException;
-	
-	public abstract int insertObject(SRTObject obj) throws SRTDAOException;
-	
-	public abstract int insertObject(SRTObject obj, Connection conn) throws SRTDAOException;
-	
-	public abstract SRTObject findObject(QueryCondition qc)	throws SRTDAOException;
-	
-	public abstract SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException;
-	
-	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc)	throws SRTDAOException;
-	public abstract ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException;
+	public int insertObject(SRTObject obj) throws SRTDAOException {
+		return 0;
+	}
 
-	public abstract ArrayList<SRTObject> findObjects() throws SRTDAOException;
-	public abstract ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException;
-	
-	public abstract boolean updateObject(SRTObject obj) throws SRTDAOException;
+	public int insertObject(SRTObject obj, Connection conn) throws SRTDAOException {
+		return 0;
+	}
 
-	public abstract boolean deleteObject(SRTObject obj) throws SRTDAOException;
-	
-	public abstract int findMaxId() throws SRTDAOException;
+	public SRTObject findObject(QueryCondition qc) throws SRTDAOException {
+		return null;
+	}
+
+	public SRTObject findObject(QueryCondition qc, Connection conn) throws SRTDAOException {
+		return null;
+	}
+
+	public ArrayList<SRTObject> findObjects(QueryCondition qc) throws SRTDAOException {
+		return new ArrayList();
+	}
+
+	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn) throws SRTDAOException {
+		return new ArrayList();
+	}
+
+	public ArrayList<SRTObject> findObjects() throws SRTDAOException {
+		return new ArrayList();
+	}
+
+	public ArrayList<SRTObject> findObjects(Connection conn) throws SRTDAOException {
+		return new ArrayList();
+	}
+
+	public boolean updateObject(SRTObject obj) throws SRTDAOException {
+		return false;
+	}
+
+	public boolean deleteObject(SRTObject obj) throws SRTDAOException {
+		return false;
+	}
+
+	public int findMaxId() throws SRTDAOException {
+		return 0;
+	}
 
 	public final void closeQuietly(DBAgent txAgent) {
 		PersistenceUtils.closeQuietly(txAgent);
@@ -67,30 +90,15 @@ public abstract class SRTDAO {
 				count = rs.getInt("num");
 			}
 			tx.commit();
-			conn.close();
 		} catch (BfPersistenceException e) {
 			throw new SRTDAOException(SRTDAOException.DAO_FIND_ERROR, e);
 		} catch (SQLException e) {
 			throw new SRTDAOException(SRTDAOException.SQL_EXECUTION_FAILED, e);
 		} finally {
-			if (ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {
-				}
-			}
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-				}
-			}
-			try {
-				if (conn != null && !conn.isClosed())
-					conn.close();
-			} catch (SQLException e) {
-			}
-			tx.close();
+			closeQuietly(rs);
+			closeQuietly(ps);
+			closeQuietly(conn);
+			closeQuietly(tx);
 		}
 		return count;
 	}

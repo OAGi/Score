@@ -1,14 +1,5 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
@@ -19,18 +10,20 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
 import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.dto.UserVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 import org.oagi.srt.web.startup.SRTInitializerException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.oagi.srt.persistence.populate.P_1_5_3_to_5_PopulateSCInDTSC;
-import org.oagi.srt.persistence.populate.P_1_5_6_PopulateBDTSCPrimitiveRestriction;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.ArrayList;
 
 /**
 *
@@ -132,10 +125,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		
 		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 		XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-		importAdditionalBDT(meta_xsd);
+		//importAdditionalBDT(meta_xsd);
 		
 		P_1_5_3_to_5_PopulateSCInDTSC dtsc = new P_1_5_3_to_5_PopulateSCInDTSC();
-		dtsc.populateDTSCforUnqualifiedBDT(businessDataType_xsd, meta_xsd, conn, false);
+		//dtsc.populateDTSCforUnqualifiedBDT(businessDataType_xsd, meta_xsd, conn, false);
 		
 		P_1_5_6_PopulateBDTSCPrimitiveRestriction bdtscpri = new P_1_5_6_PopulateBDTSCPrimitiveRestriction();
 		bdtscpri.populateBDTSCPrimitiveRestriction(businessDataType_xsd, meta_xsd, false);

@@ -1,35 +1,28 @@
 package org.oagi.srt.web.handler;
 
+import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.common.SRTObject;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.persistence.dao.SRTDAOException;
+import org.oagi.srt.persistence.dto.*;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.UnselectEvent;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-
-import org.oagi.srt.common.QueryCondition;
-import org.oagi.srt.common.SRTObject;
-import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.BusinessContextVO;
-import org.oagi.srt.persistence.dto.BusinessContextValueVO;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.oagi.srt.persistence.dto.ContextSchemeVO;
-import org.oagi.srt.persistence.dto.ContextSchemeValueVO;
-import org.oagi.srt.persistence.dto.UserVO;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.UnselectEvent;
-
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class BusinessContextHandler extends UIHandler implements Serializable {

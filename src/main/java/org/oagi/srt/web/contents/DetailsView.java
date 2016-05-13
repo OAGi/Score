@@ -1,13 +1,17 @@
 package org.oagi.srt.web.contents;
 
-import java.io.Serializable;
-import java.util.List;
+import org.oagi.srt.web.handler.ContextCategoryHandler;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import org.oagi.srt.web.handler.*;
+import java.io.Serializable;
+import java.util.List;
 
+@Controller()
+@Scope("view")
 @ManagedBean(name = "detailsView")
 @ViewScoped
 public class DetailsView implements Serializable{

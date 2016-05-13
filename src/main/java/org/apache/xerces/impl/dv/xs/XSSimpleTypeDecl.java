@@ -17,20 +17,8 @@
 
 package org.apache.xerces.impl.dv.xs;
 
-import java.math.BigInteger;
-import java.util.AbstractList;
-import java.util.Locale;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
 import org.apache.xerces.impl.Constants;
-import org.apache.xerces.impl.dv.DatatypeException;
-import org.apache.xerces.impl.dv.InvalidDatatypeFacetException;
-import org.apache.xerces.impl.dv.InvalidDatatypeValueException;
-import org.apache.xerces.impl.dv.ValidatedInfo;
-import org.apache.xerces.impl.dv.ValidationContext;
-import org.apache.xerces.impl.dv.XSFacets;
-import org.apache.xerces.impl.dv.XSSimpleType;
+import org.apache.xerces.impl.dv.*;
 import org.apache.xerces.impl.xpath.regex.RegularExpression;
 import org.apache.xerces.impl.xs.SchemaSymbols;
 import org.apache.xerces.impl.xs.util.ObjectListImpl;
@@ -39,19 +27,15 @@ import org.apache.xerces.impl.xs.util.StringListImpl;
 import org.apache.xerces.impl.xs.util.XSObjectListImpl;
 import org.apache.xerces.util.XMLChar;
 import org.apache.xerces.xni.NamespaceContext;
-import org.apache.xerces.xs.ShortList;
-import org.apache.xerces.xs.StringList;
-import org.apache.xerces.xs.XSAnnotation;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSFacet;
-import org.apache.xerces.xs.XSMultiValueFacet;
-import org.apache.xerces.xs.XSNamespaceItem;
-import org.apache.xerces.xs.XSObject;
-import org.apache.xerces.xs.XSObjectList;
-import org.apache.xerces.xs.XSSimpleTypeDefinition;
-import org.apache.xerces.xs.XSTypeDefinition;
+import org.apache.xerces.xs.*;
 import org.apache.xerces.xs.datatypes.ObjectList;
 import org.w3c.dom.TypeInfo;
+
+import java.math.BigInteger;
+import java.util.AbstractList;
+import java.util.Locale;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * @xerces.internal

@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ASBIEVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,8 +18,8 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
-
-public class ASBIEMysqlDAO extends SRTDAO{
+@Repository
+public class ASBIEMysqlDAO extends SRTDAO {
 	private final String _tableName = "asbie";
 
 	private final String _FIND_ALL_ASBIE_STATEMENT =
@@ -43,12 +44,6 @@ public class ASBIEMysqlDAO extends SRTDAO{
 
 	private final String _DELETE_ASBIE_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE ASBIE_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -527,12 +522,5 @@ public class ASBIEMysqlDAO extends SRTDAO{
 			closeQuietly(ps);
 		}
 		return list;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

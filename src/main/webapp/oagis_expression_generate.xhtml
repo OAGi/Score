@@ -24,7 +24,7 @@
 
 	<ui:define name="content">
 		<h:form id="form">
-			<p:panel header="Standalone BOD Generation">
+			<p:panel header="Profile BOD Generation">
 				<p:messages autoUpdate="true" />
 
 				<h:panelGrid id="grid" cellpadding="5">
@@ -34,14 +34,14 @@
 								style="font-weight:bold; color: red" />
 						</p:column>
 						<p:column>
-							<p:commandButton value="Add" icon="ui-icon-extlink" actionListener="#{standaloneBODHandler.chooseABIE}">
-						        <p:ajax event="dialogReturn" listener="#{standaloneBODHandler.onABIEChosen}" update=":form:tbl" />
+							<p:commandButton value="Add" icon="ui-icon-extlink" actionListener="#{profileBODHandler.chooseABIE}">
+						        <p:ajax event="dialogReturn" listener="#{profileBODHandler.onABIEChosen}" update=":form:tbl" />
 						    </p:commandButton>
 						</p:column> 
 					</p:row>	
 					<p:row>
 						<p:column colspan="2"> 					
-							<p:dataTable id="tbl" var="abieView" value="#{standaloneBODHandler.abieViewList}"
+							<p:dataTable id="tbl" var="abieView" value="#{profileBODHandler.abieViewList}"
 								style="width:600px; margin-bottom:20px">
 								
 								<p:column style="width:200px">
@@ -122,9 +122,9 @@
 				</h:panelGrid>
 				<p:separator />
 				<h:panelGrid id="grid44" cellpadding="5" columns="2" styleClass="companyHeaderGrid">	
-					<p:commandButton value="Generate" update="downloadButton" icon="ui-icon-extlink" actionListener="#{standaloneBODHandler.generate}" />
-      				<p:commandButton id="downloadButton" value="Download" disabled="#{standaloneBODHandler.filePath eq null ? true : false}" ajax="false" icon="ui-icon-arrowthick-1-s">
-				        <p:fileDownload value="#{standaloneBODHandler.file}" />
+					<p:commandButton value="Generate" update="downloadButton" icon="ui-icon-extlink" actionListener="#{profileBODHandler.generate}" />
+      				<p:commandButton id="downloadButton" value="Download" disabled="#{profileBODHandler.filePath eq null ? true : false}" ajax="false" icon="ui-icon-arrowthick-1-s">
+				        <p:fileDownload value="#{profileBODHandler.file}" />
 				    </p:commandButton>
 				</h:panelGrid>
 			</p:panel>

@@ -17,22 +17,13 @@
 
 package org.apache.xerces.impl.xs.traversers;
 
-import java.util.ArrayList;
-
-import org.apache.xerces.impl.xs.SchemaGrammar;
-import org.apache.xerces.impl.xs.SchemaSymbols;
-import org.apache.xerces.impl.xs.XSAnnotationImpl;
-import org.apache.xerces.impl.xs.XSConstraints;
-import org.apache.xerces.impl.xs.XSGroupDecl;
-import org.apache.xerces.impl.xs.XSModelGroupImpl;
-import org.apache.xerces.impl.xs.XSParticleDecl;
+import org.apache.xerces.impl.xs.*;
 import org.apache.xerces.impl.xs.util.XInt;
 import org.apache.xerces.impl.xs.util.XSObjectListImpl;
 import org.apache.xerces.util.DOMUtil;
 import org.apache.xerces.util.XMLSymbols;
 import org.apache.xerces.xni.QName;
 import org.apache.xerces.xs.XSObjectList;
-import org.oagi.srt.common.util.BODElementVO;
 import org.w3c.dom.Element;
 
 /**

@@ -1,10 +1,9 @@
 package org.oagi.srt.common.util;
 
-import java.util.Iterator;
+import org.oagi.srt.common.SRTConstants;
 
 import javax.xml.namespace.NamespaceContext;
-
-import org.oagi.srt.common.SRTConstants;
+import java.util.Iterator;
 
 public class OAGiNamespaceContext implements NamespaceContext {
 

@@ -12,6 +12,7 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.oagi.srt.web.startup.CacheContextListener;
 import org.primefaces.context.RequestContext;
@@ -27,6 +28,8 @@ import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -37,6 +40,8 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.util.*;
 
+@Controller
+@Scope("view")
 @ManagedBean
 @ViewScoped
 public class TopLevelABIEHandler implements Serializable {
@@ -2066,7 +2071,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     public void onCodeListChosen(SelectEvent event) {
         CodeListHandler ch = (CodeListHandler) event.getObject();
-        codeListVO = (CodeListVO) ch.getSelected();
+        codeListVO = CodeListVO.valueOf((CodeList) ch.getSelected());
         logger.debug(codeListVO.getName());
     }
 

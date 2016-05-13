@@ -1,11 +1,5 @@
 package org.oagi.srt.common.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.util.Random;
-import java.util.UUID;
-
 import org.chanchan.common.persistence.db.ConnectionPoolManager;
 import org.chanchan.common.util.ServerProperties;
 import org.oagi.srt.common.SRTConstants;
@@ -13,6 +7,12 @@ import org.oagi.srt.persistence.dto.DTVO;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.web.startup.SRTInitializer;
 import org.oagi.srt.web.startup.SRTInitializerException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.util.Random;
+import java.util.UUID;
 
 public class Utility {
 	public static String generateGUID(){
@@ -108,7 +108,7 @@ public class Utility {
 			den = spaceSeparator(part1) + part2 + ". Type";
 		}
 		else
-			den = spaceSeparator(type.substring(0, type.indexOf("Type")))+". Type";
+			den = spaceSeparator(type.substring(0, type.lastIndexOf("Type")))+". Type";
 		return den;
 	}
 	
@@ -180,6 +180,10 @@ public class Utility {
 	}
 	
 	public static String spaceSeparator(String str) {//Assume that we only take into account TypeName
+		if(str.equals("mimeCode")){
+			return "MIME Code";
+		}
+		
 		StringBuffer sb = new StringBuffer();
 		boolean appendOnly = false;
 		for(int i = 0; i < str.length(); i++) {
@@ -367,6 +371,79 @@ public class Utility {
 					+ e.toString());
 		}
 	
+	}
+	
+	public static boolean checkCorrespondingTypes(String xbtName, String CDTPriName){
+		if(CDTPriName.equals("Binary")){
+			if(xbtName.equals("xsd:base64Binary") || xbtName.equals("xsd:hexBinary") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Boolean")){
+			if(xbtName.equals("xsd:boolean") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Decimal")){
+			if(xbtName.equals("xsd:decimal")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Double")){
+			if(xbtName.equals("xsd:double") || xbtName.equals("xsd:float") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Float")){
+			if(xbtName.equals("xsd:float") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Integer")){
+			if(xbtName.equals("xsd:integer") || xbtName.equals("xsd:nonNegativeInteger") || xbtName.equals("xsd:positiveInteger")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("NormalizedString")){
+			if(xbtName.equals("xsd:normalizedString") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("String")){
+			if(xbtName.equals("xsd:string") ){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("TimeDuration")){
+			if(xbtName.equals("xsd:token") || xbtName.equals("xsd:duration")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("TimePoint")){
+			if(xbtName.equals("xsd:token") || xbtName.equals("xsd:dateTime") || xbtName.equals("xsd:date") || xbtName.equals("xsd:time")
+			|| xbtName.equals("xsd:gYear") || xbtName.equals("xsd:gYearMonth") || xbtName.equals("xsd:gMonthDay") || xbtName.equals("xsd:gDay") || xbtName.equals("xsd:gMonth")){
+				return true;
+			}
+			return false;
+		}
+		else if(CDTPriName.equals("Token")){
+			if(xbtName.equals("xsd:token") ){
+				return true;
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public static String toCamelCase(final String init) {

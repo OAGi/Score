@@ -17,20 +17,6 @@
 
 package org.apache.xerces.impl.xs;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.StringTokenizer;
-import java.util.WeakHashMap;
-
 import org.apache.xerces.dom.DOMErrorImpl;
 import org.apache.xerces.dom.DOMMessageFormatter;
 import org.apache.xerces.dom.DOMStringListImpl;
@@ -43,39 +29,23 @@ import org.apache.xerces.impl.dv.xs.SchemaDVFactoryImpl;
 import org.apache.xerces.impl.xs.models.CMBuilder;
 import org.apache.xerces.impl.xs.models.CMNodeFactory;
 import org.apache.xerces.impl.xs.traversers.XSDHandler;
-import org.apache.xerces.util.DOMEntityResolverWrapper;
-import org.apache.xerces.util.DOMErrorHandlerWrapper;
-import org.apache.xerces.util.DefaultErrorHandler;
-import org.apache.xerces.util.MessageFormatter;
-import org.apache.xerces.util.ParserConfigurationSettings;
-import org.apache.xerces.util.SymbolTable;
-import org.apache.xerces.util.XMLSymbols;
+import org.apache.xerces.util.*;
 import org.apache.xerces.util.URI.MalformedURIException;
 import org.apache.xerces.xni.QName;
 import org.apache.xerces.xni.XNIException;
-import org.apache.xerces.xni.grammars.Grammar;
-import org.apache.xerces.xni.grammars.XMLGrammarDescription;
-import org.apache.xerces.xni.grammars.XMLGrammarLoader;
-import org.apache.xerces.xni.grammars.XMLGrammarPool;
-import org.apache.xerces.xni.grammars.XSGrammar;
-import org.apache.xerces.xni.parser.XMLComponent;
-import org.apache.xerces.xni.parser.XMLComponentManager;
-import org.apache.xerces.xni.parser.XMLConfigurationException;
-import org.apache.xerces.xni.parser.XMLEntityResolver;
-import org.apache.xerces.xni.parser.XMLErrorHandler;
-import org.apache.xerces.xni.parser.XMLInputSource;
+import org.apache.xerces.xni.grammars.*;
+import org.apache.xerces.xni.parser.*;
 import org.apache.xerces.xs.LSInputList;
 import org.apache.xerces.xs.StringList;
 import org.apache.xerces.xs.XSLoader;
 import org.apache.xerces.xs.XSModel;
-import org.w3c.dom.DOMConfiguration;
-import org.w3c.dom.DOMError;
-import org.w3c.dom.DOMErrorHandler;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.DOMStringList;
+import org.w3c.dom.*;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.InputSource;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * This class implements xni.grammars.XMLGrammarLoader.

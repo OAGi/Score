@@ -1,11 +1,11 @@
 package org.oagi.srt.web.startup;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.apache.log4j.Logger;
 import org.oagi.srt.common.Log4jProperties;
 import org.oagi.srt.common.SRTConstants;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
  * 

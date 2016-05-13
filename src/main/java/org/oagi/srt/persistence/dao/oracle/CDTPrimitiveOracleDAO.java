@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
+@Repository
 public class CDTPrimitiveOracleDAO extends SRTDAO{
 	private final String _tableName = "cdt_pri";
 
@@ -38,19 +40,6 @@ public class CDTPrimitiveOracleDAO extends SRTDAO{
 
 	private final String _DELETE_CDT_Primitive_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE cdt_pri_id = ?";
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -351,12 +340,5 @@ public class CDTPrimitiveOracleDAO extends SRTDAO{
 		}
 
 		return list;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

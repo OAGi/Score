@@ -1,31 +1,17 @@
 package org.oagi.srt.persistence.validate;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
-
-
 import org.chanchan.common.persistence.db.DBAgent;
 import org.oagi.srt.common.QueryCondition;
-
 import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
-
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.AgencyIDListVO;
+import org.oagi.srt.persistence.dto.*;
 
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.DTSCVO;
-import org.oagi.srt.persistence.dto.DTVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CDTTest {

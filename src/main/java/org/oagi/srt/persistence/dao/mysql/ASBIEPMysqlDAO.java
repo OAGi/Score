@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.ASBIEPVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
-
+@Repository
 public class ASBIEPMysqlDAO extends SRTDAO {
 	private final String _tableName = "asbiep";
 
@@ -493,12 +494,4 @@ public class ASBIEPMysqlDAO extends SRTDAO {
 		}
 		return list;
 	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

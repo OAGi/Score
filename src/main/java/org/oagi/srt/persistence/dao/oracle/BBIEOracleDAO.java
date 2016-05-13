@@ -8,6 +8,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BBIEVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,9 +22,9 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
-
-public class BBIEOracleDAO extends SRTDAO{
-	private final String _tableName = "bbie";
+@Repository
+public class BBIEOracleDAO extends SRTDAO {
+    private final String _tableName = "bbie";
 
 	private final String _FIND_ALL_BBIE_STATEMENT = 
 			"SELECT BBIE_ID, GUID, Based_BCC_ID, From_ABIE_ID, To_BBIEP_ID, bdt_pri_restri_Id, code_list_id, Cardinality_Min, Cardinality_Max, default_value, is_Nillable, Fixed_Value,  "
@@ -42,12 +43,6 @@ public class BBIEOracleDAO extends SRTDAO{
 
 	private final String _DELETE_BBIE_STATEMENT = 
 			"DELETE FROM " + _tableName + " WHERE BBIE_ID = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
     public int insertObject(SRTObject obj) throws SRTDAOException {
         DBAgent tx = new DBAgent();
@@ -502,13 +497,6 @@ public class BBIEOracleDAO extends SRTDAO{
         return list;
     }
 
-    @Override
-    public SRTObject findObject(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
 			throws SRTDAOException {
@@ -592,11 +580,4 @@ public class BBIEOracleDAO extends SRTDAO{
         }
         return list;
     }
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -1,14 +1,16 @@
 package org.oagi.srt.web.ui.menu;
 
-import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
+import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  *
@@ -16,7 +18,8 @@ import javax.faces.event.ValueChangeEvent;
  * @version 1.0
  *
  */
-
+@Component("termType")
+@Scope("session")
 @ManagedBean(name="termType")
 @SessionScoped
 public class MenuStringHandler implements Serializable{

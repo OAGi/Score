@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,8 @@ import java.util.ArrayList;
 * @version 1.0
 *
 */
-public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
+@Repository
+public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO {
 	private final String _tableName = "cdt_awd_pri_xps_type_map";
 
 	private final String _FIND_ALL_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT =
@@ -38,12 +40,6 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 
 	private final String _DELETE_CDT_Allowed_Primitive_Expression_Type_Map_STATEMENT =
 			"DELETE FROM " + _tableName + " WHERE cdt_awd_pri_xps_type_map_id = ?";
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	public int insertObject(SRTObject obj) throws SRTDAOException {
 		DBAgent tx = new DBAgent();
@@ -346,27 +342,5 @@ public class CDTAllowedPrimitiveExpressionTypeMapMysqlDAO extends SRTDAO{
 			closeQuietly(ps);
 		}
 		return cdtallowedprimitiveexpressiontypemapVO;
-
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(QueryCondition qc, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<SRTObject> findObjects(Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

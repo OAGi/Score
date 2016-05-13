@@ -31,31 +31,31 @@
 				</h:panelGrid>
 				<h:panelGrid id="grid" columns="6" cellpadding="5">
 					<h:outputLabel for="name" rows="10" value="Name:" style="font-weight:bold" />
-					<p:inputText id="name" value="#{codeListHandler.codeListVO.name}"
+					<p:inputText id="name" value="#{codeListHandler.codeList.name}"
 						label="Name" />
 					
 					<h:outputLabel for="definition" rows="10" value="Definition:" style="font-weight:bold" />
-					<p:inputText id="definition" value="#{codeListHandler.codeListVO.definition}"
+					<p:inputText id="definition" value="#{codeListHandler.codeList.definition}"
 						label="Definition" />
 					
 					<h:outputLabel for="definitionSource" rows="10" value="Definition Source:" style="font-weight:bold" />
-					<p:inputText id="definitionSource" value="#{codeListHandler.codeListVO.definitionSource}"
+					<p:inputText id="definitionSource" value="#{codeListHandler.codeList.definitionSource}"
 						label="Definition Source" />
 
 					<h:outputLabel for="listId" rows="10" value="List Id:" style="font-weight:bold" />
-					<p:inputText id="listId" value="#{codeListHandler.codeListVO.listID}"
+					<p:inputText id="listId" value="#{codeListHandler.codeList.listId}"
 						label="List Id" />
 					
 					<h:outputLabel for="agencyId" rows="10" value="Agency Id:" style="font-weight:bold" />
-					<p:inputText id="agencyId" value="#{codeListHandler.codeListVO.agencyID}"
+					<p:inputText id="agencyId" value="#{codeListHandler.codeList.agencyId}"
 						label="Agency Id" />
 					
 					<h:outputLabel for="version" rows="10" value="Version:" style="font-weight:bold" />
-					<p:inputText id="version" value="#{codeListHandler.codeListVO.versionID}"
+					<p:inputText id="version" value="#{codeListHandler.codeList.versionId}"
 						label="Version" />
 						
 					<h:outputLabel for="remark" rows="10" value="Remark:" style="font-weight:bold" />
-					<p:inputText id="remark" value="#{codeListHandler.codeListVO.remark}"
+					<p:inputText id="remark" value="#{codeListHandler.codeList.remark}"
 						label="Remark" />
 					
 				</h:panelGrid>
@@ -66,14 +66,14 @@
 			</p:panel>
 			<p:panel header="Code">
 				<h:panelGrid id="grid2" columns="1" cellpadding="5">
-					<p:dataTable id="tbl" var="codeListValueVO" value="#{codeListHandler.codeListValues}"
+					<p:dataTable id="tbl" var="codeListValue" value="#{codeListHandler.codeListValues}"
 						style="width:1000px; margin-bottom:20px;" > 
 						<p:column style="width:65px">
 							<f:facet name="header">
 								<h:outputText value="Select" />
 							</f:facet>
-							<p:selectBooleanButton id="value2" value="#{codeListValueVO.usedIndicator}" disabled="#{codeListValueVO.disabled}" onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:65px">
-					            <p:ajax update="tbl" listener="#{codeListHandler.updateCodeListValue(codeListValueVO.codeListValueID)}" />
+							<p:selectBooleanButton id="value2" value="#{codeListValue.usedIndicator}" disabled="#{codeListValue.disabled}" onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:65px">
+					            <p:ajax update="tbl" listener="#{codeListHandler.updateCodeListValue(codeListValue.codeListValueId)}" />
 					        </p:selectBooleanButton>
 						</p:column>
 						
@@ -81,28 +81,28 @@
 							<f:facet name="header">
 								<h:outputText value="Code" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.value}" style="font-weight:bold; color:#{codeListValueVO.color};"/>
+							<h:outputText value="#{codeListValue.value}" style="font-weight:bold; color:#{codeListValue.color};"/>
 						</p:column>
 		
 						<p:column style="width:100px">
 							<f:facet name="header">
 								<h:outputText value="Short Name" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.name}" style="font-weight:bold; color:#{codeListValueVO.color};"/>
+							<h:outputText value="#{codeListValue.name}" style="font-weight:bold; color:#{codeListValue.color};"/>
 						</p:column>
 		
 						<p:column style="width:335px">
 							<f:facet name="header">
 								<h:outputText value="Definition" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.definition}" style="color:#{codeListValueVO.color};"/>
+							<h:outputText value="#{codeListValue.definition}" style="color:#{codeListValue.color};"/>
 						</p:column>
 						
 						<p:column style="width:400px">
 							<f:facet name="header">
 								<h:outputText value="Definition Source" />
 							</f:facet>
-							<h:outputText value="#{codeListValueVO.definitionSource}" style="color:#{codeListValueVO.color};"/>
+							<h:outputText value="#{codeListValue.definitionSource}" style="color:#{codeListValue.color};"/>
 						</p:column>
 					</p:dataTable>
 				</h:panelGrid>

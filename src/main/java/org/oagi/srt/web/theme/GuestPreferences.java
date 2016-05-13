@@ -15,12 +15,17 @@
  */
 package org.oagi.srt.web.theme;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import java.io.Serializable;
+import java.util.Map;
 
+@Component
+@Scope("session")
 @ManagedBean
 @SessionScoped
 public class GuestPreferences implements Serializable {

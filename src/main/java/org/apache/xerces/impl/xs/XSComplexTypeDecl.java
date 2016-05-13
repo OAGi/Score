@@ -22,15 +22,7 @@ import org.apache.xerces.impl.dv.xs.XSSimpleTypeDecl;
 import org.apache.xerces.impl.xs.models.CMBuilder;
 import org.apache.xerces.impl.xs.models.XSCMValidator;
 import org.apache.xerces.impl.xs.util.XSObjectListImpl;
-import org.apache.xerces.xs.XSAttributeUse;
-import org.apache.xerces.xs.XSComplexTypeDefinition;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSNamespaceItem;
-import org.apache.xerces.xs.XSObjectList;
-import org.apache.xerces.xs.XSParticle;
-import org.apache.xerces.xs.XSSimpleTypeDefinition;
-import org.apache.xerces.xs.XSTypeDefinition;
-import org.apache.xerces.xs.XSWildcard;
+import org.apache.xerces.xs.*;
 import org.w3c.dom.TypeInfo;
 
 /**

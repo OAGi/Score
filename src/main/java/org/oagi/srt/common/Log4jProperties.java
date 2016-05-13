@@ -1,9 +1,9 @@
 package org.oagi.srt.common;
 
 
-import java.net.URL;
-
 import org.apache.log4j.PropertyConfigurator;
+
+import java.net.URL;
 
 /*
  * @author Yunsu Lee

@@ -7,6 +7,7 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * @version 1.0
  *
  */
+@Repository
 public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 	private final String _tableName = "cdt_sc_awd_pri_xps_type_map";
 
@@ -40,13 +42,6 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 	
 	private final String _DELETE_CDT_SC_ALLOWED_PRIMITIVE_EXPRESSION_TYPE_MAP_STATEMENT
 	= "DELETE FROM " + _tableName + " WHERE cdt_sc_awd_pri_xps_type_map_id = ?";
-
-
-	@Override
-	public int findMaxId() throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public ArrayList<SRTObject> findObjects(QueryCondition qc)
@@ -405,14 +400,5 @@ public class CDTSCAllowedPrimitiveExpressionTypeMapOracleDAO extends SRTDAO {
 		}
 
 		return true;
-
 	}
-
-	@Override
-	public int insertObject(SRTObject obj, Connection conn)
-			throws SRTDAOException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

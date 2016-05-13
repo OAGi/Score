@@ -1,10 +1,10 @@
 package org.oagi.srt.common;
 
+import org.chanchan.common.system.BfObject;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
-
-import org.chanchan.common.system.BfObject;
 
 /**
  * @author Yunsu Lee
