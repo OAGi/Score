@@ -25,23 +25,23 @@
 					<p:autoComplete id="ccName" value="#{codeListHandler.basedCodeListName}" completeMethod="#{codeListHandler.completeInput}" />
 					<p:commandButton value="Search" ajax="true" actionListener="#{codeListHandler.search}" update="tbl" icon="ui-icon-search" />
 				</h:panelGrid>
-	            <p:dataTable id="tbl" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+	            <p:dataTable id="tbl" var="codeList" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 					paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-	            	value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{cVO.codeListID}" selectionMode="single">
+	            	value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{codeList.codeListId}" selectionMode="single">
 					<p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}" />
         			<p:ajax event="rowUnselect" listener="#{codeListHandler.onRowUnselect}" />
 	                <p:column style="width:400px">
 						<f:facet name="header">
 							<h:outputText value="Name" />
 						</f:facet>
-						<h:outputText value="#{cVO.name}" />
+						<h:outputText value="#{codeList.name}" />
 					</p:column>
 	
 					<p:column style="width:100px">
 						<f:facet name="header">
 							<h:outputText value="Agency Id" />
 						</f:facet>
-						<h:outputText value="#{cVO.agencyID}" />
+						<h:outputText value="#{codeList.agencyId}" />
 					</p:column>
 	            </p:dataTable>
 	            <p:commandButton ajax="true" icon="ui-icon-search" value="Select" actionListener="#{codeListHandler.closeDialog}" />

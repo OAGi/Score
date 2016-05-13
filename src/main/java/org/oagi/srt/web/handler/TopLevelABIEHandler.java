@@ -12,6 +12,7 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.oagi.srt.web.startup.CacheContextListener;
 import org.primefaces.context.RequestContext;
@@ -2070,7 +2071,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     public void onCodeListChosen(SelectEvent event) {
         CodeListHandler ch = (CodeListHandler) event.getObject();
-        codeListVO = (CodeListVO) ch.getSelected();
+        codeListVO = CodeListVO.valueOf((CodeList) ch.getSelected());
         logger.debug(codeListVO.getName());
     }
 
