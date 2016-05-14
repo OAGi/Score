@@ -204,9 +204,7 @@ public class CodeListHandler extends UIHandler {
         CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeLists = codeListRepository.findByNameContaining(query);
 
-        return codeLists.stream().map(codeList -> {
-            return codeList.getName();
-        }).collect(Collectors.toList());
+        return codeLists.stream().map(codeList -> codeList.getName()).collect(Collectors.toList());
     }
 
     public void search() {

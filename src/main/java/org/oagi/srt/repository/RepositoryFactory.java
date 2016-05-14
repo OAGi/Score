@@ -6,4 +6,14 @@ public interface RepositoryFactory {
 
     public CodeListValueRepository codeListValueRepository();
 
+    public ContextSchemeRepository contextSchemeRepository();
+
+    public ContextSchemeValueRepository contextSchemeValueRepository();
+
+    public BusinessContextRepository businessContextRepository();
+
+    public BusinessContextValueRepository businessContextValueRepository();
+
+    public ContextCategoryRepository contextCategoryRepository();
+
 }

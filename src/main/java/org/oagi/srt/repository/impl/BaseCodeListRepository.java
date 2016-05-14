@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
-public class CodeListRepositoryImpl extends NamedParameterJdbcDaoSupport implements CodeListRepository {
+public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport implements CodeListRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -27,7 +27,7 @@ public class CodeListRepositoryImpl extends NamedParameterJdbcDaoSupport impleme
         setJdbcTemplate(jdbcTemplate);
     }
 
-    private final String FIND_ALL_CODE_LIST_STATEMENT = "SELECT " +
+    private final String FIND_ALL_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
             "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
             "creation_timestamp, last_update_timestamp, state " +
@@ -36,7 +36,7 @@ public class CodeListRepositoryImpl extends NamedParameterJdbcDaoSupport impleme
 
     @Override
     public List<CodeList> findAll() {
-        return getJdbcTemplate().query(FIND_ALL_CODE_LIST_STATEMENT, CodeListFindAllMapper.INSTANCE);
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, CodeListFindAllMapper.INSTANCE);
     }
 
     private final String FIND_BY_NAME_CONTAINING_STATEMENT = "SELECT " +

@@ -1,10 +1,7 @@
 package org.oagi.srt.repository.mysql;
 
-import org.oagi.srt.repository.CodeListRepository;
-import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.RepositoryFactory;
-import org.oagi.srt.repository.impl.CodeListRepositoryImpl;
-import org.oagi.srt.repository.impl.CodeListValueRepositoryImpl;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,18 +9,58 @@ import org.springframework.stereotype.Component;
 public class MysqlRepositoryFactory implements RepositoryFactory {
 
     @Autowired
-    private CodeListRepositoryImpl codeListRepositoryImpl;
+    private BaseCodeListRepository baseCodeListRepository;
 
     @Autowired
-    private CodeListValueRepositoryImpl codeListValueRepositoryImpl;
+    private BaseCodeListValueRepository baseCodeListValueRepository;
+
+    @Autowired
+    private BaseContextSchemeRepository baseContextSchemeRepository;
+
+    @Autowired
+    private BaseContextSchemeValueRepository baseContextSchemeValueRepository;
+
+    @Autowired
+    private BaseBusinessContextRepository baseBusinessContextRepository;
+
+    @Autowired
+    private BaseBusinessContextValueRepository baseBusinessContextValueRepository;
+
+    @Autowired
+    private BaseContextCategoryRepository baseContextCategoryRepository;
 
     @Override
     public CodeListRepository codeListRepository() {
-        return codeListRepositoryImpl;
+        return baseCodeListRepository;
     }
 
     @Override
     public CodeListValueRepository codeListValueRepository() {
-        return codeListValueRepositoryImpl;
+        return baseCodeListValueRepository;
+    }
+
+    @Override
+    public ContextSchemeRepository contextSchemeRepository() {
+        return baseContextSchemeRepository;
+    }
+
+    @Override
+    public ContextSchemeValueRepository contextSchemeValueRepository() {
+        return baseContextSchemeValueRepository;
+    }
+
+    @Override
+    public BusinessContextRepository businessContextRepository() {
+        return baseBusinessContextRepository;
+    }
+
+    @Override
+    public BusinessContextValueRepository businessContextValueRepository() {
+        return baseBusinessContextValueRepository;
+    }
+
+    @Override
+    public ContextCategoryRepository contextCategoryRepository() {
+        return baseContextCategoryRepository;
     }
 }

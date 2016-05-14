@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
-public class CodeListValueRepositoryImpl extends NamedParameterJdbcDaoSupport implements CodeListValueRepository {
+public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport implements CodeListValueRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
