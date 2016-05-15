@@ -32,15 +32,15 @@
 				</h:panelGrid>
 			</p:panel>
 			<p:panel header="Context Category List">
-				<p:dataTable id="tbl1" var="contextCategoryVO" value="#{contextCategoryHandler.contextCategories}"
+				<p:dataTable id="tbl1" var="contextCategory" value="#{contextCategoryHandler.contextCategories}"
 					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:1100px; margin-bottom:20px" selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategoryVO.contextCategoryGUID}">
+					paginator="true" rows="10" style="width:1100px; margin-bottom:20px" selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategory.guid}">
 			        <p:column selectionMode="single" style="width:16px;text-align:center"/>
 					<p:column style="width:350px">
 						<f:facet name="header">
 							<h:outputText value="GUID" />
 						</f:facet>
-						<h:outputText value="#{contextCategoryVO.contextCategoryGUID}" />
+						<h:outputText value="#{contextCategory.guid}" />
 					</p:column>
 					
 					<p:column style="width:200px">
@@ -48,8 +48,8 @@
 							<h:outputText value="Name" />
 						</f:facet>
 						<p:cellEditor>
-							<f:facet name="output"><h:outputText value="#{contextCategoryVO.name}" /></f:facet>
-							<f:facet name="input"><p:inputText value="#{contextCategoryVO.name}" style="width:100%" /></f:facet>
+							<f:facet name="output"><h:outputText value="#{contextCategory.name}" /></f:facet>
+							<f:facet name="input"><p:inputText value="#{contextCategory.name}" style="width:100%" /></f:facet>
 						</p:cellEditor>
 					</p:column>
 					
@@ -58,8 +58,8 @@
 							<h:outputText value="Description" />
 						</f:facet>
 						<p:cellEditor>
-							<f:facet name="output"><h:outputText value="#{contextCategoryVO.description}" /></f:facet>
-							<f:facet name="input"><p:inputText value="#{contextCategoryVO.description}" style="width:100%" label="Description"/></f:facet>
+							<f:facet name="output"><h:outputText value="#{contextCategory.description}" /></f:facet>
+							<f:facet name="input"><p:inputText value="#{contextCategory.description}" style="width:100%" label="Description"/></f:facet>
 						</p:cellEditor>
 					</p:column>
 					
@@ -80,10 +80,10 @@
 					<p:separator />
 					<h:panelGrid columns="2" cellpadding="5">
 						<h:outputText value="Id: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextCategoryHandler.selectedCategory.contextCategoryID}" />
+						<h:outputText value="#{contextCategoryHandler.selectedCategory.ctxCategoryId}" />
 
 						<h:outputText value="GUID: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextCategoryHandler.selectedCategory.contextCategoryGUID}" />
+						<h:outputText value="#{contextCategoryHandler.selectedCategory.guid}" />
 
 						<h:outputText value="Name: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextCategoryHandler.selectedCategory.name}" />
@@ -97,7 +97,7 @@
 			        </h:panelGrid>
 			        <h:panelGrid columns="2" cellpadding="5">
 			        	<p:commandButton value="Cancel" update=":listForm:tbl1" actionListener="#{contextCategoryHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
-			        	<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextCategoryHandler.delete(contextCategoryHandler.selectedCategory.contextCategoryID)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
+			        	<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextCategoryHandler.delete(contextCategoryHandler.selectedCategory.ctxCategoryId)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
 			        </h:panelGrid>
 				</p:outputPanel>
 		    </p:dialog>
@@ -114,10 +114,10 @@
 					<p:separator />
 					<h:panelGrid columns="2" cellpadding="5">
 						<h:outputText value="Id: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextCategoryHandler.selectedCategory.contextCategoryID}" />
+						<h:outputText value="#{contextCategoryHandler.selectedCategory.ctxCategoryId}" />
 
 						<h:outputText value="GUID: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextCategoryHandler.selectedCategory.contextCategoryGUID}" />
+						<h:outputText value="#{contextCategoryHandler.selectedCategory.guid}" />
 
 						<h:outputText value="Name: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextCategoryHandler.selectedCategory.name}" />

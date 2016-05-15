@@ -5,7 +5,10 @@ import org.oagi.srt.repository.entity.ContextCategory;
 import org.oagi.srt.repository.mapper.ContextCategoryFindAllMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -29,5 +32,51 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
     @Override
     public List<ContextCategory> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextCategoryFindAllMapper.INSTANCE);
+    }
+
+    private final String SAVE_STATEMENT = "INSERT INTO ctx_category (" +
+            "guid, name, description) VALUES (" +
+            ":guid, :name, :description)";
+
+    @Override
+    public void save(ContextCategory contextCategory) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", contextCategory.getGuid())
+                .addValue("name", contextCategory.getName())
+                .addValue("description", contextCategory.getDescription());
+
+        int contextCategoryId = doSave(namedParameters, contextCategory);
+        contextCategory.setCtxCategoryId(contextCategoryId);
+    }
+
+    protected int doSave(MapSqlParameterSource namedParameters, ContextCategory contextCategory) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        getNamedParameterJdbcTemplate().update(SAVE_STATEMENT, namedParameters, keyHolder, new String[]{"ctx_category_id"});
+        return keyHolder.getKey().intValue();
+    }
+
+    private final String UPDATE_STATEMENT = "UPDATE ctx_category SET " +
+            "guid = :guid, name = :name, description = :description WHERE ctx_category_id = :ctx_category_id";
+
+    @Override
+    public void update(ContextCategory contextCategory) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", contextCategory.getGuid())
+                .addValue("name", contextCategory.getName())
+                .addValue("description", contextCategory.getDescription())
+                .addValue("ctx_category_id", contextCategory.getCtxCategoryId());
+
+        getNamedParameterJdbcTemplate().update(UPDATE_STATEMENT, namedParameters);
+    }
+
+    private final String DELETE_BY_CONTEXT_CATEGORY_ID_STATEMENT = "DELETE FROM ctx_category " +
+            "WHERE ctx_category_id = :ctx_category_id";
+
+    @Override
+    public void deleteByContextCategoryId(int contextCategoryId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("ctx_category_id", contextCategoryId);
+
+        getNamedParameterJdbcTemplate().update(DELETE_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters);
     }
 }

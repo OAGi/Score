@@ -3,7 +3,6 @@ package org.oagi.srt.repository.oracle;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.impl.BaseBusinessContextRepository;
 import org.oagi.srt.repository.impl.BaseBusinessContextValueRepository;
-import org.oagi.srt.repository.impl.BaseContextCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private BaseBusinessContextValueRepository baseBusinessContextValueRepository;
 
     @Autowired
-    private BaseContextCategoryRepository baseContextCategoryRepository;
+    private OracleContextCategoryRepository oracleContextCategoryRepository;
 
     @Override
     public CodeListRepository codeListRepository() {
@@ -63,6 +62,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public ContextCategoryRepository contextCategoryRepository() {
-        return baseContextCategoryRepository;
+        return oracleContextCategoryRepository;
     }
 }
