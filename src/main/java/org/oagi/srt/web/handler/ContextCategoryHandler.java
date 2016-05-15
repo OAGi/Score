@@ -1,11 +1,7 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ContextSchemeVO;
 import org.oagi.srt.repository.ContextCategoryRepository;
 import org.oagi.srt.repository.ContextSchemeRepository;
 import org.oagi.srt.repository.RepositoryFactory;
