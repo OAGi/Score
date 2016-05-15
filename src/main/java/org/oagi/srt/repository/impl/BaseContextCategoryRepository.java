@@ -34,6 +34,34 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextCategoryFindAllMapper.INSTANCE);
     }
 
+    private final String FIND_BY_NAME_CONTAINING_STATEMENT = "SELECT " +
+            "ctx_category_id, guid, name, description " +
+            "FROM ctx_category " +
+            "WHERE name LIKE :name";
+
+    @Override
+    public List<ContextCategory> findByNameContaining(String name) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("name", "%" + name + "%");
+
+        return getNamedParameterJdbcTemplate().query(
+                FIND_BY_NAME_CONTAINING_STATEMENT, namedParameters, ContextCategoryFindAllMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_CONTEXT_CATEGORY_ID_STATEMENT = "SELECT " +
+            "ctx_category_id, guid, name, description " +
+            "FROM ctx_category " +
+            "WHERE ctx_category_id = :ctx_category_id";
+
+    @Override
+    public ContextCategory findOneByContextCategoryId(int contextCategoryId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("ctx_category_id", contextCategoryId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters, ContextCategoryFindAllMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO ctx_category (" +
             "guid, name, description) VALUES (" +
             ":guid, :name, :description)";

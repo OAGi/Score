@@ -8,6 +8,8 @@ public interface ContextSchemeValueRepository {
 
     public List<ContextSchemeValue> findByContextSchemeId(int contextSchemeId);
 
+    public ContextSchemeValue findOneByContextSchemeValueId(int contextSchemeValueId);
+
     public void save(ContextSchemeValue contextSchemeValue);
 
     public void deleteByContextSchemeId(int contextSchemeId);

@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Repository
 public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport implements BusinessContextRepository {
@@ -20,6 +23,15 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
     @PostConstruct
     public void initialize() {
         setJdbcTemplate(jdbcTemplate);
+    }
+
+    private final String FIND_ALL_STATEMENT = "SELECT " +
+            "biz_ctx_id, guid, name, created_by, last_updated_by, creation_timestamp, last_update_timestamp " +
+            "FROM biz_ctx";
+
+    @Override
+    public List<BusinessContext> findAll() {
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, BusinessContextFindAllMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_BUSINESS_CONTEXT_ID_STATEMENT = "SELECT " +
@@ -34,5 +46,27 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
 
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BUSINESS_CONTEXT_ID_STATEMENT,
                 namedParameters, BusinessContextFindAllMapper.INSTANCE);
+    }
+
+    private final String SAVE_STATEMENT = "INSERT INTO biz_ctx (" +
+            "guid, name, created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (" +
+            ":guid, :name, :created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+
+    @Override
+    public void save(BusinessContext businessContext) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", businessContext.getGuid())
+                .addValue("name", businessContext.getName())
+                .addValue("created_by", businessContext.getCreatedBy())
+                .addValue("last_updated_by", businessContext.getLastUpdatedBy());
+
+        int businessContextId = doSave(namedParameters, businessContext);
+        businessContext.setBizCtxId(businessContextId);
+    }
+
+    protected int doSave(MapSqlParameterSource namedParameters, BusinessContext businessContext) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        getNamedParameterJdbcTemplate().update(SAVE_STATEMENT, namedParameters, keyHolder, new String[]{"biz_ctx_id"});
+        return keyHolder.getKey().intValue();
     }
 }

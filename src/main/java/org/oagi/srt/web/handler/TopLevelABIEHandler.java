@@ -12,7 +12,9 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.ContextSchemeValue;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.oagi.srt.web.startup.CacheContextListener;
 import org.primefaces.context.RequestContext;
@@ -1812,8 +1814,8 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
 
-    public void onBCSelect(BusinessContextVO bcVO) {
-        bCSelected = bcVO;
+    public void onBCSelect(BusinessContext businessContext) {
+        bCSelected = BusinessContextVO.valueOf(businessContext);
         FacesMessage msg = new FacesMessage(bCSelected.getName(), bCSelected.getName());
         FacesContext.getCurrentInstance().addMessage(null, msg);
         logger.debug(bCSelected.getBusinessContextID() + " is selected");
@@ -1832,10 +1834,10 @@ public class TopLevelABIEHandler implements Serializable {
             BusinessContextVO bvVO1 = (BusinessContextVO) daoBC.findObject(qc);
 
             for (BusinessContextValues bcv : bcH.getBcValues()) {
-                for (ContextSchemeValueVO cVO : bcv.getCsList()) {
+                for (ContextSchemeValue cVO : bcv.getCsList()) {
                     BusinessContextValueVO bcvVO = new BusinessContextValueVO();
                     bcvVO.setBusinessContextID(bvVO1.getBusinessContextID());
-                    bcvVO.setContextSchemeValueID(cVO.getContextSchemeValueID());
+                    bcvVO.setContextSchemeValueID(cVO.getCtxSchemeValueId());
                     daoBCV.insertObject(bcvVO);
                 }
             }

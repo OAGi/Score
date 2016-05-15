@@ -1,8 +1,6 @@
 package org.oagi.srt.repository.oracle;
 
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.impl.BaseBusinessContextRepository;
-import org.oagi.srt.repository.impl.BaseBusinessContextValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +20,10 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleContextSchemeValueRepository oracleContextSchemeValueRepository;
 
     @Autowired
-    private BaseBusinessContextRepository baseBusinessContextRepository;
+    private OracleBusinessContextRepository oracleBusinessContextRepository;
 
     @Autowired
-    private BaseBusinessContextValueRepository baseBusinessContextValueRepository;
+    private OracleBusinessContextValueRepository oracleBusinessContextValueRepository;
 
     @Autowired
     private OracleContextCategoryRepository oracleContextCategoryRepository;
@@ -52,12 +50,12 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public BusinessContextRepository businessContextRepository() {
-        return baseBusinessContextRepository;
+        return oracleBusinessContextRepository;
     }
 
     @Override
     public BusinessContextValueRepository businessContextValueRepository() {
-        return baseBusinessContextValueRepository;
+        return oracleBusinessContextValueRepository;
     }
 
     @Override

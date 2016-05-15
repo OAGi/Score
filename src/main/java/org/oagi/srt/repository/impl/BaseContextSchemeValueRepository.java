@@ -39,6 +39,21 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
                 namedParameters, ContextSchemeValueFindAllMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_CONTEXT_SCHEME_VALUE_ID_STATEMENT = "SELECT " +
+            "ctx_scheme_value_id, guid, value, meaning, owner_ctx_scheme_id " +
+            "FROM ctx_scheme_value " +
+            "WHERE ctx_scheme_value_id = :ctx_scheme_value_id";
+
+    @Override
+    public ContextSchemeValue findOneByContextSchemeValueId(int contextSchemeValueId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("ctx_scheme_value_id", contextSchemeValueId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_CONTEXT_SCHEME_VALUE_ID_STATEMENT,
+                namedParameters, ContextSchemeValueFindAllMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO ctx_scheme_value (" +
             "guid, value, meaning, owner_ctx_scheme_id) VALUES (" +
             ":guid, :value, :meaning, :owner_ctx_scheme_id)";

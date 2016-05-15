@@ -10,6 +10,8 @@ public interface ContextSchemeRepository {
 
     public List<ContextScheme> findByContextCategoryId(int contextCategoryId);
 
+    public ContextScheme findOneByContextSchemeId(int contextSchemeId);
+
     public void update(ContextScheme contextScheme);
 
     public void save(ContextScheme contextScheme);

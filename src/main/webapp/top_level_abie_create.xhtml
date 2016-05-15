@@ -91,7 +91,7 @@
                 <h:panelGrid columns="1" columnClasses="label, value">
 					<p:dataTable id="tbl1" var="BusinessContextVO" value="#{businessContextHandler.businessContexts}"
 						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-						paginator="true" rows="10" style="width:400px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{BusinessContextVO.businessContextID}">
+						paginator="true" rows="10" style="width:400px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{BusinessContextVO.bizCtxId}">
 				        <p:column selectionMode="single" style="width:16px;text-align:center"/>
 						<p:column style="width:200px">
 							<f:facet name="header">

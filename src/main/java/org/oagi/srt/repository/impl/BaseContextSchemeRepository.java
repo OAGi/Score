@@ -47,8 +47,25 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
     public List<ContextScheme> findByContextCategoryId(int contextCategoryId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_category_id", contextCategoryId);
+
         return getNamedParameterJdbcTemplate().query(
                 FIND_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters, ContextSchemeFindAllMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_CONTEXT_SCHEME_ID_STATEMENT = "SELECT " +
+            "classification_ctx_scheme_id, guid, scheme_id, scheme_name, description, " +
+            "scheme_agency_id, scheme_version_id, ctx_category_id, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp " +
+            "FROM classification_ctx_scheme " +
+            "WHERE classification_ctx_scheme_id = :classification_ctx_scheme_id";
+
+    @Override
+    public ContextScheme findOneByContextSchemeId(int contextSchemeId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("classification_ctx_scheme_id", contextSchemeId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_CONTEXT_SCHEME_ID_STATEMENT, namedParameters, ContextSchemeFindAllMapper.INSTANCE);
     }
 
     private final String UPDATE_STATEMENT = "UPDATE classification_ctx_scheme SET " +
