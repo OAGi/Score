@@ -2,7 +2,7 @@ package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.entity.CodeListValue;
-import org.oagi.srt.repository.mapper.CodeListValueFindAllMapper;
+import org.oagi.srt.repository.mapper.CodeListValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -35,7 +35,7 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListId);
         return getNamedParameterJdbcTemplate().query(
-                FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListValueFindAllMapper.INSTANCE);
+                FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListValueMapper.INSTANCE);
     }
 
     private final String UPDATE_CODE_LIST_ID_BY_CODE_LIST_VALUE_ID_STATEMENT = "UPDATE code_list_value SET " +

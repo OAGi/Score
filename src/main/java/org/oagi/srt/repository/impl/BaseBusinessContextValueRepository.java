@@ -2,7 +2,7 @@ package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.BusinessContextValueRepository;
 import org.oagi.srt.repository.entity.BusinessContextValue;
-import org.oagi.srt.repository.mapper.BusinessContextValueFindAllMapper;
+import org.oagi.srt.repository.mapper.BusinessContextValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -36,7 +36,7 @@ public class BaseBusinessContextValueRepository extends NamedParameterJdbcDaoSup
                 .addValue("ctx_scheme_value_id", contextSchemeValueId);
 
         return getNamedParameterJdbcTemplate().query(FIND_BY_CONTEXT_SCHEME_VALUE_ID_STATEMENT,
-                namedParameters, BusinessContextValueFindAllMapper.INSTANCE);
+                namedParameters, BusinessContextValueMapper.INSTANCE);
     }
 
     private final String FIND_BY_BUSINESS_CONTEXT_ID_STATEMENT = "SELECT " +
@@ -50,7 +50,7 @@ public class BaseBusinessContextValueRepository extends NamedParameterJdbcDaoSup
                 .addValue("biz_ctx_id", businessContextId);
 
         return getNamedParameterJdbcTemplate().query(FIND_BY_BUSINESS_CONTEXT_ID_STATEMENT,
-                namedParameters, BusinessContextValueFindAllMapper.INSTANCE);
+                namedParameters, BusinessContextValueMapper.INSTANCE);
     }
 
     private final String SAVE_STATEMENT = "INSERT INTO biz_ctx_value (" +

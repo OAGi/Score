@@ -2,7 +2,7 @@ package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.repository.mapper.BusinessContextFindAllMapper;
+import org.oagi.srt.repository.mapper.BusinessContextMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -31,7 +31,7 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
 
     @Override
     public List<BusinessContext> findAll() {
-        return getJdbcTemplate().query(FIND_ALL_STATEMENT, BusinessContextFindAllMapper.INSTANCE);
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, BusinessContextMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_BUSINESS_CONTEXT_ID_STATEMENT = "SELECT " +
@@ -45,7 +45,7 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
                 .addValue("biz_ctx_id", businessContextId);
 
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BUSINESS_CONTEXT_ID_STATEMENT,
-                namedParameters, BusinessContextFindAllMapper.INSTANCE);
+                namedParameters, BusinessContextMapper.INSTANCE);
     }
 
     private final String SAVE_STATEMENT = "INSERT INTO biz_ctx (" +

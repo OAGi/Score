@@ -3,7 +3,7 @@ package org.oagi.srt.repository.impl;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.entity.CodeList;
-import org.oagi.srt.repository.mapper.CodeListFindAllMapper;
+import org.oagi.srt.repository.mapper.CodeListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -36,7 +36,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     @Override
     public List<CodeList> findAll() {
-        return getJdbcTemplate().query(FIND_ALL_STATEMENT, CodeListFindAllMapper.INSTANCE);
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, CodeListMapper.INSTANCE);
     }
 
     private final String FIND_BY_NAME_CONTAINING_STATEMENT = "SELECT " +
@@ -51,7 +51,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", "%" + name + "%");
         return getNamedParameterJdbcTemplate().query(
-                FIND_BY_NAME_CONTAINING_STATEMENT, namedParameters, CodeListFindAllMapper.INSTANCE);
+                FIND_BY_NAME_CONTAINING_STATEMENT, namedParameters, CodeListMapper.INSTANCE);
     }
 
     private final String FIND_BY_NAME_CONTAINING_AND_STATE_IS_PUBLISHED_AND_EXTENSIBLE_INDICATOR_IS_TRUE_STATEMENT = "SELECT " +
@@ -69,7 +69,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
         namedParameters.addValue("extensible_indicator", 1);
         return getNamedParameterJdbcTemplate().query(
                 FIND_BY_NAME_CONTAINING_AND_STATE_IS_PUBLISHED_AND_EXTENSIBLE_INDICATOR_IS_TRUE_STATEMENT,
-                namedParameters, CodeListFindAllMapper.INSTANCE);
+                namedParameters, CodeListMapper.INSTANCE);
     }
 
     private final String FIND_BY_CODE_LIST_ID_STATEMENT = "SELECT " +
@@ -83,7 +83,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
     public List<CodeList> findByCodeListId(int codeListId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource("code_list_id", codeListId);
         return getNamedParameterJdbcTemplate().query(
-                FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListFindAllMapper.INSTANCE);
+                FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_NAME_AND_DEFINITION_STATEMENT = "SELECT " +
@@ -102,7 +102,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("definition", definition);
 
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_NAME_AND_DEFINITION_STATEMENT,
-                namedParameters, CodeListFindAllMapper.INSTANCE);
+                namedParameters, CodeListMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_CODE_LIST_ID_AND_NAME_AND_DEFINITION_STATEMENT = "SELECT " +
@@ -123,7 +123,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("definition", definition);
 
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_CODE_LIST_ID_AND_NAME_AND_DEFINITION_STATEMENT,
-                namedParameters, CodeListFindAllMapper.INSTANCE);
+                namedParameters, CodeListMapper.INSTANCE);
     }
 
     private final String UPDATE_STATEMENT = "UPDATE code_list SET " +

@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CodeListValueFindAllMapper implements RowMapper<CodeListValue> {
+public class CodeListValueMapper implements RowMapper<CodeListValue> {
 
-    public static final CodeListValueFindAllMapper INSTANCE = new CodeListValueFindAllMapper();
+    public static final CodeListValueMapper INSTANCE = new CodeListValueMapper();
 
     @Override
     public CodeListValue mapRow(ResultSet rs, int rowNum) throws SQLException {

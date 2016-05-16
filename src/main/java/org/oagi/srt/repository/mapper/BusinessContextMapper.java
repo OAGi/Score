@@ -7,9 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
-public class BusinessContextFindAllMapper implements RowMapper<BusinessContext> {
+public class BusinessContextMapper implements RowMapper<BusinessContext> {
 
-    public static BusinessContextFindAllMapper INSTANCE = new BusinessContextFindAllMapper();
+    public static BusinessContextMapper INSTANCE = new BusinessContextMapper();
 
     @Override
     public BusinessContext mapRow(ResultSet rs, int rowNum) throws SQLException {

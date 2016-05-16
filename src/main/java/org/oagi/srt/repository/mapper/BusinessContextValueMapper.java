@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class BusinessContextValueFindAllMapper implements RowMapper<BusinessContextValue> {
+public class BusinessContextValueMapper implements RowMapper<BusinessContextValue> {
 
-    public static BusinessContextValueFindAllMapper INSTANCE = new BusinessContextValueFindAllMapper();
+    public static BusinessContextValueMapper INSTANCE = new BusinessContextValueMapper();
 
     @Override
     public BusinessContextValue mapRow(ResultSet rs, int rowNum) throws SQLException {

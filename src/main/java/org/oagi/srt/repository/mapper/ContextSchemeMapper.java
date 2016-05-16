@@ -7,9 +7,9 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ContextSchemeFindAllMapper implements RowMapper<ContextScheme> {
+public class ContextSchemeMapper implements RowMapper<ContextScheme> {
 
-    public static ContextSchemeFindAllMapper INSTANCE = new ContextSchemeFindAllMapper();
+    public static ContextSchemeMapper INSTANCE = new ContextSchemeMapper();
 
     @Override
     public ContextScheme mapRow(ResultSet rs, int rowNum) throws SQLException {

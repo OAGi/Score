@@ -37,19 +37,19 @@
 						<f:facet name="header">
 							<h:outputText value="State" />
 						</f:facet>
-						<h:outputText value="#{(abieView.abieVO.state eq '2') ? 'Editing' : 'Published'}" />
+						<h:outputText value="#{(abieView.abie.state eq '2') ? 'Editing' : 'Published'}" />
 					</p:column>
 					<p:column style="width:300px">
 						<f:facet name="header">
 							<h:outputText value="Business Context" />
 						</f:facet>
-						<h:outputText value="#{abieView.abieVO.businessContextName}" />
+						<h:outputText value="#{abieView.abie.bizCtxName}" />
 					</p:column>
 					<p:column style="width:200px">
 						<f:facet name="header">
 							<h:outputText value="Creation Timestamp" />
 						</f:facet>
-						<h:outputText value="#{abieView.abieVO.creationTimestamp}" />
+						<h:outputText value="#{abieView.abie.creationTimestamp}" />
 					</p:column>
 	            </p:dataTable>
 	            <p:commandButton process="tbl" ajax="true" update=":form:tbDetailid" icon="ui-icon-search" value="Edit" oncomplete="PF('tbDetail').show()"/>
@@ -88,13 +88,13 @@
 									</h:panelGrid>
 									<h:panelGrid columns="4" cellpadding="5">
 										<h:outputLabel rows="10" value="Biz Term" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.abie.bizTerm}" />
 										
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" /> 
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.abie.remark}" />
 										
 										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abie.definition}">
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
@@ -106,7 +106,7 @@
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:blue" />
 										
 										<h:outputLabel rows="10" value="Used: " style="font-weight:bold;" />
-										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.asbieVO.used}"/>
+										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.asbie.used}"/>
 									</h:panelGrid>
 									<p:separator />
 									<h:panelGrid columns="1" cellpadding="5">
@@ -114,19 +114,19 @@
 									</h:panelGrid>
 									<h:panelGrid columns="4" cellpadding="5">
 										<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMin}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbie.cardinalityMin}" />
 										
 										<h:outputLabel rows="10" value="Max:" style="font-weight:bold" /> 
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.cardinalityMax}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbie.cardinalityMax}" />
 										
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbieVO.remark}" />
+										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbie.remark}" />
 										
 										<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbieVO.nillable}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.asbie.nillable}" />
 										
 										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbieVO.definition}">
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbie.definition}">
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
@@ -135,13 +135,13 @@
 									</h:panelGrid>
 									<h:panelGrid columns="4" cellpadding="5">
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.remark}" />
+										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiep.remark}" />
 										
 										<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.businessTerm}" />
+										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiep.bizTerm}" />
 										
 										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbiepVO.definition}">
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbiep.definition}">
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
@@ -150,13 +150,13 @@
 									</h:panelGrid>
 									<h:panelGrid columns="2" cellpadding="5">
 										<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.abie.bizTerm}" />
 										
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abie.remark}" />
 										
 							            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+										<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abie.definition}">
 										</p:inputTextarea>
 										
 									</h:panelGrid>
@@ -169,7 +169,7 @@
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:green" />
 										
 										<h:outputLabel rows="10" value="Used: " style="font-weight:bold;" />
-										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.bbieVO.used}"/>
+										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.bbie.used}"/>
 									</h:panelGrid>
 									<p:separator />
 							    	<h:panelGrid columns="1" cellpadding="5">
@@ -177,22 +177,22 @@
 									</h:panelGrid>
 									<h:panelGrid columns="4" cellpadding="5">
 										<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMin}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.cardinalityMin}" />
 										
 										<h:outputLabel rows="10" value="Max:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMax}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.cardinalityMax}" />
 										
 										<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.nillable}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.nillable}" />
 										
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.remark}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.remark}" />
 										
 										<h:outputLabel rows="10" value="Fixed value:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.fixedValue}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.fixedValue}" />
 										
 										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbieVO.definition}">
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbie.definition}">
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
@@ -201,13 +201,13 @@
 									</h:panelGrid>
 									<h:panelGrid columns="4" cellpadding="5">
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiepVO.remark}" /> 
+										<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiep.remark}" /> 
 										
 										<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.businessTerm}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiep.bizTerm}" />
 										
 										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiepVO.definition}">
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiep.definition}">
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
@@ -230,7 +230,7 @@
 									<h:panelGrid columns="5" cellpadding="5">
 											<p:radioButton id="opt2" for="customRadio" itemIndex="1" />
 											<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
-											<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
+											<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeList.name}  " style="font-weight:bold; color: blue;" />
 										    
 										    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()"  disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
 										    </p:commandButton>
@@ -247,7 +247,7 @@
 										<h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}" style="font-weight:bold; color:orange" />
 										
 										<h:outputLabel rows="10" value="Used: " style="font-weight:bold;" />
-										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.bbiescVO.used}"/>
+										<h:selectBooleanCheckbox rows="10" value="${topLevelABIEHandler.aABIEView.bbiesc.used}"/>
 									</h:panelGrid>
 									<p:separator />
 							    	<h:panelGrid columns="1" cellpadding="5">
@@ -255,22 +255,22 @@
 									</h:panelGrid>
 							    	<h:panelGrid id="bbiesc" columns="4" cellpadding="5">
 										<h:outputLabel rows="10" value="Max:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.maxCardinality}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiesc.maxCardinality}" />
 										
 							    		<h:outputLabel rows="10" value="Fixed Value:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.fixedValue}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiesc.fixedValue}" />
 										
 										<h:outputLabel rows="10" value="Default:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.defaultText}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiesc.defaultText}" />
 										
 										<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.businessTerm}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiesc.bizTerm}" />
 										
 										<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.remark}" />
+										<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiesc.remark}" />
 										
 										<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiescVO.definition}">
+										<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiesc.definition}">
 										</p:inputTextarea>
 									</h:panelGrid>
 									<p:separator />
@@ -294,23 +294,23 @@
 						<p:separator />
 						<p:messages autoUpdate="true" />
 	
-			            <p:dataTable id="tbl_01" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+			            <p:dataTable id="tbl_01" var="c" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 							paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-			            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.codeListVO}" rowKey="#{cVO.codeListID}" selectionMode="single">
+			            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.codeList}" rowKey="#{c.codeListID}" selectionMode="single">
 							<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
 		        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
 			                <p:column style="width:400px">
 								<f:facet name="header">
 									<h:outputText value="Name" />
 								</f:facet>
-								<h:outputText value="#{cVO.name}" />
+								<h:outputText value="#{c.name}" />
 							</p:column>
 			
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Agency Id" />
 								</f:facet>
-								<h:outputText value="#{cVO.agencyID}" />
+								<h:outputText value="#{c.agencyID}" />
 							</p:column>
 			            </p:dataTable>
 			            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('derivedCodeList').hide()" />
@@ -326,23 +326,23 @@
 							<p:autoComplete id="ccName" value="#{topLevelABIEHandler.codeListName}" completeMethod="#{topLevelABIEHandler.completeCodeListInput}" />
 							<p:commandButton value="Search" ajax="true" actionListener="#{topLevelABIEHandler.searchCodeList}" update="tbl02" icon="ui-icon-search" />
 						</h:panelGrid>
-			            <p:dataTable id="tbl02" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+			            <p:dataTable id="tbl02" var="c" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 							paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-			            	value="#{topLevelABIEHandler.codeLists2}" selection="#{topLevelABIEHandler.codeListVO}" rowKey="#{cVO.codeListID}" selectionMode="single">
+			            	value="#{topLevelABIEHandler.codeLists2}" selection="#{topLevelABIEHandler.codeList}" rowKey="#{c.codeListID}" selectionMode="single">
 							<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
 		        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
 			                <p:column style="width:400px">
 								<f:facet name="header">
 									<h:outputText value="Name" />
 								</f:facet>
-								<h:outputText value="#{cVO.name}" />
+								<h:outputText value="#{c.name}" />
 							</p:column>
 			
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Agency Id" />
 								</f:facet>
-								<h:outputText value="#{cVO.agencyID}" />
+								<h:outputText value="#{c.agencyID}" />
 							</p:column>
 			            </p:dataTable>
 			            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('codeList').hide()" />

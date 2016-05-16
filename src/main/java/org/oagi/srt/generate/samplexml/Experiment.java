@@ -24,9 +24,8 @@ public class Experiment implements Runnable {
 
 		for (File file : listOfF1) {
 			String bodname = Utility.spaceSeparator(file.getName().substring(0, file.getName().indexOf(".")));
-			a.macro(bodname);
+			// a.macro(bodname);
 		}
-
 	}
 	
 	public void macrotest_validate(File f1) throws Exception {

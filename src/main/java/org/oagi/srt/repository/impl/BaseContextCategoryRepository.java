@@ -2,7 +2,7 @@ package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.ContextCategoryRepository;
 import org.oagi.srt.repository.entity.ContextCategory;
-import org.oagi.srt.repository.mapper.ContextCategoryFindAllMapper;
+import org.oagi.srt.repository.mapper.ContextCategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -31,7 +31,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
 
     @Override
     public List<ContextCategory> findAll() {
-        return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextCategoryFindAllMapper.INSTANCE);
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextCategoryMapper.INSTANCE);
     }
 
     private final String FIND_BY_NAME_CONTAINING_STATEMENT = "SELECT " +
@@ -45,7 +45,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
                 .addValue("name", "%" + name + "%");
 
         return getNamedParameterJdbcTemplate().query(
-                FIND_BY_NAME_CONTAINING_STATEMENT, namedParameters, ContextCategoryFindAllMapper.INSTANCE);
+                FIND_BY_NAME_CONTAINING_STATEMENT, namedParameters, ContextCategoryMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_CONTEXT_CATEGORY_ID_STATEMENT = "SELECT " +
@@ -59,7 +59,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
                 .addValue("ctx_category_id", contextCategoryId);
 
         return getNamedParameterJdbcTemplate().queryForObject(
-                FIND_ONE_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters, ContextCategoryFindAllMapper.INSTANCE);
+                FIND_ONE_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters, ContextCategoryMapper.INSTANCE);
     }
 
     private final String SAVE_STATEMENT = "INSERT INTO ctx_category (" +

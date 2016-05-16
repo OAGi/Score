@@ -22,7 +22,7 @@
 
 	            <p:dataTable id="tbl" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 					paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-	            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.selectedCodeList}" rowKey="#{cVO.codeListID}" selectionMode="single">
+	            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.selectedCodeList}" rowKey="#{cVO.codeListId}" selectionMode="single">
 					<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
         			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
 	                <p:column style="width:400px">
@@ -36,7 +36,7 @@
 						<f:facet name="header">
 							<h:outputText value="Agency Id" />
 						</f:facet>
-						<h:outputText value="#{cVO.agencyID}" />
+						<h:outputText value="#{cVO.agencyId}" />
 					</p:column>
 	            </p:dataTable>
 	            <p:commandButton ajax="true" icon="ui-icon-search" value="Select" actionListener="#{topLevelABIEHandler.closeDialog}" />

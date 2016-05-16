@@ -2,7 +2,7 @@ package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.ContextSchemeRepository;
 import org.oagi.srt.repository.entity.ContextScheme;
-import org.oagi.srt.repository.mapper.ContextSchemeFindAllMapper;
+import org.oagi.srt.repository.mapper.ContextSchemeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,7 +33,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
 
     @Override
     public List<ContextScheme> findAll() {
-        return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextSchemeFindAllMapper.INSTANCE);
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextSchemeMapper.INSTANCE);
     }
 
     private final String FIND_BY_CONTEXT_CATEGORY_ID_STATEMENT = "SELECT " +
@@ -49,7 +49,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
                 .addValue("ctx_category_id", contextCategoryId);
 
         return getNamedParameterJdbcTemplate().query(
-                FIND_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters, ContextSchemeFindAllMapper.INSTANCE);
+                FIND_BY_CONTEXT_CATEGORY_ID_STATEMENT, namedParameters, ContextSchemeMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_CONTEXT_SCHEME_ID_STATEMENT = "SELECT " +
@@ -65,7 +65,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
                 .addValue("classification_ctx_scheme_id", contextSchemeId);
 
         return getNamedParameterJdbcTemplate().queryForObject(
-                FIND_ONE_BY_CONTEXT_SCHEME_ID_STATEMENT, namedParameters, ContextSchemeFindAllMapper.INSTANCE);
+                FIND_ONE_BY_CONTEXT_SCHEME_ID_STATEMENT, namedParameters, ContextSchemeMapper.INSTANCE);
     }
 
     private final String UPDATE_STATEMENT = "UPDATE classification_ctx_scheme SET " +

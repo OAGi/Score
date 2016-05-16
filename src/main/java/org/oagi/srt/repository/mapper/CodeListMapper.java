@@ -7,9 +7,9 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CodeListFindAllMapper implements RowMapper<CodeList> {
+public class CodeListMapper implements RowMapper<CodeList> {
 
-    public static CodeListFindAllMapper INSTANCE = new CodeListFindAllMapper();
+    public static CodeListMapper INSTANCE = new CodeListMapper();
 
     @Override
     public CodeList mapRow(ResultSet rs, int rowNum) throws SQLException {

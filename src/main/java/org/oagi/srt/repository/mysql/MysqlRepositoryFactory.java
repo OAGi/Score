@@ -29,6 +29,51 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Autowired
     private BaseContextCategoryRepository baseContextCategoryRepository;
 
+    @Autowired
+    private BaseAssociationCoreComponentRepository baseAssociationCoreComponentRepository;
+
+    @Autowired
+    private BaseBasicCoreComponentRepository baseBasicCoreComponentRepository;
+
+    @Autowired
+    private BaseAggregateCoreComponentRepository baseAggregateCoreComponentRepository;
+
+    @Autowired
+    private BaseAssociationCoreComponentPropertyRepository baseAssociationCoreComponentPropertyRepository;
+
+    @Autowired
+    private BaseBasicCoreComponentPropertyRepository baseBasicCoreComponentPropertyRepository;
+
+    @Autowired
+    private BaseAggregateBusinessInformationEntityRepository baseAggregateBusinessInformationEntityRepository;
+
+    @Autowired
+    private BaseAssociationBusinessInformationEntityRepository baseAssociationBusinessInformationEntityRepository;
+
+    @Autowired
+    private BaseAssociationBusinessInformationEntityPropertyRepository baseAssociationBusinessInformationEntityPropertyRepository;
+
+    @Autowired
+    private BaseBasicBusinessInformationEntityRepository baseBasicBusinessInformationEntityRepository;
+
+    @Autowired
+    private BaseBasicBusinessInformationEntityPropertyRepository baseBasicBusinessInformationEntityPropertyRepository;
+
+    @Autowired
+    private BaseBasicBusinessInformationEntitySupplementaryComponentRepository baseBasicBusinessInformationEntitySupplementaryComponentRepository;
+
+    @Autowired
+    private BaseDataTypeRepository baseDataTypeRepository;
+
+    @Autowired
+    private BaseDataTypeSupplementaryComponentRepository baseDataTypeSupplementaryComponentRepository;
+
+    @Autowired
+    private BaseBusinessDataTypePrimitiveRestrictionRepository baseBusinessDataTypePrimitiveRestrictionRepository;
+
+    @Autowired
+    private BaseUserRepository baseUserRepository;
+
     @Override
     public CodeListRepository codeListRepository() {
         return baseCodeListRepository;
@@ -62,5 +107,80 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public ContextCategoryRepository contextCategoryRepository() {
         return baseContextCategoryRepository;
+    }
+
+    @Override
+    public AssociationCoreComponentRepository associationCoreComponentRepository() {
+        return baseAssociationCoreComponentRepository;
+    }
+
+    @Override
+    public BasicCoreComponentRepository basicCoreComponentRepository() {
+        return baseBasicCoreComponentRepository;
+    }
+
+    @Override
+    public AggregateCoreComponentRepository aggregateCoreComponentRepository() {
+        return baseAggregateCoreComponentRepository;
+    }
+
+    @Override
+    public AssociationCoreComponentPropertyRepository associationCoreComponentPropertyRepository() {
+        return baseAssociationCoreComponentPropertyRepository;
+    }
+
+    @Override
+    public BasicCoreComponentPropertyRepository basicCoreComponentPropertyRepository() {
+        return baseBasicCoreComponentPropertyRepository;
+    }
+
+    @Override
+    public AggregateBusinessInformationEntityRepository aggregateBusinessInformationEntityRepository() {
+        return baseAggregateBusinessInformationEntityRepository;
+    }
+
+    @Override
+    public AssociationBusinessInformationEntityRepository associationBusinessInformationEntityRepository() {
+        return baseAssociationBusinessInformationEntityRepository;
+    }
+
+    @Override
+    public AssociationBusinessInformationEntityPropertyRepository associationBusinessInformationEntityPropertyRepository() {
+        return baseAssociationBusinessInformationEntityPropertyRepository;
+    }
+
+    @Override
+    public BasicBusinessInformationEntityRepository basicBusinessInformationEntityRepository() {
+        return baseBasicBusinessInformationEntityRepository;
+    }
+
+    @Override
+    public BasicBusinessInformationEntityPropertyRepository basicBusinessInformationEntityPropertyRepository() {
+        return baseBasicBusinessInformationEntityPropertyRepository;
+    }
+
+    @Override
+    public BasicBusinessInformationEntitySupplementaryComponentRepository basicBusinessInformationEntitySupplementaryComponentRepository() {
+        return baseBasicBusinessInformationEntitySupplementaryComponentRepository;
+    }
+
+    @Override
+    public DataTypeRepository dataTypeRepository() {
+        return baseDataTypeRepository;
+    }
+
+    @Override
+    public DataTypeSupplementaryComponentRepository dataTypeSupplementaryComponentRepository() {
+        return baseDataTypeSupplementaryComponentRepository;
+    }
+
+    @Override
+    public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository() {
+        return baseBusinessDataTypePrimitiveRestrictionRepository;
+    }
+
+    @Override
+    public UserRepository userRepository() {
+        return baseUserRepository;
     }
 }

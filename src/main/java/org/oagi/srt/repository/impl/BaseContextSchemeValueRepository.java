@@ -2,7 +2,7 @@ package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.ContextSchemeValueRepository;
 import org.oagi.srt.repository.entity.ContextSchemeValue;
-import org.oagi.srt.repository.mapper.ContextSchemeValueFindAllMapper;
+import org.oagi.srt.repository.mapper.ContextSchemeValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -36,7 +36,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
                 .addValue("owner_ctx_scheme_id", contextSchemeId);
 
         return getNamedParameterJdbcTemplate().query(FIND_BY_CONTEXT_SCHEME_ID_STATEMENT,
-                namedParameters, ContextSchemeValueFindAllMapper.INSTANCE);
+                namedParameters, ContextSchemeValueMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_CONTEXT_SCHEME_VALUE_ID_STATEMENT = "SELECT " +
@@ -51,7 +51,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
 
         return getNamedParameterJdbcTemplate().queryForObject(
                 FIND_ONE_BY_CONTEXT_SCHEME_VALUE_ID_STATEMENT,
-                namedParameters, ContextSchemeValueFindAllMapper.INSTANCE);
+                namedParameters, ContextSchemeValueMapper.INSTANCE);
     }
 
     private final String SAVE_STATEMENT = "INSERT INTO ctx_scheme_value (" +

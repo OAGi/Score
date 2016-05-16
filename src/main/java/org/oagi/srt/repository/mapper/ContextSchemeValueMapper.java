@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ContextSchemeValueFindAllMapper implements RowMapper<ContextSchemeValue> {
+public class ContextSchemeValueMapper implements RowMapper<ContextSchemeValue> {
 
-    public static ContextSchemeValueFindAllMapper INSTANCE = new ContextSchemeValueFindAllMapper();
+    public static ContextSchemeValueMapper INSTANCE = new ContextSchemeValueMapper();
 
     @Override
     public ContextSchemeValue mapRow(ResultSet rs, int rowNum) throws SQLException {

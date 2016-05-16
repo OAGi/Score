@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ContextCategoryFindAllMapper implements RowMapper<ContextCategory> {
+public class ContextCategoryMapper implements RowMapper<ContextCategory> {
 
-    public static ContextCategoryFindAllMapper INSTANCE = new ContextCategoryFindAllMapper();
+    public static ContextCategoryMapper INSTANCE = new ContextCategoryMapper();
 
     @Override
     public ContextCategory mapRow(ResultSet rs, int rowNum) throws SQLException {
