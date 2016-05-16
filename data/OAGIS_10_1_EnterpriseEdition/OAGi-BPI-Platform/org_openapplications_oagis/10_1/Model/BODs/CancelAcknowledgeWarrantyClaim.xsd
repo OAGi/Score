@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelAcknowledgeWarrantyClaim.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarrantyClaim.xsd"/>
+	<xsd:element name="CancelAcknowledgeWarrantyClaim" type="CancelAcknowledgeWarrantyClaimType" id="oagis-id-9e67cd374d4a4fdfa882dde8ec15d22d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeWarrantyClaim Business Object Document is to CancelAcknowledge receipt of the WarrantyClaim</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeWarrantyClaimType" id="oagis-id-12a3482e25134b4c973cb446ba0812a8">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeWarrantyClaimDataAreaType" id="oagis-id-454ca751ca5e4230bf795a9f1c78cea9">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeWarrantyClaim. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (WarrantyClaim).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeWarrantyClaimDataAreaType" id="oagis-id-2264d17d81d24dfc82c4b318b2960ba9">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-0fd9f0d852f646389baf111e7285629d"/>
+			<xsd:element ref="WarrantyClaim" maxOccurs="unbounded" id="oagis-id-b2f203256f9f4ed6b134f63dda545456"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

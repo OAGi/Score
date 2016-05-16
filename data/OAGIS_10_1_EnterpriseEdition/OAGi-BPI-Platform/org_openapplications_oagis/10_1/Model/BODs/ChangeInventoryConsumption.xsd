@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeInventoryConsumption.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InventoryConsumption.xsd"/>
+	<xsd:element name="ChangeInventoryConsumption" type="ChangeInventoryConsumptionType" id="oagis-id-016be90815184f17a222a825a4e1a8bd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeInventoryConsumption is to inform a seller or provider about InventoryConsumption of items.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeInventoryConsumptionType" id="oagis-id-f680d7d9a823410896ac4fdd554ec6f0">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeInventoryConsumptionDataAreaType" id="oagis-id-d8caf1e04b574db58aeb4e876c8950ed">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeInventoryConsumption. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (InventoryConsumption).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeInventoryConsumptionDataAreaType" id="oagis-id-6ab13fa11df94d39abd8e7ddcfe3bffa">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-de7f02e0dcb44787b8cd7de2ca9357b8"/>
+			<xsd:element ref="InventoryConsumption" maxOccurs="unbounded" id="oagis-id-33b33901f55f45c2ab14377c0f01c4f6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

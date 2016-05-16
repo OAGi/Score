@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/GetItemCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ItemCertificateOfAnalysis.xsd"/>
+        <xsd:element name="GetItemCertificateOfAnalysis" type="GetItemCertificateOfAnalysisType" id="oagis-id-f2607e81e339426f8d94859beda76e00">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Get ItemCertificateOfAnalysis is to enable a business application module to request information concerning a specific purchase order from another business application.  The reply to this BOD is the Show ItemCertificateOfAnalysis.
+
+There are several environments that may use this capability. For example, an MRP application may use this BOD to ask for information from a Order Management application, or a Plant Data Collection application may also use this BOD to request information from a Order Management application. This may als happen across business parties.
+
+This BOD does not usually cause updates to occur.
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetItemCertificateOfAnalysisType" id="oagis-id-83289d2be31a450888647624cbac4461">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetItemCertificateOfAnalysisDataAreaType" id="oagis-id-35145024e08443ee8d82a450c6f55ef2">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetItemCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (ItemCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetItemCertificateOfAnalysisDataAreaType" id="oagis-id-8ca67a3908ea4464a10d452b1f95731b">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-0624110df90841b6bafa8b4b37e5684f"/>
+                        <xsd:element ref="ItemCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-5b45cb493689467eb0ce5f7579a23347"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

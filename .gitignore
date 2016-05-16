@@ -1,0 +1,15 @@
+.idea/*
+*.iml
+*.class
+target/*
+build/*
+bin/*
+tmp/*
+/bin/
+.settings/*
+.classpath
+.project
+docker-compose.yml
+/target/
+data/*
+logs/*

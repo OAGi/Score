@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/SupplierPartyMaster.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="SupplierPartyMaster" type="SuppliererPartyMasterType" id="oagis-id-8c49d9e627f440b68dacdc03925e07e8"/>
+	<xsd:complexType name="SuppliererPartyMasterBaseType" id="oagis-id-4c974278f4264710917e8a66770b8b9c">
+		<xsd:complexContent>
+			<xsd:extension base="PartyMasterBaseType">
+				<xsd:sequence>
+					<xsd:element ref="SalesContact" id="oagis-id-af95e50cb3bb4b8180c021ec39c10600" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the sales contact and sales department/organization that is responsible for the sale that the instance is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShippingContact" id="oagis-id-c9c0bde70f1d49ce9b4980f51953b54c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the contact information of the person, organization, department, or group that is to shipping the contents communicated by the document or line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CustomerServiceContact" id="oagis-id-8ff088c91f804599997110edf6e88e69" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the contact information of the person, organization, department, or group that is responsible for customer service.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SuppliererPartyMasterType" id="oagis-id-fd8d5cebc26549d8927a4b8c81c58b5d">
+		<xsd:complexContent>
+			<xsd:extension base="SuppliererPartyMasterBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="SupplierPartyMasterExtensionType" id="oagis-id-b078269954274154beaa0527efce1764" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

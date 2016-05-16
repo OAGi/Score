@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseMaintenanceOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MaintenanceOrder.xsd"/>
+	<xsd:element name="SyncResponseMaintenanceOrder" type="SyncResponseMaintenanceOrderType" id="oagis-id-c43cef0c354f4497966b32a2917ab3d1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseMaintenanceOrder is to communicate the response to a MaintenanceOrder message from one business application to one or more other business applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseMaintenanceOrderType" id="oagis-id-7657fe87a0ce442e82912100682d14c6">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseMaintenanceOrderDataAreaType" id="oagis-id-2badb421d7be44c68472c60b4ea2957f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseMaintenanceOrder. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (MaintenanceOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseMaintenanceOrderDataAreaType" id="oagis-id-2ce1b6d8576742118df532f9f48772d0">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-7db1945292a944f688fce3c27d4cbde0"/>
+			<xsd:element ref="MaintenanceOrder" maxOccurs="unbounded" id="oagis-id-a9cfa1faa87345b191196caaa9a7ce1d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/Receivable.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="Receivable" type="ReceivableType" id="oagis-id-c84cdbdfa5b94d98b7a007e2caf63cf3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Receivable is a transaction representing an invoice, credit memo or debit memo to a customer.  A receivable is an open (unpaid) item in the Accounts Receivable ledger.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceivableHeader" type="ReceivableHeaderType" id="oagis-id-a96b3f23a9e94987b64fac0fe790b18b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the entire receivable document, including totals, invoice identifier, and description.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ReceivableLine" type="ReceivableLineType" id="oagis-id-10689f92c17a421283693bd0df2664e1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Line associated with the receivable document.  Can be an invoice line.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ReceivableType" id="oagis-id-2a54f042927148dab6dc5ce29b8b4eeb">
+		<xsd:sequence>
+			<xsd:element ref="ReceivableHeader" id="oagis-id-ef1974077f5342cfb6811de0fb000694" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information that applies to the entire receivable document, including totals, invoice identifier, and description.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ReceivableLine" id="oagis-id-24db37835a5d4c6a8d7a984790f55a26" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Line associated with the receivable document.  Can be an invoice line.  </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-e865ee7251bd4525bef9bfcdec2e9868"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-0a04ebf7c2814905aea8a5ffdb4cfc20"/>
+	</xsd:complexType>
+	<xsd:complexType name="ReceivableHeaderBaseType" id="oagis-id-a92a7a7225a0481888edb3cded01c310">
+		<xsd:complexContent>
+			<xsd:extension base="LedgerEntryHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="BillToParty" id="oagis-id-11536a1c92244a928576fa49bc71669f" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that the bill or invoice is to be sent. In most cases this is the same as the CustomerParty however there are many cases where the CustomerParty and the BillToParty will be different.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShipToParty" id="oagis-id-c7bc629e47064e69adc34704c64da5bd" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the ShipToParty for the document or the line. In a lot of cases, this is the same as the CustomerParty. In multi-organization purchasing, the CustomerParty may be different from the BuyerParty</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="TaxesGroup" id="oagis-id-04a334e6c68e4939bea418dd595b19b4"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceivableHeaderType" id="oagis-id-27b511f029784c81b38a071029c29d57">
+		<xsd:complexContent>
+			<xsd:extension base="ReceivableHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceivableHeaderExtensionType" id="oagis-id-8f48c1f5098e42ce81651d5b9f8573f6" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ReceivableLineType" id="oagis-id-39cea2291e934d9f95fc10ac4a0b3210">
+		<xsd:complexContent>
+			<xsd:extension base="LedgerEntryLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ReceivableLineExtensionType" id="oagis-id-743a9369c38f42279650797d038f3930" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

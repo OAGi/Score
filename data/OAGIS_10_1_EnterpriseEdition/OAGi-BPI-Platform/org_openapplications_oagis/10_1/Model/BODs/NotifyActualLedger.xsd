@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downNotify package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyActualLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ActualLedger.xsd"/>
+	<xsd:element name="NotifyActualLedger" type="NotifyActualLedgerType" id="oagis-id-1ae4dbbbef6142a4b0c72fe5afb3dfbd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyActualLedger is to enable an enterprise application to request detailed accounting ledger actual data.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyActualLedgerType" id="oagis-id-6cf2be010ace474d858dcd6b560bcff7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyActualLedgerDataAreaType" id="oagis-id-8e9391c41f2d40db809280131ba2eaec">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyActualLedger. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (ActualLedger).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyActualLedgerDataAreaType" id="oagis-id-88e0a807a79d47d2a959b6f89d602530">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-488bd341820c46658f7f6810f448f1b2"/>
+			<xsd:element ref="ActualLedger" maxOccurs="unbounded" id="oagis-id-907a10a7cb994e65b305e002b791aabd"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

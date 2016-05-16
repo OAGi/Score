@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ProcessPriceList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PriceList.xsd"/>
+	<xsd:element name="ProcessPriceList" type="ProcessPriceListType" id="oagis-id-710232654d634814a33a9fe2bd25e5cb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessPriceList is to communicate to a business application module or system the need to initiate the creation of product price list information as well as update existing price lists.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
+
+There are many possible business applications in several environments that may use this capability. For example, a Manufacturing, distributor or reseller business application could use this to communicate the price change or request a price list.
+
+It may also be necessary to support Component Supplier Management (CSM) scenarios.  In this scenario a company will provide a service of sourcing and codifying the products of many companies and publishing a consolidated catalog.  A customer purchases the product from the Catalog provider.  They have the capability to do comparison shopping from the catalog.  Supplier Certification may be provided by the Catalog provider.
+
+This definition of price list is intended to support simple pricing scenario, especially pricing that may accompany a published price list. It is not intended to support complex pricing environments that may be needed to support features such as;
+·	Deals and Promotions
+·	Coupons and Sales Incentives
+·	Rebates and Accruals
+
+This functionality will be addressed in a subsequent release. It is a working assumption that the representation of complex qualifications, coupons and sales incentives are rarely communicated between systems.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessPriceListType" id="oagis-id-1c873801dfda4a5e94d9b9eb95684922">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessPriceListDataAreaType" id="oagis-id-00eab4553fa543c6bcd954614b991423">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessPriceList. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (PriceList).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessPriceListDataAreaType" id="oagis-id-b35a319756a5434e8dd59e191d9f6981">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-28e402e176b64382874cda696482e9d6"/>
+			<xsd:element ref="PriceList" maxOccurs="unbounded" id="oagis-id-0a1add9969be449fb31321c5dcee4cf0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

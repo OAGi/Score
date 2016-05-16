@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgeAllocateResource.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/AllocateResource.xsd"/>
+	<xsd:element name="ChangeAcknowledgeAllocateResource" type="ChangeAcknowledgeAllocateResourceType" id="oagis-id-c91f676f4a724b86b31906e1f036785b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The ChangeAcknowledgeAllocateResource may be used to obtain limited information ChangeAcknowledgeing about documents that match certain selection criteria in a GetChangeAcknowledgeAllocateResource.
+
+Additional information about a specific AllocateResource may be obtained through ShowAllocateResource by using the ChangeAcknowledgeing information to populate a GetAllocateResource request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeAllocateResourceType" id="oagis-id-063b1727dd9443e29574b24da4ce4c95">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeAllocateResourceDataAreaType" id="oagis-id-85ec9b2fc7de4a57a09c421dbf31845c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeAllocateResource. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (AllocateResource).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeAllocateResourceDataAreaType" id="oagis-id-0088c53f45d5466d852efd42458cde34">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-a48fc8e55f7b4657bb03ea7096ad40fc"/>
+			<xsd:element ref="AllocateResource" maxOccurs="unbounded" id="oagis-id-68e34649ec514491994f17c063b10679"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

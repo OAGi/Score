@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/AcknowledgeItemNonconformance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ItemNonconformance.xsd"/>
+	<xsd:element name="AcknowledgeItemNonconformance" type="AcknowledgeItemNonconformanceType" id="oagis-id-283512355d1c4b94bac3a6bd08df5e41">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeItemNonconformance BOD is to provide a response with the results from the ProcessItemNonconformance.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeItemNonconformanceType" id="oagis-id-0a037885064747c186183328c0039b17">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeItemNonconformanceDataAreaType" id="oagis-id-13ad84cef4cf4873b65605da66b22760">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeItemNonconformance. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (ItemNonconformance).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeItemNonconformanceDataAreaType" id="oagis-id-b979ec55155244b0b61bd71e0cd49a02">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-ca5245f24a5e4b41854e7e02fa11012c"/>
+			<xsd:element ref="ItemNonconformance" maxOccurs="unbounded" id="oagis-id-2eeae68b722a46f9b4e0a83784559bd2"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
