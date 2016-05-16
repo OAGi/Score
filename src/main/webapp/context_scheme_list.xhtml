@@ -34,30 +34,30 @@
 			</p:panel>
 			<p:panel header="Context Scheme List">
 				
-				<p:dataTable id="tbl1" var="contextSchemeVO" value="#{contextSchemeHandler.contextSchemes}"
+				<p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeHandler.contextSchemes}"
 					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextSchemeVO.contextSchemeID}">
+					paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.classificationCtxSchemeId}">
 			        <p:column selectionMode="single" style="width:16px;text-align:center"/>
 			        
 					<p:column style="width:200px">
 						<f:facet name="header">
 							<h:outputText value="Name" />
 						</f:facet>
-						<h:outputText value="#{contextSchemeVO.schemeName}" />
+						<h:outputText value="#{contextScheme.schemeName}" />
 					</p:column>
 	
 					<p:column style="width:300px">
 						<f:facet name="header">
 							<h:outputText value="Description" />
 						</f:facet>
-						<h:outputText value="#{contextSchemeVO.description}" />
+						<h:outputText value="#{contextScheme.description}" />
 					</p:column>
 					
 					<p:column style="width:50px">
 						<f:facet name="header">
 							<h:outputText value="Version" />
 						</f:facet>
-						<h:outputText value="#{contextSchemeVO.schemeVersion}" />
+						<h:outputText value="#{contextScheme.schemeVersionId}" />
 					</p:column>
 					
 				</p:dataTable>
@@ -81,17 +81,19 @@
 						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.description}" />
 
+						<!--
 						<h:outputText value="Scheme Agency Name: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyName}" />
+						-->
 
 						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyID}" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyId}" />
 						
 						<h:outputText value="Scheme Version: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersion}" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersionId}" />
 						
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.contextCategoryID}" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.ctxCategoryId}" />
 						
 					</h:panelGrid>
 					<p:separator />
@@ -103,20 +105,20 @@
 						</p:row>
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
-						<p:dataTable id="tbl22" var="contextSchemeValueVO" value="#{contextSchemeHandler.selectedCSValues}"
+						<p:dataTable id="tbl22" var="contextSchemeValue" value="#{contextSchemeHandler.selectedCSValues}"
 							style="width:600px; margin-bottom:20px">
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Value" />
 								</f:facet>
-								<h:outputText value="#{contextSchemeValueVO.value}" />
+								<h:outputText value="#{contextSchemeValue.value}" />
 							</p:column>
 			
 							<p:column style="width:300px">
 								<f:facet name="header">
 									<h:outputText value="Meaning" />
 								</f:facet>
-								<h:outputText value="#{contextSchemeValueVO.meaning}" />
+								<h:outputText value="#{contextSchemeValue.meaning}" />
 							</p:column>
 						</p:dataTable>
 					</h:panelGrid>
@@ -125,7 +127,7 @@
 			        </h:panelGrid>
 			        <h:panelGrid columns="2" cellpadding="5">
 			        	<p:commandButton value="Cancel" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
-			        	<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.delete(contextSchemeHandler.selectedScheme.contextSchemeID)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
+			        	<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.delete(contextSchemeHandler.selectedScheme.classificationCtxSchemeId)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
 			        </h:panelGrid>
 				</p:outputPanel>
 		    </p:dialog>
@@ -148,13 +150,13 @@
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.description}" />
 
 						<h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyID}" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyId}" />
 						
 						<h:outputText value="Schema Version: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersion}" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersionId}" />
 						
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.contextCategoryID}" />
+						<h:outputText value="#{contextSchemeHandler.selectedScheme.ctxCategoryId}" />
 					</h:panelGrid>	
 					<p:separator />
 					<h:panelGrid id="grid10" cellpadding="5">
@@ -165,20 +167,20 @@
 						</p:row>
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
-						<p:dataTable id="tbl2" var="contextSchemeValueVO" value="#{contextSchemeHandler.selectedCSValues}"
+						<p:dataTable id="tbl2" var="contextSchemeValue" value="#{contextSchemeHandler.selectedCSValues}"
 							style="width:600px; margin-bottom:20px">
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Value" />
 								</f:facet>
-								<h:outputText value="#{contextSchemeValueVO.value}" />
+								<h:outputText value="#{contextSchemeValue.value}" />
 							</p:column>
 			
 							<p:column style="width:300px">
 								<f:facet name="header">
 									<h:outputText value="Meaning" />
 								</f:facet>
-								<h:outputText value="#{contextSchemeValueVO.meaning}" />
+								<h:outputText value="#{contextSchemeValue.meaning}" />
 							</p:column>
 						</p:dataTable>
 					</h:panelGrid>
@@ -233,21 +235,21 @@
 						</p:row>
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
-						<p:dataTable id="tbl3" var="contextSchemeValueVO" value="#{contextSchemeHandler.csValues}"
+						<p:dataTable id="tbl3" var="contextSchemeValue" value="#{contextSchemeHandler.csValues}"
 							style="width:600px; margin-bottom:20px">
 							
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Value" />
 								</f:facet>
-								<h:outputText value="#{contextSchemeValueVO.value}" />
+								<h:outputText value="#{contextSchemeValue.value}" />
 							</p:column>
 			
 							<p:column style="width:300px">
 								<f:facet name="header">
 									<h:outputText value="Meaning" />
 								</f:facet>
-								<h:outputText value="#{contextSchemeValueVO.meaning}" />
+								<h:outputText value="#{contextSchemeValue.meaning}" />
 							</p:column>
 							
 							<p:column style="width:90px">
@@ -255,7 +257,7 @@
 									<h:outputText value="Delete" />
 								</f:facet>
 								<p:commandButton value="Delete" update=":listForm:tbl3" icon="ui-icon-check"
-									style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValueVO.contextSchemeValueGUID, contextSchemeValueVO.contextSchemeValueID)}" />
+									style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValue.guid, contextSchemeValue.ctxSchemeValueId)}" />
 							</p:column>
 			
 						</p:dataTable>

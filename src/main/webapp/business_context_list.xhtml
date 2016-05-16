@@ -20,21 +20,21 @@
 		<h:form id="form">
 			<p:growl id="messages1" />
 			<p:panel header="Business Context List">
-				<p:dataTable id="tbl" var="BusinessContextVO" value="#{businessContextHandler.businessContexts}"
+				<p:dataTable id="tbl" var="businessContext" value="#{businessContextHandler.businessContexts}"
 					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:700px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{BusinessContextVO.businessContextID}">
+					paginator="true" rows="10" style="width:700px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{businessContext.bizCtxId}">
 			        <p:column selectionMode="single" style="width:16px;text-align:center"/>
 					<p:column style="width:200px">
 						<f:facet name="header">
 							<h:outputText value="Name" />
 						</f:facet>
-						<h:outputText value="#{BusinessContextVO.name}" />
+						<h:outputText value="#{businessContext.name}" />
 					</p:column>
 					<p:column style="width:300px">
 						<f:facet name="header">
 							<h:outputText value="GUID" />
 						</f:facet>
-						<h:outputText value="#{BusinessContextVO.businessContextGUID}" />
+						<h:outputText value="#{businessContext.guid}" />
 					</p:column>
 					
 				</p:dataTable>

@@ -73,21 +73,21 @@
 					</p:row>		
 					<p:row>
 						<p:column colspan="2"> 					
-							<p:dataTable id="tbl" var="contextSchemeValueVO" value="#{contextSchemeHandler.csValues}"
+							<p:dataTable id="tbl" var="contextSchemeValue" value="#{contextSchemeHandler.csValues}"
 								style="width:600px; margin-bottom:20px">
 								
 								<p:column style="width:100px">
 									<f:facet name="header">
 										<h:outputText value="Value" />
 									</f:facet>
-									<h:outputText value="#{contextSchemeValueVO.value}" />
+									<h:outputText value="#{contextSchemeValue.value}" />
 								</p:column>
 				
 								<p:column style="width:300px">
 									<f:facet name="header">
 										<h:outputText value="Meaning" />
 									</f:facet>
-									<h:outputText value="#{contextSchemeValueVO.meaning}" />
+									<h:outputText value="#{contextSchemeValue.meaning}" />
 								</p:column>
 								
 								<p:column style="width:90px">
@@ -95,7 +95,7 @@
 										<h:outputText value="Delete" />
 									</f:facet>
 									<p:commandButton value="Delete" update="tbl" icon="ui-icon-check"
-										validateClient="true" style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValueVO.contextSchemeValueGUID)}" />
+										validateClient="true" style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValue.guid, contextSchemeValue.ctxSchemeValueId)}" />
 								</p:column>
 				
 							</p:dataTable>

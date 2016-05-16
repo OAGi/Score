@@ -1,7 +1,6 @@
 package org.oagi.srt.web.handler;
 
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
@@ -38,7 +37,6 @@ public class CodeListHandler extends UIHandler {
     private List<CodeList> codeLists = Collections.emptyList();
     private List<CodeList> codeListsForList = Collections.emptyList();
     private List<CodeListValue> codeListValues = Collections.emptyList();
-    private List<SRTObject> newCodeListsWOBase = Collections.emptyList();
 
     private CodeList codeList = new CodeList();
     private CodeListValue codeListValueVO = new CodeListValue();
@@ -104,14 +102,6 @@ public class CodeListHandler extends UIHandler {
 
     public void setExtensible(boolean extensible) {
         this.extensible = extensible;
-    }
-
-    public List<SRTObject> getNewCodeListsWOBase() {
-        return newCodeListsWOBase;
-    }
-
-    public void setNewCodeListsWOBase(List<SRTObject> newCodeListsWOBase) {
-        this.newCodeListsWOBase = newCodeListsWOBase;
     }
 
     public String getBasedCodeListName() {
@@ -204,9 +194,7 @@ public class CodeListHandler extends UIHandler {
         CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeLists = codeListRepository.findByNameContaining(query);
 
-        return codeLists.stream().map(codeList -> {
-            return codeList.getName();
-        }).collect(Collectors.toList());
+        return codeLists.stream().map(codeList -> codeList.getName()).collect(Collectors.toList());
     }
 
     public void search() {

@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.dto;
 
 import org.oagi.srt.common.SRTObject;
+import org.oagi.srt.repository.entity.BusinessContext;
 
 import java.sql.Timestamp;
 
@@ -74,5 +75,16 @@ public class BusinessContextVO extends SRTObject {
 	public void setLastUpdateTimestamp(Timestamp lastUpdateTimestamp) {
 		LastUpdateTimestamp = lastUpdateTimestamp;
 	}
-	
+
+	public static BusinessContextVO valueOf(BusinessContext businessContext) {
+		BusinessContextVO businessContextVO = new BusinessContextVO();
+		businessContextVO.setBusinessContextID(businessContext.getBizCtxId());
+		businessContextVO.setBusinessContextGUID(businessContext.getGuid());
+		businessContextVO.setName(businessContext.getName());
+		businessContextVO.setCreatedByUserId(businessContext.getCreatedBy());
+		businessContextVO.setLastUpdatedByUserId(businessContext.getLastUpdatedBy());
+		businessContextVO.setCreationTimestamp(new Timestamp(businessContext.getCreationTimestamp().getTime()));
+		businessContextVO.setLastUpdateTimestamp(new Timestamp(businessContext.getLastUpdateTimestamp().getTime()));
+		return businessContextVO;
+	}
 }

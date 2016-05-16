@@ -1,22 +1,23 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.QueryCondition;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ASBIEPVO;
-import org.oagi.srt.persistence.dto.ASCCPVO;
+import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
+import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
+import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
+import org.oagi.srt.repository.RepositoryFactory;
+import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
+import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -34,6 +35,19 @@ import java.util.Map;
 public class ProfileBODHandler extends UIHandler implements Serializable {
 
 	private static final long serialVersionUID = 4424008438705914095L;
+
+	@Autowired
+	private RepositoryFactory repositoryFactory;
+	private AggregateBusinessInformationEntityRepository abieRepository;
+	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+	private AssociationCoreComponentPropertyRepository asccpRepository;
+
+	@PostConstruct
+	public void init() {
+		abieRepository = repositoryFactory.aggregateBusinessInformationEntityRepository();
+		asbiepRepository = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
+		asccpRepository = repositoryFactory.associationCoreComponentPropertyRepository();
+	}
 
 	private ABIEView selectedABIEView;
 	private List<ABIEView> abieViewList = new ArrayList<ABIEView>();
@@ -89,68 +103,37 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
     public List<String> completeInput(String query) {
 		List<String> results = new ArrayList<String>();
 
-		try {
-			DAOFactory df = DAOFactory.getDAOFactory();
-			SRTDAO abieDao = df.getDAO("ABIE");
-			SRTDAO asbiepDao = df.getDAO("ASBIEP");
-			SRTDAO asccpDao = df.getDAO("ASCCP");
-						
-			QueryCondition qc_01 = new QueryCondition();
-			qc_01.add("is_Top_Level", 1); 
-			List<SRTObject> list_01 = abieDao.findObjects(qc_01);
-			for(SRTObject abie : list_01) {
-				ABIEVO abieVO = (ABIEVO) abie;
-				
-				QueryCondition qc_03 = new QueryCondition();
-				qc_03.add("role_of_abie_id", abieVO.getABIEID());
-				ASBIEPVO asbiepVO = (ASBIEPVO)asbiepDao.findObject(qc_03);
-				
-				QueryCondition qc_04 = new QueryCondition();
-				qc_04.add("asccp_id", asbiepVO.getBasedASCCPID());
-				ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc_04);
-				
-				if(asccpVO.getPropertyTerm().contains(query)) {
-					results.add(asccpVO.getPropertyTerm());
-				}
+		List<AggregateBusinessInformationEntity> list_01 = abieRepository.findByTopLevel(true);
+		for (AggregateBusinessInformationEntity abieVO : list_01) {
+			AssociationBusinessInformationEntityProperty asbiepVO =
+					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
+			AssociationCoreComponentProperty asccpVO =
+					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
+
+			if (asccpVO.getPropertyTerm().contains(query)) {
+				results.add(asccpVO.getPropertyTerm());
 			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
 		}
+
 		return results;
 	}
 	
 	public void search() {
-		try {
-			DAOFactory df = DAOFactory.getDAOFactory();
-			SRTDAO abieDao = df.getDAO("ABIE");
-			SRTDAO asbiepDao = df.getDAO("ASBIEP");
-			SRTDAO asccpDao = df.getDAO("ASCCP");
-						
-			QueryCondition qc_01 = new QueryCondition();
-			qc_01.add("is_Top_Level", 1); 
-			List<SRTObject> list_01 = abieDao.findObjects(qc_01);
-			for(SRTObject abie : list_01) {
-				ABIEVO abieVO = (ABIEVO) abie;
-				
-				QueryCondition qc_03 = new QueryCondition();
-				qc_03.add("role_of_abie_id", abieVO.getABIEID());
-				ASBIEPVO asbiepVO = (ASBIEPVO)asbiepDao.findObject(qc_03);
-				
-				QueryCondition qc_04 = new QueryCondition();
-				qc_04.add("asccp_id", asbiepVO.getBasedASCCPID());
-				ASCCPVO asccpVO = (ASCCPVO)asccpDao.findObject(qc_04);
-				
-				if(asccpVO.getPropertyTerm().equals(abieName)) {
-					ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getABIEID(), "ASBIE");
-					av.setAsccpVO(asccpVO);
-					av.setAbieVO(abieVO);
-					av.setAsbiepVO(asbiepVO);
-					av.setName(asccpVO.getPropertyTerm());
-					abieViewListForSelection.add(av);
-				}
+		List<AggregateBusinessInformationEntity> list_01 = abieRepository.findByTopLevel(true);
+		for (AggregateBusinessInformationEntity abieVO : list_01) {
+			AssociationBusinessInformationEntityProperty asbiepVO =
+					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
+			AssociationCoreComponentProperty asccpVO =
+					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
+
+			if (asccpVO.getPropertyTerm().equals(abieName)) {
+				ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
+				av.setAsccp(asccpVO);
+				av.setAbie(abieVO);
+				av.setAsbiep(asbiepVO);
+				av.setName(asccpVO.getPropertyTerm());
+				abieViewListForSelection.add(av);
 			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -177,12 +160,12 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	public void setAbieName(String abieName) {
 		this.abieName = abieName;
 	}
-	
+
 	public void generate() {
 		StandaloneXMLSchema schema = new StandaloneXMLSchema();
 		ArrayList<Integer> al = new ArrayList<Integer>();
-		for(ABIEView av : abieViewList) {
-			al.add(av.getAbieVO().getABIEID());
+		for (ABIEView av : abieViewList) {
+			al.add(av.getAbie().getAbieId());
 		}
 		try {
 			filePath = schema.generateXMLSchema(al, true);

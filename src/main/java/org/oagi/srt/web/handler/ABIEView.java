@@ -5,7 +5,11 @@ import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
+import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
+import org.oagi.srt.persistence.dto.CodeListVO;
+import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.repository.entity.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -14,313 +18,305 @@ import java.util.Map;
 
 public class ABIEView implements Serializable, Comparable<ABIEView> {
 
-	private ASCCVO asccVO;
-	private ASCCPVO asccpVO;
-	private ACCVO accVO;
-	private ABIEVO abieVO;
-	private ASBIEPVO asbiepVO;
-	private ASBIEVO asbieVO;
-	private BCCVO bccVO;
-	private BBIEPVO bbiepVO;
-	private BBIEVO bbieVO;
-	private BCCPVO bccpVO;
-	private DTSCVO dtscVO;
-	private BBIE_SCVO bbiescVO;
-	private Map<String, Integer> bdtPrimitiveRestrictions = new HashMap<String, Integer>();
-	private String bdtName;
-	private BDTPrimitiveRestrictionVO bdtPrimitiveRestrictionVO;
-	private String name;
-	private int id;
-	private String color;
-	private String type;
-	private String primitiveType;
-	private int bdtPrimitiveRestrictionId;
-	private int codeListId;
-	private String restrictionType;
+    private AssociationCoreComponent ascc;
+    private AssociationCoreComponentProperty asccp;
+    private AggregateCoreComponent acc;
+    private AggregateBusinessInformationEntity abie;
+    private AssociationBusinessInformationEntityProperty asbiep;
+    private AssociationBusinessInformationEntity asbie;
+    private BasicCoreComponent bcc;
+    private BasicBusinessInformationEntityProperty bbiep;
+    private BasicBusinessInformationEntity bbie;
+    private BasicCoreComponentProperty bccp;
+    private DataTypeSupplementaryComponent dtsc;
+    private BasicBusinessInformationEntitySupplementaryComponent bbiesc;
 
-	public ABIEView() {
+    private Map<String, Integer> bdtPrimitiveRestrictions = new HashMap<String, Integer>();
+    private String bdtName;
+    private String name;
+    private int id;
+    private String color;
+    private String type;
+    private String primitiveType;
+    private int bdtPrimitiveRestrictionId;
+    private int codeListId;
+    private String restrictionType;
 
-	}
+    public ABIEView() {
+    }
 
-	public int getCodeListId() {
-		return codeListId;
-	}
+    public int getCodeListId() {
+        return codeListId;
+    }
 
-	public void setCodeListId(int codeListId) {
-		this.codeListId = codeListId;
-	}
+    public void setCodeListId(int codeListId) {
+        this.codeListId = codeListId;
+    }
 
-	public String getRestrictionType() {
-		return restrictionType;
-	}
+    public String getRestrictionType() {
+        return restrictionType;
+    }
 
-	public void setRestrictionType(String restrictionType) {
-		this.restrictionType = restrictionType;
-	}
+    public void setRestrictionType(String restrictionType) {
+        this.restrictionType = restrictionType;
+    }
 
-	public void onBDTPrimitiveChange() {
-		System.out.println(bdtPrimitiveRestrictionId);
-	}
+    public void onBDTPrimitiveChange() {
+        System.out.println(bdtPrimitiveRestrictionId);
+    }
 
-	public int getBdtPrimitiveRestrictionId() {
-		return bdtPrimitiveRestrictionId;
-	}
+    public int getBdtPrimitiveRestrictionId() {
+        return bdtPrimitiveRestrictionId;
+    }
 
-	public void setBdtPrimitiveRestrictionId(int bdtPrimitiveRestrictionId) {
-		this.bdtPrimitiveRestrictionId = bdtPrimitiveRestrictionId;
-	}
+    public void setBdtPrimitiveRestrictionId(int bdtPrimitiveRestrictionId) {
+        this.bdtPrimitiveRestrictionId = bdtPrimitiveRestrictionId;
+    }
 
-	public BDTPrimitiveRestrictionVO getBdtPrimitiveRestrictionVO() {
-		return bdtPrimitiveRestrictionVO;
-	}
+    public String getPrimitiveType() {
+        return primitiveType;
+    }
 
-	public void setBdtPrimitiveRestrictionVO(
-			BDTPrimitiveRestrictionVO bdtPrimitiveRestrictionVO) {
-		this.bdtPrimitiveRestrictionVO = bdtPrimitiveRestrictionVO;
-	}
+    public void setPrimitiveType(String primitiveType) {
+        this.primitiveType = primitiveType;
+    }
 
-	public String getPrimitiveType() {
-		return primitiveType;
-	}
+    public Map<String, Integer> getBdtPrimitiveRestrictions() {
+        try {
+            DAOFactory df = DAOFactory.getDAOFactory();
+            SRTDAO bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
 
-	public void setPrimitiveType(String primitiveType) {
-		this.primitiveType = primitiveType;
-	}
+            QueryCondition qc_02 = new QueryCondition();
+            qc_02.add("bdt_id", bccp.getBdtId());
 
-	public Map<String, Integer> getBdtPrimitiveRestrictions() {
-		try {
-			DAOFactory df = DAOFactory.getDAOFactory();
-			SRTDAO bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
+            List<SRTObject> ccs = bdtPrimitiveRestrictionDao.findObjects(qc_02);
+            // Implicitly declaration. Why does it need to be here?
+            // Because of this code, Add 'setBccpVO_BbieVO' method.
+            // TODO: Fix me.
+            bdtPrimitiveRestrictionId = bbie.getBdtPriRestriId();
+            for (SRTObject obj : ccs) {
+                BDTPrimitiveRestrictionVO cc = (BDTPrimitiveRestrictionVO) obj;
 
-			QueryCondition qc_02 = new QueryCondition();
-			qc_02.add("bdt_id", bccpVO.getBDTID());
+                if (cc.getCDTPrimitiveExpressionTypeMapID() > 0) {
+                    primitiveType = "XSD Builtin Type";
 
-			List<SRTObject> ccs = bdtPrimitiveRestrictionDao.findObjects(qc_02);
-			// Implicitly declaration. Why does it need to be here?
-			// Because of this code, Add 'setBccpVO_BbieVO' method.
-			// TODO: Fix me.
-			bdtPrimitiveRestrictionId = bbieVO.getBdtPrimitiveRestrictionId();
-			for (SRTObject obj : ccs) {
-				BDTPrimitiveRestrictionVO cc = (BDTPrimitiveRestrictionVO) obj;
+                    SRTDAO cdtAllowedPrimitiveExpressionTypeMapDao = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
+                    QueryCondition qc_03 = new QueryCondition();
+                    qc_03.add("cdt_awd_pri_xps_type_map_id", cc.getCDTPrimitiveExpressionTypeMapID());
+                    CDTAllowedPrimitiveExpressionTypeMapVO vo = (CDTAllowedPrimitiveExpressionTypeMapVO) cdtAllowedPrimitiveExpressionTypeMapDao.findObject(qc_03);
 
-				if (cc.getCDTPrimitiveExpressionTypeMapID() > 0) {
-					primitiveType = "XSD Builtin Type";
+                    SRTDAO xsdBuiltInTypeDao = df.getDAO("XSDBuiltInType");
+                    QueryCondition qc_04 = new QueryCondition();
+                    qc_04.add("xbt_id", vo.getXSDBuiltInTypeID());
+                    XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO) xsdBuiltInTypeDao.findObject(qc_04);
+                    bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBDTPrimitiveRestrictionID());
+                } else {
+                    primitiveType = "Code List";
 
-					SRTDAO cdtAllowedPrimitiveExpressionTypeMapDao = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-					QueryCondition qc_03 = new QueryCondition();
-					qc_03.add("cdt_awd_pri_xps_type_map_id", cc.getCDTPrimitiveExpressionTypeMapID());
-					CDTAllowedPrimitiveExpressionTypeMapVO vo = (CDTAllowedPrimitiveExpressionTypeMapVO) cdtAllowedPrimitiveExpressionTypeMapDao.findObject(qc_03);
+                    SRTDAO codeListDao = df.getDAO("CodeList");
+                    QueryCondition qc_04 = new QueryCondition();
+                    qc_04.add("code_list_id", cc.getCodeListID());
+                    CodeListVO code = (CodeListVO) codeListDao.findObject(qc_04);
+                    bdtPrimitiveRestrictions.put(code.getName(), cc.getBDTPrimitiveRestrictionID());
+                }
+            }
+        } catch (SRTDAOException e) {
+            e.printStackTrace();
+        }
+        return bdtPrimitiveRestrictions;
+    }
 
-					SRTDAO xsdBuiltInTypeDao = df.getDAO("XSDBuiltInType");
-					QueryCondition qc_04 = new QueryCondition();
-					qc_04.add("xbt_id", vo.getXSDBuiltInTypeID());
-					XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO) xsdBuiltInTypeDao.findObject(qc_04);
-					bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBDTPrimitiveRestrictionID());
-				} else {
-					primitiveType = "Code List";
+    public void setBdtPrimitiveRestrictions(Map<String, Integer> bdtPrimitiveRestrictions) {
+        this.bdtPrimitiveRestrictions = bdtPrimitiveRestrictions;
+    }
 
-					SRTDAO codeListDao = df.getDAO("CodeList");
-					QueryCondition qc_04 = new QueryCondition();
-					qc_04.add("code_list_id", cc.getCodeListID());
-					CodeListVO code = (CodeListVO) codeListDao.findObject(qc_04);
-					bdtPrimitiveRestrictions.put(code.getName(), cc.getBDTPrimitiveRestrictionID());
-				}
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return bdtPrimitiveRestrictions;
-	}
+    public String getBdtName() {
+        return bdtName;
+    }
 
-	public void setBdtPrimitiveRestrictions(Map<String, Integer> bdtPrimitiveRestrictions) {
-		this.bdtPrimitiveRestrictions = bdtPrimitiveRestrictions;
-	}
+    public void setBdtName(String bdtName) {
+        this.bdtName = bdtName;
+    }
 
-	public String getBdtName() {
-		return bdtName;
-	}
+    public ABIEView(String name, int id, String type) {
+        this.name = name;
+        this.id = id;
+        this.type = type;
+    }
 
-	public void setBdtName(String bdtName) {
-		this.bdtName = bdtName;
-	}
+    public AssociationBusinessInformationEntity getAsbie() {
+        return asbie;
+    }
 
-	public ABIEView(String name, int id, String type) {
-		this.name = name;
-		this.id = id;
-		this.type = type;
-	}
+    public void setAsbie(AssociationBusinessInformationEntity asbie) {
+        this.asbie = asbie;
+    }
 
-	public ASBIEVO getAsbieVO() {
-		return asbieVO;
-	}
+    public AssociationCoreComponent getAscc() {
+        return ascc;
+    }
 
-	public void setAsbieVO(ASBIEVO asbieVO) {
-		this.asbieVO = asbieVO;
-	}
+    public void setAscc(AssociationCoreComponent ascc) {
+        this.ascc = ascc;
+    }
 
-	public ASCCVO getAsccVO() {
-		return asccVO;
-	}
+    public AssociationCoreComponentProperty getAsccp() {
+        return asccp;
+    }
 
-	public void setAsccVO(ASCCVO asccVO) {
-		this.asccVO = asccVO;
-	}
+    public void setAsccp(AssociationCoreComponentProperty asccp) {
+        this.asccp = asccp;
+    }
 
-	public ASCCPVO getAsccpVO() {
-		return asccpVO;
-	}
+    public AggregateCoreComponent getAcc() {
+        return acc;
+    }
 
-	public void setAsccpVO(ASCCPVO asccpVO) {
-		this.asccpVO = asccpVO;
-	}
+    public void setAcc(AggregateCoreComponent acc) {
+        this.acc = acc;
+    }
 
-	public ACCVO getAccVO() {
-		return accVO;
-	}
+    public AggregateBusinessInformationEntity getAbie() {
+        return abie;
+    }
 
-	public void setAccVO(ACCVO accVO) {
-		this.accVO = accVO;
-	}
+    public void setAbie(AggregateBusinessInformationEntity abie) {
+        this.abie = abie;
+    }
 
-	public ABIEVO getAbieVO() {
-		return abieVO;
-	}
+    public AssociationBusinessInformationEntityProperty getAsbiep() {
+        return asbiep;
+    }
 
-	public void setAbieVO(ABIEVO abieVO) {
-		this.abieVO = abieVO;
-	}
+    public void setAsbiep(AssociationBusinessInformationEntityProperty asbiep) {
+        this.asbiep = asbiep;
+    }
 
-	public ASBIEPVO getAsbiepVO() {
-		return asbiepVO;
-	}
+    public BasicCoreComponent getBcc() {
+        return bcc;
+    }
 
-	public void setAsbiepVO(ASBIEPVO asbiepVO) {
-		this.asbiepVO = asbiepVO;
-	}
+    public void setBcc(BasicCoreComponent bcc) {
+        this.bcc = bcc;
+    }
 
-	public BCCVO getBccVO() {
-		return bccVO;
-	}
+    public BasicBusinessInformationEntityProperty getBbiep() {
+        return bbiep;
+    }
 
-	public void setBccVO(BCCVO bccVO) {
-		this.bccVO = bccVO;
-	}
+    public void setBbiep(BasicBusinessInformationEntityProperty bbiep) {
+        this.bbiep = bbiep;
+    }
 
-	public BBIEPVO getBbiepVO() {
-		return bbiepVO;
-	}
+    public BasicBusinessInformationEntity getBbie() {
+        return bbie;
+    }
 
-	public void setBbiepVO(BBIEPVO bbiepVO) {
-		this.bbiepVO = bbiepVO;
-	}
+    public void setBbie(BasicBusinessInformationEntity bbie) {
+        this.bbie = bbie;
+    }
 
-	public BBIEVO getBbieVO() {
-		return bbieVO;
-	}
+    public BasicCoreComponentProperty getBccp() {
+        return bccp;
+    }
 
-	public void setBbieVO(BBIEVO bbieVO) {
-		this.bbieVO = bbieVO;
-	}
+    private void setBccp(BasicCoreComponentProperty bccp) {
+        this.bccp = bccp;
+    }
 
-	public BCCPVO getBccpVO() {
-		return bccpVO;
-	}
+    public void setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(
+            BasicCoreComponentProperty basicCoreComponentProperty,
+            BasicBusinessInformationEntity basicBusinessInformationEntity) {
+        setBccp(basicCoreComponentProperty);
+        setBbie(basicBusinessInformationEntity);
+    }
 
-	private void setBccpVO(BCCPVO bccpVO) {
-		this.bccpVO = bccpVO;
-	}
+    public DataTypeSupplementaryComponent getDtsc() {
+        return dtsc;
+    }
 
-	public void setBccpVO_BbieVO(BCCPVO bccpVO, BBIEVO bbieVO) {
-		setBccpVO(bccpVO);
-		setBbieVO(bbieVO);
-	}
+    public void setDtsc(DataTypeSupplementaryComponent dtsc) {
+        this.dtsc = dtsc;
+    }
 
-	public DTSCVO getDtscVO() {
-		return dtscVO;
-	}
+    public BasicBusinessInformationEntitySupplementaryComponent getBbiesc() {
+        return bbiesc;
+    }
 
-	public void setDtscVO(DTSCVO dtscVO) {
-		this.dtscVO = dtscVO;
-	}
+    public void setBbiesc(BasicBusinessInformationEntitySupplementaryComponent bbiesc) {
+        this.bbiesc = bbiesc;
+    }
 
-	public BBIE_SCVO getBbiescVO() {
-		return bbiescVO;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setBbiescVO(BBIE_SCVO bbiescVO) {
-		this.bbiescVO = bbiescVO;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getColor() {
+        return color;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setColor(String color) {
+        this.color = color;
+    }
 
-	public String getColor() {
-		return color;
-	}
+    //Eclipse Generated hashCode and equals
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((String.valueOf(id) == null) ? 0 : String.valueOf(id).hashCode());
+        return result;
+    }
 
-	public void setColor(String color) {
-		this.color = color;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ABIEView other = (ABIEView) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (id <= 0) {
+            if (other.id > 0)
+                return false;
+        } else if (id != other.id)
+            return false;
+        return true;
+    }
 
-	//Eclipse Generated hashCode and equals
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((String.valueOf(id) == null) ? 0 : String.valueOf(id).hashCode());
-		return result;
-	}
+    @Override
+    public String toString() {
+        return name;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ABIEView other = (ABIEView) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (id <= 0) {
-			if (other.id > 0)
-				return false;
-		} else if (id != other.id)
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	public int compareTo(ABIEView document) {
-		return this.getName().compareTo(document.getName());
-	}
+    public int compareTo(ABIEView document) {
+        return this.getName().compareTo(document.getName());
+    }
 } 

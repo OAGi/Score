@@ -1,37 +1,54 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.ContextCategoryVO;
-import org.oagi.srt.persistence.dto.ContextSchemeVO;
+import org.oagi.srt.repository.ContextCategoryRepository;
+import org.oagi.srt.repository.ContextSchemeRepository;
+import org.oagi.srt.repository.RepositoryFactory;
+import org.oagi.srt.repository.entity.ContextCategory;
+import org.oagi.srt.repository.entity.ContextScheme;
 import org.primefaces.event.RowEditEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
-@Scope("session")
+@Scope("view")
 @ManagedBean
+@ViewScoped
 public class ContextCategoryHandler extends UIHandler {
+
+	@Autowired
+	private RepositoryFactory repositoryFactory;
+	private ContextCategoryRepository contextCategoryRepository;
+	private ContextSchemeRepository contextSchemeRepository;
 
 	private String name;
 	private String description;
 	private String GUID;
 	private int id;
 
-	private List<SRTObject> contextCategories;
-	private SRTObject selectedCategory;
+	private List<ContextCategory> contextCategories;
+	private ContextCategory selectedCategory;
 	
-	private ContextCategoryVO contextCategory;
+	private ContextCategory contextCategory;
+
+	@PostConstruct
+	public void init() {
+		contextCategoryRepository = repositoryFactory.contextCategoryRepository();
+		contextSchemeRepository = repositoryFactory.contextSchemeRepository();
+	}
 
 	public String getName() {
 		return name;
@@ -48,7 +65,6 @@ public class ContextCategoryHandler extends UIHandler {
 	public void setGUID(String GUID) {
 		this.GUID = GUID;
 	}
-	
 
 	public int getId() {
 		return id;
@@ -66,21 +82,20 @@ public class ContextCategoryHandler extends UIHandler {
 		this.description = description;
 	}
 
-	public List<SRTObject> getContextCategories() {
-		try {	
-			contextCategories = daoCC.findObjects();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public List<ContextCategory> getContextCategories() {
+		contextCategories = contextCategoryRepository.findAll();
 		return contextCategories;
 	}
 
-	public void setContextCategories(List<SRTObject> contextCategories) {
+	public void refreshContextCategories() {
+		getContextCategories();
+	}
+
+	public void setContextCategories(List<ContextCategory> contextCategories) {
 		this.contextCategories = contextCategories;
 	}
 	
 	public void edit(ActionEvent actionEvent) {
-		
 		addMessage("Coming soon!!!");
 	}
 
@@ -93,118 +108,78 @@ public class ContextCategoryHandler extends UIHandler {
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public void createContextCategory() {
-		try {
-			ContextCategoryVO ccVO = new ContextCategoryVO();
-			ccVO.setName(this.name);
-			ccVO.setDescription(this.description);
-			ccVO.setContextCategoryGUID(Utility.generateGUID());
-			daoCC.insertObject(ccVO);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		ContextCategory contextCategory = new ContextCategory();
+		contextCategory.setName(this.name);
+		contextCategory.setDescription(this.description);
+		contextCategory.setGuid(Utility.generateGUID());
+		contextCategoryRepository.save(contextCategory);
 	}
 	
 	public List<String> completeInput(String query) {
-		List<String> results = new ArrayList<String>();
-
-		try {
-			contextCategories = daoCC.findObjects();
-			for(SRTObject obj : contextCategories) {
-				ContextCategoryVO ccVO = (ContextCategoryVO)obj;
-				if(ccVO.getName().contains(query)) {
-					results.add(ccVO.getName());
-				}
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		return results;
+		return getContextCategories().stream()
+				.filter(contextCategory -> contextCategory.getName().contains(query))
+				.map(contextCategory -> contextCategory.getName()).collect(Collectors.toList());
 	}
 
 	public List<String> completeDescription(String query) {
-		List<String> results = new ArrayList<String>();
-
-		try {
-			contextCategories = daoCC.findObjects();
-			for(SRTObject obj : contextCategories) {
-				ContextCategoryVO ccVO = (ContextCategoryVO)obj;
-				if(ccVO.getDescription().contains(query)) {
-					results.add(ccVO.getDescription());
-				}
-			}
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-
-		return results;
+		return getContextCategories().stream()
+				.filter(contextCategory -> contextCategory.getDescription().contains(query))
+				.map(contextCategory -> contextCategory.getDescription()).collect(Collectors.toList());
 	}
 
-	public ContextCategoryVO getContextCategory() {
+	public ContextCategory getContextCategory() {
 		return contextCategory;
 	}
 
-	public void setContextCategory(ContextCategoryVO contextCategory) {
+	public void setContextCategory(ContextCategory contextCategory) {
 		this.contextCategory = contextCategory;
 	}
-	
-    public SRTObject getselectedCategory() {
-        return selectedCategory;
+
+	public ContextCategory getSelectedCategory() {
+		return selectedCategory;
+	}
+
+	public void setSelectedCategory(ContextCategory selectedCategory) {
+		this.selectedCategory = selectedCategory;
+	}
+
+	public void onEdit(ContextCategory contextCategory) {
+    	this.id = contextCategory.getCtxCategoryId();
+    	this.GUID = contextCategory.getGuid();
+    	this.name = contextCategory.getName();
+    	this.description = contextCategory.getDescription();
     }
- 
-    public void setselectedCategory(SRTObject selectedCategory) {
-        this.selectedCategory = selectedCategory;
-    }
-    
-    public void onEdit(SRTObject obj) {
-    	ContextCategoryVO cVO = (ContextCategoryVO) obj;
-    	this.id = cVO.getContextCategoryID();
-    	this.GUID = cVO.getContextCategoryGUID();
-    	this.name = cVO.getName();
-    	this.description = cVO.getDescription();
-    }
-    
+
+	@Transactional(rollbackFor = Throwable.class)
     public void save() {
-    	ContextCategoryVO ccVO = new ContextCategoryVO();
-		ccVO.setName(this.name);
-		ccVO.setDescription(this.description);
-		ccVO.setContextCategoryGUID(this.GUID);
-		ccVO.setContextCategoryID(this.id);
-		
-		try {
-			daoCC.updateObject(ccVO);
-			contextCategories = daoCC.findObjects();
-			this.selectedCategory = ccVO;
-		} catch (SRTDAOException e) {
-			e.printStackTrace();
-		}
-		//this.selectedCategory = null;
+    	ContextCategory contextCategory = new ContextCategory();
+		contextCategory.setName(this.name);
+		contextCategory.setDescription(this.description);
+		contextCategory.setGuid(this.GUID);
+		contextCategory.setCtxCategoryId(this.id);
+
+		contextCategoryRepository.update(contextCategory);
+		refreshContextCategories();
+		setSelectedCategory(contextCategory);
     }
     
     public void cancel() {
     	this.selectedCategory = null;
     }
-    
+
+	@Transactional(rollbackFor = Throwable.class)
     public void delete(int id) {
-    	ContextCategoryVO ccVO = new ContextCategoryVO();
-		ccVO.setContextCategoryID(id);
-		
 		try {
-			daoCC.deleteObject(ccVO);
-			contextCategories = daoCC.findObjects();
-		} catch (SRTDAOException e) {
-			if(e.getLocalizedMessage().contains(SRTConstants.FOREIGNKEY_ERROR_MSG)) {
-				QueryCondition qc = new QueryCondition();
-				qc.add("ctx_category_id", id);
-				String msg = "";
-				try {
-					List<SRTObject> list = daoCS.findObjects(qc);
-					msg = partResult(list);
-				} catch (SRTDAOException e1) {
-					e1.printStackTrace();
-				}
-				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_CATEGORTY + msg,  null);
+			contextCategoryRepository.deleteByContextCategoryId(id);
+			refreshContextCategories();
+		} catch (DataAccessException e) {
+			if (e.getLocalizedMessage().contains(SRTConstants.FOREIGNKEY_ERROR_MSG)) {
+				List<ContextScheme> contextSchemes = contextSchemeRepository.findByContextCategoryId(id);
+				String msg = partResult(contextSchemes);
+
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_CATEGORTY + msg, null);
 				FacesContext.getCurrentInstance().addMessage(null, message);
 				this.selectedCategory = null;
 			} else {
@@ -213,35 +188,30 @@ public class ContextCategoryHandler extends UIHandler {
 		}
     }
     
-    private String partResult(List<SRTObject> list) {
+    private String partResult(List<ContextScheme> list) {
     	StringBuffer sb = new StringBuffer();
-    	for(SRTObject obj : list) {
-    		ContextSchemeVO vo = (ContextSchemeVO)obj;
-    		sb.append(vo.getSchemeName() + ", ");
+    	for(ContextScheme contextScheme : list) {
+    		sb.append(contextScheme.getSchemeName() + ", ");
     	}
     	String res = sb.toString();
     	return res.substring(0, res.lastIndexOf(","));
     }
-	
+
+	@Transactional(rollbackFor = Throwable.class)
     public void onRowEdit(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage("Context Category Edited  "+ ((ContextCategoryVO) event.getObject()).getName());
+        FacesMessage msg = new FacesMessage("Context Category Edited  "+ ((ContextCategory) event.getObject()).getName());
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
-        ContextCategoryVO ccVO = new ContextCategoryVO();
-		ccVO.setName(((ContextCategoryVO) event.getObject()).getName());
-		ccVO.setDescription(((ContextCategoryVO) event.getObject()).getDescription());
-		ccVO.setContextCategoryGUID(((ContextCategoryVO) event.getObject()).getContextCategoryGUID());
-		ccVO.setContextCategoryID(((ContextCategoryVO) event.getObject()).getContextCategoryID());
-		try {
-			daoCC.updateObject(ccVO);
-		} catch (SRTDAOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+        ContextCategory contextCategory = new ContextCategory();
+		contextCategory.setName(((ContextCategory) event.getObject()).getName());
+		contextCategory.setDescription(((ContextCategory) event.getObject()).getDescription());
+		contextCategory.setGuid(((ContextCategory) event.getObject()).getGuid());
+		contextCategory.setCtxCategoryId(((ContextCategory) event.getObject()).getCtxCategoryId());
+		contextCategoryRepository.update(contextCategory);
     }
      
     public void onRowCancel(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage("Edit Cancelled", ((SRTObject) event.getObject()).getObid());
+        FacesMessage msg = new FacesMessage("Edit Cancelled", ((ContextCategory) event.getObject()).getName());
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 }

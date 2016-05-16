@@ -37,30 +37,30 @@
 				</h:panelGrid>
 			</p:panel>
 			<p:panel header="Top-level Concept List">
-				<p:dataTable id="tbl" var="aSCCPVO" value="#{topLevelABIEHandler.asccpVOs}"
+				<p:dataTable id="tbl" var="aSCCP" value="#{topLevelABIEHandler.asccpVOs}"
 					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="20" style="width:900px; margin-bottom:20px" selection="#{topLevelABIEHandler.selected}" rowKey="#{aSCCPVO.ASCCPID}" selectionMode="single">
+					paginator="true" rows="20" style="width:900px; margin-bottom:20px" selection="#{topLevelABIEHandler.selected}" rowKey="#{aSCCP.asccpId}" selectionMode="single">
 					<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onRowSelect}" />
         			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onRowUnselect}" />
 					<p:column style="width:350px">
 						<f:facet name="header">
 							<h:outputText value="ASCCP Property Term" />
 						</f:facet>
-						<h:outputText value="#{aSCCPVO.propertyTerm}" />
+						<h:outputText value="#{aSCCP.propertyTerm}" />
 					</p:column>
 	
 					<p:column style="width:300px">
 						<f:facet name="header">
 							<h:outputText value="Module" />
 						</f:facet>
-						<h:outputText value="#{aSCCPVO.module}" />
+						<h:outputText value="#{aSCCP.module}" />
 					</p:column>
 					
 					<p:column style="width:180px">
 						<f:facet name="header">
 							<h:outputText value="Last Updated Time" />
 						</f:facet>
-						<h:outputText value="#{aSCCPVO.lastUpdateTimestamp}" />
+						<h:outputText value="#{aSCCP.lastUpdateTimestamp}" />
 					</p:column>
 				
 				</p:dataTable>
@@ -69,17 +69,17 @@
  
         <p:tab id="select_bc" title="Select Business Context">
        		<p:panel header="Selected Top-level Concept">
-                <p:dataTable var="aSCCPVO" value="#{topLevelABIEHandler.selected}" style="width:900px; margin-bottom:20px">
+                <p:dataTable var="aSCCP" value="#{topLevelABIEHandler.selected}" style="width:900px; margin-bottom:20px">
 				    <p:column headerText="ASCCP Property Term">
-				        <h:outputText value="#{aSCCPVO.propertyTerm}" />
+				        <h:outputText value="#{aSCCP.propertyTerm}" />
 				    </p:column>
 				 
 				    <p:column headerText="Module">
-				        <h:outputText value="#{aSCCPVO.module}" />
+				        <h:outputText value="#{aSCCP.module}" />
 				    </p:column>
 				 
 				    <p:column headerText="Last Updated Time">
-				        <h:outputText value="#{aSCCPVO.lastUpdateTimestamp}" />
+				        <h:outputText value="#{aSCCP.lastUpdateTimestamp}" />
 				    </p:column>
 				</p:dataTable>
             </p:panel>
@@ -89,15 +89,15 @@
             		<h:outputLabel id="selectedBC" value="#{topLevelABIEHandler.bCSelected.name}" style="font-weight:bold; color:blue;" />
             	</h:panelGrid>
                 <h:panelGrid columns="1" columnClasses="label, value">
-					<p:dataTable id="tbl1" var="BusinessContextVO" value="#{businessContextHandler.businessContexts}"
+					<p:dataTable id="tbl1" var="businessContext" value="#{businessContextHandler.businessContexts}"
 						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-						paginator="true" rows="10" style="width:400px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{BusinessContextVO.businessContextID}">
+						paginator="true" rows="10" style="width:400px; margin-bottom:20px" selection="#{businessContextHandler.bcDetail}" rowKey="#{businessContext.bizCtxId}">
 				        <p:column selectionMode="single" style="width:16px;text-align:center"/>
 						<p:column style="width:200px">
 							<f:facet name="header">
 								<h:outputText value="Name" />
 							</f:facet>
-							<h:outputText value="#{BusinessContextVO.name}" />
+							<h:outputText value="#{businessContext.name}" />
 						</p:column>
 						
 					</p:dataTable>
@@ -270,13 +270,13 @@
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
 									<h:outputLabel rows="10" value="Biz Term" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.abie.bizTerm}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" /> 
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.abie.remark}" />
 									
 									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abie.definition}">
 									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
@@ -317,7 +317,7 @@
 									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.remark}" />
 									
 									<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
-									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.businessTerm}" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.asbiepVO.bizTerm}" />
 									
 									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
 									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.asbiepVO.definition}">
@@ -329,13 +329,13 @@
 								</h:panelGrid>
 								<h:panelGrid columns="2" cellpadding="5">
 									<h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.abieVO.businessTerm}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.abie.bizTerm}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abieVO.remark}" />
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.abie.remark}" />
 									
 						            <h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abieVO.definition}">
+									<p:inputTextarea rows="2" cols="40" autoResize="false" value="#{topLevelABIEHandler.aABIEView.abie.definition}">
 									</p:inputTextarea>
 									
 								</h:panelGrid>
@@ -353,22 +353,22 @@
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
 									<h:outputLabel rows="10" value="Min:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMin}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.cardinalityMin}" />
 									
 									<h:outputLabel rows="10" value="Max:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.cardinalityMax}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.cardinalityMax}" />
 									
 									<h:outputLabel rows="10" value="Nillable:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.nillable}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.nillable}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.remark}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.remark}" />
 									
 									<h:outputLabel rows="10" value="Fixed value:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbieVO.fixedValue}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbie.fixedValue}" />
 									
 									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbieVO.definition}">
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbie.definition}">
 									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
@@ -377,13 +377,13 @@
 								</h:panelGrid>
 								<h:panelGrid columns="4" cellpadding="5">
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
-									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiepVO.remark}" /> 
+									<p:inputText style="width: 250px" value="#{topLevelABIEHandler.aABIEView.bbiep.remark}" />
 									
 									<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiepVO.businessTerm}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiep.bizTerm}" />
 									
 									<h:outputLabel rows="10" value="Definition:" style="font-weight:bold" />
-									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiepVO.definition}">
+									<p:inputTextarea rows="2" cols="30" autoResize="false" value="#{topLevelABIEHandler.aABIEView.bbiep.definition}">
 									</p:inputTextarea>
 								</h:panelGrid>
 								<p:separator />
@@ -406,7 +406,7 @@
 								<h:panelGrid columns="5" cellpadding="5">
 										<p:radioButton id="opt2" for="customRadio" itemIndex="1" />
 										<h:outputLabel rows="10" value="Code List: " style="font-weight:bold" />
-										<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeListVO.name}  " style="font-weight:bold; color: blue;" />
+										<h:outputLabel id="codeSelected" rows="10" value="#{topLevelABIEHandler.codeList.name}  " style="font-weight:bold; color: blue;" />
 									    
 									    <p:commandButton process="tbl" update=":form:codeListId" value="Code List" icon="ui-icon-extlink" oncomplete="PF('codeList').show()" disabled="#{(topLevelABIEHandler.aABIEView.primitiveType == 'XSD Builtin Type') ? 'false' : 'true'}" >
 									    </p:commandButton>
@@ -437,7 +437,7 @@
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.defaultText}" />
 									
 									<h:outputLabel rows="10" value="Business Term:" style="font-weight:bold" />
-									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.businessTerm}" />
+									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.bizTerm}" />
 									
 									<h:outputLabel rows="10" value="Remark:" style="font-weight:bold" />
 									<p:inputText value="#{topLevelABIEHandler.aABIEView.bbiescVO.remark}" />
@@ -483,7 +483,7 @@
 
 		            <p:dataTable id="tbl_01" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 						paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-		            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.codeListVO}" rowKey="#{cVO.codeListID}" selectionMode="single">
+		            	value="#{topLevelABIEHandler.codeLists}" selection="#{topLevelABIEHandler.codeList}" rowKey="#{cVO.codeListId}" selectionMode="single">
 						<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
 	        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
 		                <p:column style="width:400px">
@@ -497,7 +497,7 @@
 							<f:facet name="header">
 								<h:outputText value="Agency Id" />
 							</f:facet>
-							<h:outputText value="#{cVO.agencyID}" />
+							<h:outputText value="#{cVO.agencyId}" />
 						</p:column>
 		            </p:dataTable>
 		            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('derivedCodeList').hide()" />
@@ -515,7 +515,7 @@
 					</h:panelGrid>
 		            <p:dataTable id="tbl02" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 						paginator="true" rows="10" style="width:550px; margin-bottom:20px"
-		            	value="#{topLevelABIEHandler.codeLists2}" selection="#{topLevelABIEHandler.codeListVO}" rowKey="#{cVO.codeListID}" selectionMode="single">
+		            	value="#{topLevelABIEHandler.codeLists2}" selection="#{topLevelABIEHandler.codeList}" rowKey="#{cVO.codeListId}" selectionMode="single">
 						<p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onCodeListRowSelect}" />
 	        			<p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onCodeListRowUnselect}" />
 		                <p:column style="width:400px">
@@ -529,7 +529,7 @@
 							<f:facet name="header">
 								<h:outputText value="Agency Id" />
 							</f:facet>
-							<h:outputText value="#{cVO.agencyID}" />
+							<h:outputText value="#{cVO.agencyId}" />
 						</p:column>
 		            </p:dataTable>
 		            <p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('codeList').hide()" />
