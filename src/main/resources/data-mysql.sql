@@ -577,7 +577,7 @@ VALUES
   (58, '58', 'EUROFER', 'European steel organisation - EDI project for the', 1),
   (59, '59', 'European steel industry.', 'DE, EDIBAU', 1),
   (60, '60', 'National body responsible for the German codification in the construction area.', '', 1),
-  (61, '61', ' Aerospatial (AECMA)', 'A code to identify the Association Europeenne des Constructeurs de Materiel Aeropsatial (European Association of Aerospace Products Manufacturers) as an authorizing agency for code lists.', 1),
+  (61, '61', 'Aerospatial (AECMA)', 'A code to identify the Association Europeenne des Constructeurs de Materiel Aeropsatial (European Association of Aerospace Products Manufacturers) as an authorizing agency for code lists.', 1),
   (62, '62', 'US, DIstilled Spirits Council of the United States (DISCUS)', 'United States DIstilled Spirits Council of the United States (DISCUS).', 1),
   (63, '63', 'North Atlantic Treaty Organization (NATO)', 'A code to identify the North Atlantic Treaty Organization (NATO) as an authorizing agency for code lists.', 1),
   (64, '64', 'FR, EDIFRANCE', 'French association responsible for coordination and promotion of EDI application in France.', 1),
@@ -912,5 +912,6 @@ VALUES
   (393, '397', 'BE, FSMA', 'The Belgian Financial Services Market Authority, which delivers identifiers for, amongst others, Intermediaries in insurance business.', 1),
   (394, '398', 'FR, PHAST', 'French association responsible for standardization, coordination and promotion of EDI and Data Exchange applications in Health and Hospital sector.', 1),
   (395, 'ZZZ', 'Mutually defined', 'A code assigned within a code list to be used on an interim basis and as defined among trading partners until a precise code can be assigned to the code list.', 1);
+
 
 SET FOREIGN_KEY_CHECKS = 1;
