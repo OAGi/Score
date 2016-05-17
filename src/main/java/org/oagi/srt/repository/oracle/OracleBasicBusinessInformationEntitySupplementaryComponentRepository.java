@@ -11,6 +11,13 @@ import org.springframework.stereotype.Repository;
 public class OracleBasicBusinessInformationEntitySupplementaryComponentRepository extends
         BaseBasicBusinessInformationEntitySupplementaryComponentRepository {
 
+    private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(bbie_sc_id), 0) FROM bbie_sc";
+
+    @Override
+    public int findGreatestId() {
+        return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO bbie_sc (" +
             "bbie_sc_id, bbie_id, dt_sc_id, dt_sc_pri_restri_id, code_list_id, " +
             "agency_id_list_id, min_cardinality, max_cardinality, default_value, fixed_value, " +

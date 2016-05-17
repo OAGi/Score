@@ -11,6 +11,13 @@ import org.springframework.stereotype.Repository;
 public class OracleAssociationBusinessInformationEntityPropertyRepository
         extends BaseAssociationBusinessInformationEntityPropertyRepository {
 
+    private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(asbiep_id), 0) FROM asbiep";
+
+    @Override
+    public int findGreatestId() {
+        return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO asbiep (" +
             "asbiep_id, guid, based_asccp_id, role_of_abie_id, definition, remark, biz_term, " +
             "created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (" +

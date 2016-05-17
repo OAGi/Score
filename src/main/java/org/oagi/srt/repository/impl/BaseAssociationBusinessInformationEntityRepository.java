@@ -26,7 +26,7 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
         setJdbcTemplate(jdbcTemplate);
     }
 
-    private final String FIND_GREATEST_ID_STATEMENT = "SELECT MAX(asbie_id) FROM asbie";
+    private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(asbie_id), 0) FROM asbie";
 
     @Override
     public int findGreatestId() {

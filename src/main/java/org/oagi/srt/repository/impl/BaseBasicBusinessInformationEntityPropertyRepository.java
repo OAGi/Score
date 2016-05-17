@@ -25,7 +25,7 @@ public class BaseBasicBusinessInformationEntityPropertyRepository extends NamedP
         setJdbcTemplate(jdbcTemplate);
     }
 
-    private final String FIND_GREATEST_ID_STATEMENT = "SELECT MAX(bbiep_id) FROM bbiep";
+    private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(bbiep_id), 0) FROM bbiep";
 
     @Override
     public int findGreatestId() {

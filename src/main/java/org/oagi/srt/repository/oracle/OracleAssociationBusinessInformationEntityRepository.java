@@ -7,9 +7,18 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+
 @Repository
 public class OracleAssociationBusinessInformationEntityRepository
         extends BaseAssociationBusinessInformationEntityRepository {
+
+    private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(asbie_id), 0) FROM asbie";
+
+    @Override
+    public int findGreatestId() {
+        return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO asbie (" +
             "asbie_id, guid, from_abie_id, to_asbiep_id, based_ascc, definition, " +

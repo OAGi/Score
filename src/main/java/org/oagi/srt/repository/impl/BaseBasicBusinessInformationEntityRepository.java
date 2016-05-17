@@ -26,7 +26,7 @@ public class BaseBasicBusinessInformationEntityRepository extends NamedParameter
         setJdbcTemplate(jdbcTemplate);
     }
 
-    private final String FIND_GREATEST_ID_STATEMENT = "SELECT MAX(bbie_id) FROM bbie";
+    private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(bbie_id), 0) FROM bbie";
 
     @Override
     public int findGreatestId() {
