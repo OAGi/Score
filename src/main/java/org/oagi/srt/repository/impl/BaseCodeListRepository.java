@@ -126,6 +126,22 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 namedParameters, CodeListMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_GUID_STATEMENT = "SELECT " +
+            "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
+            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
+            "creation_timestamp, last_update_timestamp, state " +
+            "FROM code_list " +
+            "WHERE guid = :guid";
+
+    @Override
+    public CodeList findOneByGuid(String guid) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", guid);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_STATEMENT,
+                namedParameters, CodeListMapper.INSTANCE);
+    }
+
     private final String UPDATE_STATEMENT = "UPDATE code_list SET " +
             "guid = :guid, enum_type_guid = :enum_type_guid, name = :name, list_id = :list_id, agency_id = :agency_id, " +
             "version_id = :version_id, definition = :definition, remark = :remark, definition_source = :definition_source, " +

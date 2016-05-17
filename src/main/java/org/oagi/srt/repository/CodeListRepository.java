@@ -22,6 +22,8 @@ public interface CodeListRepository {
             String guid, String enumTypeGuid, int codeListId, String name, String definition
     );
 
+    public CodeList findOneByGuid(String guid);
+
     public void update(CodeList codeList);
 
     public void updateStateByCodeListId(String state, int codeListId);

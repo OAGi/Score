@@ -10,5 +10,7 @@ public interface AgencyIdListValueRepository {
 
     public AgencyIdListValue findOneByAgencyIdListValueId(int agencyIdListValueId);
 
+    public AgencyIdListValue findOneByValue(String value);
+
     public void save(AgencyIdListValue agencyIdListValue);
 }

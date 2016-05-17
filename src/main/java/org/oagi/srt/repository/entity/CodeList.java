@@ -2,8 +2,7 @@ package org.oagi.srt.repository.entity;
 
 import org.oagi.srt.common.SRTConstants;
 
-import java.sql.Date;
-
+import java.util.Date;
 
 public class CodeList {
 

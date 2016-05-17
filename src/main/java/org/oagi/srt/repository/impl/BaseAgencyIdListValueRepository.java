@@ -48,6 +48,20 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
                 FIND_ONE_BY_AGENCY_ID_LIST_VALUE_ID_STATEMENT, namedParameters, AgencyIdListValueMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_VALUE_STATEMENT = "SELECT " +
+            "agency_id_list_value_id, `value`, `name`, definition, owner_list_id " +
+            "FROM agency_id_list_value " +
+            "WHERE `value` = :value";
+
+    @Override
+    public AgencyIdListValue findOneByValue(String value) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("value", value);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_VALUE_STATEMENT, namedParameters, AgencyIdListValueMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO agency_id_list_value (" +
             "`value`, `name`, definition, owner_list_id) VALUES (" +
             ":value, :name, :definition, :owner_list_id)";
