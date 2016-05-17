@@ -199,7 +199,7 @@ public class P_1_3_PopulateAgencyIDList {
 				else {
 					fromXSD = fromXSD + "null";
 				}
-				if(definition!=null){
+				if(definition!=null && !definition.getTextContent().equals("")){
 					fromXSD = fromXSD + ((Element)definition).getTextContent();
 				}
 				else{

@@ -455,6 +455,15 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			unionExist =true;
 		}
 		
+		Node base = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/@base");
+		if(base==null){
+			base = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']/xsd:restriction/@base");
+		}
+		String baseName = "";
+		if(base!=null){
+			baseName = base.getTextContent();
+		}
+		
 		QueryCondition qc4defaultbdt = new QueryCondition();
 		qc4defaultbdt.add("guid", aElementBDT.getAttribute("id"));
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -503,7 +512,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				
 			}
 			
-			validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), unionExist);
+			validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), unionExist, baseName);
 		}		
 		
 		
@@ -586,7 +595,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		}
 		else {
 			System.out.println("$ $ $ Unqaulified BDT "+dataType+" is Valid");
-			validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false);
+			validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false, baseName);
 		}
 		
 		
@@ -667,7 +676,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 		XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 		
-		typeName = "ValueType_039C44";
+		typeName = dataType;
 		String type = "simple";
 		Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 		
@@ -937,6 +946,15 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 				System.out.println("Error getting the data type term for the unqualified BDT in the exception: " + dataType + " Stacktrace:" + e.getMessage());
 			}
 			
+			Node base = businessDataType_xsd.getNode("//xsd:complexType[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/@base");
+			if(base==null){
+				base = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']/xsd:restriction/@base");
+			}
+			String baseName = "";
+			if(base!=null){
+				baseName = base.getTextContent();
+			}
+			
 			//Definitions
 			Node definitionNode = businessDataType_xsd.getNode("//xsd:"+type+"Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
 			Element definitionElement = (Element)definitionNode;
@@ -1038,7 +1056,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			else {
 				System.out.println("# # # Default BDT "+typeName+ " (Exceptional BDT) is Valid");
 				
-				validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false);
+				validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false, baseName);
 			}		
 			
 			unqualifiedFromXSD = unqualifiedFromXSD + aElementTN.getAttribute("id");//guid
@@ -1119,7 +1137,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 			}
 			else {
 				System.out.println("$ $ $ Unqaulified BDT "+dataType+" (Exceptional BDT) is Valid");
-				validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false);
+				validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false, baseName);
 			}
 			
 		}
@@ -1241,7 +1259,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		else {
 			System.out.println("# # # Default BDT ValueType_039C44 (Exceptional BDT) is Valid");
 			
-			validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false);
+			validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDTID(), dtvoFromDB.getDTID(), false, "ValueType_039C44");
 		}		
 	}
 	
@@ -1282,9 +1300,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 		}
 	}
 	
-	private void validateInsertBDTPrimitiveRestriction(int cdtID, int bdtID, boolean unionExist) throws SRTDAOException {
+	private void validateInsertBDTPrimitiveRestriction(int basedtID, int bdtID, boolean unionExist, String baseName) throws SRTDAOException {
 		
 		DAOFactory df = DAOFactory.getDAOFactory();
+		SRTDAO aDTDAO = df.getDAO("DT");
 		SRTDAO aBDTPrimitiveRestrictionDAO = df.getDAO("BDTPrimitiveRestriction");
 		SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 		SRTDAO aCDTAllowedPrimitiveDAO = df.getDAO("CDTAllowedPrimitive");
@@ -1326,8 +1345,22 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 					System.out.println("         XBT: "+axbt.getBuiltInType());
 					System.out.println("     CDT_Pri: "+aCDTP.getName());
 				}
-				
+
 				if(aBDTVO.getisDefault()){
+					QueryCondition qc4checkDefault = new QueryCondition();
+					qc4checkDefault.add("dt_id", basedtID);
+					DTVO baseDTVO = (DTVO) aDTDAO.findObject(qc4checkDefault);
+
+					if(unionExist && baseDTVO.getDTType()==0){
+						if(!axbt.getBuiltInType().equals("xsd:token") ){//xsd:token but is not default
+							System.out.println("@@@@ xsd:token should be Default! Check DT_ID:" +bdtID);
+						}
+					}
+					else if(baseDTVO.getDTType()==0){
+						if(!axbt.getBuiltInType().equals(baseName)){
+							System.out.println("@@@@ "+baseName+" should be Default! Check DT_ID:" +bdtID);
+						}
+					}
 					defaultCnt ++;
 				}
 			}	

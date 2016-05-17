@@ -27,6 +27,7 @@ import org.oagi.srt.persistence.dao.DAOFactory;
 import org.oagi.srt.persistence.dao.SRTDAO;
 import org.oagi.srt.persistence.dao.SRTDAOException;
 import org.oagi.srt.persistence.dto.BDTSCPrimitiveRestrictionVO;
+import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
 import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveVO;
 import org.oagi.srt.persistence.dto.CDTPrimitiveVO;
 import org.oagi.srt.persistence.dto.CDTSCAllowedPrimitiveExpressionTypeMapVO;
@@ -82,8 +83,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 				if(attributeNodeList==null || attributeNodeList.getLength()<1){
 					attributeNodeList = xh.getNodeList("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
 				}
-				boolean checkOfAttr = false;
-				
 				for(int i = 0 ; i < attributeNodeList.getLength(); i++) {
 					DTSCVO vo = new DTSCVO();
 					int min_cardinality=-1;
@@ -93,28 +92,29 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					String attribute_id = attrElement.getAttribute("id");
 						
 					vo.setDTSCGUID(attribute_id);
-					Node propertyTermNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_PropertyTermName");
-					if(propertyTermNode==null){
-						propertyTermNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_PropertyTermName");
-					}
-					if(propertyTermNode!=null){
-						vo.setPropertyTerm(propertyTermNode.getTextContent());
-					}
-					
-					Node repTermNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_RepresentationTermName");
-					if(repTermNode==null){
-						repTermNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_RepresentationTermName");
-					}
-					if(repTermNode!=null){
-						vo.setRepresentationTerm(repTermNode.getTextContent());
-					}
-					Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
-					if(defNode==null){
-						defNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
-					}
-					if(defNode!=null){
-						vo.setDefinition(defNode.getTextContent());
-					}
+					vo.setOwnerDTID(dtVO.getDTID());
+//					Node propertyTermNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_PropertyTermName");
+//					if(propertyTermNode==null){
+//						propertyTermNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_PropertyTermName");
+//					}
+//					if(propertyTermNode!=null){
+//						vo.setPropertyTerm(propertyTermNode.getTextContent());
+//					}
+//					
+//					Node repTermNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_RepresentationTermName");
+//					if(repTermNode==null){
+//						repTermNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_RepresentationTermName");
+//					}
+//					if(repTermNode!=null){
+//						vo.setRepresentationTerm(repTermNode.getTextContent());
+//					}
+//					Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
+//					if(defNode==null){
+//						defNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
+//					}
+//					if(defNode!=null){
+//						vo.setDefinition(defNode.getTextContent());
+//					}
 					
 					if(attrElement.getAttribute("use")==null){
 						min_cardinality = 0;
@@ -140,32 +140,60 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					for(int j=0; j<cdtSCList.size(); j++){
 						
 						DTSCVO baseCDTSC = (DTSCVO) cdtSCList.get(j);
+						String basePropertyTerm = baseCDTSC.getPropertyTerm();
+						String baseRepresentationTerm = baseCDTSC.getRepresentationTerm();
+						String baseStr = basePropertyTerm + " "+baseRepresentationTerm;
+						String thisStr = Utility.spaceSeparator(attribute_name);
 						
-						if(baseCDTSC.getPropertyTerm().equals(vo.getPropertyTerm())){
+						System.out.println(baseStr+" vs "+thisStr);
+						if(baseStr.equals(thisStr)){
 							baseInd = j;
+							vo.setPropertyTerm(baseCDTSC.getPropertyTerm());
+							vo.setRepresentationTerm(baseCDTSC.getRepresentationTerm());
+							vo.setDefinition(baseCDTSC.getDefinition());
 							vo.setBasedDTSCID(baseCDTSC.getDTSCID());
 							break;
 						}
 					}
 					if(baseInd>-1){
 						cdtSCList.remove(baseInd);
-						System.out.println("This sc has corresponding base!");
+						System.out.println("~~~ "+vo.getPropertyTerm()+" "+vo.getRepresentationTerm()+". This sc has corresponding base!");
 						daoDTSC.insertObject(vo);
 					}
 					else{
-						System.out.println("This sc is new from Attribute!");
+						String propertyTerm = "";
+						String representationTerm = "";
+						String definition = "";
+						
+						propertyTerm = Utility.spaceSeparator(attribute_name);
+						representationTerm = Utility.getRepresentationTerm(attribute_name);
+						
+						Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
+						if(defNode==null){
+							defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation");
+						}
+						if(defNode==null){
+							defNode = xh.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
+						}
+						if(defNode!=null){
+							definition = defNode.getTextContent();
+						}
+
+						vo.setPropertyTerm(propertyTerm);
+						vo.setRepresentationTerm(representationTerm);
+						vo.setDefinition(definition);		
+						System.out.println("~~~ "+vo.getPropertyTerm()+" "+vo.getRepresentationTerm()+". This SC owned by default BDT is new from Attribute!");
 						daoDTSC.insertObject(vo);
 					}
 				}
 
-				//After the attribute loop
-				//Inherit from base because they don't have corresponding attributes
-				//Inherit from remain cdtSCList
-				
+				//Inherit From the remain SCs based on CDT because they don't have corresponding attributes
+				//Just copy and get the values from remain cdtSCList
 				for(int i=0; i<cdtSCList.size(); i++){
 					DTSCVO baseCDTSC = (DTSCVO) cdtSCList.get(i);
 					DTSCVO vo = new DTSCVO();
 
+					vo.setOwnerDTID(dtVO.getDTID());
 					vo.setDTSCGUID(Utility.generateGUID());
 					vo.setPropertyTerm(baseCDTSC.getPropertyTerm());
 					vo.setRepresentationTerm(baseCDTSC.getRepresentationTerm());
@@ -177,7 +205,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 					vo.setMinCardinality(0);
 					vo.setMaxCardinality(0);
 					vo.setBasedDTSCID(baseCDTSC.getDTSCID());
-					System.out.println("This sc is inherited from Base!");
+					System.out.println("~~~ "+baseCDTSC.getPropertyTerm()+" "+baseCDTSC.getRepresentationTerm()+". This SC owned by default BDT is inherited from Base!");
 					daoDTSC.insertObject(vo);
 				}
 			}
@@ -201,7 +229,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 			
 			// default BDT
 			if(dtVO2.getDTType() == 0) {
-				System.out.println("Popuating SCs for default BDT with type = "+Utility.denToTypeName(dtVO.getDEN()));
+				System.out.println("Validating SCs for default BDT with type = "+Utility.denToTypeName(dtVO.getDEN()));
 				//Inherit from based CDT
 				ArrayList<String> fromXSDwAttrs =new ArrayList<String>();
 				ArrayList<String> fromDBwAttrs= new ArrayList<String>();
@@ -306,71 +334,76 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 						}
 					}
 				}
-				else {//Copy the CDT's SC
-					//Check two are same
-				}
+				//Copy the CDT's SC
+				//Check BDT SC >= CDT SC (it could be if it's from attr)
+					
+				QueryCondition qc4CDTSC = new QueryCondition();
+				qc4CDTSC.add("owner_dt_id", dtVO.getBasedDTID());
+				ArrayList<SRTObject> CDTSCs = daoDTSC.findObjects(qc4CDTSC);
 				
-				ArrayList<String> cdtSCs = new ArrayList<String>();
-				ArrayList<String> bdtSCs = new ArrayList<String>();
-				
-				qc = new QueryCondition();
-				qc.add("owner_dt_id", dtVO2.getDTID());
-				ArrayList<SRTObject> cdtSCList = daoDTSC.findObjects(qc, conn);
-				ArrayList<String> CDTSCPropertyTermList = new ArrayList<String>();
-				for(SRTObject dt : cdtSCList) {
-					DTSCVO cdtscvo = (DTSCVO) dt;
-					DTSCVO vo = new DTSCVO();
-					System.out.println("Inheriting from based CDTs from "+cdtscvo.getPropertyTerm());
+				QueryCondition qc4BDTSC = new QueryCondition();
+				qc4BDTSC.add("owner_dt_id", dtVO.getDTID());
+				ArrayList<SRTObject> BDTSCs = daoDTSC.findObjects(qc4BDTSC);
 					
-					String cdtsc = "";
-					cdtsc = cdtsc + cdtscvo.getPropertyTerm();
-					cdtsc = cdtsc + cdtscvo.getRepresentationTerm();
-					cdtsc = cdtsc + cdtscvo.getDefinition();
-					cdtsc = cdtsc + cdtscvo.getMinCardinality();
-					cdtsc = cdtsc + cdtscvo.getMaxCardinality();
-					
-					
-					vo.setBasedDTSCID(cdtscvo.getDTSCID());
-					vo.setPropertyTerm(cdtscvo.getPropertyTerm());
-					vo.setRepresentationTerm(cdtscvo.getRepresentationTerm());
-					vo.setDefinition(cdtscvo.getDefinition());
-					vo.setOwnerDTID(dtVO.getDTID());
-					vo.setBasedDTSCID(cdtscvo.getDTSCID());
-					CDTSCPropertyTermList.add(cdtscvo.getPropertyTerm().replaceAll(" ", "").toLowerCase());
-					int min_cardinality = 0, max_cardinality = 0;
+				for(int i=CDTSCs.size()-1; i>-1; i--){
+					DTSCVO cdtscVO = (DTSCVO) CDTSCs.get(i);
+					System.out.print("    Default SC:"+cdtscVO.getPropertyTerm() +" "+ cdtscVO.getRepresentationTerm());
+					for(int j=0; j<BDTSCs.size(); j++){
+						
+						DTSCVO bdtscVO = (DTSCVO) BDTSCs.get(j);
 
-				
-					boolean checkOfAttr = false;
-					for(int i = 0 ; i < attributeNodeList.getLength(); i++) {
-						Element attrElement = (Element)attributeNodeList.item(i);
-						String attribute_name = attrElement.getAttribute("name");
-						if(attribute_name.toLowerCase().startsWith(cdtscvo.getPropertyTerm().replaceAll(" ", "").toLowerCase())){
-							if(attrElement.getAttribute("use") == null || attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
-								min_cardinality = 0;
-							else if(attrElement.getAttribute("use").equalsIgnoreCase("required"))
-								min_cardinality = 1;
-							vo.setMinCardinality(min_cardinality);
+						if(cdtscVO.getPropertyTerm().equals(bdtscVO.getPropertyTerm())
+						&& cdtscVO.getRepresentationTerm().equals(bdtscVO.getRepresentationTerm())
+						&& cdtscVO.getDefinition().equals(bdtscVO.getDefinition())
+						&& cdtscVO.getDTSCID()==bdtscVO.getBasedDTSCID()){
+							System.out.print(" has corresponding Attr= "+cdtscVO.getPropertyTerm() +" "+ cdtscVO.getRepresentationTerm());
+							Node attrCheckNode = xh2.getNode("//xsd:complexType/xsd:simpleContent/xsd:extension/xsd:attribute[@id = '" + bdtscVO.getDTSCGUID() + "']");
+							if(attrCheckNode==null){
+								attrCheckNode = xh.getNode("//xsd:complexType/xsd:simpleContent/xsd:extension/xsd:attribute[@id = '" + bdtscVO.getDTSCGUID() + "']");
+							}
 							
-							if(attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("required"))
-								max_cardinality = 1;
-							else if(attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
-								max_cardinality = 0;
-							vo.setMaxCardinality(max_cardinality);
-							vo.setDTSCGUID(attrElement.getAttribute("id"));
-							System.out.println("There is corresponing xsd:attribute");
-							daoDTSC.insertObject(vo);
-							checkOfAttr = true;
-							break;
+							if(attrCheckNode!=null){
+								Element ele = (Element) attrCheckNode;
+								if(ele.getAttribute("use")==null){
+									if(bdtscVO.getMinCardinality()==0 && bdtscVO.getMaxCardinality() == 1){
+										CDTSCs.remove(i);
+										break;
+									}
+								}
+								else if(ele.getAttribute("use").equalsIgnoreCase("optional")) {
+									if(bdtscVO.getMinCardinality()==0 && bdtscVO.getMaxCardinality() == 1){
+										CDTSCs.remove(i);
+										break;
+									}
+								}
+								else if(ele.getAttribute("use").equalsIgnoreCase("required")) {
+									if(bdtscVO.getMinCardinality()==1 && bdtscVO.getMaxCardinality() == 1){
+										CDTSCs.remove(i);
+										break;
+									}
+								}
+								else if(ele.getAttribute("use").equalsIgnoreCase("prohibited")) {
+									if(bdtscVO.getMinCardinality()==0 && bdtscVO.getMaxCardinality() == 0){
+										CDTSCs.remove(i);
+										break;
+									}
+								}
+							}
+							else {
+								if(bdtscVO.getMinCardinality()==0 && bdtscVO.getMaxCardinality() == 0){
+									CDTSCs.remove(i);
+									break;
+								}
+							}
 						}
 					}
-
-					if(!checkOfAttr){
-						vo.setMinCardinality(min_cardinality);
-						vo.setMaxCardinality(max_cardinality);
-						vo.setDTSCGUID(Utility.generateGUID());
-						System.out.println("There is no corresponing xsd:attribute for SC whose property term = "+ vo.getPropertyTerm());
-						daoDTSC.insertObject(vo);
-					}
+					System.out.println("");
+					
+				}
+				
+				for(int i=CDTSCs.size()-1; i>-1; i--){
+					DTSCVO cdtscVO = (DTSCVO) CDTSCs.get(i);
+					System.out.println("@@@@ "+cdtscVO.getPropertyTerm() + " " + cdtscVO.getRepresentationTerm() + " is not imported! Check Default BDT: "+dtVO.getDTGUID());
 				}
 			}
 		}
@@ -382,7 +415,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 		SRTDAO daoDTSC = df.getDAO("DTSC");
 		//SRTDAO aBDTSCPrimitiveRestrictionDAO = df.getDAO("BDTSCPrimitiveRestriction");
 		SRTDAO aCDTSCAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-		//SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
+		SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 		SRTDAO aCDTSCAllowedPrimitiveDAO = df.getDAO("CDTSCAllowedPrimitive");
 		SRTDAO aCDTAllowedPrimitiveDAO = df.getDAO("CDTAllowedPrimitive");
 		SRTDAO aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
@@ -432,22 +465,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 				int based_dt_id = basedDtVO.getDTID();
 				qc = new QueryCondition();
 				qc.add("owner_dt_id", based_dt_id);
-				List<SRTObject> dtscVOs = daoDTSC.findObjects(qc, conn);
-				for(SRTObject dtscObject: dtscVOs) { // copy all SCs from its based default BDT  
-					DTSCVO dtscVO = (DTSCVO)dtscObject;
-					DTSCVO vo = new DTSCVO();
-					System.out.println("Inheriting from based default BDTs from "+dtscVO.getPropertyTerm());
-					vo.setDTSCGUID(Utility.generateGUID());  // set new GUID
-					vo.setPropertyTerm(dtscVO.getPropertyTerm());
-					vo.setRepresentationTerm(dtscVO.getRepresentationTerm());
-					vo.setDefinition((dtscVO.getDefinition()));
-					vo.setOwnerDTID(dtVO.getDTID());
-					vo.setMinCardinality(dtscVO.getMinCardinality());
-					vo.setMaxCardinality(dtscVO.getMaxCardinality());
-					vo.setBasedDTSCID(dtscVO.getDTSCID());
-					daoDTSC.insertObject(vo);
-				}
-				
+				List<SRTObject> baseDefaultDTSCs = daoDTSC.findObjects(qc, conn);
 				
 				//adding additional SCs for attributes
 				NodeList attributeList = xh2.getNodeList("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -456,170 +474,180 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 				}
 				int min_cardinality = 0;
 				int max_cardinality = 1;
+				
 				for(int i = 0; i < attributeList.getLength(); i++) {
-					Node attribute = attributeList.item(i);
-					Element attrElement = (Element)attribute;
-					System.out.println("Populating SCs from attributes in unqualified BDTs.. attribute name = "+attrElement.getAttribute("name"));
-					DTSCVO vo = new DTSCVO();
-					vo.setDTSCGUID(attrElement.getAttribute("id"));
-					
+					Element attrElement = (Element)attributeList.item(i);
 					String attribute_name = attrElement.getAttribute("name");
-					Node definitionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attribute_name + "']/xsd:annotation/xsd:documentation");
-					String definition = definitionNode == null? "": definitionNode.getTextContent();
-					vo.setPropertyTerm(Utility.spaceSeparator(attribute_name));
-					vo.setRepresentationTerm(Utility.getRepresentationTerm(attribute_name));
-					vo.setDefinition(definition);
+					String attribute_id = attrElement.getAttribute("id");
+					
+					DTSCVO vo = new DTSCVO();
 					vo.setOwnerDTID(dtVO.getDTID());
+					vo.setDTSCGUID(attribute_id);
+					if(attrElement.getAttribute("use")==null){
+						min_cardinality=0;
+						max_cardinality=1;
+					}
+					else if(attrElement.getAttribute("use").equalsIgnoreCase("optional")){
+						min_cardinality=0;
+						max_cardinality=1;
+					}
+					else if(attrElement.getAttribute("use").equalsIgnoreCase("required")){
+						min_cardinality=1;
+						max_cardinality=1;
+					}
+					else if(attrElement.getAttribute("use").equalsIgnoreCase("prohibited")){
+						min_cardinality=0;
+						max_cardinality=0;
+					}
 					
-					if(attrElement.getAttribute("use") == null || attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
-						min_cardinality = 0;
-					else if(attrElement.getAttribute("use").equalsIgnoreCase("required"))
-						min_cardinality = 1;
 					vo.setMinCardinality(min_cardinality);
-					
-					if(attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("required"))
-						max_cardinality = 1;
-					else if(attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
-						min_cardinality = 0;
 					vo.setMaxCardinality(max_cardinality);
-					daoDTSC.insertObject(vo);
-					if(attrElement.getAttribute("type").endsWith("CodeContentType")){
+					
+					
+					int baseInd = -1;
+					
+					for(int j=0; j<baseDefaultDTSCs.size(); j++){
+						DTSCVO baseDefaultBDTSC = (DTSCVO)baseDefaultDTSCs.get(j);
+						String basePropertyTerm = baseDefaultBDTSC.getPropertyTerm();
+						String baseRepresentationTerm = baseDefaultBDTSC.getRepresentationTerm();
+						String baseStr = basePropertyTerm + " "+baseRepresentationTerm;
+						String thisStr = Utility.spaceSeparator(attribute_name);
 						
-						QueryCondition qc_04 = new QueryCondition();
-						qc_04.add("Data_Type_Term", vo.getRepresentationTerm());
-						qc_04.add("Type", 0);
-						DTVO cdtVO = (DTVO) aDTDAO.findObject(qc_04, conn);
-						QueryCondition qc_05 = new QueryCondition();
-						qc_05.add("CDT_ID", cdtVO.getDTID()); 
-						qc_05.add("is_default", 1);
-						ArrayList<SRTObject> cdtawdprilist = aCDTAllowedPrimitiveDAO.findObjects(qc_05);
-						for(SRTObject acdtawdprilist : cdtawdprilist) {
-							CDTAllowedPrimitiveVO aCDTAPVO = (CDTAllowedPrimitiveVO) acdtawdprilist;
-							if(aCDTAPVO.getCDTPrimitiveID() != 0){
-								CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
-								QueryCondition qc_055 = new QueryCondition();
-								qc_055.add("guid", vo.getDTSCGUID());
-								int cdt_sc_id = ((DTSCVO)daoDTSC.findObject(qc_055, conn)).getDTSCID();
-								
-								aVO.setCDTSCID(cdt_sc_id);
-								aVO.setCDTPrimitiveID(aCDTAPVO.getCDTPrimitiveID());
-								aVO.setisDefault(aCDTAPVO.getisDefault());
-								aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
-								QueryCondition qc_051 = new QueryCondition();
-								qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
-								qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-								CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
-								int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
-
-								String xsd_builtin_type = "xsd:token";
-								CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-								bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
-								QueryCondition qc_07 = new QueryCondition();
-								qc_07.add("BuiltIn_Type", xsd_builtin_type);
-								XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
-								bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
-								System.out.println("Inserting CDT SC Allowed Primitive Expresssion Typemap for new SC whose property term = "+vo.getPropertyTerm()+", expression type map = "+xsd_builtin_type);
-								aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
-							}
+						System.out.println(baseStr+" vs "+thisStr);
+						if(baseStr.equals(thisStr)){
+							baseInd = j;
+							vo.setPropertyTerm(baseDefaultBDTSC.getPropertyTerm());
+							vo.setRepresentationTerm(baseDefaultBDTSC.getRepresentationTerm());
+							vo.setDefinition(baseDefaultBDTSC.getDefinition());
+							vo.setBasedDTSCID(baseDefaultBDTSC.getDTSCID());
+							break;
 						}
 					}
-					else {
-						QueryCondition qc_04 = new QueryCondition();
-						qc_04.add("Data_Type_Term", vo.getRepresentationTerm());
-						qc_04.add("Type", 0);
-						DTVO cdtVO = (DTVO) aDTDAO.findObject(qc_04, conn);
-						QueryCondition qc_05 = new QueryCondition();
-						qc_05.add("CDT_ID", cdtVO.getDTID()); 
-						ArrayList<SRTObject> cdtawdprilist = aCDTAllowedPrimitiveDAO.findObjects(qc_05);
-						for(SRTObject acdtawdprilist : cdtawdprilist) {
-							CDTAllowedPrimitiveVO aCDTAPVO = (CDTAllowedPrimitiveVO) acdtawdprilist;
-							if(aCDTAPVO.getCDTPrimitiveID() != 0){
-								CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
-								QueryCondition qc_055 = new QueryCondition();
-								qc_055.add("guid", vo.getDTSCGUID());
-								int cdt_sc_id = ((DTSCVO)daoDTSC.findObject(qc_055, conn)).getDTSCID();
-								
-								aVO.setCDTSCID(cdt_sc_id);
-								aVO.setCDTPrimitiveID(aCDTAPVO.getCDTPrimitiveID());
-								aVO.setisDefault(aCDTAPVO.getisDefault());
-								aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
-								
-								QueryCondition qc_051 = new QueryCondition();
-								qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
-								qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-								CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
-								int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
-								
-								QueryCondition qc_06 = new QueryCondition();
-								qc_06.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-								CDTPrimitiveVO aCDTPrimitiveVO = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc_06);
-								String cdt_primitive_name = aCDTPrimitiveVO.getName();
-								ArrayList<String> xsd_builtin_type = new ArrayList<String>();
-	
-								if(cdt_primitive_name.equals("Binary")){
-									xsd_builtin_type.add("xsd:base64Binary");
-									xsd_builtin_type.add("xsd:hexBinary");
-								}
-								else if(cdt_primitive_name.equals("Boolean")){
-									xsd_builtin_type.add("xsd:Boolean");
-								}
-								else if(cdt_primitive_name.equals("Decimal")){
-									xsd_builtin_type.add("xsd:decimal");
-								}
-								else if(cdt_primitive_name.equals("Double")){
-									xsd_builtin_type.add("xsd:double");
-									xsd_builtin_type.add("xsd:float");
-								}
-								else if(cdt_primitive_name.equals("Float")){
-									xsd_builtin_type.add("xsd:float");
-								}
-								else if(cdt_primitive_name.equals("Integer")){
-									xsd_builtin_type.add("xsd:integer");
-									xsd_builtin_type.add("xsd:nonNegativeInteger");
-									xsd_builtin_type.add("xsd:positiveInteger");
-								}
-								else if(cdt_primitive_name.equals("NormalizedString")){
-									xsd_builtin_type.add("xsd:normalizedString");
-								}
-								else if(cdt_primitive_name.equals("String")){
-									xsd_builtin_type.add("xsd:string");
-								}
-								else if(cdt_primitive_name.equals("TimeDuration")){
-									xsd_builtin_type.add("xsd:token");
-									xsd_builtin_type.add("xsd:duration");
-								}
-								else if(cdt_primitive_name.equals("TimePoint")){
-									xsd_builtin_type.add("xsd:token");
-									xsd_builtin_type.add("xsd:dateTime");
-									xsd_builtin_type.add("xsd:date");
-									xsd_builtin_type.add("xsd:time");
-									xsd_builtin_type.add("xsd:gYearMonth");
-									xsd_builtin_type.add("xsd:gYear");
-									xsd_builtin_type.add("xsd:gMonthDay");
-									xsd_builtin_type.add("xsd:gDay");
-									xsd_builtin_type.add("xsd:gMonth");
-								}
-								else if(cdt_primitive_name.equals("Token")){
-									xsd_builtin_type.add("xsd:token");
-								}
+					
+					if(baseInd>-1){
+						baseDefaultDTSCs.remove(baseInd);
+						System.out.println("~~~"+vo.getPropertyTerm()+" "+vo.getRepresentationTerm()+". This SC owned by unqualified BDT has corresponding base!");
+						daoDTSC.insertObject(vo);
+					}
+					else{
+						
+						String propertyTerm = "";
+						String representationTerm = "";
+						String definition = "";
+						
+						propertyTerm = Utility.spaceSeparator(attribute_name);
+						if(!is_fields_xsd){
+							propertyTerm = Utility.spaceSeparatorBeforeStr(attribute_name, "Code");
+						}
+						representationTerm = Utility.getRepresentationTerm(attribute_name);
+						
+						Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
+						if(defNode==null){
+							defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation");
+						}
+						if(defNode!=null){
+							definition = defNode.getTextContent();
+						}
+						
+						vo.setPropertyTerm(propertyTerm);
+						vo.setRepresentationTerm(representationTerm);
+						vo.setDefinition(definition);		
+						System.out.println("~~~"+vo.getPropertyTerm()+" "+vo.getRepresentationTerm()+". This SC owned by unqualified BDT is new from Attribute!");
+
+						daoDTSC.insertObject(vo);
+						
+						//if it has new attribute extension, 
+						//it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map					
+						DTSCVO insertedSCVO = new DTSCVO();
+						QueryCondition qc4SC = new QueryCondition();
+						qc4SC.add("guid", vo.getDTSCGUID());
+						insertedSCVO = (DTSCVO) daoDTSC.findObject(qc4SC);
+						
+						ArrayList<SRTObject> DTVOwDataTypeTerm = new ArrayList<SRTObject>();
+						QueryCondition qc4DTwDataTypeTerm = new QueryCondition();
+						qc4DTwDataTypeTerm.add("data_type_term", vo.getRepresentationTerm());
+						DTVOwDataTypeTerm = dao.findObjects(qc4DTwDataTypeTerm);
+						
+						for(int j=0; j<DTVOwDataTypeTerm.size(); j++){						
+							DTVO aDTVO = (DTVO) DTVOwDataTypeTerm.get(j);
+							ArrayList<SRTObject> CDTAwdPriVOs = new ArrayList<SRTObject>();
+							QueryCondition qc4CDTAwdPris = new QueryCondition();
+							qc4CDTAwdPris.add("CDT_ID", aDTVO.getDTID());
+							CDTAwdPriVOs = aCDTAllowedPrimitiveDAO.findObjects(qc4CDTAwdPris);
+							
+							if(CDTAwdPriVOs.size() > 0 && !CDTAwdPriVOs.isEmpty()){
+								for(int k=0;k<CDTAwdPriVOs.size(); k++){
+									CDTSCAllowedPrimitiveVO cdtSCAP = new CDTSCAllowedPrimitiveVO();
+									CDTAllowedPrimitiveVO cdtAP = (CDTAllowedPrimitiveVO) CDTAwdPriVOs.get(k);
+									cdtSCAP.setCDTSCID(insertedSCVO.getDTSCID());
+									cdtSCAP.setCDTPrimitiveID(cdtAP.getCDTPrimitiveID());
+									cdtSCAP.setisDefault(cdtAP.getisDefault());
 									
-								for(int l = 0 ; l < xsd_builtin_type.size(); l++){
-									CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-									bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
-									QueryCondition qc_07 = new QueryCondition();
-									qc_07.add("BuiltIn_Type", xsd_builtin_type.get(l));
-									XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
-									bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
-									System.out.println("Inserting CDT SC Allowed Primitive Expresssion Typemap for new SC whose property term = "+vo.getPropertyTerm()+", expression type map = "+xsd_builtin_type.get(l));
-									aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
+									QueryCondition qc4pri = new QueryCondition();
+									qc4pri.add("cdt_pri_id", cdtAP.getCDTPrimitiveID());
+									CDTPrimitiveVO tmpPri = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc4pri);
+
+									
+									String expressionLanguageOrActionCode = "";
+									expressionLanguageOrActionCode= insertedSCVO.getPropertyTerm();
+									
+									System.out.print("   ~~~"+insertedSCVO.getPropertyTerm()+" "+insertedSCVO.getRepresentationTerm()+" is "+tmpPri.getName());
+									if(cdtSCAP.getisDefault()){
+										System.out.println(" and it's Default!");
+									}
+									else{
+										System.out.println("");
+									}
+									
+									aCDTSCAllowedPrimitiveDAO.insertObject(cdtSCAP);		
+										
+									CDTSCAllowedPrimitiveVO insertedCDTSCAP = new CDTSCAllowedPrimitiveVO();
+									QueryCondition qc4SCAP = new QueryCondition();
+									qc4SCAP.add("CDT_SC_ID", cdtSCAP.getCDTSCID());
+									qc4SCAP.add("CDT_Pri_id", cdtSCAP.getCDTPrimitiveID());
+									insertedCDTSCAP = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc4SCAP);
+									
+									QueryCondition qc4XTMap = new QueryCondition();
+									qc4XTMap.add("CDT_awd_pri_id", cdtAP.getCDTAllowedPrimitiveID());
+									ArrayList<SRTObject> cdtAPXTMs = aCDTAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc4XTMap);
+									for(int m=0; m<cdtAPXTMs.size(); m++){
+										CDTAllowedPrimitiveExpressionTypeMapVO thisAPXTmap= (CDTAllowedPrimitiveExpressionTypeMapVO) cdtAPXTMs.get(m);
+										CDTSCAllowedPrimitiveExpressionTypeMapVO tmp = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+										tmp.setXSDBuiltInTypeID(thisAPXTmap.getXSDBuiltInTypeID());
+										tmp.setCDTSCAllowedPrimitive(insertedCDTSCAP.getCDTSCAllowedPrimitiveID());
+										aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(tmp);
+									}
 								}
+								break;//if this is hit, that means dt sc is mapped to cdt sc
 							}
 						}
 					}
 				}
+
+				//Inherit From the remain SCs based on default bdt because they don't have corresponding attributes
+				//Just copy and get the values from remain baseDefaultDTSCs
+				for(int i=0; i<baseDefaultDTSCs.size(); i++){
+					DTSCVO baseDefaultBDTSC = (DTSCVO) baseDefaultDTSCs.get(i);
+					DTSCVO vo = new DTSCVO();
+					vo.setOwnerDTID(dtVO.getDTID());
+					vo.setDTSCGUID(Utility.generateGUID());
+					vo.setPropertyTerm(baseDefaultBDTSC.getPropertyTerm());
+					vo.setRepresentationTerm(baseDefaultBDTSC.getRepresentationTerm());
+					vo.setDefinition(baseDefaultBDTSC.getDefinition());
+					
+					//we already know it doesn't have attributes
+					//so according to design doc, 
+					//inherit the values of default BDT sc's min_cardinality, max_cardinality
+					vo.setMinCardinality(baseDefaultBDTSC.getMinCardinality());
+					vo.setMaxCardinality(baseDefaultBDTSC.getMaxCardinality());
+					vo.setBasedDTSCID(baseDefaultBDTSC.getDTSCID());
+					System.out.println("~~~"+vo.getPropertyTerm()+" "+vo.getRepresentationTerm()+". This SC owned by unqualified BDT is inherited from Base!");
+					daoDTSC.insertObject(vo);
+				}
 			}
 		}
 	}
+	
 	
 	public void validatePopulateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, Connection conn, boolean is_fields_xsd) throws SRTDAOException, XPathExpressionException{
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -627,7 +655,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 		SRTDAO daoDTSC = df.getDAO("DTSC");
 		//SRTDAO aBDTSCPrimitiveRestrictionDAO = df.getDAO("BDTSCPrimitiveRestriction");
 		SRTDAO aCDTSCAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-		//SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
+		SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
 		SRTDAO aCDTSCAllowedPrimitiveDAO = df.getDAO("CDTSCAllowedPrimitive");
 		SRTDAO aCDTAllowedPrimitiveDAO = df.getDAO("CDTAllowedPrimitive");
 		SRTDAO aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
@@ -656,9 +684,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 			DTVO dtVO2 = (DTVO)dao.findObject(qc, conn);
 			// unqualified BDT
 			if(dtVO2.getDTType() != 0) {
-				//inheritance
 				String denType = Utility.DenToName(dtVO.getDEN());
-				System.out.println("Popuating SCs for unqualified bdt with type = "+denType);
+				System.out.println("Validating SCs for unqualified bdt with type = "+denType);
 				Node extensionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");
 				if(extensionNode == null)
 					extensionNode = xh2.getNode("//xsd:simpleType[@name = '" + denType + "']/xsd:restriction");
@@ -677,22 +704,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 				int based_dt_id = basedDtVO.getDTID();
 				qc = new QueryCondition();
 				qc.add("owner_dt_id", based_dt_id);
-				List<SRTObject> dtscVOs = daoDTSC.findObjects(qc, conn);
-				for(SRTObject dtscObject: dtscVOs) { // copy all SCs from its based default BDT  
-					DTSCVO dtscVO = (DTSCVO)dtscObject;
-					DTSCVO vo = new DTSCVO();
-					System.out.println("Inheriting from based default BDTs from "+dtscVO.getPropertyTerm());
-					vo.setDTSCGUID(Utility.generateGUID());  // set new GUID
-					vo.setPropertyTerm(dtscVO.getPropertyTerm());
-					vo.setRepresentationTerm(dtscVO.getRepresentationTerm());
-					vo.setDefinition((dtscVO.getDefinition()));
-					vo.setOwnerDTID(dtVO.getDTID());
-					vo.setMinCardinality(dtscVO.getMinCardinality());
-					vo.setMaxCardinality(dtscVO.getMaxCardinality());
-					vo.setBasedDTSCID(dtscVO.getDTSCID());
-					daoDTSC.insertObject(vo);
-				}
-				
+				List<SRTObject> baseDefaultDTSCs = daoDTSC.findObjects(qc, conn);
 				
 				//adding additional SCs for attributes
 				NodeList attributeList = xh2.getNodeList("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -701,166 +713,222 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 				}
 				int min_cardinality = 0;
 				int max_cardinality = 1;
+				
 				for(int i = 0; i < attributeList.getLength(); i++) {
-					Node attribute = attributeList.item(i);
-					Element attrElement = (Element)attribute;
-					System.out.println("Populating SCs from attributes in unqualified BDTs.. attribute name = "+attrElement.getAttribute("name"));
-					DTSCVO vo = new DTSCVO();
-					vo.setDTSCGUID(attrElement.getAttribute("id"));
-					
+					Element attrElement = (Element)attributeList.item(i);
 					String attribute_name = attrElement.getAttribute("name");
-					Node definitionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@name = '" + attribute_name + "']/xsd:annotation/xsd:documentation");
-					String definition = definitionNode == null? "": definitionNode.getTextContent();
-					vo.setPropertyTerm(Utility.spaceSeparator(attribute_name));
-					vo.setRepresentationTerm(Utility.getRepresentationTerm(attribute_name));
-					vo.setDefinition(definition);
+					String attribute_id = attrElement.getAttribute("id");
+					
+					String fromXSD="";
+					String fromDB="";
+					
+					DTSCVO vo = new DTSCVO();
 					vo.setOwnerDTID(dtVO.getDTID());
+					vo.setDTSCGUID(attribute_id);
+					if(attrElement.getAttribute("use")==null){
+						min_cardinality=0;
+						max_cardinality=1;
+					}
+					else if(attrElement.getAttribute("use").equalsIgnoreCase("optional")){
+						min_cardinality=0;
+						max_cardinality=1;
+					}
+					else if(attrElement.getAttribute("use").equalsIgnoreCase("required")){
+						min_cardinality=1;
+						max_cardinality=1;
+					}
+					else if(attrElement.getAttribute("use").equalsIgnoreCase("prohibited")){
+						min_cardinality=0;
+						max_cardinality=0;
+					}
 					
-					if(attrElement.getAttribute("use") == null || attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
-						min_cardinality = 0;
-					else if(attrElement.getAttribute("use").equalsIgnoreCase("required"))
-						min_cardinality = 1;
-					vo.setMinCardinality(min_cardinality);
+					String propertyTerm = "null";
+					String representationTerm = "null";
+					String definition = "null";
 					
-					if(attrElement.getAttribute("use").equalsIgnoreCase("optional") || attrElement.getAttribute("use").equalsIgnoreCase("required"))
-						max_cardinality = 1;
-					else if(attrElement.getAttribute("use").equalsIgnoreCase("prohibited"))
-						min_cardinality = 0;
-					vo.setMaxCardinality(max_cardinality);
-					daoDTSC.insertObject(vo);
-					if(attrElement.getAttribute("type").endsWith("CodeContentType")){
-						
-						QueryCondition qc_04 = new QueryCondition();
-						qc_04.add("Data_Type_Term", vo.getRepresentationTerm());
-						qc_04.add("Type", 0);
-						DTVO cdtVO = (DTVO) aDTDAO.findObject(qc_04, conn);
-						QueryCondition qc_05 = new QueryCondition();
-						qc_05.add("CDT_ID", cdtVO.getDTID()); 
-						qc_05.add("is_default", 1);
-						ArrayList<SRTObject> cdtawdprilist = aCDTAllowedPrimitiveDAO.findObjects(qc_05);
-						for(SRTObject acdtawdprilist : cdtawdprilist) {
-							CDTAllowedPrimitiveVO aCDTAPVO = (CDTAllowedPrimitiveVO) acdtawdprilist;
-							if(aCDTAPVO.getCDTPrimitiveID() != 0){
-								CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
-								QueryCondition qc_055 = new QueryCondition();
-								qc_055.add("guid", vo.getDTSCGUID());
-								int cdt_sc_id = ((DTSCVO)daoDTSC.findObject(qc_055, conn)).getDTSCID();
-								
-								aVO.setCDTSCID(cdt_sc_id);
-								aVO.setCDTPrimitiveID(aCDTAPVO.getCDTPrimitiveID());
-								aVO.setisDefault(aCDTAPVO.getisDefault());
-								aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
-								QueryCondition qc_051 = new QueryCondition();
-								qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
-								qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-								CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
-								int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
+					propertyTerm = Utility.spaceSeparator(attribute_name);
+					if(!is_fields_xsd) {
+						propertyTerm = Utility.spaceSeparatorBeforeStr(attribute_name, "Code");
+					}
 
-								String xsd_builtin_type = "xsd:token";
-								CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-								bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
-								QueryCondition qc_07 = new QueryCondition();
-								qc_07.add("BuiltIn_Type", xsd_builtin_type);
-								XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
-								bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
-								System.out.println("Inserting CDT SC Allowed Primitive Expresssion Typemap for new SC whose property term = "+vo.getPropertyTerm()+", expression type map = "+xsd_builtin_type);
-								aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
-							}
-						}
+					representationTerm = Utility.getRepresentationTerm(attribute_name);
+					
+					Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation/ccts_Definition");
+					if(defNode==null){
+						defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dtVO.getDEN()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+attribute_id+"']/xsd:annotation/xsd:documentation");
+					}
+					if(defNode!=null){
+						definition = defNode.getTextContent();
+					}
+					
+					fromXSD = fromXSD + attribute_id;
+					fromXSD = fromXSD + propertyTerm;
+					fromXSD = fromXSD + representationTerm;
+					fromXSD = fromXSD + definition;
+					fromXSD = fromXSD + min_cardinality;
+					fromXSD = fromXSD + max_cardinality;
+					
+					QueryCondition qc4DTSC = new QueryCondition();
+					qc4DTSC.add("guid", attribute_id);
+					DTSCVO dtscVO = (DTSCVO) daoDTSC.findObject(qc4DTSC);
+					
+					if(dtscVO==null){
+						System.out.println("@@@@ The Attribute is not imported! Check DT: "+ dtVO.getDTGUID());
 					}
 					else {
-						QueryCondition qc_04 = new QueryCondition();
-						qc_04.add("Data_Type_Term", vo.getRepresentationTerm());
-						qc_04.add("Type", 0);
-						DTVO cdtVO = (DTVO) aDTDAO.findObject(qc_04, conn);
-						QueryCondition qc_05 = new QueryCondition();
-						qc_05.add("CDT_ID", cdtVO.getDTID()); 
-						ArrayList<SRTObject> cdtawdprilist = aCDTAllowedPrimitiveDAO.findObjects(qc_05);
-						for(SRTObject acdtawdprilist : cdtawdprilist) {
-							CDTAllowedPrimitiveVO aCDTAPVO = (CDTAllowedPrimitiveVO) acdtawdprilist;
-							if(aCDTAPVO.getCDTPrimitiveID() != 0){
-								CDTSCAllowedPrimitiveVO aVO = new CDTSCAllowedPrimitiveVO();
-								QueryCondition qc_055 = new QueryCondition();
-								qc_055.add("guid", vo.getDTSCGUID());
-								int cdt_sc_id = ((DTSCVO)daoDTSC.findObject(qc_055, conn)).getDTSCID();
+						fromDB = fromDB+dtscVO.getDTSCGUID();
+						fromDB = fromDB+dtscVO.getPropertyTerm();
+						fromDB = fromDB+dtscVO.getRepresentationTerm();
+						fromDB = fromDB+dtscVO.getDefinition();
+						fromDB = fromDB+dtscVO.getMinCardinality();
+						fromDB = fromDB+dtscVO.getMaxCardinality();
+						
+						if(!fromXSD.equals(fromDB)){
+							System.out.println("@@@@ DTSC from Attributes has different values! Check DTSC (guid="+dtscVO.getDTSCGUID()+")");
+							System.out.println("     FromXSD: "+fromXSD);
+							System.out.println("      FromDB: "+fromDB);
+						}
+					}
+					
+					
+					//if it has new attribute extension, 
+					//it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map					
+					DTSCVO insertedSCVO = new DTSCVO();
+					QueryCondition qc4SC = new QueryCondition();
+					qc4SC.add("guid", vo.getDTSCGUID());
+					insertedSCVO = (DTSCVO) daoDTSC.findObject(qc4SC);
+					
+					ArrayList<SRTObject> DTVOwDataTypeTerm = new ArrayList<SRTObject>();
+					QueryCondition qc4DTwDataTypeTerm = new QueryCondition();
+					qc4DTwDataTypeTerm.add("data_type_term", insertedSCVO.getRepresentationTerm());
+					DTVOwDataTypeTerm = dao.findObjects(qc4DTwDataTypeTerm);
+					
+					for(int j=0; j<DTVOwDataTypeTerm.size(); j++){						
+						DTVO aDTVO = (DTVO) DTVOwDataTypeTerm.get(j);
+						ArrayList<SRTObject> CDTAwdPriVOs = new ArrayList<SRTObject>();
+						QueryCondition qc4CDTAwdPris = new QueryCondition();
+						qc4CDTAwdPris.add("CDT_ID", aDTVO.getDTID());
+						CDTAwdPriVOs = aCDTAllowedPrimitiveDAO.findObjects(qc4CDTAwdPris);
+						
+						if(CDTAwdPriVOs.size() > 0 && !CDTAwdPriVOs.isEmpty()){
+							for(int k=0;k<CDTAwdPriVOs.size(); k++){
+								CDTSCAllowedPrimitiveVO cdtSCAP = new CDTSCAllowedPrimitiveVO();
+								CDTAllowedPrimitiveVO cdtAP = (CDTAllowedPrimitiveVO) CDTAwdPriVOs.get(k);
+								cdtSCAP.setCDTSCID(insertedSCVO.getDTSCID());
+								cdtSCAP.setCDTPrimitiveID(cdtAP.getCDTPrimitiveID());
+								cdtSCAP.setisDefault(cdtAP.getisDefault());
 								
-								aVO.setCDTSCID(cdt_sc_id);
-								aVO.setCDTPrimitiveID(aCDTAPVO.getCDTPrimitiveID());
-								aVO.setisDefault(aCDTAPVO.getisDefault());
-								aCDTSCAllowedPrimitiveDAO.insertObject(aVO);
+								QueryCondition qc4pri = new QueryCondition();
+								qc4pri.add("cdt_pri_id", cdtAP.getCDTPrimitiveID());
+								CDTPrimitiveVO tmpPri = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc4pri);
 								
-								QueryCondition qc_051 = new QueryCondition();
-								qc_051.add("CDT_SC_ID", aVO.getCDTSCID());
-								qc_051.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-								CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc_051);
-								int cdtscallowedprimitiveid = aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID();
+								String expressionLanguageOrActionCode = "";
+								expressionLanguageOrActionCode= insertedSCVO.getPropertyTerm();
 								
-								QueryCondition qc_06 = new QueryCondition();
-								qc_06.add("cdt_pri_id", aVO.getCDTPrimitiveID());
-								CDTPrimitiveVO aCDTPrimitiveVO = (CDTPrimitiveVO) aCDTPrimitiveDAO.findObject(qc_06);
-								String cdt_primitive_name = aCDTPrimitiveVO.getName();
-								ArrayList<String> xsd_builtin_type = new ArrayList<String>();
-	
-								if(cdt_primitive_name.equals("Binary")){
-									xsd_builtin_type.add("xsd:base64Binary");
-									xsd_builtin_type.add("xsd:hexBinary");
-								}
-								else if(cdt_primitive_name.equals("Boolean")){
-									xsd_builtin_type.add("xsd:Boolean");
-								}
-								else if(cdt_primitive_name.equals("Decimal")){
-									xsd_builtin_type.add("xsd:decimal");
-								}
-								else if(cdt_primitive_name.equals("Double")){
-									xsd_builtin_type.add("xsd:double");
-									xsd_builtin_type.add("xsd:float");
-								}
-								else if(cdt_primitive_name.equals("Float")){
-									xsd_builtin_type.add("xsd:float");
-								}
-								else if(cdt_primitive_name.equals("Integer")){
-									xsd_builtin_type.add("xsd:integer");
-									xsd_builtin_type.add("xsd:nonNegativeInteger");
-									xsd_builtin_type.add("xsd:positiveInteger");
-								}
-								else if(cdt_primitive_name.equals("NormalizedString")){
-									xsd_builtin_type.add("xsd:normalizedString");
-								}
-								else if(cdt_primitive_name.equals("String")){
-									xsd_builtin_type.add("xsd:string");
-								}
-								else if(cdt_primitive_name.equals("TimeDuration")){
-									xsd_builtin_type.add("xsd:token");
-									xsd_builtin_type.add("xsd:duration");
-								}
-								else if(cdt_primitive_name.equals("TimePoint")){
-									xsd_builtin_type.add("xsd:token");
-									xsd_builtin_type.add("xsd:dateTime");
-									xsd_builtin_type.add("xsd:date");
-									xsd_builtin_type.add("xsd:time");
-									xsd_builtin_type.add("xsd:gYearMonth");
-									xsd_builtin_type.add("xsd:gYear");
-									xsd_builtin_type.add("xsd:gMonthDay");
-									xsd_builtin_type.add("xsd:gDay");
-									xsd_builtin_type.add("xsd:gMonth");
-								}
-								else if(cdt_primitive_name.equals("Token")){
-									xsd_builtin_type.add("xsd:token");
-								}
+//								System.out.print("   ~~~"+insertedSCVO.getPropertyTerm()+" "+insertedSCVO.getRepresentationTerm()+" is "+tmpPri.getName());
+//								if(cdtSCAP.getisDefault()){
+//									System.out.println(" and it's Default!");
+//								}
+//								else{
+//									System.out.println("");
+//								}
+								
+								//aCDTSCAllowedPrimitiveDAO.insertObject(cdtSCAP);	
+								
+								
+								System.out.println("        ** Pri:" + tmpPri.getName() + " Default:" + cdtSCAP.getisDefault());
 									
-								for(int l = 0 ; l < xsd_builtin_type.size(); l++){
-									CDTSCAllowedPrimitiveExpressionTypeMapVO bVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-									bVO.setCDTSCAllowedPrimitive(cdtscallowedprimitiveid);
-									QueryCondition qc_07 = new QueryCondition();
-									qc_07.add("BuiltIn_Type", xsd_builtin_type.get(l));
-									XSDBuiltInTypeVO cVO = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc_07);
-									bVO.setXSDBuiltInTypeID(cVO.getXSDBuiltInTypeID());
-									System.out.println("Inserting CDT SC Allowed Primitive Expresssion Typemap for new SC whose property term = "+vo.getPropertyTerm()+", expression type map = "+xsd_builtin_type.get(l));
-									aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(bVO);
+								CDTSCAllowedPrimitiveVO insertedCDTSCAP = new CDTSCAllowedPrimitiveVO();
+								QueryCondition qc4SCAP = new QueryCondition();
+								qc4SCAP.add("CDT_SC_ID", cdtSCAP.getCDTSCID());
+								qc4SCAP.add("CDT_Pri_id", cdtSCAP.getCDTPrimitiveID());
+								insertedCDTSCAP = (CDTSCAllowedPrimitiveVO) aCDTSCAllowedPrimitiveDAO.findObject(qc4SCAP);
+								
+								QueryCondition qc4XTMap = new QueryCondition();
+								qc4XTMap.add("CDT_awd_pri_id", cdtAP.getCDTAllowedPrimitiveID());
+								ArrayList<SRTObject> cdtAPXTMs = aCDTAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc4XTMap);
+								for(int m=0; m<cdtAPXTMs.size(); m++){
+									CDTAllowedPrimitiveExpressionTypeMapVO thisAPXTmap= (CDTAllowedPrimitiveExpressionTypeMapVO) cdtAPXTMs.get(m);
+									CDTSCAllowedPrimitiveExpressionTypeMapVO tmp = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
+									tmp.setXSDBuiltInTypeID(thisAPXTmap.getXSDBuiltInTypeID());
+									tmp.setCDTSCAllowedPrimitive(insertedCDTSCAP.getCDTSCAllowedPrimitiveID());
+									
+									QueryCondition qc4xbt = new QueryCondition();
+									qc4xbt.add("xbt_id", tmp.getXSDBuiltInTypeID());
+									XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc4xbt);
+											
+									//aCDTSCAllowedPrimitiveExpressionTypeMapDAO.insertObject(tmp);
+									System.out.println("          ** XBT:" + xbt.getBuiltInType());
+
+								}
+							}
+							break;//if this is hit, that means dt sc is mapped to cdt sc
+						}
+					}
+				}
+
+				//Inherit From the remain SCs based on default bdt because they don't have corresponding attributes
+				//Just copy and get the values from remain baseDefaultDTSCs
+				
+				QueryCondition qc4UnqualifiedDTSC = new QueryCondition();
+				qc4UnqualifiedDTSC.add("owner_dt_id", dtVO.getDTID());
+				ArrayList<SRTObject> unqaulifiedDTSCs = daoDTSC.findObjects(qc4UnqualifiedDTSC);
+				
+				for(int i=baseDefaultDTSCs.size()-1; i>-1; i--){
+					DTSCVO baseDefaultDTSC = (DTSCVO) baseDefaultDTSCs.get(i);
+					System.out.print("    Unqualified SC:"+baseDefaultDTSC.getPropertyTerm() +" "+ baseDefaultDTSC.getRepresentationTerm());
+
+					for(int j=0; j<unqaulifiedDTSCs.size(); j++){
+						
+						DTSCVO unqualifiedDTSC = (DTSCVO) unqaulifiedDTSCs.get(j);
+
+						if(baseDefaultDTSC.getPropertyTerm().equals(unqualifiedDTSC.getPropertyTerm())
+						&& baseDefaultDTSC.getRepresentationTerm().equals(unqualifiedDTSC.getRepresentationTerm())
+						&& baseDefaultDTSC.getDefinition().equals(unqualifiedDTSC.getDefinition())
+						&& baseDefaultDTSC.getDTSCID()==unqualifiedDTSC.getBasedDTSCID()){
+							System.out.print(" has corresponding attr="+baseDefaultDTSC.getPropertyTerm() +" "+ baseDefaultDTSC.getRepresentationTerm());
+							
+							Node attribute = xh2.getNode("//xsd:complexType/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+unqualifiedDTSC.getDTSCGUID()+"']");
+							if(attribute==null){
+								attribute = xh.getNode("//xsd:complexType/xsd:simpleContent/xsd:extension/xsd:attribute[@id='"+unqualifiedDTSC.getDTSCGUID()+"']");
+							}
+							
+							if(attribute!=null){
+								Element ele = (Element) attribute;
+								
+								if(ele.getAttribute("use").equalsIgnoreCase("required")){
+									if(unqualifiedDTSC.getMinCardinality()==1 && unqualifiedDTSC.getMaxCardinality()==1){
+										baseDefaultDTSCs.remove(i);
+										break;
+									}
+								}
+								else if (ele.getAttribute("use").equalsIgnoreCase("optional")){
+									if(unqualifiedDTSC.getMinCardinality()==0 && unqualifiedDTSC.getMaxCardinality()==1){
+										baseDefaultDTSCs.remove(i);
+										break;
+									}
+								}
+								else if (ele.getAttribute("use").equalsIgnoreCase("prohibited")){
+									if(unqualifiedDTSC.getMinCardinality()==0 && unqualifiedDTSC.getMaxCardinality()==0){
+										baseDefaultDTSCs.remove(i);
+										break;
+									}
+								}
+							}
+							else {
+								if(baseDefaultDTSC.getMinCardinality() == unqualifiedDTSC.getMinCardinality()
+								&& baseDefaultDTSC.getMaxCardinality() == unqualifiedDTSC.getMaxCardinality()){
+									baseDefaultDTSCs.remove(i);
+									break;
 								}
 							}
 						}
 					}
+					System.out.println("");
+				}
+				for(int i=baseDefaultDTSCs.size()-1; i>-1; i--){
+					DTSCVO bdtscVO = (DTSCVO) baseDefaultDTSCs.get(i);
+					System.out.println("@@@@ "+bdtscVO.getPropertyTerm() + " " + bdtscVO.getRepresentationTerm() + " is not inherited! Check Unqualified BDT: "+dtVO.getDTGUID());
 				}
 			}
 		}
