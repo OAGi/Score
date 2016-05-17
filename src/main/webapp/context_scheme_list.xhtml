@@ -1,8 +1,8 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
 	<ui:define name="side_menu">
 		<h:form>
@@ -33,44 +33,44 @@
 				</h:panelGrid>
 			</p:panel>
 			<p:panel header="Context Scheme List">
-				
+
 				<p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeHandler.contextSchemes}"
-					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.classificationCtxSchemeId}">
-			        <p:column selectionMode="single" style="width:16px;text-align:center"/>
-			        
+							 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+							 paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.classificationCtxSchemeId}">
+					<p:column selectionMode="single" style="width:16px;text-align:center"/>
+
 					<p:column style="width:200px">
 						<f:facet name="header">
 							<h:outputText value="Name" />
 						</f:facet>
 						<h:outputText value="#{contextScheme.schemeName}" />
 					</p:column>
-	
+
 					<p:column style="width:300px">
 						<f:facet name="header">
 							<h:outputText value="Description" />
 						</f:facet>
 						<h:outputText value="#{contextScheme.description}" />
 					</p:column>
-					
+
 					<p:column style="width:50px">
 						<f:facet name="header">
 							<h:outputText value="Version" />
 						</f:facet>
 						<h:outputText value="#{contextScheme.schemeVersionId}" />
 					</p:column>
-					
+
 				</p:dataTable>
 				<p:commandButton process="tbl1" update=":listForm:ccDetailid" icon="ui-icon-search" value="Detail" oncomplete="PF('ccDetail').show()" />
 				<p:commandButton process="tbl1" update=":listForm:ccDeleteid" icon="ui-icon-delete" value="Delete" oncomplete="PF('ccDelete').show()" />
 			</p:panel>
 			<p:dialog header="Delete Context Scheme" widgetVar="ccDelete" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="500">
-        		<p:outputPanel id="ccDeleteid">
-        			<h:panelGrid cellpadding="5">
+				<p:outputPanel id="ccDeleteid">
+					<h:panelGrid cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel value="Do you really want to delete the following item?" style="font-weight:bold; color:red" />
-							</p:column> 
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<p:separator />
@@ -84,42 +84,36 @@
 						<!--
 						<h:outputText value="Scheme Agency Name: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyName}" />
-<<<<<<< HEAD:WebContent/context_scheme_list.xhtml
-						
-						<h:outputText value="Scheme ID: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeID}" />
-=======
 						-->
->>>>>>> branch_for_revision:src/main/webapp/context_scheme_list.xhtml
 
 						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyId}" />
-						
+
 						<h:outputText value="Scheme Version: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersionId}" />
-						
+
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.ctxCategoryId}" />
-						
+
 					</h:panelGrid>
 					<p:separator />
 					<h:panelGrid id="grid12" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel value="Context Scheme Values" style="font-weight:bold; color:red" />
-							</p:column> 
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
 						<p:dataTable id="tbl22" var="contextSchemeValue" value="#{contextSchemeHandler.selectedCSValues}"
-							style="width:600px; margin-bottom:20px">
+									 style="width:600px; margin-bottom:20px">
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Value" />
 								</f:facet>
 								<h:outputText value="#{contextSchemeValue.value}" />
 							</p:column>
-			
+
 							<p:column style="width:300px">
 								<f:facet name="header">
 									<h:outputText value="Meaning" />
@@ -129,22 +123,22 @@
 						</p:dataTable>
 					</h:panelGrid>
 					<p:separator />
-			        <h:panelGrid cellpadding="5">
-			        </h:panelGrid>
-			        <h:panelGrid columns="2" cellpadding="5">
-			        	<p:commandButton value="Cancel" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
-			        	<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.delete(contextSchemeHandler.selectedScheme.classificationCtxSchemeId)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
-			        </h:panelGrid>
+					<h:panelGrid cellpadding="5">
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellpadding="5">
+						<p:commandButton value="Cancel" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
+						<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.delete(contextSchemeHandler.selectedScheme.classificationCtxSchemeId)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
+					</h:panelGrid>
 				</p:outputPanel>
-		    </p:dialog>
-			
+			</p:dialog>
+
 			<p:dialog header="Context Scheme Detail" widgetVar="ccDetail" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="500">
-        		<p:outputPanel id="ccDetailid">
-        			<h:panelGrid id="grid6" cellpadding="5">
+				<p:outputPanel id="ccDetailid">
+					<h:panelGrid id="grid6" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel value="Context Scheme Detail" style="font-weight:bold; color:red" />
-							</p:column> 
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<p:separator />
@@ -154,37 +148,34 @@
 
 						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.description}" />
-						
-						<h:outputText value="Schema ID: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeID}" />
 
 						<h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyId}" />
-						
+
 						<h:outputText value="Schema Version: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersionId}" />
-						
+
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{contextSchemeHandler.selectedScheme.ctxCategoryId}" />
-					</h:panelGrid>	
+					</h:panelGrid>
 					<p:separator />
 					<h:panelGrid id="grid10" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel value="Context Scheme Values" style="font-weight:bold; color:red" />
-							</p:column> 
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
 						<p:dataTable id="tbl2" var="contextSchemeValue" value="#{contextSchemeHandler.selectedCSValues}"
-							style="width:600px; margin-bottom:20px">
+									 style="width:600px; margin-bottom:20px">
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Value" />
 								</f:facet>
 								<h:outputText value="#{contextSchemeValue.value}" />
 							</p:column>
-			
+
 							<p:column style="width:300px">
 								<f:facet name="header">
 									<h:outputText value="Meaning" />
@@ -194,22 +185,22 @@
 						</p:dataTable>
 					</h:panelGrid>
 					<p:separator />
-			        <h:panelGrid id="grid3" cellpadding="5">
-			        </h:panelGrid>
-			        <h:panelGrid id="grid4" columns="2" cellpadding="5">
-			        	<p:commandButton value="Close" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide()"/>
-			        	<p:commandButton value="Edit" actionListener="#{contextSchemeHandler.onEdit(contextSchemeHandler.selectedScheme)}" update=":listForm:ccEditid" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide(); PF('ccEdit').show();"/>
-			        </h:panelGrid>
+					<h:panelGrid id="grid3" cellpadding="5">
+					</h:panelGrid>
+					<h:panelGrid id="grid4" columns="2" cellpadding="5">
+						<p:commandButton value="Close" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide()"/>
+						<p:commandButton value="Edit" actionListener="#{contextSchemeHandler.onEdit(contextSchemeHandler.selectedScheme)}" update=":listForm:ccEditid" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').hide(); PF('ccEdit').show();"/>
+					</h:panelGrid>
 				</p:outputPanel>
-		    </p:dialog>
-		    
-		    <p:dialog id="edit" header="Edit Context Scheme" widgetVar="ccEdit" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="700">
-        		<p:outputPanel id="ccEditid">
-        			<h:panelGrid id="grid17" cellpadding="5">
+			</p:dialog>
+
+			<p:dialog id="edit" header="Edit Context Scheme" widgetVar="ccEdit" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="700">
+				<p:outputPanel id="ccEditid">
+					<h:panelGrid id="grid17" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel value="Edit Context Scheme" style="font-weight:bold; color:red" />
-							</p:column> 
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<p:separator />
@@ -219,102 +210,99 @@
 
 						<h:outputText value="Description: " style="font-weight:bold; color:blue" />
 						<p:inputTextarea id="desc" rows="5" cols="40" autoResize="false" value="#{contextSchemeHandler.description}"
-							label="Description">
+										 label="Description">
 						</p:inputTextarea>
-						
-						<h:outputText value="Scheme ID (or short name): " style="font-weight:bold; color:blue" />
-						<p:inputText value="#{contextSchemeHandler.schemeId}" />
 
 						<h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.schemeAgencyID}" />
-						
+
 						<h:outputText value="Scheme Version: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.schemeVersion}" />
-						
+
 						<h:outputText value="Context Category: " style="font-weight:bold; color:blue" />
 						<p:inputText value="#{contextSchemeHandler.contextCategoryID}" />
-					</h:panelGrid>	
+					</h:panelGrid>
 					<p:separator />
 					<h:panelGrid id="grid11" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel for="desc" value="Scheme Value: " style="font-weight:bold; color: red" />
 								<h:outputLabel for="desc" value="(Click 'Add' button to add new Scheme Value) " style="font-weight:bold; color: blue" />
 							</p:column>
 							<p:column>
-								<p:commandButton process="tbl3" update=":listForm:addSVid" icon="ui-icon-search" value="Add" oncomplete="PF('addSV').show()" />	
-							</p:column> 
+								<p:commandButton process="tbl3" update=":listForm:addSVid" icon="ui-icon-search" value="Add" oncomplete="PF('addSV').show()" />
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
 						<p:dataTable id="tbl3" var="contextSchemeValue" value="#{contextSchemeHandler.csValues}"
-							style="width:600px; margin-bottom:20px">
-							
+									 style="width:600px; margin-bottom:20px">
+
 							<p:column style="width:100px">
 								<f:facet name="header">
 									<h:outputText value="Value" />
 								</f:facet>
 								<h:outputText value="#{contextSchemeValue.value}" />
 							</p:column>
-			
+
 							<p:column style="width:300px">
 								<f:facet name="header">
 									<h:outputText value="Meaning" />
 								</f:facet>
 								<h:outputText value="#{contextSchemeValue.meaning}" />
 							</p:column>
-							
+
 							<p:column style="width:90px">
 								<f:facet name="header">
 									<h:outputText value="Delete" />
 								</f:facet>
 								<p:commandButton value="Delete" update=":listForm:tbl3" icon="ui-icon-check"
-									style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValue.guid, contextSchemeValue.ctxSchemeValueId)}" />
+												 style="margin-right:10px" actionListener="#{contextSchemeHandler.deleteCSV(contextSchemeValue.guid, contextSchemeValue.ctxSchemeValueId)}" />
 							</p:column>
-			
+
 						</p:dataTable>
-					
+
 						<h:inputHidden value="#{contextSchemeHandler.id}" />
 						<h:inputHidden value="#{contextSchemeHandler.guid}" />
 						<h:inputHidden value="#{contextSchemeHandler.schemeId}" />
 					</h:panelGrid>
 					<p:separator />
-			        <h:panelGrid id="grid81" cellpadding="5">
-			        </h:panelGrid>
-			        <h:panelGrid id="grid91" columns="2" cellpadding="5">
-			        	<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').show(); PF('ccEdit').hide();"/>
-			        	<p:commandButton value="Save" update=":listForm:ccDetailid, :listForm:tbl1" actionListener="#{contextSchemeHandler.save()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccEdit').hide(); PF('ccDetail').show(); "/>
-			        </h:panelGrid>
+					<h:panelGrid id="grid81" cellpadding="5">
+					</h:panelGrid>
+					<h:panelGrid id="grid91" columns="2" cellpadding="5">
+						<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDetail').show(); PF('ccEdit').hide();"/>
+						<p:commandButton value="Save" update=":listForm:ccDetailid, :listForm:tbl1" actionListener="#{contextSchemeHandler.save()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccEdit').hide(); PF('ccDetail').show(); "/>
+					</h:panelGrid>
 				</p:outputPanel>
-		    </p:dialog>
-		    
-		    <p:dialog header="Add Scheme value" widgetVar="addSV" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="250">
-        		<p:outputPanel id="addSVid">
-        			<h:panelGrid id="grid7" cellpadding="5">
+			</p:dialog>
+
+			<p:dialog header="Add Scheme value" widgetVar="addSV" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="250">
+				<p:outputPanel id="addSVid">
+					<h:panelGrid id="grid7" cellpadding="5">
 						<p:row>
-	        				<p:column style="width:400px"> 
+							<p:column style="width:400px">
 								<h:outputLabel value="Add new Scheme Value" style="font-weight:bold; color:red" />
-							</p:column> 
+							</p:column>
 						</p:row>
 					</h:panelGrid>
 					<p:separator />
 					<h:panelGrid columns="2" cellpadding="5">
 						<h:outputText value="Value: " style="font-weight:bold; color:blue" />
 						<p:inputText id="value" value="#{contextSchemeHandler.value}" label="Name" />
-						
+
 						<h:outputText value="Meaning: " style="font-weight:bold; color:blue" />
 						<p:inputText id="meaning" value="#{contextSchemeHandler.meaning}" label="Meaning" style="width: 400px !important;"/>
 
 					</h:panelGrid>
 					<p:separator />
-			        <h:panelGrid id="grid8" cellpadding="5">
-			        </h:panelGrid>
-			        <h:panelGrid id="grid9" columns="2" cellpadding="5">
-			        	<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('addSV').hide()"/>
-			        	<p:commandButton value="Save" update=":listForm:tbl3" actionListener="#{contextSchemeHandler.addSchemeValue()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('addSV').hide()"/>
-			        </h:panelGrid>
+					<h:panelGrid id="grid8" cellpadding="5">
+					</h:panelGrid>
+					<h:panelGrid id="grid9" columns="2" cellpadding="5">
+						<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('addSV').hide()"/>
+						<p:commandButton value="Save" update=":listForm:tbl3" actionListener="#{contextSchemeHandler.addSchemeValue()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('addSV').hide()"/>
+					</h:panelGrid>
 				</p:outputPanel>
-		    </p:dialog>
+			</p:dialog>
 		</h:form>
 	</ui:define>
 </ui:composition>
