@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
+    private OracleAgencyIdListRepository oracleAgencyIdListRepository;
+
+    @Autowired
+    private OracleAgencyIdListValueRepository oracleAgencyIdListValueRepository;
+
+    @Autowired
     private OracleBaseCodeListRepository oracleCodeListRepository;
 
     @Autowired
@@ -73,6 +79,16 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private BaseUserRepository baseUserRepository;
+
+    @Override
+    public AgencyIdListRepository agencyIdListRepository() {
+        return oracleAgencyIdListRepository;
+    }
+
+    @Override
+    public AgencyIdListValueRepository agencyIdListValueRepository() {
+        return oracleAgencyIdListValueRepository;
+    }
 
     @Override
     public CodeListRepository codeListRepository() {

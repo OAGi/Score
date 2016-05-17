@@ -24,7 +24,7 @@ public class XPathHandler {
 	private DocumentBuilder builder;
 	private XPath xPath;
     
-	public XPathHandler(String filePath) throws ParserConfigurationException, FileNotFoundException, SAXException, IOException {
+	public XPathHandler(String filePath) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 		builderFactory.setNamespaceAware(true);
 		
@@ -42,7 +42,7 @@ public class XPathHandler {
 		return (Node)xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODE);
 	}
 	
-	public static void main(String args[]) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
+	public static void main(String args[]) throws ParserConfigurationException, SAXException, IOException {
 	
 		XPathHandler xh = new XPathHandler(SRTConstants.BOD_FILE_PATH_02 + "LoadPayable.xsd");
 		
