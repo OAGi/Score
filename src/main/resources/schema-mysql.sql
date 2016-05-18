@@ -65,9 +65,9 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`xbt` (
   `xbt_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique ID of XML Schema built-in types.',
   `name` VARCHAR(45) NULL COMMENT 'Human readable name of the XML Schema built-in type.',
   `builtIn_type` VARCHAR(45) NULL COMMENT 'XML Schema built-in type as it should appear in an XML schema.',
-  `subtype_of_xbt_id` INT(11) NULL DEFAULT NULL,
+  `subtype_of_xbt_id` INT(11) UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`xbt_id`),
-  CONSTRAINT `FK_Subtype_Of_XSD_BuiltIn_Type_ID`
+  CONSTRAINT `subtype_of_xbt_id_fk`
   FOREIGN KEY (`subtype_of_xbt_id`)
   REFERENCES `oagsrt_revision`.`xbt` (`xbt_id`)
     ON DELETE NO ACTION
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`bccp` (
   REFERENCES `oagsrt_revision`.`dt` (`dt_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `Target_Namespace`
+  CONSTRAINT `BCCP_Target_Namespace`
   FOREIGN KEY (`namespace_id`)
   REFERENCES `oagsrt_revision`.`namespace` (`namespace_id`)
     ON DELETE NO ACTION
@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`acc` (
   REFERENCES `oagsrt_revision`.`release` (`release_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `Target_Namespace`
+  CONSTRAINT `ACC_Target_Namespace`
   FOREIGN KEY (`namespace_id`)
   REFERENCES `oagsrt_revision`.`namespace` (`namespace_id`)
     ON DELETE NO ACTION
@@ -498,7 +498,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`code_list` (
   `last_update_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `state` VARCHAR(255) NOT NULL COMMENT 'Life cycle state of the Code List. Possible values are Editing, Published, or Deleted.',
   PRIMARY KEY (`code_list_id`),
-  CONSTRAINT `agency_id_fk`
+  CONSTRAINT `code_list_agency_id_fk`
   FOREIGN KEY (`agency_id`)
   REFERENCES `agency_id_list_value` (`agency_id_list_value_id`)
     ON DELETE NO ACTION
@@ -552,7 +552,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`agency_id_list` (
   `version_id` TEXT CHARACTER SET 'utf8' NULL,
   `definition` TEXT CHARACTER SET 'utf8' NULL,
   PRIMARY KEY (`agency_id_list_id`),
-  CONSTRAINT `agency_id_fk`
+  CONSTRAINT `agency_id_list_agency_id_fk`
   FOREIGN KEY (`agency_id`)
   REFERENCES `oagsrt_revision`.`agency_id_list_value` (`agency_id_list_value_id`)
     ON DELETE NO ACTION
@@ -665,7 +665,7 @@ DROP TABLE IF EXISTS `oagsrt_revision`.`cdt_sc_awd_pri_xps_type_map` ;
 
 CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`cdt_sc_awd_pri_xps_type_map` (
   `cdt_sc_awd_pri_xps_type_map_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cdt_sc_awd_pri` INT(11) NOT NULL,
+  `cdt_sc_awd_pri` INT(11) UNSIGNED NOT NULL,
   `xbt_id` INT(11) UNSIGNED NOT NULL,
   PRIMARY KEY (`cdt_sc_awd_pri_xps_type_map_id`),
   CONSTRAINT `CDT_SC_Allowed_Primitive`
@@ -764,7 +764,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`asccp` (
   REFERENCES `oagsrt_revision`.`release` (`release_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `Target_Namespace`
+  CONSTRAINT `ASCCP_Target_Namespace`
   FOREIGN KEY (`namespace_id`)
   REFERENCES `oagsrt_revision`.`namespace` (`namespace_id`)
     ON DELETE NO ACTION
@@ -865,7 +865,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`asbie` (
   `guid` VARCHAR(41) NOT NULL COMMENT 'A globally unique identifier (GUID) of an ASBIE. GUID of an ASBIE is different from its based ASCC. Per OAGIS, a GUID is of the form \"oagis-id-\" followed by a 32 Hex character sequence.',
   `from_abie_id` INT(11) UNSIGNED NOT NULL COMMENT 'Assoc_From_ABIE_ID is a foreign key pointing to the ABIE table. Assoc_From_ABIE_ID is basically  a parent data element (type) of the Assoc_To_ASBIEP_ID. Assoc_From_ABIE_ID must be based on the Assoc_From_ACC_ID in the Based_ASCC except when the Assoc_From_ACC_ID refers to an ACC Semantic Group.',
   `to_asbiep_id` INT(11) UNSIGNED NOT NULL COMMENT 'Assoc_To_ASBIEP_ID is a foreign key to the ASBIEP table. Assoc_To_ASBIEP_ID is basically a child data element of the Assoc_From_ABIE_ID. Assoc_To_ASBIEP_ID must be based on the Role_of_ACC_ID in the Based_ASCC.',
-  `based_ascc` INT(11) NOT NULL COMMENT 'The Based_ASCC column refers to the ASCC record, which this ASBIE contextualizes.',
+  `based_ascc` INT(11) UNSIGNED NOT NULL COMMENT 'The Based_ASCC column refers to the ASCC record, which this ASBIE contextualizes.',
   `definition` TEXT CHARACTER SET 'utf8' NULL COMMENT 'Definition to override the ASCC definition. If Null, it means that the definition should be derived from the based CC on the UI, expression generation, and any API.',
   `cardinality_min` INT(11) NOT NULL COMMENT 'Minimum cardinality of the Assoc_To_ASBIEP_ID. The valid values are non-negative integer.',
   `cardinality_max` INT(11) NOT NULL COMMENT 'Maximum cardinality of the Assoc_To_ASBIEP_ID. The valid values are integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.',
