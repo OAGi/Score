@@ -127,9 +127,9 @@ public class P_1_4_PopulateCodeList {
                 codeList.setListId(tmp.getAttribute("id"));
                 codeList.setAgencyId(getAgencyID(agencyId));
 
-                if (tmp.getAttribute("name").startsWith("oacl")) {
+                if (codeList.getName().startsWith("oacl")) {
                     codeList.setVersionId("1");
-                } else if (tmp.getAttribute("name").equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
+                } else if (codeList.getName().equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
                     codeList.setVersionId("5");
                 } else {
                     for (int j = 0; j < tmp.getAttribute("name").length(); j++) {
@@ -326,7 +326,7 @@ public class P_1_4_PopulateCodeList {
                         }
                         if (definitionNode != null) {
                             Element definition = (Element) definitionNode;
-                            codelistvalueVO.setDefinition(definition.getTextContent());
+                            codelistvalueVO.setDefinition(definition.getTextContent().trim());
                             codelistvalueVO.setDefinitionSource(definition.getAttribute("source"));
                         } else {
                             codelistvalueVO.setDefinition(null);
