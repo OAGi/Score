@@ -69,13 +69,25 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleBasicBusinessInformationEntitySupplementaryComponentRepository oracleBasicBusinessInformationEntitySupplementaryComponentRepository;
 
     @Autowired
-    private BaseDataTypeRepository baseDataTypeRepository;
+    private OracleDataTypeRepository oracleDataTypeRepository;
 
     @Autowired
     private BaseDataTypeSupplementaryComponentRepository baseDataTypeSupplementaryComponentRepository;
 
     @Autowired
-    private BaseBusinessDataTypePrimitiveRestrictionRepository baseBusinessDataTypePrimitiveRestrictionRepository;
+    private OracleBusinessDataTypePrimitiveRestrictionRepository oracleBusinessDataTypePrimitiveRestrictionRepository;
+
+    @Autowired
+    private BaseCoreDataTypePrimitiveRepository baseCoreDataTypePrimitiveRepository;
+
+    @Autowired
+    private BaseCoreDataTypeAllowedPrimitiveRepository baseCoreDataTypeAllowedPrimitiveRepository;
+
+    @Autowired
+    private BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+
+    @Autowired
+    private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
 
     @Autowired
     private BaseUserRepository baseUserRepository;
@@ -182,7 +194,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public DataTypeRepository dataTypeRepository() {
-        return baseDataTypeRepository;
+        return oracleDataTypeRepository;
     }
 
     @Override
@@ -192,7 +204,27 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository() {
-        return baseBusinessDataTypePrimitiveRestrictionRepository;
+        return oracleBusinessDataTypePrimitiveRestrictionRepository;
+    }
+
+    @Override
+    public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository() {
+        return baseCoreDataTypePrimitiveRepository;
+    }
+
+    @Override
+    public CoreDataTypeAllowedPrimitiveRepository coreDataTypeAllowedPrimitiveRepository() {
+        return baseCoreDataTypeAllowedPrimitiveRepository;
+    }
+
+    @Override
+    public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository() {
+        return baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+    }
+
+    @Override
+    public XSDBuiltInTypeRepository xsdBuiltInTypeRepository() {
+        return baseXSDBuiltInTypeRepository;
     }
 
     @Override

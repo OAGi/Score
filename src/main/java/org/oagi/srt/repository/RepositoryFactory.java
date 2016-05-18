@@ -32,6 +32,10 @@ public interface RepositoryFactory {
     public DataTypeSupplementaryComponentRepository dataTypeSupplementaryComponentRepository();
 
     public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository();
+    public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository();
+    public CoreDataTypeAllowedPrimitiveRepository coreDataTypeAllowedPrimitiveRepository();
+    public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+    public XSDBuiltInTypeRepository xsdBuiltInTypeRepository();
 
     public UserRepository userRepository();
 

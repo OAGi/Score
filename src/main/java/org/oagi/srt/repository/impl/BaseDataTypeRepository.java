@@ -1,12 +1,15 @@
 package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.DataTypeRepository;
+import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.mapper.DataTypeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -37,5 +40,103 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_DT_ID_STATEMENT,
                 namedParameters, DataTypeMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_DATA_TYPE_TERM_AND_TYPE_STATEMENT = "SELECT " +
+            "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
+            "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
+            "FROM dt " +
+            "WHERE data_type_term = :data_type_term AND type = :type";
+
+    @Override
+    public DataType findOneByDataTypeTermAndType(String dataTypeTerm, int type) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("data_type_term", dataTypeTerm)
+                .addValue("type", type);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_DATA_TYPE_TERM_AND_TYPE_STATEMENT,
+                namedParameters, DataTypeMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_GUID_STATEMENT = "SELECT " +
+            "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
+            "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
+            "FROM dt " +
+            "WHERE guid = :guid";
+
+    @Override
+    public DataType findOneByGuid(String guid) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", guid);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_STATEMENT,
+                namedParameters, DataTypeMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_DEN_STATEMENT = "SELECT " +
+            "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
+            "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
+            "FROM dt " +
+            "WHERE den = :den";
+
+    @Override
+    public DataType findOneByDen(String den) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("den", den);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_DEN_STATEMENT,
+                namedParameters, DataTypeMapper.INSTANCE);
+    }
+
+    private final String SAVE_STATEMENT = "INSERT INTO dt (" +
+            "guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
+            "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated) VALUES (" +
+            ":guid, :type, :version_num, :previous_version_dt_id, :data_type_term, :qualifier, " +
+            ":based_dt_id, :den, :content_component_den, :definition, :content_component_definition, :revision_doc, :state, " +
+            ":created_by, :owner_user_id, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
+            ":revision_num, :revision_tracking_num, :revision_action, :release_id, :current_bdt_id, :is_deprecated)";
+
+    @Override
+    public void save(DataType dataType) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", dataType.getGuid())
+                .addValue("type", dataType.getType())
+                .addValue("version_num", dataType.getVersionNum())
+                .addValue("previous_version_dt_id", dataType.getPreviousVersionDtId())
+                .addValue("data_type_term", dataType.getDataTypeTerm())
+                .addValue("qualifier", dataType.getQualifier())
+                .addValue("based_dt_id", dataType.getBasedDtId())
+                .addValue("den", dataType.getDen())
+                .addValue("content_component_den", dataType.getContentComponentDen())
+                .addValue("definition", dataType.getDefinition())
+                .addValue("content_component_definition", dataType.getContentComponentDefinition())
+                .addValue("revision_doc", dataType.getRevisionDoc())
+                .addValue("state", dataType.getState())
+                .addValue("created_by", dataType.getCreatedBy())
+                .addValue("owner_user_id", dataType.getOwnerUserId())
+                .addValue("last_updated_by", dataType.getLastUpdatedBy())
+                .addValue("revision_num", dataType.getRevisionNum())
+                .addValue("revision_tracking_num", dataType.getRevisionTrackingNum())
+                .addValue("revision_action", dataType.getRevisionAction())
+                .addValue("release_id", dataType.getReleaseId())
+                .addValue("current_bdt_id", dataType.getCurrentBdtId())
+                .addValue("is_deprecated", dataType.isDeprecated() ? 1 : 0);
+
+        int dtId = doSave(namedParameters, dataType);
+        dataType.setDtId(dtId);
+    }
+
+    protected int doSave(MapSqlParameterSource namedParameters, DataType dataType) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        getNamedParameterJdbcTemplate().update(SAVE_STATEMENT, namedParameters, keyHolder, new String[]{"dt_id"});
+        return keyHolder.getKey().intValue();
     }
 }

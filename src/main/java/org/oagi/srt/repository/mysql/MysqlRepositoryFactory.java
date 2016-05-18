@@ -78,6 +78,18 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     private BaseBusinessDataTypePrimitiveRestrictionRepository baseBusinessDataTypePrimitiveRestrictionRepository;
 
     @Autowired
+    private BaseCoreDataTypePrimitiveRepository baseCoreDataTypePrimitiveRepository;
+
+    @Autowired
+    private BaseCoreDataTypeAllowedPrimitiveRepository baseCoreDataTypeAllowedPrimitiveRepository;
+
+    @Autowired
+    private BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+
+    @Autowired
+    private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
+
+    @Autowired
     private BaseUserRepository baseUserRepository;
 
     @Override
@@ -193,6 +205,26 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository() {
         return baseBusinessDataTypePrimitiveRestrictionRepository;
+    }
+
+    @Override
+    public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository() {
+        return baseCoreDataTypePrimitiveRepository;
+    }
+
+    @Override
+    public CoreDataTypeAllowedPrimitiveRepository coreDataTypeAllowedPrimitiveRepository() {
+        return baseCoreDataTypeAllowedPrimitiveRepository;
+    }
+
+    @Override
+    public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository() {
+        return baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+    }
+
+    @Override
+    public XSDBuiltInTypeRepository xsdBuiltInTypeRepository() {
+        return baseXSDBuiltInTypeRepository;
     }
 
     @Override
