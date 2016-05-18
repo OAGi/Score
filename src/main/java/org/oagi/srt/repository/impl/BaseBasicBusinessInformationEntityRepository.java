@@ -95,7 +95,7 @@ public class BaseBasicBusinessInformationEntityRepository extends NamedParameter
     private final String UPDATE_STATEMENT = "UPDATE bbie SET " +
             "guid = :guid, based_bcc_id = :based_bcc_id, from_abie_id = :from_abie_id, to_bbiep_id = :to_bbiep_id, " +
             "bdt_pri_restri_id = :bdt_pri_restri_id, code_list_id = :code_list_id, " +
-            "cardinality_min = :cardinality_min, cardinality_max = :cardinality_min, default_value = :default_value, " +
+            "cardinality_min = :cardinality_min, cardinality_max = :cardinality_max, default_value = :default_value, " +
             "is_nillable = :is_nillable, fixed_value = :fixed_value, is_null = :is_null, " +
             "definition = :definition, remark = :remark, last_updated_by = :last_updated_by, last_update_timestamp = CURRENT_TIMESTAMP, " +
             "seq_key = :seq_key, is_used = :is_used " +
@@ -115,7 +115,7 @@ public class BaseBasicBusinessInformationEntityRepository extends NamedParameter
                 .addValue("default_value", bbie.getDefaultValue())
                 .addValue("is_nillable", bbie.isNillable() ? 1 : 0)
                 .addValue("fixed_value", bbie.getFixedValue())
-                .addValue("is_null", bbie.isNill())
+                .addValue("is_null", bbie.isNill() ? 1 : 0)
                 .addValue("definition", bbie.getDefinition())
                 .addValue("remark", bbie.getRemark())
                 .addValue("last_updated_by", bbie.getLastUpdatedBy())
