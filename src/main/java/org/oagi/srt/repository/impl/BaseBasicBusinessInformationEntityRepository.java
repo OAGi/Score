@@ -98,7 +98,7 @@ public class BaseBasicBusinessInformationEntityRepository extends NamedParameter
             "cardinality_min = :cardinality_min, cardinality_max = :cardinality_max, default_value = :default_value, " +
             "is_nillable = :is_nillable, fixed_value = :fixed_value, is_null = :is_null, " +
             "definition = :definition, remark = :remark, last_updated_by = :last_updated_by, last_update_timestamp = CURRENT_TIMESTAMP, " +
-            "seq_key = :seq_key, is_used = :is_used" +
+            "seq_key = :seq_key, is_used = :is_used " +
             "WHERE bbie_id = :bbie_id";
 
     @Override
@@ -115,7 +115,7 @@ public class BaseBasicBusinessInformationEntityRepository extends NamedParameter
                 .addValue("default_value", bbie.getDefaultValue())
                 .addValue("is_nillable", bbie.isNillable() ? 1 : 0)
                 .addValue("fixed_value", bbie.getFixedValue())
-                .addValue("is_null", bbie.isNill())
+                .addValue("is_null", bbie.isNill() ? 1 : 0)
                 .addValue("definition", bbie.getDefinition())
                 .addValue("remark", bbie.getRemark())
                 .addValue("last_updated_by", bbie.getLastUpdatedBy())
