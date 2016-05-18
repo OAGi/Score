@@ -10,6 +10,7 @@ import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class P_1_3_PopulateAgencyIDList {
     private RepositoryFactory repositoryFactory;
 
     @Transactional(rollbackFor = Throwable.class)
-    public void run() throws Exception {
+    public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.3 Start");
         Collection<AgencyIdList> agencyIdLists = agencyIDList();
         Collection<AgencyIdListValue> agencyIdListValues = agencyIDListValue(agencyIdLists);
@@ -238,7 +239,7 @@ public class P_1_3_PopulateAgencyIDList {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
             P_1_3_PopulateAgencyIDList populateAgencyIDList = ctx.getBean(P_1_3_PopulateAgencyIDList.class);
-            //populateAgencyIDList.run();
+            populateAgencyIDList.run(ctx);
             populateAgencyIDList.validate();
         }
     }

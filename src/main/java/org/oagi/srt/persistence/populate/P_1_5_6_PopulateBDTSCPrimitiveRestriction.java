@@ -1,453 +1,371 @@
 package org.oagi.srt.persistence.populate;
 
-import org.chanchan.common.persistence.db.BfPersistenceException;
-import org.chanchan.common.persistence.db.DBAgent;
-import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.xpath.XPathExpressionException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @version 1.0
  * @author Yunsu Lee
+ * @version 1.0
  */
+@Component
 public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
-	
-	private static Connection conn = null;
-	
-	public int getAgencyListID() throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("AgencyIDList");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("name", "Agency Identification");
-		AgencyIDListVO agencyidlistVO = (AgencyIDListVO)dao.findObject(qc);
-		return agencyidlistVO.getAgencyIDListID();
-	}
 
-	public void run() throws Exception {
-		XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-		XPathHandler xh2 = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
-		System.out.println("### 1.5.6 Start");
-		populateBDTSCPrimitiveRestriction(xh, xh2, true);
-		System.out.println("### 1.5.6 End");
-	}
-	
-	public void populateBDTSCPrimitiveRestriction(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws BfPersistenceException, SRTDAOException, XPathExpressionException, SQLException {
-		DBAgent tx = new DBAgent();
-		conn = tx.open();
-		
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("DTSC");
-		SRTDAO aBDTSCPrimitiveRestrictionDAO = df.getDAO("BDTSCPrimitiveRestriction");
-		SRTDAO aCDTSCAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-		SRTDAO aCDTAllowedPrimitiveExpressionTypeMapDAO = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		SRTDAO aCDTSCAllowedPrimitiveDAO = df.getDAO("CDTSCAllowedPrimitive");
-		SRTDAO aCDTAllowedPrimitiveDAO = df.getDAO("CDTAllowedPrimitive");
-		SRTDAO aCodeListDAO = df.getDAO("CodeList");
-		SRTDAO aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
-		SRTDAO aXBTDAO = df.getDAO("XSDBuiltInType");
-		SRTDAO aDTDAO = df.getDAO("DT");
-		
-		ArrayList<SRTObject> al = dao.findObjects(conn);
-		ArrayList<SRTObject> al_meta = new ArrayList<SRTObject>();
-		if(is_fields_xsd){
-			
-		}
-		else {
-			for(SRTObject aSRTObject : al){
-				DTSCVO aDTSCVO = (DTSCVO)aSRTObject;
-				QueryCondition qc_01 = new QueryCondition();
-				qc_01.add("dt_id", aDTSCVO.getOwnerDTID());
-				DTVO dtVO = (DTVO) aDTDAO.findObject(qc_01, conn);
-				
-				String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"} ;
-				for(int k = 0 ; k < metalist.length; k++){
-					if(dtVO.getDEN().equalsIgnoreCase(Utility.typeToDen(metalist[k])))
-						al_meta.add(k, aDTSCVO);
-				}
-			}
-			al = new ArrayList<SRTObject>();
-			al = (ArrayList<SRTObject>) al_meta.clone();
-		}
-			
-		for(SRTObject aSRTObject : al) {
-			DTSCVO aDTSCVO = (DTSCVO)aSRTObject;
-			String tmp_guid = null;
-			if(isBDTSC(aDTSCVO.getOwnerDTID())) {
-				
-				Node result = xh.getNode("//xsd:attribute[@id='" + aDTSCVO.getDTSCGUID() + "']");
-				tmp_guid = aDTSCVO.getDTSCGUID();
-				if(result == null) { // if result is null, then look up its based default BDT and get guid
-					result = xh2.getNode("//xsd:attribute[@id='" + aDTSCVO.getDTSCGUID() + "']");
-					tmp_guid = aDTSCVO.getDTSCGUID();
+    @Autowired
+    private RepositoryFactory repositoryFactory;
 
-					if(aDTSCVO.getBasedDTSCID() != 0 && result == null){
-						DTSCVO dtscVO = getDTSC(aDTSCVO.getBasedDTSCID());
-						result = xh.getNode("//xsd:attribute[@id='" + dtscVO.getDTSCGUID() + "']");
-						tmp_guid = dtscVO.getDTSCGUID();
-						if(result == null){
-							result = xh2.getNode("//xsd:attribute[@id='" + dtscVO.getDTSCGUID() + "']");
-							tmp_guid = dtscVO.getDTSCGUID();
-						}
-					}
-				}
+    public int getAgencyListID() throws Exception {
+        AgencyIdListRepository dao = repositoryFactory.agencyIdListRepository();
+        AgencyIdList agencyidlistVO = dao.findOneByName("Agency Identification");
+        return agencyidlistVO.getAgencyIdListId();
+    }
 
-				Element ele = (Element)result;
-				int codeListId = 0;
-				QueryCondition qc_00 = new QueryCondition();
-				String ele_name = "";
+    @Transactional(rollbackFor = Throwable.class)
+    public void run(ApplicationContext applicationContext) throws Exception {
+        XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xh2 = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        System.out.println("### 1.5.6 Start");
+        populateBDTSCPrimitiveRestriction(xh, xh2, true);
+        System.out.println("### 1.5.6 End");
+    }
 
-				System.out.print("***** "+ aDTSCVO.getPropertyTerm()+ "_"+aDTSCVO.getRepresentationTerm()+ " Start! " + aDTSCVO.getDTSCGUID());
+    public void populateBDTSCPrimitiveRestriction(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
+        DataTypeSupplementaryComponentRepository dao = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository aBDTSCPrimitiveRestrictionDAO = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCDTSCAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
+        CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
+        CodeListRepository aCodeListDAO = repositoryFactory.codeListRepository();
+        CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
+        XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
+        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
 
-				if(ele != null && ele.getAttribute("type") != null) {
-					String attrTypeName = ele.getAttribute("type").replaceAll("ContentType", "");
-					qc_00.add("name", ele.getAttribute("type").replaceAll("ContentType", ""));
-					codeListId = ((CodeListVO)aCodeListDAO.findObject(qc_00, conn)).getCodeListID();
-					ele_name = ele.getAttribute("name");
-					System.out.println(" attrTypeName= "+attrTypeName +" codelist=" +codeListId);
-				}
-				else {
-					System.out.println("");
-				}
-				
-				if(!is_fields_xsd){
-					
-					QueryCondition qc_01 = new QueryCondition();
-					qc_01.add("dt_id", aDTSCVO.getOwnerDTID());
-					DTVO dtVO = (DTVO) aDTDAO.findObject(qc_01, conn);
-					
-					QueryCondition qc4Base = new QueryCondition();
-					qc4Base.add("dt_id", dtVO.getBasedDTID());
-					DTVO defaultTextBDT = (DTVO) aDTDAO.findObject(qc4Base);
-					
-					QueryCondition qc4BDTSCs = new QueryCondition();
-					qc4BDTSCs.add("owner_dt_id", defaultTextBDT.getDTID());
-					ArrayList<SRTObject> baseDTSCs = dao.findObjects(qc4BDTSCs);
-					
-					for (int i=0; i<baseDTSCs.size(); i++){
-						DTSCVO adtscVO = (DTSCVO) baseDTSCs.get(i);
-						QueryCondition qc4BDTSCPris = new QueryCondition();
-						qc4BDTSCPris.add("BDT_SC_ID", adtscVO.getDTSCID());
-						ArrayList<SRTObject> baseBDTSCPris = aBDTSCPrimitiveRestrictionDAO.findObjects(qc4BDTSCPris);
-						
-						for(int j=0; j<baseBDTSCPris.size(); j++){
-							BDTSCPrimitiveRestrictionVO aBDTSCPri = (BDTSCPrimitiveRestrictionVO) baseBDTSCPris.get(j);
-							BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
-							
-							bVO.setBDTSCID(aDTSCVO.getDTSCID());
-							bVO.setCDTSCAllowedPrimitiveExpressionTypeMapID(aBDTSCPri.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-							
-							QueryCondition qc4CDTAPX = new QueryCondition();
-							qc4CDTAPX.add("CDT_SC_awd_Pri_xps_Type_map_id", aBDTSCPri.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-							CDTSCAllowedPrimitiveExpressionTypeMapVO CDTSCAPX = (CDTSCAllowedPrimitiveExpressionTypeMapVO) aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc4CDTAPX);
-							
-							QueryCondition qc4TokenXbt = new QueryCondition();
-							qc4TokenXbt.add("builtin_type", "xsd:token");
-							XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc4TokenXbt);
-							
-							if(CDTSCAPX.getXSDBuiltInTypeID()==xbt.getXSDBuiltInTypeID()){//if it is token
-								bVO.setisDefault(true);
-							}
-							else {
-								bVO.setisDefault(false);
-							}
-							
-							QueryCondition qc4Xbtname = new QueryCondition();
-							qc4Xbtname.add("xbt_id", CDTSCAPX.getXSDBuiltInTypeID());
-							XSDBuiltInTypeVO xbtName = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc4Xbtname);
-							System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" xbt = "+xbtName.getBuiltInType()+" is default = "+bVO.getisDefault());
-							aBDTSCPrimitiveRestrictionDAO.insertObject(bVO);
-						}
-					}
-					
-					if(aDTSCVO.getPropertyTerm().equals("Language")){
-						BDTSCPrimitiveRestrictionVO bLanguageVO = new BDTSCPrimitiveRestrictionVO();
-						bLanguageVO.setBDTSCID(aDTSCVO.getDTSCID());
-						
-						QueryCondition qc4Codelist = new QueryCondition();
-						qc4Codelist.add("name", "clm56392A20081107_LanguageCode");
-						CodeListVO clVO = (CodeListVO) aCodeListDAO.findObject(qc4Codelist);
-						bLanguageVO.setCodeListID(clVO.getCodeListID());
-						bLanguageVO.setisDefault(false);
-						System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bLanguageVO.getCodeListID()+" is default = "+bLanguageVO.getisDefault());
-						aBDTSCPrimitiveRestrictionDAO.insertObject(bLanguageVO);
-					}
-					else if (aDTSCVO.getPropertyTerm().equals("Action Code")){
-						BDTSCPrimitiveRestrictionVO bActionCodeVO = new BDTSCPrimitiveRestrictionVO();
-						bActionCodeVO.setBDTSCID(aDTSCVO.getDTSCID());
-						QueryCondition qc4Codelist = new QueryCondition();
-						
-						if(dtVO.getDEN().equals("Action Expression. Type")){
-							qc4Codelist.add("name", "oacl_ActionCode");
-						}
-						else if (dtVO.getDEN().equals("Response Expression. Type")){
-							qc4Codelist.add("name", "oacl_ResponseActionCode");
-						}
-						
-						CodeListVO clVO = (CodeListVO) aCodeListDAO.findObject(qc4Codelist);
-						bActionCodeVO.setCodeListID(clVO.getCodeListID());
-						bActionCodeVO.setisDefault(false);
-						System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bActionCodeVO.getCodeListID()+" is default = "+bActionCodeVO.getisDefault());
-						aBDTSCPrimitiveRestrictionDAO.insertObject(bActionCodeVO);
-					}
-				}
-				else if((aDTSCVO.getRepresentationTerm().contains("Code") && codeListId > 0) || ele_name.contains("AgencyID")) { 
-					
-					BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
-					bVO.setBDTSCID(aDTSCVO.getDTSCID());
-					bVO.setisDefault(false);
-					
-					if(ele.getAttribute("name").contains("AgencyID")) {
-						bVO.setAgencyIDListID(getAgencyListID());
-						System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.getisDefault());
-					} else {
-						bVO.setCodeListID(codeListId);
-						System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bVO.getCodeListID()+" is default = "+bVO.getisDefault());
-					}
-					//System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bVO.getCodeListID()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.getisDefault());
-					aBDTSCPrimitiveRestrictionDAO.insertObject(bVO);
-					
-					QueryCondition qc01 = new QueryCondition();
-					qc01.add("name", "Token");
-					int CDT_Primitive_id = ((CDTPrimitiveVO)aCDTPrimitiveDAO.findObject(qc01, conn)).getCDTPrimitiveID();
-					
-					QueryCondition qc02 = new QueryCondition();
-					qc02.add("builtin_type", "xsd:token");
-					int xbt_id = ((XSDBuiltInTypeVO)aXBTDAO.findObject(qc02, conn)).getXSDBuiltInTypeID();
-					
-					QueryCondition qc021 = new QueryCondition();
-					qc021.add("dt_sc_id", aDTSCVO.getBasedDTSCID());
-					DTSCVO stscVO = (DTSCVO)dao.findObject(qc021, conn);
-					int cdt_id = 0;
-					if(stscVO.getBasedDTSCID() < 1)
-						cdt_id = aDTSCVO.getBasedDTSCID();
-					else
-						cdt_id = stscVO.getBasedDTSCID();
-					
-					QueryCondition qc03 = new QueryCondition();
-					qc03.add("cdt_sc_id", cdt_id); 
-					qc03.add("CDT_Pri_id", CDT_Primitive_id);
-					int cdt_sc_awd_pri_id = ((CDTSCAllowedPrimitiveVO)aCDTSCAllowedPrimitiveDAO.findObject(qc03, conn)).getCDTSCAllowedPrimitiveID();
-					
-					QueryCondition qc04 = new QueryCondition();
-					qc04.add("CDT_SC_awd_pri", cdt_sc_awd_pri_id);
-					qc04.add("xbt_id", xbt_id);
-					int CDTSCAllowedPrimitiveExpressionTypeMapID = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc04, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
-					
-					BDTSCPrimitiveRestrictionVO bVO1 = new BDTSCPrimitiveRestrictionVO();
-					bVO1.setBDTSCID(aDTSCVO.getDTSCID());
-					
-					bVO1.setCDTSCAllowedPrimitiveExpressionTypeMapID(CDTSCAllowedPrimitiveExpressionTypeMapID);
-					bVO1.setisDefault(true); 
-					
-					QueryCondition qc4CDTSCAPX = new QueryCondition();
-					qc4CDTSCAPX.add("CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID", bVO1.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-					CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCPAX = (CDTSCAllowedPrimitiveExpressionTypeMapVO) aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc4CDTSCAPX);
-					
-					
-					QueryCondition qc4XBTName = new QueryCondition();
-					qc4XBTName.add("xbt_id", aCDTSCPAX.getXSDBuiltInTypeID());
-					XSDBuiltInTypeVO aXBT = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc4XBTName);
-					System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" xbt = "+aXBT.getBuiltInType()+"  is default = "+bVO1.getisDefault());
-					aBDTSCPrimitiveRestrictionDAO.insertObject(bVO1);
-					
-					
-					
+        List<DataTypeSupplementaryComponent> al = dao.findAll();
+        List<DataTypeSupplementaryComponent> al_meta = new ArrayList();
+        if (is_fields_xsd) {
+
+        } else {
+            for (DataTypeSupplementaryComponent aDataTypeSupplementaryComponent : al) {
+                DataType dtVO = aDTDAO.findOneByDtId(aDataTypeSupplementaryComponent.getOwnerDtId());
+
+                String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
+                for (int k = 0; k < metalist.length; k++) {
+                    if (dtVO.getDen().equalsIgnoreCase(Utility.typeToDen(metalist[k])))
+                        al_meta.add(k, aDataTypeSupplementaryComponent);
+                }
+            }
+            al = new ArrayList(al_meta);
+        }
+
+        for (DataTypeSupplementaryComponent aDataTypeSupplementaryComponent : al) {
+            String tmp_guid = null;
+            if (isBDTSC(aDataTypeSupplementaryComponent.getOwnerDtId())) {
+
+                Node result = xh.getNode("//xsd:attribute[@id='" + aDataTypeSupplementaryComponent.getGuid() + "']");
+                tmp_guid = aDataTypeSupplementaryComponent.getGuid();
+                if (result == null) { // if result is null, then look up its based default BDT and get guid
+                    result = xh2.getNode("//xsd:attribute[@id='" + aDataTypeSupplementaryComponent.getGuid() + "']");
+                    tmp_guid = aDataTypeSupplementaryComponent.getGuid();
+
+                    if (aDataTypeSupplementaryComponent.getBasedDtScId() != 0 && result == null) {
+                        DataTypeSupplementaryComponent dtscVO = getDTSC(aDataTypeSupplementaryComponent.getBasedDtScId());
+                        result = xh.getNode("//xsd:attribute[@id='" + dtscVO.getGuid() + "']");
+                        tmp_guid = dtscVO.getGuid();
+                        if (result == null) {
+                            result = xh2.getNode("//xsd:attribute[@id='" + dtscVO.getGuid() + "']");
+                            tmp_guid = dtscVO.getGuid();
+                        }
+                    }
+                }
+
+                Element ele = (Element) result;
+                int codeListId = 0;
+                String ele_name = "";
+
+                System.out.print("***** " + aDataTypeSupplementaryComponent.getPropertyTerm() + "_" + aDataTypeSupplementaryComponent.getRepresentationTerm() + " Start! " + aDataTypeSupplementaryComponent.getGuid());
+
+                if (ele != null && ele.getAttribute("type") != null) {
+                    String attrTypeName = ele.getAttribute("type").replaceAll("ContentType", "");
+                    codeListId = aCodeListDAO.findOneByName(ele.getAttribute("type").replaceAll("ContentType", "")).getCodeListId();
+                    ele_name = ele.getAttribute("name");
+                    System.out.println(" attrTypeName= " + attrTypeName + " codelist=" + codeListId);
+                } else {
+                    System.out.println("");
+                }
+
+                if (!is_fields_xsd) {
+
+                    DataType dtVO = (DataType) aDTDAO.findOneByDtId(aDataTypeSupplementaryComponent.getOwnerDtId());
+
+                    DataType defaultTextBDT = (DataType) aDTDAO.findOneByDtId(dtVO.getBasedDtId());
+
+                    List<DataTypeSupplementaryComponent> baseDTSCs = dao.findByOwnerDtId(defaultTextBDT.getDtId());
+
+                    for (int i = 0; i < baseDTSCs.size(); i++) {
+                        DataTypeSupplementaryComponent adtscVO = baseDTSCs.get(i);
+                        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> baseBDTSCPris = aBDTSCPrimitiveRestrictionDAO.findByBdtScId(adtscVO.getDtScId());
+
+                        for (int j = 0; j < baseBDTSCPris.size(); j++) {
+                            BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPri = baseBDTSCPris.get(j);
+                            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+
+                            bVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+                            bVO.setCdtScAwdPriXpsTypeMapId(aBDTSCPri.getCdtScAwdPriXpsTypeMapId());
+
+                            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap CDTSCAPX = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(aBDTSCPri.getCdtScAwdPriXpsTypeMapId());
+
+                            XSDBuiltInType xbt = aXBTDAO.findOneByBuiltInType("xsd:token");
+
+                            if (CDTSCAPX.getXbtId() == xbt.getXbtId()) {//if it is token
+                                bVO.setDefault(true);
+                            } else {
+                                bVO.setDefault(false);
+                            }
+
+                            XSDBuiltInType xbtName = aXBTDAO.findOneByXbtId(CDTSCAPX.getXbtId());
+                            System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
+                            aBDTSCPrimitiveRestrictionDAO.save(bVO);
+                        }
+                    }
+
+                    if (aDataTypeSupplementaryComponent.getPropertyTerm().equals("Language")) {
+                        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bLanguageVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                        bLanguageVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+
+                        CodeList clVO = (CodeList) aCodeListDAO.findOneByName("clm56392A20081107_LanguageCode");
+                        bLanguageVO.setCodeListId(clVO.getCodeListId());
+                        bLanguageVO.setDefault(false);
+                        System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bLanguageVO.getCodeListId() + " is default = " + bLanguageVO.isDefault());
+                        aBDTSCPrimitiveRestrictionDAO.save(bLanguageVO);
+                    } else if (aDataTypeSupplementaryComponent.getPropertyTerm().equals("Action Code")) {
+                        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bActionCodeVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                        bActionCodeVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+
+                        CodeList clVO = null;
+                        if (dtVO.getDen().equals("Action Expression. Type")) {
+                            clVO = aCodeListDAO.findOneByName("oacl_ActionCode");
+                        } else if (dtVO.getDen().equals("Response Expression. Type")) {
+                            clVO = aCodeListDAO.findOneByName("oacl_ResponseActionCode");
+                        }
+
+                        if (clVO != null) {
+                            bActionCodeVO.setCodeListId(clVO.getCodeListId());
+                            bActionCodeVO.setDefault(false);
+                            System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bActionCodeVO.getCodeListId() + " is default = " + bActionCodeVO.isDefault());
+                            aBDTSCPrimitiveRestrictionDAO.save(bActionCodeVO);
+                        }
+                    }
+                } else if ((aDataTypeSupplementaryComponent.getRepresentationTerm().contains("Code") && codeListId > 0) || ele_name.contains("AgencyID")) {
+
+                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                    bVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+                    bVO.setDefault(false);
+
+                    if (ele.getAttribute("name").contains("AgencyID")) {
+                        bVO.setAgencyIdListId(getAgencyListID());
+                        System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " agency id list id = " + bVO.getAgencyIdListId() + " is default = " + bVO.isDefault());
+                    } else {
+                        bVO.setCodeListId(codeListId);
+                        System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bVO.getCodeListId() + " is default = " + bVO.isDefault());
+                    }
+                    //System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDataTypeSupplementaryComponent.getPropertyTerm()+aDataTypeSupplementaryComponent.getRepresentationTerm()+" owner dt den = "+getDen(aDataTypeSupplementaryComponent.getOwnerDtId())+" code list id = "+bVO.getCodeListId()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.isDefault());
+                    aBDTSCPrimitiveRestrictionDAO.save(bVO);
+
+                    int CDT_Primitive_id = aCDTPrimitiveDAO.findOneByName("Token").getCdtPriId();
+
+                    int xbt_id = aXBTDAO.findOneByBuiltInType("xsd:token").getXbtId();
+
+                    DataTypeSupplementaryComponent stscVO = dao.findOneByDtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
+                    int cdt_id = 0;
+                    if (stscVO.getBasedDtScId() < 1)
+                        cdt_id = aDataTypeSupplementaryComponent.getBasedDtScId();
+                    else
+                        cdt_id = stscVO.getBasedDtScId();
+
+                    int cdt_sc_awd_pri_id = aCDTSCAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdt_id, CDT_Primitive_id).getCdtScAwdPriId();
+
+                    int CDTSCAllowedPrimitiveExpressionTypeMapID = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.
+                            findOneByCdtScAwdPriAndXbtId(cdt_sc_awd_pri_id, xbt_id).getCdtScAwdPriXpsTypeMapId();
+
+                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO1 = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                    bVO1.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+
+                    bVO1.setCdtScAwdPriXpsTypeMapId(CDTSCAllowedPrimitiveExpressionTypeMapID);
+                    bVO1.setDefault(true);
+
+                    CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCPAX =
+                            aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(bVO1.getCdtScAwdPriXpsTypeMapId());
+
+
+                    XSDBuiltInType aXBT = aXBTDAO.findOneByXbtId(aCDTSCPAX.getXbtId());
+                    System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO1.isDefault());
+                    aBDTSCPrimitiveRestrictionDAO.save(bVO1);
+
+
 //					QueryCondition qc021 = new QueryCondition();
-//					qc021.add("dt_sc_id", aDTSCVO.getBasedDTSCID());
-//					DTSCVO stscVO = (DTSCVO)dao.findObject(qc021, conn);
+//					qc021.add("dt_sc_id", aDataTypeSupplementaryComponent.getBasedDtScId());
+//					DataTypeSupplementaryComponent stscVO = (DataTypeSupplementaryComponent)dao.findObject(qc021, conn);
 //					int cdt_id = 0;
 //					if(stscVO == null){ //New
 //						QueryCondition qc031 = new QueryCondition();
 //						qc031.add("name", ele.getAttribute("type").substring(0, ele.getAttribute("type").lastIndexOf("ContentType")));
-//						CodeListVO codelistVO = (CodeListVO)aCodeListDAO.findObject(qc031, conn);
-//						BDTSCPrimitiveRestrictionVO bVO1 = new BDTSCPrimitiveRestrictionVO();
-//						bVO1.setBDTSCID(aDTSCVO.getDTSCID());
-//						bVO1.setCodeListID(codelistVO.getCodeListID());
-//						bVO1.setisDefault(false);
-//						System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" code list id = "+bVO1.getCodeListID()+" code list name = "+codelistVO.getName()+"  is default = "+bVO1.getisDefault());
-//						aBDTSCPrimitiveRestrictionDAO.insertObject(bVO1);
+//						CodeList codelistVO = (CodeList)aCodeListDAO.findObject(qc031, conn);
+//						BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO1 = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+//						bVO1.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+//						bVO1.setCodeListId(codelistVO.getCodeListId());
+//						bVO1.setDefault(false);
+//						System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDataTypeSupplementaryComponent.getPropertyTerm()+aDataTypeSupplementaryComponent.getRepresentationTerm()+" owner dt den = "+getDen(aDataTypeSupplementaryComponent.getOwnerDtId())+" code list id = "+bVO1.getCodeListId()+" code list name = "+codelistVO.getName()+"  is default = "+bVO1.isDefault());
+//						aBDTSCPrimitiveRestrictionDAO.save(bVO1);
 //					}
 //					else {
-//						if(stscVO.getBasedDTSCID() < 1)
-//							cdt_id = aDTSCVO.getBasedDTSCID();
+//						if(stscVO.getBasedDtScId() < 1)
+//							cdt_id = aDataTypeSupplementaryComponent.getBasedDtScId();
 //						else
-//							cdt_id = stscVO.getBasedDTSCID();
-//						
+//							cdt_id = stscVO.getBasedDtScId();
+//
 //						QueryCondition qc03 = new QueryCondition();
-//						qc03.add("cdt_sc_id", cdt_id); 
+//						qc03.add("cdt_sc_id", cdt_id);
 //						qc03.add("CDT_Pri_id", CDT_Primitive_id);
 //						int cdt_sc_awd_pri_id = ((CDTSCAllowedPrimitiveVO)aCDTSCAllowedPrimitiveDAO.findObject(qc03, conn)).getCDTSCAllowedPrimitiveID();
-//						
+//
 //						QueryCondition qc04 = new QueryCondition();
 //						qc04.add("CDT_SC_awd_pri", cdt_sc_awd_pri_id);
 //						qc04.add("xbt_id", xbt_id);
-//						int CDTSCAllowedPrimitiveExpressionTypeMapID = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc04, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
-//						
-//						BDTSCPrimitiveRestrictionVO bVO1 = new BDTSCPrimitiveRestrictionVO();
-//						bVO1.setBDTSCID(aDTSCVO.getDTSCID());
-//						
+//						int CDTSCAllowedPrimitiveExpressionTypeMapID = ((CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap)aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc04, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
+//
+//						BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO1 = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+//						bVO1.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+//
 //						bVO1.setCDTSCAllowedPrimitiveExpressionTypeMapID(CDTSCAllowedPrimitiveExpressionTypeMapID);
-//						bVO1.setisDefault(true); 
-//						System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" cdt_sc_allowed_pri_xps_type_map_id = "+bVO1.getCDTSCAllowedPrimitiveExpressionTypeMapID()+"  is default = "+bVO1.getisDefault());
-//						aBDTSCPrimitiveRestrictionDAO.insertObject(bVO1);
+//						bVO1.setDefault(true);
+//						System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDataTypeSupplementaryComponent.getPropertyTerm()+aDataTypeSupplementaryComponent.getRepresentationTerm()+" owner dt den = "+getDen(aDataTypeSupplementaryComponent.getOwnerDtId())+" cdt_sc_allowed_pri_xps_type_map_id = "+bVO1.getCDTSCAllowedPrimitiveExpressionTypeMapID()+"  is default = "+bVO1.isDefault());
+//						aBDTSCPrimitiveRestrictionDAO.save(bVO1);
 //					}
-				} 
-				else {
-					ArrayList<SRTObject> al3 = new ArrayList<SRTObject>();
-					if(aDTSCVO.getBasedDTSCID() < 1) { //new attributes SC
-						QueryCondition qc = new QueryCondition();
-						qc.add("cdt_sc_id", aDTSCVO.getDTSCID());
-						al3 = aCDTSCAllowedPrimitiveDAO.findObjects(qc, conn);
-					}
-					else { // DTSC is based on other dt_sc
-						QueryCondition qc = new QueryCondition();
-						qc.add("cdt_sc_id", aDTSCVO.getBasedDTSCID());
-						
-						al3 = aCDTSCAllowedPrimitiveDAO.findObjects(qc, conn);
-						if(al3.size() < 1) {
-							QueryCondition qc4 = new QueryCondition();
-							qc4.add("dt_sc_id", aDTSCVO.getBasedDTSCID());
-							
-							qc = new QueryCondition();
-							qc.add("cdt_sc_id", ((DTSCVO)dao.findObject(qc4, conn)).getBasedDTSCID());
-							
-							al3 = aCDTSCAllowedPrimitiveDAO.findObjects(qc, conn);
-						}
-					}
-					for(SRTObject aSRTObject3 : al3) {//Loop retrieved cdt_sc_awd_pri
-						CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = (CDTSCAllowedPrimitiveVO)aSRTObject3;
-						
-						QueryCondition qc1 = new QueryCondition();
-						qc1.add("cdt_sc_awd_pri", aCDTSCAllowedPrimitiveVO.getCDTSCAllowedPrimitiveID());
-						ArrayList<SRTObject> al4 = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObjects(qc1, conn);
-						for(SRTObject aSRTObject4 : al4) {
-							CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExVO = (CDTSCAllowedPrimitiveExpressionTypeMapVO)aSRTObject4;
-							
-							BDTSCPrimitiveRestrictionVO bVO = new BDTSCPrimitiveRestrictionVO();
-							bVO.setBDTSCID(aDTSCVO.getDTSCID());
-							
-							bVO.setCDTSCAllowedPrimitiveExpressionTypeMapID(aCDTSCAllowedPrimitiveExVO.getCTSCAllowedPrimitiveExpressionTypeMapID());
-							
-							
-							XSDBuiltInTypeVO xbtVO = getXSDBuiltInTypeID(aCDTSCAllowedPrimitiveExVO.getXSDBuiltInTypeID());
-							String xdtName = xbtVO.getBuiltInType();
-							
-							int cdtPrimitiveId = aCDTSCAllowedPrimitiveVO.getCDTPrimitiveID();
-							
-							String representationTerm = aDTSCVO.getRepresentationTerm();
-							if(representationTerm.equalsIgnoreCase("Code") && xdtName.equalsIgnoreCase("xsd:token") && "Token".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Identifier") && xdtName.equalsIgnoreCase("xsd:normalizedString") && "NormalizedString".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Name") && xdtName.equalsIgnoreCase("xsd:normalizedString") && "NormalizedString".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Indicator") && xdtName.equalsIgnoreCase("xsd:boolean") && "Boolean".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Value") && xdtName.equalsIgnoreCase("xsd:decimal") && "Decimal".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Text") && xdtName.equalsIgnoreCase("xsd:normalizedString") && "NormalizedString".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Number") && xdtName.equalsIgnoreCase("xsd:decimal") && "Decimal".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else if(representationTerm.equalsIgnoreCase("Date Time") && xdtName.equalsIgnoreCase("xsd:token") && "Timepoint".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
-								bVO.setisDefault(true); 
-							} else {
-								bVO.setisDefault(false); 
-							}
-							
-							QueryCondition qc4CDTSCAPX = new QueryCondition();
-							qc4CDTSCAPX.add("CDT_SC_awd_Pri_xps_Type_map_id", bVO.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-							CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCPAX = (CDTSCAllowedPrimitiveExpressionTypeMapVO) aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findObject(qc4CDTSCAPX);
-							
-							
-							QueryCondition qc4XBTName = new QueryCondition();
-							qc4XBTName.add("xbt_id", aCDTSCPAX.getXSDBuiltInTypeID());
-							XSDBuiltInTypeVO aXBT = (XSDBuiltInTypeVO) aXBTDAO.findObject(qc4XBTName);
-							
-							//exceptional case
-							if(ele != null && ele.getAttribute("type") != null && ele.getAttribute("type").equalsIgnoreCase("NumberType_B98233") ){
-								if(representationTerm.equalsIgnoreCase("Number") && xdtName.equalsIgnoreCase("xsd:integer") && "Integer".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))){
-									bVO.setisDefault(true); 
-									System.out.println("     ##### Populating bdt sc primitive restriction(NumberType_B98233) for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" xbt = "+aXBT.getBuiltInType()+"  is default = "+bVO.getisDefault());
-								}
-								else if(representationTerm.equalsIgnoreCase("Number") && xdtName.equalsIgnoreCase("xsd:decimal") && "Decimal".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))){
-									bVO.setisDefault(false); 
-									System.out.println("     ##### Populating bdt sc primitive restriction(NumberType_B98233) for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" xbt = "+aXBT.getBuiltInType()+"  is default = "+bVO.getisDefault());
-								}
-							}
-							//System.out.println("representation term = "+representationTerm+" xbt name = "+xdtName+" cdt primitive name = "+getCDTPrimitiveName(cdtPrimitiveId));
-							System.out.println("     ##### Populating bdt sc primitive restriction for bdt sc = "+aDTSCVO.getPropertyTerm()+aDTSCVO.getRepresentationTerm()+" owner dt den = "+getDEN(aDTSCVO.getOwnerDTID())+" xbt = "+aXBT.getBuiltInType()+"  is default = "+bVO.getisDefault());
-							aBDTSCPrimitiveRestrictionDAO.insertObject(bVO);
-						}
-					}
-				}
-			}
-		}
-		
-		tx.close();
-		conn.close();
-	}
-	public DTSCVO getDTSC(int id) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO aDTDAO = df.getDAO("DTSC");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("dt_sc_id",  id);
-		return (DTSCVO)aDTDAO.findObject(qc, conn);
-	}
-	
-	public String getDEN (int id) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO aDTDAO = df.getDAO("DT");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("dt_id",  id);
-		return ((DTVO)aDTDAO.findObject(qc, conn)).getDEN();
-	}
-	
-	public boolean isBDTSC (int id) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO aDTDAO = df.getDAO("DT");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("dt_id",  id);
-		
-		DTVO tmp = (DTVO)aDTDAO.findObject(qc, conn);
-		
-		if(tmp!=null && tmp.getDTType() == 1)
-			return true;
-		return false;
-	}
-	
-	public String getCDTPrimitiveName(int id) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO aCDTPrimitiveDAO = df.getDAO("CDTPrimitive");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("cdt_pri_id",  id);
-		return ((CDTPrimitiveVO)aCDTPrimitiveDAO.findObject(qc)).getName();
-	}
-	
-	public XSDBuiltInTypeVO getXSDBuiltInTypeID(int id) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO aXSDBuiltInTypeDAO = df.getDAO("XSDBuiltInType");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("xbt_id", id);
-		return (XSDBuiltInTypeVO)aXSDBuiltInTypeDAO.findObject(qc);
-	}
+                } else {
+                    List<CoreDataTypeSupplementaryComponentAllowedPrimitive> al3;
+                    if (aDataTypeSupplementaryComponent.getBasedDtScId() < 1) { //new attributes SC
+                        al3 = aCDTSCAllowedPrimitiveDAO.findByCdtScId(aDataTypeSupplementaryComponent.getDtScId());
+                    } else { // DTSC is based on other dt_sc
+                        al3 = aCDTSCAllowedPrimitiveDAO.findByCdtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
+                        if (al3.isEmpty()) {
+                            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = dao.findOneByDtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
+                            al3 = aCDTSCAllowedPrimitiveDAO.findByCdtScId(dataTypeSupplementaryComponent.getBasedDtScId());
+                        }
+                    }
 
-	public static void main(String args[]) throws Exception {
-		Utility.dbSetup();
-		P_1_5_6_PopulateBDTSCPrimitiveRestriction p = new P_1_5_6_PopulateBDTSCPrimitiveRestriction();
-		p.run();
-	}
+                    for (CoreDataTypeSupplementaryComponentAllowedPrimitive aCDTSCAllowedPrimitiveVO : al3) {//Loop retrieved cdt_sc_awd_pri\
+                        List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> al4 =
+                                aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findByCdtScAwdPri(aCDTSCAllowedPrimitiveVO.getCdtScAwdPriId());
+                        for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExVO : al4) {
+
+                            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                            bVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
+
+                            bVO.setCdtScAwdPriXpsTypeMapId(aCDTSCAllowedPrimitiveExVO.getCdtScAwdPriXpsTypeMapId());
+
+
+                            XSDBuiltInType xbtVO = getXbtId(aCDTSCAllowedPrimitiveExVO.getXbtId());
+                            String xdtName = xbtVO.getBuiltInType();
+
+                            int cdtPrimitiveId = aCDTSCAllowedPrimitiveVO.getCdtPriId();
+
+                            String representationTerm = aDataTypeSupplementaryComponent.getRepresentationTerm();
+                            if (representationTerm.equalsIgnoreCase("Code") && xdtName.equalsIgnoreCase("xsd:token") && "Token".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Identifier") && xdtName.equalsIgnoreCase("xsd:normalizedString") && "NormalizedString".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Name") && xdtName.equalsIgnoreCase("xsd:normalizedString") && "NormalizedString".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Indicator") && xdtName.equalsIgnoreCase("xsd:boolean") && "Boolean".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Value") && xdtName.equalsIgnoreCase("xsd:decimal") && "Decimal".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Text") && xdtName.equalsIgnoreCase("xsd:normalizedString") && "NormalizedString".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Number") && xdtName.equalsIgnoreCase("xsd:decimal") && "Decimal".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else if (representationTerm.equalsIgnoreCase("Date Time") && xdtName.equalsIgnoreCase("xsd:token") && "Timepoint".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                bVO.setDefault(true);
+                            } else {
+                                bVO.setDefault(false);
+                            }
+
+                            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCPAX =
+                                    aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(bVO.getCdtScAwdPriXpsTypeMapId());
+
+
+                            XSDBuiltInType aXBT = aXBTDAO.findOneByXbtId(aCDTSCPAX.getXbtId());
+
+                            //exceptional case
+                            if (ele != null && ele.getAttribute("type") != null && ele.getAttribute("type").equalsIgnoreCase("NumberType_B98233")) {
+                                if (representationTerm.equalsIgnoreCase("Number") && xdtName.equalsIgnoreCase("xsd:integer") && "Integer".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                    bVO.setDefault(true);
+                                    System.out.println("     ##### Populating bdt sc primitive restriction(NumberType_B98233) for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO.isDefault());
+                                } else if (representationTerm.equalsIgnoreCase("Number") && xdtName.equalsIgnoreCase("xsd:decimal") && "Decimal".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
+                                    bVO.setDefault(false);
+                                    System.out.println("     ##### Populating bdt sc primitive restriction(NumberType_B98233) for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO.isDefault());
+                                }
+                            }
+                            //System.out.println("representation term = "+representationTerm+" xbt name = "+xdtName+" cdt primitive name = "+getCDTPrimitiveName(cdtPrimitiveId));
+                            System.out.println("     ##### Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO.isDefault());
+                            aBDTSCPrimitiveRestrictionDAO.save(bVO);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public DataTypeSupplementaryComponent getDTSC(int id) throws Exception {
+        DataTypeSupplementaryComponentRepository aDTDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        return aDTDAO.findOneByDtScId(id);
+    }
+
+    public String getDen(int id) throws Exception {
+        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
+        return aDTDAO.findOneByDtId(id).getDen();
+    }
+
+    public boolean isBDTSC(int id) throws Exception {
+        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
+
+        DataType tmp = aDTDAO.findOneByDtId(id);
+
+        if (tmp != null && tmp.getType() == 1)
+            return true;
+        return false;
+    }
+
+    public String getCDTPrimitiveName(int id) throws Exception {
+        CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
+        return aCDTPrimitiveDAO.findOneByCdtPriId(id).getName();
+    }
+
+    public XSDBuiltInType getXbtId(int id) throws Exception {
+        XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
+        return aXSDBuiltInTypeDAO.findOneByXbtId(id);
+    }
+
+    public static void main(String args[]) throws Exception {
+        try (AbstractApplicationContext ctx = (AbstractApplicationContext)
+                SpringApplication.run(Application.class, args);) {
+            P_1_5_6_PopulateBDTSCPrimitiveRestriction populateBDTSCPrimitiveRestriction = ctx.getBean(P_1_5_6_PopulateBDTSCPrimitiveRestriction.class);
+            populateBDTSCPrimitiveRestriction.run(ctx);
+        }
+    }
 }

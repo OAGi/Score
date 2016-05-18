@@ -10,6 +10,8 @@ public interface AgencyIdListRepository {
 
     public AgencyIdList findOneByGuid(String guid);
 
+    public AgencyIdList findOneByName(String name);
+
     public void save(AgencyIdList agencyIdList);
 
     public void updateAgencyId(int agencyIdListValue);

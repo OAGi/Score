@@ -8,6 +8,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -35,13 +36,13 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
             P_1_5_1_to_2_PopulateBDTsInDT populateBDTsInDT = ctx.getBean(P_1_5_1_to_2_PopulateBDTsInDT.class);
-            populateBDTsInDT.run();
+            populateBDTsInDT.run(ctx);
             populateBDTsInDT.validate();
         }
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void run() throws Exception {
+    public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.5.1-2 Start");
 
         int userId = getUserID("oagis");

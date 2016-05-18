@@ -1,228 +1,193 @@
 package org.oagi.srt.persistence.populate;
 
-import org.chanchan.common.persistence.db.DBAgent;
-import org.oagi.srt.common.QueryCondition;
+import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Connection;
 import java.util.List;
 
 /**
-*
-* @author Jaehun Lee
-* @author Yunsu Lee
-* @version 1.0
-*
-*/
+ * @author Jaehun Lee
+ * @author Yunsu Lee
+ * @version 1.0
+ */
+@Component
 public class P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD {
-	
-	private static Connection conn = null;
-	
-	public void importDTSCFromMeta() throws SRTDAOException, FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dtscDao = df.getDAO("DTSC");
-		SRTDAO dtDao = df.getDAO("DT");
-		SRTDAO cdtSCAPDao = df.getDAO("CDTSCAllowedPrimitive");
-		SRTDAO cdtSCAPMapDao = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-		SRTDAO xbtDao = df.getDAO("XSDBuiltInType");
-		SRTDAO bdtSCPRDao = df.getDAO("BDTSCPrimitiveRestriction");
-		SRTDAO codeListDao = df.getDAO("CodeList");
-		
-		QueryCondition qc_01 = new QueryCondition();
-		qc_01.add("den", "Text_62S0B4. Type");
-		DTVO dtVO_01 = (DTVO)dtDao.findObject(qc_01, conn);
-		
-		QueryCondition qc_011 = new QueryCondition();
-		qc_011.add("DT_ID", dtVO_01.getBasedDTID());
-		DTVO dtVO_012 = (DTVO)dtDao.findObject(qc_011, conn);
-		
-		QueryCondition qc_02 = new QueryCondition();
-		qc_02.add("owner_dt_id", dtVO_012.getDTID());
-		DTSCVO dtscVO_01 = (DTSCVO)dtscDao.findObject(qc_02, conn); //cdt
-		
-		QueryCondition qc_12 = new QueryCondition();
-		qc_12.add("owner_dt_id", dtVO_01.getDTID());
-		DTSCVO textBDT_dtscVO = (DTSCVO)dtscDao.findObject(qc_12, conn); //bdt
-		
-		
-		XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-		NodeList complexTypes = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
-		for(int i = 0; i < complexTypes.getLength(); i++) {
-			Element ele = (Element)complexTypes.item(i);
-		    String eleGuid = ele.getAttribute("id");
-		    System.out.println("");
-		    System.out.println("Populating DT SCs from complextype whose name is "+ele.getAttribute("name"));
-			// inherit all values from default Text BDT with two exceptions (max cardinality and based DTSC Id)
-			QueryCondition qc_021 = new QueryCondition();
-			qc_021.add("guid", eleGuid);
-			DTVO dtVO_011 = (DTVO)dtDao.findObject(qc_021, conn);
-			
-			DTSCVO dtscVO_02 = new DTSCVO();
-			dtscVO_02.setBasedDTSCID(textBDT_dtscVO.getDTSCID());
-			dtscVO_02.setDefinition(dtscVO_01.getDefinition());
-			dtscVO_02.setDTSCGUID(dtscVO_01.getDTSCGUID());
-			dtscVO_02.setMaxCardinality(0);
-			dtscVO_02.setMinCardinality(dtscVO_01.getMinCardinality());
-			dtscVO_02.setOwnerDTID(dtVO_011.getDTID());
-			dtscVO_02.setPropertyTerm(dtscVO_01.getPropertyTerm());
-			dtscVO_02.setRepresentationTerm(dtscVO_01.getRepresentationTerm());
-			
-			dtscDao.insertObject(dtscVO_02);
-			
-			QueryCondition qc_0211 = new QueryCondition();
-			qc_0211.add("guid", dtscVO_01.getDTSCGUID());
-			qc_0211.add("owner_dt_id", dtVO_011.getDTID());
-			int bdtSCId = ((DTSCVO)dtscDao.findObject(qc_0211, conn)).getDTSCID();
-			// populate BDT_SC_Primitive_Restriction table for language code
-			QueryCondition qc_022 = new QueryCondition();
-			qc_022.add("bdt_sc_id", textBDT_dtscVO.getDTSCID());
-			System.out.println("Inherit BDT SC which is "+textBDT_dtscVO.getPropertyTerm()+textBDT_dtscVO.getRepresentationTerm());
-			List<SRTObject> bdtscs = bdtSCPRDao.findObjects(qc_022, conn);
-			for(SRTObject obj : bdtscs) {
-				BDTSCPrimitiveRestrictionVO parent = (BDTSCPrimitiveRestrictionVO)obj;
-				
-				BDTSCPrimitiveRestrictionVO bdtSCPRVO = new BDTSCPrimitiveRestrictionVO();
-				bdtSCPRVO.setBDTSCID(bdtSCId);
-				bdtSCPRVO.setCDTSCAllowedPrimitiveExpressionTypeMapID(parent.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-				bdtSCPRVO.setCodeListID(parent.getCodeListID());
-				bdtSCPRVO.setisDefault(parent.getisDefault());
-				bdtSCPRDao.insertObject(bdtSCPRVO);
-				System.out.println("bdt sc id = " + bdtSCPRVO.getBDTSCID()+" cdt sc allow pri ex type map id = "+bdtSCPRVO.getCDTSCAllowedPrimitiveExpressionTypeMapID()+" code list id = "+  bdtSCPRVO.getCodeListID()+ " is_default = "+bdtSCPRVO.getisDefault()+" max cardinality of dt_sc = "+((DTSCVO)dtscDao.findObject(qc_0211, conn)).getMaxCardinality()+" min cardinality of dt_sc = "+((DTSCVO)dtscDao.findObject(qc_0211, conn)).getMinCardinality());
-			}
-			
-			// populate using attributes
-		    QueryCondition qc_03 = new QueryCondition();
-		    qc_03.add("guid", eleGuid);
-			DTVO dtVO_02 = (DTVO)dtDao.findObject(qc_03, conn);
-			
-		    NodeList attributes = ele.getElementsByTagName("xsd:attribute");
-		    for(int j = 0; j < attributes.getLength(); j++) {
-		    	Element attr = (Element)attributes.item(j);
-		    	String attrName = attr.getAttribute("name");
-		    	
-		    	DTSCVO dtscVO_03 = new DTSCVO();
-		    	dtscVO_03.setDTSCGUID(attr.getAttribute("id"));
-		    	
-		    	String use = attr.getAttribute("use");
-		    	int minCardinality = 0;
-		    	int maxCardinality = 1;
-		    	minCardinality = (use == null) ? 0 : (use.equalsIgnoreCase("required")) ? 1: 0;
-		    	maxCardinality = (use == null) ? 1 : (use.equalsIgnoreCase("prohibited")) ? 0: 1;
-		    	dtscVO_03.setMaxCardinality(maxCardinality);
-		    	dtscVO_03.setMinCardinality(minCardinality);
-		    	
-		    	dtscVO_03.setOwnerDTID(dtVO_02.getDTID());
-		    	dtscVO_03.setPropertyTerm(Utility.spaceSeparator(attrName));
-		    	dtscVO_03.setRepresentationTerm((attrName.equalsIgnoreCase("expressionLanguage")) ? "Text" : "Code");
-				System.out.println("Populating xsd:attribute [@name = "+attrName+"]");
-				dtscDao.insertObject(dtscVO_03);
-				
-				// populate CDT_SC for this new dt_sc
-				QueryCondition qc_04 = new QueryCondition();
-			    qc_04.add("guid", attr.getAttribute("id"));
-			    String[] name = {"NormalizedString", "String", "Token"};
-			    int dt_sc_id = 0;
-			    for(int k = 0; k < name.length; k++) {
-					DTSCVO dtscVO_04 = (DTSCVO)dtscDao.findObject(qc_04, conn);
-					dt_sc_id = dtscVO_04.getDTSCID();
-					CDTSCAllowedPrimitiveVO aCDTSCAllowedPrimitiveVO = new CDTSCAllowedPrimitiveVO();
-					aCDTSCAllowedPrimitiveVO.setCDTSCID(dt_sc_id);
-					
-					int cdtPrimitiveID = getCDTPrimitiveID(name[k]);
-					aCDTSCAllowedPrimitiveVO.setCDTPrimitiveID(cdtPrimitiveID);
-					aCDTSCAllowedPrimitiveVO.setisDefault((name[k].equalsIgnoreCase("Token")) ? true : false);
-					System.out.println("Populating CDT SC Primitives... cdt sc id = " + aCDTSCAllowedPrimitiveVO.getCDTSCID() +" cdt primitive = " + name[k] + " is_default = " + aCDTSCAllowedPrimitiveVO.getisDefault());
-					cdtSCAPDao.insertObject(aCDTSCAllowedPrimitiveVO);
-					
-					QueryCondition qc_05 = new QueryCondition();
-					qc_05.add("cdt_sc_id", dt_sc_id);
-					qc_05.add("cdt_pri_id", cdtPrimitiveID);
-					int cdtSCAllowedPrimitiveId = ((CDTSCAllowedPrimitiveVO)cdtSCAPDao.findObject(qc_05, conn)).getCDTSCAllowedPrimitiveID();
-					
-					// populate CDT_SC_Allowed_Primitive_Expression_Type_Map 
-					List<String> xsdbs = Types.getCorrespondingXSDBuiltType(name[k]);
-					for(String xbt : xsdbs) {
-						CDTSCAllowedPrimitiveExpressionTypeMapVO mapVO = new CDTSCAllowedPrimitiveExpressionTypeMapVO();
-						mapVO.setCDTSCAllowedPrimitive(cdtSCAllowedPrimitiveId);
-						QueryCondition qc_06 = new QueryCondition();
-						qc_06.add("builtin_type", xbt);
-						int xdtBuiltTypeId = ((XSDBuiltInTypeVO)xbtDao.findObject(qc_06, conn)).getXSDBuiltInTypeID();
-						mapVO.setXSDBuiltInTypeID(xdtBuiltTypeId);
-						System.out.println("Populating CDT SC Allowed Primitive Expression Type map .. xdt built in type id = "+xdtBuiltTypeId+ " cdt sc id = " + aCDTSCAllowedPrimitiveVO.getCDTSCID() +" cdt primitive = " + name[k] + " is_default = " + aCDTSCAllowedPrimitiveVO.getisDefault());
-						cdtSCAPMapDao.insertObject(mapVO);
-						
-						QueryCondition qc_07 = new QueryCondition();
-						qc_07.add("cdt_sc_awd_pri", cdtSCAllowedPrimitiveId);
-						qc_07.add("xbt_id", xdtBuiltTypeId);
-						int mapId = ((CDTSCAllowedPrimitiveExpressionTypeMapVO)cdtSCAPMapDao.findObject(qc_07, conn)).getCTSCAllowedPrimitiveExpressionTypeMapID();
-						
-						// populate BDT_SC_Primitive_Restriction table for expressionLanguage and actionCode
-						BDTSCPrimitiveRestrictionVO bdtSCPRVO = new BDTSCPrimitiveRestrictionVO();
-						bdtSCPRVO.setBDTSCID(dt_sc_id);
-						bdtSCPRVO.setCDTSCAllowedPrimitiveExpressionTypeMapID(mapId);
-						if(attrName.equalsIgnoreCase("expressionLanguage")) {
-							bdtSCPRVO.setisDefault((name[k].equalsIgnoreCase("Token")) ? true : false);
-						} else if(attrName.equalsIgnoreCase("actionCode")) {
-							bdtSCPRVO.setisDefault(false);
-						}
-						System.out.println("Populating BDT SC Primitive for "+attrName);
-						bdtSCPRDao.insertObject(bdtSCPRVO);
-					}
-			    }
-			    
-			 // populate BDT_SC_Primitive_Restriction table for actionCode (add codeList field)
-			    if(attrName.equalsIgnoreCase("actionCode")) {
-			    	BDTSCPrimitiveRestrictionVO bdtSCPRVO = new BDTSCPrimitiveRestrictionVO();
-					bdtSCPRVO.setBDTSCID(dt_sc_id);
-					bdtSCPRVO.setisDefault(true);
-					QueryCondition qc = new QueryCondition();
-					qc.add("name", "oacl_ActionCode");
-					bdtSCPRVO.setCodeListID(((CodeListVO)codeListDao.findObject(qc, conn)).getCodeListID());
-					System.out.println("Populating BDT SC Primitive for "+attrName);
-					bdtSCPRDao.insertObject(bdtSCPRVO);
-			    }
-		    }
-		}
-	}
-	
-	public int getCDTPrimitiveID(String name) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("CDTPrimitive");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("Name", name);
-		return ((CDTPrimitiveVO)dao.findObject(qc, conn)).getCDTPrimitiveID();
-	}
-	
-	public void run() throws Exception {
-		System.out.println("### 1.6.3-6 Start");
-		
-		DBAgent tx = new DBAgent();
-		conn = tx.open();
-		
-		importDTSCFromMeta();
-		
-		tx.close();
-		conn.close();
-		System.out.println("### 1.6.3-6 End");
-	}
-	
-	public static void main (String args[]) throws Exception {
-		Utility.dbSetup();
-		P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD scindt_sc = new P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD();
-		scindt_sc.run();
-	}
+
+    @Autowired
+    private RepositoryFactory repositoryFactory;
+
+    public void importDTSCFromMeta() throws Exception {
+        DataTypeSupplementaryComponentRepository dtscDao = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        DataTypeRepository dtDao = repositoryFactory.dataTypeRepository();
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtSCAPDao = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDao = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+        XSDBuiltInTypeRepository xbtDao = repositoryFactory.xsdBuiltInTypeRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtSCPRDao = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+        CodeListRepository codeListDao = repositoryFactory.codeListRepository();
+
+        DataType dtVO_01 = dtDao.findOneByDen("Text_62S0B4. Type");
+
+        DataType dtVO_012 = dtDao.findOneByDtId(dtVO_01.getBasedDtId());
+
+        DataTypeSupplementaryComponent dtscVO_01 = dtscDao.findByOwnerDtId(dtVO_012.getDtId()).get(0);
+        DataTypeSupplementaryComponent textBDT_dtscVO = dtscDao.findByOwnerDtId(dtVO_01.getDtId()).get(0);
+
+        XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+        NodeList complexTypes = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
+        for (int i = 0; i < complexTypes.getLength(); i++) {
+            Element ele = (Element) complexTypes.item(i);
+            String eleGuid = ele.getAttribute("id");
+            System.out.println("");
+            System.out.println("Populating DT SCs from complextype whose name is " + ele.getAttribute("name"));
+            // inherit all values from default Text BDT with two exceptions (max cardinality and based DTSC Id)
+            DataType dtVO_011 = dtDao.findOneByGuid(eleGuid);
+
+            DataTypeSupplementaryComponent dtscVO_02 = new DataTypeSupplementaryComponent();
+            dtscVO_02.setBasedDtScId(textBDT_dtscVO.getDtScId());
+            dtscVO_02.setDefinition(dtscVO_01.getDefinition());
+            dtscVO_02.setGuid(dtscVO_01.getGuid());
+            dtscVO_02.setMaxCardinality(0);
+            dtscVO_02.setMinCardinality(dtscVO_01.getMinCardinality());
+            dtscVO_02.setOwnerDtId(dtVO_011.getDtId());
+            dtscVO_02.setPropertyTerm(dtscVO_01.getPropertyTerm());
+            dtscVO_02.setRepresentationTerm(dtscVO_01.getRepresentationTerm());
+
+            dtscDao.save(dtscVO_02);
+
+            DataTypeSupplementaryComponent dtsc = dtscDao.findOneByGuidAndOwnerDtId(dtscVO_01.getGuid(), dtVO_011.getDtId());
+            int bdtSCId = dtsc.getDtScId();
+            // populate BDT_SC_Primitive_Restriction table for language code
+            System.out.println("Inherit BDT SC which is " + textBDT_dtscVO.getPropertyTerm() + textBDT_dtscVO.getRepresentationTerm());
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = bdtSCPRDao.findByBdtScId(textBDT_dtscVO.getDtScId());
+            for (BusinessDataTypeSupplementaryComponentPrimitiveRestriction parent : bdtscs) {
+                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPRVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                bdtSCPRVO.setBdtScId(bdtSCId);
+                bdtSCPRVO.setCdtScAwdPriXpsTypeMapId(parent.getCdtScAwdPriXpsTypeMapId());
+                bdtSCPRVO.setCodeListId(parent.getCodeListId());
+                bdtSCPRVO.setDefault(parent.isDefault());
+                bdtSCPRDao.save(bdtSCPRVO);
+                System.out.println("bdt sc id = " + bdtSCPRVO.getBdtScId() + " cdt sc allow pri ex type map id = " +
+                        bdtSCPRVO.getCdtScAwdPriXpsTypeMapId() + " code list id = " + bdtSCPRVO.getCodeListId() +
+                        " is_default = " + bdtSCPRVO.isDefault() + " max cardinality of dt_sc = " + dtsc.getMaxCardinality() +
+                        " min cardinality of dt_sc = " + dtsc.getMinCardinality());
+            }
+
+            // populate using attributes
+            DataType dtVO_02 = dtDao.findOneByGuid(eleGuid);
+
+            NodeList attributes = ele.getElementsByTagName("xsd:attribute");
+            for (int j = 0; j < attributes.getLength(); j++) {
+                Element attr = (Element) attributes.item(j);
+                String attrName = attr.getAttribute("name");
+
+                DataTypeSupplementaryComponent dtscVO_03 = new DataTypeSupplementaryComponent();
+                dtscVO_03.setGuid(attr.getAttribute("id"));
+
+                String use = attr.getAttribute("use");
+                int minCardinality = 0;
+                int maxCardinality = 1;
+                minCardinality = (use == null) ? 0 : (use.equalsIgnoreCase("required")) ? 1 : 0;
+                maxCardinality = (use == null) ? 1 : (use.equalsIgnoreCase("prohibited")) ? 0 : 1;
+                dtscVO_03.setMaxCardinality(maxCardinality);
+                dtscVO_03.setMinCardinality(minCardinality);
+
+                dtscVO_03.setOwnerDtId(dtVO_02.getDtId());
+                dtscVO_03.setPropertyTerm(Utility.spaceSeparator(attrName));
+                dtscVO_03.setRepresentationTerm((attrName.equalsIgnoreCase("expressionLanguage")) ? "Text" : "Code");
+                System.out.println("Populating xsd:attribute [@name = " + attrName + "]");
+                dtscDao.save(dtscVO_03);
+
+                // populate CDT_SC for this new dt_sc
+                String[] name = {"NormalizedString", "String", "Token"};
+                int dt_sc_id = 0;
+                for (int k = 0; k < name.length; k++) {
+                    DataTypeSupplementaryComponent dtscVO_04 = dtscDao.findOneByGuid(attr.getAttribute("id"));
+                    dt_sc_id = dtscVO_04.getDtScId();
+                    CoreDataTypeSupplementaryComponentAllowedPrimitive aCoreDataTypeSupplementaryComponentAllowedPrimitive = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
+                    aCoreDataTypeSupplementaryComponentAllowedPrimitive.setCdtScId(dt_sc_id);
+
+                    int cdtPrimitiveID = getCDTPrimitiveID(name[k]);
+                    aCoreDataTypeSupplementaryComponentAllowedPrimitive.setCdtPriId(cdtPrimitiveID);
+                    aCoreDataTypeSupplementaryComponentAllowedPrimitive.setDefault((name[k].equalsIgnoreCase("Token")) ? true : false);
+                    System.out.println("Populating CDT SC Primitives... cdt sc id = " + aCoreDataTypeSupplementaryComponentAllowedPrimitive.getCdtScId() +
+                            " cdt primitive = " + name[k] + " is_default = " + aCoreDataTypeSupplementaryComponentAllowedPrimitive.isDefault());
+                    cdtSCAPDao.save(aCoreDataTypeSupplementaryComponentAllowedPrimitive);
+
+                    int cdtSCAllowedPrimitiveId =
+                            cdtSCAPDao.findOneByCdtScIdAndCdtPriId(dt_sc_id, cdtPrimitiveID).getCdtScAwdPriId();
+
+                    // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
+                    List<String> xsdbs = Types.getCorrespondingXSDBuiltType(name[k]);
+                    for (String xbt : xsdbs) {
+                        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap mapVO = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
+                        mapVO.setCdtScAwdPri(cdtSCAllowedPrimitiveId);
+                        int xdtBuiltTypeId = xbtDao.findOneByBuiltInType(xbt).getXbtId();
+                        mapVO.setXbtId(xdtBuiltTypeId);
+                        System.out.println("Populating CDT SC Allowed Primitive Expression Type map .. xdt built in type id = " + xdtBuiltTypeId +
+                                " cdt sc id = " + aCoreDataTypeSupplementaryComponentAllowedPrimitive.getCdtScId() + " cdt primitive = " + name[k] +
+                                " is_default = " + aCoreDataTypeSupplementaryComponentAllowedPrimitive.isDefault());
+                        cdtSCAPMapDao.save(mapVO);
+
+                        int mapId = cdtSCAPMapDao.findOneByCdtScAwdPriAndXbtId(cdtSCAllowedPrimitiveId, xdtBuiltTypeId).getCdtScAwdPriXpsTypeMapId();
+
+                        // populate BDT_SC_Primitive_Restriction table for expressionLanguage and actionCode
+                        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPRVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                        bdtSCPRVO.setBdtScId(dt_sc_id);
+                        bdtSCPRVO.setCdtScAwdPriXpsTypeMapId(mapId);
+                        if (attrName.equalsIgnoreCase("expressionLanguage")) {
+                            bdtSCPRVO.setDefault((name[k].equalsIgnoreCase("Token")) ? true : false);
+                        } else if (attrName.equalsIgnoreCase("actionCode")) {
+                            bdtSCPRVO.setDefault(false);
+                        }
+                        System.out.println("Populating BDT SC Primitive for " + attrName);
+                        bdtSCPRDao.save(bdtSCPRVO);
+                    }
+                }
+
+                // populate BDT_SC_Primitive_Restriction table for actionCode (add codeList field)
+                if (attrName.equalsIgnoreCase("actionCode")) {
+                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPRVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                    bdtSCPRVO.setBdtScId(dt_sc_id);
+                    bdtSCPRVO.setDefault(true);
+                    bdtSCPRVO.setCodeListId(codeListDao.findOneByName("oacl_ActionCode").getCodeListId());
+                    System.out.println("Populating BDT SC Primitive for " + attrName);
+                    bdtSCPRDao.save(bdtSCPRVO);
+                }
+            }
+        }
+    }
+
+    public int getCDTPrimitiveID(String name) throws Exception {
+        CoreDataTypePrimitiveRepository dao = repositoryFactory.coreDataTypePrimitiveRepository();
+        return dao.findOneByName(name).getCdtPriId();
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void run(ApplicationContext applicationContext) throws Exception {
+        System.out.println("### 1.6.3-6 Start");
+
+        importDTSCFromMeta();
+
+        System.out.println("### 1.6.3-6 End");
+    }
+
+    public static void main(String args[]) throws Exception {
+        try (AbstractApplicationContext ctx = (AbstractApplicationContext)
+                SpringApplication.run(Application.class, args);) {
+            P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD populateSCInDTSCFromMetaXSD = ctx.getBean(P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD.class);
+            populateSCInDTSCFromMetaXSD.run(ctx);
+        }
+    }
 }

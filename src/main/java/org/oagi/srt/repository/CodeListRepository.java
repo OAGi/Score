@@ -24,6 +24,8 @@ public interface CodeListRepository {
 
     public CodeList findOneByGuid(String guid);
 
+    public CodeList findOneByName(String name);
+
     public void update(CodeList codeList);
 
     public void updateStateByCodeListId(String state, int codeListId);

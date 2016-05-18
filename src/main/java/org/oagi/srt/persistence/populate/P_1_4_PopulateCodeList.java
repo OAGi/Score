@@ -1,11 +1,5 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.File;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
@@ -15,12 +9,18 @@ import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Jaehun Lee
@@ -33,7 +33,7 @@ public class P_1_4_PopulateCodeList {
     private RepositoryFactory repositoryFactory;
 
     @Transactional(rollbackFor = Throwable.class)
-    public void run() throws Exception {
+    public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.4 Start");
 
         String tt[][] = {
@@ -673,7 +673,7 @@ public class P_1_4_PopulateCodeList {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
             P_1_4_PopulateCodeList populateCodeList = ctx.getBean(P_1_4_PopulateCodeList.class);
-            populateCodeList.run();
+            populateCodeList.run(ctx);
             populateCodeList.validate();
         }
     }
