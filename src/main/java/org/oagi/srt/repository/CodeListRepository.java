@@ -12,7 +12,7 @@ public interface CodeListRepository {
 
     public List<CodeList> findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(String name);
 
-    public List<CodeList> findByCodeListId(int codeListId);
+    public CodeList findOneByCodeListId(int codeListId);
 
     public CodeList findOneByGuidAndEnumTypeGuidAndNameAndDefinition(
             String guid, String enumTypeGuid, String name, String definition

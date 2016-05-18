@@ -76,7 +76,7 @@ public class SRTConstants {
 	public static final String TEST_XML_FILE_PATH = "/Users/tnk11/Desktop/OAG/xsd";
 
 	public static String filepath(String list) {
-		String prefix_filepath = "/Users/tnk11/Desktop/OAG/";
+		String prefix_filepath = "./data/";
 		//String prefix_filepath = "C:/Users/yslee/Work/Project/OAG/Development/";
 		String origin_filepath = "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/";
 		if(list.equals("AgencyID")){

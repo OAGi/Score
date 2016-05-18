@@ -18,6 +18,7 @@ public class CodeList {
     private String definitionSource;
     private int basedCodeListId;
     private boolean extensibleIndicator;
+    private String module;
     private int createdBy;
     private Date creationTimestamp;
     private int lastUpdatedBy;
@@ -122,6 +123,14 @@ public class CodeList {
 
     public void setExtensibleIndicator(boolean extensibleIndicator) {
         this.extensibleIndicator = extensibleIndicator;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
     }
 
     public int getCreatedBy() {

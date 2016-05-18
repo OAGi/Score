@@ -1355,7 +1355,8 @@ public class TopLevelABIEHandler implements Serializable {
 
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
                     bdtPriRestriRepository.findOneByBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
-            codeLists = codeListRepository.findByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+            CodeList codeList = codeListRepository.findOneByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+            codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
     }
 
@@ -1497,7 +1498,8 @@ public class TopLevelABIEHandler implements Serializable {
 
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
                     bdtPriRestriRepository.findOneByBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
-            codeLists = codeListRepository.findByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+            CodeList codeList = codeListRepository.findOneByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+            codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
     }
 
@@ -1574,7 +1576,8 @@ public class TopLevelABIEHandler implements Serializable {
 
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
                 bdtPriRestriRepository.findOneByBdtPriRestriId(bdtPrimitiveRestrictionId);
-        codeLists = codeListRepository.findByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+        CodeList codeList = codeListRepository.findOneByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+        codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
 
         logger.debug("##### " + codeLists);
 

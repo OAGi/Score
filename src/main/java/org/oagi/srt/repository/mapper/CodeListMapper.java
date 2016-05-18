@@ -26,6 +26,7 @@ public class CodeListMapper implements RowMapper<CodeList> {
         codeList.setDefinitionSource(rs.getString("definition_source"));
         codeList.setBasedCodeListId(rs.getInt("based_code_list_id"));
         codeList.setExtensibleIndicator(rs.getShort("extensible_indicator") == 1 ? true : false);
+        codeList.setModule(rs.getString("module"));
         codeList.setCreatedBy(rs.getInt("created_by"));
         codeList.setLastUpdatedBy(rs.getInt("last_updated_by"));
         codeList.setCreationTimestamp(new Date(rs.getTimestamp("creation_timestamp").getTime()));

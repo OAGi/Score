@@ -1,25 +1,18 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Connection;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
+import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.Application;
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
-import org.oagi.srt.web.startup.SRTInitializerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -28,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * @author Jaehun Lee
@@ -44,11 +36,23 @@ public class P_1_4_PopulateCodeList {
     public void run() throws Exception {
         System.out.println("### 1.4 Start");
 
-        String tt[][] = {{"CodeList_ConditionTypeCode_1", "314"}, {"CodeList_ConstraintTypeCode_1", "314"},
-                {"CodeList_DateFormatCode_1", "314"}, {"CodeList_DateTimeFormatCode_1", "314"}, {"CodeList_TimeFormatCode_1", "314"},
-                {"CodeList_CharacterSetCode_IANA_20070514", "379"}, {"CodeList_MIMEMediaTypeCode_IANA_7_04", "379"},
-                {"CodeList_CurrencyCode_ISO_7_04", "5"}, {"CodeList_LanguageCode_ISO_7_04", "5"}, {"CodeList_TimeZoneCode_1", "5"},
-                {"CodeList_UnitCode_UNECE_7_04", "6"}, {"CodeLists_1", "314"}};
+        String tt[][] = {
+                {"CodeLists_1", "314"},
+                {"CodeList_ConditionTypeCode_1", "314"},
+                {"CodeList_ConstraintTypeCode_1", "314"},
+                {"CodeList_DateFormatCode_1", "314"},
+                {"CodeList_DateTimeFormatCode_1", "314"},
+                {"CodeList_TimeFormatCode_1", "314"},
+
+                {"CodeList_CharacterSetCode_IANA_20070514", "379"},
+                {"CodeList_MIMEMediaTypeCode_IANA_7_04", "379"},
+
+                {"CodeList_CurrencyCode_ISO_7_04", "5"},
+                {"CodeList_LanguageCode_ISO_7_04", "5"},
+                {"CodeList_TimeZoneCode_1", "5"},
+
+                {"CodeList_UnitCode_UNECE_7_04", "6"}
+        };
 
         for (int i = 0; i < tt.length; i++) {
             System.out.println("## Importing Code List from " + tt[i][0] + "..");
@@ -178,11 +182,17 @@ public class P_1_4_PopulateCodeList {
 //	    		}
 //	    		else
 //	    			codelistVO.setExtensibleIndicator(false);
+                codeList.setModule(extractModuleName(path1));
 
                 codeListRepository.save(codeList);
             } else if (!tmp.getAttribute("name").endsWith("EnumerationType"))
                 System.out.println("Check !!  " + tmp.getAttribute("name"));
         }
+    }
+
+    private String extractModuleName(String filePath) {
+        int idx = filePath.indexOf("Model");
+        return FilenameUtils.separatorsToWindows(filePath.substring(idx));
     }
 
     private int getAgencyID(int valueid) {
@@ -470,10 +480,11 @@ public class P_1_4_PopulateCodeList {
                             + codelistFromDBVO.getRemark();
 
                     int basedCodeListId = codelistFromDBVO.getBasedCodeListId();
-                    System.out.println("Code List ID: " + codelistFromDBVO.getCodeListId() + ", Based Code List ID: " + basedCodeListId);
-                    List<CodeList> codeLists = codeListRepository.findByCodeListId(basedCodeListId);
-                    CodeList baseCodeList = codeLists.get(0);
-                    fromDB = fromDB + baseCodeList.getName();  //base code list's Name is used instead of its ID
+                    if (basedCodeListId > 0) {
+                        System.out.println("Code List ID: " + codelistFromDBVO.getCodeListId() + ", Based Code List ID: " + basedCodeListId);
+                        CodeList baseCodeList = codeListRepository.findOneByCodeListId(basedCodeListId);
+                        fromDB = fromDB + baseCodeList.getName();  //base code list's Name is used instead of its ID
+                    }
 
                     fromDB = fromDB + codelistFromDBVO.isExtensibleIndicator()
                             + codelistFromDBVO.getCreatedBy()

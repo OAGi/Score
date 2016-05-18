@@ -19,10 +19,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -209,7 +206,8 @@ public class CodeListHandler extends UIHandler {
 
     public void searchDerived(String id) {
         CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        codeLists = codeListRepository.findByCodeListId(Integer.parseInt(id));
+        CodeList codeList = codeListRepository.findOneByCodeListId(Integer.parseInt(id));
+        codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         if (codeLists.isEmpty()) {
             FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists.", "[" + getBasedCodeListName() + "] No such Code List exists.");
             FacesContext.getCurrentInstance().addMessage(null, msg);

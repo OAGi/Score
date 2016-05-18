@@ -29,8 +29,8 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ALL_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "ORDER BY creation_timestamp DESC";
 
@@ -41,8 +41,8 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_BY_NAME_CONTAINING_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "WHERE name LIKE :name";
 
@@ -56,8 +56,8 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_BY_NAME_CONTAINING_AND_STATE_IS_PUBLISHED_AND_EXTENSIBLE_INDICATOR_IS_TRUE_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "WHERE name LIKE :name AND state = :state AND extensible_indicator = :extensible_indicator";
 
@@ -74,22 +74,22 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_BY_CODE_LIST_ID_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "WHERE code_list_id = :code_list_id";
 
     @Override
-    public List<CodeList> findByCodeListId(int codeListId) {
+    public CodeList findOneByCodeListId(int codeListId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource("code_list_id", codeListId);
-        return getNamedParameterJdbcTemplate().query(
+        return getNamedParameterJdbcTemplate().queryForObject(
                 FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_NAME_AND_DEFINITION_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "WHERE guid = :guid AND enum_type_guid = :enum_type_guid AND name = :name AND definition = :definition";
 
@@ -107,8 +107,8 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_CODE_LIST_ID_AND_NAME_AND_DEFINITION_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "WHERE guid = :guid AND enum_type_guid = :enum_type_guid AND code_list_id = :code_list_id AND name = :name AND definition = :definition";
 
@@ -128,8 +128,8 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_GUID_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
-            "definition_source, based_code_list_id, extensible_indicator, created_by, last_updated_by, " +
-            "creation_timestamp, last_update_timestamp, state " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
             "FROM code_list " +
             "WHERE guid = :guid";
 
@@ -145,7 +145,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
     private final String UPDATE_STATEMENT = "UPDATE code_list SET " +
             "guid = :guid, enum_type_guid = :enum_type_guid, name = :name, list_id = :list_id, agency_id = :agency_id, " +
             "version_id = :version_id, definition = :definition, remark = :remark, definition_source = :definition_source, " +
-            "based_code_list_id = :based_code_list_id, extensible_indicator = :extensible_indicator, " +
+            "based_code_list_id = :based_code_list_id, extensible_indicator = :extensible_indicator, module = :module, " +
             "last_updated_by = :last_updated_by, last_update_timestamp = CURRENT_TIMESTAMP, state = :state " +
             "WHERE code_list_id = :code_list_id";
 
@@ -161,8 +161,9 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("definition", codeList.getDefinition())
                 .addValue("remark", codeList.getRemark())
                 .addValue("definition_source", codeList.getDefinitionSource())
-                .addValue("based_code_list_id", codeList.getBasedCodeListId())
+                .addValue("based_code_list_id", codeList.getBasedCodeListId() == 0 ? null : codeList.getBasedCodeListId())
                 .addValue("extensible_indicator", codeList.isExtensibleIndicator() == true ? 1 : 0)
+                .addValue("module", codeList.getModule())
                 .addValue("last_updated_by", codeList.getLastUpdatedBy())
                 .addValue("state", codeList.getState())
                 .addValue("code_list_id", codeList.getCodeListId());
@@ -184,10 +185,10 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String SAVE_STATEMENT = "INSERT INTO code_list (" +
             "guid, enum_type_guid, name, list_id, agency_id, version_id, " +
-            "definition, remark, definition_source, based_code_list_id, extensible_indicator, " +
+            "definition, remark, definition_source, based_code_list_id, extensible_indicator, module, " +
             "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state) VALUES (" +
             ":guid, :enum_type_guid, :name, :list_id, :agency_id, :version_id, " +
-            ":definition, :remark, :definition_source, :based_code_list_id, :extensible_indicator, " +
+            ":definition, :remark, :definition_source, :based_code_list_id, :extensible_indicator, :module, " +
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :state)";
 
     @Override
@@ -202,8 +203,9 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("definition", codeList.getDefinition())
                 .addValue("remark", codeList.getRemark())
                 .addValue("definition_source", codeList.getDefinitionSource())
-                .addValue("based_code_list_id", codeList.getBasedCodeListId())
+                .addValue("based_code_list_id", codeList.getBasedCodeListId() == 0 ? null : codeList.getBasedCodeListId())
                 .addValue("extensible_indicator", codeList.isExtensibleIndicator() == true ? 1 : 0)
+                .addValue("module", codeList.getModule())
                 .addValue("created_by", codeList.getCreatedBy())
                 .addValue("last_updated_by", codeList.getLastUpdatedBy())
                 .addValue("state", codeList.getState());
