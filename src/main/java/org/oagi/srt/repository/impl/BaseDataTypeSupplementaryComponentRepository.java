@@ -135,7 +135,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "guid, property_term, representation_term, definition, owner_dt_id, " +
             "min_cardinality, max_cardinality, based_dt_sc_id) VALUES (" +
             ":guid, :property_term, :representation_term, :definition, :owner_dt_id, " +
-            "min_cardinality, :max_cardinality, :based_dt_sc_id)";
+            ":min_cardinality, :max_cardinality, :based_dt_sc_id)";
 
     @Override
     public void save(DataTypeSupplementaryComponent dtSc) {
@@ -147,7 +147,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
                 .addValue("owner_dt_id", dtSc.getOwnerDtId())
                 .addValue("min_cardinality", dtSc.getMinCardinality())
                 .addValue("max_cardinality", dtSc.getMaxCardinality())
-                .addValue("based_dt_sc_id", dtSc.getBasedDtScId());
+                .addValue("based_dt_sc_id", dtSc.getBasedDtScId() == 0 ? null : dtSc.getBasedDtScId());
 
         int dtScId = doSave(namedParameters, dtSc);
         dtSc.setDtScId(dtScId);

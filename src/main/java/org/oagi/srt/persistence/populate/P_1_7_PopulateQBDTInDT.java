@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
@@ -19,6 +20,7 @@ import org.w3c.dom.NodeList;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -119,8 +121,9 @@ public class P_1_7_PopulateQBDTInDT {
             String typeGuid = ((Element) typeNode).getAttribute("id");
             Node simpleContent = fields_xsd.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
             if (simpleContent != null) {
-                DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
-                if (dtVO == null) {
+                try {
+                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDT(typeGuid, type, typeNode, fields_xsd);
 
@@ -179,12 +182,12 @@ public class P_1_7_PopulateQBDTInDT {
                     typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
                 }
                 String typeGuid = ((Element) typeNode).getAttribute("id");
-                DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                try {
+                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
 
-
-                CodeList codelistVO = aCodeListDAO.findOneByGuid(typeGuid);
-
-                if (dtVO == null) {
+                    // add BCCP
+                    addToBCCP(guid, bccp, dtVO, definition);
+                } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDT(typeGuid, type, typeNode, xHandler);
 
@@ -193,9 +196,6 @@ public class P_1_7_PopulateQBDTInDT {
 
                     // add BCCP
                     addToBCCP(guid, bccp, dVO, definition);
-                } else {
-                    // add BCCP
-                    addToBCCP(guid, bccp, dtVO, definition);
                 }
             }
         }
@@ -204,6 +204,9 @@ public class P_1_7_PopulateQBDTInDT {
     private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO) throws Exception {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = bdtSCPRDAO.findByBdtScId(dtscVO.getBasedDtScId());
         if (bdtscs.isEmpty()) {
+            if (dtscVO.getBasedDtScId() == 0) {
+                return Collections.emptyList();
+            }
             DataTypeSupplementaryComponent vo = aDTSCDAO.findOneByDtScId(dtscVO.getBasedDtScId());
             bdtscs = getBDTSCPrimitiveRestriction(vo);
         }
@@ -226,14 +229,16 @@ public class P_1_7_PopulateQBDTInDT {
             }
 
         } else { // else if (new SC)
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtscprimitiverestionvo;
 
             cdtscallowedprimitivelist = getCdtSCAllowedPrimitiveID(dtscVO.getDtScId());
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive svo : cdtscallowedprimitivelist) {
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> maps = getCdtSCAPMap(svo.getCdtScAwdPriId());
                 for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap vo : maps) {
+                    bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                    bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
                     bdtscprimitiverestionvo.setCdtScAwdPriXpsTypeMapId(vo.getCdtScAwdPriXpsTypeMapId());
+
                     if (type.equalsIgnoreCase("NumberType_B98233")) {
                         if (svo.getCdtPriId() == getCdtPriId("Decimal") && vo.getXbtId() == getXbtId("xsd:decimal"))
                             bdtscprimitiverestionvo.setDefault(true);
@@ -319,6 +324,7 @@ public class P_1_7_PopulateQBDTInDT {
 
                 }
             }
+
             if (type.contains("CodeContentType")) {
                 // add code_list id for this case
                 bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -326,8 +332,8 @@ public class P_1_7_PopulateQBDTInDT {
                 bdtscprimitiverestionvo.setCodeListId(getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
                 bdtscprimitiverestionvo.setDefault(false);
                 bdtSCPRDAO.save(bdtscprimitiverestionvo);
-
             }
+
             if (name.equalsIgnoreCase("listAgencyID")) {
                 // add agency_id_list id for this case
                 bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -678,8 +684,12 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtVO) throws Exception {
-        return aDTSCDAO.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
-                dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
+        try {
+            return aDTSCDAO.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
+                    dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
 
@@ -758,7 +768,11 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataType getDataTypeWithDen(String den) throws Exception {
-        return aDTDAO.findOneByTypeAndDen(1, den);
+        try {
+            return aDTDAO.findOneByTypeAndDen(1, den);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private DataType getDataTypeWithRepresentationTerm(String representationTerm) throws Exception {
@@ -766,7 +780,11 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataType getDataTypeWithGUID(String guid) throws Exception {
-        return aDTDAO.findOneByGuid(guid);
+        try {
+            return aDTDAO.findOneByGuid(guid);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private void insertCodeContentTypeDT() throws Exception {
@@ -778,8 +796,9 @@ public class P_1_7_PopulateQBDTInDT {
             String type = ((Element) typeNode).getAttribute("name");
             if (type.endsWith(dataType) && !type.equals(dataType)) {
                 String typeGuid = ((Element) typeNode).getAttribute("id");
-                DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
-                if (dtVO == null) {
+                try {
+                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
 
@@ -799,8 +818,9 @@ public class P_1_7_PopulateQBDTInDT {
             String type = ((Element) typeNode).getAttribute("name");
             if (type.endsWith(dataType) && !type.equals(dataType)) {
                 String typeGuid = ((Element) typeNode).getAttribute("id");
-                DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
-                if (dtVO == null) {
+                try {
+                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
 

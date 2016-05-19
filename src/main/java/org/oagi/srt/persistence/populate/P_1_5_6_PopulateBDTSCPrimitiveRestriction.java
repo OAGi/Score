@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
@@ -101,7 +102,12 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                 if (ele != null && ele.getAttribute("type") != null) {
                     String attrTypeName = ele.getAttribute("type").replaceAll("ContentType", "");
-                    codeListId = aCodeListDAO.findOneByName(ele.getAttribute("type").replaceAll("ContentType", "")).getCodeListId();
+                    String typeName = ele.getAttribute("type").replaceAll("ContentType", "");
+                    try {
+                        codeListId = aCodeListDAO.findOneByName(typeName).getCodeListId();
+                    } catch (EmptyResultDataAccessException e) {
+                        codeListId = 0;
+                    }
                     ele_name = ele.getAttribute("name");
                     System.out.println(" attrTypeName= " + attrTypeName + " codelist=" + codeListId);
                 } else {
@@ -109,11 +115,8 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                 }
 
                 if (!is_fields_xsd) {
-
-                    DataType dtVO = (DataType) aDTDAO.findOneByDtId(aDataTypeSupplementaryComponent.getOwnerDtId());
-
-                    DataType defaultTextBDT = (DataType) aDTDAO.findOneByDtId(dtVO.getBasedDtId());
-
+                    DataType dtVO = aDTDAO.findOneByDtId(aDataTypeSupplementaryComponent.getOwnerDtId());
+                    DataType defaultTextBDT = aDTDAO.findOneByDtId(dtVO.getBasedDtId());
                     List<DataTypeSupplementaryComponent> baseDTSCs = dao.findByOwnerDtId(defaultTextBDT.getDtId());
 
                     for (int i = 0; i < baseDTSCs.size(); i++) {
@@ -147,7 +150,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bLanguageVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                         bLanguageVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
 
-                        CodeList clVO = (CodeList) aCodeListDAO.findOneByName("clm56392A20081107_LanguageCode");
+                        CodeList clVO = aCodeListDAO.findOneByName("clm56392A20081107_LanguageCode");
                         bLanguageVO.setCodeListId(clVO.getCodeListId());
                         bLanguageVO.setDefault(false);
                         System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bLanguageVO.getCodeListId() + " is default = " + bLanguageVO.isDefault());

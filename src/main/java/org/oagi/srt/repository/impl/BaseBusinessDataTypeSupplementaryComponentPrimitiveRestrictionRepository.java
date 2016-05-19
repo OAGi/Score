@@ -150,10 +150,10 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
     public void save(BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScPriRestri.getBdtScId())
-                .addValue("cdt_sc_awd_pri_xps_type_map_id", bdtScPriRestri.getCdtScAwdPriXpsTypeMapId())
-                .addValue("code_list_id", bdtScPriRestri.getCodeListId())
+                .addValue("cdt_sc_awd_pri_xps_type_map_id", bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() == 0 ? null : bdtScPriRestri.getCdtScAwdPriXpsTypeMapId())
+                .addValue("code_list_id", bdtScPriRestri.getCodeListId() == 0 ? null : bdtScPriRestri.getCodeListId())
                 .addValue("is_default", bdtScPriRestri.isDefault() ? 1 : 0)
-                .addValue("agency_id_list_id", bdtScPriRestri.getAgencyIdListId());
+                .addValue("agency_id_list_id", bdtScPriRestri.getAgencyIdListId() == 0 ? null : bdtScPriRestri.getAgencyIdListId());
 
         int bdtScPriRestriId = doSave(namedParameters, bdtScPriRestri);
         bdtScPriRestri.setCodeListId(bdtScPriRestriId);

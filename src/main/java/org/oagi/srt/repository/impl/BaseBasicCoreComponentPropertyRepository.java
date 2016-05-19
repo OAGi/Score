@@ -114,7 +114,7 @@ public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbc
                 .addValue("den", bccp.getDen())
                 .addValue("definition", bccp.getDefinition())
                 .addValue("module", bccp.getModule())
-                .addValue("namespace_id", bccp.getNamespaceId())
+                .addValue("namespace_id", bccp.getNamespaceId() == 0 ? null : bccp.getNamespaceId())
                 .addValue("is_deprecated", bccp.isDeprecated() ? 1 : 0)
                 .addValue("created_by", bccp.getCreatedBy())
                 .addValue("owner_user_id", bccp.getOwnerUserId())
