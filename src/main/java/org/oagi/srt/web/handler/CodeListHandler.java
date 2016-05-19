@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -32,7 +33,6 @@ public class CodeListHandler extends UIHandler {
     private RepositoryFactory repositoryFactory;
 
     private List<CodeList> codeLists = Collections.emptyList();
-    private List<CodeList> codeListsForList = Collections.emptyList();
     private List<CodeListValue> codeListValues = Collections.emptyList();
 
     private CodeList codeList = new CodeList();
@@ -51,14 +51,10 @@ public class CodeListHandler extends UIHandler {
         this.codeListValueVO = codeListValueVO;
     }
 
-    public List<CodeList> getCodeListsForList() {
+    @PostConstruct
+    public void init() {
         CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        codeListsForList = codeListRepository.findAll();
-        return codeListsForList;
-    }
-
-    public void setCodeListsForList(List<CodeList> codeListsForList) {
-        this.codeListsForList = codeListsForList;
+        codeLists = codeListRepository.findAll();
     }
 
     public List<CodeListValue> getSelectedCodeListValue() {
