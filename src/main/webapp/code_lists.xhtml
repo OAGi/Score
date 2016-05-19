@@ -32,7 +32,7 @@
 			<p:panel header="Code List">
 				<p:dataTable id="tbl" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 					paginator="true" rows="20" style="width:920px; margin-bottom:20px"
-	            	value="#{codeListHandler.codeListsForList}" selection="#{codeListHandler.selected}" rowKey="#{cVO.codeListId}" selectionMode="single">
+	            	value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{cVO.codeListId}" selectionMode="single">
 					<p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}" />
         			<p:ajax event="rowUnselect" listener="#{codeListHandler.onRowUnselect}" />
 	                <p:column style="width:400px">
