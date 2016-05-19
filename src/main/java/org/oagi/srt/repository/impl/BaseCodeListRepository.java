@@ -86,6 +86,24 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_NAME_STATEMENT = "SELECT " +
+            "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
+            "FROM code_list " +
+            "WHERE guid = :guid AND enum_type_guid = :enum_type_guid AND name = :name";
+
+    @Override
+    public CodeList findOneByGuidAndEnumTypeGuidAndName(String guid, String enumTypeGuid, String name) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", guid)
+                .addValue("enum_type_guid", enumTypeGuid)
+                .addValue("name", name);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_NAME_STATEMENT,
+                namedParameters, CodeListMapper.INSTANCE);
+    }
+
     private final String FIND_ONE_BY_GUID_AND_ENUM_TYPE_GUID_AND_NAME_AND_DEFINITION_STATEMENT = "SELECT " +
             "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
             "definition_source, based_code_list_id, extensible_indicator, module, " +
@@ -139,6 +157,22 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("guid", guid);
 
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_STATEMENT,
+                namedParameters, CodeListMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_NAME_STATEMENT = "SELECT " +
+            "code_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition, remark, " +
+            "definition_source, based_code_list_id, extensible_indicator, module, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, state " +
+            "FROM code_list " +
+            "WHERE name = :name";
+
+    @Override
+    public CodeList findOneByName(String name) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("name", name);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_NAME_STATEMENT,
                 namedParameters, CodeListMapper.INSTANCE);
     }
 

@@ -108,6 +108,23 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
                 namedParameters, AssociationCoreComponentPropertyMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_GUID_STATEMENT = "SELECT " +
+            "asccp_id, guid, property_term, definition, role_of_acc_id, den, " +
+            "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
+            "state, module, namespace_id, reusable_indicator, is_deprecated, " +
+            "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id " +
+            "FROM asccp " +
+            "WHERE guid = :guid";
+
+    @Override
+    public AssociationCoreComponentProperty findOneByGuid(String guid) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", guid);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_STATEMENT,
+                namedParameters, AssociationCoreComponentPropertyMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO asccp (" +
             "guid, property_term, definition, role_of_acc_id, den, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +

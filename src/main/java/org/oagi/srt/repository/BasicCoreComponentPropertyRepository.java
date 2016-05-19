@@ -7,4 +7,10 @@ public interface BasicCoreComponentPropertyRepository {
     public BasicCoreComponentProperty findOneByBccpId(int bccpId);
 
     public BasicCoreComponentProperty findOneByBccpIdAndRevisionNum(int bccpId, int revisionNum);
+
+    public BasicCoreComponentProperty findOneByPropertyTerm(String propertyTerm);
+
+    public BasicCoreComponentProperty findOneByGuid(String guid);
+
+    public void save(BasicCoreComponentProperty basicCoreComponentProperty);
 }

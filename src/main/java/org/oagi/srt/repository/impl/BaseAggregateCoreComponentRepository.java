@@ -42,6 +42,23 @@ public class BaseAggregateCoreComponentRepository extends NamedParameterJdbcDaoS
                 namedParameters, AggregateCoreComponentMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_GUID_STATEMENT = "SELECT " +
+            "acc_id, guid, object_class_term, den, definition, based_acc_id, object_class_qualifier, " +
+            "oagis_component_type, module, namespace_id, created_by, owner_user_id, last_updated_by, " +
+            "creation_timestamp, last_update_timestamp, state, revision_num, revision_tracking_num, " +
+            "revision_action, release_id, current_acc_id, is_deprecated " +
+            "FROM acc " +
+            "WHERE guid = :guid";
+
+    @Override
+    public AggregateCoreComponent findOneByGuid(String guid) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("guid", guid);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_GUID_STATEMENT,
+                namedParameters, AggregateCoreComponentMapper.INSTANCE);
+    }
+
     private final String FIND_ONE_BY_ACC_ID_AND_REVISION_NUM_STATEMENT = "SELECT " +
             "acc_id, guid, object_class_term, den, definition, based_acc_id, object_class_qualifier, " +
             "oagis_component_type, module, namespace_id, created_by, owner_user_id, last_updated_by, " +

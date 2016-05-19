@@ -57,6 +57,22 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
                 namedParameters, BusinessDataTypePrimitiveRestrictionMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_BDT_ID_AND_CDT_AWD_PRI_XPS_TYPE_MAP_ID_STATEMENT = "SELECT " +
+            "bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, " +
+            "is_default, agency_id_list_id " +
+            "FROM bdt_pri_restri " +
+            "WHERE bdt_id = :bdt_id AND cdt_awd_pri_xps_type_map_id = :cdt_awd_pri_xps_type_map_id";
+
+    @Override
+    public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndCdtAwdPriXpsTypeMapId(int bdtId, int cdtAwdPriXpsTypeMapId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_id", bdtId)
+                .addValue("cdt_awd_pri_xps_type_map_id", cdtAwdPriXpsTypeMapId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BDT_ID_AND_CDT_AWD_PRI_XPS_TYPE_MAP_ID_STATEMENT,
+                namedParameters, BusinessDataTypePrimitiveRestrictionMapper.INSTANCE);
+    }
+
     private final String FIND_BY_BDT_ID_STATEMENT = "SELECT " +
             "bdt_pri_restri_id, bdt_id, cdt_awd_pri_xps_type_map_id, code_list_id, " +
             "is_default, agency_id_list_id " +

@@ -36,4 +36,18 @@ public class BaseCoreDataTypePrimitiveRepository extends NamedParameterJdbcDaoSu
         return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_CDT_PRI_ID_STATEMENT,
                 namedParameters, CoreDataTypePrimitiveMapper.INSTANCE);
     }
+
+    private final String FIND_ONE_BY_NAME_STATEMENT = "SELECT " +
+            "cdt_pri_id, name " +
+            "FROM cdt_pri " +
+            "WHERE name = :name";
+
+    @Override
+    public CoreDataTypePrimitive findOneByName(String name) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("name", name);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_NAME_STATEMENT,
+                namedParameters, CoreDataTypePrimitiveMapper.INSTANCE);
+    }
 }

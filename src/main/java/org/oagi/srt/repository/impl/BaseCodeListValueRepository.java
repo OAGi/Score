@@ -26,7 +26,8 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
     }
 
     private final String FIND_BY_CODE_LIST_ID_STATEMENT = "SELECT " +
-            "code_list_value_id, code_list_id, value, name, definition, definition_source, used_indicator, locked_indicator, extension_indicator " +
+            "code_list_value_id, code_list_id, value, name, definition, " +
+            "definition_source, used_indicator, locked_indicator, extension_indicator " +
             "FROM code_list_value " +
             "WHERE code_list_id = :code_list_id";
 
@@ -36,6 +37,22 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
                 .addValue("code_list_id", codeListId);
         return getNamedParameterJdbcTemplate().query(
                 FIND_BY_CODE_LIST_ID_STATEMENT, namedParameters, CodeListValueMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_CODE_LIST_ID_AND_VALUE_STATEMENT = "SELECT " +
+            "code_list_value_id, code_list_id, value, name, definition, " +
+            "definition_source, used_indicator, locked_indicator, extension_indicator " +
+            "FROM code_list_value " +
+            "WHERE code_list_id = :code_list_id AND value = :value";
+
+    @Override
+    public CodeListValue findOneByCodeListIdAndValue(int codeListId, String value) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("code_list_id", codeListId)
+                .addValue("value", value);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_CODE_LIST_ID_AND_VALUE_STATEMENT, namedParameters, CodeListValueMapper.INSTANCE);
     }
 
     private final String UPDATE_CODE_LIST_ID_BY_CODE_LIST_VALUE_ID_STATEMENT = "UPDATE code_list_value SET " +

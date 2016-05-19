@@ -16,5 +16,7 @@ public interface AssociationCoreComponentPropertyRepository {
 
     public AssociationCoreComponentProperty findOneByRoleOfAccId(int roleOfAccId);
 
+    public AssociationCoreComponentProperty findOneByGuid(String guid);
+
     public void save(AssociationCoreComponentProperty associationCoreComponentProperty);
 }

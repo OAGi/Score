@@ -14,6 +14,10 @@ public interface CodeListRepository {
 
     public CodeList findOneByCodeListId(int codeListId);
 
+    public CodeList findOneByGuidAndEnumTypeGuidAndName(
+            String guid, String enumTypeGuid, String name
+    );
+
     public CodeList findOneByGuidAndEnumTypeGuidAndNameAndDefinition(
             String guid, String enumTypeGuid, String name, String definition
     );

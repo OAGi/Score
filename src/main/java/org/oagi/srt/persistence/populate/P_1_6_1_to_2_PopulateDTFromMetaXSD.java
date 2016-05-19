@@ -1,7 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
 import org.oagi.srt.Application;
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
@@ -91,9 +90,6 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 	
 	private void insertBDTPrimitiveRestriction(int basedBdtId, int bdtId) throws Exception {
 		BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-		
-		QueryCondition qc = new QueryCondition();
-		qc.add("bdt_id", basedBdtId);
 		List<BusinessDataTypePrimitiveRestriction> al = aBDTPrimitiveRestrictionDAO.findByBdtId(basedBdtId);
 		
 		for(BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {

@@ -127,7 +127,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().equals(abieName)) {
-				ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
+				ABIEView av = new ABIEView(repositoryFactory, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
 				av.setAsccp(asccpVO);
 				av.setAbie(abieVO);
 				av.setAsbiep(asbiepVO);

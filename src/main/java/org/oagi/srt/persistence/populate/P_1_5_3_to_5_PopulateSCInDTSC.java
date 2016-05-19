@@ -1,7 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
 import org.oagi.srt.Application;
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
@@ -175,8 +174,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     private void validatePopulateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         DataTypeRepository dao = repositoryFactory.dataTypeRepository();
         DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        QueryCondition qc = new QueryCondition();
-        qc.add("type", 1);
         List<DataType> srtObjects = dao.findByType(1);
         for (DataType dt : srtObjects) {
             DataType dt2 = dao.findOneByDtId(dt.getBasedDtId());

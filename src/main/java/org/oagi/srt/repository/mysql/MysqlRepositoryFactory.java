@@ -78,6 +78,9 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     private BaseBusinessDataTypePrimitiveRestrictionRepository baseBusinessDataTypePrimitiveRestrictionRepository;
 
     @Autowired
+    private BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository baseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
+
+    @Autowired
     private BaseCoreDataTypePrimitiveRepository baseCoreDataTypePrimitiveRepository;
 
     @Autowired
@@ -85,6 +88,12 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+
+    @Autowired
+    private BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository baseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
+
+    @Autowired
+    private BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
 
     @Autowired
     private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
@@ -208,6 +217,11 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository() {
+        return baseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
+    }
+
+    @Override
     public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository() {
         return baseCoreDataTypePrimitiveRepository;
     }
@@ -220,6 +234,16 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository() {
         return baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+    }
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository coreDataTypeSupplementaryComponentAllowedPrimitiveRepository() {
+        return baseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
+    }
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
+        return baseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
     }
 
     @Override

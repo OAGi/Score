@@ -5,13 +5,13 @@ import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
-import org.oagi.srt.persistence.dto.ACCVO;
-import org.oagi.srt.persistence.dto.ASCCVO;
-import org.oagi.srt.persistence.dto.BCCVO;
+import org.oagi.srt.repository.entity.AggregateCoreComponent;
+import org.oagi.srt.repository.entity.AssociationCoreComponent;
+import org.oagi.srt.repository.entity.BasicCoreComponent;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.ArrayList;
+import java.util.List;
 
 public class CacheContextListener implements ServletContextListener {
 
@@ -20,8 +20,8 @@ public class CacheContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         Class<Integer> keyType = Integer.class;
-        Class<ArrayList<BCCVO>> bccValueType = (Class) ArrayList.class;
-        Class<ArrayList<ASCCVO>> asccValueType = (Class) ArrayList.class;
+        Class<List<BasicCoreComponent>> bccValueType = (Class) List.class;
+        Class<List<AssociationCoreComponent>> asccValueType = (Class) List.class;
 
         cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
                 .withDefaultSizeOfMaxObjectSize(500, MemoryUnit.B)
@@ -43,7 +43,7 @@ public class CacheContextListener implements ServletContextListener {
                                 .withSizeOfMaxObjectSize(1000, MemoryUnit.B)
                                 .build())
                 .withCache("acc",
-                        CacheConfigurationBuilder.newCacheConfigurationBuilder(keyType, ACCVO.class,
+                        CacheConfigurationBuilder.newCacheConfigurationBuilder(keyType, AggregateCoreComponent.class,
                                 ResourcePoolsBuilder.newResourcePoolsBuilder()
                                         .heap(10, MemoryUnit.KB)
                                         .offheap(10, MemoryUnit.MB))
@@ -60,7 +60,7 @@ public class CacheContextListener implements ServletContextListener {
         cacheManager.close();
     }
 
-    public static CacheManager getChcheManager() {
+    public static CacheManager getCacheManager() {
         return cacheManager;
     }
 }

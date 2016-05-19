@@ -10,6 +10,8 @@ public interface BusinessDataTypePrimitiveRestrictionRepository {
 
     public BusinessDataTypePrimitiveRestriction findOneByBdtPriRestriId(int bdtPriRestriId);
 
+    public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndCdtAwdPriXpsTypeMapId(int bdtId, int cdtAwdPriXpsTypeMapId);
+
     public List<BusinessDataTypePrimitiveRestriction> findByBdtId(int bdtId);
 
     public void save(BusinessDataTypePrimitiveRestriction businessDataTypePrimitiveRestriction);

@@ -1,11 +1,7 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dto.UserVO;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +23,6 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class ContextSchemeHandler {
 
-	private DAOFactory df;
-	private SRTDAO daoUser;
-
 	@Autowired
 	private RepositoryFactory repositoryFactory;
 	private ContextSchemeRepository contextSchemeRepository;
@@ -40,17 +33,7 @@ public class ContextSchemeHandler {
 
 	@PostConstruct
 	private void init() {
-		try {
-			df = DAOFactory.getDAOFactory();
-			daoUser = df.getDAO("User");
-			
-			QueryCondition qc = new QueryCondition();
-			qc.add("name", "oagis");
-			userId = ((UserVO)daoUser.findObject(qc)).getUserID();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		userId = repositoryFactory.userRepository().findOneByLoginId("oagis").getAppUserId();
 
 		contextSchemeRepository = repositoryFactory.contextSchemeRepository();
 		contextSchemeValueRepository = repositoryFactory.contextSchemeValueRepository();

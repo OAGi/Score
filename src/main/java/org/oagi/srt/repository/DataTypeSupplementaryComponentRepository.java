@@ -16,5 +16,13 @@ public interface DataTypeSupplementaryComponentRepository {
 
     public DataTypeSupplementaryComponent findOneByGuidAndOwnerDtId(String guid, int ownerDtId);
 
+    public DataTypeSupplementaryComponent findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
+            int ownerDtId, String propertyTerm, String representationTerm
+    );
+
+    public DataTypeSupplementaryComponent findOneByOwnerDtIdAndBasedDtScId(int ownerDtId, int basedDtScId);
+
     public void save(DataTypeSupplementaryComponent dataTypeSupplementaryComponent);
+
+    public void update(DataTypeSupplementaryComponent dataTypeSupplementaryComponent);
 }

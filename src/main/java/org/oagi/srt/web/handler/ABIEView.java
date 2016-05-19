@@ -1,14 +1,6 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.QueryCondition;
-import org.oagi.srt.common.SRTObject;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.BDTPrimitiveRestrictionVO;
-import org.oagi.srt.persistence.dto.CDTAllowedPrimitiveExpressionTypeMapVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 
 import java.io.Serializable;
@@ -17,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ABIEView implements Serializable, Comparable<ABIEView> {
+
+    private RepositoryFactory repositoryFactory;
 
     private AssociationCoreComponent ascc;
     private AssociationCoreComponentProperty asccp;
@@ -42,7 +36,15 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     private int codeListId;
     private String restrictionType;
 
-    public ABIEView() {
+    public ABIEView(RepositoryFactory repositoryFactory) {
+        this.repositoryFactory = repositoryFactory;
+    }
+
+    public ABIEView(RepositoryFactory repositoryFactory, String name, int id, String type) {
+        this.repositoryFactory = repositoryFactory;
+        this.name = name;
+        this.id = id;
+        this.type = type;
     }
 
     public int getCodeListId() {
@@ -82,47 +84,35 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     }
 
     public Map<String, Integer> getBdtPrimitiveRestrictions() {
-        try {
-            DAOFactory df = DAOFactory.getDAOFactory();
-            SRTDAO bdtPrimitiveRestrictionDao = df.getDAO("BDTPrimitiveRestriction");
+        BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
+                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
 
-            QueryCondition qc_02 = new QueryCondition();
-            qc_02.add("bdt_id", bccp.getBdtId());
+        List<BusinessDataTypePrimitiveRestriction> ccs = bdtPriRestriRepository.findByBdtId(bccp.getBdtId());
+        // Implicitly declaration. Why does it need to be here?
+        // Because of this code, Add 'setBccpVO_BbieVO' method.
+        // TODO: Fix me.
+        bdtPrimitiveRestrictionId = bbie.getBdtPriRestriId();
+        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
+            if (cc.getCdtAwdPriXpsTypeMapId() > 0) {
+                primitiveType = "XSD Builtin Type";
 
-            List<SRTObject> ccs = bdtPrimitiveRestrictionDao.findObjects(qc_02);
-            // Implicitly declaration. Why does it need to be here?
-            // Because of this code, Add 'setBccpVO_BbieVO' method.
-            // TODO: Fix me.
-            bdtPrimitiveRestrictionId = bbie.getBdtPriRestriId();
-            for (SRTObject obj : ccs) {
-                BDTPrimitiveRestrictionVO cc = (BDTPrimitiveRestrictionVO) obj;
+                CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
+                        repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+                CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
+                        cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(cc.getCdtAwdPriXpsTypeMapId());
 
-                if (cc.getCDTPrimitiveExpressionTypeMapID() > 0) {
-                    primitiveType = "XSD Builtin Type";
+                XSDBuiltInTypeRepository xsdBuiltInTypeRepository = repositoryFactory.xsdBuiltInTypeRepository();
+                XSDBuiltInType xbt = xsdBuiltInTypeRepository.findOneByXbtId(vo.getXbtId());
+                bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
+            } else {
+                primitiveType = "Code List";
 
-                    SRTDAO cdtAllowedPrimitiveExpressionTypeMapDao = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-                    QueryCondition qc_03 = new QueryCondition();
-                    qc_03.add("cdt_awd_pri_xps_type_map_id", cc.getCDTPrimitiveExpressionTypeMapID());
-                    CDTAllowedPrimitiveExpressionTypeMapVO vo = (CDTAllowedPrimitiveExpressionTypeMapVO) cdtAllowedPrimitiveExpressionTypeMapDao.findObject(qc_03);
-
-                    SRTDAO xsdBuiltInTypeDao = df.getDAO("XSDBuiltInType");
-                    QueryCondition qc_04 = new QueryCondition();
-                    qc_04.add("xbt_id", vo.getXSDBuiltInTypeID());
-                    XSDBuiltInTypeVO xbt = (XSDBuiltInTypeVO) xsdBuiltInTypeDao.findObject(qc_04);
-                    bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBDTPrimitiveRestrictionID());
-                } else {
-                    primitiveType = "Code List";
-
-                    SRTDAO codeListDao = df.getDAO("CodeList");
-                    QueryCondition qc_04 = new QueryCondition();
-                    qc_04.add("code_list_id", cc.getCodeListID());
-                    CodeListVO code = (CodeListVO) codeListDao.findObject(qc_04);
-                    bdtPrimitiveRestrictions.put(code.getName(), cc.getBDTPrimitiveRestrictionID());
-                }
+                CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
+                CodeList code = codeListRepository.findOneByCodeListId(cc.getCodeListId());
+                bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
             }
-        } catch (SRTDAOException e) {
-            e.printStackTrace();
         }
+
         return bdtPrimitiveRestrictions;
     }
 
@@ -136,12 +126,6 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 
     public void setBdtName(String bdtName) {
         this.bdtName = bdtName;
-    }
-
-    public ABIEView(String name, int id, String type) {
-        this.name = name;
-        this.id = id;
-        this.type = type;
     }
 
     public AssociationBusinessInformationEntity getAsbie() {

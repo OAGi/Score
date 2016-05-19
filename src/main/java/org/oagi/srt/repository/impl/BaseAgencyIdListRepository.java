@@ -48,6 +48,20 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
                 FIND_ONE_BY_GUID_STATEMENT, namedParameters, AgencyIdListMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_NAME_STATEMENT = "SELECT " +
+            "agency_id_list_id, guid, enum_type_guid, name, list_id, agency_id, version_id, definition " +
+            "FROM agency_id_list " +
+            "WHERE name = :name";
+
+    @Override
+    public AgencyIdList findOneByName(String name) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("name", name);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_NAME_STATEMENT, namedParameters, AgencyIdListMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO agency_id_list (" +
             "guid, enum_type_guid, name, list_id, agency_id, version_id, definition) VALUES (" +
             ":guid, :enum_type_guid, :name, :list_id, :agency_id, :version_id, :definition)";

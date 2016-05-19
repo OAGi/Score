@@ -16,9 +16,13 @@ public interface DataTypeRepository {
 
     public DataType findOneByGuid(String guid);
 
+    public DataType findOneByGuidAndType(String guid, int type);
+
     public DataType findOneByDen(String den);
 
     public DataType findOneByTypeAndDen(int type, String den);
+
+    public DataType findOneByGuidAndDen(String guid, String den);
 
     public void save(DataType dataType);
 }

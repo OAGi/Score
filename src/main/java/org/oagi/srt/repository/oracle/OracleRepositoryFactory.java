@@ -39,7 +39,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleAssociationCoreComponentRepository oracleAssociationCoreComponentRepository;
 
     @Autowired
-    private BaseBasicCoreComponentRepository baseBasicCoreComponentRepository;
+    private OracleBasicCoreComponentRepository oracleBasicCoreComponentRepository;
 
     @Autowired
     private OracleAggregateCoreComponentRepository oracleAggregateCoreComponentRepository;
@@ -48,7 +48,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleAssociationCoreComponentPropertyRepository oracleAssociationCoreComponentPropertyRepository;
 
     @Autowired
-    private BaseBasicCoreComponentPropertyRepository baseBasicCoreComponentPropertyRepository;
+    private OracleBasicCoreComponentPropertyRepository oracleBasicCoreComponentPropertyRepository;
 
     @Autowired
     private OracleAggregateBusinessInformationEntityRepository oracleAggregateBusinessInformationEntityRepository;
@@ -72,10 +72,13 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleDataTypeRepository oracleDataTypeRepository;
 
     @Autowired
-    private BaseDataTypeSupplementaryComponentRepository baseDataTypeSupplementaryComponentRepository;
+    private OracleDataTypeSupplementaryComponentRepository oracleDataTypeSupplementaryComponentRepository;
 
     @Autowired
     private OracleBusinessDataTypePrimitiveRestrictionRepository oracleBusinessDataTypePrimitiveRestrictionRepository;
+
+    @Autowired
+    private OracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository oracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
 
     @Autowired
     private BaseCoreDataTypePrimitiveRepository baseCoreDataTypePrimitiveRepository;
@@ -85,6 +88,12 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+
+    @Autowired
+    private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
+
+    @Autowired
+    private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
 
     @Autowired
     private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
@@ -144,7 +153,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public BasicCoreComponentRepository basicCoreComponentRepository() {
-        return baseBasicCoreComponentRepository;
+        return oracleBasicCoreComponentRepository;
     }
 
     @Override
@@ -159,7 +168,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public BasicCoreComponentPropertyRepository basicCoreComponentPropertyRepository() {
-        return baseBasicCoreComponentPropertyRepository;
+        return oracleBasicCoreComponentPropertyRepository;
     }
 
     @Override
@@ -199,12 +208,17 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public DataTypeSupplementaryComponentRepository dataTypeSupplementaryComponentRepository() {
-        return baseDataTypeSupplementaryComponentRepository;
+        return oracleDataTypeSupplementaryComponentRepository;
     }
 
     @Override
     public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository() {
         return oracleBusinessDataTypePrimitiveRestrictionRepository;
+    }
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository() {
+        return oracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
     }
 
     @Override
@@ -220,6 +234,16 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository() {
         return baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+    }
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository coreDataTypeSupplementaryComponentAllowedPrimitiveRepository() {
+        return oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
+    }
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
+        return oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
     }
 
     @Override
