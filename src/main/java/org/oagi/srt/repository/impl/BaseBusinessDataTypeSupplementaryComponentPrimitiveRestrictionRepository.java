@@ -41,6 +41,74 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
                 namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_BDT_SC_ID_AND_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_STATEMENT = "SELECT " +
+            "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
+            "code_list_id, is_default, agency_id_list_id " +
+            "FROM bdt_sc_pri_restri " +
+            "WHERE bdt_sc_id = :bdt_sc_id AND cdt_sc_awd_pri_xps_type_map_id = :cdt_sc_awd_pri_xps_type_map_id";
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapId(int bdtScId, int cdtScAwdPriXpsTypeMapId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_sc_id", bdtScId)
+                .addValue("cdt_sc_awd_pri_xps_type_map_id", cdtScAwdPriXpsTypeMapId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BDT_SC_ID_AND_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_STATEMENT,
+                namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_BDT_SC_ID_AND_CODE_LIST_ID_STATEMENT = "SELECT " +
+            "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
+            "code_list_id, is_default, agency_id_list_id " +
+            "FROM bdt_sc_pri_restri " +
+            "WHERE bdt_sc_id = :bdt_sc_id AND code_list_id = :code_list_id";
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCodeListId(int bdtScId, int codeListId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_sc_id", bdtScId)
+                .addValue("code_list_id", codeListId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BDT_SC_ID_AND_CODE_LIST_ID_STATEMENT,
+                namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_BDT_SC_ID_AND_AGENCY_ID_LIST_ID_STATEMENT = "SELECT " +
+            "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
+            "code_list_id, is_default, agency_id_list_id " +
+            "FROM bdt_sc_pri_restri " +
+            "WHERE bdt_sc_id = :bdt_sc_id AND agency_id_list_id = :agency_id_list_id";
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndAgencyIdListId(int bdtScId, int agencyIdListId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_sc_id", bdtScId)
+                .addValue("agency_id_list_id", agencyIdListId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BDT_SC_ID_AND_AGENCY_ID_LIST_ID_STATEMENT,
+                namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_BDT_SC_ID_AND_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_AND_CODE_LIST_ID_AND_AGENCY_ID_LIST_ID_STATEMENT = "SELECT " +
+            "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
+            "code_list_id, is_default, agency_id_list_id " +
+            "FROM bdt_sc_pri_restri " +
+            "WHERE bdt_sc_id = :bdt_sc_id AND cdt_sc_awd_pri_xps_type_map_id = :cdt_sc_awd_pri_xps_type_map_id AND " +
+            "code_list_id = :code_list_id AND agency_id_list_id = :agency_id_list_id";
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapIdAndCodeListIdAndAgencyIdListId(
+            int bdtScId, int cdtScAwdPriXpsTypeMapId, int codeListId, int agencyIdListId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_sc_id", bdtScId)
+                .addValue("cdt_sc_awd_pri_xps_type_map_id", cdtScAwdPriXpsTypeMapId)
+                .addValue("code_list_id", codeListId)
+                .addValue("agency_id_list_id", agencyIdListId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_BDT_SC_ID_AND_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_AND_CODE_LIST_ID_AND_AGENCY_ID_LIST_ID_STATEMENT,
+                namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO bdt_sc_pri_restri (" +
             "bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
             "code_list_id, is_default, agency_id_list_id) VALUES (" +

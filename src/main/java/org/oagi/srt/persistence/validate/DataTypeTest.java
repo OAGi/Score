@@ -135,6 +135,7 @@ public class DataTypeTest {
             return dao.findOneByGuid(id);
         } catch (EmptyResultDataAccessException e) {
             System.err.println("Error!" + e.getStackTrace()[0].getLineNumber());
+            return null;
         }
     }
 
@@ -201,8 +202,10 @@ public class DataTypeTest {
         String unQualifiedDataTypeTerm = dataTypeTerm;
 
         DataType dVO2 = validateInsertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"));
-        System.out.println(dVO1.getBasedDtId() + "  " + dVO2.getDtId() + "  " + defaultId);
-        validateInsertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        if (dVO2 != null) {
+            System.out.println(dVO1.getBasedDtId() + "  " + dVO2.getDtId() + "  " + defaultId);
+            validateInsertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        }
     }
 
     private void validateImportDataTypeList(String dataType) throws Exception {
@@ -290,7 +293,9 @@ public class DataTypeTest {
         String unQualifiedDataTypeTerm = dataTypeTerm;
 
         DataType dVO2 = validateInsertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"));
-        validateInsertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        if (dVO2 != null) {
+            validateInsertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        }
     }
 
     private void validateImportExceptionalDataTypeList(String dataType) throws Exception {
@@ -358,7 +363,9 @@ public class DataTypeTest {
         String unQualifiedDataTypeTerm = dataTypeTerm;
 
         DataType dVO2 = validateInsertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"));
-        validateInsertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        if (dVO2 != null) {
+            validateInsertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        }
     }
 
     private void validateInsertBDTPrimitiveRestriction(int cdtID, int bdtID, int defaultId) {
@@ -420,16 +427,20 @@ public class DataTypeTest {
         List<BusinessDataTypePrimitiveRestriction> al = aBDTPrimitiveRestrictionDAO.findByBdtId(basedBdtId);
 
         for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
+            int cdtAwdPriXpsTypeMapId = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
+            int codeListId = aBusinessDataTypePrimitiveRestriction.getCodeListId();
 
-            if (aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId() != 0)
-                qc2.add("cdt_awd_pri_xps_type_map_id", aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-            if (aBusinessDataTypePrimitiveRestriction.getCodeListId() != 0)
-                qc2.add("code_list_id", aBusinessDataTypePrimitiveRestriction.getCodeListId());
-
-            if (aBDTPrimitiveRestrictionDAO.findObject(qc2, conn) == null)
-                System.out.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
-            else
-                ;//System.out.println("Success!!");
+            try {
+                if (cdtAwdPriXpsTypeMapId != 0 && codeListId != 0) {
+                    aBDTPrimitiveRestrictionDAO.findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(codeListId, cdtAwdPriXpsTypeMapId);
+                } else if (cdtAwdPriXpsTypeMapId != 0) {
+                    aBDTPrimitiveRestrictionDAO.findOneByCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
+                } else if (codeListId != 0) {
+                    aBDTPrimitiveRestrictionDAO.findOneByCodeListId(codeListId);
+                }
+            } catch (EmptyResultDataAccessException e) {
+                System.err.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
+            }
         }
     }
 
@@ -577,15 +588,16 @@ public class DataTypeTest {
             List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = getBDTSCPrimitiveRestriction(dtscVO);
             for (BusinessDataTypeSupplementaryComponentPrimitiveRestriction parent : bdtscs) {
 
-                QueryCondition qc1 = new QueryCondition();
-                qc1.add("bdt_sc_id", dtscVO.getDtScId());
-                qc1.add("cdt_sc_awd_pri_xps_type_map_id", parent.getCdtScAwdPriXpsTypeMapId());
-                qc1.add("code_list_id", parent.getCodeListId());
-                qc1.add("agency_id_list_id", parent.getAgencyIdListId());
-                if (bdtSCPRDAO.findObject(qc1, conn) == null)
-                    System.out.println("#######BDT_SC_PRIMITIVE_RESTRICTION FROM BASE IS NOT POPULATED!! Check DT_SC_ID: " + dtscVO.getDtScId());
-                else
-                    ;//System.out.println("Success!!");
+                try {
+                    bdtSCPRDAO.findOneByBdtScIdAndCdtScAwdPriXpsTypeMapIdAndCodeListIdAndAgencyIdListId(
+                            dtscVO.getDtScId(),
+                            parent.getCdtScAwdPriXpsTypeMapId(),
+                            parent.getCodeListId(),
+                            parent.getAgencyIdListId()
+                    );
+                } catch (EmptyResultDataAccessException e) {
+                    System.err.println("#######BDT_SC_PRIMITIVE_RESTRICTION FROM BASE IS NOT POPULATED!! Check DT_SC_ID: " + dtscVO.getDtScId());
+                }
             }
 
         } else { // else if (new SC)
@@ -596,33 +608,32 @@ public class DataTypeTest {
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive svo : cdtscallowedprimitivelist) {
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> maps = getCdtSCAPMap(svo.getCdtScAwdPriId());
                 for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap vo : maps) {
-                    qc1.add("cdt_sc_awd_pri_xps_type_map_id", vo.getCdtScAwdPriXpsTypeMapId());
-                    if (bdtSCPRDAO.findObject(qc1, conn) == null)
-                        System.out.println("#######BDT_SC_PRIMITIVE_RESTRICTION FROM ATTRIBUTES IS NOT POPULATED!! Check DT_SC_ID: " + dtscVO.getDtScId());
-                    else
-                        ;//System.out.println("Success!!");
 
+                    try {
+                        bdtSCPRDAO.findOneByBdtScIdAndCdtScAwdPriXpsTypeMapId(dtscVO.getDtScId(), vo.getCdtScAwdPriXpsTypeMapId());
+                    } catch (EmptyResultDataAccessException e) {
+                        System.err.println("#######BDT_SC_PRIMITIVE_RESTRICTION FROM ATTRIBUTES IS NOT POPULATED!! Check DT_SC_ID: " + dtscVO.getDtScId());
+                    }
                 }
             }
 
             if (type.contains("CodeContentType")) {
-                QueryCondition qc2 = new QueryCondition();
-                qc2.add("bdt_sc_id", dtscVO.getDtScId());
-                qc2.add("code_list_id", getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
-                if (bdtSCPRDAO.findObject(qc2, conn) == null)
-                    System.out.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
-                else
-                    ;//System.out.println("Success!!");
-
+                try {
+                    bdtSCPRDAO.findOneByBdtScIdAndCodeListId(
+                            dtscVO.getDtScId(),
+                            getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
+                } catch (EmptyResultDataAccessException e) {
+                    System.err.println("Error!" + e.getStackTrace()[0].getLineNumber());
+                }
             }
             if (name.equalsIgnoreCase("listAgencyID")) {
-                QueryCondition qc2 = new QueryCondition();
-                qc2.add("bdt_sc_id", dtscVO.getDtScId());
-                qc2.add("agency_id_list_id", getAgencyListID());
-                if (bdtSCPRDAO.findObject(qc2, conn) == null)
-                    System.out.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
-                else
-                    ;//System.out.println("Success!!");
+                try {
+                    bdtSCPRDAO.findOneByBdtScIdAndAgencyIdListId(
+                            dtscVO.getDtScId(),
+                            getAgencyListID());
+                } catch (EmptyResultDataAccessException e) {
+                    System.err.println("Error!" + e.getStackTrace()[0].getLineNumber());
+                }
             }
         }
     }
