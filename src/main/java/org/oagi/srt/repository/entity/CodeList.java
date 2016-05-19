@@ -2,9 +2,10 @@ package org.oagi.srt.repository.entity;
 
 import org.oagi.srt.common.SRTConstants;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CodeList {
+public class CodeList implements Serializable {
 
     private int codeListId;
     private String guid;
@@ -212,5 +213,32 @@ public class CodeList {
 
     public void setDiscardDisabled(boolean discardDisabled) {
         this.discardDisabled = discardDisabled;
+    }
+
+    @Override
+    public String toString() {
+        return "CodeList{" +
+                "codeListId=" + codeListId +
+                ", guid='" + guid + '\'' +
+                ", enumTypeGuid='" + enumTypeGuid + '\'' +
+                ", name='" + name + '\'' +
+                ", listId='" + listId + '\'' +
+                ", agencyId=" + agencyId +
+                ", versionId='" + versionId + '\'' +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
+                ", basedCodeListId=" + basedCodeListId +
+                ", extensibleIndicator=" + extensibleIndicator +
+                ", module='" + module + '\'' +
+                ", createdBy=" + createdBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state='" + state + '\'' +
+                ", editDisabled=" + editDisabled +
+                ", deleteDisabled=" + deleteDisabled +
+                ", discardDisabled=" + discardDisabled +
+                '}';
     }
 }

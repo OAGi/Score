@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class CoreDataTypePrimitive {
+import java.io.Serializable;
+
+public class CoreDataTypePrimitive implements Serializable {
 
     private int cdtPriId;
     private String name;
@@ -19,5 +21,13 @@ public class CoreDataTypePrimitive {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "CoreDataTypePrimitive{" +
+                "cdtPriId=" + cdtPriId +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

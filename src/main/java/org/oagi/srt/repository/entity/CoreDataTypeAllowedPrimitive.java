@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class CoreDataTypeAllowedPrimitive {
+import java.io.Serializable;
+
+public class CoreDataTypeAllowedPrimitive implements Serializable {
 
     private int cdtAwdPriId;
     private int cdtId;
@@ -37,5 +39,15 @@ public class CoreDataTypeAllowedPrimitive {
 
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    @Override
+    public String toString() {
+        return "CoreDataTypeAllowedPrimitive{" +
+                "cdtAwdPriId=" + cdtAwdPriId +
+                ", cdtId=" + cdtId +
+                ", cdtPriId=" + cdtPriId +
+                ", isDefault=" + isDefault +
+                '}';
     }
 }

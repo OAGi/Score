@@ -1,8 +1,10 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasicBusinessInformationEntityProperty {
+public class BasicBusinessInformationEntityProperty implements Serializable {
+
     private int bbiepId;
     private String guid;
     private int basedBccpId;
@@ -92,5 +94,21 @@ public class BasicBusinessInformationEntityProperty {
 
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicBusinessInformationEntityProperty{" +
+                "bbiepId=" + bbiepId +
+                ", guid='" + guid + '\'' +
+                ", basedBccpId=" + basedBccpId +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
     }
 }

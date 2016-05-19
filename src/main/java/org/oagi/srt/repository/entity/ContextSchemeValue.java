@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class ContextSchemeValue {
+import java.io.Serializable;
+
+public class ContextSchemeValue implements Serializable {
 
     private int ctxSchemeValueId;
     private String guid;
@@ -46,5 +48,16 @@ public class ContextSchemeValue {
 
     public void setOwnerCtxSchemeId(int ownerCtxSchemeId) {
         this.ownerCtxSchemeId = ownerCtxSchemeId;
+    }
+
+    @Override
+    public String toString() {
+        return "ContextSchemeValue{" +
+                "ctxSchemeValueId=" + ctxSchemeValueId +
+                ", guid='" + guid + '\'' +
+                ", value='" + value + '\'' +
+                ", meaning='" + meaning + '\'' +
+                ", ownerCtxSchemeId=" + ownerCtxSchemeId +
+                '}';
     }
 }

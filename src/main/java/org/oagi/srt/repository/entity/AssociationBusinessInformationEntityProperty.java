@@ -1,8 +1,9 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AssociationBusinessInformationEntityProperty {
+public class AssociationBusinessInformationEntityProperty implements Serializable {
 
     private int asbiepId;
     private String guid;
@@ -102,5 +103,22 @@ public class AssociationBusinessInformationEntityProperty {
 
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationBusinessInformationEntityProperty{" +
+                "asbiepId=" + asbiepId +
+                ", guid='" + guid + '\'' +
+                ", basedAsccpId=" + basedAsccpId +
+                ", roleOfAbieId=" + roleOfAbieId +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
     }
 }

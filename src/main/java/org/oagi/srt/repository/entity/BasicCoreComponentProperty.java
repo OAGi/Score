@@ -1,8 +1,10 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasicCoreComponentProperty {
+public class BasicCoreComponentProperty implements Serializable {
+
     private int bccpId;
     private String guid;
     private String propertyTerm;
@@ -191,5 +193,32 @@ public class BasicCoreComponentProperty {
 
     public void setCurrentBccpId(int currentBccpId) {
         this.currentBccpId = currentBccpId;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicCoreComponentProperty{" +
+                "bccpId=" + bccpId +
+                ", guid='" + guid + '\'' +
+                ", propertyTerm='" + propertyTerm + '\'' +
+                ", representationTerm='" + representationTerm + '\'' +
+                ", bdtId=" + bdtId +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", module='" + module + '\'' +
+                ", namespaceId=" + namespaceId +
+                ", deprecated=" + deprecated +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentBccpId=" + currentBccpId +
+                '}';
     }
 }

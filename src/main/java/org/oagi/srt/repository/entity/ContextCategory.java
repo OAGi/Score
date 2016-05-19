@@ -1,6 +1,9 @@
 package org.oagi.srt.repository.entity;
 
-public class ContextCategory {
+import java.io.Serializable;
+
+public class ContextCategory implements Serializable {
+
     private int ctxCategoryId;
     private String guid;
     private String name;
@@ -36,5 +39,15 @@ public class ContextCategory {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "ContextCategory{" +
+                "ctxCategoryId=" + ctxCategoryId +
+                ", guid='" + guid + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

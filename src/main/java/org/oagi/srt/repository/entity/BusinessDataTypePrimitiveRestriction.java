@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class BusinessDataTypePrimitiveRestriction {
+import java.io.Serializable;
+
+public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
     private int bdtPriRestriId;
     private int bdtId;
@@ -55,5 +57,17 @@ public class BusinessDataTypePrimitiveRestriction {
 
     public void setAgencyIdListId(int agencyIdListId) {
         this.agencyIdListId = agencyIdListId;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessDataTypePrimitiveRestriction{" +
+                "bdtPriRestriId=" + bdtPriRestriId +
+                ", bdtId=" + bdtId +
+                ", cdtAwdPriXpsTypeMapId=" + cdtAwdPriXpsTypeMapId +
+                ", codeListId=" + codeListId +
+                ", isDefault=" + isDefault +
+                ", agencyIdListId=" + agencyIdListId +
+                '}';
     }
 }

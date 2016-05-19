@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private int appUserId;
     private String loginId;
@@ -55,5 +57,17 @@ public class User {
 
     public void setOagisDeveloperIndicator(boolean oagisDeveloperIndicator) {
         this.oagisDeveloperIndicator = oagisDeveloperIndicator;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "appUserId=" + appUserId +
+                ", loginId='" + loginId + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", organization='" + organization + '\'' +
+                ", oagisDeveloperIndicator=" + oagisDeveloperIndicator +
+                '}';
     }
 }

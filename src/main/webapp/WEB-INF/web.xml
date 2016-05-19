@@ -3,9 +3,6 @@
   <welcome-file-list>
     <welcome-file>/index.xhtml</welcome-file>
   </welcome-file-list>
-  <listener>
-    <listener-class>org.oagi.srt.web.startup.CacheContextListener</listener-class>
-  </listener>
   <context-param>
     <param-name>com.sun.faces.numberOfViewsInSession</param-name>
     <param-value>5</param-value>

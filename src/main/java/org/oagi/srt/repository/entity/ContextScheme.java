@@ -1,8 +1,9 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ContextScheme {
+public class ContextScheme implements Serializable {
 
     private int classificationCtxSchemeId;
     private String guid;
@@ -111,5 +112,23 @@ public class ContextScheme {
 
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "ContextScheme{" +
+                "classificationCtxSchemeId=" + classificationCtxSchemeId +
+                ", guid='" + guid + '\'' +
+                ", schemeId='" + schemeId + '\'' +
+                ", schemeName='" + schemeName + '\'' +
+                ", description='" + description + '\'' +
+                ", schemeAgencyId='" + schemeAgencyId + '\'' +
+                ", schemeVersionId='" + schemeVersionId + '\'' +
+                ", ctxCategoryId=" + ctxCategoryId +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
     }
 }

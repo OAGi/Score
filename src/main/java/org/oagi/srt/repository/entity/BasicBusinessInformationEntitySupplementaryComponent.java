@@ -1,6 +1,9 @@
 package org.oagi.srt.repository.entity;
 
-public class BasicBusinessInformationEntitySupplementaryComponent {
+import java.io.Serializable;
+
+public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable {
+
     private int bbieScId;
     private int bbieId;
     private int dtScId;
@@ -126,5 +129,25 @@ public class BasicBusinessInformationEntitySupplementaryComponent {
 
     public void setUsed(boolean used) {
         this.used = used;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicBusinessInformationEntitySupplementaryComponent{" +
+                "bbieScId=" + bbieScId +
+                ", bbieId=" + bbieId +
+                ", dtScId=" + dtScId +
+                ", dtScPriRestriId=" + dtScPriRestriId +
+                ", codeListId=" + codeListId +
+                ", agencyIdListId=" + agencyIdListId +
+                ", minCardinality=" + minCardinality +
+                ", maxCardinality=" + maxCardinality +
+                ", defaultValue='" + defaultValue + '\'' +
+                ", fixedValue='" + fixedValue + '\'' +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                ", used=" + used +
+                '}';
     }
 }

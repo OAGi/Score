@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class AgencyIdListValue {
+import java.io.Serializable;
+
+public class AgencyIdListValue implements Serializable {
 
     private int agencyIdListValueId;
     private String value;
@@ -46,5 +48,16 @@ public class AgencyIdListValue {
 
     public void setOwnerListId(int ownerListId) {
         this.ownerListId = ownerListId;
+    }
+
+    @Override
+    public String toString() {
+        return "AgencyIdListValue{" +
+                "agencyIdListValueId=" + agencyIdListValueId +
+                ", value='" + value + '\'' +
+                ", name='" + name + '\'' +
+                ", definition='" + definition + '\'' +
+                ", ownerListId=" + ownerListId +
+                '}';
     }
 }

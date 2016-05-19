@@ -6,7 +6,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.oagi.srt.scope.ViewScope;
 import org.oagi.srt.web.filter.CharacterEncodingFilter;
-import org.oagi.srt.web.startup.CacheContextListener;
 import org.primefaces.webapp.filter.FileUploadFilter;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.context.embedded.*;
@@ -32,11 +31,6 @@ import javax.servlet.ServletException;
 @Configuration
 public class FacesInitializer extends WebMvcConfigurerAdapter
         implements EmbeddedServletContainerCustomizer, ServletContextInitializer {
-
-    @Bean
-    public CacheContextListener cacheContextListener() {
-        return new CacheContextListener();
-    }
 
     @Bean
     public ConfigureListener configureListener() {

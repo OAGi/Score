@@ -1,8 +1,9 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasicBusinessInformationEntity implements BusinessInformationEntity {
+public class BasicBusinessInformationEntity implements Serializable, BusinessInformationEntity {
 
     private int bbieId;
     private String guid;
@@ -192,5 +193,32 @@ public class BasicBusinessInformationEntity implements BusinessInformationEntity
 
     public void setUsed(boolean used) {
         this.used = used;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicBusinessInformationEntity{" +
+                "bbieId=" + bbieId +
+                ", guid='" + guid + '\'' +
+                ", basedBccId=" + basedBccId +
+                ", fromAbieId=" + fromAbieId +
+                ", toBbiepId=" + toBbiepId +
+                ", bdtPriRestriId=" + bdtPriRestriId +
+                ", codeListId=" + codeListId +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", defaultValue='" + defaultValue + '\'' +
+                ", nillable=" + nillable +
+                ", fixedValue='" + fixedValue + '\'' +
+                ", nill=" + nill +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", seqKey=" + seqKey +
+                ", used=" + used +
+                '}';
     }
 }

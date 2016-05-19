@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class XSDBuiltInType {
+import java.io.Serializable;
+
+public class XSDBuiltInType implements Serializable {
 
     private int xbtId;
     private String name;
@@ -37,5 +39,15 @@ public class XSDBuiltInType {
 
     public void setSubtypeOfXbtId(int subtypeOfXbtId) {
         this.subtypeOfXbtId = subtypeOfXbtId;
+    }
+
+    @Override
+    public String toString() {
+        return "XSDBuiltInType{" +
+                "xbtId=" + xbtId +
+                ", name='" + name + '\'' +
+                ", builtInType='" + builtInType + '\'' +
+                ", subtypeOfXbtId=" + subtypeOfXbtId +
+                '}';
     }
 }

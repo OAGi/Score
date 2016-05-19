@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class CodeListValue {
+import java.io.Serializable;
+
+public class CodeListValue implements Serializable {
 
     private int codeListValueId;
     private int codeListId;
@@ -101,5 +103,22 @@ public class CodeListValue {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    @Override
+    public String toString() {
+        return "CodeListValue{" +
+                "codeListValueId=" + codeListValueId +
+                ", codeListId=" + codeListId +
+                ", value='" + value + '\'' +
+                ", name='" + name + '\'' +
+                ", definition='" + definition + '\'' +
+                ", definitionSource='" + definitionSource + '\'' +
+                ", usedIndicator=" + usedIndicator +
+                ", lockedIndicator=" + lockedIndicator +
+                ", extensionIndicator=" + extensionIndicator +
+                ", color='" + color + '\'' +
+                ", disabled=" + disabled +
+                '}';
     }
 }

@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class CoreDataTypeAllowedPrimitiveExpressionTypeMap {
+import java.io.Serializable;
+
+public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializable {
 
     private int cdtAwdPriXpsTypeMapId;
     private int cdtAwdPriId;
@@ -28,5 +30,14 @@ public class CoreDataTypeAllowedPrimitiveExpressionTypeMap {
 
     public void setXbtId(int xbtId) {
         this.xbtId = xbtId;
+    }
+
+    @Override
+    public String toString() {
+        return "CoreDataTypeAllowedPrimitiveExpressionTypeMap{" +
+                "cdtAwdPriXpsTypeMapId=" + cdtAwdPriXpsTypeMapId +
+                ", cdtAwdPriId=" + cdtAwdPriId +
+                ", xbtId=" + xbtId +
+                '}';
     }
 }

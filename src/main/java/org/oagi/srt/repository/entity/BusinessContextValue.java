@@ -1,6 +1,9 @@
 package org.oagi.srt.repository.entity;
 
-public class BusinessContextValue {
+import java.io.Serializable;
+
+public class BusinessContextValue implements Serializable {
+
     private int bizCtxValueId;
     private int bizCtxId;
     private int ctxSchemeValueId;
@@ -27,5 +30,14 @@ public class BusinessContextValue {
 
     public void setCtxSchemeValueId(int ctxSchemeValueId) {
         this.ctxSchemeValueId = ctxSchemeValueId;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessContextValue{" +
+                "bizCtxValueId=" + bizCtxValueId +
+                ", bizCtxId=" + bizCtxId +
+                ", ctxSchemeValueId=" + ctxSchemeValueId +
+                '}';
     }
 }

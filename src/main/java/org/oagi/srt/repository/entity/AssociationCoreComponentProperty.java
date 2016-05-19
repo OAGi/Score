@@ -1,8 +1,9 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AssociationCoreComponentProperty {
+public class AssociationCoreComponentProperty implements Serializable {
 
     private int asccpId;
     private String guid;
@@ -192,5 +193,32 @@ public class AssociationCoreComponentProperty {
 
     public void setCurrentAsccpId(int currentAsccpId) {
         this.currentAsccpId = currentAsccpId;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationCoreComponentProperty{" +
+                "asccpId=" + asccpId +
+                ", guid='" + guid + '\'' +
+                ", propertyTerm='" + propertyTerm + '\'' +
+                ", definition='" + definition + '\'' +
+                ", roleOfAccId=" + roleOfAccId +
+                ", den='" + den + '\'' +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", module='" + module + '\'' +
+                ", namespaceId=" + namespaceId +
+                ", reusableIndicator=" + reusableIndicator +
+                ", deprecated=" + deprecated +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentAsccpId=" + currentAsccpId +
+                '}';
     }
 }

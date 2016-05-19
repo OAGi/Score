@@ -1,8 +1,10 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasicCoreComponent extends CoreComponent {
+public class BasicCoreComponent extends CoreComponent implements Serializable {
+
     private int bccId;
     private String guid;
     private int cardinalityMin;
@@ -200,5 +202,33 @@ public class BasicCoreComponent extends CoreComponent {
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicCoreComponent{" +
+                "bccId=" + bccId +
+                ", guid='" + guid + '\'' +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", toBccpId=" + toBccpId +
+                ", fromAccId=" + fromAccId +
+                ", seqKey=" + seqKey +
+                ", entityType=" + entityType +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentBccId=" + currentBccId +
+                ", deprecated=" + deprecated +
+                '}';
     }
 }

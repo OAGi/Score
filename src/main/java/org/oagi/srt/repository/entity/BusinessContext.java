@@ -1,8 +1,10 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BusinessContext {
+public class BusinessContext implements Serializable {
+
     private int bizCtxId;
     private String guid;
     private String name;
@@ -65,5 +67,18 @@ public class BusinessContext {
 
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessContext{" +
+                "bizCtxId=" + bizCtxId +
+                ", guid='" + guid + '\'' +
+                ", name='" + name + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
     }
 }

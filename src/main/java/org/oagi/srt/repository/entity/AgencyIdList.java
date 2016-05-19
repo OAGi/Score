@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class AgencyIdList {
+import java.io.Serializable;
+
+public class AgencyIdList implements Serializable {
 
     private int agencyIdListId;
     private String guid;
@@ -73,5 +75,19 @@ public class AgencyIdList {
 
     public void setDefinition(String definition) {
         this.definition = definition;
+    }
+
+    @Override
+    public String toString() {
+        return "AgencyIdList{" +
+                "agencyIdListId=" + agencyIdListId +
+                ", guid='" + guid + '\'' +
+                ", enumTypeGuid='" + enumTypeGuid + '\'' +
+                ", name='" + name + '\'' +
+                ", listId='" + listId + '\'' +
+                ", agencyId=" + agencyId +
+                ", versionId='" + versionId + '\'' +
+                ", definition='" + definition + '\'' +
+                '}';
     }
 }

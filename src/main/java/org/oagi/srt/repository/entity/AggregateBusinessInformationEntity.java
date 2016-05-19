@@ -1,8 +1,10 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AggregateBusinessInformationEntity {
+public class AggregateBusinessInformationEntity implements Serializable {
+
     private int abieId;
     private String guid;
     private int basedAccId;
@@ -155,5 +157,28 @@ public class AggregateBusinessInformationEntity {
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
+    }
+
+    @Override
+    public String toString() {
+        return "AggregateBusinessInformationEntity{" +
+                "abieId=" + abieId +
+                ", guid='" + guid + '\'' +
+                ", basedAccId=" + basedAccId +
+                ", topLevel=" + topLevel +
+                ", bizCtxId=" + bizCtxId +
+                ", bizCtxName='" + bizCtxName + '\'' +
+                ", definition='" + definition + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", clientId=" + clientId +
+                ", version='" + version + '\'' +
+                ", status='" + status + '\'' +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                '}';
     }
 }

@@ -1,6 +1,8 @@
 package org.oagi.srt.repository.entity;
 
-public class DataTypeSupplementaryComponent {
+import java.io.Serializable;
+
+public class DataTypeSupplementaryComponent implements Serializable {
 
     private int dtScId;
     private String guid;
@@ -82,5 +84,20 @@ public class DataTypeSupplementaryComponent {
 
     public void setBasedDtScId(int basedDtScId) {
         this.basedDtScId = basedDtScId;
+    }
+
+    @Override
+    public String toString() {
+        return "DataTypeSupplementaryComponent{" +
+                "dtScId=" + dtScId +
+                ", guid='" + guid + '\'' +
+                ", propertyTerm='" + propertyTerm + '\'' +
+                ", representationTerm='" + representationTerm + '\'' +
+                ", definition='" + definition + '\'' +
+                ", ownerDtId=" + ownerDtId +
+                ", minCardinality=" + minCardinality +
+                ", maxCardinality=" + maxCardinality +
+                ", basedDtScId=" + basedDtScId +
+                '}';
     }
 }

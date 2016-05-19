@@ -1,8 +1,9 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AggregateCoreComponent {
+public class AggregateCoreComponent implements Serializable {
 
     private int accId;
     private String guid;
@@ -201,5 +202,33 @@ public class AggregateCoreComponent {
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    @Override
+    public String toString() {
+        return "AggregateCoreComponent{" +
+                "accId=" + accId +
+                ", guid='" + guid + '\'' +
+                ", objectClassTerm='" + objectClassTerm + '\'' +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", basedAccId=" + basedAccId +
+                ", objectClassQualifier='" + objectClassQualifier + '\'' +
+                ", oagisComponentType=" + oagisComponentType +
+                ", module='" + module + '\'' +
+                ", namespaceId=" + namespaceId +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentAccId=" + currentAccId +
+                ", deprecated=" + deprecated +
+                '}';
     }
 }

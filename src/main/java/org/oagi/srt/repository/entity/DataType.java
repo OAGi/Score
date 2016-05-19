@@ -1,8 +1,10 @@
 package org.oagi.srt.repository.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class DataType {
+public class DataType implements Serializable {
+
     private int dtId;
     private String guid;
     private int type;
@@ -227,5 +229,36 @@ public class DataType {
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    @Override
+    public String toString() {
+        return "DataType{" +
+                "dtId=" + dtId +
+                ", guid='" + guid + '\'' +
+                ", type=" + type +
+                ", versionNum='" + versionNum + '\'' +
+                ", previousVersionDtId=" + previousVersionDtId +
+                ", dataTypeTerm='" + dataTypeTerm + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", basedDtId=" + basedDtId +
+                ", den='" + den + '\'' +
+                ", contentComponentDen='" + contentComponentDen + '\'' +
+                ", definition='" + definition + '\'' +
+                ", contentComponentDefinition='" + contentComponentDefinition + '\'' +
+                ", revisionDoc='" + revisionDoc + '\'' +
+                ", state=" + state +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentBdtId=" + currentBdtId +
+                ", deprecated=" + deprecated +
+                '}';
     }
 }
