@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -36,6 +37,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
     private AggregateCoreComponentRepository accDao;
     private AssociationCoreComponentPropertyRepository asccpDao;
     private BasicCoreComponentPropertyRepository bccpDao;
@@ -134,7 +136,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             String definition = bodSchemaHandler.getAnnotation(element);
 
             int roleOfAccId;
-            AggregateCoreComponent accVO = accDao.findOneByGuid(complexType.getFId());
+            AggregateCoreComponent accVO = null;
+            try {
+                accVO = accDao.findOneByGuid(complexType.getFId());
+            } catch (EmptyResultDataAccessException e) {
+            }
+
             if (accVO == null) {
                 insertACC(complexType, bodPath);
                 accVO = accDao.findOneByGuid(complexType.getFId());
@@ -223,7 +230,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
         try {
             asccDao.findOneByGuid((bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId());
-        } catch (EmptyStackException e) {
+        } catch (EmptyResultDataAccessException e) {
             String asccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
             int cardinalityMin = bodVO.getMinOccur();
             int cardinalityMax = bodVO.getMaxOccur();
@@ -354,19 +361,30 @@ public class P_1_8_PopulateAccAsccpBccAscc {
     }
 
     private AggregateCoreComponent getACC(String guid) throws Exception {
-        return accDao.findOneByGuid(guid);
+        try {
+            return accDao.findOneByGuid(guid);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private AssociationCoreComponentProperty getASCCP(String guid) throws Exception {
-        return asccpDao.findOneByGuid(guid);
+        try {
+            return asccpDao.findOneByGuid(guid);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private AssociationCoreComponent getASCC(String guid) throws Exception {
-        return asccDao.findOneByGuid(guid);
+        try {
+            return asccDao.findOneByGuid(guid);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private void insertBCC(BODElementVO bodVO, String parentGuid, BasicCoreComponentProperty bccpVO) throws Exception {
-
         if (bccpVO == null)
             return;
 
@@ -414,7 +432,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         XSSimpleTypeDecl xtd = (XSSimpleTypeDecl) xad.getTypeDefinition();
 
         int assocToBccpId;
-        BasicCoreComponentProperty bccpVO = bccpDao.findOneByPropertyTerm(Utility.spaceSeparator(xad.getName()).replace("ID", "Identifier"));
+        BasicCoreComponentProperty bccpVO = null;
+        try {
+            bccpVO = bccpDao.findOneByPropertyTerm(Utility.spaceSeparator(xad.getName()).replace("ID", "Identifier"));
+        } catch (EmptyResultDataAccessException e) {
+        }
+
         if (bccpVO == null) {
             bccpVO = insertBCCP(xad.getName(), xtd.getFId());
         }
@@ -760,11 +783,11 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         });
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.8 Start");
 
-        P_1_8_PopulateAccAsccpBccAscc q = new P_1_8_PopulateAccAsccpBccAscc();
-        q.populate();
+        populate();
 
         System.out.println("### 1.8 End");
     }
