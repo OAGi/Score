@@ -10,6 +10,8 @@ public interface BasicBusinessInformationEntitySupplementaryComponentRepository 
 
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(int bbieId);
 
+    public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieIdAndUsed(int bbieId, boolean used);
+
     public void save(BasicBusinessInformationEntitySupplementaryComponent basicBusinessInformationEntitySupplementaryComponent);
 
     public void update(BasicBusinessInformationEntitySupplementaryComponent basicBusinessInformationEntitySupplementaryComponent);

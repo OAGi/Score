@@ -8,6 +8,8 @@ public interface AgencyIdListRepository {
 
     public List<AgencyIdList> findAll();
 
+    public AgencyIdList findOneByAgencyIdListId(int agencyIdListId);
+
     public AgencyIdList findOneByGuid(String guid);
 
     public AgencyIdList findOneByName(String name);

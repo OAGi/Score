@@ -2,10 +2,6 @@ package org.oagi.srt.web.handler;
 
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dto.ABIEVO;
-import org.oagi.srt.persistence.dto.ASCCPVO;
-import org.oagi.srt.persistence.dto.BBIEVO;
-import org.oagi.srt.persistence.dto.BusinessContextVO;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
@@ -313,7 +309,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     private AggregateBusinessInformationEntity topAbieVO;
     private AssociationBusinessInformationEntityProperty asbiepVO;
-    private BBIEVO bieVO;
+    private BasicBusinessInformationEntity bieVO;
 
     public String onFlowProcess(FlowEvent event) {
 
@@ -865,15 +861,15 @@ public class TopLevelABIEHandler implements Serializable {
             BasicBusinessInformationEntityProperty oBBIEPVO =
                     bbiepRepository.findOneByBbiepId(basicBusinessInformationEntity.getToBbiepId());
             BasicBusinessInformationEntityProperty nBBIEPVO = copyBBIEP(oBBIEPVO);
-            BasicBusinessInformationEntity nBBIEVO =
+            BasicBusinessInformationEntity nBasicBusinessInformationEntity =
                     copyBBIE(basicBusinessInformationEntity, nabieVO.getAbieId(), nBBIEPVO.getBbiepId());
 
             BasicCoreComponentProperty bccpVO =
                     bccpRepository.findOneByBccpId(nBBIEPVO.getBasedBccpId());
 
-            ABIEView av = new ABIEView(repositoryFactory, bccpVO.getPropertyTerm(), nBBIEVO.getBbieId(), "BBIE");
+            ABIEView av = new ABIEView(repositoryFactory, bccpVO.getPropertyTerm(), nBasicBusinessInformationEntity.getBbieId(), "BBIE");
             av.setBbiep(nBBIEPVO);
-            av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, nBBIEVO);
+            av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, nBasicBusinessInformationEntity);
 
             DataType dtVO = dtRepository.findOneByDtId(bccpVO.getBdtId());
             av.setBdtName(dtVO.getDen());
@@ -882,7 +878,7 @@ public class TopLevelABIEHandler implements Serializable {
             List<BasicBusinessInformationEntitySupplementaryComponent> bbiesc =
                     getBBIESCsFromBBIE(basicBusinessInformationEntity.getBbieId());
             for (BasicBusinessInformationEntitySupplementaryComponent oBBIESCVO : bbiesc) {
-                copyBBIESC(oBBIESCVO, nBBIEVO.getBbieId(), tNode2);
+                copyBBIESC(oBBIESCVO, nBasicBusinessInformationEntity.getBbieId(), tNode2);
             }
         }
 
@@ -1057,7 +1053,7 @@ public class TopLevelABIEHandler implements Serializable {
         int state;
         int userId = 0;
         //if(Extension is selected thru ui)
-        ABIEVO abieVO = new ABIEVO();
+        AggregateBusinessInformationEntity abieVO = new AggregateBusinessInformationEntity();
         if (abieVO.getState() == 1) { // Assume that 1 is editing
 
             AggregateCoreComponent ueACC = new AggregateCoreComponent(); //get ueACC
@@ -1383,7 +1379,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void onBCRowSelect(SelectEvent event) {
-        logger.debug(((BusinessContextVO) event.getObject()).getBusinessContextID() + "Business context Selected");
+        logger.debug(((BusinessContext) event.getObject()).getBizCtxId() + "Business context Selected");
     }
 
 
@@ -1417,7 +1413,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void onRowUnselect(UnselectEvent event) {
-        FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((ASCCPVO) event.getObject()).getASCCPID()));
+        FacesMessage msg = new FacesMessage("Item Unselected", String.valueOf(((AssociationCoreComponentProperty) event.getObject()).getAsccpId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
 

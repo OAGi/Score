@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository {
 
+    public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findAll();
+
     public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findByCdtAwdPriId(int cdtAwdPriId);
 
     public CoreDataTypeAllowedPrimitiveExpressionTypeMap findOneByCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId);

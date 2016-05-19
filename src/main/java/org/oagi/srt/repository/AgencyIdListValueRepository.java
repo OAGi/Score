@@ -8,6 +8,8 @@ public interface AgencyIdListValueRepository {
 
     public List<AgencyIdListValue> findAll();
 
+    public List<AgencyIdListValue> findByOwnerListId(int ownerListId);
+
     public AgencyIdListValue findOneByAgencyIdListValueId(int agencyIdListValueId);
 
     public AgencyIdListValue findOneByValue(String value);

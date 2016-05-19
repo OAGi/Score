@@ -10,6 +10,8 @@ public interface CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository {
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findByCdtPriId(int cdtPriId);
 
+    public CoreDataTypeSupplementaryComponentAllowedPrimitive findOneByCdtScAwdPriId(int cdtScAwdPriId);
+
     public CoreDataTypeSupplementaryComponentAllowedPrimitive findOneByCdtScIdAndCdtPriId(int cdtScId, int cdtPriId);
 
     public void save(CoreDataTypeSupplementaryComponentAllowedPrimitive coreDataTypeSupplementaryComponentAllowedPrimitive);

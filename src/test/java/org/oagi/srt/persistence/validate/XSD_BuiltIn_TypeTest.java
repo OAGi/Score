@@ -1,107 +1,68 @@
 package org.oagi.srt.persistence.validate;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.chanchan.common.persistence.db.ConnectionPoolManager;
-import org.chanchan.common.util.ServerProperties;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.oagi.srt.common.QueryCondition;
-import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.XSDBuiltInTypeVO;
 import org.oagi.srt.persistence.validate.data.TableData;
-import org.oagi.srt.web.startup.SRTInitializer;
-import org.oagi.srt.web.startup.SRTInitializerException;
+import org.oagi.srt.repository.RepositoryFactory;
+import org.oagi.srt.repository.XSDBuiltInTypeRepository;
+import org.oagi.srt.repository.entity.XSDBuiltInType;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.Assert.*;
 
 /**
-*
-* @author Yunsu Lee
-* @version 1.0
-*/
-
+ * @author Yunsu Lee
+ * @version 1.0
+ */
 
 public class XSD_BuiltIn_TypeTest {
-	private static SRTDAO dao;
-	
-	@BeforeClass
-	public static void connectDB() throws Exception{
-		Utility.dbSetup();
 
-		DAOFactory df = DAOFactory.getDAOFactory();
-		dao = df.getDAO("XSD_BuiltIn_Type");
-	}
-	
-	@Test
-	public void testNumberOfData() {
-		try {
-			assertEquals(TableData.XDT_BUILT_IN_TYPE.length, dao.findObjects().size());
-		} catch (SRTDAOException e) {
-			fail("Database error.");
-		}
-	}
+    @Autowired
+    private RepositoryFactory repositoryFactory;
+    private XSDBuiltInTypeRepository dao;
 
-	@Test
-	public void testName() {
-		for (int i = 0; i < TableData.XDT_BUILT_IN_TYPE.length; i++){
-			QueryCondition qc  = new QueryCondition();
-			qc.add("name", TableData.XDT_BUILT_IN_TYPE[i][0]);
-			try {
-				XSDBuiltInTypeVO xVO = (XSDBuiltInTypeVO)dao.findObject(qc);
-				if(xVO.getBuiltInType() == null)
-					fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
-				
-			} catch (SRTDAOException e) {
-				fail("Database error.");
-			}
-		}
-	}
-	
-	@Test
-	public void testBuiltinType() {
-		for (int i = 0; i < TableData.XDT_BUILT_IN_TYPE.length; i++){
-			QueryCondition qc  = new QueryCondition();
-			qc.add("name", TableData.XDT_BUILT_IN_TYPE[i][0]);
-			try {
-				XSDBuiltInTypeVO xVO = (XSDBuiltInTypeVO)dao.findObject(qc);
-				if(xVO.getBuiltInType() == null)
-					fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
-				
-				assertEquals(TableData.XDT_BUILT_IN_TYPE[i][1], xVO.getBuiltInType());
-			} catch (SRTDAOException e) {
-				fail("Database error.");
-			}
-		}
-	}
-	
-	@Test
-	public void testTypeHierarchy() {
-		for (int i = 0; i < TableData.XDT_BUILT_IN_TYPE.length; i++){
-			QueryCondition qc  = new QueryCondition();
-			qc.add("name", TableData.XDT_BUILT_IN_TYPE[i][0]);
-			try {
-				XSDBuiltInTypeVO xVO = (XSDBuiltInTypeVO)dao.findObject(qc);
-				if(xVO.getBuiltInType() == null)
-					fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
-				
-				QueryCondition qc1  = new QueryCondition();
-				qc1.add("XSD_BuiltIn_Type_ID", xVO.getSubtypeOfXSDBuiltinTypeId());
-				XSDBuiltInTypeVO xVO1 = (XSDBuiltInTypeVO)dao.findObject(qc1);
-				
-				assertEquals(TableData.XDT_BUILT_IN_TYPE[i][2], xVO1.getBuiltInType());
-			} catch (SRTDAOException e) {
-				fail("Database error.");
-			}
-		}
-	}
+    @Before
+    public void connectDB() throws Exception {
+        dao = repositoryFactory.xsdBuiltInTypeRepository();
+    }
+
+    @Test
+    public void testNumberOfData() {
+        assertEquals(TableData.XDT_BUILT_IN_TYPE.length, dao.findAll().size());
+    }
+
+    @Test
+    public void testName() {
+        for (int i = 0; i < TableData.XDT_BUILT_IN_TYPE.length; i++) {
+            XSDBuiltInType xVO = dao.findOneByName(TableData.XDT_BUILT_IN_TYPE[i][0]);
+            if (xVO.getBuiltInType() == null)
+                fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
+        }
+    }
+
+    @Test
+    public void testBuiltinType() {
+        for (int i = 0; i < TableData.XDT_BUILT_IN_TYPE.length; i++) {
+            XSDBuiltInType xVO = dao.findOneByName(TableData.XDT_BUILT_IN_TYPE[i][0]);
+            if (xVO.getBuiltInType() == null)
+                fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
+
+            assertEquals(TableData.XDT_BUILT_IN_TYPE[i][1], xVO.getBuiltInType());
+        }
+    }
+
+    @Test
+    public void testTypeHierarchy() {
+        for (int i = 0; i < TableData.XDT_BUILT_IN_TYPE.length; i++) {
+            XSDBuiltInType xVO = dao.findOneByName(TableData.XDT_BUILT_IN_TYPE[i][0]);
+            if (xVO.getBuiltInType() == null)
+                fail("No such type with the name, '" + TableData.XDT_BUILT_IN_TYPE[i][0] + "'r.");
+
+            XSDBuiltInType xVO1 = dao.findOneByXbtId(xVO.getSubtypeOfXbtId());
+
+            assertEquals(TableData.XDT_BUILT_IN_TYPE[i][2], xVO1.getBuiltInType());
+        }
+    }
 }

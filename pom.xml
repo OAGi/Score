@@ -122,13 +122,6 @@
 			<version>3.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.chanchan</groupId>
-			<artifactId>common</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/Libraries/chanchan-commons-1.1.1.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<version>1.0</version>

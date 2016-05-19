@@ -54,6 +54,20 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository ex
                 namedParameters, CoreDataTypeSupplementaryComponentAllowedPrimitiveMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_CDT_SC_AWD_PRI_ID_STATEMENT = "SELECT " +
+            "cdt_sc_awd_pri_id, cdt_sc_id, cdt_pri_id, is_default " +
+            "FROM cdt_sc_awd_pri " +
+            "WHERE cdt_sc_awd_pri_id = :cdt_sc_awd_pri_id";
+
+    @Override
+    public CoreDataTypeSupplementaryComponentAllowedPrimitive findOneByCdtScAwdPriId(int cdtScAwdPriId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("cdt_sc_awd_pri_id", cdtScAwdPriId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_CDT_SC_AWD_PRI_ID_STATEMENT,
+                namedParameters, CoreDataTypeSupplementaryComponentAllowedPrimitiveMapper.INSTANCE);
+    }
+
     private final String FIND_ONE_BY_CDT_SC_ID_AND_CDT_PRI_ID_STATEMENT = "SELECT " +
             "cdt_sc_awd_pri_id, cdt_sc_id, cdt_pri_id, is_default " +
             "FROM cdt_sc_awd_pri " +

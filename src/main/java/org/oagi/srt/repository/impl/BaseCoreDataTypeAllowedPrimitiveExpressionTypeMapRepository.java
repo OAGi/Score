@@ -23,6 +23,15 @@ public class BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository extends
     public void initialize() {
         setJdbcTemplate(jdbcTemplate);
     }
+
+    private final String FIND_ALL_STATEMENT = "SELECT " +
+            "cdt_awd_pri_xps_type_map_id, cdt_awd_pri_id, xbt_id " +
+            "FROM cdt_awd_pri_xps_type_map";
+
+    @Override
+    public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findAll() {
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, CoreDataTypeAllowedPrimitiveExpressionTypeMapMapper.INSTANCE);
+    }
     
     private final String FIND_BY_CDT_AWD_PRI_ID_STATEMENT = "SELECT " + 
             "cdt_awd_pri_xps_type_map_id, cdt_awd_pri_id, xbt_id " +

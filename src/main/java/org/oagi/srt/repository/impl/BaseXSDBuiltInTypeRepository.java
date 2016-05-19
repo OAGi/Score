@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Repository
 public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport implements XSDBuiltInTypeRepository {
@@ -20,6 +21,15 @@ public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport i
     @PostConstruct
     public void initialize() {
         setJdbcTemplate(jdbcTemplate);
+    }
+
+    private final String FIND_ALL_STATEMENT = "SELECT " +
+            "xbt_id, name, builtIn_type, subtype_of_xbt_id " +
+            "FROM xbt";
+
+    @Override
+    public List<XSDBuiltInType> findAll() {
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, XSDBuiltInTypeMapper.INSTANCE);
     }
 
     private final String FIND_ONE_BY_NAME_STATEMENT = "SELECT " +

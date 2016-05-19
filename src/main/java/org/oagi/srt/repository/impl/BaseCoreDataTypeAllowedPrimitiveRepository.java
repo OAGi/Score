@@ -38,17 +38,17 @@ public class BaseCoreDataTypeAllowedPrimitiveRepository extends NamedParameterJd
                 namedParameters, CoreDataTypeAllowedPrimitiveMapper.INSTANCE);
     }
 
-    private final String FIND_BY_CDT_AWD_PRI_ID_STATEMENT = "SELECT " +
+    private final String FIND_ONE_BY_CDT_AWD_PRI_ID_STATEMENT = "SELECT " +
             "cdt_awd_pri_id, cdt_id, cdt_pri_id, is_default " +
             "FROM cdt_awd_pri " +
             "WHERE cdt_awd_pri_id = :cdt_awd_pri_id";
 
     @Override
-    public CoreDataTypeAllowedPrimitive findByCdtAwdPriId(int cdtAwdPriId) {
+    public CoreDataTypeAllowedPrimitive findOneByCdtAwdPriId(int cdtAwdPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_awd_pri_id", cdtAwdPriId);
 
-        return getNamedParameterJdbcTemplate().queryForObject(FIND_BY_CDT_AWD_PRI_ID_STATEMENT,
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_ONE_BY_CDT_AWD_PRI_ID_STATEMENT,
                 namedParameters, CoreDataTypeAllowedPrimitiveMapper.INSTANCE);
     }
 }

@@ -34,6 +34,20 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, AgencyIdListValueMapper.INSTANCE);
     }
 
+    private final String FIND_ONE_BY_OWNER_LIST_ID_STATEMENT = "SELECT " +
+            "agency_id_list_value_id, `value`, `name`, definition, owner_list_id " +
+            "FROM agency_id_list_value " +
+            "WHERE owner_list_id = :owner_list_id";
+
+    @Override
+    public List<AgencyIdListValue> findByOwnerListId(int ownerListId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("owner_list_id", ownerListId);
+
+        return getNamedParameterJdbcTemplate().query(
+                FIND_ONE_BY_OWNER_LIST_ID_STATEMENT, namedParameters, AgencyIdListValueMapper.INSTANCE);
+    }
+
     private final String FIND_ONE_BY_AGENCY_ID_LIST_VALUE_ID_STATEMENT = "SELECT " +
             "agency_id_list_value_id, `value`, `name`, definition, owner_list_id " +
             "FROM agency_id_list_value " +

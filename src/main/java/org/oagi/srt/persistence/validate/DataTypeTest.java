@@ -1,15 +1,9 @@
 package org.oagi.srt.persistence.validate;
 
 import org.oagi.srt.Application;
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.*;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -23,7 +17,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPathExpressionException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -601,9 +594,6 @@ public class DataTypeTest {
             }
 
         } else { // else if (new SC)
-            QueryCondition qc1 = new QueryCondition();
-            qc1.add("bdt_sc_id", dtscVO.getDtScId());
-
             cdtscallowedprimitivelist = getCdtSCAllowedPrimitiveID(dtscVO.getDtScId());
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive svo : cdtscallowedprimitivelist) {
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> maps = getCdtSCAPMap(svo.getCdtScAwdPriId());
@@ -638,7 +628,7 @@ public class DataTypeTest {
         }
     }
 
-    private DataType validateAddToDTForCodeContentQBDT(DataType queriedQBDataType, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
+    private DataType validateAddToDTForCodeContentQBDT(DataType queriedQBDataType, String type, Node typeNode, XPathHandler xHandler) throws Exception {
 
         String fromDataType = "";
         String fromXSD = "";
@@ -714,7 +704,7 @@ public class DataTypeTest {
         return queriedQBDataType;
     }
 
-    private DataType validateAddToDTForIDContentQBDT(DataType queriedQBDataType, String type, Node typeNode, XPathHandler xHandler) throws XPathExpressionException, SRTDAOException {
+    private DataType validateAddToDTForIDContentQBDT(DataType queriedQBDataType, String type, Node typeNode, XPathHandler xHandler) throws Exception {
 
         String fromDataType = "";
         String fromXSD = "";
@@ -1588,7 +1578,7 @@ public class DataTypeTest {
 
             CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitive =
                     repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-            CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = aCDTAllowedPrimitive.findByCdtAwdPriId(cdt_awd_pri_id);
+            CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = aCDTAllowedPrimitive.findOneByCdtAwdPriId(cdt_awd_pri_id);
 
             CoreDataTypePrimitiveRepository aCDTPrimitive = repositoryFactory.coreDataTypePrimitiveRepository();
             CoreDataTypePrimitive cdtPrimitiveVO = aCDTPrimitive.findOneByCdtPriId(cdtAllowedPrimitiveVO.getCdtPriId());

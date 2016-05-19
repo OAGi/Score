@@ -50,6 +50,24 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
                 namedParameters, AssociationBusinessInformationEntityMapper.INSTANCE);
     }
 
+    private final String FIND_BY_FROM_ABIE_ID_AND_USED_STATEMENT =  "SELECT " +
+            "asbie_id, guid, from_abie_id, to_asbiep_id, based_ascc, definition, " +
+            "cardinality_min, cardinality_max, is_nillable, remark, " +
+            "created_by, last_updated_by, creation_timestamp, last_update_timestamp, " +
+            "seq_key, is_used " +
+            "FROM asbie " +
+            "WHERE from_abie_id = :from_abie_id AND is_used = :is_used";
+
+    @Override
+    public List<AssociationBusinessInformationEntity> findByFromAbieIdAndUsed(int fromAbieId, boolean used) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("from_abie_id", fromAbieId)
+                .addValue("is_used", used ? 1 : 0);
+
+        return getNamedParameterJdbcTemplate().query(FIND_BY_FROM_ABIE_ID_AND_USED_STATEMENT,
+                namedParameters, AssociationBusinessInformationEntityMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO asbie (" +
             "guid, from_abie_id, to_asbiep_id, based_ascc, definition, " +
             "cardinality_min, cardinality_max, is_nillable, remark, " +

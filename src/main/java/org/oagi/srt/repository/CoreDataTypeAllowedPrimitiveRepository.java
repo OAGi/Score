@@ -8,5 +8,5 @@ public interface CoreDataTypeAllowedPrimitiveRepository {
 
     public List<CoreDataTypeAllowedPrimitive> findByCdtId(int cdtId);
 
-    public CoreDataTypeAllowedPrimitive findByCdtAwdPriId(int cdtAwdPriId);
+    public CoreDataTypeAllowedPrimitive findOneByCdtAwdPriId(int cdtAwdPriId);
 }

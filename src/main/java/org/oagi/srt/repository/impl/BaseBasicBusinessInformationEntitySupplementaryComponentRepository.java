@@ -49,6 +49,23 @@ public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository 
                 namedParameters, BasicBusinessInformationEntitySupplementaryComponentMapper.INSTANCE);
     }
 
+    private final String FIND_BY_BBIE_ID_AND_USED_STATEMENT = "SELECT " +
+            "bbie_sc_id, bbie_id, dt_sc_id, dt_sc_pri_restri_id, code_list_id, " +
+            "agency_id_list_id, min_cardinality, max_cardinality, default_value, fixed_value, " +
+            "definition, remark, biz_term, is_used " +
+            "FROM bbie_sc " +
+            "WHERE bbie_id = :bbie_id AND is_used = :is_used";
+
+    @Override
+    public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieIdAndUsed(int bbieId, boolean used) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bbie_id", bbieId)
+                .addValue("is_used", used ? 1 : 0);
+
+        return getNamedParameterJdbcTemplate().query(FIND_BY_BBIE_ID_AND_USED_STATEMENT,
+                namedParameters, BasicBusinessInformationEntitySupplementaryComponentMapper.INSTANCE);
+    }
+
     private final String SAVE_STATEMENT = "INSERT INTO bbie_sc (" +
             "bbie_id, dt_sc_id, dt_sc_pri_restri_id, code_list_id, " +
             "agency_id_list_id, min_cardinality, max_cardinality, default_value, fixed_value, " +

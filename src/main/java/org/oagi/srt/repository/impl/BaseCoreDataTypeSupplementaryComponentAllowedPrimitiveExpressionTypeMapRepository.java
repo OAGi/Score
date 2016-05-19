@@ -26,6 +26,15 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTyp
         setJdbcTemplate(jdbcTemplate);
     }
 
+    private final String FIND_ALL_STATEMENT = "SELECT " +
+            "cdt_sc_awd_pri_xps_type_map_id, cdt_sc_awd_pri, xbt_id " +
+            "FROM cdt_sc_awd_pri_xps_type_map";
+
+    @Override
+    public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findAll() {
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapMapper.INSTANCE);
+    }
+
     private final String FIND_BY_CDT_SC_AWD_PRI_STATEMENT = "SELECT " +
             "cdt_sc_awd_pri_xps_type_map_id, cdt_sc_awd_pri, xbt_id " +
             "FROM cdt_sc_awd_pri_xps_type_map " +

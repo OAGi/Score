@@ -10,6 +10,8 @@ public interface AssociationBusinessInformationEntityRepository {
 
     public List<AssociationBusinessInformationEntity> findByFromAbieId(int fromAbieId);
 
+    public List<AssociationBusinessInformationEntity> findByFromAbieIdAndUsed(int fromAbieId, boolean used);
+
     public void save(AssociationBusinessInformationEntity associationBusinessInformationEntity);
 
     public void update(AssociationBusinessInformationEntity associationBusinessInformationEntity);

@@ -41,6 +41,37 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
                 namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
     }
 
+    private final String FIND_BY_BDT_SC_PRI_RESTRI_ID_STATEMENT = "SELECT " +
+            "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
+            "code_list_id, is_default, agency_id_list_id " +
+            "FROM bdt_sc_pri_restri " +
+            "WHERE bdt_sc_pri_restri_id = :bdt_sc_pri_restri_id";
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScPriRestriId(int bdtScPriRestriId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_sc_pri_restri_id", bdtScPriRestriId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_BY_BDT_SC_PRI_RESTRI_ID_STATEMENT,
+                namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
+    }
+
+    private final String FIND_BY_BDT_SC_ID_AND_DEFAULT_STATEMENT = "SELECT " +
+            "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
+            "code_list_id, is_default, agency_id_list_id " +
+            "FROM bdt_sc_pri_restri " +
+            "WHERE bdt_sc_id = :bdt_sc_id AND is_default = :is_default";
+
+    @Override
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndDefault(int bdtScId, boolean isDefault) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("bdt_sc_id", bdtScId)
+                .addValue("is_default", isDefault ? 1 : 0);
+
+        return getNamedParameterJdbcTemplate().queryForObject(FIND_BY_BDT_SC_ID_AND_DEFAULT_STATEMENT,
+                namedParameters, BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper.INSTANCE);
+    }
+
     private final String FIND_ONE_BY_BDT_SC_ID_AND_CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID_STATEMENT = "SELECT " +
             "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
             "code_list_id, is_default, agency_id_list_id " +

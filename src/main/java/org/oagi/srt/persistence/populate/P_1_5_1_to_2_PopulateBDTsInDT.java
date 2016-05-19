@@ -1325,7 +1325,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                     cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(aBDataType.getCdtAwdPriXpsTypeMapId());
 
             //Now We get CDT_AWD_PRI and XBT
-            CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findByCdtAwdPriId(aCDTAPXTM.getCdtAwdPriId());
+            CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findOneByCdtAwdPriId(aCDTAPXTM.getCdtAwdPriId());
             CoreDataTypePrimitive aCDTP = cdtPriRepository.findOneByCdtPriId(aCDTAP.getCdtPriId());
             XSDBuiltInType xbt = xsdBuiltInTypeRepository.findOneByXbtId(aCDTAPXTM.getXbtId());
 

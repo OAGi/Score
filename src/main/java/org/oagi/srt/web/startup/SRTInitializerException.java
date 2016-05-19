@@ -1,12 +1,10 @@
 package org.oagi.srt.web.startup;
 
-import org.oagi.srt.common.SRTException;
-
 /**
  * 
  * @author Yunsu Lee
  */
-public class SRTInitializerException extends SRTException {
+public class SRTInitializerException extends Exception {
 
 	private static final long serialVersionUID = -5488400761729843429L;
 

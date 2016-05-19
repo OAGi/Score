@@ -1,16 +1,13 @@
 package org.oagi.srt.generate.standalone;
 
-import org.chanchan.common.persistence.db.DBAgent;
-import org.oagi.srt.common.QueryCondition;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.SRTObject;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
-import org.oagi.srt.persistence.PersistenceUtils;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.*;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,1396 +19,1212 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.sql.Connection;
 import java.util.*;
 
+@Component
 public class StandaloneXMLSchema {
 
-	private static Connection conn = null;
-	public static ArrayList<Integer> abie_ids = new ArrayList<Integer>();
-	public static boolean schema_package_flag = false;
-	private ArrayList<String> StoredCC = new ArrayList<String>();
-	private ArrayList<String> GUID_array_list = new ArrayList<String>();
+    @Autowired
+    private RepositoryFactory repositoryFactory;
 
-	public String writeXSDFile(Document doc, String filename) throws TransformerException {
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		DOMSource source = new DOMSource(doc);
+    public static List<Integer> abie_ids = new ArrayList();
+    public static boolean schema_package_flag = false;
+    private List<String> StoredCC = new ArrayList();
+    private List<String> Guid_array_list = new ArrayList();
 
-		String filepath = SRTConstants.BOD_FILE_PATH + filename + ".xsd";
-		StreamResult result = new StreamResult(new File(filepath));
-		transformer.transform(source, result);
-		System.out.println(filepath + " is generated");
-		return filepath;
-	}
+    public String writeXSDFile(Document doc, String filename) throws TransformerException {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        DOMSource source = new DOMSource(doc);
 
-	public Element generateSchema(Document doc) {
-		Element schemaNode = doc.createElement("xsd:schema");
-		schemaNode.setAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
-		schemaNode.setAttribute("xmlns","http://www.openapplications.org/oagis/10");
-		schemaNode.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
-		schemaNode.setAttribute("targetNamespace", "http://www.openapplications.org/oagis/10");
-		schemaNode.setAttribute("elementFormDefault", "qualified");
-		schemaNode.setAttribute("attributeFormDefault", "unqualified");
-		doc.appendChild(schemaNode);
-		return schemaNode;
-	}
+        String filepath = SRTConstants.BOD_FILE_PATH + filename + ".xsd";
+        StreamResult result = new StreamResult(new File(filepath));
+        transformer.transform(source, result);
+        System.out.println(filepath + " is generated");
+        return filepath;
+    }
 
-	public Document generateTopLevelABIE(ASBIEPVO tlASBIEP, Document tlABIEDOM, Element schemaNode) throws Exception {
+    public Element generateSchema(Document doc) {
+        Element schemaNode = doc.createElement("xsd:schema");
+        schemaNode.setAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+        schemaNode.setAttribute("xmlns", "http://www.openapplications.org/oagis/10");
+        schemaNode.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
+        schemaNode.setAttribute("targetNamespace", "http://www.openapplications.org/oagis/10");
+        schemaNode.setAttribute("elementFormDefault", "qualified");
+        schemaNode.setAttribute("attributeFormDefault", "unqualified");
+        doc.appendChild(schemaNode);
+        return schemaNode;
+    }
 
-		Element rootEleNode = generateTopLevelASBIEP(tlASBIEP, schemaNode);
-		ABIEVO aABIE = queryTargetABIE(tlASBIEP);
-		Element rootSeqNode = generateABIE(aABIE, rootEleNode, schemaNode);
-		schemaNode = generateBIEs(aABIE, rootSeqNode, schemaNode);
-		return tlABIEDOM;
-	}
+    public Document generateTopLevelABIE(AssociationBusinessInformationEntityProperty tlASBIEP, Document tlABIEDOM, Element schemaNode) throws Exception {
 
-	public Element generateTopLevelASBIEP(ASBIEPVO tlASBIEP, Element gSchemaNode) throws Exception {
+        Element rootEleNode = generateTopLevelASBIEP(tlASBIEP, schemaNode);
+        AggregateBusinessInformationEntity aABIE = queryTargetABIE(tlASBIEP);
+        Element rootSeqNode = generateABIE(aABIE, rootEleNode, schemaNode);
+        schemaNode = generateBIEs(aABIE, rootSeqNode, schemaNode);
+        return tlABIEDOM;
+    }
 
-		ASCCPVO asccpVO = queryBasedASCCP(tlASBIEP);
+    public Element generateTopLevelASBIEP(AssociationBusinessInformationEntityProperty tlASBIEP, Element gSchemaNode) throws Exception {
 
-		//serm: What does this do?
-		if(isCCStored(tlASBIEP.getASBIEPGUID()))
-			return gSchemaNode;
+        AssociationCoreComponentProperty asccpVO = queryBasedASCCP(tlASBIEP);
 
-		Element rootEleNode = gSchemaNode.getOwnerDocument().createElement("xsd:element");
-		gSchemaNode.appendChild(rootEleNode);
-		rootEleNode.setAttribute("name", asccpVO.getPropertyTerm().replaceAll(" ", ""));
-		rootEleNode.setAttribute("id", tlASBIEP.getASBIEPGUID()); //rootEleNode.setAttribute("id", asccpVO.getASCCPGUID());
-		//rootEleNode.setAttribute("type", Utility.second(asccpVO.getDEN()).replaceAll(" ", "")+"Type");
-		Element annotation = gSchemaNode.getOwnerDocument().createElement("xsd:annotation");
-		Element documentation = gSchemaNode.getOwnerDocument().createElement("xsd:documentation");
-		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
-		//documentation.setTextContent(asccpVO.getDefinition());
-		rootEleNode.appendChild(annotation);
-		annotation.appendChild(documentation);
+        //serm: What does this do?
+        if (isCCStored(tlASBIEP.getGuid()))
+            return gSchemaNode;
 
-		//serm: what does this do?
-		StoredCC.add(tlASBIEP.getASBIEPGUID());
+        Element rootEleNode = gSchemaNode.getOwnerDocument().createElement("xsd:element");
+        gSchemaNode.appendChild(rootEleNode);
+        rootEleNode.setAttribute("name", asccpVO.getPropertyTerm().replaceAll(" ", ""));
+        rootEleNode.setAttribute("id", tlASBIEP.getGuid()); //rootEleNode.setAttribute("id", asccpVO.getASCCPGuid());
+        //rootEleNode.setAttribute("type", Utility.second(asccpVO.getDen()).replaceAll(" ", "")+"Type");
+        Element annotation = gSchemaNode.getOwnerDocument().createElement("xsd:annotation");
+        Element documentation = gSchemaNode.getOwnerDocument().createElement("xsd:documentation");
+        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
+        //documentation.setTextContent(asccpVO.getDefinition());
+        rootEleNode.appendChild(annotation);
+        annotation.appendChild(documentation);
 
-		return rootEleNode;
-	}
+        //serm: what does this do?
+        StoredCC.add(tlASBIEP.getGuid());
 
-	public Element generateABIE (ABIEVO gABIE, Element gElementNode, Element gSchemaNode) throws Exception {
-		//ACCVO gACC = queryBasedACC(gABIE);
+        return rootEleNode;
+    }
 
-		if(isCCStored(gABIE.getAbieGUID()))
-			return gElementNode;
-		Element complexType = gElementNode.getOwnerDocument().createElement("xsd:complexType");
-		complexType.setAttribute("id", gABIE.getAbieGUID());
-		gElementNode.appendChild(complexType);
-		//serm: why is this one called generateACC - the function name is not sensible.
-		Element PNode = generateACC(gABIE, complexType, gElementNode);
-		return PNode;
-	}
+    public Element generateABIE(AggregateBusinessInformationEntity gABIE, Element gElementNode, Element gSchemaNode) throws Exception {
+        //AggregateCoreComponent gACC = queryBasedACC(gABIE);
 
-	public Element generateACC(ABIEVO gABIE, Element complexType, Element gElementNode) throws Exception{
+        if (isCCStored(gABIE.getGuid()))
+            return gElementNode;
+        Element complexType = gElementNode.getOwnerDocument().createElement("xsd:complexType");
+        complexType.setAttribute("id", gABIE.getGuid());
+        gElementNode.appendChild(complexType);
+        //serm: why is this one called generateACC - the function name is not sensible.
+        Element PNode = generateACC(gABIE, complexType, gElementNode);
+        return PNode;
+    }
 
-		ACCVO gACC = queryBasedACC(gABIE);
-		Element PNode = complexType.getOwnerDocument().createElement("xsd:sequence");
-		//***complexType.setAttribute("id", Utility.generateGUID()); 		
-		StoredCC.add(gACC.getACCGUID());
-		Element annotation = gElementNode.getOwnerDocument().createElement("xsd:annotation");
-		Element documentation = gElementNode.getOwnerDocument().createElement("xsd:documentation");
-		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
-		//documentation.setTextContent(gACC.getDefinition());
-		complexType.appendChild(annotation);
-		annotation.appendChild(documentation);
-		complexType.appendChild(PNode);
+    public Element generateACC(AggregateBusinessInformationEntity gABIE, Element complexType, Element gElementNode) throws Exception {
 
-		return PNode;
-	}
+        AggregateCoreComponent gACC = queryBasedACC(gABIE);
+        Element PNode = complexType.getOwnerDocument().createElement("xsd:sequence");
+        //***complexType.setAttribute("id", Utility.generateGUID()); 		
+        StoredCC.add(gACC.getGuid());
+        Element annotation = gElementNode.getOwnerDocument().createElement("xsd:annotation");
+        Element documentation = gElementNode.getOwnerDocument().createElement("xsd:documentation");
+        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        //documentation.setTextContent(gACC.getDefinition());
+        complexType.appendChild(annotation);
+        annotation.appendChild(documentation);
+        complexType.appendChild(PNode);
 
-	public Element generateBIEs(ABIEVO gABIE, Element gPNode, Element gSchemaNode) throws Exception {
-		ACCVO gACC = queryBasedACC(gABIE);
+        return PNode;
+    }
 
-		if(gACC.getDEN().equalsIgnoreCase("Any User Area. Details") == true || gACC.getDEN().equalsIgnoreCase("Signature. Details") == true) {
-			Element any = gPNode.getOwnerDocument().createElement("xsd:any");
-			any.setAttribute("namespace", "##any");
-			gPNode.appendChild(any);
-		}
+    public Element generateBIEs(AggregateBusinessInformationEntity gABIE, Element gPNode, Element gSchemaNode) throws Exception {
+        AggregateCoreComponent gACC = queryBasedACC(gABIE);
 
-		ArrayList<SRTObject> childBIEs = queryChildBIEs(gABIE);
-		Element node = null;
+        if (gACC.getDen().equalsIgnoreCase("Any User Area. Details") == true || gACC.getDen().equalsIgnoreCase("Signature. Details") == true) {
+            Element any = gPNode.getOwnerDocument().createElement("xsd:any");
+            any.setAttribute("namespace", "##any");
+            gPNode.appendChild(any);
+        }
 
-		for(SRTObject aSRTObject : childBIEs){
-			if(aSRTObject.getClass().getCanonicalName().endsWith("BBIEVO")) {
-				BBIEVO childBIE = (BBIEVO)aSRTObject;
-				DTVO aBDT = queryAssocBDT(childBIE);
-				generateBBIE(childBIE, aBDT, gPNode, gSchemaNode);
-			}
+        List<BusinessInformationEntity> childBIEs = queryChildBIEs(gABIE);
+        Element node = null;
 
-			else {
-				ASBIEVO childBIE = (ASBIEVO)aSRTObject;
-				node = generateASBIE(childBIE, gPNode);
-				ASBIEPVO anASBIEP = queryAssocToASBIEP(childBIE);
-				node = generateASBIEP(anASBIEP, node);
-				ABIEVO anABIE = queryTargetABIE2(anASBIEP);
-				node = generateABIE(anABIE, node, gSchemaNode);
-				node = generateBIEs(anABIE, node, gSchemaNode);
-			}
+        for (BusinessInformationEntity aSRTObject : childBIEs) {
+            if (aSRTObject instanceof BasicBusinessInformationEntity) {
+                BasicBusinessInformationEntity childBIE = (BasicBusinessInformationEntity) aSRTObject;
+                DataType aBDT = queryAssocBDT(childBIE);
+                generateBBIE(childBIE, aBDT, gPNode, gSchemaNode);
+            } else {
+                AssociationBusinessInformationEntity childBIE = (AssociationBusinessInformationEntity) aSRTObject;
+                node = generateASBIE(childBIE, gPNode);
+                AssociationBusinessInformationEntityProperty anASBIEP = queryAssocToASBIEP(childBIE);
+                node = generateASBIEP(anASBIEP, node);
+                AggregateBusinessInformationEntity anABIE = queryTargetABIE2(anASBIEP);
+                node = generateABIE(anABIE, node, gSchemaNode);
+                node = generateBIEs(anABIE, node, gSchemaNode);
+            }
 
-		}
-		return gSchemaNode;
-	}
+        }
+        return gSchemaNode;
+    }
 
-	public Element generateBDT(BBIEVO gBBIE, Element eNode, Element gSchemaNode, CodeListVO gCL) throws Exception{
+    public Element generateBDT(BasicBusinessInformationEntity gBBIE, Element eNode, Element gSchemaNode, CodeList gCL) throws Exception {
 
-		DTVO bDT = queryBDT(gBBIE);
-//		if(isCCStored(bDT.getDTGUID()))
+        DataType bDT = queryBDT(gBBIE);
+//		if(isCCStored(bDT.getGuid()))
 //			return eNode;
 
-		Element complexType = eNode.getOwnerDocument().createElement("xsd:complexType");
-		Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
-		Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
-		//complexType.setAttribute("name", Utility.DenToName(bDT.getDEN())); 
-		complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getDTGUID());
-		if(bDT.getDefinition() != null) {
-			Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
-			Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
-			documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
-			//documentation.setTextContent(bDT.getDefinition());
-			complexType.appendChild(annotation);
-		}
-		StoredCC.add(bDT.getDTGUID());
+        Element complexType = eNode.getOwnerDocument().createElement("xsd:complexType");
+        Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
+        Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
+        //complexType.setAttribute("name", Utility.DenToName(bDT.getDen())); 
+        complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
+        if (bDT.getDefinition() != null) {
+            Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
+            Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+            documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
+            //documentation.setTextContent(bDT.getDefinition());
+            complexType.appendChild(annotation);
+        }
+        StoredCC.add(bDT.getGuid());
 
-		complexType.appendChild(simpleContent);
-		simpleContent.appendChild(extNode);
+        complexType.appendChild(simpleContent);
+        simpleContent.appendChild(extNode);
 
-		Attr base = extNode.getOwnerDocument().createAttribute("base");
-		base.setNodeValue(getCodeListTypeName(gCL));
-		extNode.setAttributeNode(base);
-		eNode.appendChild(complexType);
-		return eNode;
-	}
+        Attr base = extNode.getOwnerDocument().createAttribute("base");
+        base.setNodeValue(getCodeListTypeName(gCL));
+        extNode.setAttributeNode(base);
+        eNode.appendChild(complexType);
+        return eNode;
+    }
 
 
-	public Attr setBDTBase(DTVO gBDT, Attr base) throws Exception{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("BDT_ID", gBDT.getDTID());
-		qc3.add("is_Default", 1);
-		BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3, conn);
+    public Attr setBDTBase(DataType gBDT, Attr base) throws Exception {
+        BusinessDataTypePrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                dao3.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
 
-		SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("cdt_awd_pri_xps_type_map_id", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-		CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
+                dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-		SRTDAO dao5 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("xbt_id", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
-		base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
+        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        base.setValue(aXSDBuiltInType.getBuiltInType());
 
-		return base;
-	}
+        return base;
+    }
 
-	public Attr setBDTBase(BBIEVO gBBIE, Attr base) throws Exception{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc3_2 = new QueryCondition();
-		qc3_2.add("bdt_pri_restri_id", gBBIE.getBdtPrimitiveRestrictionId());
-		BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2, conn);
+    public Attr setBDTBase(BasicBusinessInformationEntity gBBIE, Attr base) throws Exception {
+        BusinessDataTypePrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                dao3.findOneByBdtPriRestriId(gBBIE.getBdtPriRestriId());
 
-		SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("cdt_awd_pri_xps_type_map_id", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-		CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
+                dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-		SRTDAO dao5 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("xbt_id", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
+        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
-		base.setValue(aXSDBuiltInTypeVO.getBuiltInType());
+        base.setValue(aXSDBuiltInType.getBuiltInType());
 
-		return base;
-	}
+        return base;
+    }
 
-	public Element setBBIE_Attr_Type(DTVO gBDT, Element gNode) throws Exception{
+    public Element setBBIE_Attr_Type(DataType gBDT, Element gNode) throws Exception {
+        BusinessDataTypePrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                dao3.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
 
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("BDT_ID", gBDT.getDTID());
-		qc3.add("is_Default", 1);
-		BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3, conn);
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
+                dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-		SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("cdt_awd_pri_xps_type_map_id", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-		CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
+        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        if (aXSDBuiltInType.getBuiltInType() != null) {
+            Attr type = gNode.getOwnerDocument().createAttribute("type");
+            type.setValue(aXSDBuiltInType.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInType.getName())+"Type");
+            gNode.setAttributeNode(type);
+        }
+        return gNode;
+    }
 
-		SRTDAO dao5 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("xbt_id", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
-		if(aXSDBuiltInTypeVO.getBuiltInType() != null){
-			Attr type = gNode.getOwnerDocument().createAttribute("type");
-			type.setValue(aXSDBuiltInTypeVO.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInTypeVO.getName())+"Type");
-			gNode.setAttributeNode(type);
-		}
-		return gNode;
-	}
+    public Element setBBIE_Attr_Type(BasicBusinessInformationEntity gBBIE, Element gNode) throws Exception {
+        BusinessDataTypePrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                dao3.findOneByBdtPriRestriId(gBBIE.getBdtPriRestriId());
 
-	public Element setBBIE_Attr_Type(BBIEVO gBBIE, Element gNode) throws Exception{
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
+                dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
+        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        if (aXSDBuiltInType.getBuiltInType() != null) {
+            Attr type = gNode.getOwnerDocument().createAttribute("type");
+            type.setValue(aXSDBuiltInType.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInType.getName())+"Type");
+            gNode.setAttributeNode(type);
+        }
+        return gNode;
+    }
 
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc3_2 = new QueryCondition();
-		qc3_2.add("bdt_pri_restri_id", gBBIE.getBdtPrimitiveRestrictionId());
-		BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2, conn);
+    public Element generateBDT(BasicBusinessInformationEntity gBBIE, Element eNode) throws Exception {
 
-		SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("cdt_awd_pri_xps_type_map_id", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-		CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
-		SRTDAO dao5 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("xbt_id", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
-		if(aXSDBuiltInTypeVO.getBuiltInType() != null){
-			Attr type = gNode.getOwnerDocument().createAttribute("type");
-			type.setValue(aXSDBuiltInTypeVO.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInTypeVO.getName())+"Type");
-			gNode.setAttributeNode(type);
-		}
-		return gNode;
-	}
-
-	public Element generateBDT(BBIEVO gBBIE, Element eNode) throws Exception{
-
-		DTVO bDT = queryBDT(gBBIE);
-//		if(isCCStored(bDT.getDTGUID()))
+        DataType bDT = queryBDT(gBBIE);
+//		if(isCCStored(bDT.getGuid()))
 //			return eNode;
 
-		Element complexType = eNode.getOwnerDocument().createElement("xsd:complexType");
-		Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
-		Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
-		//complexType.setAttribute("name", Utility.DenToName(bDT.getDEN())); 
-		complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getDTGUID());
-		if(bDT.getDefinition() != null) {
-			Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
-			Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
-			documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
-			//documentation.setTextContent(bDT.getDefinition());
-			complexType.appendChild(annotation);
-		}
-		StoredCC.add(bDT.getDTGUID());
-
-		complexType.appendChild(simpleContent);
-		simpleContent.appendChild(extNode);
-
-		DTVO gBDT = queryAssocBDT(gBBIE);
-
-		Attr base = extNode.getOwnerDocument().createAttribute("base");
-
-		if(gBBIE.getBdtPrimitiveRestrictionId() == 0)
-			base = setBDTBase(gBDT, base);
-		else{
-			base = setBDTBase(gBBIE, base);
-		}extNode.setAttributeNode(base);
-		eNode.appendChild(complexType);
-		return eNode;
-	}
-
-	public Element generateASBIE(ASBIEVO gASBIE, Element gPNode) throws Exception{
-
-		ASCCVO gASCC = queryBasedASCC(gASBIE);
-
-		Element element = gPNode.getOwnerDocument().createElement("xsd:element");
-		element.setAttribute("id", gASBIE.getAsbieGuid()); //element.setAttribute("id", gASCC.getASCCGUID()); 
-		element.setAttribute("minOccurs", String.valueOf(gASBIE.getCardinalityMin()));
-		if(gASBIE.getCardinalityMax() == -1)
-			element.setAttribute("maxOccurs" ,"unbounded");
-		else
-			element.setAttribute("maxOccurs", String.valueOf(gASBIE.getCardinalityMax()));
-		if(gASBIE.getNillable() !=0)
-			element.setAttribute("nillable", String.valueOf(gASBIE.getNillable()));
-
-		while(!gPNode.getNodeName().equals("xsd:sequence")) {
-			gPNode = (Element) gPNode.getParentNode();
-		}
-		Element annotation = element.getOwnerDocument().createElement("xsd:annotation");
-		Element documentation = element.getOwnerDocument().createElement("xsd:documentation");
-		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
-		//documentation.setTextContent(gASBIE.getDefinition());
-		annotation.appendChild(documentation);
-		element.appendChild(annotation);
-		gPNode.appendChild(element);
-		StoredCC.add(gASCC.getASCCGUID());//check
-		return element;
-	}
-
-	public Element generateASBIEP(ASBIEPVO gASBIEP, Element gElementNode) throws SRTDAOException{
-
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ASCCP");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ASCCP_ID", gASBIEP.getBasedASCCPID());
-		ASCCPVO asccp = (ASCCPVO)dao.findObject(qc, conn);
-		gElementNode.setAttribute("name", Utility.first(asccp.getDEN(), true));
-		//gElementNode.setAttribute("type", Utility.second(asccp.getDEN())+"Type");
-		return gElementNode;
-
-	}
-
-	public BCCVO queryBasedBCC(BBIEVO gBBIE) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("BCC");
-		QueryCondition qc = new QueryCondition();
-		qc.add("BCC_ID", gBBIE.getBasedBCCID());
-		BCCVO bccVO = (BCCVO)dao.findObject(qc, conn);
-		return bccVO;
-	}
-
-	public Element handleBBIE_Elementvalue(BBIEVO gBBIE, Element eNode) throws Exception {
-
-		BCCVO bccVO = queryBasedBCC(gBBIE);
-		Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-		nameANode.setValue(Utility.second(bccVO.getDEN(), true));
-		eNode.setAttributeNode(nameANode);
-		eNode.setAttribute("id", gBBIE.getBbieGuid()); //eNode.setAttribute("id", bccVO.getBCCGUID());
-		StoredCC.add(bccVO.getBCCGUID());
-		if(gBBIE.getDefaultText() != null && gBBIE.getFixedValue() != null) {
-			System.out.println("Error");
-		}
-		if(gBBIE.getNillable() == 1) {
-			Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
-			nillable.setValue("true");
-			eNode.setAttributeNode(nillable);
-		}
-		if(gBBIE.getDefaultText() != null && gBBIE.getDefaultText().length() != 0) {
-			Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
-			defaulta.setValue(gBBIE.getDefaultText());
-			eNode.setAttributeNode(defaulta);
-		}
-		if(gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
-			Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
-			fixedvalue.setValue(gBBIE.getFixedValue());
-			eNode.setAttributeNode(fixedvalue);
-		}
-
-		eNode.setAttribute("minOccurs", String.valueOf(gBBIE.getCardinalityMin()));
-		if(gBBIE.getCardinalityMax() == -1)
-			eNode.setAttribute("maxOccurs" ,"unbounded");
-		else
-			eNode.setAttribute("maxOccurs", String.valueOf(gBBIE.getCardinalityMax()));
-		if(gBBIE.getNillable() !=0)
-			eNode.setAttribute("nillable", String.valueOf(gBBIE.getNillable()));
-
-		Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
-		Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
-		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
-		//documentation.setTextContent(gBBIE.getDefinition());
-		annotation.appendChild(documentation);
-		eNode.appendChild(annotation);
-
-		return eNode;
-	}
-
-	public Element handleBBIE_Attributevalue(BBIEVO gBBIE, Element eNode) throws Exception {
-
-		BCCVO bccVO = queryBasedBCC(gBBIE);
-		Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-		nameANode.setValue(Utility.second(bccVO.getDEN(), false));
-		eNode.setAttributeNode(nameANode);
-		eNode.setAttribute("id", gBBIE.getBbieGuid()); //eNode.setAttribute("id", bccVO.getBCCGUID());
-		StoredCC.add(bccVO.getBCCGUID());
-		if(gBBIE.getDefaultText() != null && gBBIE.getFixedValue() != null) {
-			System.out.println("Error");
-		}
-		if(gBBIE.getNillable() == 1) {
-			Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
-			nillable.setValue("true");
-			eNode.setAttributeNode(nillable);
-		}
-		if(gBBIE.getDefaultText() != null && gBBIE.getDefaultText().length() != 0) {
-			Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
-			defaulta.setValue(gBBIE.getDefaultText());
-			eNode.setAttributeNode(defaulta);
-		}
-		if(gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
-			Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
-			fixedvalue.setValue(gBBIE.getFixedValue());
-			eNode.setAttributeNode(fixedvalue);
-		}
-		if(gBBIE.getCardinalityMin() >= 1)
-			eNode.setAttribute("use", "required");
-		else
-			eNode.setAttribute("use" ,"optional");
-		Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
-		Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
-		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
-		//documentation.setTextContent(gBBIE.getDefinition());
-		annotation.appendChild(documentation);
-		eNode.appendChild(annotation);
-		return eNode;
-	}
-
-	public CodeListVO getCodeList(BBIEVO gBBIE, DTVO gBDT) throws Exception{
-		CodeListVO aCL = null;
-
-		DAOFactory df = DAOFactory.getDAOFactory();
-		if(gBBIE.getCodeListId() != 0){
-			SRTDAO dao1 = df.getDAO("CodeList");
-			QueryCondition qc1 = new QueryCondition();
-			qc1.add("Code_List_ID", gBBIE.getCodeListId());
-			aCL = (CodeListVO)dao1.findObject(qc1, conn);
-		}
-
-		if(aCL == null) {
-			SRTDAO dao2 = df.getDAO("BDTPrimitiveRestriction");
-			QueryCondition qc2_2 = new QueryCondition();
-			qc2_2.add("BDT_pri_restri_ID", gBBIE.getBdtPrimitiveRestrictionId());
-			BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao2.findObject(qc2_2, conn);
-			SRTDAO dao1 = df.getDAO("CodeList");
-			QueryCondition qc1_2 = new QueryCondition();
-			if(aBDTPrimitiveRestriction.getCodeListID() != 0){
-				qc1_2.add("Code_List_ID", aBDTPrimitiveRestriction.getCodeListID());
-				aCL = (CodeListVO)dao1.findObject(qc1_2, conn);
-			}
-
-		}
-
-		if(aCL == null) {
-			SRTDAO dao2 = df.getDAO("BDTPrimitiveRestriction");
-			QueryCondition qc2 = new QueryCondition();
-			qc2.add("BDT_ID", gBDT.getDTID());
-			qc2.add("is_Default", 1);
-			BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao2.findObject(qc2, conn);
-			if(aBDTPrimitiveRestriction.getBDTPrimitiveRestrictionID() == 0)
-				aCL = null;
-			else {
-				SRTDAO dao1 = df.getDAO("CodeList");
-				QueryCondition qc1_3 = new QueryCondition();
-				qc1_3.add("Code_List_ID", aBDTPrimitiveRestriction.getCodeListID());
-				if(aBDTPrimitiveRestriction.getCodeListID() !=0 )
-					aCL = (CodeListVO)dao1.findObject(qc1_3, conn);
-				else
-					aCL = null;
-			}
-		}
-		return aCL;
-	}
-
-	public Element setBBIEType(DTVO gBDT, Element gNode) throws Exception {
-		Attr tNode = gNode.getOwnerDocument().createAttribute("type");
-
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("BDT_ID", gBDT.getDTID());
-		qc3.add("is_Default", 1);
-		BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3, conn);
-
-		SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("cdt_awd_pri_xps_type_map_id", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-		CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
-
-		SRTDAO dao5 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("xbt_ID", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
-
-		tNode.setValue(aXSDBuiltInTypeVO.getBuiltInType());
-		if(aXSDBuiltInTypeVO.getBuiltInType() != null)
-			gNode.setAttributeNode(tNode);
-		return gNode;
-	}
-
-	public Element setBBIEType(BBIEVO gBBIE, Element gNode) throws Exception {
-		Attr tNode = gNode.getOwnerDocument().createAttribute("type");
-
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc3_2 = new QueryCondition();
-		qc3_2.add("bdt_pri_restri_id", gBBIE.getBdtPrimitiveRestrictionId());
-		BDTPrimitiveRestrictionVO aBDTPrimitiveRestriction = (BDTPrimitiveRestrictionVO)dao3.findObject(qc3_2, conn);
-
-		SRTDAO dao4 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("cdt_awd_pri_xps_type_map_id", aBDTPrimitiveRestriction.getCDTPrimitiveExpressionTypeMapID());
-		CDTAllowedPrimitiveExpressionTypeMapVO aDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO)dao4.findObject(qc4, conn);
-
-		SRTDAO dao5 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("xbt_id", aDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInTypeVO = (XSDBuiltInTypeVO)dao5.findObject(qc5, conn);
-
-		tNode.setValue(aXSDBuiltInTypeVO.getBuiltInType());
-		if(aXSDBuiltInTypeVO.getBuiltInType() != null)
-			gNode.setAttributeNode(tNode);
-
-		return gNode;
-	}
-
-	public Element generateBBIE(BBIEVO gBBIE, DTVO gBDT, Element gPNode, Element gSchemaNode) throws Exception{
-
-		BCCVO gBCC = queryBasedBCC(gBBIE);
-		Element eNode = null;
-		eNode = gPNode.getOwnerDocument().createElement("xsd:element");
-		eNode = handleBBIE_Elementvalue(gBBIE, eNode);
-		if(gBCC.getEntityType() == 1) {
-			while(!gPNode.getNodeName().equals("xsd:sequence")) {
-				gPNode = (Element) gPNode.getParentNode();
-			}
-
-			gPNode.appendChild(eNode);
-
-			ArrayList<SRTObject> SCs = queryBBIESCs(gBBIE);
-
-			CodeListVO aCL = getCodeList(gBBIE, gBDT);
-
-			if(aCL == null) {
-				if(gBBIE.getBdtPrimitiveRestrictionId() == 0) {
-					if(SCs.size() == 0) {
-						eNode = setBBIEType(gBDT, eNode);
-						return eNode;
-					}
-					else {
-						eNode = generateBDT(gBBIE, eNode);
-						eNode = generateSCs(gBBIE, eNode, SCs, gSchemaNode);
-						return eNode;
-					}
-				}
-				else {
-					if(SCs.size() == 0) {
-						eNode = setBBIEType(gBBIE, eNode);
-						return eNode;
-					}
-					else {
-						eNode = generateBDT(gBBIE, eNode);
-						eNode = generateSCs(gBBIE, eNode, SCs, gSchemaNode);
-						return eNode;
-					}
-				}
-			}
-
-			else { //is aCL null?
-				if(!isCodeListGenerated(aCL)) {
-					generateCodeList(aCL, gBDT, gSchemaNode);
-				}
-				if(SCs.size() == 0) {
-					Attr tNode = eNode.getOwnerDocument().createAttribute("type");
-					tNode.setNodeValue(getCodeListTypeName(aCL));
-					eNode.setAttributeNode(tNode);
-					return eNode;
-				}
-				else {
-					eNode = generateBDT(gBBIE, eNode, gSchemaNode, aCL);
-					eNode = generateSCs(gBBIE, eNode, SCs, gSchemaNode);
-					return eNode;
-				}
-			}
-
-
-		}
-		else {
-			ArrayList<SRTObject> SCs = queryBBIESCs(gBBIE);
-			CodeListVO aCL = getCodeList(gBBIE, gBDT);
-			if(aCL == null) {
-				if(gBBIE.getBdtPrimitiveRestrictionId() == 0) {
-					if(SCs.size() == 0) {
-						eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
-						eNode = handleBBIE_Attributevalue(gBBIE, eNode);
-
-						while(!gPNode.getNodeName().equals("xsd:complexType")) {
-							gPNode = (Element) gPNode.getParentNode();
-						}
-
-						gPNode.appendChild(eNode);
-						eNode = setBBIE_Attr_Type(gBDT, eNode);
-						return eNode;
-					}
-					else {
-						//eNode = setBBIE_Attr_Type(gBBIE, eNode);
-						eNode = generateBDT(gBBIE, eNode);
-						return eNode;
-					}
-				}
-				else {
-					if(SCs.size() == 0) {
-						eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
-						eNode = handleBBIE_Attributevalue(gBBIE, eNode);
-
-						while(!gPNode.getNodeName().equals("xsd:complexType")) {
-							gPNode = (Element) gPNode.getParentNode();
-						}
-
-						gPNode.appendChild(eNode);
-						eNode = setBBIE_Attr_Type(gBBIE, eNode);
-						return eNode;
-					}
-					else {
-						//eNode = setBBIE_Attr_Type(gBBIE, eNode);
-						eNode = generateBDT(gBBIE, eNode);
-						return eNode;
-					}
-				}
-			}
-
-			else { //is aCL null?
-				eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
-				eNode = handleBBIE_Attributevalue(gBBIE, eNode);
-
-				while(!gPNode.getNodeName().equals("xsd:complexType")) {
-					gPNode = (Element) gPNode.getParentNode();
-				}
-
-				gPNode.appendChild(eNode);
-
-				if(!isCodeListGenerated(aCL)) {
-					generateCodeList(aCL, gBDT, gSchemaNode);
-				}
-				if(SCs.size() == 0) {
-					if(getCodeListTypeName(aCL) != null){
-						Attr tNode = eNode.getOwnerDocument().createAttribute("type");
-						tNode.setNodeValue(getCodeListTypeName(aCL));
-						eNode.setAttributeNode(tNode);
-					}
-					return eNode;
-				}
-				else {
-					if(gBBIE.getBdtPrimitiveRestrictionId() == 0){
-						eNode = setBBIE_Attr_Type(gBDT, eNode);
-						return eNode;
-					}
-					else {
-						if(getCodeListTypeName(aCL) != null){
-							Attr tNode = eNode.getOwnerDocument().createAttribute("type");
-							tNode.setNodeValue(getCodeListTypeName(aCL));
-							eNode.setAttributeNode(tNode);
-						}
-						return eNode;
-					}
-				}
-			}
-		}
-	}
-
-	public String getCodeListTypeName(CodeListVO gCL) throws Exception { //confirm
-		//String CodeListTypeName ="xsd:string";
-		String CodeListTypeName = gCL.getName() + (gCL.getName().endsWith("Code") == true ? "" : "Code") + "ContentType" + "_" + gCL.getAgencyID() + "_" + gCL.getListID() + "_" + gCL.getVersionID();
-		CodeListTypeName = CodeListTypeName.replaceAll(" ", "");
-		return CodeListTypeName;
-	}
-
-	public Attr setCodeListRestrictionAttr(DTVO gBDT, Attr base) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("BDTPrimitiveRestriction");
-		QueryCondition qc = new QueryCondition();
-		qc.add("BDT_ID", gBDT.getDTID());
-		qc.add("is_Default", 1);
-		BDTPrimitiveRestrictionVO dPrim = (BDTPrimitiveRestrictionVO) dao.findObject(qc, conn);
-		if(dPrim.getCodeListID() != 0) {
-			base.setNodeValue("xsd:token");
-		}
-		else {
-			SRTDAO dao2 = df.getDAO("CDTAllowedPrimitiveExpressionTypeMap");
-			QueryCondition qc2 = new QueryCondition();
-			qc2.add("cdt_awd_pri_xps_type_map_id", dPrim.getCDTPrimitiveExpressionTypeMapID());
-			CDTAllowedPrimitiveExpressionTypeMapVO aCDTAllowedPrimitiveExpressionTypeMap = (CDTAllowedPrimitiveExpressionTypeMapVO) dao2.findObject(qc2, conn);
-
-			SRTDAO dao3 = df.getDAO("XSDBuiltInType");
-			QueryCondition qc3 = new QueryCondition();
-			qc3.add("xbt_ID", aCDTAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-			XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao3.findObject(qc3, conn);
-			base.setNodeValue(aXSDBuiltInType.getBuiltInType());
-		}
-		return base;
-	}
-
-	public Attr setCodeListRestrictionAttr(DTSCVO gSC, Attr base) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("BDTSCPrimitiveRestriction");
-		QueryCondition qc = new QueryCondition();
-		qc.add("BDT_SC_ID", gSC.getDTSCID());
-		qc.add("is_Default", 1);
-		BDTSCPrimitiveRestrictionVO dPrim = (BDTSCPrimitiveRestrictionVO) dao.findObject(qc, conn);
-		if(dPrim.getCodeListID() != 0) {
-			base.setNodeValue("xsd:token");
-		}
-		else {
-			SRTDAO dao2 = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-			QueryCondition qc2 = new QueryCondition();
-			qc2.add("cdt_sc_awd_pri_xps_type_map_id", dPrim.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-			CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExpressionTypeMap = (CDTSCAllowedPrimitiveExpressionTypeMapVO) dao2.findObject(qc2, conn);
-
-			SRTDAO dao3 = df.getDAO("XSDBuiltInType");
-			QueryCondition qc3 = new QueryCondition();
-			qc3.add("xbt_id", aCDTSCAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-			XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao3.findObject(qc3, conn);
-			base.setNodeValue(aXSDBuiltInType.getBuiltInType());
-		}
-		return base;
-	}
-
-	public ArrayList<CodeListValueVO> getCodeListValues(CodeListVO gCL) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("CodeListValue");
-		QueryCondition qc = new QueryCondition();
-		qc.add("Code_List_ID", gCL.getCodeListID());
-		ArrayList<SRTObject> codelistid = dao.findObjects(qc);
-		ArrayList<CodeListValueVO> gCLVs = new ArrayList<CodeListValueVO>();
-
-		for(int i = 0; i < codelistid.size(); i++){
-			CodeListValueVO aCodeListValue = (CodeListValueVO)codelistid.get(i);
-			if(aCodeListValue.getUsedIndicator())
-				gCLVs.add(aCodeListValue);
-		}
-
-		return gCLVs;
-	}
-
-	public Element generateCodeList(CodeListVO gCL, DTVO gBDT, Element gSchemaNode) throws DOMException, Exception {
-		Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
-		Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
-		stNameNode.setValue(getCodeListTypeName(gCL));
-		stNode.setAttributeNode(stNameNode);
-
-		Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
-		stIdNode.setValue(gCL.getCodeListGUID());
-		stNode.setAttributeNode(stIdNode);
-
-		Element rtNode = stNode.getOwnerDocument().createElement("xsd:restriction");
-		Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
-		base = setCodeListRestrictionAttr(gBDT, base);
-		rtNode.setAttributeNode(base);
-		stNode.appendChild(rtNode);
-
-		ArrayList<CodeListValueVO> gCLVs = getCodeListValues(gCL);
-		for(int i = 0; i< gCLVs.size(); i++){
-			CodeListValueVO bCodeListValue = (CodeListValueVO)gCLVs.get(i);
-			Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-			Attr value = stNode.getOwnerDocument().createAttribute("value");
-			value.setNodeValue(bCodeListValue.getValue());
-			enumeration.setAttributeNode(value);
-			rtNode.appendChild(enumeration);
-		}
-		GUID_array_list.add(gCL.getCodeListGUID());
-		gSchemaNode.appendChild(stNode);
-		return stNode;
-	}
-
-	public Element generateCodeList(CodeListVO gCL, DTSCVO gSC, Element gSchemaNode) throws DOMException, Exception {
-		Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
-		Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
-		stNameNode.setValue(getCodeListTypeName(gCL));
-		stNode.setAttributeNode(stNameNode);
-
-		Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
-		stIdNode.setValue(gCL.getCodeListGUID());
-		stNode.setAttributeNode(stIdNode);
-
-		Element rtNode = gSchemaNode.getOwnerDocument().createElement("xsd:restriction");
-
-		Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
-		base = setCodeListRestrictionAttr(gSC, base);
-		rtNode.setAttributeNode(base);
-		stNode.appendChild(rtNode);
-
-		ArrayList<CodeListValueVO> gCLVs = getCodeListValues(gCL);
-		for(int i = 0; i< gCLVs.size(); i++){
-			CodeListValueVO bCodeListValue = (CodeListValueVO)gCLVs.get(i);
-			Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-			Attr value = stNode.getOwnerDocument().createAttribute("value");
-			value.setNodeValue(bCodeListValue.getValue());
-			enumeration.setAttributeNode(value);
-			rtNode.appendChild(enumeration);
-		}
-		GUID_array_list.add(gCL.getCodeListGUID());
-		gSchemaNode.appendChild(stNode);
-		return stNode;
-	}
-
-	public Element handleBBIESCvalue(BBIE_SCVO aBBIESC, Element aNode) throws Exception {
-		//Handle gSC[i]
-		if(aBBIESC.getDefaultText() != null && aBBIESC.getFixedValue() != null){
-			System.out.println("default and fixed value options handling error");
-		}
-		else if(aBBIESC.getDefaultText() != null && aBBIESC.getDefaultText().length() != 0){
-			Attr default_att = aNode.getOwnerDocument().createAttribute("default");
-			default_att.setNodeValue(aBBIESC.getDefaultText());
-			aNode.setAttributeNode(default_att);
-		}
-		else if(aBBIESC.getFixedValue() != null && aBBIESC.getFixedValue().length() != 0){
-			Attr fixed_att = aNode.getOwnerDocument().createAttribute("fixed");
-			fixed_att.setNodeValue(aBBIESC.getFixedValue());
-			aNode.setAttributeNode(fixed_att);
-		}
-		// Generate a DOM Attribute node
-		Attr aNameNode = aNode.getOwnerDocument().createAttribute("name");
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("DTSC");
-		QueryCondition qc = new QueryCondition();
-		qc.add("DT_SC_ID", aBBIESC.getDTSCID());
-		DTSCVO aDTSC = (DTSCVO) dao.findObject(qc, conn);
-		if(aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
-			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
-		else if(aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("ID"));
-		else
-			aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
-		//aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm())));
-		aNode.setAttributeNode(aNameNode);
-		if(aBBIESC.getMinCardinality() >= 1)
-			aNode.setAttribute("use", "required");
-		else
-			aNode.setAttribute("use" ,"optional");
-		Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation");
-		Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
-		documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
-		//documentation.setTextContent(aBBIESC.getDefinition());
-		annotation.appendChild(documentation);
-		aNode.appendChild(annotation);
-
-		return aNode;
-	}
-
-	public CodeListVO getCodeList(BBIE_SCVO gBBIESC) throws Exception{
-
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao2 = df.getDAO("CodeList");
-		QueryCondition qc2 = new QueryCondition();
-		qc2.add("Code_List_ID", gBBIESC.getCodeListId());
-		SRTDAO dao3 = df.getDAO("BDTSCPrimitiveRestriction");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("bdt_sc_pri_restri_id", gBBIESC.getDTSCPrimitiveRestrictionID());
-		CodeListVO aCL = new CodeListVO();
-		SRTDAO dao4 = df.getDAO("DTSC");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("DT_SC_ID", gBBIESC.getDTSCID());
-		DTSCVO gDTSC = (DTSCVO) dao4.findObject(qc4, conn);
-
-		BDTSCPrimitiveRestrictionVO aBDTSCPrimitiveRestriction = null;
-		if(((CodeListVO)dao2.findObject(qc2, conn)).getCodeListID() != 0){
-			aCL = (CodeListVO) dao2.findObject(qc2, conn);
-		}
-
-		else if (((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn)).getBDTSCPrimitiveRestrictionID() != 0){
-			aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn);
-			QueryCondition qc2_2 = new QueryCondition();
-			qc2_2.add("Code_List_ID", aBDTSCPrimitiveRestriction.getCodeListID());
-			aCL = (CodeListVO) dao2.findObject(qc2_2, conn);
-		}
-
-		else if(((CodeListVO)dao2.findObject(qc2, conn)).getCodeListID() == 0 && ((BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn)).getBDTSCPrimitiveRestrictionID() == 0) {
-			QueryCondition qc3_2 = new QueryCondition();
-			qc3_2.add("BDT_SC_ID", gDTSC.getDTSCID());
-			qc3_2.add("is_Default", 1);
-			BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2, conn);
-			QueryCondition qc2_3 = new QueryCondition();
-			qc2_3.add("Code_List_ID", bBDTSCPrimitiveRestriction.getCodeListID());
-			if(((CodeListVO)dao2.findObject(qc2_3, conn)).getCodeListID() == 0){
-				aCL = null;
-			}
-			else {
-				aCL = (CodeListVO) dao2.findObject(qc2_3, conn);
-			}
-		}
-		return aCL;
-	}
-
-	public AgencyIDListVO getAgencyIDList(BBIE_SCVO gBBIESC) throws Exception {
-
-		AgencyIDListVO aAL = new AgencyIDListVO();
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao4 = df.getDAO("AgencyIDList");
-		QueryCondition qc4 = new QueryCondition();
-		qc4.add("Agency_ID_List_ID", gBBIESC.getAgencyIdListId());
-		SRTDAO dao3 = df.getDAO("BDTSCPrimitiveRestriction");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("bdt_sc_pri_restri_id", gBBIESC.getDTSCPrimitiveRestrictionID());
-		BDTSCPrimitiveRestrictionVO aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn);
-		QueryCondition qc2_4 = new QueryCondition();
-		qc2_4.add("Agency_ID_List_ID", aBDTSCPrimitiveRestriction.getAgencyIDListID());
-		SRTDAO dao5 = df.getDAO("DTSC");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("DT_SC_ID", gBBIESC.getDTSCID());
-		DTSCVO gDTSC = (DTSCVO) dao5.findObject(qc5, conn);
-
-		if(((AgencyIDListVO)dao4.findObject(qc4, conn)) != null)
-			aAL = (AgencyIDListVO) dao4.findObject(qc4, conn);
-
-		if(((AgencyIDListVO)dao4.findObject(qc2_4, conn)) != null){
-			aAL = (AgencyIDListVO) dao4.findObject(qc2_4, conn);
-		}
-		if(((AgencyIDListVO)dao4.findObject(qc4, conn)) == null && ((AgencyIDListVO) dao4.findObject(qc2_4, conn)) == null) {
-			QueryCondition qc3_2 = new QueryCondition();
-			qc3_2.add("BDT_SC_ID", gDTSC.getDTSCID());
-			qc3_2.add("is_Default", 1);
-			BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2, conn);
-			QueryCondition qc2_5 = new QueryCondition();
-			qc2_5.add("Agency_ID_List_ID", bBDTSCPrimitiveRestriction.getAgencyIDListID());
-			if(((AgencyIDListVO) dao4.findObject(qc2_5, conn)) == null){
-				aAL = null;
-			}
-			else {
-				aAL = (AgencyIDListVO) dao4.findObject(qc2_5, conn);
-			}
-		}
-		return aAL;
-	}
-
-	public Element setBBIESCType(BBIE_SCVO gBBIESC, Element gNode) throws Exception {
-
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao2 = df.getDAO("DTSC");
-		QueryCondition qc2 = new QueryCondition();
-		qc2.add("DT_SC_ID", gBBIESC.getDTSCID());
-		DTSCVO gDTSC = (DTSCVO) dao2.findObject(qc2, conn);
-		SRTDAO dao3 = df.getDAO("BDTSCPrimitiveRestriction");
-		QueryCondition qc3_2 = new QueryCondition();
-		qc3_2.add("BDT_SC_ID", gDTSC.getDTSCID());
-		qc3_2.add("is_Default", 1);
-		BDTSCPrimitiveRestrictionVO bBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3_2, conn);
-		SRTDAO dao5 = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("cdt_sc_awd_pri_xps_type_map_id", bBDTSCPrimitiveRestriction.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-		CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExpressionTypeMap = (CDTSCAllowedPrimitiveExpressionTypeMapVO) dao5.findObject(qc5, conn);
-		SRTDAO dao6 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc6 = new QueryCondition();
-		qc6.add("xbt_id", aCDTSCAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao6.findObject(qc6, conn);
-		if(aXSDBuiltInType.getBuiltInType()!= null){
-			Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
-			aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
-			gNode.setAttributeNode(aTypeNode);
-		}
-		return gNode;
-
-	}
-
-	public Element setBBIESCType2(BBIE_SCVO gBBIESC, Element gNode) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BDTSCPrimitiveRestriction");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("bdt_sc_pri_restri_id", gBBIESC.getDTSCPrimitiveRestrictionID());
-		BDTSCPrimitiveRestrictionVO aBDTSCPrimitiveRestriction = (BDTSCPrimitiveRestrictionVO) dao3.findObject(qc3, conn);
-		SRTDAO dao5 = df.getDAO("CDTSCAllowedPrimitiveExpressionTypeMap");
-		QueryCondition qc5 = new QueryCondition();
-		qc5.add("cdt_sc_awd_pri_xps_type_map_id", aBDTSCPrimitiveRestriction.getCDTSCAllowedPrimitiveExpressionTypeMapID());
-		CDTSCAllowedPrimitiveExpressionTypeMapVO aCDTSCAllowedPrimitiveExpressionTypeMap = (CDTSCAllowedPrimitiveExpressionTypeMapVO) dao5.findObject(qc5, conn);
-		SRTDAO dao6 = df.getDAO("XSDBuiltInType");
-		QueryCondition qc6 = new QueryCondition();
-		qc6.add("xbt_id", aCDTSCAllowedPrimitiveExpressionTypeMap.getXSDBuiltInTypeID());
-		XSDBuiltInTypeVO aXSDBuiltInType = (XSDBuiltInTypeVO) dao6.findObject(qc6, conn);
-		if(aXSDBuiltInType.getBuiltInType() != null){
-			Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
-			aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
-			gNode.setAttributeNode(aTypeNode);
-		}
-		return gNode;
-
-	}
-
-	public Element generateSCs(BBIEVO gBBIE, Element gBBIENode, ArrayList<SRTObject> gSCs, Element gSchemaNode) throws DOMException, Exception{
-		Element tNode = (Element) gBBIENode;
-		while(true){
-			if(tNode.getNodeName().equals("xsd:simpleType") || tNode.getNodeName().equals("xsd:complexType"))
-				break;
-			tNode = (Element) tNode.getLastChild();
-			//tNode = (Element) tNode.getParentNode();
-		}
-		Node tmp = tNode.getFirstChild();
-		do {
-			if(tmp.getNodeName().equals("xsd:simpleContent"))
-			{
-				tNode = (Element) tmp.getFirstChild();
-				break;
-			}
-			if(tmp.getNextSibling() != null)
-				tmp = tmp.getNextSibling();
-		} while(tmp != null);
+        Element complexType = eNode.getOwnerDocument().createElement("xsd:complexType");
+        Element simpleContent = eNode.getOwnerDocument().createElement("xsd:simpleContent");
+        Element extNode = eNode.getOwnerDocument().createElement("xsd:extension");
+        //complexType.setAttribute("name", Utility.DenToName(bDT.getDen())); 
+        complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
+        if (bDT.getDefinition() != null) {
+            Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
+            Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+            documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
+            //documentation.setTextContent(bDT.getDefinition());
+            complexType.appendChild(annotation);
+        }
+        StoredCC.add(bDT.getGuid());
+
+        complexType.appendChild(simpleContent);
+        simpleContent.appendChild(extNode);
+
+        DataType gBDT = queryAssocBDT(gBBIE);
+
+        Attr base = extNode.getOwnerDocument().createAttribute("base");
+
+        if (gBBIE.getBdtPriRestriId() == 0)
+            base = setBDTBase(gBDT, base);
+        else {
+            base = setBDTBase(gBBIE, base);
+        }
+        extNode.setAttributeNode(base);
+        eNode.appendChild(complexType);
+        return eNode;
+    }
+
+    public Element generateASBIE(AssociationBusinessInformationEntity gASBIE, Element gPNode) throws Exception {
+
+        AssociationCoreComponent gASCC = queryBasedASCC(gASBIE);
+
+        Element element = gPNode.getOwnerDocument().createElement("xsd:element");
+        element.setAttribute("id", gASBIE.getGuid()); //element.setAttribute("id", gASCC.getASCCGuid());
+        element.setAttribute("minOccurs", String.valueOf(gASBIE.getCardinalityMin()));
+        if (gASBIE.getCardinalityMax() == -1)
+            element.setAttribute("maxOccurs", "unbounded");
+        else
+            element.setAttribute("maxOccurs", String.valueOf(gASBIE.getCardinalityMax()));
+        if (gASBIE.isNillable())
+            element.setAttribute("nillable", String.valueOf(gASBIE.isNillable()));
+
+        while (!gPNode.getNodeName().equals("xsd:sequence")) {
+            gPNode = (Element) gPNode.getParentNode();
+        }
+        Element annotation = element.getOwnerDocument().createElement("xsd:annotation");
+        Element documentation = element.getOwnerDocument().createElement("xsd:documentation");
+        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        //documentation.setTextContent(gASBIE.getDefinition());
+        annotation.appendChild(documentation);
+        element.appendChild(annotation);
+        gPNode.appendChild(element);
+        StoredCC.add(gASCC.getGuid());//check
+        return element;
+    }
+
+    public Element generateASBIEP(AssociationBusinessInformationEntityProperty gASBIEP, Element gElementNode) throws Exception {
+        AssociationCoreComponentPropertyRepository dao = repositoryFactory.associationCoreComponentPropertyRepository();
+        AssociationCoreComponentProperty asccp = dao.findOneByAsccpId(gASBIEP.getBasedAsccpId());
+        gElementNode.setAttribute("name", Utility.first(asccp.getDen(), true));
+        //gElementNode.setAttribute("type", Utility.second(asccp.getDen())+"Type");
+        return gElementNode;
+
+    }
+
+    public BasicCoreComponent queryBasedBCC(BasicBusinessInformationEntity gBBIE) throws Exception {
+        BasicCoreComponentRepository dao = repositoryFactory.basicCoreComponentRepository();
+        BasicCoreComponent bccVO = dao.findOneByBccId(gBBIE.getBasedBccId());
+        return bccVO;
+    }
+
+    public Element handleBBIE_Elementvalue(BasicBusinessInformationEntity gBBIE, Element eNode) throws Exception {
+
+        BasicCoreComponent bccVO = queryBasedBCC(gBBIE);
+        Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
+        nameANode.setValue(Utility.second(bccVO.getDen(), true));
+        eNode.setAttributeNode(nameANode);
+        eNode.setAttribute("id", gBBIE.getGuid()); //eNode.setAttribute("id", bccVO.getGuid());
+        StoredCC.add(bccVO.getGuid());
+        if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
+            System.out.println("Error");
+        }
+        if (gBBIE.isNillable()) {
+            Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
+            nillable.setValue("true");
+            eNode.setAttributeNode(nillable);
+        }
+        if (gBBIE.getDefaultValue() != null && gBBIE.getDefaultValue().length() != 0) {
+            Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
+            defaulta.setValue(gBBIE.getDefaultValue());
+            eNode.setAttributeNode(defaulta);
+        }
+        if (gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
+            Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
+            fixedvalue.setValue(gBBIE.getFixedValue());
+            eNode.setAttributeNode(fixedvalue);
+        }
+
+        eNode.setAttribute("minOccurs", String.valueOf(gBBIE.getCardinalityMin()));
+        if (gBBIE.getCardinalityMax() == -1)
+            eNode.setAttribute("maxOccurs", "unbounded");
+        else
+            eNode.setAttribute("maxOccurs", String.valueOf(gBBIE.getCardinalityMax()));
+        if (gBBIE.isNillable())
+            eNode.setAttribute("nillable", String.valueOf(gBBIE.isNillable()));
+
+        Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
+        Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        //documentation.setTextContent(gBBIE.getDefinition());
+        annotation.appendChild(documentation);
+        eNode.appendChild(annotation);
+
+        return eNode;
+    }
+
+    public Element handleBBIE_Attributevalue(BasicBusinessInformationEntity gBBIE, Element eNode) throws Exception {
+
+        BasicCoreComponent bccVO = queryBasedBCC(gBBIE);
+        Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
+        nameANode.setValue(Utility.second(bccVO.getDen(), false));
+        eNode.setAttributeNode(nameANode);
+        eNode.setAttribute("id", gBBIE.getGuid()); //eNode.setAttribute("id", bccVO.getGuid());
+        StoredCC.add(bccVO.getGuid());
+        if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
+            System.out.println("Error");
+        }
+        if (gBBIE.isNillable()) {
+            Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
+            nillable.setValue("true");
+            eNode.setAttributeNode(nillable);
+        }
+        if (gBBIE.getDefaultValue() != null && gBBIE.getDefaultValue().length() != 0) {
+            Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
+            defaulta.setValue(gBBIE.getDefaultValue());
+            eNode.setAttributeNode(defaulta);
+        }
+        if (gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
+            Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
+            fixedvalue.setValue(gBBIE.getFixedValue());
+            eNode.setAttributeNode(fixedvalue);
+        }
+        if (gBBIE.getCardinalityMin() >= 1)
+            eNode.setAttribute("use", "required");
+        else
+            eNode.setAttribute("use", "optional");
+        Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
+        Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        //documentation.setTextContent(gBBIE.getDefinition());
+        annotation.appendChild(documentation);
+        eNode.appendChild(annotation);
+        return eNode;
+    }
+
+    public CodeList getCodeList(BasicBusinessInformationEntity gBBIE, DataType gBDT) throws Exception {
+        CodeList aCL = null;
+
+        if (gBBIE.getCodeListId() != 0) {
+            CodeListRepository dao1 = repositoryFactory.codeListRepository();
+            try {
+                aCL = dao1.findOneByCodeListId(gBBIE.getCodeListId());
+            } catch (EmptyResultDataAccessException e) {
+            }
+        }
+
+        if (aCL == null) {
+            BusinessDataTypePrimitiveRestrictionRepository dao2 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                    dao2.findOneByBdtPriRestriId(gBBIE.getBdtPriRestriId());
+            CodeListRepository dao1 = repositoryFactory.codeListRepository();
+            if (aBDTPrimitiveRestriction.getCodeListId() != 0) {
+                try {
+                    aCL = dao1.findOneByCodeListId(aBDTPrimitiveRestriction.getCodeListId());
+                } catch (EmptyResultDataAccessException e) {
+                }
+            }
+        }
+
+        if (aCL == null) {
+            BusinessDataTypePrimitiveRestrictionRepository dao2 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+            try {
+                BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                        dao2.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
+
+                CodeListRepository dao1 = repositoryFactory.codeListRepository();
+                if (aBDTPrimitiveRestriction.getCodeListId() != 0)
+                    aCL = dao1.findOneByCodeListId(aBDTPrimitiveRestriction.getCodeListId());
+                else
+                    aCL = null;
+
+            } catch (EmptyResultDataAccessException e) {
+                aCL = null;
+            }
+        }
+        return aCL;
+    }
+
+    public Element setBBIEType(DataType gBDT, Element gNode) throws Exception {
+        Attr tNode = gNode.getOwnerDocument().createAttribute("type");
+
+        BusinessDataTypePrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                dao3.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
+
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
+                dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
+
+        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+
+        tNode.setValue(aXSDBuiltInType.getBuiltInType());
+        if (aXSDBuiltInType.getBuiltInType() != null)
+            gNode.setAttributeNode(tNode);
+        return gNode;
+    }
+
+    public Element setBBIEType(BasicBusinessInformationEntity gBBIE, Element gNode) throws Exception {
+        Attr tNode = gNode.getOwnerDocument().createAttribute("type");
+
+        BusinessDataTypePrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = dao3.findOneByBdtPriRestriId(gBBIE.getBdtPriRestriId());
+
+        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
+                dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
+
+        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+
+        tNode.setValue(aXSDBuiltInType.getBuiltInType());
+        if (aXSDBuiltInType.getBuiltInType() != null)
+            gNode.setAttributeNode(tNode);
+
+        return gNode;
+    }
+
+    public Element generateBBIE(BasicBusinessInformationEntity gBBIE, DataType gBDT, Element gPNode, Element gSchemaNode) throws Exception {
+
+        BasicCoreComponent gBCC = queryBasedBCC(gBBIE);
+        Element eNode = null;
+        eNode = gPNode.getOwnerDocument().createElement("xsd:element");
+        eNode = handleBBIE_Elementvalue(gBBIE, eNode);
+        if (gBCC.getEntityType() == 1) {
+            while (!gPNode.getNodeName().equals("xsd:sequence")) {
+                gPNode = (Element) gPNode.getParentNode();
+            }
+
+            gPNode.appendChild(eNode);
+
+            List<BasicBusinessInformationEntitySupplementaryComponent> SCs = queryBBIESCs(gBBIE);
+
+            CodeList aCL = getCodeList(gBBIE, gBDT);
+
+            if (aCL == null) {
+                if (gBBIE.getBdtPriRestriId() == 0) {
+                    if (SCs.size() == 0) {
+                        eNode = setBBIEType(gBDT, eNode);
+                        return eNode;
+                    } else {
+                        eNode = generateBDT(gBBIE, eNode);
+                        eNode = generateSCs(gBBIE, eNode, SCs, gSchemaNode);
+                        return eNode;
+                    }
+                } else {
+                    if (SCs.size() == 0) {
+                        eNode = setBBIEType(gBBIE, eNode);
+                        return eNode;
+                    } else {
+                        eNode = generateBDT(gBBIE, eNode);
+                        eNode = generateSCs(gBBIE, eNode, SCs, gSchemaNode);
+                        return eNode;
+                    }
+                }
+            } else { //is aCL null?
+                if (!isCodeListGenerated(aCL)) {
+                    generateCodeList(aCL, gBDT, gSchemaNode);
+                }
+                if (SCs.size() == 0) {
+                    Attr tNode = eNode.getOwnerDocument().createAttribute("type");
+                    tNode.setNodeValue(getCodeListTypeName(aCL));
+                    eNode.setAttributeNode(tNode);
+                    return eNode;
+                } else {
+                    eNode = generateBDT(gBBIE, eNode, gSchemaNode, aCL);
+                    eNode = generateSCs(gBBIE, eNode, SCs, gSchemaNode);
+                    return eNode;
+                }
+            }
+
+
+        } else {
+            List<BasicBusinessInformationEntitySupplementaryComponent> SCs = queryBBIESCs(gBBIE);
+            CodeList aCL = getCodeList(gBBIE, gBDT);
+            if (aCL == null) {
+                if (gBBIE.getBdtPriRestriId() == 0) {
+                    if (SCs.size() == 0) {
+                        eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
+                        eNode = handleBBIE_Attributevalue(gBBIE, eNode);
+
+                        while (!gPNode.getNodeName().equals("xsd:complexType")) {
+                            gPNode = (Element) gPNode.getParentNode();
+                        }
+
+                        gPNode.appendChild(eNode);
+                        eNode = setBBIE_Attr_Type(gBDT, eNode);
+                        return eNode;
+                    } else {
+                        //eNode = setBBIE_Attr_Type(gBBIE, eNode);
+                        eNode = generateBDT(gBBIE, eNode);
+                        return eNode;
+                    }
+                } else {
+                    if (SCs.size() == 0) {
+                        eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
+                        eNode = handleBBIE_Attributevalue(gBBIE, eNode);
+
+                        while (!gPNode.getNodeName().equals("xsd:complexType")) {
+                            gPNode = (Element) gPNode.getParentNode();
+                        }
+
+                        gPNode.appendChild(eNode);
+                        eNode = setBBIE_Attr_Type(gBBIE, eNode);
+                        return eNode;
+                    } else {
+                        //eNode = setBBIE_Attr_Type(gBBIE, eNode);
+                        eNode = generateBDT(gBBIE, eNode);
+                        return eNode;
+                    }
+                }
+            } else { //is aCL null?
+                eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
+                eNode = handleBBIE_Attributevalue(gBBIE, eNode);
+
+                while (!gPNode.getNodeName().equals("xsd:complexType")) {
+                    gPNode = (Element) gPNode.getParentNode();
+                }
+
+                gPNode.appendChild(eNode);
+
+                if (!isCodeListGenerated(aCL)) {
+                    generateCodeList(aCL, gBDT, gSchemaNode);
+                }
+                if (SCs.size() == 0) {
+                    if (getCodeListTypeName(aCL) != null) {
+                        Attr tNode = eNode.getOwnerDocument().createAttribute("type");
+                        tNode.setNodeValue(getCodeListTypeName(aCL));
+                        eNode.setAttributeNode(tNode);
+                    }
+                    return eNode;
+                } else {
+                    if (gBBIE.getBdtPriRestriId() == 0) {
+                        eNode = setBBIE_Attr_Type(gBDT, eNode);
+                        return eNode;
+                    } else {
+                        if (getCodeListTypeName(aCL) != null) {
+                            Attr tNode = eNode.getOwnerDocument().createAttribute("type");
+                            tNode.setNodeValue(getCodeListTypeName(aCL));
+                            eNode.setAttributeNode(tNode);
+                        }
+                        return eNode;
+                    }
+                }
+            }
+        }
+    }
+
+    public String getCodeListTypeName(CodeList gCL) throws Exception { //confirm
+        //String CodeListTypeName ="xsd:string";
+        String CodeListTypeName = gCL.getName() + (gCL.getName().endsWith("Code") == true ? "" : "Code") + "ContentType" + "_" + gCL.getAgencyId() + "_" + gCL.getListId() + "_" + gCL.getVersionId();
+        CodeListTypeName = CodeListTypeName.replaceAll(" ", "");
+        return CodeListTypeName;
+    }
+
+    public Attr setCodeListRestrictionAttr(DataType gBDT, Attr base) throws Exception {
+        BusinessDataTypePrimitiveRestrictionRepository dao = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
+        BusinessDataTypePrimitiveRestriction dPrim = dao.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
+        if (dPrim.getCodeListId() != 0) {
+            base.setNodeValue("xsd:token");
+        } else {
+            CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao2 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
+            CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMap =
+                    dao2.findOneByCdtAwdPriXpsTypeMapId(dPrim.getCdtAwdPriXpsTypeMapId());
+
+            XSDBuiltInTypeRepository dao3 = repositoryFactory.xsdBuiltInTypeRepository();
+            XSDBuiltInType aXSDBuiltInType = dao3.findOneByXbtId(aCDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+            base.setNodeValue(aXSDBuiltInType.getBuiltInType());
+        }
+        return base;
+    }
+
+    public Attr setCodeListRestrictionAttr(DataTypeSupplementaryComponent gSC, Attr base) throws Exception {
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction dPrim =
+                dao.findOneByBdtScIdAndDefault(gSC.getDtScId(), true);
+        if (dPrim.getCodeListId() != 0) {
+            base.setNodeValue("xsd:token");
+        } else {
+            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository dao2 =
+                    repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
+                    dao2.findOneByCdtScAwdPriXpsTypeMapId(dPrim.getCdtScAwdPriXpsTypeMapId());
+
+            XSDBuiltInTypeRepository dao3 = repositoryFactory.xsdBuiltInTypeRepository();
+            XSDBuiltInType aXSDBuiltInType = dao3.findOneByXbtId(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
+            base.setNodeValue(aXSDBuiltInType.getBuiltInType());
+        }
+        return base;
+    }
+
+    public List<CodeListValue> getCodeListValues(CodeList gCL) throws Exception {
+        CodeListValueRepository dao = repositoryFactory.codeListValueRepository();
+        List<CodeListValue> codelistid = dao.findByCodeListId(gCL.getCodeListId());
+        List<CodeListValue> gCLVs = new ArrayList();
+
+        for (int i = 0; i < codelistid.size(); i++) {
+            CodeListValue aCodeListValue = codelistid.get(i);
+            if (aCodeListValue.isUsedIndicator())
+                gCLVs.add(aCodeListValue);
+        }
+
+        return gCLVs;
+    }
+
+    public Element generateCodeList(CodeList gCL, DataType gBDT, Element gSchemaNode) throws DOMException, Exception {
+        Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
+        Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
+        stNameNode.setValue(getCodeListTypeName(gCL));
+        stNode.setAttributeNode(stNameNode);
+
+        Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
+        stIdNode.setValue(gCL.getGuid());
+        stNode.setAttributeNode(stIdNode);
+
+        Element rtNode = stNode.getOwnerDocument().createElement("xsd:restriction");
+        Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
+        base = setCodeListRestrictionAttr(gBDT, base);
+        rtNode.setAttributeNode(base);
+        stNode.appendChild(rtNode);
+
+        List<CodeListValue> gCLVs = getCodeListValues(gCL);
+        for (int i = 0; i < gCLVs.size(); i++) {
+            CodeListValue bCodeListValue = (CodeListValue) gCLVs.get(i);
+            Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
+            Attr value = stNode.getOwnerDocument().createAttribute("value");
+            value.setNodeValue(bCodeListValue.getValue());
+            enumeration.setAttributeNode(value);
+            rtNode.appendChild(enumeration);
+        }
+        Guid_array_list.add(gCL.getGuid());
+        gSchemaNode.appendChild(stNode);
+        return stNode;
+    }
+
+    public Element generateCodeList(CodeList gCL, DataTypeSupplementaryComponent gSC, Element gSchemaNode) throws DOMException, Exception {
+        Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
+        Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
+        stNameNode.setValue(getCodeListTypeName(gCL));
+        stNode.setAttributeNode(stNameNode);
+
+        Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
+        stIdNode.setValue(gCL.getGuid());
+        stNode.setAttributeNode(stIdNode);
+
+        Element rtNode = gSchemaNode.getOwnerDocument().createElement("xsd:restriction");
+
+        Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
+        base = setCodeListRestrictionAttr(gSC, base);
+        rtNode.setAttributeNode(base);
+        stNode.appendChild(rtNode);
+
+        List<CodeListValue> gCLVs = getCodeListValues(gCL);
+        for (int i = 0; i < gCLVs.size(); i++) {
+            CodeListValue bCodeListValue = (CodeListValue) gCLVs.get(i);
+            Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
+            Attr value = stNode.getOwnerDocument().createAttribute("value");
+            value.setNodeValue(bCodeListValue.getValue());
+            enumeration.setAttributeNode(value);
+            rtNode.appendChild(enumeration);
+        }
+        Guid_array_list.add(gCL.getGuid());
+        gSchemaNode.appendChild(stNode);
+        return stNode;
+    }
+
+    public Element handleBBIESCvalue(BasicBusinessInformationEntitySupplementaryComponent aBBIESC, Element aNode) throws Exception {
+        //Handle gSC[i]
+        if (aBBIESC.getDefaultValue() != null && aBBIESC.getFixedValue() != null) {
+            System.out.println("default and fixed value options handling error");
+        } else if (aBBIESC.getDefaultValue() != null && aBBIESC.getDefaultValue().length() != 0) {
+            Attr default_att = aNode.getOwnerDocument().createAttribute("default");
+            default_att.setNodeValue(aBBIESC.getDefaultValue());
+            aNode.setAttributeNode(default_att);
+        } else if (aBBIESC.getFixedValue() != null && aBBIESC.getFixedValue().length() != 0) {
+            Attr fixed_att = aNode.getOwnerDocument().createAttribute("fixed");
+            fixed_att.setNodeValue(aBBIESC.getFixedValue());
+            aNode.setAttributeNode(fixed_att);
+        }
+        // Generate a DOM Attribute node
+        Attr aNameNode = aNode.getOwnerDocument().createAttribute("name");
+        DataTypeSupplementaryComponentRepository dao = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        DataTypeSupplementaryComponent aDTSC = dao.findOneByDtScId(aBBIESC.getDtScId());
+        if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
+        else if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("Id"));
+        else
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
+        //aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm())));
+        aNode.setAttributeNode(aNameNode);
+        if (aBBIESC.getMinCardinality() >= 1)
+            aNode.setAttribute("use", "required");
+        else
+            aNode.setAttribute("use", "optional");
+        Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation");
+        Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
+        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        //documentation.setTextContent(aBBIESC.getDefinition());
+        annotation.appendChild(documentation);
+        aNode.appendChild(annotation);
+
+        return aNode;
+    }
+
+    public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
+        CodeListRepository dao2 = repositoryFactory.codeListRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+
+        DataTypeSupplementaryComponentRepository dao4 = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        DataTypeSupplementaryComponent gDTSC = dao4.findOneByDtScId(gBBIESC.getDtScId());
+
+        CodeList aCL = new CodeList();
+        try {
+            aCL = dao2.findOneByCodeListId(gBBIESC.getCodeListId());
+        } catch (EmptyResultDataAccessException e) {
+        }
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
+                new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+        try {
+            aBDTSCPrimitiveRestriction = dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
+        } catch (EmptyResultDataAccessException e) {
+        }
+
+        if (aCL.getCodeListId() != 0) {
+
+        } else if (aBDTSCPrimitiveRestriction.getBdtScPriRestriId() != 0) {
+            aCL = dao2.findOneByCodeListId(aBDTSCPrimitiveRestriction.getCodeListId());
+        } else if (aCL.getCodeListId() == 0 && aBDTSCPrimitiveRestriction.getBdtScPriRestriId() == 0) {
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
+                    dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+            try {
+                aCL = dao2.findOneByCodeListId(bBDTSCPrimitiveRestriction.getCodeListId());
+            } catch (EmptyResultDataAccessException e) {
+                return null;
+            }
+        }
+        return aCL;
+    }
+
+    public AgencyIdList getAgencyIdList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
+        AgencyIdList aAL = null;
+        AgencyIdListRepository dao4 = repositoryFactory.agencyIdListRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
+                dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
+        DataTypeSupplementaryComponentRepository dao5 = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        DataTypeSupplementaryComponent gDTSC = dao5.findOneByDtScId(gBBIESC.getDtScId());
+
+        boolean firstCheck = true;
+        try {
+            aAL = dao4.findOneByAgencyIdListId(gBBIESC.getAgencyIdListId());
+        } catch (EmptyResultDataAccessException e) {
+            firstCheck = false;
+        }
+
+        boolean secondCheck = true;
+        if (aAL == null) {
+            try {
+                aAL = dao4.findOneByAgencyIdListId(aBDTSCPrimitiveRestriction.getAgencyIdListId());
+            } catch (EmptyResultDataAccessException e) {
+                secondCheck = false;
+            }
+        }
+
+        if (!firstCheck && !secondCheck) {
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
+                    dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+            try {
+                aAL = dao4.findOneByAgencyIdListId(bBDTSCPrimitiveRestriction.getAgencyIdListId());
+            } catch (EmptyResultDataAccessException e) {
+                return null;
+            }
+        }
+        return aAL;
+    }
+
+    public Element setBBIESCType(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
+        DataTypeSupplementaryComponentRepository dao2 = repositoryFactory.dataTypeSupplementaryComponentRepository();
+        DataTypeSupplementaryComponent gDTSC = dao2.findOneByDtScId(gBBIESC.getDtScId());
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 =
+                repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
+                dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository dao5 =
+                repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
+                dao5.findOneByCdtScAwdPriXpsTypeMapId(bBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
+        XSDBuiltInTypeRepository dao6 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao6.findOneByXbtId(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
+        if (aXSDBuiltInType.getBuiltInType() != null) {
+            Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
+            aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
+            gNode.setAttributeNode(aTypeNode);
+        }
+        return gNode;
+
+    }
+
+    public Element setBBIESCType2(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
+        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 =
+                repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction = dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository dao5 =
+                repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
+                        dao5.findOneByCdtScAwdPriXpsTypeMapId(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
+        XSDBuiltInTypeRepository dao6 = repositoryFactory.xsdBuiltInTypeRepository();
+        XSDBuiltInType aXSDBuiltInType = dao6.findOneByXbtId(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
+        if (aXSDBuiltInType.getBuiltInType() != null) {
+            Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
+            aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
+            gNode.setAttributeNode(aTypeNode);
+        }
+        return gNode;
+
+    }
+
+    public Element generateSCs(BasicBusinessInformationEntity gBBIE, Element gBBIENode, List<BasicBusinessInformationEntitySupplementaryComponent> gSCs, Element gSchemaNode) throws DOMException, Exception {
+        Element tNode = (Element) gBBIENode;
+        while (true) {
+            if (tNode.getNodeName().equals("xsd:simpleType") || tNode.getNodeName().equals("xsd:complexType"))
+                break;
+            tNode = (Element) tNode.getLastChild();
+            //tNode = (Element) tNode.getParentNode();
+        }
+        Node tmp = tNode.getFirstChild();
+        do {
+            if (tmp.getNodeName().equals("xsd:simpleContent")) {
+                tNode = (Element) tmp.getFirstChild();
+                break;
+            }
+            if (tmp.getNextSibling() != null)
+                tmp = tmp.getNextSibling();
+        } while (tmp != null);
 
 //		if(tNode.getFirstChild().getNodeName().equals("xsd:simpleContent"))
 //			tNode = (Element) tNode.getFirstChild().getFirstChild();
-		//here
-		for(int i = 0; i < gSCs.size(); i++) {
-			BBIE_SCVO aBBIESC = (BBIE_SCVO)gSCs.get(i);
-			if(aBBIESC.getMaxCardinality() == 0)
-				continue;
-			Element aNode = tNode.getOwnerDocument().createElement("xsd:attribute");
-			aNode = handleBBIESCvalue(aBBIESC, aNode); //Generate a DOM Element Node, handle values
+        //here
+        for (int i = 0; i < gSCs.size(); i++) {
+            BasicBusinessInformationEntitySupplementaryComponent aBBIESC = gSCs.get(i);
+            if (aBBIESC.getMaxCardinality() == 0)
+                continue;
+            Element aNode = tNode.getOwnerDocument().createElement("xsd:attribute");
+            aNode = handleBBIESCvalue(aBBIESC, aNode); //Generate a DOM Element Node, handle values
 
-			//Get a code list object
-			CodeListVO aCL = getCodeList(aBBIESC);
-			if(aCL != null) {
-				Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
-				stIdNode.setNodeValue(Utility.generateGUID());
-				aNode.setAttributeNode(stIdNode);
-			}
+            //Get a code list object
+            CodeList aCL = getCodeList(aBBIESC);
+            if (aCL != null) {
+                Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
+                stIdNode.setNodeValue(Utility.generateGUID());
+                aNode.setAttributeNode(stIdNode);
+            }
 
-			AgencyIDListVO aAL = new AgencyIDListVO();
+            AgencyIdList aAL = new AgencyIdList();
 
-			if(aCL == null) { //aCL = null?
-				aAL = getAgencyIDList(aBBIESC);
+            if (aCL == null) { //aCL = null?
+                aAL = getAgencyIdList(aBBIESC);
 
-				if(aAL != null) {
-					Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
-					stIdNode.setNodeValue(aAL.getAgencyIDListGUID());
-					aNode.setAttributeNode(stIdNode);
-				}
+                if (aAL != null) {
+                    Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
+                    stIdNode.setNodeValue(aAL.getGuid());
+                    aNode.setAttributeNode(stIdNode);
+                }
 
-				if(aAL == null) { //aAL = null?
-					int primRestriction = aBBIESC.getDTSCPrimitiveRestrictionID();
-					if(primRestriction == 0)
-						aNode = setBBIESCType(aBBIESC, aNode);
-					else
-						aNode = setBBIESCType2(aBBIESC, aNode);
-				}
-				else { //aAL = null?
-					if(!isAgencyListGenerated(aAL))  //isAgencyListGenerated(aAL)?
-						generateAgencyList(aAL, aBBIESC, gSchemaNode);
-					if(getAgencyListTypeName(aAL) != null) {
-						Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
-						aTypeNode.setNodeValue(getAgencyListTypeName(aAL));
-						aNode.setAttributeNode(aTypeNode);
-					}
-				}
-			}
-
-			else { //aCL = null?
-				if(!isCodeListGenerated(aCL)) {
-					DAOFactory df = DAOFactory.getDAOFactory();
-					SRTDAO dao = df.getDAO("DTSC");
-					QueryCondition qc = new QueryCondition();
-					qc.add("DT_SC_ID", aBBIESC.getDTSCID());
-					DTSCVO aDTSC = (DTSCVO)dao.findObject(qc, conn);
-					generateCodeList(aCL, aDTSC, gSchemaNode);
-				}
-				if(getCodeListTypeName(aCL) != null) {
-					Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
-					aTypeNode.setNodeValue(getCodeListTypeName(aCL));
-					aNode.setAttributeNode(aTypeNode);
-				}
-			}
+                if (aAL == null) { //aAL = null?
+                    int primRestriction = aBBIESC.getDtScPriRestriId();
+                    if (primRestriction == 0)
+                        aNode = setBBIESCType(aBBIESC, aNode);
+                    else
+                        aNode = setBBIESCType2(aBBIESC, aNode);
+                } else { //aAL = null?
+                    if (!isAgencyListGenerated(aAL))  //isAgencyListGenerated(aAL)?
+                        generateAgencyList(aAL, aBBIESC, gSchemaNode);
+                    if (getAgencyListTypeName(aAL) != null) {
+                        Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
+                        aTypeNode.setNodeValue(getAgencyListTypeName(aAL));
+                        aNode.setAttributeNode(aTypeNode);
+                    }
+                }
+            } else { //aCL = null?
+                if (!isCodeListGenerated(aCL)) {
+                    DataTypeSupplementaryComponentRepository dao = repositoryFactory.dataTypeSupplementaryComponentRepository();
+                    DataTypeSupplementaryComponent aDTSC = dao.findOneByDtScId(aBBIESC.getDtScId());
+                    generateCodeList(aCL, aDTSC, gSchemaNode);
+                }
+                if (getCodeListTypeName(aCL) != null) {
+                    Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
+                    aTypeNode.setNodeValue(getCodeListTypeName(aCL));
+                    aNode.setAttributeNode(aTypeNode);
+                }
+            }
 //			if(isCCStored(aNode.getAttribute("id")))
 //				continue;
 //			StoredCC.add(aNode.getAttribute("id"));
-			tNode.appendChild(aNode);
-		}
-		return tNode;
-	}
+            tNode.appendChild(aNode);
+        }
+        return tNode;
+    }
 
-	public boolean isAgencyListGenerated(AgencyIDListVO gAL) throws Exception {
-		for(int i = 0; i < GUID_array_list.size(); i++) {
-			if(gAL.getAgencyIDListGUID().equals(GUID_array_list.get(i)))
-				return true;
-		}
-		return false;
-	}
+    public boolean isAgencyListGenerated(AgencyIdList gAL) throws Exception {
+        for (int i = 0; i < Guid_array_list.size(); i++) {
+            if (gAL.getGuid().equals(Guid_array_list.get(i)))
+                return true;
+        }
+        return false;
+    }
 
-	public String getAgencyListTypeName(AgencyIDListVO gAL) throws Exception {
-		String AgencyListTypeName = "clm" + gAL.getAgencyID() + gAL.getListID() + gAL.getVersionID() + "_" + Utility.toCamelCase(gAL.getName()) + "ContentType";
-		AgencyListTypeName = AgencyListTypeName.replaceAll(" ", "");
-		return AgencyListTypeName;
-	}
+    public String getAgencyListTypeName(AgencyIdList gAL) throws Exception {
+        String AgencyListTypeName = "clm" + gAL.getAgencyId() + gAL.getListId() + gAL.getVersionId() + "_" + Utility.toCamelCase(gAL.getName()) + "ContentType";
+        AgencyListTypeName = AgencyListTypeName.replaceAll(" ", "");
+        return AgencyListTypeName;
+    }
 
-	public Element generateAgencyList(AgencyIDListVO gAL, BBIE_SCVO gSC, Element gSchemaNode) throws DOMException, Exception {
-		Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
+    public Element generateAgencyList(AgencyIdList gAL, BasicBusinessInformationEntitySupplementaryComponent gSC, Element gSchemaNode) throws Exception {
+        Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
 
-		Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
-		stNameNode.setNodeValue(getAgencyListTypeName(gAL));
-		stNode.setAttributeNode(stNameNode);
+        Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
+        stNameNode.setNodeValue(getAgencyListTypeName(gAL));
+        stNode.setAttributeNode(stNameNode);
 
-		Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
-		stIdNode.setNodeValue(gAL.getAgencyIDListGUID());
-		stNode.setAttributeNode(stIdNode);
+        Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
+        stIdNode.setNodeValue(gAL.getGuid());
+        stNode.setAttributeNode(stIdNode);
 
-		Element rtNode = gSchemaNode.getOwnerDocument().createElement("xsd:restriction");
+        Element rtNode = gSchemaNode.getOwnerDocument().createElement("xsd:restriction");
 
-		Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
-		base.setNodeValue("xsd:token");
-		stNode.appendChild(rtNode);
-		rtNode.setAttributeNode(base);
+        Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
+        base.setNodeValue("xsd:token");
+        stNode.appendChild(rtNode);
+        rtNode.setAttributeNode(base);
 
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("AgencyIDListValue");
-		QueryCondition qc = new QueryCondition();
-		qc.add("Agency_ID_List_ID", gAL.getAgencyIDListID());
-		ArrayList<SRTObject> gALVs = dao.findObjects(qc);
+        AgencyIdListValueRepository dao = repositoryFactory.agencyIdListValueRepository();
+        List<AgencyIdListValue> gALVs = dao.findByOwnerListId(gAL.getAgencyIdListId());
 
-		for(int i = 0; i< gALVs.size(); i++){
-			AgencyIDListValueVO aAgencyIDListValue = (AgencyIDListValueVO)gALVs.get(i);
-			Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-			stNode.appendChild(enumeration);
-			Attr value = stNode.getOwnerDocument().createAttribute("value");
-			value.setNodeValue(aAgencyIDListValue.getValue());
-			stNode.setAttributeNode(value);
-		}
-		gSchemaNode.appendChild(stNode);
-		GUID_array_list.add(gAL.getAgencyIDListGUID());
-		return stNode;
-	}
+        for (int i = 0; i < gALVs.size(); i++) {
+            AgencyIdListValue aAgencyIdListValue = gALVs.get(i);
+            Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
+            stNode.appendChild(enumeration);
+            Attr value = stNode.getOwnerDocument().createAttribute("value");
+            value.setNodeValue(aAgencyIdListValue.getValue());
+            stNode.setAttributeNode(value);
+        }
+        gSchemaNode.appendChild(stNode);
+        Guid_array_list.add(gAL.getGuid());
+        return stNode;
+    }
 
-	public ASBIEPVO receiveASBIEP(int ABIE_ID) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ASBIEP");
-		QueryCondition qc = new QueryCondition();
-		qc.add("Role_Of_ABIE_ID", ABIE_ID);
-		ASBIEPVO aASBIEPVO = (ASBIEPVO) dao.findObject(qc, conn);
-		return aASBIEPVO;
-	}
+    public AssociationBusinessInformationEntityProperty receiveASBIEP(int ABIE_Id) throws Exception {
+        AssociationBusinessInformationEntityPropertyRepository dao = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
+        AssociationBusinessInformationEntityProperty aAssociationBusinessInformationEntityProperty = dao.findOneByRoleOfAbieId(ABIE_Id);
+        return aAssociationBusinessInformationEntityProperty;
+    }
 
-	public ArrayList<SRTObject> receiveABIE(ArrayList<Integer> abie_ids) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ABIE");
+    public List<AggregateBusinessInformationEntity> receiveABIE(List<Integer> abie_ids) throws Exception {
+        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
 
-		ArrayList<SRTObject> aABIEVO = new ArrayList<SRTObject>();
-		for(int i = 0; i < abie_ids.size() ; i++) {
-			QueryCondition qc = new QueryCondition();
-			qc.add("ABIE_ID", abie_ids.get(i));
-			aABIEVO.addAll(dao.findObjects(qc, conn));
-		}
-		return aABIEVO;
-	}
+        List<AggregateBusinessInformationEntity> aAggregateBusinessInformationEntity = new ArrayList();
+        for (int i = 0; i < abie_ids.size(); i++) {
+            aAggregateBusinessInformationEntity.add(dao.findOneByAbieId(abie_ids.get(i)));
+        }
+        return aAggregateBusinessInformationEntity;
+    }
 
-	public DTVO queryBDT(BBIEVO gBBIE) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao3 = df.getDAO("BCC");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("BCC_ID", gBBIE.getBasedBCCID());
-		BCCVO gBCC = (BCCVO) dao3.findObject(qc3, conn);
-		SRTDAO dao = df.getDAO("BCCP");
-		QueryCondition qc = new QueryCondition();
-		qc.add("BCCP_ID", gBCC.getAssocToBCCPID());
-		BCCPVO aBCCPVO = (BCCPVO) dao.findObject(qc, conn);
-		SRTDAO dao2 = df.getDAO("DT");
-		QueryCondition qc2 = new QueryCondition();
-		qc2.add("DT_ID", aBCCPVO.getBDTID());
-		DTVO bDT = (DTVO) dao2.findObject(qc2, conn);
-		return bDT;
-	}
+    public DataType queryBDT(BasicBusinessInformationEntity gBBIE) throws Exception {
+        BasicCoreComponentRepository dao3 = repositoryFactory.basicCoreComponentRepository();
+        BasicCoreComponent gBCC = dao3.findOneByBccId(gBBIE.getBasedBccId());
+        BasicCoreComponentPropertyRepository dao = repositoryFactory.basicCoreComponentPropertyRepository();
+        BasicCoreComponentProperty aBasicCoreComponentProperty = dao.findOneByBccpId(gBCC.getToBccpId());
+        DataTypeRepository dao2 = repositoryFactory.dataTypeRepository();
+        DataType bDT = dao2.findOneByDtId(aBasicCoreComponentProperty.getBdtId());
+        return bDT;
+    }
 
-	public ASCCPVO queryBasedASCCP(ASBIEPVO gASBIEP) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ASCCP");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ASCCP_ID", gASBIEP.getBasedASCCPID());
-		ASCCPVO asccpVO = (ASCCPVO) dao.findObject(qc, conn);
-		return asccpVO;
-	}
+    public AssociationCoreComponentProperty queryBasedASCCP(AssociationBusinessInformationEntityProperty gASBIEP) throws Exception {
+        AssociationCoreComponentPropertyRepository dao = repositoryFactory.associationCoreComponentPropertyRepository();
+        AssociationCoreComponentProperty asccpVO = dao.findOneByAsccpId(gASBIEP.getBasedAsccpId());
+        return asccpVO;
+    }
 
-	public ACCVO queryBasedACC(ABIEVO gABIE) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ACC");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ACC_ID", gABIE.getBasedACCID());
-		ACCVO gACC = (ACCVO) dao.findObject(qc, conn);
-		return gACC;
-	}
+    public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity gABIE) throws Exception {
+        AggregateCoreComponentRepository dao = repositoryFactory.aggregateCoreComponentRepository();
+        AggregateCoreComponent gACC = dao.findOneByAccId(gABIE.getBasedAccId());
+        return gACC;
+    }
 
-	public ASCCVO queryBasedASCC(ASBIEVO gASBIE) throws Exception {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ASCC");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ASCC_ID", gASBIE.getBasedASCC());
-		ASCCVO gASCC = (ASCCVO) dao.findObject(qc, conn);
-		return gASCC;
-	}
+    public AssociationCoreComponent queryBasedASCC(AssociationBusinessInformationEntity gASBIE) throws Exception {
+        AssociationCoreComponentRepository dao = repositoryFactory.associationCoreComponentRepository();
+        AssociationCoreComponent gASCC = dao.findOneByAsccId(gASBIE.getBasedAscc());
+        return gASCC;
+    }
 
-	public ABIEVO queryTargetABIE(ASBIEPVO gASBIEP) throws SRTDAOException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ABIE");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
-		ABIEVO abievo = (ABIEVO)dao.findObject(qc, conn);
-		return abievo;
-	}
+    public AggregateBusinessInformationEntity queryTargetABIE(AssociationBusinessInformationEntityProperty gASBIEP) {
+        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
+        AggregateBusinessInformationEntity abievo = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
+        return abievo;
+    }
 
-	public ACCVO queryTargetACC(ASBIEPVO gASBIEP) throws SRTDAOException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ABIE");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
-		ABIEVO abievo = (ABIEVO)dao.findObject(qc, conn);
+    public AggregateCoreComponent queryTargetACC(AssociationBusinessInformationEntityProperty gASBIEP) {
+        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
+        AggregateBusinessInformationEntity abievo = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
 
-		SRTDAO dao2 = df.getDAO("ACC");
-		QueryCondition qc2 = new QueryCondition();
-		qc2.add("ACC_ID", abievo.getBasedACCID());
-		ACCVO aACCVO = (ACCVO) dao2.findObject(qc2, conn);
-		return aACCVO;
-	}
+        AggregateCoreComponentRepository dao2 = repositoryFactory.aggregateCoreComponentRepository();
+        AggregateCoreComponent aAggregateCoreComponent = dao2.findOneByAccId(abievo.getBasedAccId());
+        return aAggregateCoreComponent;
+    }
 
-	public ABIEVO queryTargetABIE2(ASBIEPVO gASBIEP) throws SRTDAOException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ABIE");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ABIE_ID", gASBIEP.getRoleOfABIEID());
-		ABIEVO abieVO = (ABIEVO)dao.findObject(qc, conn);
-		return abieVO;
-	}
+    public AggregateBusinessInformationEntity queryTargetABIE2(AssociationBusinessInformationEntityProperty gASBIEP) {
+        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
+        AggregateBusinessInformationEntity abieVO = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
+        return abieVO;
+    }
 
-	//Get only Child BIEs whose is_used flag is true
-	public ArrayList<SRTObject> queryChildBIEs(ABIEVO gABIE) throws SRTDAOException {
-		HashMap<SRTObject, Double> sequence = new HashMap<SRTObject, Double>();
-		ValueComparator bvc =  new ValueComparator(sequence);
-		TreeMap<SRTObject, Double> ordered_sequence = new TreeMap<SRTObject, Double>(bvc);
+    //Get only Child BIEs whose is_used flag is true
+    public List<BusinessInformationEntity> queryChildBIEs(AggregateBusinessInformationEntity gABIE) {
+        Map<BusinessInformationEntity, Integer> sequence = new HashMap();
+        ValueComparator bvc = new ValueComparator(sequence);
+        Map<BusinessInformationEntity, Integer> ordered_sequence = new TreeMap(bvc);
 
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ASBIE");
-		QueryCondition qc = new QueryCondition();
-		qc.add("From_ABIE_ID", gABIE.getABIEID());
-		qc.add("is_used", 1);
-		ArrayList<SRTObject> asbievo = dao.findObjects(qc, conn);
-		SRTDAO dao2 = df.getDAO("BBIE");
-		QueryCondition qc2 = new QueryCondition();
-		qc2.add("From_ABIE_ID", gABIE.getABIEID());
-		qc2.add("is_used", 1);
-		ArrayList<SRTObject> bbievo = dao2.findObjects(qc2, conn);
-		ArrayList<SRTObject> result = new ArrayList<SRTObject>();
+        AssociationBusinessInformationEntityRepository dao = repositoryFactory.associationBusinessInformationEntityRepository();
+        List<AssociationBusinessInformationEntity> asbievo = dao.findByFromAbieIdAndUsed(gABIE.getAbieId(), true);
+        BasicBusinessInformationEntityRepository dao2 = repositoryFactory.basicBusinessInformationEntityRepository();
+        List<BasicBusinessInformationEntity> bbievo = dao2.findByFromAbieIdAndUsed(gABIE.getAbieId(), true);
+        List<BusinessInformationEntity> result = new ArrayList();
 
-		for(SRTObject aSRTObject : bbievo){
-			BBIEVO aBBIEVO = (BBIEVO)aSRTObject;
-			if(aBBIEVO.getCardinalityMax() != 0) //modify
-				sequence.put(aBBIEVO, aBBIEVO.getSequencing_key());
-		}
+        for (BasicBusinessInformationEntity aBasicBusinessInformationEntity : bbievo) {
+            if (aBasicBusinessInformationEntity.getCardinalityMax() != 0) //modify
+                sequence.put(aBasicBusinessInformationEntity, aBasicBusinessInformationEntity.getSeqKey());
+        }
 
-		for(SRTObject aSRTObject : asbievo){
-			ASBIEVO aASBIEVO = (ASBIEVO)aSRTObject;
-			if(aASBIEVO.getCardinalityMax() != 0)
-				sequence.put(aASBIEVO, aASBIEVO.getSequencingKey());
-		}
+        for (AssociationBusinessInformationEntity aAssociationBusinessInformationEntity : asbievo) {
+            if (aAssociationBusinessInformationEntity.getCardinalityMax() != 0)
+                sequence.put(aAssociationBusinessInformationEntity, aAssociationBusinessInformationEntity.getSeqKey());
+        }
 
-		ordered_sequence.putAll(sequence);
-		Set set = ordered_sequence.entrySet();
-		Iterator i = set.iterator();
-		while(i.hasNext()) {
-			Map.Entry me = (Map.Entry)i.next();
-			result.add((SRTObject)me.getKey());
-		}
-		return result;
-	}
+        ordered_sequence.putAll(sequence);
+        Set set = ordered_sequence.entrySet();
+        Iterator i = set.iterator();
+        while (i.hasNext()) {
+            Map.Entry me = (Map.Entry) i.next();
+            result.add((BusinessInformationEntity) me.getKey());
+        }
+        return result;
+    }
 
-	class ValueComparator implements Comparator<SRTObject> {
+    class ValueComparator implements Comparator<BusinessInformationEntity> {
 
-		Map<SRTObject, Double> base;
-		public ValueComparator(Map<SRTObject, Double> base) {
-			this.base = base;
-		}
+        Map<BusinessInformationEntity, Integer> base;
 
-		// Note: this comparator imposes orderings that are inconsistent with equals.
-		public int compare(SRTObject a, SRTObject b) {
-			if (base.get(a) <= base.get(b)) {
-				return -1;
-			} else {
-				return 1;
-			} // returning 0 would merge keys
-		}
+        public ValueComparator(Map<BusinessInformationEntity, Integer> base) {
+            this.base = base;
+        }
 
-	}
-	public ASBIEPVO queryAssocToASBIEP(ASBIEVO gASBIE) throws SRTDAOException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("ASBIEP");
-		QueryCondition qc = new QueryCondition();
-		qc.add("ASBIEP_ID", gASBIE.getAssocToASBIEPID());
-		ASBIEPVO asbiepVO = (ASBIEPVO)dao.findObject(qc, conn);
-		return asbiepVO;
-	}
+        // Note: this comparator imposes orderings that are inconsistent with equals.
+        public int compare(BusinessInformationEntity a, BusinessInformationEntity b) {
+            if (base.get(a) <= base.get(b)) {
+                return -1;
+            } else {
+                return 1;
+            } // returning 0 would merge keys
+        }
 
-	public DTVO queryAssocBDT(BBIEVO gBBIE) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("BCC");
-		QueryCondition qc = new QueryCondition();
-		qc.add("BCC_ID", gBBIE.getBasedBCCID());
-		BCCVO bccVO = (BCCVO)dao.findObject(qc, conn);
+    }
 
-		SRTDAO dao2 = df.getDAO("BCCP");
-		QueryCondition qc2 = new QueryCondition();
-		qc2.add("BCCP_ID", bccVO.getAssocToBCCPID());
-		BCCPVO bccpVO = (BCCPVO)dao2.findObject(qc2, conn);
+    public AssociationBusinessInformationEntityProperty queryAssocToASBIEP(AssociationBusinessInformationEntity gASBIE) {
+        AssociationBusinessInformationEntityPropertyRepository dao = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
+        AssociationBusinessInformationEntityProperty asbiepVO = dao.findOneByAsbiepId(gASBIE.getToAsbiepId());
+        return asbiepVO;
+    }
 
-		SRTDAO dao3 = df.getDAO("DT");
-		QueryCondition qc3 = new QueryCondition();
-		qc3.add("DT_ID", bccpVO.getBDTID());
-		DTVO aBDT = (DTVO)dao3.findObject(qc3, conn);
+    public DataType queryAssocBDT(BasicBusinessInformationEntity gBBIE) throws Exception {
+        BasicCoreComponentRepository dao = repositoryFactory.basicCoreComponentRepository();
+        BasicCoreComponent bccVO = dao.findOneByBccId(gBBIE.getBasedBccId());
 
-		return aBDT;
-	}
+        BasicCoreComponentPropertyRepository dao2 = repositoryFactory.basicCoreComponentPropertyRepository();
+        BasicCoreComponentProperty bccpVO = dao2.findOneByBccpId(bccVO.getToBccpId());
 
-	//Get only SCs whose is_used is true.
-	public ArrayList<SRTObject> queryBBIESCs(BBIEVO gBBIE) throws SRTDAOException {
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("BBIE_SC");
-		QueryCondition qc = new QueryCondition();
-		qc.add("BBIE_ID", gBBIE.getBBIEID());
-		qc.add("is_used", 1);
-		ArrayList<SRTObject> bbiescVO = dao.findObjects(qc, conn);
-		return bbiescVO;
-	}
+        DataTypeRepository dao3 = repositoryFactory.dataTypeRepository();
+        DataType aBDT = dao3.findOneByDtId(bccpVO.getBdtId());
 
-	public boolean isCodeListGenerated(CodeListVO gCL) throws Exception {
-		for(int i = 0; i < GUID_array_list.size(); i++) {
-			if(gCL.getCodeListGUID().equals(GUID_array_list.get(i)))
-				return true;
-		}
-		return false;
-	}
+        return aBDT;
+    }
 
-	public boolean isCCStored(String id) throws Exception {
-		for(int i = 0; i < StoredCC.size(); i++) {
-			if(StoredCC.get(i).equals(id)){
-				return true;
-			}
-		}
-		return false;
-	}
+    //Get only SCs whose is_used is true.
+    public List<BasicBusinessInformationEntitySupplementaryComponent> queryBBIESCs(BasicBusinessInformationEntity gBBIE) {
+        BasicBusinessInformationEntitySupplementaryComponentRepository dao = repositoryFactory.basicBusinessInformationEntitySupplementaryComponentRepository();
+        return dao.findByBbieIdAndUsed(gBBIE.getBbieId(), true);
+    }
 
-	public String generateXMLSchema(ArrayList<Integer> abie_ids, boolean schema_package_flag) throws Exception {
-		Utility.dbSetup();
-		DBAgent tx = new DBAgent();
-		conn = tx.open();
-		try {
-			ArrayList<SRTObject> gABIE = receiveABIE(abie_ids);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-			Document doc = docBuilder.newDocument();
+    public boolean isCodeListGenerated(CodeList gCL) throws Exception {
+        for (int i = 0; i < Guid_array_list.size(); i++) {
+            if (gCL.getGuid().equals(Guid_array_list.get(i)))
+                return true;
+        }
+        return false;
+    }
 
-			Element schemaNode = generateSchema(doc);
-			String filepath = null, filename = null;
-			if(schema_package_flag == true) {
-				for(SRTObject aSRTObject : gABIE){
-					ABIEVO aABIEVO = (ABIEVO)aSRTObject;
-					ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
-					System.out.println("Generating Top Level ABIE w/ given ASBIEPVO ID: "+ aASBIEPVO.getASBIEPID());
-					doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
-					DAOFactory df = DAOFactory.getDAOFactory();
-					SRTDAO dao = df.getDAO("ASCCP");
-					QueryCondition qc = new QueryCondition();
-					qc.add("ASCCP_ID", aASBIEPVO.getBasedASCCPID());
-					ASCCPVO asccpvo = (ASCCPVO)dao.findObject(qc, conn);
-					filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
-				}
-				filepath = writeXSDFile(doc, filename+"_standalone");
-			}
-			else {
-				for(SRTObject aSRTObject : gABIE){
-					ABIEVO aABIEVO = (ABIEVO)aSRTObject;
-					ASBIEPVO aASBIEPVO = receiveASBIEP(aABIEVO.getABIEID());
-					doc = docBuilder.newDocument();
-					schemaNode = generateSchema(doc);
-					doc = generateTopLevelABIE(aASBIEPVO, doc, schemaNode);
-					writeXSDFile(doc, "Package/" + aABIEVO.getAbieGUID());
-				}
-				filepath = Zip.compression(Utility.generateGUID());
-			}
+    public boolean isCCStored(String id) throws Exception {
+        for (int i = 0; i < StoredCC.size(); i++) {
+            if (StoredCC.get(i).equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-			return filepath;
-		} finally {
-			PersistenceUtils.closeQuietly(conn);
-			PersistenceUtils.closeQuietly(tx);
-		}
-	}
+    public String generateXMLSchema(List<Integer> abie_ids, boolean schema_package_flag) throws Exception {
+        List<AggregateBusinessInformationEntity> gABIE = receiveABIE(abie_ids);
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
 
-	public static void main(String args[]) throws Exception {
-		StandaloneXMLSchema aa = new StandaloneXMLSchema();
-		abie_ids.add(2871957);
-		aa.generateXMLSchema(abie_ids, true);
-		System.out.println("###END###");
-	}
+        Element schemaNode = generateSchema(doc);
+        String filepath = null, filename = null;
+        if (schema_package_flag == true) {
+            for (AggregateBusinessInformationEntity aAggregateBusinessInformationEntity : gABIE) {
+                AssociationBusinessInformationEntityProperty aAssociationBusinessInformationEntityProperty = receiveASBIEP(aAggregateBusinessInformationEntity.getAbieId());
+                System.out.println("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + aAssociationBusinessInformationEntityProperty.getAsbiepId());
+                doc = generateTopLevelABIE(aAssociationBusinessInformationEntityProperty, doc, schemaNode);
+                AssociationCoreComponentPropertyRepository dao = repositoryFactory.associationCoreComponentPropertyRepository();
+                AssociationCoreComponentProperty asccpvo = dao.findOneByAsccpId(aAssociationBusinessInformationEntityProperty.getBasedAsccpId());
+                filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
+            }
+            filepath = writeXSDFile(doc, filename + "_standalone");
+        } else {
+            for (AggregateBusinessInformationEntity aAggregateBusinessInformationEntity : gABIE) {
+                AssociationBusinessInformationEntityProperty aAssociationBusinessInformationEntityProperty = receiveASBIEP(aAggregateBusinessInformationEntity.getAbieId());
+                doc = docBuilder.newDocument();
+                schemaNode = generateSchema(doc);
+                doc = generateTopLevelABIE(aAssociationBusinessInformationEntityProperty, doc, schemaNode);
+                writeXSDFile(doc, "Package/" + aAggregateBusinessInformationEntity.getGuid());
+            }
+            filepath = Zip.compression(Utility.generateGUID());
+        }
+
+        return filepath;
+    }
+
+    public static void main(String args[]) throws Exception {
+        StandaloneXMLSchema aa = new StandaloneXMLSchema();
+        abie_ids.add(2871957);
+        aa.generateXMLSchema(abie_ids, true);
+        System.out.println("###END###");
+    }
 }

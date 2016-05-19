@@ -8,6 +8,10 @@ public interface BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
 
     public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScId(int bdtScId);
 
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScPriRestriId(int bdtScPriRestriId);
+
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndDefault(int bdtScId, boolean isDefault);
+
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapId(
             int bdtScId, int cdtScAwdPriXpsTypeMapId
     );
