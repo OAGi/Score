@@ -19,6 +19,7 @@ import org.primefaces.model.chart.ChartSeries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Value("${spring.datasource.platform}")
+    private String platform;
 
     private AssociationCoreComponentRepository asccRepository;
     private BasicCoreComponentRepository bccRepository;
@@ -442,7 +446,7 @@ public class TopLevelABIEHandler implements Serializable {
         for (int i = 0; i < size; i++)
             assoc.add(a);
 
-        if (SRTConstants.getDBType() == SRTConstants.DB_TYPE_ORACLE) {
+        if ("oracle".equalsIgnoreCase(platform)) {
             tmp_assoc = getAssocList(tmp_assoc);
         }
 
@@ -465,7 +469,7 @@ public class TopLevelABIEHandler implements Serializable {
         assoc.trimToSize();
 
         try {
-            if (SRTConstants.getDBType() == SRTConstants.DB_TYPE_MYSQL) {
+            if ("mysql".equalsIgnoreCase(platform)) {
                 return getAssocList(assoc);
             } else {
                 return assoc;
@@ -508,7 +512,7 @@ public class TopLevelABIEHandler implements Serializable {
         assoc.trimToSize();
 
         try {
-            if (SRTConstants.getDBType() == SRTConstants.DB_TYPE_MYSQL) {
+            if ("mysql".equalsIgnoreCase(platform)) {
                 return getAssocList(assoc);
             } else {
                 return assoc;

@@ -1,16 +1,8 @@
 package org.oagi.srt.common.util;
 
-import org.chanchan.common.persistence.db.ConnectionPoolManager;
-import org.chanchan.common.util.ServerProperties;
-import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.repository.entity.DataType;
-import org.oagi.srt.web.startup.SRTInitializer;
-import org.oagi.srt.web.startup.SRTInitializerException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
 import java.util.Random;
 import java.util.UUID;
 
@@ -324,42 +316,6 @@ public class Utility {
         qualifier = qualifier.trim();
         //System.out.println("\t\t"+qualifier);
         return qualifier;
-    }
-
-    public static void dbSetup() throws Exception {
-        ServerProperties props = ServerProperties.getInstance();
-        String _propFile = SRTConstants.SRT_PROPERTIES_FILE_NAME;
-        try {
-            InputStream is = SRTInitializer.class.getResourceAsStream(_propFile);
-            if (is == null) {
-                throw new SRTInitializerException(_propFile + " not found!");
-            }
-            try {
-                props.load(is, true);
-            } catch (IOException e) {
-                throw new SRTInitializerException(_propFile + " cannot be read...");
-            }
-        } catch (Exception e) {
-            System.out.println("[SRTInitializer] Fail to Getting "
-                    + SRTConstants.SRT_PROPERTIES_FILE_NAME + " URL : "
-                    + e.toString());
-        }
-        try {
-            ConnectionPoolManager cpm = ConnectionPoolManager.getInstance();
-            String poolName = cpm.getDefaultPoolName();
-            System.out.println("DefaultPoolName:" + poolName);
-            Connection dbConnection = cpm.getConnection(poolName);
-            dbConnection.close();
-            System.out.println("DB Connection Pool initialized...");
-            cpm.release();
-        } catch (Exception e) {
-            System.out.println("[SRTInitializer] Fail to Creating Connection Pool : "
-                    + e.toString());
-            e.printStackTrace();
-            throw new SRTInitializerException("[SRTInitializer] Fail to Creating Connection Pool : "
-                    + e.toString());
-        }
-
     }
 
     public static boolean checkCorrespondingTypes(String xbtName, String CDTPriName) {

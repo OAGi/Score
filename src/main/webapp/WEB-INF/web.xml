@@ -4,9 +4,6 @@
     <welcome-file>/index.xhtml</welcome-file>
   </welcome-file-list>
   <listener>
-    <listener-class>org.oagi.srt.web.startup.ContextListener</listener-class>
-  </listener>
-  <listener>
     <listener-class>org.oagi.srt.web.startup.CacheContextListener</listener-class>
   </listener>
   <context-param>
