@@ -2,13 +2,67 @@ package org.oagi.srt.repository.oracle;
 
 import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.oagi.srt.repository.impl.BaseAgencyIdListValueRepository;
+import org.oagi.srt.repository.mapper.AgencyIdListValueMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class OracleAgencyIdListValueRepository extends BaseAgencyIdListValueRepository {
+
+    private final String FIND_ALL_STATEMENT = "SELECT " +
+            "agency_id_list_value_id, value, name, definition, owner_list_id " +
+            "FROM agency_id_list_value";
+
+    @Override
+    public List<AgencyIdListValue> findAll() {
+        return getJdbcTemplate().query(FIND_ALL_STATEMENT, AgencyIdListValueMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_OWNER_LIST_ID_STATEMENT = "SELECT " +
+            "agency_id_list_value_id, value, name, definition, owner_list_id " +
+            "FROM agency_id_list_value " +
+            "WHERE owner_list_id = :owner_list_id";
+
+    @Override
+    public List<AgencyIdListValue> findByOwnerListId(int ownerListId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("owner_list_id", ownerListId);
+
+        return getNamedParameterJdbcTemplate().query(
+                FIND_ONE_BY_OWNER_LIST_ID_STATEMENT, namedParameters, AgencyIdListValueMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_AGENCY_ID_LIST_VALUE_ID_STATEMENT = "SELECT " +
+            "agency_id_list_value_id, value, name, definition, owner_list_id " +
+            "FROM agency_id_list_value " +
+            "WHERE agency_id_list_value_id = :agency_id_list_value_id";
+
+    @Override
+    public AgencyIdListValue findOneByAgencyIdListValueId(int agencyIdListValueId) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("agency_id_list_value_id", agencyIdListValueId);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_AGENCY_ID_LIST_VALUE_ID_STATEMENT, namedParameters, AgencyIdListValueMapper.INSTANCE);
+    }
+
+    private final String FIND_ONE_BY_VALUE_STATEMENT = "SELECT " +
+            "agency_id_list_value_id, value, name, definition, owner_list_id " +
+            "FROM agency_id_list_value " +
+            "WHERE value = :value";
+
+    @Override
+    public AgencyIdListValue findOneByValue(String value) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("value", value);
+
+        return getNamedParameterJdbcTemplate().queryForObject(
+                FIND_ONE_BY_VALUE_STATEMENT, namedParameters, AgencyIdListValueMapper.INSTANCE);
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO agency_id_list_value (" +
             "agency_id_list_value_id, value, name, definition, owner_list_id) VALUES (" +

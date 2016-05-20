@@ -102,7 +102,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private BaseUserRepository baseUserRepository;
 
     @Autowired
-    private BaseReleaseRepository baseReleaseRepository;
+    private OracleReleaseRepository oracleReleaseRepository;
 
     @Autowired
     private OracleBlobContentRepository oracleBlobContentRepository;
@@ -264,7 +264,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Override
     public ReleaseRepository releaseRepository() {
-        return baseReleaseRepository;
+        return oracleReleaseRepository;
     }
 
     @Override
