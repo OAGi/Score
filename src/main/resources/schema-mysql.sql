@@ -1118,7 +1118,7 @@ DROP TABLE IF EXISTS `oagsrt_revision`.`blob_content` ;
 
 CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`blob_content` (
   `blob_content_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
-  `content` BLOB NOT NULL COMMENT 'The Blob content of the schema file.',
+  `content` MEDIUMBLOB NOT NULL COMMENT 'The Blob content of the schema file.',
   `release_id` INT(11) UNSIGNED NOT NULL COMMENT 'The release to which this file belongs/published.',
   `module` TEXT(100) NOT NULL COMMENT 'The is the subdirectory and filename of the blob. The format is Windows file path. The starting directory shall be the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be \'Model\\filename.xsd\'. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be \'Model\\Platform\\2_1\\Common\\Components\\filename.xsd\'.',
   PRIMARY KEY (`blob_content_id`),

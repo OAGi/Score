@@ -42,4 +42,6 @@ public interface RepositoryFactory {
 
     public UserRepository userRepository();
 
+    public ReleaseRepository releaseRepository();
+    public BlobContentRepository blobContentRepository();
 }

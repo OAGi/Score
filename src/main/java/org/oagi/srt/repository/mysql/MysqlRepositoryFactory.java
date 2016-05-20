@@ -101,6 +101,12 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Autowired
     private BaseUserRepository baseUserRepository;
 
+    @Autowired
+    private BaseReleaseRepository baseReleaseRepository;
+
+    @Autowired
+    private BaseBlobContentRepository baseBlobContentRepository;
+
     @Override
     public AgencyIdListRepository agencyIdListRepository() {
         return baseAgencyIdListRepository;
@@ -254,5 +260,15 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public UserRepository userRepository() {
         return baseUserRepository;
+    }
+
+    @Override
+    public ReleaseRepository releaseRepository() {
+        return baseReleaseRepository;
+    }
+
+    @Override
+    public BlobContentRepository blobContentRepository() {
+        return baseBlobContentRepository;
     }
 }

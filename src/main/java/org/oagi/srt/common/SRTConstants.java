@@ -46,6 +46,8 @@ public class SRTConstants {
 	public static final String TEST_BOD_FILE_PATH = "./data/xsd";
 	public static final String TEST_XML_FILE_PATH = "./data/xsd";
 
+	public static final String BASE_DATA_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1";
+
 	public static String filepath(String list) {
 		String prefix_filepath = "./data/";
 		//String prefix_filepath = "C:/Users/yslee/Work/Project/OAG/Development/";
