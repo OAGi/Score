@@ -193,17 +193,32 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                     int xbt_id = aXBTDAO.findOneByBuiltInType("xsd:token").getXbtId();
 
-                    DataTypeSupplementaryComponent stscVO = dao.findOneByDtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
                     int cdt_id = 0;
-                    if (stscVO.getBasedDtScId() < 1)
+                    DataTypeSupplementaryComponent stscVO = null;
+                    try {
+                        stscVO = dao.findOneByDtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
+                    } catch (EmptyResultDataAccessException e) {
+                        stscVO = new DataTypeSupplementaryComponent();
+                    }
+                    if (stscVO.getBasedDtScId() < 1) {
                         cdt_id = aDataTypeSupplementaryComponent.getBasedDtScId();
-                    else
+                    } else {
                         cdt_id = stscVO.getBasedDtScId();
+                    }
 
-                    int cdt_sc_awd_pri_id = aCDTSCAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdt_id, CDT_Primitive_id).getCdtScAwdPriId();
+                    int cdt_sc_awd_pri_id = 0;
+                    if (cdt_id > 0) {
+                        try {
+                            cdt_sc_awd_pri_id = aCDTSCAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdt_id, CDT_Primitive_id).getCdtScAwdPriId();
+                        } catch (EmptyResultDataAccessException e) {
+                        }
+                    }
 
-                    int CDTSCAllowedPrimitiveExpressionTypeMapID = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.
-                            findOneByCdtScAwdPriAndXbtId(cdt_sc_awd_pri_id, xbt_id).getCdtScAwdPriXpsTypeMapId();
+                    int CDTSCAllowedPrimitiveExpressionTypeMapID = 0;
+                    if (cdt_sc_awd_pri_id > 0) {
+                        CDTSCAllowedPrimitiveExpressionTypeMapID = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.
+                                findOneByCdtScAwdPriAndXbtId(cdt_sc_awd_pri_id, xbt_id).getCdtScAwdPriXpsTypeMapId();
+                    }
 
                     BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO1 = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                     bVO1.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
@@ -211,11 +226,18 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     bVO1.setCdtScAwdPriXpsTypeMapId(CDTSCAllowedPrimitiveExpressionTypeMapID);
                     bVO1.setDefault(true);
 
-                    CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCPAX =
-                            aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(bVO1.getCdtScAwdPriXpsTypeMapId());
+                    CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCPAX = null;
+                    if (CDTSCAllowedPrimitiveExpressionTypeMapID > 0) {
+                        aCDTSCPAX = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(
+                                bVO1.getCdtScAwdPriXpsTypeMapId());
+                    }
 
-
-                    XSDBuiltInType aXBT = aXBTDAO.findOneByXbtId(aCDTSCPAX.getXbtId());
+                    XSDBuiltInType aXBT;
+                    if (aCDTSCPAX == null) {
+                        aXBT = new XSDBuiltInType();
+                    } else {
+                        aXBT = aXBTDAO.findOneByXbtId(aCDTSCPAX.getXbtId());
+                    }
                     System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO1.isDefault());
                     aBDTSCPrimitiveRestrictionDAO.save(bVO1);
 
