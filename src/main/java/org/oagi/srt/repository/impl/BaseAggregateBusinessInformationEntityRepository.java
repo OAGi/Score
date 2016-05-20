@@ -77,7 +77,7 @@ public class BaseAggregateBusinessInformationEntityRepository extends NamedParam
                 .addValue("created_by", abie.getCreatedBy())
                 .addValue("last_updated_by", abie.getLastUpdatedBy())
                 .addValue("state", abie.getState() == 0 ? null : abie.getState())
-                .addValue("client_id", abie.getClientId())
+                .addValue("client_id", abie.getClientId() == 0 ? null : abie.getClientId())
                 .addValue("version", abie.getVersion())
                 .addValue("status", abie.getStatus())
                 .addValue("remark", abie.getRemark())
