@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BusinessDataTypeSupplementaryComponentPrimitiveRe
 import org.oagi.srt.repository.entity.BusinessDataTypeSupplementaryComponentPrimitiveRestriction;
 import org.oagi.srt.repository.mapper.BusinessDataTypeSupplementaryComponentPrimitiveRestrictionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "BDTSCPriRestris", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository extends NamedParameterJdbcDaoSupport
         implements BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository {
 
@@ -33,6 +37,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "WHERE bdt_sc_id = :bdt_sc_id";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScId(int bdtScId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScId);
@@ -48,6 +53,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "WHERE bdt_sc_pri_restri_id = :bdt_sc_pri_restri_id";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScPriRestriId(int bdtScPriRestriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_pri_restri_id", bdtScPriRestriId);
@@ -63,6 +69,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "WHERE bdt_sc_id = :bdt_sc_id AND is_default = :is_default";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndDefault(int bdtScId, boolean isDefault) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScId)
@@ -79,6 +86,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "WHERE bdt_sc_id = :bdt_sc_id AND cdt_sc_awd_pri_xps_type_map_id = :cdt_sc_awd_pri_xps_type_map_id";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapId(int bdtScId, int cdtScAwdPriXpsTypeMapId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScId)
@@ -95,6 +103,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "WHERE bdt_sc_id = :bdt_sc_id AND code_list_id = :code_list_id";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCodeListId(int bdtScId, int codeListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScId)
@@ -111,6 +120,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "WHERE bdt_sc_id = :bdt_sc_id AND agency_id_list_id = :agency_id_list_id";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndAgencyIdListId(int bdtScId, int agencyIdListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScId)
@@ -128,6 +138,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             "code_list_id = :code_list_id AND agency_id_list_id = :agency_id_list_id";
 
     @Override
+    @Cacheable("BDTSCPriRestris")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapIdAndCodeListIdAndAgencyIdListId(
             int bdtScId, int cdtScAwdPriXpsTypeMapId, int codeListId, int agencyIdListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
@@ -147,6 +158,7 @@ public class BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
             ":code_list_id, :is_default, :agency_id_list_id)";
 
     @Override
+    @CacheEvict("BDTSCPriRestris")
     public void save(BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_sc_id", bdtScPriRestri.getBdtScId())

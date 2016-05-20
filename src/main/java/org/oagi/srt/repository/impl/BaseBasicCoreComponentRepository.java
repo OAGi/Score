@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BasicCoreComponentRepository;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.mapper.BasicCoreComponentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "BCCs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSupport
         implements BasicCoreComponentRepository {
 
@@ -35,6 +39,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             "WHERE from_acc_id = :from_acc_id";
 
     @Override
+    @Cacheable("BCCs")
     public List<BasicCoreComponent> findByFromAccId(int fromAccId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("from_acc_id", fromAccId);
@@ -52,6 +57,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             "WHERE den = :den";
 
     @Override
+    @Cacheable("BCCs")
     public List<BasicCoreComponent> findByDenStartsWith(String den) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("den", den + "%");
@@ -69,6 +75,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             "WHERE bcc_id = :bcc_id";
 
     @Override
+    @Cacheable("BCCs")
     public BasicCoreComponent findOneByBccId(int bccId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bcc_id", bccId);
@@ -86,6 +93,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             "WHERE guid = :guid AND to_bccp_id = :to_bccp_id";
 
     @Override
+    @Cacheable("BCCs")
     public BasicCoreComponent findOnebyGuidAndToBccpId(String guid, int toBccpId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid)
@@ -104,6 +112,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             "WHERE guid = :guid AND to_bccp_id = :to_bccp_id AND from_acc_id = :from_acc_id";
 
     @Override
+    @Cacheable("BCCs")
     public BasicCoreComponent findOnebyGuidAndFromAccIdAndToBccpId(String guid, int fromAccId, int toBccpId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid)
@@ -125,6 +134,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             ":state, :revision_num, :revision_tracking_num, :revision_action, :release_id, :current_bcc_id, :is_deprecated)";
 
     @Override
+    @CacheEvict("BCCs")
     public void save(BasicCoreComponent basicCoreComponent) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", basicCoreComponent.getGuid())
@@ -169,6 +179,7 @@ public class BaseBasicCoreComponentRepository extends NamedParameterJdbcDaoSuppo
             "WHERE bcc_id = :bcc_id";
 
     @Override
+    @CacheEvict(value = "BCCs")
     public void update(BasicCoreComponent basicCoreComponent) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", basicCoreComponent.getGuid())

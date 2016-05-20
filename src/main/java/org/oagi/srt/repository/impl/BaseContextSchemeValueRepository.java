@@ -4,6 +4,9 @@ import org.oagi.srt.repository.ContextSchemeValueRepository;
 import org.oagi.srt.repository.entity.ContextSchemeValue;
 import org.oagi.srt.repository.mapper.ContextSchemeValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ContextSchemeValues", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSupport implements ContextSchemeValueRepository {
 
     @Autowired
@@ -31,6 +35,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
             "WHERE owner_ctx_scheme_id = :owner_ctx_scheme_id";
 
     @Override
+    @Cacheable("ContextSchemeValues")
     public List<ContextSchemeValue> findByContextSchemeId(int contextSchemeId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("owner_ctx_scheme_id", contextSchemeId);
@@ -45,6 +50,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
             "WHERE ctx_scheme_value_id = :ctx_scheme_value_id";
 
     @Override
+    @Cacheable("ContextSchemeValues")
     public ContextSchemeValue findOneByContextSchemeValueId(int contextSchemeValueId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_scheme_value_id", contextSchemeValueId);
@@ -59,6 +65,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
             ":guid, :value, :meaning, :owner_ctx_scheme_id)";
 
     @Override
+    @CacheEvict("ContextSchemeValues")
     public void save(ContextSchemeValue contextSchemeValue) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", contextSchemeValue.getGuid())
@@ -80,6 +87,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
             "DELETE FROM ctx_scheme_value WHERE owner_ctx_scheme_id = :owner_ctx_scheme_id";
 
     @Override
+    @CacheEvict("ContextSchemeValues")
     public void deleteByContextSchemeId(int contextSchemeId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("owner_ctx_scheme_id", contextSchemeId);
@@ -91,6 +99,7 @@ public class BaseContextSchemeValueRepository extends NamedParameterJdbcDaoSuppo
             "DELETE FROM ctx_scheme_value WHERE ctx_scheme_value_id = :ctx_scheme_value_id";
 
     @Override
+    @CacheEvict("ContextSchemeValues")
     public void deleteByContextSchemeValueId(int contextSchemeValueId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_scheme_value_id", contextSchemeValueId);

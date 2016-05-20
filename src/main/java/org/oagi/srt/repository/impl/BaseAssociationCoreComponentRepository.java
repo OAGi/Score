@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AssociationCoreComponentRepository;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.mapper.AssociationCoreComponentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ASCCs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDaoSupport
         implements AssociationCoreComponentRepository {
 
@@ -35,6 +39,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             "WHERE from_acc_id = :from_acc_id";
 
     @Override
+    @Cacheable("ASCCs")
     public List<AssociationCoreComponent> findByFromAccId(int fromAccId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("from_acc_id", fromAccId);
@@ -52,6 +57,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             "WHERE definition = :definition";
 
     @Override
+    @Cacheable("ASCCs")
     public List<AssociationCoreComponent> findByDefinition(String definition) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("definition", definition);
@@ -69,6 +75,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             "WHERE den = :den";
 
     @Override
+    @Cacheable("ASCCs")
     public List<AssociationCoreComponent> findByDenStartsWith(String den) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("den", den + "%");
@@ -78,6 +85,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
     }
 
     @Override
+    @Cacheable("ASCCs")
     public List<AssociationCoreComponent> findByDenContaining(String den) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("den", "%" + den + "%");
@@ -95,6 +103,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             "WHERE ascc_id = :ascc_id";
 
     @Override
+    @Cacheable("ASCCs")
     public AssociationCoreComponent findOneByAsccId(int asccId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ascc_id", asccId);
@@ -112,6 +121,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("ASCCs")
     public AssociationCoreComponent findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -131,6 +141,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             ":state, :revision_num, :revision_tracking_num, :revision_action, :release_id, :current_ascc_id)";
 
     @Override
+    @CacheEvict("ASCCs")
     public void save(AssociationCoreComponent ascc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", ascc.getGuid())
@@ -172,6 +183,7 @@ public class BaseAssociationCoreComponentRepository extends NamedParameterJdbcDa
             "WHERE ascc_id = :ascc_id";
 
     @Override
+    @CacheEvict("ASCCs")
     public void update(AssociationCoreComponent ascc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", ascc.getGuid())

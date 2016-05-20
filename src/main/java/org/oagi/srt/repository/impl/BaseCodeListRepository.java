@@ -5,6 +5,9 @@ import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.mapper.CodeListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -17,6 +20,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "CodeLists", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport implements CodeListRepository {
 
     @Autowired
@@ -35,6 +39,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "ORDER BY creation_timestamp DESC";
 
     @Override
+    @Cacheable("CodeLists")
     public List<CodeList> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, CodeListMapper.INSTANCE);
     }
@@ -47,6 +52,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE name LIKE :name";
 
     @Override
+    @Cacheable("CodeLists")
     public List<CodeList> findByNameContaining(String name) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", "%" + name + "%");
@@ -62,6 +68,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE name LIKE :name AND state = :state AND extensible_indicator = :extensible_indicator";
 
     @Override
+    @Cacheable("CodeLists")
     public List<CodeList> findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         namedParameters.addValue("name", "%" + name + "%");
@@ -80,6 +87,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE code_list_id = :code_list_id";
 
     @Override
+    @Cacheable("CodeLists")
     public CodeList findOneByCodeListId(int codeListId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource("code_list_id", codeListId);
         return getNamedParameterJdbcTemplate().queryForObject(
@@ -94,6 +102,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid AND enum_type_guid = :enum_type_guid AND name = :name";
 
     @Override
+    @Cacheable("CodeLists")
     public CodeList findOneByGuidAndEnumTypeGuidAndName(String guid, String enumTypeGuid, String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid)
@@ -112,6 +121,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid AND enum_type_guid = :enum_type_guid AND name = :name AND definition = :definition";
 
     @Override
+    @Cacheable("CodeLists")
     public CodeList findOneByGuidAndEnumTypeGuidAndNameAndDefinition(String guid, String enumTypeGuid, String name, String definition) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid)
@@ -131,6 +141,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid AND enum_type_guid = :enum_type_guid AND code_list_id = :code_list_id AND name = :name AND definition = :definition";
 
     @Override
+    @Cacheable("CodeLists")
     public CodeList findOneByGuidAndEnumTypeGuidAndCodeListIdAndNameAndDefinition(
             String guid, String enumTypeGuid, int codeListId, String name, String definition) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
@@ -152,6 +163,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("CodeLists")
     public CodeList findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -168,6 +180,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE name = :name";
 
     @Override
+    @Cacheable("CodeLists")
     public CodeList findOneByName(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", name);
@@ -184,6 +197,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE code_list_id = :code_list_id";
 
     @Override
+    @CacheEvict("CodeLists")
     public void update(CodeList codeList) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", codeList.getGuid())
@@ -209,6 +223,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             "UPDATE code_list SET state = :state WHERE code_list_id = :code_list_id";
 
     @Override
+    @CacheEvict("CodeLists")
     public void updateStateByCodeListId(String state, int codeListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("state", state)
@@ -226,6 +241,7 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :state)";
 
     @Override
+    @CacheEvict("CodeLists")
     public void save(CodeList codeList) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", codeList.getGuid())

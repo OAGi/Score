@@ -4,6 +4,9 @@ import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.mapper.DataTypeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "DTs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport implements DataTypeRepository {
 
     @Autowired
@@ -34,6 +38,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE dt_id = :dt_id";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByDtId(int dtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("dt_id", dtId);
@@ -51,6 +56,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE type = :type";
 
     @Override
+    @Cacheable("DTs")
     public List<DataType> findByType(int type) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("type", type);
@@ -68,6 +74,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE data_type_term = :data_type_term";
 
     @Override
+    @Cacheable("DTs")
     public List<DataType> findByDataTypeTerm(String dataTypeTerm) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("data_type_term", dataTypeTerm);
@@ -85,6 +92,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE data_type_term = :data_type_term AND type = :type";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByDataTypeTermAndType(String dataTypeTerm, int type) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("data_type_term", dataTypeTerm)
@@ -103,6 +111,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -120,6 +129,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid AND type = :type";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByGuidAndType(String guid, int type) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid)
@@ -138,6 +148,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE den = :den";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByDen(String den) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("den", den);
@@ -155,6 +166,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE den = :den AND type = :type";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByTypeAndDen(int type, String den) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("den", den)
@@ -173,6 +185,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             "WHERE guid = :guid AND type = :type";
 
     @Override
+    @Cacheable("DTs")
     public DataType findOneByGuidAndDen(String guid, String den) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("den", den)
@@ -193,6 +206,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
             ":revision_num, :revision_tracking_num, :revision_action, :release_id, :current_bdt_id, :is_deprecated)";
 
     @Override
+    @CacheEvict("DTs")
     public void save(DataType dataType) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", dataType.getGuid())

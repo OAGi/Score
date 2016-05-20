@@ -4,6 +4,8 @@ import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.Release;
 import org.oagi.srt.repository.mapper.ReleaseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "Releases", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseReleaseRepository extends NamedParameterJdbcDaoSupport implements ReleaseRepository {
 
     @Autowired
@@ -28,6 +31,7 @@ public class BaseReleaseRepository extends NamedParameterJdbcDaoSupport implemen
             "WHERE release_num = :release_num";
 
     @Override
+    @Cacheable("Releases")
     public Release findOneByReleaseNum(String releaseNum) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("release_num", releaseNum);

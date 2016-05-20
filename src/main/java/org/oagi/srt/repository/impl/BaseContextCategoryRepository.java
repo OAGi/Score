@@ -4,6 +4,9 @@ import org.oagi.srt.repository.ContextCategoryRepository;
 import org.oagi.srt.repository.entity.ContextCategory;
 import org.oagi.srt.repository.mapper.ContextCategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ContextCategories", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport implements ContextCategoryRepository {
 
     @Autowired
@@ -30,6 +34,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
             "FROM ctx_category";
 
     @Override
+    @Cacheable("ContextCategories")
     public List<ContextCategory> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextCategoryMapper.INSTANCE);
     }
@@ -40,6 +45,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
             "WHERE name LIKE :name";
 
     @Override
+    @Cacheable("ContextCategories")
     public List<ContextCategory> findByNameContaining(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", "%" + name + "%");
@@ -54,6 +60,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
             "WHERE ctx_category_id = :ctx_category_id";
 
     @Override
+    @Cacheable("ContextCategories")
     public ContextCategory findOneByContextCategoryId(int contextCategoryId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_category_id", contextCategoryId);
@@ -67,6 +74,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
             ":guid, :name, :description)";
 
     @Override
+    @CacheEvict("ContextCategories")
     public void save(ContextCategory contextCategory) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", contextCategory.getGuid())
@@ -87,6 +95,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
             "guid = :guid, name = :name, description = :description WHERE ctx_category_id = :ctx_category_id";
 
     @Override
+    @CacheEvict("ContextCategories")
     public void update(ContextCategory contextCategory) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", contextCategory.getGuid())
@@ -101,6 +110,7 @@ public class BaseContextCategoryRepository extends NamedParameterJdbcDaoSupport 
             "WHERE ctx_category_id = :ctx_category_id";
 
     @Override
+    @CacheEvict("ContextCategories")
     public void deleteByContextCategoryId(int contextCategoryId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_category_id", contextCategoryId);

@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BasicBusinessInformationEntityPropertyRepository;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntityProperty;
 import org.oagi.srt.repository.mapper.BasicBusinessInformationEntityPropertyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "BBIEPs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBasicBusinessInformationEntityPropertyRepository extends NamedParameterJdbcDaoSupport
         implements BasicBusinessInformationEntityPropertyRepository {
 
@@ -28,6 +32,7 @@ public class BaseBasicBusinessInformationEntityPropertyRepository extends NamedP
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(bbiep_id), 0) FROM bbiep";
 
     @Override
+    @Cacheable("BBIEPs")
     public int findGreatestId() {
         return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
     }
@@ -39,6 +44,7 @@ public class BaseBasicBusinessInformationEntityPropertyRepository extends NamedP
             "WHERE bbiep_id = :bbiep_id";
 
     @Override
+    @Cacheable("BBIEPs")
     public BasicBusinessInformationEntityProperty findOneByBbiepId(int bbiepId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bbiep_id", bbiepId);
@@ -54,6 +60,7 @@ public class BaseBasicBusinessInformationEntityPropertyRepository extends NamedP
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     @Override
+    @CacheEvict("BBIEPs")
     public void save(BasicBusinessInformationEntityProperty bbiep) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", bbiep.getGuid())
@@ -80,6 +87,7 @@ public class BaseBasicBusinessInformationEntityPropertyRepository extends NamedP
             "WHERE bbiep_id = :bbiep_id";
 
     @Override
+    @CacheEvict("BBIEPs")
     public void update(BasicBusinessInformationEntityProperty bbiep) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", bbiep.getGuid())

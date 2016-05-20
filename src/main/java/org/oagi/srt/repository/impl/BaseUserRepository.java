@@ -4,6 +4,8 @@ import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.repository.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "Users", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseUserRepository extends NamedParameterJdbcDaoSupport implements UserRepository {
 
     @Autowired
@@ -28,6 +31,7 @@ public class BaseUserRepository extends NamedParameterJdbcDaoSupport implements 
             "WHERE login_id = :login_id";
 
     @Override
+    @Cacheable("Users")
     public User findOneByLoginId(String loginId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("login_id", loginId);
@@ -42,6 +46,7 @@ public class BaseUserRepository extends NamedParameterJdbcDaoSupport implements 
             "WHERE name = :name";
 
     @Override
+    @Cacheable("Users")
     public User findOneByName(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", name);

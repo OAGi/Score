@@ -4,6 +4,8 @@ import org.oagi.srt.repository.CoreDataTypeAllowedPrimitiveExpressionTypeMapRepo
 import org.oagi.srt.repository.entity.CoreDataTypeAllowedPrimitiveExpressionTypeMap;
 import org.oagi.srt.repository.mapper.CoreDataTypeAllowedPrimitiveExpressionTypeMapMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -13,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "CDTAwdPriXpsTypeMaps", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository extends NamedParameterJdbcDaoSupport
         implements CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository {
 
@@ -29,6 +32,7 @@ public class BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository extends
             "FROM cdt_awd_pri_xps_type_map";
 
     @Override
+    @Cacheable("CDTAwdPriXpsTypeMaps")
     public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, CoreDataTypeAllowedPrimitiveExpressionTypeMapMapper.INSTANCE);
     }
@@ -39,6 +43,7 @@ public class BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository extends
             "WHERE cdt_awd_pri_id = :cdt_awd_pri_id";
 
     @Override
+    @Cacheable("CDTAwdPriXpsTypeMaps")
     public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findByCdtAwdPriId(int cdtAwdPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_awd_pri_id", cdtAwdPriId);
@@ -53,6 +58,7 @@ public class BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository extends
             "WHERE cdt_awd_pri_xps_type_map_id = :cdt_awd_pri_xps_type_map_id";
 
     @Override
+    @Cacheable("CDTAwdPriXpsTypeMaps")
     public CoreDataTypeAllowedPrimitiveExpressionTypeMap findOneByCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_awd_pri_xps_type_map_id", cdtAwdPriXpsTypeMapId);

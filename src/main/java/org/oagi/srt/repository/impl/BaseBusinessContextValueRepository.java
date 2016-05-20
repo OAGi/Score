@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BusinessContextValueRepository;
 import org.oagi.srt.repository.entity.BusinessContextValue;
 import org.oagi.srt.repository.mapper.BusinessContextValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "BusinessContextValues", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBusinessContextValueRepository extends NamedParameterJdbcDaoSupport implements BusinessContextValueRepository {
 
     @Autowired
@@ -31,6 +35,7 @@ public class BaseBusinessContextValueRepository extends NamedParameterJdbcDaoSup
             "WHERE ctx_scheme_value_id = :ctx_scheme_value_id";
 
     @Override
+    @Cacheable("BusinessContextValues")
     public List<BusinessContextValue> findByContextSchemeValueId(int contextSchemeValueId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_scheme_value_id", contextSchemeValueId);
@@ -45,6 +50,7 @@ public class BaseBusinessContextValueRepository extends NamedParameterJdbcDaoSup
             "WHERE biz_ctx_id = :biz_ctx_id";
 
     @Override
+    @Cacheable("BusinessContextValues")
     public List<BusinessContextValue> findByBusinessContextId(int businessContextId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("biz_ctx_id", businessContextId);
@@ -58,6 +64,7 @@ public class BaseBusinessContextValueRepository extends NamedParameterJdbcDaoSup
             ":biz_ctx_id, :ctx_scheme_value_id)";
 
     @Override
+    @CacheEvict("BusinessContextValues")
     public void save(BusinessContextValue businessContextValue) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("biz_ctx_id", businessContextValue.getBizCtxId())

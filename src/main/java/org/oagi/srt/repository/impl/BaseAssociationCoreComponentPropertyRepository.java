@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.mapper.AssociationCoreComponentPropertyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ASCCPs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAssociationCoreComponentPropertyRepository extends NamedParameterJdbcDaoSupport
         implements AssociationCoreComponentPropertyRepository {
 
@@ -35,6 +39,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             "ORDER BY property_term ASC";
 
     @Override
+    @Cacheable("ASCCPs")
     public List<AssociationCoreComponentProperty> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, AssociationCoreComponentPropertyMapper.INSTANCE);
     }
@@ -48,6 +53,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             "WHERE property_term LIKE :property_term";
 
     @Override
+    @Cacheable("ASCCPs")
     public List<AssociationCoreComponentProperty> findByPropertyTermContaining(String propertyTerm) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("property_term", "%" + propertyTerm + "%");
@@ -65,6 +71,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             "WHERE asccp_id = :asccp_id";
 
     @Override
+    @Cacheable("ASCCPs")
     public AssociationCoreComponentProperty findOneByAsccpId(int asccpId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("asccp_id", asccpId);
@@ -82,6 +89,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             "WHERE asccp_id = :asccp_id AND revision_num = :revision_num";
 
     @Override
+    @Cacheable("ASCCPs")
     public AssociationCoreComponentProperty findOneByAsccpIdAndRevisionNum(int asccpId, int revisionNum) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("asccp_id", asccpId)
@@ -100,6 +108,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             "WHERE role_of_acc_id = :role_of_acc_id";
 
     @Override
+    @Cacheable("ASCCPs")
     public AssociationCoreComponentProperty findOneByRoleOfAccId(int roleOfAccId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("role_of_acc_id", roleOfAccId);
@@ -117,6 +126,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("ASCCPs")
     public AssociationCoreComponentProperty findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -136,6 +146,7 @@ public class BaseAssociationCoreComponentPropertyRepository extends NamedParamet
             ":revision_num, :revision_tracking_num, :revision_action, :release_id, :current_asccp_id)";
 
     @Override
+    @CacheEvict("ASCCPs")
     public void save(AssociationCoreComponentProperty asccp) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", asccp.getGuid())

@@ -4,6 +4,8 @@ import org.oagi.srt.repository.CoreDataTypeAllowedPrimitiveRepository;
 import org.oagi.srt.repository.entity.CoreDataTypeAllowedPrimitive;
 import org.oagi.srt.repository.mapper.CoreDataTypeAllowedPrimitiveMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -13,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "CDTAwdPris", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCoreDataTypeAllowedPrimitiveRepository extends NamedParameterJdbcDaoSupport
         implements CoreDataTypeAllowedPrimitiveRepository {
 
@@ -30,6 +33,7 @@ public class BaseCoreDataTypeAllowedPrimitiveRepository extends NamedParameterJd
             "WHERE cdt_id = :cdt_id";
 
     @Override
+    @Cacheable("CDTAwdPris")
     public List<CoreDataTypeAllowedPrimitive> findByCdtId(int cdtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_id", cdtId);
@@ -44,6 +48,7 @@ public class BaseCoreDataTypeAllowedPrimitiveRepository extends NamedParameterJd
             "WHERE cdt_awd_pri_id = :cdt_awd_pri_id";
 
     @Override
+    @Cacheable("CDTAwdPris")
     public CoreDataTypeAllowedPrimitive findOneByCdtAwdPriId(int cdtAwdPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_awd_pri_id", cdtAwdPriId);

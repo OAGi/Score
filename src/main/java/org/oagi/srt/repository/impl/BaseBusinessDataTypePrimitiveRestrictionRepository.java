@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
 import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.mapper.BusinessDataTypePrimitiveRestrictionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "BDTPriRestris", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedParameterJdbcDaoSupport
         implements BusinessDataTypePrimitiveRestrictionRepository {
 
@@ -33,6 +37,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE bdt_id = :bdt_id AND is_default = :is_default";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndDefault(int bdtId, boolean isDefault) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_id", bdtId)
@@ -49,6 +54,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE bdt_pri_restri_id = :bdt_pri_restri_id";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public BusinessDataTypePrimitiveRestriction findOneByBdtPriRestriId(int bdtPriRestriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_pri_restri_id", bdtPriRestriId);
@@ -64,6 +70,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE bdt_id = :bdt_id AND cdt_awd_pri_xps_type_map_id = :cdt_awd_pri_xps_type_map_id";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public BusinessDataTypePrimitiveRestriction findOneByBdtIdAndCdtAwdPriXpsTypeMapId(int bdtId, int cdtAwdPriXpsTypeMapId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_id", bdtId)
@@ -80,6 +87,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE code_list_id = :code_list_id AND cdt_awd_pri_xps_type_map_id = :cdt_awd_pri_xps_type_map_id";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public BusinessDataTypePrimitiveRestriction findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(int codeListId, int cdtAwdPriXpsTypeMapId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListId)
@@ -96,6 +104,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE code_list_id = :code_list_id AND cdt_awd_pri_xps_type_map_id = :cdt_awd_pri_xps_type_map_id";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public BusinessDataTypePrimitiveRestriction findOneByCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_awd_pri_xps_type_map_id", cdtAwdPriXpsTypeMapId);
@@ -111,6 +120,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE code_list_id = :code_list_id";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public BusinessDataTypePrimitiveRestriction findOneByCodeListId(int codeListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListId);
@@ -126,6 +136,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             "WHERE bdt_id = :bdt_id";
 
     @Override
+    @Cacheable("BDTPriRestris")
     public List<BusinessDataTypePrimitiveRestriction> findByBdtId(int bdtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_id", bdtId);
@@ -141,6 +152,7 @@ public class BaseBusinessDataTypePrimitiveRestrictionRepository extends NamedPar
             ":is_default, :agency_id_list_id)";
 
     @Override
+    @CacheEvict("BDTPriRestris")
     public void save(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bdt_id", bdtPriRestri.getBdtId())

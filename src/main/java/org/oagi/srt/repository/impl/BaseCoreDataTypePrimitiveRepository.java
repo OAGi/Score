@@ -4,6 +4,8 @@ import org.oagi.srt.repository.CoreDataTypePrimitiveRepository;
 import org.oagi.srt.repository.entity.CoreDataTypePrimitive;
 import org.oagi.srt.repository.mapper.CoreDataTypePrimitiveMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "CDTPris", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCoreDataTypePrimitiveRepository extends NamedParameterJdbcDaoSupport
         implements CoreDataTypePrimitiveRepository {
 
@@ -29,6 +32,7 @@ public class BaseCoreDataTypePrimitiveRepository extends NamedParameterJdbcDaoSu
             "WHERE cdt_pri_id = :cdt_pri_id";
 
     @Override
+    @Cacheable("CDTPris")
     public CoreDataTypePrimitive findOneByCdtPriId(int cdtPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_pri_id", cdtPriId);
@@ -43,6 +47,7 @@ public class BaseCoreDataTypePrimitiveRepository extends NamedParameterJdbcDaoSu
             "WHERE name = :name";
 
     @Override
+    @Cacheable("CDTPris")
     public CoreDataTypePrimitive findOneByName(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", name);

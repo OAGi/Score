@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AssociationBusinessInformationEntityRepository;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntity;
 import org.oagi.srt.repository.mapper.AssociationBusinessInformationEntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ASBIEs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAssociationBusinessInformationEntityRepository extends NamedParameterJdbcDaoSupport
         implements AssociationBusinessInformationEntityRepository {
 
@@ -29,6 +33,7 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(asbie_id), 0) FROM asbie";
 
     @Override
+    @Cacheable("ASBIEs")
     public int findGreatestId() {
         return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
     }
@@ -42,6 +47,7 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
             "WHERE from_abie_id = :from_abie_id";
 
     @Override
+    @Cacheable("ASBIEs")
     public List<AssociationBusinessInformationEntity> findByFromAbieId(int fromAbieId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("from_abie_id", fromAbieId);
@@ -59,6 +65,7 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
             "WHERE from_abie_id = :from_abie_id AND is_used = :is_used";
 
     @Override
+    @Cacheable("ASBIEs")
     public List<AssociationBusinessInformationEntity> findByFromAbieIdAndUsed(int fromAbieId, boolean used) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("from_abie_id", fromAbieId)
@@ -79,6 +86,7 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
             ":seq_key, :is_used)";
 
     @Override
+    @CacheEvict("ASBIEs")
     public void save(AssociationBusinessInformationEntity asbie) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", asbie.getGuid())
@@ -114,6 +122,7 @@ public class BaseAssociationBusinessInformationEntityRepository extends NamedPar
             "WHERE asbie_id = :asbie_id";
 
     @Override
+    @CacheEvict("ASBIEs")
     public void update(AssociationBusinessInformationEntity asbie) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", asbie.getGuid())

@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.mapper.AgencyIdListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "AgencyIdLists", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport implements AgencyIdListRepository {
 
     @Autowired
@@ -30,6 +34,7 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
             "FROM agency_id_list";
 
     @Override
+    @Cacheable("AgencyIdLists")
     public List<AgencyIdList> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, AgencyIdListMapper.INSTANCE);
     }
@@ -40,6 +45,7 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
             "WHERE agency_id_list_id = :agency_id_list_id";
 
     @Override
+    @Cacheable("AgencyIdLists")
     public AgencyIdList findOneByAgencyIdListId(int agencyIdListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("agency_id_list_id", agencyIdListId);
@@ -54,6 +60,7 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("AgencyIdLists")
     public AgencyIdList findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -68,6 +75,7 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
             "WHERE name = :name";
 
     @Override
+    @Cacheable("AgencyIdLists")
     public AgencyIdList findOneByName(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", name);
@@ -81,6 +89,7 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
             ":guid, :enum_type_guid, :name, :list_id, :agency_id, :version_id, :definition)";
 
     @Override
+    @CacheEvict("AgencyIdLists")
     public void save(AgencyIdList agencyIdList) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", agencyIdList.getGuid())
@@ -104,6 +113,7 @@ public class BaseAgencyIdListRepository extends NamedParameterJdbcDaoSupport imp
     private final String UPDATE_STATEMENT = "UPDATE agency_id_list SET agency_id = :agency_id";
 
     @Override
+    @CacheEvict("AgencyIdLists")
     public void updateAgencyId(int agencyId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("agency_id", agencyId);

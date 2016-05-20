@@ -4,6 +4,9 @@ import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.mapper.CodeListValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "CodeListValues", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport implements CodeListValueRepository {
 
     @Autowired
@@ -32,6 +36,7 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
             "WHERE code_list_id = :code_list_id";
 
     @Override
+    @Cacheable("CodeListValues")
     public List<CodeListValue> findByCodeListId(int codeListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListId);
@@ -46,6 +51,7 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
             "WHERE code_list_id = :code_list_id AND value = :value";
 
     @Override
+    @Cacheable("CodeListValues")
     public CodeListValue findOneByCodeListIdAndValue(int codeListId, String value) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListId)
@@ -59,6 +65,7 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
             "code_list_id = :code_list_id WHERE code_list_value_id = :code_list_value_id";
 
     @Override
+    @CacheEvict("CodeListValues")
     public void updateCodeListIdByCodeListValueId(int codeListId, int codeListValueId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListId)
@@ -71,6 +78,7 @@ public class BaseCodeListValueRepository extends NamedParameterJdbcDaoSupport im
             ":code_list_id, :value, :name, :definition, :definition_source, :used_indicator, :locked_indicator, :extension_indicator)";
 
     @Override
+    @CacheEvict("CodeListValues")
     public void save(CodeListValue codeListValue) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("code_list_id", codeListValue.getCodeListId())

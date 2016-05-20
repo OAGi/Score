@@ -4,6 +4,9 @@ import org.oagi.srt.repository.ContextSchemeRepository;
 import org.oagi.srt.repository.entity.ContextScheme;
 import org.oagi.srt.repository.mapper.ContextSchemeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ContextSchemes", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport implements ContextSchemeRepository {
 
     @Autowired
@@ -32,6 +36,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
             "FROM classification_ctx_scheme";
 
     @Override
+    @Cacheable("ContextSchemes")
     public List<ContextScheme> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, ContextSchemeMapper.INSTANCE);
     }
@@ -44,6 +49,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
             "WHERE ctx_category_id = :ctx_category_id";
 
     @Override
+    @Cacheable("ContextSchemes")
     public List<ContextScheme> findByContextCategoryId(int contextCategoryId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("ctx_category_id", contextCategoryId);
@@ -60,6 +66,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
             "WHERE classification_ctx_scheme_id = :classification_ctx_scheme_id";
 
     @Override
+    @Cacheable("ContextSchemes")
     public ContextScheme findOneByContextSchemeId(int contextSchemeId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("classification_ctx_scheme_id", contextSchemeId);
@@ -76,6 +83,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
             "WHERE classification_ctx_scheme_id = :classification_ctx_scheme_id";
 
     @Override
+    @CacheEvict("ContextSchemes")
     public void update(ContextScheme contextScheme) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", contextScheme.getGuid())
@@ -100,6 +108,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     @Override
+    @CacheEvict("ContextSchemes")
     public void save(ContextScheme contextScheme) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", contextScheme.getGuid())
@@ -126,6 +135,7 @@ public class BaseContextSchemeRepository extends NamedParameterJdbcDaoSupport im
             "WHERE classification_ctx_scheme_id = :classification_ctx_scheme_id";
 
     @Override
+    @CacheEvict("ContextSchemes")
     public void deleteByContextSchemeId(int contextSchemeId) {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("classification_ctx_scheme_id", contextSchemeId);

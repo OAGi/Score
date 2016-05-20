@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.mapper.BusinessContextMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "BusinessContexts", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport implements BusinessContextRepository {
 
     @Autowired
@@ -30,6 +34,7 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
             "FROM biz_ctx";
 
     @Override
+    @Cacheable("BusinessContexts")
     public List<BusinessContext> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, BusinessContextMapper.INSTANCE);
     }
@@ -40,6 +45,7 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
             "WHERE biz_ctx_id = :biz_ctx_id";
 
     @Override
+    @Cacheable("BusinessContexts")
     public BusinessContext findOneByBusinessContextId(int businessContextId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("biz_ctx_id", businessContextId);
@@ -53,6 +59,7 @@ public class BaseBusinessContextRepository extends NamedParameterJdbcDaoSupport 
             ":guid, :name, :created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     @Override
+    @CacheEvict("BusinessContexts")
     public void save(BusinessContext businessContext) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", businessContext.getGuid())

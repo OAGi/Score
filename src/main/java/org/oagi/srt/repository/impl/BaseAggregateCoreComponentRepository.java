@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AggregateCoreComponentRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.mapper.AggregateCoreComponentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "ACCs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAggregateCoreComponentRepository extends NamedParameterJdbcDaoSupport
         implements AggregateCoreComponentRepository {
 
@@ -34,6 +38,7 @@ public class BaseAggregateCoreComponentRepository extends NamedParameterJdbcDaoS
             "WHERE acc_id = :acc_id";
 
     @Override
+    @Cacheable("ACCs")
     public AggregateCoreComponent findOneByAccId(int accId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("acc_id", accId);
@@ -51,6 +56,7 @@ public class BaseAggregateCoreComponentRepository extends NamedParameterJdbcDaoS
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("ACCs")
     public AggregateCoreComponent findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -68,6 +74,7 @@ public class BaseAggregateCoreComponentRepository extends NamedParameterJdbcDaoS
             "WHERE acc_id = :acc_id AND revision_num = :revision_num";
 
     @Override
+    @Cacheable("ACCs")
     public AggregateCoreComponent findOneByAccIdAndRevisionNum(int accId, int revisionNum) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("acc_id", accId)
@@ -88,6 +95,7 @@ public class BaseAggregateCoreComponentRepository extends NamedParameterJdbcDaoS
             ":revision_action, :release_id, :current_acc_id, :is_deprecated)";
 
     @Override
+    @CacheEvict("ACCs")
     public void save(AggregateCoreComponent acc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", acc.getGuid())

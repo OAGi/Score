@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.oagi.srt.repository.mapper.AgencyIdListValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "AgencyIdListValues", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSupport implements AgencyIdListValueRepository {
 
     @Autowired
@@ -30,6 +34,7 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
             "FROM agency_id_list_value";
 
     @Override
+    @Cacheable("AgencyIdListValues")
     public List<AgencyIdListValue> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, AgencyIdListValueMapper.INSTANCE);
     }
@@ -40,6 +45,7 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
             "WHERE owner_list_id = :owner_list_id";
 
     @Override
+    @Cacheable("AgencyIdListValues")
     public List<AgencyIdListValue> findByOwnerListId(int ownerListId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("owner_list_id", ownerListId);
@@ -54,6 +60,7 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
             "WHERE agency_id_list_value_id = :agency_id_list_value_id";
 
     @Override
+    @Cacheable("AgencyIdListValues")
     public AgencyIdListValue findOneByAgencyIdListValueId(int agencyIdListValueId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("agency_id_list_value_id", agencyIdListValueId);
@@ -68,6 +75,7 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
             "WHERE `value` = :value";
 
     @Override
+    @Cacheable("AgencyIdListValues")
     public AgencyIdListValue findOneByValue(String value) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("value", value);
@@ -81,6 +89,7 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
             ":value, :name, :definition, :owner_list_id)";
 
     @Override
+    @CacheEvict("AgencyIdListValues")
     public void save(AgencyIdListValue agencyIdListValue) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("value", agencyIdListValue.getValue())

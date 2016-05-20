@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BasicBusinessInformationEntitySupplementaryCompon
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.mapper.BasicBusinessInformationEntitySupplementaryComponentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "BBIESCs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository extends NamedParameterJdbcDaoSupport
         implements BasicBusinessInformationEntitySupplementaryComponentRepository {
 
@@ -29,6 +33,7 @@ public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository 
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(bbie_sc_id), 0) FROM bbie_sc";
 
     @Override
+    @Cacheable("BBIESCs")
     public int findGreatestId() {
         return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
     }
@@ -41,6 +46,7 @@ public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository 
             "WHERE bbie_id = :bbie_id";
 
     @Override
+    @Cacheable("BBIESCs")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(int bbieId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bbie_id", bbieId);
@@ -57,6 +63,7 @@ public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository 
             "WHERE bbie_id = :bbie_id AND is_used = :is_used";
 
     @Override
+    @Cacheable("BBIESCs")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieIdAndUsed(int bbieId, boolean used) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bbie_id", bbieId)
@@ -75,6 +82,7 @@ public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository 
             ":definition, :remark, :biz_term, :is_used)";
 
     @Override
+    @CacheEvict("BBIESCs")
     public void save(BasicBusinessInformationEntitySupplementaryComponent bbiesc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bbie_id", bbiesc.getBbieId())
@@ -110,6 +118,7 @@ public class BaseBasicBusinessInformationEntitySupplementaryComponentRepository 
             "WHERE bbie_sc_id = :bbie_sc_id";
 
     @Override
+    @CacheEvict("BBIESCs")
     public void update(BasicBusinessInformationEntitySupplementaryComponent bbiesc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bbie_id", bbiesc.getBbieId())

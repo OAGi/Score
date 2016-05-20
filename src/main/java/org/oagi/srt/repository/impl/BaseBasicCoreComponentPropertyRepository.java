@@ -4,6 +4,9 @@ import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.oagi.srt.repository.mapper.BasicCoreComponentPropertyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "BCCPs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbcDaoSupport
         implements BasicCoreComponentPropertyRepository {
 
@@ -34,6 +38,7 @@ public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbc
             "WHERE bccp_id = :bccp_id";
 
     @Override
+    @Cacheable("BCCPs")
     public BasicCoreComponentProperty findOneByBccpId(int bccpId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bccp_id", bccpId);
@@ -51,6 +56,7 @@ public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbc
             "WHERE bccp_id = :bccp_id AND revision_num = :revision_num";
 
     @Override
+    @Cacheable("BCCPs")
     public BasicCoreComponentProperty findOneByBccpIdAndRevisionNum(int bccpId, int revisionNum) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("bccp_id", bccpId)
@@ -69,6 +75,7 @@ public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbc
             "WHERE property_term = :property_term";
 
     @Override
+    @Cacheable("BCCPs")
     public BasicCoreComponentProperty findOneByPropertyTerm(String propertyTerm) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("property_term", propertyTerm);
@@ -86,6 +93,7 @@ public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbc
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("BCCPs")
     public BasicCoreComponentProperty findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -105,6 +113,7 @@ public class BaseBasicCoreComponentPropertyRepository extends NamedParameterJdbc
             ":state, :revision_num, :revision_tracking_num, :revision_action, :release_id, :current_bccp_id)";
 
     @Override
+    @CacheEvict("BCCPs")
     public void save(BasicCoreComponentProperty bccp) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", bccp.getGuid())

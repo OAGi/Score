@@ -4,6 +4,9 @@ import org.oagi.srt.repository.CoreDataTypeSupplementaryComponentAllowedPrimitiv
 import org.oagi.srt.repository.entity.CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap;
 import org.oagi.srt.repository.mapper.CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "CDTSCAwdPriXpsTypeMaps", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository extends NamedParameterJdbcDaoSupport
         implements CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository {
 
@@ -31,6 +35,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTyp
             "FROM cdt_sc_awd_pri_xps_type_map";
 
     @Override
+    @Cacheable("CDTSCAwdPriXpsTypeMaps")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapMapper.INSTANCE);
     }
@@ -41,6 +46,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTyp
             "WHERE cdt_sc_awd_pri = :cdt_sc_awd_pri";
 
     @Override
+    @Cacheable("CDTSCAwdPriXpsTypeMaps")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findByCdtScAwdPri(int cdtScAwdPri) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_awd_pri", cdtScAwdPri);
@@ -55,6 +61,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTyp
             "WHERE cdt_sc_awd_pri_xps_type_map_id = :cdt_sc_awd_pri_xps_type_map_id";
 
     @Override
+    @Cacheable("CDTSCAwdPriXpsTypeMaps")
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findOneByCdtScAwdPriXpsTypeMapId(int cdtScAwdPriXpsTypeMapId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_awd_pri_xps_type_map_id", cdtScAwdPriXpsTypeMapId);
@@ -69,6 +76,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTyp
             "WHERE cdt_sc_awd_pri = :cdt_sc_awd_pri AND xbt_id = :xbt_id";
 
     @Override
+    @Cacheable("CDTSCAwdPriXpsTypeMaps")
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findOneByCdtScAwdPriAndXbtId(int cdtScAwdPri, int xbtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_awd_pri", cdtScAwdPri)
@@ -83,6 +91,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTyp
             ":cdt_sc_awd_pri, :xbt_id)";
 
     @Override
+    @CacheEvict("CDTSCAwdPriXpsTypeMaps")
     public void save(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_awd_pri", cdtScAwdPriXpsTypeMap.getCdtScAwdPri())

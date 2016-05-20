@@ -4,6 +4,10 @@ import org.oagi.srt.repository.DataTypeSupplementaryComponentRepository;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 import org.oagi.srt.repository.mapper.DataTypeSupplementaryComponentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "DTSCs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseDataTypeSupplementaryComponentRepository extends NamedParameterJdbcDaoSupport
         implements DataTypeSupplementaryComponentRepository {
 
@@ -32,6 +37,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "FROM dt_sc";
 
     @Override
+    @Cacheable("DTSCs")
     public List<DataTypeSupplementaryComponent> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, DataTypeSupplementaryComponentMapper.INSTANCE);
     }
@@ -43,6 +49,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE owner_dt_id = :owner_dt_id";
 
     @Override
+    @Cacheable("DTSCs")
     public List<DataTypeSupplementaryComponent> findByOwnerDtId(int ownerDtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("owner_dt_id", ownerDtId);
@@ -58,6 +65,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE guid = :guid";
 
     @Override
+    @Cacheable("DTSCs")
     public DataTypeSupplementaryComponent findOneByGuid(String guid) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid);
@@ -73,6 +81,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE dt_sc_id = :dt_sc_id";
 
     @Override
+    @Cacheable("DTSCs")
     public DataTypeSupplementaryComponent findOneByDtScId(int dtScId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("dt_sc_id", dtScId);
@@ -88,6 +97,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE guid = :guid AND owner_dt_id = :owner_dt_id";
 
     @Override
+    @Cacheable("DTSCs")
     public DataTypeSupplementaryComponent findOneByGuidAndOwnerDtId(String guid, int ownerDtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", guid)
@@ -104,6 +114,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE owner_dt_id = :owner_dt_id AND property_term = :property_term AND representation_term = :representation_term";
 
     @Override
+    @Cacheable("DTSCs")
     public DataTypeSupplementaryComponent findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
             int ownerDtId, String propertyTerm, String representationTerm) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
@@ -122,6 +133,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE owner_dt_id = :owner_dt_id AND based_dt_sc_id = :based_dt_sc_id";
 
     @Override
+    @Cacheable("DTSCs")
     public DataTypeSupplementaryComponent findOneByOwnerDtIdAndBasedDtScId(int ownerDtId, int basedDtScId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("owner_dt_id", ownerDtId)
@@ -138,6 +150,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             ":min_cardinality, :max_cardinality, :based_dt_sc_id)";
 
     @Override
+    @CacheEvict("DTSCs")
     public void save(DataTypeSupplementaryComponent dtSc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", dtSc.getGuid())
@@ -166,6 +179,7 @@ public class BaseDataTypeSupplementaryComponentRepository extends NamedParameter
             "WHERE dt_sc_id = :dt_sc_id";
 
     @Override
+    @CacheEvict("DTSCs")
     public void update(DataTypeSupplementaryComponent dtSc) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", dtSc.getGuid())

@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.mapper.AggregateBusinessInformationEntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "ABIEs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAggregateBusinessInformationEntityRepository extends NamedParameterJdbcDaoSupport
         implements AggregateBusinessInformationEntityRepository {
 
@@ -34,6 +38,7 @@ public class BaseAggregateBusinessInformationEntityRepository extends NamedParam
             "WHERE is_top_level = :is_top_level";
 
     @Override
+    @Cacheable("ABIEs")
     public List<AggregateBusinessInformationEntity> findByTopLevel(boolean topLevel) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("is_top_level", topLevel == true ? 1 : 0);
@@ -50,6 +55,7 @@ public class BaseAggregateBusinessInformationEntityRepository extends NamedParam
             "WHERE abie_id = :abie_id";
 
     @Override
+    @Cacheable("ABIEs")
     public AggregateBusinessInformationEntity findOneByAbieId(int abieId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("abie_id", abieId);
@@ -67,6 +73,7 @@ public class BaseAggregateBusinessInformationEntityRepository extends NamedParam
             ":state, :client_id, :version, :status, :remark, :biz_term)";
 
     @Override
+    @CacheEvict("ABIEs")
     public void save(AggregateBusinessInformationEntity abie) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", abie.getGuid())
@@ -100,6 +107,7 @@ public class BaseAggregateBusinessInformationEntityRepository extends NamedParam
             "WHERE abie_id = :abie_id";
 
     @Override
+    @CacheEvict("ABIEs")
     public void update(AggregateBusinessInformationEntity abie) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", abie.getGuid())

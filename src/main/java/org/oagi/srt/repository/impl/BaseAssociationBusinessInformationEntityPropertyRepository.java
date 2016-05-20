@@ -4,6 +4,9 @@ import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepos
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.mapper.AssociationBusinessInformationEntityPropertyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 
 @Repository
+@CacheConfig(cacheNames = "ASBIEPs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseAssociationBusinessInformationEntityPropertyRepository extends NamedParameterJdbcDaoSupport
         implements AssociationBusinessInformationEntityPropertyRepository {
 
@@ -28,6 +32,7 @@ public class BaseAssociationBusinessInformationEntityPropertyRepository extends 
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT IFNULL(MAX(asbiep_id), 0) FROM asbiep";
 
     @Override
+    @Cacheable("ASBIEPs")
     public int findGreatestId() {
         return getJdbcTemplate().queryForObject(FIND_GREATEST_ID_STATEMENT, Integer.class);
     }
@@ -39,6 +44,7 @@ public class BaseAssociationBusinessInformationEntityPropertyRepository extends 
             "WHERE role_of_abie_id = :role_of_abie_id";
 
     @Override
+    @Cacheable("ASBIEPs")
     public AssociationBusinessInformationEntityProperty findOneByRoleOfAbieId(int roleOfAbieId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("role_of_abie_id", roleOfAbieId);
@@ -54,6 +60,7 @@ public class BaseAssociationBusinessInformationEntityPropertyRepository extends 
             "WHERE asbiep_id = :asbiep_id";
 
     @Override
+    @Cacheable("ASBIEPs")
     public AssociationBusinessInformationEntityProperty findOneByAsbiepId(int asbiepId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("asbiep_id", asbiepId);
@@ -69,6 +76,7 @@ public class BaseAssociationBusinessInformationEntityPropertyRepository extends 
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     @Override
+    @CacheEvict("ASBIEPs")
     public void save(AssociationBusinessInformationEntityProperty asbiep) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("guid", asbiep.getGuid())

@@ -4,6 +4,8 @@ import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.oagi.srt.repository.entity.XSDBuiltInType;
 import org.oagi.srt.repository.mapper.XSDBuiltInTypeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -13,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "XBTs", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport implements XSDBuiltInTypeRepository {
 
     @Autowired
@@ -28,6 +31,7 @@ public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport i
             "FROM xbt";
 
     @Override
+    @Cacheable("XBTs")
     public List<XSDBuiltInType> findAll() {
         return getJdbcTemplate().query(FIND_ALL_STATEMENT, XSDBuiltInTypeMapper.INSTANCE);
     }
@@ -38,6 +42,7 @@ public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport i
             "WHERE name = :name";
 
     @Override
+    @Cacheable("XBTs")
     public XSDBuiltInType findOneByName(String name) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", name);
@@ -52,6 +57,7 @@ public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport i
             "WHERE builtIn_type = :builtIn_type";
 
     @Override
+    @Cacheable("XBTs")
     public XSDBuiltInType findOneByBuiltInType(String builtInType) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("builtIn_type", builtInType);
@@ -66,6 +72,7 @@ public class BaseXSDBuiltInTypeRepository extends NamedParameterJdbcDaoSupport i
             "WHERE xbt_id = :xbt_id";
 
     @Override
+    @Cacheable("XBTs")
     public XSDBuiltInType findOneByXbtId(int xbtId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("xbt_id", xbtId);

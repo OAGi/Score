@@ -4,6 +4,9 @@ import org.oagi.srt.repository.CoreDataTypeSupplementaryComponentAllowedPrimitiv
 import org.oagi.srt.repository.entity.CoreDataTypeSupplementaryComponentAllowedPrimitive;
 import org.oagi.srt.repository.mapper.CoreDataTypeSupplementaryComponentAllowedPrimitiveMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -15,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
+@CacheConfig(cacheNames = "CDTSCAwdPris", keyGenerator = "simpleCacheKeyGenerator")
 public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository extends NamedParameterJdbcDaoSupport
         implements CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository {
 
@@ -32,6 +36,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository ex
             "WHERE cdt_sc_id = :cdt_sc_id";
 
     @Override
+    @Cacheable("CDTSCAwdPris")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findByCdtScId(int cdtScId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_id", cdtScId);
@@ -46,6 +51,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository ex
             "WHERE cdt_pri_id = :cdt_pri_id";
 
     @Override
+    @Cacheable("CDTSCAwdPris")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findByCdtPriId(int cdtPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_pri_id", cdtPriId);
@@ -60,6 +66,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository ex
             "WHERE cdt_sc_awd_pri_id = :cdt_sc_awd_pri_id";
 
     @Override
+    @Cacheable("CDTSCAwdPris")
     public CoreDataTypeSupplementaryComponentAllowedPrimitive findOneByCdtScAwdPriId(int cdtScAwdPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_awd_pri_id", cdtScAwdPriId);
@@ -74,6 +81,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository ex
             "WHERE cdt_sc_id = :cdt_sc_id AND cdt_pri_id = :cdt_pri_id";
 
     @Override
+    @Cacheable("CDTSCAwdPris")
     public CoreDataTypeSupplementaryComponentAllowedPrimitive findOneByCdtScIdAndCdtPriId(int cdtScId, int cdtPriId) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_id", cdtScId)
@@ -88,6 +96,7 @@ public class BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository ex
             ":cdt_sc_id, :cdt_pri_id, :is_default)";
 
     @Override
+    @CacheEvict("CDTSCAwdPris")
     public void save(CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("cdt_sc_id", cdtScAwdPri.getCdtScId())
