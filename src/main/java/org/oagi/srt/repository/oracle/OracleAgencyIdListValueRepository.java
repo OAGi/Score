@@ -1,21 +1,29 @@
 package org.oagi.srt.repository.oracle;
 
+import com.codepoetics.protonpack.StreamUtils;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.oagi.srt.repository.impl.BaseAgencyIdListValueRepository;
 import org.oagi.srt.repository.mapper.AgencyIdListValueMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @CacheConfig(cacheNames = "AgencyIdListValues", keyGenerator = "simpleCacheKeyGenerator")
 public class OracleAgencyIdListValueRepository extends BaseAgencyIdListValueRepository implements OracleRepository {
+
+    @Autowired
+    private OracleSequenceAccessor oracleSequenceAccessor;
 
     @Override
     public String getSequenceName() {
@@ -98,5 +106,32 @@ public class OracleAgencyIdListValueRepository extends BaseAgencyIdListValueRepo
         KeyHolder keyHolder = new GeneratedKeyHolder();
         getNamedParameterJdbcTemplate().update(SAVE_STATEMENT, namedParameters, keyHolder, new String[]{"agency_id_list_value_id"});
         return keyHolder.getKey().intValue();
+    }
+
+    private final String SAVE_STATEMENT_FOR_BATCH_UPDATE = "INSERT INTO agency_id_list_value (" +
+            "agency_id_list_value_id, value, name, definition, owner_list_id) VALUES (" +
+            ":agency_id_list_value_id, :value, :name, :definition, :owner_list_id)";
+
+    @Override
+    @CacheEvict("AgencyIdListValues")
+    public void saveBatch(Collection<AgencyIdListValue> agencyIdListValues) {
+        Collection<SqlParameterSource> sqlParameterSources =
+                StreamUtils.zip(agencyIdListValues.stream(),
+                        oracleSequenceAccessor.nextVals(this, getJdbcTemplate(), agencyIdListValues.size()).stream(),
+                        ((agencyIdListValue, agencyIdListValueId) -> {
+                            agencyIdListValue.setAgencyIdListValueId(agencyIdListValueId);
+                            return agencyIdListValue;
+                        })).map(agencyIdListValue -> {
+                    MapSqlParameterSource namedParameters = new MapSqlParameterSource()
+                            .addValue("agency_id_list_value_id", agencyIdListValue.getAgencyIdListValueId())
+                            .addValue("value", agencyIdListValue.getValue())
+                            .addValue("name", agencyIdListValue.getName())
+                            .addValue("definition", agencyIdListValue.getDefinition())
+                            .addValue("owner_list_id", agencyIdListValue.getOwnerListId());
+                    return namedParameters;
+                }).collect(Collectors.toList());
+
+        getNamedParameterJdbcTemplate().batchUpdate(SAVE_STATEMENT_FOR_BATCH_UPDATE,
+                sqlParameterSources.toArray(new SqlParameterSource[sqlParameterSources.size()]));
     }
 }

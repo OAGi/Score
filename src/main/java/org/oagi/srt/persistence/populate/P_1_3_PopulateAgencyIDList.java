@@ -63,7 +63,13 @@ public class P_1_3_PopulateAgencyIDList {
         agencyIdList.setName("Agency Identification");
         agencyIdList.setListId("3055");
         agencyIdList.setVersionId("D13A");
-        agencyIdList.setDefinition("Schema agency:  UN/CEFACT	Schema version: 4.5	Schema date:    02 February 2014	Code list name:     Agency Identification Code	Code list agency:   UNECE	Code list version:  D13A");
+        agencyIdList.setDefinition("Schema agency:  UN/CEFACT\n" +
+                "Schema version: 4.5\n" +
+                "Schema date:    02 February 2014\n" +
+                "\n" +
+                "Code list name:     Agency Identification Code\n" +
+                "Code list agency:   UNECE\n" +
+                "Code list version:  D13A");
 
         AgencyIdListRepository agencyIdListRepository = repositoryFactory.agencyIdListRepository();
         agencyIdListRepository.save(agencyIdList);
@@ -93,12 +99,11 @@ public class P_1_3_PopulateAgencyIDList {
                 agencyIdListValue.setName(name.getTextContent());
                 agencyIdListValue.setDefinition(definition.getTextContent());
                 agencyIdListValue.setOwnerListId(agencyIdList.getAgencyIdListId());
-                //System.out.println("@@@  "+agencyIdListValue.getValue()+"  th turn, name = "+agencyIdListValue.getName() +",  definition = "+ agencyIdListValue.getDefinition());
-                agencyIdListValueRepository.save(agencyIdListValue);
                 agencyIdListValues.add(agencyIdListValue);
             }
         }
 
+        agencyIdListValueRepository.saveBatch(agencyIdListValues);
         return agencyIdListValues;
     }
 

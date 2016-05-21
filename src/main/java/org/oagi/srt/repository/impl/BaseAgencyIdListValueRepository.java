@@ -15,6 +15,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -105,5 +106,13 @@ public class BaseAgencyIdListValueRepository extends NamedParameterJdbcDaoSuppor
         KeyHolder keyHolder = new GeneratedKeyHolder();
         getNamedParameterJdbcTemplate().update(SAVE_STATEMENT, namedParameters, keyHolder, new String[]{"agency_id_list_value_id"});
         return keyHolder.getKey().intValue();
+    }
+
+    @Override
+    @CacheEvict("AgencyIdListValues")
+    public void saveBatch(Collection<AgencyIdListValue> agencyIdListValues) {
+        for (AgencyIdListValue agencyIdListValue : agencyIdListValues) {
+            save(agencyIdListValue);
+        }
     }
 }
