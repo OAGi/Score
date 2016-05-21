@@ -12,7 +12,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 @CacheConfig(cacheNames = "BBIEPs", keyGenerator = "simpleCacheKeyGenerator")
 public class OracleBasicBusinessInformationEntityPropertyRepository
-        extends BaseBasicBusinessInformationEntityPropertyRepository {
+        extends BaseBasicBusinessInformationEntityPropertyRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BBIEP_ID_SEQ";
+    }
 
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(bbiep_id), 0) FROM bbiep";
 
@@ -25,7 +30,7 @@ public class OracleBasicBusinessInformationEntityPropertyRepository
     private final String SAVE_STATEMENT = "INSERT INTO bbiep (" +
             "bbiep_id, guid, based_bccp_id, definition, remark, biz_term, " +
             "created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (" +
-            "bbiep_bbiep_id_seq.NEXTVAL, :guid, :based_bccp_id, :definition, :remark, :biz_term, " +
+            getSequenceName() + ".NEXTVAL, :guid, :based_bccp_id, :definition, :remark, :biz_term, " +
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     @Override

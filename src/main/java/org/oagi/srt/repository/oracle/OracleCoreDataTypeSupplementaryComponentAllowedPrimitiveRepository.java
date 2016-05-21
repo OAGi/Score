@@ -9,11 +9,16 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository
-        extends BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository {
+        extends BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "CDT_SC_AWD_PRI_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO cdt_sc_awd_pri (" +
             "cdt_sc_awd_pri_id, cdt_sc_id, cdt_pri_id, is_default) VALUES (" +
-            "cdt_sc_awd_pri_cdt_sc_awd_pri_.NEXTVAL, :cdt_sc_id, :cdt_pri_id, :is_default)";
+            getSequenceName() + ".NEXTVAL, :cdt_sc_id, :cdt_pri_id, :is_default)";
 
     @Override
     protected int doSave(MapSqlParameterSource namedParameters,

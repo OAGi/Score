@@ -8,13 +8,18 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleAggregateBusinessInformationEntityRepository extends BaseAggregateBusinessInformationEntityRepository {
+public class OracleAggregateBusinessInformationEntityRepository extends BaseAggregateBusinessInformationEntityRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "ABIE_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO abie (" +
             "abie_id, guid, based_acc_id, is_top_level, biz_ctx_id, definition, " +
             "created_by, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "state, client_id, version, status, remark, biz_term) VALUES (" +
-            "abie_abie_id_seq.NEXTVAL, :guid, :based_acc_id, :is_top_level, :biz_ctx_id, :definition, " +
+            getSequenceName() + ".NEXTVAL, :guid, :based_acc_id, :is_top_level, :biz_ctx_id, :definition, " +
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
             ":state, :client_id, :version, :status, :remark, :biz_term)";
 

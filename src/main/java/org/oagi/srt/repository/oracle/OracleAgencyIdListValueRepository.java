@@ -15,7 +15,12 @@ import java.util.List;
 
 @Repository
 @CacheConfig(cacheNames = "AgencyIdListValues", keyGenerator = "simpleCacheKeyGenerator")
-public class OracleAgencyIdListValueRepository extends BaseAgencyIdListValueRepository {
+public class OracleAgencyIdListValueRepository extends BaseAgencyIdListValueRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "AGENCY_ID_LIST_VALUE_ID_SEQ";
+    }
 
     private final String FIND_ALL_STATEMENT = "SELECT " +
             "agency_id_list_value_id, value, name, definition, owner_list_id " +
@@ -74,7 +79,7 @@ public class OracleAgencyIdListValueRepository extends BaseAgencyIdListValueRepo
 
     private final String SAVE_STATEMENT = "INSERT INTO agency_id_list_value (" +
             "agency_id_list_value_id, value, name, definition, owner_list_id) VALUES (" +
-            "agency_id_list_value_agency_id.NEXTVAL, :value, :name, :definition, :owner_list_id)";
+            getSequenceName() + ".NEXTVAL, :value, :name, :definition, :owner_list_id)";
 
     @Override
     @CacheEvict("AgencyIdListValues")

@@ -12,7 +12,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 @CacheConfig(cacheNames = "BBIESCs", keyGenerator = "simpleCacheKeyGenerator")
 public class OracleBasicBusinessInformationEntitySupplementaryComponentRepository extends
-        BaseBasicBusinessInformationEntitySupplementaryComponentRepository {
+        BaseBasicBusinessInformationEntitySupplementaryComponentRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BBIE_SC_ID_SEQ";
+    }
 
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(bbie_sc_id), 0) FROM bbie_sc";
 
@@ -26,7 +31,7 @@ public class OracleBasicBusinessInformationEntitySupplementaryComponentRepositor
             "bbie_sc_id, bbie_id, dt_sc_id, dt_sc_pri_restri_id, code_list_id, " +
             "agency_id_list_id, min_cardinality, max_cardinality, default_value, fixed_value, " +
             "definition, remark, biz_term, is_used) VALUES (" +
-            "bbie_sc_bbie_sc_id_seq.NEXTVAL, :bbie_id, :dt_sc_id, :dt_sc_pri_restri_id, :code_list_id, " +
+            getSequenceName() + ".NEXTVAL, :bbie_id, :dt_sc_id, :dt_sc_pri_restri_id, :code_list_id, " +
             ":agency_id_list_id, :min_cardinality, :max_cardinality, :default_value, :fixed_value, " +
             ":definition, :remark, :biz_term, :is_used)";
 

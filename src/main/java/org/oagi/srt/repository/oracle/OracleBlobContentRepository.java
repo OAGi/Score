@@ -9,11 +9,16 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleBlobContentRepository extends BaseBlobContentRepository {
+public class OracleBlobContentRepository extends BaseBlobContentRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BLOB_CONTENT_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO blob_content (" +
             "blob_content_id, content, release_id, module) VALUES (" +
-            "blob_content_id_seq.NEXTVAL, :content, :release_id, :module)";
+            getSequenceName() + ".NEXTVAL, :content, :release_id, :module)";
 
     @Override
     protected int doSave(MapSqlParameterSource namedParameters,

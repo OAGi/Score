@@ -8,14 +8,19 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleAssociationCoreComponentPropertyRepository extends BaseAssociationCoreComponentPropertyRepository {
+public class OracleAssociationCoreComponentPropertyRepository extends BaseAssociationCoreComponentPropertyRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "ASCCP_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO asccp (" +
             "asccp_id, guid, property_term, definition, role_of_acc_id, den, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "state, module, namespace_id, reusable_indicator, is_deprecated, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_asccp_id) VALUES (" +
-            "asccp_asccp_id_seq.NEXTVAL, :guid, :property_term, :definition, :role_of_acc_id, :den, " +
+            getSequenceName() + ".NEXTVAL, :guid, :property_term, :definition, :role_of_acc_id, :den, " +
             ":created_by, :owner_user_id, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
             ":state, :module, :namespace_id, :reusable_indicator, :is_deprecated, " +
             ":revision_num, :revision_tracking_num, :revision_action, :release_id, :current_asccp_id)";

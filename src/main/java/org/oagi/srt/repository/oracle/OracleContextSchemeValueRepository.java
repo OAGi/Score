@@ -8,11 +8,16 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleContextSchemeValueRepository extends BaseContextSchemeValueRepository {
+public class OracleContextSchemeValueRepository extends BaseContextSchemeValueRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "CTX_SCHEME_VALUE_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO ctx_scheme_value (" +
             "ctx_scheme_value_id, guid, value, meaning, owner_ctx_scheme_id) VALUES (" +
-            "ctx_scheme_value_ctx_scheme_va.NEXTVAL, :guid, :value, :meaning, :owner_ctx_scheme_id)";
+            getSequenceName() + ".NEXTVAL, :guid, :value, :meaning, :owner_ctx_scheme_id)";
 
     @Override
     protected int doSave(MapSqlParameterSource namedParameters, ContextSchemeValue contextSchemeValue) {

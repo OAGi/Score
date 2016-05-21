@@ -12,7 +12,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 @CacheConfig(cacheNames = "ASBIEs", keyGenerator = "simpleCacheKeyGenerator")
 public class OracleAssociationBusinessInformationEntityRepository
-        extends BaseAssociationBusinessInformationEntityRepository {
+        extends BaseAssociationBusinessInformationEntityRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "ASBIE_ID_SEQ";
+    }
 
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(asbie_id), 0) FROM asbie";
 
@@ -27,7 +32,7 @@ public class OracleAssociationBusinessInformationEntityRepository
             "cardinality_min, cardinality_max, is_nillable, remark, " +
             "created_by, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "seq_key, is_used) VALUES (" +
-            "asbie_asbie_id_seq.NEXTVAL, :guid, :from_abie_id, :to_asbiep_id, :based_ascc, :definition, " +
+            getSequenceName() + ".NEXTVAL, :guid, :from_abie_id, :to_asbiep_id, :based_ascc, :definition, " +
             ":cardinality_min, :cardinality_max, :is_nillable, :remark, " +
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
             ":seq_key, :is_used)";

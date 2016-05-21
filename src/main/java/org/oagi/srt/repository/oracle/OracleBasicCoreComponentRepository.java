@@ -8,14 +8,19 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleBasicCoreComponentRepository extends BaseBasicCoreComponentRepository {
+public class OracleBasicCoreComponentRepository extends BaseBasicCoreComponentRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BCC_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO bcc (" +
             "bcc_id, guid, cardinality_min, cardinality_max, to_bccp_id, from_acc_id, " +
             "seq_key, entity_type, den, definition, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "state, revision_num, revision_tracking_num, revision_action, release_id, current_bcc_id, is_deprecated) VALUES (" +
-            "bcc_bcc_id_seq.NEXTVAL, :guid, :cardinality_min, :cardinality_max, :to_bccp_id, :from_acc_id, " +
+            getSequenceName() + ".NEXTVAL, :guid, :cardinality_min, :cardinality_max, :to_bccp_id, :from_acc_id, " +
             ":seq_key, :entity_type, :den, :definition, " +
             ":created_by, :owner_user_id, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
             ":state, :revision_num, :revision_tracking_num, :revision_action, :release_id, :current_bcc_id, :is_deprecated)";

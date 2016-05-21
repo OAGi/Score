@@ -8,12 +8,17 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleBaseCodeListValueRepository extends BaseCodeListValueRepository {
+public class OracleBaseCodeListValueRepository extends BaseCodeListValueRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "CODE_LIST_VALUE_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO code_list_value (" +
             "code_list_value_id, code_list_id, value, name, definition, definition_source, " +
             "used_indicator, locked_indicator, extension_indicator) VALUES (" +
-            "code_list_value_code_list_valu.NEXTVAL, :code_list_id, :value, :name, :definition, :definition_source, " +
+            getSequenceName() + ".NEXTVAL, :code_list_id, :value, :name, :definition, :definition_source, " +
             ":used_indicator, :locked_indicator, :extension_indicator)";
 
     @Override

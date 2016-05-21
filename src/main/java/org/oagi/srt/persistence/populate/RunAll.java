@@ -11,37 +11,29 @@ public class RunAll {
                 SpringApplication.run(Application.class, args);) {
 
             P_1_3_PopulateAgencyIDList p1 = ctx.getBean(P_1_3_PopulateAgencyIDList.class);
-            // p1.run(ctx);
+            p1.run(ctx);
 
             P_1_4_PopulateCodeList p2 = ctx.getBean(P_1_4_PopulateCodeList.class);
-            // p2.run(ctx);
+            p2.run(ctx);
 
             P_1_5_1_to_2_PopulateBDTsInDT p3 = ctx.getBean(P_1_5_1_to_2_PopulateBDTsInDT.class);
-            // p3.run(ctx);
+            p3.run(ctx);
 
             P_1_5_3_to_5_PopulateSCInDTSC p4 = ctx.getBean(P_1_5_3_to_5_PopulateSCInDTSC.class);
             p4.run(ctx);
 
             P_1_5_6_PopulateBDTSCPrimitiveRestriction p6 = ctx.getBean(P_1_5_6_PopulateBDTSCPrimitiveRestriction.class);
-            // p6.run(ctx);
+            p6.run(ctx);
 
             P_1_6_1_to_2_PopulateDTFromMetaXSD p7 = ctx.getBean(P_1_6_1_to_2_PopulateDTFromMetaXSD.class);
-            // p7.run(ctx);
+            p7.run(ctx);
 
-            /* this part is not used at all
-            P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD p9 = ctx.getBean(P_1_6_3_to_6_PopulateSCInDTSCFromMetaXSD.class);
-            p9.run(ctx);
-            */
+//            P_1_7_PopulateQBDTInDT p13 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
+//            p13.run(ctx);
 
-            P_1_7_PopulateQBDTInDT p13 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
-            // p13.run(ctx);
+//            P_1_8_PopulateAccAsccpBccAscc p14 = ctx.getBean(P_1_8_PopulateAccAsccpBccAscc.class);
+//            p14.run(ctx);
 
-            P_1_8_PopulateAccAsccpBccAscc p14 = ctx.getBean(P_1_8_PopulateAccAsccpBccAscc.class);
-            // p14.run(ctx);
-
-            // p1.validate();
-            // p2.validate();
-            // p3.validate();
         }
     }
 }

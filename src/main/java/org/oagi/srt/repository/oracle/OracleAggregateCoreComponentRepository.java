@@ -8,14 +8,19 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleAggregateCoreComponentRepository extends BaseAggregateCoreComponentRepository {
+public class OracleAggregateCoreComponentRepository extends BaseAggregateCoreComponentRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "ACC_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO acc (" +
             "acc_id, guid, object_class_term, den, definition, based_acc_id, object_class_qualifier, " +
             "oagis_component_type, module, namespace_id, created_by, owner_user_id, last_updated_by, " +
             "creation_timestamp, last_update_timestamp, state, revision_num, revision_tracking_num, " +
             "revision_action, release_id, current_acc_id, is_deprecated) VALUES (" +
-            "acc_acc_id_seq.NEXTVAL, :guid, :object_class_term, :den, :definition, :based_acc_id, :object_class_qualifier, " +
+            getSequenceName() + ".NEXTVAL, :guid, :object_class_term, :den, :definition, :based_acc_id, :object_class_qualifier, " +
             ":oagis_component_type, :module, :namespace_id, :created_by, :owner_user_id, :last_updated_by, " +
             "CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :state, :revision_num, :revision_tracking_num, " +
             ":revision_action, :release_id, :current_acc_id, :is_deprecated)";

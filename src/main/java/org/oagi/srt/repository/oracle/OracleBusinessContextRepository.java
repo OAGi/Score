@@ -8,11 +8,16 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleBusinessContextRepository extends BaseBusinessContextRepository {
+public class OracleBusinessContextRepository extends BaseBusinessContextRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BIZ_CTX_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO biz_ctx (" +
             "biz_ctx_id, guid, name, created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (" +
-            "biz_ctx_biz_ctx_id_seq.NEXTVAL, :guid, :name, :created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+            getSequenceName() + ".NEXTVAL, :guid, :name, :created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     @Override
     protected int doSave(MapSqlParameterSource namedParameters, BusinessContext contextCategory) {

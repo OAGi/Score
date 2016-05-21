@@ -9,12 +9,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class OracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository
-        extends BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository {
+        extends BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BDT_SC_PRI_RESTRI_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO bdt_sc_pri_restri (" +
             "bdt_sc_pri_restri_id, bdt_sc_id, cdt_sc_awd_pri_xps_type_map_id, " +
             "code_list_id, is_default, agency_id_list_id) VALUES (" +
-            "bdt_sc_pri_restri_bdt_sc_pri_r.NEXTVAL, :bdt_sc_id, :cdt_sc_awd_pri_xps_type_map_id, " +
+            getSequenceName() + ".NEXTVAL, :bdt_sc_id, :cdt_sc_awd_pri_xps_type_map_id, " +
             ":code_list_id, :is_default, :agency_id_list_id)";
 
     @Override

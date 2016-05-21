@@ -8,13 +8,18 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleDataTypeSupplementaryComponentRepository extends BaseDataTypeSupplementaryComponentRepository {
+public class OracleDataTypeSupplementaryComponentRepository extends BaseDataTypeSupplementaryComponentRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "DT_SC_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO dt_sc (" +
             "dt_sc_id, guid, property_term, representation_term, definition, owner_dt_id, " +
             "min_cardinality, max_cardinality, based_dt_sc_id) VALUES (" +
-            "dt_sc_dt_sc_id_seq.NEXTVAL, :guid, :property_term, :representation_term, :definition, :owner_dt_id, " +
-            "min_cardinality, :max_cardinality, :based_dt_sc_id)";
+            getSequenceName() + ".NEXTVAL, :guid, :property_term, :representation_term, :definition, :owner_dt_id, " +
+            ":min_cardinality, :max_cardinality, :based_dt_sc_id)";
 
     @Override
     protected int doSave(MapSqlParameterSource namedParameters, DataTypeSupplementaryComponent dtSc) {

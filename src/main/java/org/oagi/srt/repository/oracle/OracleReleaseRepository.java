@@ -10,7 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @CacheConfig(cacheNames = "Releases", keyGenerator = "simpleCacheKeyGenerator")
-public class OracleReleaseRepository extends BaseReleaseRepository {
+public class OracleReleaseRepository extends BaseReleaseRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "RELEASE_ID_SEQ";
+    }
 
     private final String FIND_ONE_BY_RELEASE_NUM_STATEMENT = "SELECT " +
             "release_id, release_num, release_note, namespace_id " +

@@ -8,13 +8,18 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleContextSchemeRepository extends BaseContextSchemeRepository {
+public class OracleContextSchemeRepository extends BaseContextSchemeRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "CTX_SCHEME_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO classification_ctx_scheme (" +
             "classification_ctx_scheme_id, guid, scheme_id, scheme_name, description, " +
             "scheme_agency_id, scheme_version_id, ctx_category_id, " +
             "created_by, last_updated_by, creation_timestamp, last_update_timestamp) VALUES (" +
-            "classification_ctx_scheme_clas.NEXTVAL, :guid, :scheme_id, :scheme_name, :description, " +
+            getSequenceName() + ".NEXTVAL, :guid, :scheme_id, :scheme_name, :description, " +
             ":scheme_agency_id, :scheme_version_id, :ctx_category_id, " +
             ":created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 

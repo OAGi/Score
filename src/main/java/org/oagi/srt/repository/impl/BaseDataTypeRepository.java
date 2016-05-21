@@ -212,10 +212,10 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("guid", dataType.getGuid())
                 .addValue("type", dataType.getType())
                 .addValue("version_num", dataType.getVersionNum())
-                .addValue("previous_version_dt_id", dataType.getPreviousVersionDtId())
+                .addValue("previous_version_dt_id", dataType.getPreviousVersionDtId() == 0 ? null : dataType.getPreviousVersionDtId())
                 .addValue("data_type_term", dataType.getDataTypeTerm())
                 .addValue("qualifier", dataType.getQualifier())
-                .addValue("based_dt_id", dataType.getBasedDtId())
+                .addValue("based_dt_id", dataType.getBasedDtId() == 0 ? null : dataType.getBasedDtId())
                 .addValue("den", dataType.getDen())
                 .addValue("content_component_den", dataType.getContentComponentDen())
                 .addValue("definition", dataType.getDefinition())
@@ -228,8 +228,8 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("revision_num", dataType.getRevisionNum())
                 .addValue("revision_tracking_num", dataType.getRevisionTrackingNum())
                 .addValue("revision_action", dataType.getRevisionAction())
-                .addValue("release_id", dataType.getReleaseId())
-                .addValue("current_bdt_id", dataType.getCurrentBdtId())
+                .addValue("release_id", dataType.getReleaseId() == 0 ? null : dataType.getReleaseId())
+                .addValue("current_bdt_id", dataType.getCurrentBdtId() == 0 ? null : dataType.getCurrentBdtId())
                 .addValue("is_deprecated", dataType.isDeprecated() ? 1 : 0);
 
         int dtId = doSave(namedParameters, dataType);

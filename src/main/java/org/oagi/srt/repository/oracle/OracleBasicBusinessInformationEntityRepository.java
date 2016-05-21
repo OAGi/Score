@@ -11,7 +11,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @CacheConfig(cacheNames = "BBIEs", keyGenerator = "simpleCacheKeyGenerator")
-public class OracleBasicBusinessInformationEntityRepository extends BaseBasicBusinessInformationEntityRepository {
+public class OracleBasicBusinessInformationEntityRepository extends BaseBasicBusinessInformationEntityRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "BBIE_ID_SEQ";
+    }
 
     private final String FIND_GREATEST_ID_STATEMENT = "SELECT NVL(MAX(bbie_id), 0) FROM bbie";
 
@@ -26,7 +31,7 @@ public class OracleBasicBusinessInformationEntityRepository extends BaseBasicBus
             "cardinality_min, cardinality_max, default_value, is_nillable, fixed_value, is_null, " +
             "definition, remark, created_by, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "seq_key, is_used) VALUES (" +
-            "bbie_bbie_id_seq.NEXTVAL, :guid, :based_bcc_id, :from_abie_id, :to_bbiep_id, :bdt_pri_restri_id, :code_list_id, " +
+            getSequenceName() + ".NEXTVAL, :guid, :based_bcc_id, :from_abie_id, :to_bbiep_id, :bdt_pri_restri_id, :code_list_id, " +
             ":cardinality_min, :cardinality_max, :default_value, :is_nillable, :fixed_value, :is_null, " +
             ":definition, :remark, :created_by, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
             ":seq_key, :is_used)";

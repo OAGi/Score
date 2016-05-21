@@ -8,11 +8,16 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleContextCategoryRepository extends BaseContextCategoryRepository {
+public class OracleContextCategoryRepository extends BaseContextCategoryRepository implements OracleRepository {
+
+    @Override
+    public String getSequenceName() {
+        return "CTX_CATEGORY_ID_SEQ";
+    }
 
     private final String SAVE_STATEMENT = "INSERT INTO ctx_category (" +
             "ctx_category_id, guid, name, description) VALUES (" +
-            "ctx_category_ctx_category_id_s.NEXTVAL, :guid, :name, :description)";
+            getSequenceName() + ".NEXTVAL, :guid, :name, :description)";
 
     @Override
     protected int doSave(MapSqlParameterSource namedParameters, ContextCategory contextCategory) {
