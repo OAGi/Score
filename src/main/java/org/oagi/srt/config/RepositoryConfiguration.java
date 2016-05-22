@@ -5,11 +5,13 @@ import org.oagi.srt.repository.mysql.MysqlRepositoryFactory;
 import org.oagi.srt.repository.oracle.OracleRepositoryFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
+@ComponentScan(basePackages = {"org.oagi.srt.repository"})
 @EnableTransactionManagement
 public class RepositoryConfiguration {
 

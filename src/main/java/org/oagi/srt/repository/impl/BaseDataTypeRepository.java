@@ -31,7 +31,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_DT_ID_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -49,7 +49,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_BY_TYPE_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -67,7 +67,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_BY_DATA_TYPE_TERM_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -85,7 +85,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_DATA_TYPE_TERM_AND_TYPE_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -104,7 +104,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_GUID_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -122,7 +122,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_GUID_AND_TYPE_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -141,7 +141,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_DEN_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -159,7 +159,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_TYPE_AND_DEN_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -178,7 +178,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String FIND_ONE_BY_GUID_AND_DEN_STATEMENT = "SELECT " +
             "dt_id, guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated " +
             "FROM dt " +
@@ -197,11 +197,11 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
 
     private final String SAVE_STATEMENT = "INSERT INTO dt (" +
             "guid, type, version_num, previous_version_dt_id, data_type_term, qualifier, " +
-            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, state, " +
+            "based_dt_id, den, content_component_den, definition, content_component_definition, revision_doc, module, state, " +
             "created_by, owner_user_id, last_updated_by, creation_timestamp, last_update_timestamp, " +
             "revision_num, revision_tracking_num, revision_action, release_id, current_bdt_id, is_deprecated) VALUES (" +
             ":guid, :type, :version_num, :previous_version_dt_id, :data_type_term, :qualifier, " +
-            ":based_dt_id, :den, :content_component_den, :definition, :content_component_definition, :revision_doc, :state, " +
+            ":based_dt_id, :den, :content_component_den, :definition, :content_component_definition, :revision_doc, :module, :state, " +
             ":created_by, :owner_user_id, :last_updated_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, " +
             ":revision_num, :revision_tracking_num, :revision_action, :release_id, :current_bdt_id, :is_deprecated)";
 
@@ -221,6 +221,7 @@ public class BaseDataTypeRepository extends NamedParameterJdbcDaoSupport impleme
                 .addValue("definition", dataType.getDefinition())
                 .addValue("content_component_definition", dataType.getContentComponentDefinition())
                 .addValue("revision_doc", dataType.getRevisionDoc())
+                .addValue("module", dataType.getModule())
                 .addValue("state", dataType.getState())
                 .addValue("created_by", dataType.getCreatedBy())
                 .addValue("owner_user_id", dataType.getOwnerUserId())

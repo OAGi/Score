@@ -27,6 +27,7 @@ public class DataTypeMapper implements RowMapper<DataType> {
         dataType.setDefinition(rs.getString("definition"));
         dataType.setContentComponentDefinition(rs.getString("content_component_definition"));
         dataType.setRevisionDoc(rs.getString("revision_doc"));
+        dataType.setModule(rs.getString("module"));
         dataType.setState(rs.getInt("state"));
         dataType.setCreatedBy(rs.getInt("created_by"));
         dataType.setOwnerUserId(rs.getInt("owner_user_id"));

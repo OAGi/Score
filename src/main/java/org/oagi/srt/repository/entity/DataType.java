@@ -18,6 +18,7 @@ public class DataType implements Serializable {
     private String definition;
     private String contentComponentDefinition;
     private String revisionDoc;
+    private String module;
     private int state;
     private int createdBy;
     private int ownerUserId;
@@ -133,6 +134,14 @@ public class DataType implements Serializable {
 
     public void setRevisionDoc(String revisionDoc) {
         this.revisionDoc = revisionDoc;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
     }
 
     public int getState() {

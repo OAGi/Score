@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `oagsrt_revision`.`dt` (
   `definition` TEXT CHARACTER SET 'utf8' NULL,
   `content_component_definition` TEXT CHARACTER SET 'utf8' NULL,
   `revision_doc` TEXT CHARACTER SET 'utf8' NULL COMMENT 'This is for documenting about the revision.',
+  `module` TEXT(100) NULL COMMENT 'physical file where the DT shall belong to when generating it.',
   `state` INT(11) NULL COMMENT '1 = Editing, 2 = Candidate, 3 = Published. This the revision life cycle state of the entity.\n\nState change can\'t be undone. But the history record can still keep the records of when the state was changed.',
   `created_by` INT(11) NOT NULL,
   `owner_user_id` INT(11) UNSIGNED NOT NULL COMMENT 'This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn\'t rollback the ownership. ',
