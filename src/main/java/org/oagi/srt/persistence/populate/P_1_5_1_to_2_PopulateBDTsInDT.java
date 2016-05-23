@@ -36,7 +36,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
             P_1_5_1_to_2_PopulateBDTsInDT populateBDTsInDT = ctx.getBean(P_1_5_1_to_2_PopulateBDTsInDT.class);
-            populateBDTsInDT.run(ctx);
+            //populateBDTsInDT.run(ctx);
             populateBDTsInDT.validate();
         }
     }
@@ -524,8 +524,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             base = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']/xsd:restriction/@base");
         }
         String baseName = "";
-        if (base != null) {
-            baseName = base.getTextContent();
+        if (base != null) {       	
+        	baseName = base.getTextContent();       	
         }
 
         DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
@@ -873,6 +873,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
             DataType dVO1 = new DataType();
 
+            if(dataType.equals("DayOfWeekHourMinuteUTCType")){
+            	int a = 0;
+            }
+            
             if (check_BDT(aElementBDT.getAttribute("id"))) {
                 System.out.println("Default BDT is already existing");
                 dVO1 = DTDao.findOneByGuid(aElementBDT.getAttribute("id"));
@@ -929,7 +933,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                             getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = true");
                     bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
                 }
-                if (idOfXsdToken != defaultId && idOfXsdToken == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) {
+                else {
                     BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
                     aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
                     aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
@@ -1017,8 +1021,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             }
             String baseName = "";
             if (base != null) {
-                baseName = base.getTextContent();
+            	baseName = base.getTextContent();
             }
+            if(baseName.startsWith("xbt_")){
+         		 Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + baseName + "']/xsd:restriction");
+         		 baseName = ((Element) xbtNode).getAttribute("base");
+	        }
 
             //Definitions
             Node definitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
@@ -1111,8 +1119,21 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 System.err.println("      FromDB: " + defaultFromDB);
             } else {
                 System.out.println("# # # Default BDT " + typeName + " (Exceptional BDT) is Valid");
-
-                validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDtId(), dtvoFromDB.getDtId(), false, baseName);
+                int checkInserted = 0;
+                List<DataType> DTList = dataTypeRepository.findByDataTypeTerm(dtvoFromDB.getDataTypeTerm());
+                for(int i=0; i<DTList.size(); i++){
+                	DataType aDT = DTList.get(i);
+                	if(aDT.getBasedDtId()==dtvoFromDB.getDtId()){
+                		checkInserted++;
+                	}
+                }
+                
+                if(checkInserted <= 1){
+                	validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDtId(), dtvoFromDB.getDtId(), false, baseName);
+                }
+                else {
+                    System.out.println("      BDT Pri restri of Default BDT " + typeName + " is Checked! already");               	
+                }
             }
 
             unqualifiedFromXSD = unqualifiedFromXSD + aElementTN.getAttribute("id");//guid
@@ -1295,7 +1316,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             } else {
                 System.out.println("# # # Default BDT ValueType_039C44 (Exceptional BDT) is Valid");
 
-                validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDtId(), dtvoFromDB.getDtId(), false, "ValueType_039C44");
+                validateInsertBDTPrimitiveRestriction(dtvoFromDB.getBasedDtId(), dtvoFromDB.getDtId(), false, "xsd:integer");
             }
         } catch (EmptyResultDataAccessException e) {
             System.err.println("@@@@ Default BDT is not imported! Check: " + aElementBDT.getAttribute("id"));
@@ -1314,47 +1335,89 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
                 repositoryFactory.xsdBuiltInTypeRepository();
-
-        List<BusinessDataTypePrimitiveRestriction> thisBDTPris = bdtPriRestriRepository.findByBdtId(bdtId);
-        int defaultCnt = 0;
-
-        for (int i = 0; i < thisBDTPris.size(); i++) {
-
-            BusinessDataTypePrimitiveRestriction aBDataType = thisBDTPris.get(i);
-            CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAPXTM =
-                    cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(aBDataType.getCdtAwdPriXpsTypeMapId());
-
-            //Now We get CDT_AWD_PRI and XBT
-            CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findOneByCdtAwdPriId(aCDTAPXTM.getCdtAwdPriId());
-            CoreDataTypePrimitive aCDTP = cdtPriRepository.findOneByCdtPriId(aCDTAP.getCdtPriId());
-            XSDBuiltInType xbt = xsdBuiltInTypeRepository.findOneByXbtId(aCDTAPXTM.getXbtId());
-
-            boolean correspond = Utility.checkCorrespondingTypes(xbt.getBuiltInType(), aCDTP.getName());
-
-            if (!correspond) {
-                System.err.println("@@@@ Check XBT and CDT Pri! XBT and CDT Pri are not Corresponding!");
-                System.err.println("         XBT: " + xbt.getBuiltInType());
-                System.err.println("     CDT_Pri: " + aCDTP.getName());
-            }
-
-            if (aBDataType.isDefault()) {
-                DataType baseDataType = dtRepository.findOneByDtId(basedtID);
-
-                if (unionExist && baseDataType.getType() == 0) {
-                    if (!xbt.getBuiltInType().equals("xsd:token")) {//xsd:token but is not default
-                        System.err.println("@@@@ xsd:token should be Default! Check DT_ID:" + bdtId);
-                    }
-                } else if (baseDataType.getType() == 0) {
-                    if (!xbt.getBuiltInType().equals(baseName)) {
-                        System.err.println("@@@@ " + baseName + " should be Default! Check DT_ID:" + bdtId);
-                    }
-                }
-                defaultCnt++;
-            }
+        
+        DataType baseDataType = dtRepository.findOneByDtId(basedtID);
+        if(baseDataType.getType()==0){//if the base is CDT and this is default
+        	
+        	List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = cdtAwdPriRepository.findByCdtId(basedtID);
+        	List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAwdPriXpsTypeMapList = cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId((cdtAwdPriList.get(0).getCdtAwdPriId()));
+        	for(int i=1; i<cdtAwdPriList.size(); i++){
+        		List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> listAdded = cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId((cdtAwdPriList.get(i).getCdtAwdPriId()));
+        		cdtAwdPriXpsTypeMapList.addAll(listAdded);
+        	}
+        	
+        	List<BusinessDataTypePrimitiveRestriction> defaultBDTPri = bdtPriRestriRepository.findByBdtId(bdtId);
+        	int defaultCount = 0;
+        	
+        	if(cdtAwdPriXpsTypeMapList.size()!=defaultBDTPri.size()){
+        		System.out.println("@@@@ Default BDT Pri is not properly imported! Check BDT: "+bdtId);
+        	}
+        	else {
+        		for(int i=cdtAwdPriXpsTypeMapList.size()-1; i>-1; i--){	
+	        		for(int j=defaultBDTPri.size()-1; j>-1; j--){	        			
+	        			int thisCDTAwdPriXpsTypeMapId = defaultBDTPri.get(j).getCdtAwdPriXpsTypeMapId();
+	        			if(cdtAwdPriXpsTypeMapList.get(i).getCdtAwdPriXpsTypeMapId()==thisCDTAwdPriXpsTypeMapId){
+	        				
+	        				if(defaultBDTPri.get(j).isDefault()){
+	        					defaultCount++;
+		        				CoreDataTypeAllowedPrimitiveExpressionTypeMap mapFromBDT = cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(thisCDTAwdPriXpsTypeMapId);	        				
+		        				CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findOneByCdtAwdPriId(mapFromBDT.getCdtAwdPriId());
+		        				CoreDataTypePrimitive aCDTP = cdtPriRepository.findOneByCdtPriId(aCDTAP.getCdtPriId());
+		        		        XSDBuiltInType xbt = xsdBuiltInTypeRepository.findOneByXbtId(mapFromBDT.getXbtId());
+		        				
+		        		        if (unionExist) {
+		                            if (!xbt.getBuiltInType().equals("xsd:token")) {//xsd:token but is not default
+		                                System.err.println("@@@@ xsd:token should be Default! Check DT_ID:" + bdtId);
+		                            }
+		                        } else {
+		                            if (!xbt.getBuiltInType().equals(baseName)) {
+		                                System.err.println("@@@@ " + baseName + " should be Default! Check DT_ID:" + bdtId);
+		                            }
+		                        }
+	        				}
+	        				
+	        				cdtAwdPriXpsTypeMapList.remove(i);
+	        				defaultBDTPri.remove(j);
+	        				break;
+	        			}
+	        		}
+        		}
+        		if(defaultCount!=1){
+            		System.out.println("@@@@ Default BDT Pri has multiple or zero isDefault! Check BDT: "+bdtId);
+            	}
+        	}
         }
-
-        if (defaultCnt != 1) {
-            System.err.println("@@@@ Check BDT Pri! Default is invalid!");
+        else {//if the base is Default and this is unqualified bdt
+        	
+        	List<BusinessDataTypePrimitiveRestriction> defaultBDTPriList = bdtPriRestriRepository.findByBdtId(basedtID);
+        	List<BusinessDataTypePrimitiveRestriction> unqualifiedBDTPriList = bdtPriRestriRepository.findByBdtId(bdtId);
+        	int defaultCount = 0;
+        	if(defaultBDTPriList.size()!=unqualifiedBDTPriList.size()){
+        		System.out.println("@@@@ Unqualified BDT Pri is not properly inherited! Check BDT: "+bdtId);
+        	}
+        	else {
+        		for(int i=defaultBDTPriList.size()-1; i>-1; i--){
+        			for(int j=unqualifiedBDTPriList.size()-1; j>-1; j--){       				
+        				BusinessDataTypePrimitiveRestriction defaultBDTPri = defaultBDTPriList.get(i);
+        				BusinessDataTypePrimitiveRestriction unqualifiedBDTPri = unqualifiedBDTPriList.get(j);        				
+        				if(defaultBDTPri.getCdtAwdPriXpsTypeMapId()==unqualifiedBDTPri.getCdtAwdPriXpsTypeMapId()
+        				&& defaultBDTPri.isDefault() == unqualifiedBDTPri.isDefault()){
+        					defaultBDTPriList.remove(i);
+        					unqualifiedBDTPriList.remove(j);
+        					if(unqualifiedBDTPri.isDefault()){
+        						defaultCount++;
+        					}
+        					break;
+        				}
+        			}
+        		}
+        		if(defaultBDTPriList.size()>0 || unqualifiedBDTPriList.size()>0){
+        			System.out.println("@@@@ Unqualified BDT Pri is not properly inherited! Check BDT: "+bdtId);       			
+        		}
+        		if(defaultCount!=1){
+            		System.out.println("@@@@ Unqaulified BDT Pri has multiple or zero isDefault! Check BDT: "+bdtId);	
+        		}
+        	}
         }
     }
 
