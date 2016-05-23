@@ -2,6 +2,7 @@ package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.CodeList;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CodeListRepository {
@@ -36,4 +37,5 @@ public interface CodeListRepository {
 
     public void save(CodeList codeList);
 
+    public void saveBatch(Collection<CodeList> codeLists);
 }

@@ -17,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -268,5 +269,12 @@ public class BaseCodeListRepository extends NamedParameterJdbcDaoSupport impleme
         KeyHolder keyHolder = new GeneratedKeyHolder();
         getNamedParameterJdbcTemplate().update(SAVE_STATEMENT, namedParameters, keyHolder, new String[]{"code_list_id"});
         return keyHolder.getKey().intValue();
+    }
+
+    @Override
+    public void saveBatch(Collection<CodeList> codeLists) {
+        for (CodeList codeList : codeLists) {
+            save(codeList);
+        }
     }
 }

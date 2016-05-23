@@ -8,7 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OracleBaseCodeListValueRepository extends BaseCodeListValueRepository implements OracleRepository {
+public class OracleCodeListValueRepository extends BaseCodeListValueRepository implements OracleRepository {
 
     @Override
     public String getSequenceName() {

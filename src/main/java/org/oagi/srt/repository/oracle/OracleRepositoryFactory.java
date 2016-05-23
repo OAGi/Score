@@ -15,10 +15,10 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleAgencyIdListValueRepository oracleAgencyIdListValueRepository;
 
     @Autowired
-    private OracleBaseCodeListRepository oracleCodeListRepository;
+    private OracleCodeListRepository oracleCodeListRepository;
 
     @Autowired
-    private OracleBaseCodeListValueRepository oracleCodeListValueRepository;
+    private OracleCodeListValueRepository oracleCodeListValueRepository;
 
     @Autowired
     private OracleContextSchemeRepository oracleContextSchemeRepository;
