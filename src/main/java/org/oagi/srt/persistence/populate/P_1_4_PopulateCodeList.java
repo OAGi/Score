@@ -55,22 +55,31 @@ public class P_1_4_PopulateCodeList {
         };
 
         for (int i = 0; i < tt.length; i++) {
-            System.out.println("## Importing Code List from " + tt[i][0] + "..");
-            String filename = tt[i][0] + ".xsd";
-            codeList(filename, Integer.parseInt(tt[i][1]));
+            String fileName = tt[i][0];
+            int agencyId = Integer.parseInt(tt[i][1]);
+
+            System.out.println("## Importing Code List from " + fileName + "..");
+            String filename = fileName + ".xsd";
+            codeList(filename, agencyId);
         }
 
         for (int i = 0; i < tt.length; i++) {
-            System.out.println("## Updating Code List referring " + tt[i][0] + "..");
+            String fileName = tt[i][0];
+            int agencyId = Integer.parseInt(tt[i][1]);
 
-            String filename = tt[i][0] + ".xsd";
-            updateBasedCodeListID(filename, Integer.parseInt(tt[i][1]));
+            System.out.println("## Updating Code List referring " + fileName + "..");
+
+            String filename = fileName + ".xsd";
+            updateBasedCodeListID(filename, agencyId);
         }
 
         for (int i = 0; i < tt.length; i++) {
-            System.out.println("## Impoting Code List Value from " + tt[i][0] + "..");
+            String fileName = tt[i][0];
+            int agencyId = Integer.parseInt(tt[i][1]);
 
-            String filename = tt[i][0] + ".xsd";
+            System.out.println("## Impoting Code List Value from " + fileName + "..");
+
+            String filename = fileName + ".xsd";
             codeListValue(filename);
         }
 
@@ -86,45 +95,30 @@ public class P_1_4_PopulateCodeList {
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
 
-        Date current_stamp = new Date(System.currentTimeMillis());
+        int userId = getUserID("oagis");
 
         for (int i = 0; i < result.getLength(); i++) {
-            Element tmp = (Element) result.item(i);
+            Element element = (Element) result.item(i);
+            String name = element.getAttribute("name");
+            if (name.endsWith("CodeContentType")) {
+                codeList.setGuid(element.getAttribute("id"));
 
-            if (tmp.getAttribute("name").endsWith("CodeContentType")) {
-                codeList.setGuid(tmp.getAttribute("id"));
-
-//		    	for(int j = 0; j < result.getLength(); j++) {
-//		    		Element tmp2 = (Element)result.item(j);
-//
-//	    			if(tmp2.getAttribute("name").endsWith("EnumerationType")) {
-//	    				if(tmp2.getAttribute("name").substring(0, tmp2.getAttribute("name").lastIndexOf("EnumerationType")).equals(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")))) {
-//		    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
-//		    				break;
-//		    			}
-//		    		} else {
-//	    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
-//	    			}
-//
-//		    	}
                 //added by TKim according to design Doc v2.4
-                if (tmp.getAttribute("name").startsWith("oacl")) {
-                    String xyz = tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("CodeContentType"));
-                    //System.out.print("  "+tmp.getAttribute("name") + " with ");
+                if (name.startsWith("oacl")) {
+                    String xyz = name.substring(0, name.lastIndexOf("CodeContentType"));
+                    //System.out.print("  "+name + " with ");
                     Node enumTypeNode = xh.getNode("//xsd:simpleType[@name='" + xyz + "CodeEnumerationType']/@id");
                     String enumerationTypeGUID = null;
                     if (enumTypeNode != null) {
                         enumerationTypeGUID = enumTypeNode.getTextContent();
-                        //System.out.println(xyz+"CodeEnumerationTypeGUID: "+enumerationTypeGUID);
                     }
                     codeList.setEnumTypeGuid(enumerationTypeGUID);
                 } else {
-                    //System.out.print("  "+tmp.getAttribute("name") + " with its own enumeration ");
                     codeList.setEnumTypeGuid(null);
                 }
 
-                codeList.setName(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")));
-                codeList.setListId(tmp.getAttribute("id"));
+                codeList.setName(name.substring(0, name.lastIndexOf("ContentType")));
+                codeList.setListId(element.getAttribute("id"));
                 codeList.setAgencyId(getAgencyID(agencyId));
 
                 if (codeList.getName().startsWith("oacl")) {
@@ -132,27 +126,10 @@ public class P_1_4_PopulateCodeList {
                 } else if (codeList.getName().equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
                     codeList.setVersionId("5");
                 } else {
-                    for (int j = 0; j < tmp.getAttribute("name").length(); j++) {
-                        if (tmp.getAttribute("name").charAt(j) > 47 && tmp.getAttribute("name").charAt(j) < 58) {
-                            for (int k = j + 1; k < tmp.getAttribute("name").length(); k++) {
-                                if (tmp.getAttribute("name").charAt(k) == '_') {
-                                    String complicated_version = tmp.getAttribute("name").substring(j, k);
-                                    for (int l = complicated_version.length() - 1; l >= 0; l--) {
-                                        if (!(complicated_version.charAt(l) > 47 && complicated_version.charAt(l) < 58)) {
-                                            complicated_version = complicated_version.substring(l + 1);
-                                            break;
-                                        }
-                                    }
-                                    codeList.setVersionId(complicated_version);
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
+                    codeList.setVersionId(extractVersionId(name));
                 }
 
-                Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']/xsd:annotation/xsd:documentation");
+                Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + name + "']/xsd:annotation/xsd:documentation");
                 if (definition_node != null) {
                     Element definition_element2 = (Element) definition_node;
                     codeList.setDefinition(definition_element2.getTextContent());
@@ -163,31 +140,36 @@ public class P_1_4_PopulateCodeList {
                 }
                 codeList.setExtensibleIndicator(true);  //logic changed. extensible indicator is always TRUE.
 
-//		    	for(int j = 0; j < union.getLength(); j++) {
-//				    Element tmp2 = (Element)union.item(j);
-//				    if(tmp2.getAttribute("name").equals(tmp.getAttribute("name"))) {
-//				    	codelistVO.setExtensibleIndicator(true);
-//				    	break;
-//				    }
-//				}
-
-                int id = getUserID("oagis");
-                codeList.setCreatedBy(id);
-                codeList.setLastUpdatedBy(id);
-                codeList.setLastUpdateTimestamp(current_stamp);
+                codeList.setCreatedBy(userId);
+                codeList.setLastUpdatedBy(userId);
                 codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-//	    		Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
-//	    		if(union_check != null){
-//		    		codelistVO.setExtensibleIndicator(true);
-//	    		}
-//	    		else
-//	    			codelistVO.setExtensibleIndicator(false);
                 codeList.setModule(extractModuleName(path1));
 
                 codeListRepository.save(codeList);
-            } else if (!tmp.getAttribute("name").endsWith("EnumerationType"))
-                System.out.println("Check !!  " + tmp.getAttribute("name"));
+            } else if (!name.endsWith("EnumerationType"))
+                System.out.println("Check !!  " + name);
         }
+    }
+
+    private String extractVersionId(String name) {
+        for (int j = 0; j < name.length(); j++) {
+            if (name.charAt(j) > 47 && name.charAt(j) < 58) {
+                for (int k = j + 1; k < name.length(); k++) {
+                    if (name.charAt(k) == '_') {
+                        String versionId = name.substring(j, k);
+                        for (int l = versionId.length() - 1; l >= 0; l--) {
+                            if (!(versionId.charAt(l) > 47 && versionId.charAt(l) < 58)) {
+                                versionId = versionId.substring(l + 1);
+                                break;
+                            }
+                        }
+                        return versionId;
+                    }
+                }
+                break;
+            }
+        }
+        return null;
     }
 
     private String extractModuleName(String filePath) {
@@ -195,9 +177,9 @@ public class P_1_4_PopulateCodeList {
         return FilenameUtils.separatorsToWindows(filePath.substring(idx));
     }
 
-    private int getAgencyID(int valueid) {
+    private int getAgencyID(int value) {
         AgencyIdListValueRepository agencyIdListValueRepository = repositoryFactory.agencyIdListValueRepository();
-        return agencyIdListValueRepository.findOneByValue(String.valueOf(valueid)).getAgencyIdListValueId();
+        return agencyIdListValueRepository.findOneByValue(String.valueOf(value)).getAgencyIdListValueId();
     }
 
     private int getUserID(String userName) {
@@ -228,7 +210,7 @@ public class P_1_4_PopulateCodeList {
                     unionMemberStr = unionMemberStr.trim();
                     String checkEnumType = xyz + "CodeEnumerationType";
 
-                    if (!unionMemberStr.equals(checkEnumType)) {//find base code list!
+                    if (!unionMemberStr.equals(checkEnumType)) { //find base code list!
                         unionMemberStr = unionMemberStr.replace("ContentType", "");
 
                         CodeList baseCodelistVO = codeListRepository.findByNameContaining(unionMemberStr).get(0);
@@ -263,43 +245,40 @@ public class P_1_4_PopulateCodeList {
         NodeList enumeration = null;
 
         for (int i = 0; i < result.getLength(); i++) {
-            Element tmp = (Element) result.item(i);
+            Element element = (Element) result.item(i);
 
             enumeration = null;
 
-            if (tmp.getAttribute("name").endsWith("CodeContentType")) {
-                //System.out.println("Import CodeListValue for: "+tmp.getAttribute("name"));
-                String guid = new String(tmp.getAttribute("id"));
-                CodeList codelistVO = codeListRepository.findOneByGuid(guid);
+            if (element.getAttribute("name").endsWith("CodeContentType")) {
+                String guid = new String(element.getAttribute("id"));
+                CodeList codeList = codeListRepository.findOneByGuid(guid);
 
-                if (codelistVO.getEnumTypeGuid() != null) {
+                if (codeList.getEnumTypeGuid() != null) {
                     //Get code_list_value from enumerationType
-                    enumeration = xh.getNodeList("//xsd:simpleType[@id='" + codelistVO.getEnumTypeGuid() + "']//xsd:enumeration");
+                    enumeration = xh.getNodeList("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration");
                     if (enumeration.getLength() < 1) {
-                        System.out.println("   EnumerationType " + codelistVO.getEnumTypeGuid() + " has no enumerations");
+                        System.out.println("   EnumerationType " + codeList.getEnumTypeGuid() + " has no enumerations");
                     } else {
-                        System.out.println("   Start import from EnumerationType: " + codelistVO.getEnumTypeGuid());
+                        System.out.println("   Start import from EnumerationType: " + codeList.getEnumTypeGuid());
                     }
                 } else {//if enum_type_guid is null
-                    if (codelistVO.getBasedCodeListId() > 0) {
+                    if (codeList.getBasedCodeListId() > 0) {
                         //Inherit from based code list
-                        List<CodeListValue> codeListValuesFromBase = codeListValueRepository.findByCodeListId(codelistVO.getBasedCodeListId());
+                        List<CodeListValue> codeListValuesFromBase = codeListValueRepository.findByCodeListId(codeList.getBasedCodeListId());
 
                         if (codeListValuesFromBase.size() > 0) {
-                            System.out.println("   Start inherit from BasedCodeList: " + codelistVO.getName());
+                            System.out.println("   Start inherit from BasedCodeList: " + codeList.getName());
                             for (int j = 0; j < codeListValuesFromBase.size(); j++) {
-                                CodeListValue codelistvalVO = (CodeListValue) codeListValuesFromBase.get(j);
-                                codelistvalVO.setCodeListId(codelistVO.getCodeListId());
-                                //System.out.print("       "+codelistvalVO.getName()+" (value=");
-                                //System.out.println(codelistvalVO.getValue()+")");
+                                CodeListValue codelistvalVO = codeListValuesFromBase.get(j);
+                                codelistvalVO.setCodeListId(codeList.getCodeListId());
                                 codeListValueRepository.save(codelistvalVO);
                             }
                         }
                     } else {//if based code list is null
                         //Get the values from local xsd:enumeration
-                        enumeration = xh.getNodeList("//xsd:simpleType[@name='" + tmp.getAttribute("name") + "']//xsd:enumeration");
+                        enumeration = xh.getNodeList("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration");
                         if (enumeration.getLength() < 1) {
-                            System.out.println("   " + codelistVO.getEnumTypeGuid() + " has no enumerations");
+                            System.out.println("   " + codeList.getEnumTypeGuid() + " has no enumerations");
                         } else {
                             System.out.println("   Start import from LocalEnumeration: ");
                         }
@@ -310,19 +289,16 @@ public class P_1_4_PopulateCodeList {
                     for (int j = 0; j < enumeration.getLength(); j++) {
                         Element aEnum = (Element) enumeration.item(j);
                         CodeListValue codelistvalueVO = new CodeListValue();
-                        codelistvalueVO.setCodeListId(codelistVO.getCodeListId());
+                        codelistvalueVO.setCodeListId(codeList.getCodeListId());
                         codelistvalueVO.setValue(aEnum.getAttribute("value"));
                         codelistvalueVO.setName(aEnum.getAttribute("value"));
                         codelistvalueVO.setUsedIndicator(true);
                         codelistvalueVO.setLockedIndicator(false);
                         codelistvalueVO.setExtensionIndicator(false);
 
-                        //System.out.print("       "+codelistvalueVO.getName()+" (value=");
-                        //System.out.println(codelistvalueVO.getValue()+")");
-
-                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + tmp.getAttribute("name") + "']//xsd:enumeration[@value='" + codelistvalueVO.getValue() + "']//xsd:documentation");
+                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration[@value='" + codelistvalueVO.getValue() + "']//xsd:documentation");
                         if (definitionNode == null) {
-                            definitionNode = xh.getNode("//xsd:simpleType[@id='" + codelistVO.getEnumTypeGuid() + "']//xsd:enumeration[@value='" + codelistvalueVO.getValue() + "']//xsd:documentation");
+                            definitionNode = xh.getNode("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration[@value='" + codelistvalueVO.getValue() + "']//xsd:documentation");
                         }
                         if (definitionNode != null) {
                             Element definition = (Element) definitionNode;
@@ -519,8 +495,8 @@ public class P_1_4_PopulateCodeList {
                 CodeList codelistVO = codeListRepository.findOneByGuid(guid);
 
                 List<CodeListValue> clvalListVOFromDB = codeListValueRepository.findByCodeListId(codelistVO.getCodeListId());
-                List<String> clvalListFromXSD = new ArrayList<String>();
-                List<String> clvalListFromDB = new ArrayList<String>();
+                List<String> clvalListFromXSD = new ArrayList();
+                List<String> clvalListFromDB = new ArrayList();
 
                 if (tmp.getAttribute("name").startsWith("oacl")) {
 
@@ -549,18 +525,14 @@ public class P_1_4_PopulateCodeList {
                                 Node enumNode = xh.getNode("//xsd:simpleType[@name='" + checkEnumType + "']//xsd:enumeration[@value='" + codeListVal + "']//xsd:documentation");
 
                                 if (enumNode != null) {
-
                                     Element definition = (Element) enumNode;
-
                                     codeListVal = codeListVal + definition.getTextContent();
-
                                     codeListVal = codeListVal + definition.getAttribute("source");
                                 } else {
                                     codeListVal = codeListVal + "null" + "null";
                                 }
 
                                 codeListVal = codeListVal + "true" + "false" + "false";
-
 
                                 clvalListFromXSD.add(codeListVal);
                             }
@@ -583,7 +555,6 @@ public class P_1_4_PopulateCodeList {
                                 }
                             }
 
-
                             if (enumerations != null) {
                                 for (int j = 0; j < enumerations.getLength(); j++) {
                                     Element itsEnum = (Element) enumerations.item(j);
@@ -593,11 +564,8 @@ public class P_1_4_PopulateCodeList {
                                     Node enumNode = xh4Base.getNode("//xsd:simpleType[@name='" + unionMemberStr + "']//xsd:enumeration[@value='" + codeListVal + "']//xsd:documentation");
 
                                     if (enumNode != null) {
-
                                         Element definition = (Element) enumNode;
-
                                         codeListVal = codeListVal + definition.getTextContent();
-
                                         codeListVal = codeListVal + definition.getAttribute("source");
                                     } else {
                                         codeListVal = codeListVal + "null" + "null";
