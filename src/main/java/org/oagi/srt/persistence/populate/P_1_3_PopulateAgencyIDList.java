@@ -18,6 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.XPathExpression;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -84,17 +85,19 @@ public class P_1_3_PopulateAgencyIDList {
         AgencyIdListValueRepository agencyIdListValueRepository = repositoryFactory.agencyIdListValueRepository();
         List<AgencyIdListValue> agencyIdListValues = new ArrayList();
 
+        XPathExpression cctsNameExp = xh.compile(".//*[local-name()=\"ccts_Name\"]");
+        XPathExpression cctsDefinitionExp = xh.compile(".//*[local-name()=\"ccts_Definition\"]");
         for (AgencyIdList agencyIdList : agencyIdLists) {
             NodeList enumeration = xh.getNodeList("//xsd:simpleType[@id = '" + agencyIdList.getEnumTypeGuid() + "']//xsd:enumeration");
 
             for (int i = 0; i < enumeration.getLength(); i++) {
-                Element enum_element = (Element) enumeration.item(i);
+                Element enumElement = (Element) enumeration.item(i);
 
                 AgencyIdListValue agencyIdListValue = new AgencyIdListValue();
-                agencyIdListValue.setValue(enum_element.getAttribute("value"));
+                agencyIdListValue.setValue(enumElement.getAttribute("value"));
 
-                Node name = xh.getNode("//xsd:simpleType[@id = '" + agencyIdList.getEnumTypeGuid() + "']//xsd:enumeration[@value = '" + agencyIdListValue.getValue() + "']//*[local-name()=\"ccts_Name\"]");
-                Node definition = xh.getNode("//xsd:simpleType[@id = '" + agencyIdList.getEnumTypeGuid() + "']//xsd:enumeration[@value = '" + agencyIdListValue.getValue() + "']//*[local-name()=\"ccts_Definition\"]");
+                Node name = xh.getNode(cctsNameExp, enumElement);
+                Node definition = xh.getNode(cctsDefinitionExp, enumElement);
 
                 agencyIdListValue.setName(name.getTextContent());
                 agencyIdListValue.setDefinition(definition.getTextContent());
@@ -108,7 +111,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private void updateAgencyIDList(Collection<AgencyIdList> agencyIdLists,
-                                   Collection<AgencyIdListValue> agencyIdListValues) throws Exception {
+                                    Collection<AgencyIdListValue> agencyIdListValues) throws Exception {
         AgencyIdListRepository agencyIdListRepository = repositoryFactory.agencyIdListRepository();
         agencyIdListValues.stream().filter(agencyIdListValue -> "6".equals(agencyIdListValue.getValue()))
                 .forEach(agencyIdListValue -> {
