@@ -1,20 +1,45 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "code_list_value")
 public class CodeListValue implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "CODE_LIST_VALUE_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CODE_LIST_VALUE_ID_SEQ", sequenceName = "CODE_LIST_VALUE_ID_SEQ", allocationSize = 1)
     private int codeListValueId;
+
+    @Column
     private int codeListId;
+
+    @Column(nullable = false)
     private String value;
+
+    @Column
     private String name;
+
+    @Column
     private String definition;
+
+    @Column
     private String definitionSource;
-    private boolean usedIndicator;
+
+    @Column
+    private boolean usedIndicator = true;
+
+    @Column
     private boolean lockedIndicator;
+
+    @Column
     private boolean extensionIndicator;
 
+    @Transient
     private String color;
+
+    @Transient
     private boolean disabled;
 
     public int getCodeListValueId() {

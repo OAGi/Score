@@ -39,6 +39,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
     private XPathHandler businessdatatype_xsd;
@@ -51,7 +54,6 @@ public class P_1_7_PopulateQBDTInDT {
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO;
     private CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO;
-    private CodeListRepository aCodeListDAO;
     private DataTypeSupplementaryComponentRepository aDTSCDAO;
     private XSDBuiltInTypeRepository aXSDBuiltInTypeDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO;
@@ -66,7 +68,6 @@ public class P_1_7_PopulateQBDTInDT {
         aBDTPrimitiveRestrictionDAO = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
         aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        aCodeListDAO = repositoryFactory.codeListRepository();
         aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
         aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
@@ -696,7 +697,7 @@ public class P_1_7_PopulateQBDTInDT {
 
 
     public int getCodeListId(String codeName) throws Exception {
-        List<CodeList> al = aCodeListDAO.findByNameContaining(codeName.trim());
+        List<CodeList> al = codeListRepository.findByNameContaining(codeName.trim());
         int minStrLen = Integer.MAX_VALUE;
         int minInd = -1;
         for (CodeList codelistVO : al) {

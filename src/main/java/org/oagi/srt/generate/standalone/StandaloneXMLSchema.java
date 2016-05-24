@@ -33,6 +33,12 @@ public class StandaloneXMLSchema {
     @Autowired
     private AgencyIdListValueRepository agencyIdListValueRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
+    @Autowired
+    private CodeListValueRepository codeListValueRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -428,9 +434,8 @@ public class StandaloneXMLSchema {
         CodeList aCL = null;
 
         if (gBBIE.getCodeListId() != 0) {
-            CodeListRepository dao1 = repositoryFactory.codeListRepository();
             try {
-                aCL = dao1.findOneByCodeListId(gBBIE.getCodeListId());
+                aCL = codeListRepository.findOne(gBBIE.getCodeListId());
             } catch (EmptyResultDataAccessException e) {
             }
         }
@@ -439,10 +444,9 @@ public class StandaloneXMLSchema {
             BusinessDataTypePrimitiveRestrictionRepository dao2 = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                     dao2.findOneByBdtPriRestriId(gBBIE.getBdtPriRestriId());
-            CodeListRepository dao1 = repositoryFactory.codeListRepository();
             if (aBDTPrimitiveRestriction.getCodeListId() != 0) {
                 try {
-                    aCL = dao1.findOneByCodeListId(aBDTPrimitiveRestriction.getCodeListId());
+                    aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
                 } catch (EmptyResultDataAccessException e) {
                 }
             }
@@ -454,9 +458,8 @@ public class StandaloneXMLSchema {
                 BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                         dao2.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
 
-                CodeListRepository dao1 = repositoryFactory.codeListRepository();
                 if (aBDTPrimitiveRestriction.getCodeListId() != 0)
-                    aCL = dao1.findOneByCodeListId(aBDTPrimitiveRestriction.getCodeListId());
+                    aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
                 else
                     aCL = null;
 
@@ -681,8 +684,7 @@ public class StandaloneXMLSchema {
     }
 
     public List<CodeListValue> getCodeListValues(CodeList gCL) throws Exception {
-        CodeListValueRepository dao = repositoryFactory.codeListValueRepository();
-        List<CodeListValue> codelistid = dao.findByCodeListId(gCL.getCodeListId());
+        List<CodeListValue> codelistid = codeListValueRepository.findByCodeListId(gCL.getCodeListId());
         List<CodeListValue> gCLVs = new ArrayList();
 
         for (int i = 0; i < codelistid.size(); i++) {
@@ -795,7 +797,6 @@ public class StandaloneXMLSchema {
     }
 
     public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
-        CodeListRepository dao2 = repositoryFactory.codeListRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
 
         DataTypeSupplementaryComponentRepository dao4 = repositoryFactory.dataTypeSupplementaryComponentRepository();
@@ -803,7 +804,7 @@ public class StandaloneXMLSchema {
 
         CodeList aCL = new CodeList();
         try {
-            aCL = dao2.findOneByCodeListId(gBBIESC.getCodeListId());
+            aCL = codeListRepository.findOne(gBBIESC.getCodeListId());
         } catch (EmptyResultDataAccessException e) {
         }
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
@@ -816,12 +817,12 @@ public class StandaloneXMLSchema {
         if (aCL.getCodeListId() != 0) {
 
         } else if (aBDTSCPrimitiveRestriction.getBdtScPriRestriId() != 0) {
-            aCL = dao2.findOneByCodeListId(aBDTSCPrimitiveRestriction.getCodeListId());
+            aCL = codeListRepository.findOne(aBDTSCPrimitiveRestriction.getCodeListId());
         } else if (aCL.getCodeListId() == 0 && aBDTSCPrimitiveRestriction.getBdtScPriRestriId() == 0) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
                     dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
             try {
-                aCL = dao2.findOneByCodeListId(bBDTSCPrimitiveRestriction.getCodeListId());
+                aCL = codeListRepository.findOne(bBDTSCPrimitiveRestriction.getCodeListId());
             } catch (EmptyResultDataAccessException e) {
                 return null;
             }

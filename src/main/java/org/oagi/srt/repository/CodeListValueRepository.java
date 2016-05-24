@@ -1,16 +1,20 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.CodeListValue;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface CodeListValueRepository {
+public interface CodeListValueRepository extends CrudRepository<CodeListValue, Integer> {
 
+    @Query("select c from CodeListValue c where c.codeListId = ?1")
     public List<CodeListValue> findByCodeListId(int codeListId);
 
+    @Query("select c from CodeListValue c where c.codeListId = ?1 and c.value = ?2")
     public CodeListValue findOneByCodeListIdAndValue(int codeListId, String value);
 
+    @Query("update CodeListValue c set c.codeListId = ?1 where codeListValueId = ?2")
     public void updateCodeListIdByCodeListValueId(int codeListId, int codeListValueId);
 
-    public void save(CodeListValue codeListValue);
 }

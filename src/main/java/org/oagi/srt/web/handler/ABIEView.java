@@ -12,6 +12,8 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 
     private RepositoryFactory repositoryFactory;
 
+    private CodeListRepository codeListRepository;
+
     private AssociationCoreComponent ascc;
     private AssociationCoreComponentProperty asccp;
     private AggregateCoreComponent acc;
@@ -36,12 +38,13 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     private int codeListId;
     private String restrictionType;
 
-    public ABIEView(RepositoryFactory repositoryFactory) {
+    public ABIEView(RepositoryFactory repositoryFactory, CodeListRepository codeListRepository) {
         this.repositoryFactory = repositoryFactory;
     }
 
-    public ABIEView(RepositoryFactory repositoryFactory, String name, int id, String type) {
+    public ABIEView(RepositoryFactory repositoryFactory, CodeListRepository codeListRepository, String name, int id, String type) {
         this.repositoryFactory = repositoryFactory;
+        this.codeListRepository = codeListRepository;
         this.name = name;
         this.id = id;
         this.type = type;
@@ -107,8 +110,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
             } else {
                 primitiveType = "Code List";
 
-                CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-                CodeList code = codeListRepository.findOneByCodeListId(cc.getCodeListId());
+                CodeList code = codeListRepository.findOne(cc.getCodeListId());
                 bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
             }
         }

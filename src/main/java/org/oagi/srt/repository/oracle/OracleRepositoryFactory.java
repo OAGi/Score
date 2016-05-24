@@ -12,12 +12,6 @@ import org.springframework.stereotype.Component;
 public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
-    private OracleCodeListRepository oracleCodeListRepository;
-
-    @Autowired
-    private OracleCodeListValueRepository oracleCodeListValueRepository;
-
-    @Autowired
     private OracleContextSchemeRepository oracleContextSchemeRepository;
 
     @Autowired
@@ -100,16 +94,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private OracleBlobContentRepository oracleBlobContentRepository;
-
-    @Override
-    public CodeListRepository codeListRepository() {
-        return oracleCodeListRepository;
-    }
-
-    @Override
-    public CodeListValueRepository codeListValueRepository() {
-        return oracleCodeListValueRepository;
-    }
 
     @Override
     public ContextSchemeRepository contextSchemeRepository() {

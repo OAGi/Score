@@ -46,6 +46,9 @@ public class TopLevelABIEHandler implements Serializable {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
     @Value("${spring.datasource.platform}")
     private String platform;
 
@@ -67,7 +70,6 @@ public class TopLevelABIEHandler implements Serializable {
     private BusinessContextRepository businessContextRepository;
     private BusinessContextValueRepository businessContextValueRepository;
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
-    private CodeListRepository codeListRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -121,7 +123,6 @@ public class TopLevelABIEHandler implements Serializable {
         businessContextValueRepository = repositoryFactory.businessContextValueRepository();
         bdtPriRestriRepository =
                 repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-        codeListRepository = repositoryFactory.codeListRepository();
 
         maxABIEId = asbieRepository.findGreatestId();
         maxASBIEPId = asbiepRepository.findGreatestId();
@@ -275,6 +276,7 @@ public class TopLevelABIEHandler implements Serializable {
                 aggregateBusinessInformationEntity.setBizCtxName(businessContext.getName());
                 ABIEView aABIEView = new ABIEView(
                         repositoryFactory,
+                        codeListRepository,
                         associationCoreComponentProperty.getPropertyTerm(),
                         aggregateBusinessInformationEntity.getAbieId(), "ABIE");
                 aABIEView.setAbie(aggregateBusinessInformationEntity);
@@ -335,13 +337,15 @@ public class TopLevelABIEHandler implements Serializable {
         topAbieVO = createABIE(aggregateCoreComponent, bCSelected.getBizCtxId(), true);
         int abieId = topAbieVO.getAbieId();
 
-        ABIEView rootABIEView = new ABIEView(repositoryFactory, selected.getPropertyTerm(), abieId, "ABIE");
+        ABIEView rootABIEView = new ABIEView(repositoryFactory,
+                codeListRepository, selected.getPropertyTerm(), abieId, "ABIE");
         rootABIEView.setAbie(topAbieVO);
         root = new DefaultTreeNode(rootABIEView, null);
 
         asbiepVO = createASBIEP(selected, abieId);
 
-        aABIEView = new ABIEView(repositoryFactory, selected.getPropertyTerm(), abieId, "ABIE");
+        aABIEView = new ABIEView(repositoryFactory,
+                codeListRepository, selected.getPropertyTerm(), abieId, "ABIE");
         aABIEView.setAbie(topAbieVO);
         aABIEView.setColor("blue");
         aABIEView.setAcc(aggregateCoreComponent);
@@ -370,13 +374,13 @@ public class TopLevelABIEHandler implements Serializable {
             topAbieVO = copyABIE(selectedAggregateBusinessInformationEntity, bCSelected.getBizCtxId(), true);
             int abieId = topAbieVO.getAbieId();
 
-            ABIEView rootABIEView = new ABIEView(repositoryFactory, associationCoreComponentProperty.getPropertyTerm(), abieId, "ABIE");
+            ABIEView rootABIEView = new ABIEView(repositoryFactory, codeListRepository, associationCoreComponentProperty.getPropertyTerm(), abieId, "ABIE");
             rootABIEView.setAbie(topAbieVO);
             root = new DefaultTreeNode(rootABIEView, null);
             AssociationBusinessInformationEntityProperty associationBusinessInformationEntityProperty =
                     copyASBIEP(asbiepRepository.
                             findOneByRoleOfAbieId(selectedAggregateBusinessInformationEntity.getAbieId()), abieId);
-            aABIEView = new ABIEView(repositoryFactory, associationCoreComponentProperty.getPropertyTerm(), abieId, "ABIE");
+            aABIEView = new ABIEView(repositoryFactory, codeListRepository, associationCoreComponentProperty.getPropertyTerm(), abieId, "ABIE");
             aABIEView.setAbie(topAbieVO);
             aABIEView.setColor("blue");
             aABIEView.setAsbiep(associationBusinessInformationEntityProperty);
@@ -870,7 +874,7 @@ public class TopLevelABIEHandler implements Serializable {
             BasicCoreComponentProperty bccpVO =
                     bccpRepository.findOneByBccpId(nBBIEPVO.getBasedBccpId());
 
-            ABIEView av = new ABIEView(repositoryFactory, bccpVO.getPropertyTerm(), nBasicBusinessInformationEntity.getBbieId(), "BBIE");
+            ABIEView av = new ABIEView(repositoryFactory, codeListRepository, bccpVO.getPropertyTerm(), nBasicBusinessInformationEntity.getBbieId(), "BBIE");
             av.setBbiep(nBBIEPVO);
             av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, nBasicBusinessInformationEntity);
 
@@ -898,7 +902,8 @@ public class TopLevelABIEHandler implements Serializable {
             AssociationCoreComponentProperty asccpVO =
                     asccpRepository.findOneByAsccpId(n_next_asbiepVO.getBasedAsccpId());
 
-            ABIEView av = new ABIEView(repositoryFactory, asccpVO.getPropertyTerm(), nabieVO.getAbieId(), "ASBIE");
+            ABIEView av = new ABIEView(repositoryFactory,
+                    codeListRepository, asccpVO.getPropertyTerm(), nabieVO.getAbieId(), "ASBIE");
             av.setColor("blue");
             av.setAbie(n_next_abieVO);
             av.setAsbie(nASBIEVO);
@@ -1036,7 +1041,8 @@ public class TopLevelABIEHandler implements Serializable {
 
         DataTypeSupplementaryComponent dtscvo = dtScRepository.findOneByDtScId(nbbiescVO.getDtScId());
 
-        ABIEView av = new ABIEView(repositoryFactory, dtscvo.getPropertyTerm(), nbbiescVO.getBbieScId(), "BBIESC");
+        ABIEView av = new ABIEView(repositoryFactory,
+                codeListRepository, dtscvo.getPropertyTerm(), nbbiescVO.getBbieScId(), "BBIESC");
 
         av.setBbiesc(nbbiescVO);
         String sc_name = "";
@@ -1232,11 +1238,13 @@ public class TopLevelABIEHandler implements Serializable {
         //root = new DefaultTreeNode(selectedBod, null);
 
         logger.debug("#### " + selectedBod.getName());
-        ABIEView rootABIEView = new ABIEView(repositoryFactory, selectedBod.getName(), selectedBod.getId(), "ROOT");
+        ABIEView rootABIEView = new ABIEView(repositoryFactory,
+                codeListRepository, selectedBod.getName(), selectedBod.getId(), "ROOT");
         rootABIEView.setAbie(selectedBod.getAbie());
         root = new DefaultTreeNode(rootABIEView, null);
 
-        aABIEView = new ABIEView(repositoryFactory, selectedBod.getName(), selectedBod.getId(), "ABIE");
+        aABIEView = new ABIEView(repositoryFactory,
+                codeListRepository, selectedBod.getName(), selectedBod.getId(), "ABIE");
         aABIEView.setAbie(selectedBod.getAbie());
         aABIEView.setColor("blue");
         TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
@@ -1282,7 +1290,7 @@ public class TopLevelABIEHandler implements Serializable {
         BasicCoreComponentProperty bccpVO = bccpRepository.findOneByBccpId(bbiepVO.getBasedBccpId());
         BasicCoreComponent bccVO = bccRepository.findOneByBccId(bbieVO.getBasedBccId());
 
-        ABIEView av = new ABIEView(repositoryFactory, bccpVO.getPropertyTerm(), bbieVO.getBbieId(), "BBIE");
+        ABIEView av = new ABIEView(repositoryFactory, codeListRepository, bccpVO.getPropertyTerm(), bbieVO.getBbieId(), "BBIE");
         av.setBcc(bccVO);
         av.setBbiep(bbiepVO);
         av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, bbieVO);
@@ -1300,7 +1308,7 @@ public class TopLevelABIEHandler implements Serializable {
         AggregateBusinessInformationEntity abieVO = abieRepository.findOneByAbieId(asbiepVO.getRoleOfAbieId());
         AggregateCoreComponent accVO = accRepository.findOneByAccId(abieVO.getBasedAccId());
 
-        ABIEView av = new ABIEView(repositoryFactory, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
+        ABIEView av = new ABIEView(repositoryFactory, codeListRepository, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
         av.setColor("blue");
         av.setAscc(asccVO);
         av.setAsccp(asccpVO);
@@ -1317,7 +1325,7 @@ public class TopLevelABIEHandler implements Serializable {
         for (BasicBusinessInformationEntitySupplementaryComponent bbiescVO : list_01) {
             DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByDtScId(bbiescVO.getDtScId());
 
-            ABIEView av_01 = new ABIEView(repositoryFactory, dtscVO.getPropertyTerm(), bbiescVO.getBbieScId(), "BBIESC");
+            ABIEView av_01 = new ABIEView(repositoryFactory, codeListRepository, dtscVO.getPropertyTerm(), bbiescVO.getBbieScId(), "BBIESC");
             av_01.setDtsc(dtscVO);
             av_01.setBbiesc(bbiescVO);
 
@@ -1355,7 +1363,7 @@ public class TopLevelABIEHandler implements Serializable {
 
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
                     bdtPriRestriRepository.findOneByBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
-            CodeList codeList = codeListRepository.findOneByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+            CodeList codeList = codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId());
             codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
     }
@@ -1464,7 +1472,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     public ABIEView getaABIEView() {
         if (aABIEView == null)
-            aABIEView = new ABIEView(repositoryFactory);
+            aABIEView = new ABIEView(repositoryFactory, codeListRepository);
         return aABIEView;
     }
 
@@ -1498,7 +1506,7 @@ public class TopLevelABIEHandler implements Serializable {
 
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
                     bdtPriRestriRepository.findOneByBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
-            CodeList codeList = codeListRepository.findOneByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+            CodeList codeList = codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId());
             codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
     }
@@ -1576,7 +1584,7 @@ public class TopLevelABIEHandler implements Serializable {
 
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
                 bdtPriRestriRepository.findOneByBdtPriRestriId(bdtPrimitiveRestrictionId);
-        CodeList codeList = codeListRepository.findOneByCodeListId(aBDTPrimitiveRestrictionVO.getCodeListId());
+        CodeList codeList = codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId());
         codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
 
         logger.debug("##### " + codeLists);

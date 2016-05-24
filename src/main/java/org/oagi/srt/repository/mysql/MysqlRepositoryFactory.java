@@ -9,12 +9,6 @@ import org.springframework.stereotype.Component;
 public class MysqlRepositoryFactory implements RepositoryFactory {
 
     @Autowired
-    private BaseCodeListRepository baseCodeListRepository;
-
-    @Autowired
-    private BaseCodeListValueRepository baseCodeListValueRepository;
-
-    @Autowired
     private BaseContextSchemeRepository baseContextSchemeRepository;
 
     @Autowired
@@ -97,16 +91,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private BaseBlobContentRepository baseBlobContentRepository;
-
-    @Override
-    public CodeListRepository codeListRepository() {
-        return baseCodeListRepository;
-    }
-
-    @Override
-    public CodeListValueRepository codeListValueRepository() {
-        return baseCodeListValueRepository;
-    }
 
     @Override
     public ContextSchemeRepository contextSchemeRepository() {

@@ -24,9 +24,11 @@ public class CDTTest {
     @Autowired
     private AgencyIdListValueRepository agencyIdListValueRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
     public int getCodeListId(String codeName) throws Exception {
-        CodeListRepository aCodeListDAO = repositoryFactory.codeListRepository();
-        CodeList codelist = aCodeListDAO.findByNameContaining(codeName.trim()).get(0);
+        CodeList codelist = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelist.getCodeListId();
     }
 

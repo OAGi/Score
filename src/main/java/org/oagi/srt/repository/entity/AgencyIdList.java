@@ -73,11 +73,11 @@ public class AgencyIdList implements Serializable {
         this.listId = listId;
     }
 
-    public Integer getAgencyId() {
-        return agencyId;
+    public int getAgencyId() {
+        return (agencyId == null) ? 0 : agencyId;
     }
 
-    public void setAgencyId(Integer agencyId) {
+    public void setAgencyId(int agencyId) {
         this.agencyId = agencyId;
     }
 

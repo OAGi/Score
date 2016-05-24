@@ -1,10 +1,7 @@
 package org.oagi.srt.web.handler;
 
 import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
-import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
-import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.RepositoryFactory;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
@@ -38,6 +35,10 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 
 	@Autowired
 	private RepositoryFactory repositoryFactory;
+
+	@Autowired
+	private CodeListRepository codeListRepository;
+
 	private AggregateBusinessInformationEntityRepository abieRepository;
 	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
 	private AssociationCoreComponentPropertyRepository asccpRepository;
@@ -127,7 +128,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().equals(abieName)) {
-				ABIEView av = new ABIEView(repositoryFactory, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
+				ABIEView av = new ABIEView(repositoryFactory, codeListRepository, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
 				av.setAsccp(asccpVO);
 				av.setAbie(abieVO);
 				av.setAsbiep(asbiepVO);

@@ -2,33 +2,91 @@ package org.oagi.srt.repository.entity;
 
 import org.oagi.srt.common.SRTConstants;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "code_list")
 public class CodeList implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "CODE_LIST_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CODE_LIST_ID_SEQ", sequenceName = "CODE_LIST_ID_SEQ", allocationSize = 1)
     private int codeListId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column
     private String enumTypeGuid;
+
+    @Column
     private String name;
+
+    @Column(nullable = false)
     private String listId;
+
+    @Column(nullable = false)
     private int agencyId;
+
+    @Column(nullable = false)
     private String versionId;
+
+    @Column
     private String definition;
+
+    @Column
     private String remark;
+
+    @Column
     private String definitionSource;
-    private int basedCodeListId;
+
+    @Column
+    private Integer basedCodeListId;
+
+    @Column(nullable = false)
     private boolean extensibleIndicator;
+
+    @Column
     private String module;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private String state;
 
+    @Transient
     private boolean editDisabled;
+
+    @Transient
     private boolean deleteDisabled;
+
+    @Transient
     private boolean discardDisabled;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getCodeListId() {
         return codeListId;
@@ -111,7 +169,7 @@ public class CodeList implements Serializable {
     }
 
     public int getBasedCodeListId() {
-        return basedCodeListId;
+        return (basedCodeListId == null) ? 0 : basedCodeListId;
     }
 
     public void setBasedCodeListId(int basedCodeListId) {

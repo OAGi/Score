@@ -29,6 +29,12 @@ public class CodeListTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
+    @Autowired
+    private CodeListValueRepository codeListValueRepository;
+
     public void validate(String path1) throws Exception {
 
         XPathHandler xh = new XPathHandler(path1);
@@ -72,8 +78,6 @@ public class CodeListTest {
             }
         }
 
-        CodeListRepository aCodeListDAO = repositoryFactory.codeListRepository();
-
         NodeList result = xh.getNodeList("//xsd:simpleType");
         NodeList union = xh.getNodeList("//xsd:simpleType[xsd:union]");
         List<Integer> unionInt = new ArrayList<Integer>();
@@ -81,14 +85,12 @@ public class CodeListTest {
             Element tmp = (Element) result.item(i);
             Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
             if (union_check != null) {
-                CodeList codelistVO = aCodeListDAO.findOneByGuid(tmp.getAttribute("id"));
+                CodeList codelistVO = codeListRepository.findOneByGuid(tmp.getAttribute("id"));
                 unionInt.add(codelistVO.getCodeListId());
             }
         }
 
-        List<CodeList> allCodelist = aCodeListDAO.findAll();
-        for (CodeList aCodelist : allCodelist) {
-
+        for (CodeList aCodelist : codeListRepository.findAll()) {
             if (aCodelist.getBasedCodeListId() != 0)
                 System.out.println("Error, based code list id is not null when code list id =" + aCodelist.getCodeListId());
             if (aCodelist.getCreatedBy() != getUserID("oagis"))
@@ -105,12 +107,10 @@ public class CodeListTest {
     }
 
     public int getCodeListId(String codelistGuid, String enumTypeguid, String name) {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         return codeListRepository.findOneByGuidAndEnumTypeGuidAndName(codelistGuid, enumTypeguid, name).getCodeListId();
     }
 
     public int getCodeListValueID(int codelist_id, String value) {
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         return codeListValueRepository.findOneByCodeListIdAndValue(codelist_id, value).getCodeListValueId();
     }
 

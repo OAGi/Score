@@ -37,6 +37,12 @@ public class P_1_4_PopulateCodeList {
     @Autowired
     private AgencyIdListValueRepository agencyIdListValueRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
+    @Autowired
+    private CodeListValueRepository codeListValueRepository;
+
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.4 Start");
@@ -59,14 +65,16 @@ public class P_1_4_PopulateCodeList {
                 {"CodeList_UnitCode_UNECE_7_04", "6"}
         };
 
+        List<CodeList> codeLists = new ArrayList();
         for (int i = 0; i < tt.length; i++) {
             String fileName = tt[i][0];
             int agencyId = Integer.parseInt(tt[i][1]);
 
             System.out.println("## Importing Code List from " + fileName + "..");
             String filename = fileName + ".xsd";
-            codeList(filename, agencyId);
+            codeLists.addAll(codeList(filename, agencyId));
         }
+        codeListRepository.save(codeLists);
 
         for (int i = 0; i < tt.length; i++) {
             String fileName = tt[i][0];
@@ -91,12 +99,10 @@ public class P_1_4_PopulateCodeList {
         System.out.println("### 1.4 End");
     }
 
-    private void codeList(String fileinput, int agencyId) throws Exception {
+    private List<CodeList> codeList(String fileinput, int agencyId) throws Exception {
+        List<CodeList> codeLists = new ArrayList();
         String path1 = SRTConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
-
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        CodeList codeList = new CodeList();
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
 
@@ -106,6 +112,7 @@ public class P_1_4_PopulateCodeList {
             Element element = (Element) result.item(i);
             String name = element.getAttribute("name");
             if (name.endsWith("CodeContentType")) {
+                CodeList codeList = new CodeList();
                 codeList.setGuid(element.getAttribute("id"));
 
                 //added by TKim according to design Doc v2.4
@@ -149,11 +156,12 @@ public class P_1_4_PopulateCodeList {
                 codeList.setLastUpdatedBy(userId);
                 codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
                 codeList.setModule(extractModuleName(path1));
-
-                codeListRepository.save(codeList);
+                codeLists.add(codeList);
             } else if (!name.endsWith("EnumerationType"))
                 System.out.println("Check !!  " + name);
         }
+
+        return codeLists;
     }
 
     private String extractVersionId(String name) {
@@ -194,8 +202,6 @@ public class P_1_4_PopulateCodeList {
         String path1 = SRTConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
 
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-
         NodeList result = xh.getNodeList("//xsd:simpleType");
 
         for (int i = 0; i < result.getLength(); i++) {
@@ -223,7 +229,7 @@ public class P_1_4_PopulateCodeList {
 
                         if (baseCodelistVO != null && codelistVO != null) {
                             codelistVO.setBasedCodeListId(baseCodelistVO.getCodeListId());
-                            codeListRepository.update(codelistVO);
+                            codeListRepository.save(codelistVO);
                             System.out.println(" Update Based Code List ID: " + tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
                         } else {
                             System.out.println(" Update Based Code List ID Is Failed! Check CodeListID: " + tmp.getAttribute("name"));
@@ -241,9 +247,6 @@ public class P_1_4_PopulateCodeList {
         String path1 = SRTConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
 
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
-
         NodeList result = xh.getNodeList("//xsd:simpleType");
         NodeList enumeration = null;
 
@@ -253,7 +256,7 @@ public class P_1_4_PopulateCodeList {
             enumeration = null;
 
             if (element.getAttribute("name").endsWith("CodeContentType")) {
-                String guid = new String(element.getAttribute("id"));
+                String guid = element.getAttribute("id");
                 CodeList codeList = codeListRepository.findOneByGuid(guid);
 
                 if (codeList.getEnumTypeGuid() != null) {
@@ -272,9 +275,9 @@ public class P_1_4_PopulateCodeList {
                         if (codeListValuesFromBase.size() > 0) {
                             System.out.println("   Start inherit from BasedCodeList: " + codeList.getName());
                             for (int j = 0; j < codeListValuesFromBase.size(); j++) {
-                                CodeListValue codelistvalVO = codeListValuesFromBase.get(j);
-                                codelistvalVO.setCodeListId(codeList.getCodeListId());
-                                codeListValueRepository.save(codelistvalVO);
+                                CodeListValue codeListValue = codeListValuesFromBase.get(j);
+                                codeListValue.setCodeListId(codeList.getCodeListId());
+                                codeListValueRepository.save(codeListValue);
                             }
                         }
                     } else {//if based code list is null
@@ -291,27 +294,27 @@ public class P_1_4_PopulateCodeList {
                 if (enumeration != null) {
                     for (int j = 0; j < enumeration.getLength(); j++) {
                         Element aEnum = (Element) enumeration.item(j);
-                        CodeListValue codelistvalueVO = new CodeListValue();
-                        codelistvalueVO.setCodeListId(codeList.getCodeListId());
-                        codelistvalueVO.setValue(aEnum.getAttribute("value"));
-                        codelistvalueVO.setName(aEnum.getAttribute("value"));
-                        codelistvalueVO.setUsedIndicator(true);
-                        codelistvalueVO.setLockedIndicator(false);
-                        codelistvalueVO.setExtensionIndicator(false);
+                        CodeListValue codeListValue = new CodeListValue();
+                        codeListValue.setCodeListId(codeList.getCodeListId());
+                        codeListValue.setValue(aEnum.getAttribute("value"));
+                        codeListValue.setName(aEnum.getAttribute("value"));
+                        codeListValue.setUsedIndicator(true);
+                        codeListValue.setLockedIndicator(false);
+                        codeListValue.setExtensionIndicator(false);
 
-                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration[@value='" + codelistvalueVO.getValue() + "']//xsd:documentation");
+                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
                         if (definitionNode == null) {
-                            definitionNode = xh.getNode("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration[@value='" + codelistvalueVO.getValue() + "']//xsd:documentation");
+                            definitionNode = xh.getNode("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
                         }
                         if (definitionNode != null) {
                             Element definition = (Element) definitionNode;
-                            codelistvalueVO.setDefinition(definition.getTextContent().trim());
-                            codelistvalueVO.setDefinitionSource(definition.getAttribute("source"));
+                            codeListValue.setDefinition(definition.getTextContent().trim());
+                            codeListValue.setDefinitionSource(definition.getAttribute("source"));
                         } else {
-                            codelistvalueVO.setDefinition(null);
-                            codelistvalueVO.setDefinitionSource(null);
+                            codeListValue.setDefinition(null);
+                            codeListValue.setDefinitionSource(null);
                         }
-                        codeListValueRepository.save(codelistvalueVO);
+                        codeListValueRepository.save(codeListValue);
                     }
                 }
             }
@@ -346,7 +349,6 @@ public class P_1_4_PopulateCodeList {
         String path1 = SRTConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
 
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         CodeList codeList = new CodeList();
 
         CodeList codelistVO = new CodeList();
@@ -461,7 +463,7 @@ public class P_1_4_PopulateCodeList {
                     int basedCodeListId = codelistFromDBVO.getBasedCodeListId();
                     if (basedCodeListId > 0) {
                         System.out.println("Code List ID: " + codelistFromDBVO.getCodeListId() + ", Based Code List ID: " + basedCodeListId);
-                        CodeList baseCodeList = codeListRepository.findOneByCodeListId(basedCodeListId);
+                        CodeList baseCodeList = codeListRepository.findOne(basedCodeListId);
                         fromDB = fromDB + baseCodeList.getName();  //base code list's Name is used instead of its ID
                     }
 
@@ -486,8 +488,6 @@ public class P_1_4_PopulateCodeList {
         String path1 = SRTConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
 
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         NodeList result = xh.getNodeList("//xsd:simpleType");
 
         for (int i = 0; i < result.getLength(); i++) {
@@ -645,7 +645,7 @@ public class P_1_4_PopulateCodeList {
                 SpringApplication.run(Application.class, args);) {
             P_1_4_PopulateCodeList populateCodeList = ctx.getBean(P_1_4_PopulateCodeList.class);
             populateCodeList.run(ctx);
-            populateCodeList.validate();
+            //populateCodeList.validate();
         }
     }
 }

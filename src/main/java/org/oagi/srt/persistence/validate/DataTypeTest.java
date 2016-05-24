@@ -31,6 +31,9 @@ public class DataTypeTest {
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
     public DataType validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) {
         DataTypeRepository dataTypeRepository = repositoryFactory.dataTypeRepository();
 
@@ -1362,8 +1365,7 @@ public class DataTypeTest {
     }
 
     public int getCodeListId(String codeName) {
-        CodeListRepository aCodeListDAO = repositoryFactory.codeListRepository();
-        CodeList codelistVO = aCodeListDAO.findByNameContaining(codeName.trim()).get(0);
+        CodeList codelistVO = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelistVO.getCodeListId();
     }
 

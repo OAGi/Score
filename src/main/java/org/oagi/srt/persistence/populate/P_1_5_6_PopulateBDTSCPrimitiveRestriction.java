@@ -32,6 +32,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
+    @Autowired
+    private CodeListRepository codeListRepository;
+
     public int getAgencyListID() throws Exception {
         AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyIdList.getAgencyIdListId();
@@ -53,7 +56,6 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CodeListRepository aCodeListDAO = repositoryFactory.codeListRepository();
         CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
         XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
         DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
@@ -106,7 +108,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     String attrTypeName = ele.getAttribute("type").replaceAll("ContentType", "");
                     String typeName = ele.getAttribute("type").replaceAll("ContentType", "");
                     try {
-                        codeListId = aCodeListDAO.findOneByName(typeName).getCodeListId();
+                        codeListId = codeListRepository.findOneByName(typeName).getCodeListId();
                     } catch (EmptyResultDataAccessException e) {
                         codeListId = 0;
                     }
@@ -152,7 +154,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bLanguageVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                         bLanguageVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
 
-                        CodeList clVO = aCodeListDAO.findOneByName("clm56392A20081107_LanguageCode");
+                        CodeList clVO = codeListRepository.findOneByName("clm56392A20081107_LanguageCode");
                         bLanguageVO.setCodeListId(clVO.getCodeListId());
                         bLanguageVO.setDefault(false);
                         System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " code list id = " + bLanguageVO.getCodeListId() + " is default = " + bLanguageVO.isDefault());
@@ -163,9 +165,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                         CodeList clVO = null;
                         if (dtVO.getDen().equals("Action Expression. Type")) {
-                            clVO = aCodeListDAO.findOneByName("oacl_ActionCode");
+                            clVO = codeListRepository.findOneByName("oacl_ActionCode");
                         } else if (dtVO.getDen().equals("Response Expression. Type")) {
-                            clVO = aCodeListDAO.findOneByName("oacl_ResponseActionCode");
+                            clVO = codeListRepository.findOneByName("oacl_ResponseActionCode");
                         }
 
                         if (clVO != null) {
