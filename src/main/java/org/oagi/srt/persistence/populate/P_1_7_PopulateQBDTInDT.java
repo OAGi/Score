@@ -36,6 +36,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AgencyIdListRepository agencyIdListRepository;
+
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
     private XPathHandler businessdatatype_xsd;
@@ -54,7 +57,6 @@ public class P_1_7_PopulateQBDTInDT {
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO;
     private CoreDataTypePrimitiveRepository aCDTPrimitiveDAO;
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtSCPRDAO;
-    private AgencyIdListRepository agencyIdListRepository;
 
     @PostConstruct
     public void init() throws Exception {
@@ -70,7 +72,6 @@ public class P_1_7_PopulateQBDTInDT {
         aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
         cdtSCAPMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        agencyIdListRepository = repositoryFactory.agencyIdListRepository();
 
         fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);

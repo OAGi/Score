@@ -2,9 +2,6 @@ package org.oagi.srt.repository;
 
 public interface RepositoryFactory {
 
-    public AgencyIdListRepository agencyIdListRepository();
-    public AgencyIdListValueRepository agencyIdListValueRepository();
-
     public CodeListRepository codeListRepository();
     public CodeListValueRepository codeListValueRepository();
 

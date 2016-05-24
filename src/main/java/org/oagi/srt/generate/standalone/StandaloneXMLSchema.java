@@ -27,6 +27,12 @@ public class StandaloneXMLSchema {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private AgencyIdListRepository agencyIdListRepository;
+
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -825,7 +831,6 @@ public class StandaloneXMLSchema {
 
     public AgencyIdList getAgencyIdList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
         AgencyIdList aAL = null;
-        AgencyIdListRepository dao4 = repositoryFactory.agencyIdListRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
                 dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
@@ -834,7 +839,7 @@ public class StandaloneXMLSchema {
 
         boolean firstCheck = true;
         try {
-            aAL = dao4.findOneByAgencyIdListId(gBBIESC.getAgencyIdListId());
+            aAL = agencyIdListRepository.findOne(gBBIESC.getAgencyIdListId());
         } catch (EmptyResultDataAccessException e) {
             firstCheck = false;
         }
@@ -842,7 +847,7 @@ public class StandaloneXMLSchema {
         boolean secondCheck = true;
         if (aAL == null) {
             try {
-                aAL = dao4.findOneByAgencyIdListId(aBDTSCPrimitiveRestriction.getAgencyIdListId());
+                aAL = agencyIdListRepository.findOne(aBDTSCPrimitiveRestriction.getAgencyIdListId());
             } catch (EmptyResultDataAccessException e) {
                 secondCheck = false;
             }
@@ -852,7 +857,7 @@ public class StandaloneXMLSchema {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
                     dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
             try {
-                aAL = dao4.findOneByAgencyIdListId(bBDTSCPrimitiveRestriction.getAgencyIdListId());
+                aAL = agencyIdListRepository.findOne(bBDTSCPrimitiveRestriction.getAgencyIdListId());
             } catch (EmptyResultDataAccessException e) {
                 return null;
             }
@@ -1015,8 +1020,7 @@ public class StandaloneXMLSchema {
         stNode.appendChild(rtNode);
         rtNode.setAttributeNode(base);
 
-        AgencyIdListValueRepository dao = repositoryFactory.agencyIdListValueRepository();
-        List<AgencyIdListValue> gALVs = dao.findByOwnerListId(gAL.getAgencyIdListId());
+        List<AgencyIdListValue> gALVs = agencyIdListValueRepository.findByOwnerListId(gAL.getAgencyIdListId());
 
         for (int i = 0; i < gALVs.size(); i++) {
             AgencyIdListValue aAgencyIdListValue = gALVs.get(i);

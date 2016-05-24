@@ -5,7 +5,6 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,10 @@ import java.util.List;
 public class P_1_3_PopulateAgencyIDList {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
+    private AgencyIdListRepository agencyIdListRepository;
+
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
@@ -72,7 +74,6 @@ public class P_1_3_PopulateAgencyIDList {
                 "Code list agency:   UNECE\n" +
                 "Code list version:  D13A");
 
-        AgencyIdListRepository agencyIdListRepository = repositoryFactory.agencyIdListRepository();
         agencyIdListRepository.save(agencyIdList);
 
         return Arrays.asList(agencyIdList);
@@ -82,7 +83,6 @@ public class P_1_3_PopulateAgencyIDList {
         String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
         XPathHandler xh = new XPathHandler(path1);
 
-        AgencyIdListValueRepository agencyIdListValueRepository = repositoryFactory.agencyIdListValueRepository();
         List<AgencyIdListValue> agencyIdListValues = new ArrayList();
 
         XPathExpression cctsNameExp = xh.compile(".//*[local-name()=\"ccts_Name\"]");
@@ -106,13 +106,12 @@ public class P_1_3_PopulateAgencyIDList {
             }
         }
 
-        agencyIdListValueRepository.saveBatch(agencyIdListValues);
+        agencyIdListValueRepository.save(agencyIdListValues);
         return agencyIdListValues;
     }
 
     private void updateAgencyIDList(Collection<AgencyIdList> agencyIdLists,
                                     Collection<AgencyIdListValue> agencyIdListValues) throws Exception {
-        AgencyIdListRepository agencyIdListRepository = repositoryFactory.agencyIdListRepository();
         agencyIdListValues.stream().filter(agencyIdListValue -> "6".equals(agencyIdListValue.getValue()))
                 .forEach(agencyIdListValue -> {
                     agencyIdListRepository.updateAgencyId(agencyIdListValue.getAgencyIdListValueId());
@@ -131,9 +130,6 @@ public class P_1_3_PopulateAgencyIDList {
 
         String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
         XPathHandler xh = new XPathHandler(path1);
-
-        AgencyIdListRepository agencyIdListRepository = repositoryFactory.agencyIdListRepository();
-        AgencyIdListValueRepository agencyIdListValueRepository = repositoryFactory.agencyIdListValueRepository();
 
         AgencyIdList agencyIdList;
         AgencyIdListValue agencyIdListValue;
@@ -163,7 +159,7 @@ public class P_1_3_PopulateAgencyIDList {
         fromDB = fromDB + agencyIdList.getName();
         fromDB = fromDB + agencyIdList.getListId();
 
-        agencyIdListValue = agencyIdListValueRepository.findOneByAgencyIdListValueId(agencyIdList.getAgencyId());
+        agencyIdListValue = agencyIdListValueRepository.findOne(agencyIdList.getAgencyId());
 
         fromDB = fromDB + agencyIdListValue.getValue();
         fromDB = fromDB + agencyIdList.getVersionId();
@@ -181,9 +177,6 @@ public class P_1_3_PopulateAgencyIDList {
 
         String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
         XPathHandler xh = new XPathHandler(path1);
-
-        AgencyIdListRepository agencyIdListRepository = repositoryFactory.agencyIdListRepository();
-        AgencyIdListValueRepository agencyIdListValueRepository = repositoryFactory.agencyIdListValueRepository();
 
         ArrayList<String> fromXSDList = new ArrayList<String>();
         ArrayList<String> fromDBList = new ArrayList<String>();
@@ -248,7 +241,7 @@ public class P_1_3_PopulateAgencyIDList {
                 SpringApplication.run(Application.class, args);) {
             P_1_3_PopulateAgencyIDList populateAgencyIDList = ctx.getBean(P_1_3_PopulateAgencyIDList.class);
             populateAgencyIDList.run(ctx);
-            populateAgencyIDList.validate();
+            //populateAgencyIDList.validate();
         }
     }
 }

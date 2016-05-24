@@ -146,7 +146,8 @@ CREATE TABLE `app_user` (
   `name` text,
   `organization` text,
   `oagis_developer_indicator` tinyint(1) NOT NULL COMMENT 'This indicates whether the user can edit OAGIS Model content. Content created by the OAGIS developer is also considered OAGIS Model content.',
-  PRIMARY KEY (`app_user_id`)
+  PRIMARY KEY (`app_user_id`),
+  UNIQUE KEY `app_user_uk1` (`login_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

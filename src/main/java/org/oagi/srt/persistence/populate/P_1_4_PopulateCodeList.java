@@ -34,6 +34,9 @@ public class P_1_4_PopulateCodeList {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
+
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.4 Start");
@@ -180,7 +183,6 @@ public class P_1_4_PopulateCodeList {
     }
 
     private int getAgencyID(int value) {
-        AgencyIdListValueRepository agencyIdListValueRepository = repositoryFactory.agencyIdListValueRepository();
         return agencyIdListValueRepository.findOneByValue(String.valueOf(value)).getAgencyIdListValueId();
     }
 

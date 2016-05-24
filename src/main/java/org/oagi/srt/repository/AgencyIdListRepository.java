@@ -1,20 +1,19 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AgencyIdList;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
+public interface AgencyIdListRepository extends CrudRepository<AgencyIdList, Integer> {
 
-public interface AgencyIdListRepository {
-
-    public List<AgencyIdList> findAll();
-
-    public AgencyIdList findOneByAgencyIdListId(int agencyIdListId);
-
+    @Query("select a from AgencyIdList a where a.guid = ?1")
     public AgencyIdList findOneByGuid(String guid);
 
+    @Query("select a from AgencyIdList a where a.name = ?1")
     public AgencyIdList findOneByName(String name);
 
-    public void save(AgencyIdList agencyIdList);
-
+    @Modifying
+    @Query("update AgencyIdList a set a.agencyId = ?1")
     public void updateAgencyId(int agencyIdListValue);
 }

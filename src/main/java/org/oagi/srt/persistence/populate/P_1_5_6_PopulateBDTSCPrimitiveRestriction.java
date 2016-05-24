@@ -29,10 +29,12 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private AgencyIdListRepository agencyIdListRepository;
+
     public int getAgencyListID() throws Exception {
-        AgencyIdListRepository dao = repositoryFactory.agencyIdListRepository();
-        AgencyIdList agencyidlistVO = dao.findOneByName("Agency Identification");
-        return agencyidlistVO.getAgencyIdListId();
+        AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
+        return agencyIdList.getAgencyIdListId();
     }
 
     @Transactional(rollbackFor = Throwable.class)

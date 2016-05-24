@@ -18,6 +18,12 @@ public class CDTTest {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private AgencyIdListRepository agencyIdListRepository;
+
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
+
     public int getCodeListId(String codeName) throws Exception {
         CodeListRepository aCodeListDAO = repositoryFactory.codeListRepository();
         CodeList codelist = aCodeListDAO.findByNameContaining(codeName.trim()).get(0);
@@ -25,8 +31,7 @@ public class CDTTest {
     }
 
     public int getAgencyListId() throws Exception {
-        AgencyIdListRepository dao = repositoryFactory.agencyIdListRepository();
-        AgencyIdList agencyidlist = dao.findOneByName("Agency Identification");
+        AgencyIdList agencyidlist = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyidlist.getAgencyIdListId();
     }
 
@@ -477,9 +482,7 @@ public class CDTTest {
     }
 
     private void validate_agency_id_list() throws Exception {
-        AgencyIdListValueRepository aAgencyIdListValue = repositoryFactory.agencyIdListValueRepository();
-        List<AgencyIdListValue> AgencyIdListValueList = aAgencyIdListValue.findAll();
-        if (AgencyIdListValueList.size() == 395)
+        if (agencyIdListValueRepository.count() == 395)
             System.out.println("# of Agency Id List Values is correct");
     }
 
