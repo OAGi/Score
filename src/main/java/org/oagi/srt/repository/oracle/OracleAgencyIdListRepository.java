@@ -2,7 +2,6 @@ package org.oagi.srt.repository.oracle;
 
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.impl.BaseAgencyIdListRepository;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;

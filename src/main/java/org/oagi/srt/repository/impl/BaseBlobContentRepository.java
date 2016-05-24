@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.impl;
 
 import org.oagi.srt.repository.BlobContentRepository;
-import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.BlobContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

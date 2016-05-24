@@ -3,7 +3,6 @@ package org.oagi.srt.repository.oracle;
 import org.oagi.srt.repository.entity.BlobContent;
 import org.oagi.srt.repository.impl.BaseBlobContentRepository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.support.SqlLobValue;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
