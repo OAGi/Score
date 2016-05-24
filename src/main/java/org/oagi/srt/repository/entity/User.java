@@ -1,14 +1,29 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "app_user")
 public class User implements Serializable {
 
+    @Id
+    @GeneratedValue
     private int appUserId;
+
+    @Column(nullable = false)
     private String loginId;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column
     private String name;
+
+    @Column
     private String organization;
+
+    @Column(nullable = false)
     private boolean oagisDeveloperIndicator;
 
     public int getAppUserId() {

@@ -1,6 +1,5 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.UserRepository;
 import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +11,11 @@ import javax.annotation.PostConstruct;
 public class UIHandler {
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
+	private UserRepository userRepository;
 	protected int userId;
 
 	@PostConstruct
 	public void init() {
-		UserRepository userRepository = repositoryFactory.userRepository();
 		userId = userRepository.findOneByLoginId("oagis").getAppUserId();
 	}
 

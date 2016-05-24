@@ -19,7 +19,6 @@ import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,6 +32,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public static void main(String[] args) throws Exception {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
@@ -67,7 +69,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private int getUserID(String userName) {
-        UserRepository userRepository = repositoryFactory.userRepository();
         return userRepository.findOneByLoginId(userName).getAppUserId();
     }
 

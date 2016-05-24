@@ -1,7 +1,10 @@
 package org.oagi.srt.repository.oracle;
 
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.impl.*;
+import org.oagi.srt.repository.impl.BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+import org.oagi.srt.repository.impl.BaseCoreDataTypeAllowedPrimitiveRepository;
+import org.oagi.srt.repository.impl.BaseCoreDataTypePrimitiveRepository;
+import org.oagi.srt.repository.impl.BaseXSDBuiltInTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -97,9 +100,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
-
-    @Autowired
-    private BaseUserRepository baseUserRepository;
 
     @Autowired
     private OracleReleaseRepository oracleReleaseRepository;
@@ -255,11 +255,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public XSDBuiltInTypeRepository xsdBuiltInTypeRepository() {
         return baseXSDBuiltInTypeRepository;
-    }
-
-    @Override
-    public UserRepository userRepository() {
-        return baseUserRepository;
     }
 
     @Override

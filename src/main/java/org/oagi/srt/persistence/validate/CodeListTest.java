@@ -6,6 +6,7 @@ import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.RepositoryFactory;
+import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +25,9 @@ public class CodeListTest {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public void validate(String path1) throws Exception {
 
@@ -97,7 +101,7 @@ public class CodeListTest {
     }
 
     public int getUserID(String userName) {
-        return repositoryFactory.userRepository().findOneByLoginId(userName).getAppUserId();
+        return userRepository.findOneByLoginId(userName).getAppUserId();
     }
 
     public int getCodeListId(String codelistGuid, String enumTypeguid, String name) {

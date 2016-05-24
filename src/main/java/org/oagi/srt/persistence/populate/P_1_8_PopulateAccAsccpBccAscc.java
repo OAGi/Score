@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.List;
 
 /**
@@ -38,13 +37,15 @@ public class P_1_8_PopulateAccAsccpBccAscc {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private AggregateCoreComponentRepository accDao;
     private AssociationCoreComponentPropertyRepository asccpDao;
     private BasicCoreComponentPropertyRepository bccpDao;
     private BasicCoreComponentRepository bccDao;
     private AssociationCoreComponentRepository asccDao;
     private DataTypeRepository dtDao;
-    private UserRepository daoUser;
 
     private BODSchemaHandler bodSchemaHandler;
     private String bodPath;
@@ -60,7 +61,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         bccpDao = repositoryFactory.basicCoreComponentPropertyRepository();
         bccDao = repositoryFactory.basicCoreComponentRepository();
         dtDao = repositoryFactory.dataTypeRepository();
-        daoUser = repositoryFactory.userRepository();
     }
 
     private void populate() throws Exception {
@@ -161,7 +161,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             accpVO.setDen(den);
             accpVO.setState(state);
             accpVO.setModule(module);
-            int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+            int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
             accpVO.setCreatedBy(userId);
             accpVO.setLastUpdatedBy(userId);
             accpVO.setOwnerUserId(userId);
@@ -203,7 +203,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         accpVO.setDen(den);
         accpVO.setState(state);
         accpVO.setModule(module);
-        int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
         accpVO.setCreatedBy(userId);
         accpVO.setLastUpdatedBy(userId);
         accpVO.setOwnerUserId(userId);
@@ -509,7 +509,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         bccpVO.setRepresentationTerm(representationTerm);
         bccpVO.setDen(den);
         bccpVO.setState(3);
-        int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
         bccpVO.setCreatedBy(userId);
         bccpVO.setLastUpdatedBy(userId);
         bccpVO.setOwnerUserId(userId);
@@ -555,7 +555,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             aAggregateCoreComponent.setDefinition("Group");
             aAggregateCoreComponent.setOagisComponentType(oagisComponentType);
             aAggregateCoreComponent.setBasedAccId(-1);
-            int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+            int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
             aAggregateCoreComponent.setCreatedBy(userId);
             aAggregateCoreComponent.setLastUpdatedBy(userId);
             aAggregateCoreComponent.setOwnerUserId(userId);
@@ -588,7 +588,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             asccpVO.setDen(Utility.spaceSeparator(propertyTerm + ". " + Utility.first(accDen)));
             asccpVO.setState(3);
             asccpVO.setModule(module);
-            int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+            int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
             asccpVO.setCreatedBy(userId);
             asccpVO.setLastUpdatedBy(userId);
             asccpVO.setOwnerUserId(userId);
@@ -684,7 +684,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         aAggregateCoreComponent.setDefinition(definition);
         aAggregateCoreComponent.setBasedAccId(basedAccId);
         aAggregateCoreComponent.setOagisComponentType(oagisComponentType);
-        int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
         aAggregateCoreComponent.setCreatedBy(userId);
         aAggregateCoreComponent.setLastUpdatedBy(userId);
         aAggregateCoreComponent.setOwnerUserId(userId);

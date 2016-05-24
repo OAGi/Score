@@ -19,7 +19,6 @@ import org.w3c.dom.NodeList;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,6 +30,9 @@ public class P_1_4_PopulateCodeList {
 
     @Autowired
     private RepositoryFactory repositoryFactory;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
@@ -183,7 +185,6 @@ public class P_1_4_PopulateCodeList {
     }
 
     private int getUserID(String userName) {
-        UserRepository userRepository = repositoryFactory.userRepository();
         return userRepository.findOneByLoginId(userName).getAppUserId();
     }
 

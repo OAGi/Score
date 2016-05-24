@@ -99,9 +99,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
 
     @Autowired
-    private BaseUserRepository baseUserRepository;
-
-    @Autowired
     private BaseReleaseRepository baseReleaseRepository;
 
     @Autowired
@@ -255,11 +252,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public XSDBuiltInTypeRepository xsdBuiltInTypeRepository() {
         return baseXSDBuiltInTypeRepository;
-    }
-
-    @Override
-    public UserRepository userRepository() {
-        return baseUserRepository;
     }
 
     @Override

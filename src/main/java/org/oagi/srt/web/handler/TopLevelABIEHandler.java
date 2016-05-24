@@ -69,6 +69,7 @@ public class TopLevelABIEHandler implements Serializable {
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
     private CodeListRepository codeListRepository;
 
+    @Autowired
     private UserRepository userRepository;
 
     private int abieCount = 0;
@@ -121,8 +122,6 @@ public class TopLevelABIEHandler implements Serializable {
         bdtPriRestriRepository =
                 repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
         codeListRepository = repositoryFactory.codeListRepository();
-
-        userRepository = repositoryFactory.userRepository();
 
         maxABIEId = asbieRepository.findGreatestId();
         maxASBIEPId = asbiepRepository.findGreatestId();

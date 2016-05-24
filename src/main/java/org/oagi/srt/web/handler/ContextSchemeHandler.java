@@ -25,6 +25,10 @@ public class ContextSchemeHandler {
 
 	@Autowired
 	private RepositoryFactory repositoryFactory;
+
+	@Autowired
+	private UserRepository userRepository;
+
 	private ContextSchemeRepository contextSchemeRepository;
 	private ContextSchemeValueRepository contextSchemeValueRepository;
 	private BusinessContextRepository businessContextRepository;
@@ -33,7 +37,7 @@ public class ContextSchemeHandler {
 
 	@PostConstruct
 	private void init() {
-		userId = repositoryFactory.userRepository().findOneByLoginId("oagis").getAppUserId();
+		userId = userRepository.findOneByLoginId("oagis").getAppUserId();
 
 		contextSchemeRepository = repositoryFactory.contextSchemeRepository();
 		contextSchemeValueRepository = repositoryFactory.contextSchemeValueRepository();

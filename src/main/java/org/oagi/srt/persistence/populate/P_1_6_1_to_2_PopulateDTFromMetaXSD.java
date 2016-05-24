@@ -34,10 +34,12 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
 	@Autowired
 	private RepositoryFactory repositoryFactory;
+
+	@Autowired
+	private UserRepository userRepository;
 	
 	public void importAdditionalBDT(XPathHandler xh) throws Exception {
 		DataTypeRepository dao = repositoryFactory.dataTypeRepository();
-		UserRepository daoUser = repositoryFactory.userRepository();
 		DataType dtVO = new DataType();
 
 		NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
@@ -72,7 +74,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setRevisionDoc(null);
 		    dtVO.setState(3);
 
-			int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+			int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
 			dtVO.setCreatedBy(userId);
 			dtVO.setLastUpdatedBy(userId);
 			dtVO.setOwnerUserId(userId);

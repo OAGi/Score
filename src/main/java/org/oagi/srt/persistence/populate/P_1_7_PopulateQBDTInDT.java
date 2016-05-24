@@ -33,6 +33,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
     private XPathHandler businessdatatype_xsd;
@@ -52,7 +55,6 @@ public class P_1_7_PopulateQBDTInDT {
     private CoreDataTypePrimitiveRepository aCDTPrimitiveDAO;
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtSCPRDAO;
     private AgencyIdListRepository agencyIdListRepository;
-    private UserRepository daoUser;
 
     @PostConstruct
     public void init() throws Exception {
@@ -69,7 +71,6 @@ public class P_1_7_PopulateQBDTInDT {
         cdtSCAPMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
         agencyIdListRepository = repositoryFactory.agencyIdListRepository();
-        daoUser = repositoryFactory.userRepository();
 
         fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -402,7 +403,7 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setDefinition(definition);
         dtVO.setContentComponentDefinition(null);
         dtVO.setState(3);
-        int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);
@@ -516,7 +517,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccpVO.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dtVO.getDataTypeTerm());
         bccpVO.setDefinition(definition);
         bccpVO.setState(3);
-        int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);
@@ -876,7 +877,7 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setDefinition(definition);
         dtVO.setContentComponentDefinition(null);
         dtVO.setState(3);
-        int userId = daoUser.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);
