@@ -1,16 +1,15 @@
 package org.oagi.srt.persistence.validate;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.validate.data.TableData;
 import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.oagi.srt.repository.entity.XSDBuiltInType;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Yunsu Lee
