@@ -266,11 +266,16 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase {
         	
         	DataType getDT = dataTypeRepository.findOneByGuid(key);
         	if(getDT==null){
-        		System.out.println("@@@@@@@@@@@ DataType is not imported! Check DT_guid = "+key);
+        		assertTrue(getDT!=null);
         	}
         	else {
         		DataType baseDT = dataTypeRepository.findOneByDtId(getDT.getBasedDtId());
+        		assertEquals(baseDT.getGuid(), value.getBaseGuid());
         		
+        		String den = Utility.denToTypeName(value.getTypeName());       		
+        		assertEquals(getDT.getDen(), den);
+        		assertEquals(getDT.getDefinition(), value.getDefinition());
+        		assertEquals(getDT.getContentComponentDefinition(), value.getCcDefinition());
         	}
         }
 
