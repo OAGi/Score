@@ -67,6 +67,7 @@ public class Utility {
     public static String denToTypeName(String den) {
 
         int pos = den.indexOf("_");
+        den = den.replace("Identifier","ID");
 
         if (pos >= 0) {
             String part1 = den.substring(0, den.indexOf("_"));

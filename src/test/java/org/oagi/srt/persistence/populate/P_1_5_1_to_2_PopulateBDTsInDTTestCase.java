@@ -85,12 +85,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
             	else if(typeName.contains("ValueType")) { baseGuid = "oagis-id-a06e726d98274399bd6c76fe82a5fbdc";}
             	else if(typeName.contains("VideoType")) { baseGuid = "oagis-id-ce7635625e75420d973bcda56bb80a9f";}
             	
-            	Node aDefinitionNode = bizDTXP.getNode("//xsd:complexType[@id='"+guid+"']/xsd:annotation/xsd:documentation//ccts_Definition | //xsd:simpleType[@id='"+guid+"']/xsd:annotation/xsd:documentation//ccts_Definition");
-            	Node aCCDefinitionNode = bizDTXP.getNode("//xsd:complexType[@id='"+guid+"']//(xsd:restriction| xsd:extension | xsd:union)/xsd:annotation/xsd:documentation//ccts_Definition | //xsd:simpleType[@id='"+guid+"']//(xsd:restriction| xsd:extension | xsd:union)/xsd:annotation/xsd:documentation//ccts_Definition");
-            	
-            	definition="";
-            	ccDefinition="";
-            	
+            	Node aDefinitionNode = bizDTXP.getNode("//xsd:complexType[@id='"+guid+"']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"] | //xsd:simpleType[@id='"+guid+"']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+            	Node aCCDefinitionNode = bizDTXP.getNode("//xsd:complexType[@id='"+guid+"']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"] | //xsd:simpleType[@id='"+guid+"']/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"] | //xsd:simpleType[@id='"+guid+"']/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+            	definition=null;
+            	ccDefinition=null;
             	if(aDefinitionNode!=null){
             		definition=aDefinitionNode.getTextContent();
             	}
@@ -100,15 +98,15 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
             }
             else {
             	Element aDTElem = (Element) aDTNode;
-            	String baseName ="";
-            	Element restriction = (Element) aDTElem.getElementsByTagName("xsd:restriction");
+            	String baseName =""; 
+            	Element restriction = (Element) aDTElem.getElementsByTagName("xsd:restriction").item(0);
             	if(restriction!=null){
             		baseName = restriction.getAttribute("base");
             	}
             	else {
-            		Element simpleContent = (Element) aDTElem.getElementsByTagName("xsd:simpleContent");
+            		Element simpleContent = (Element) aDTElem.getElementsByTagName("xsd:simpleContent").item(0);
                 	if(simpleContent!=null){
-                		Element extension = (Element) simpleContent.getElementsByTagName("xsd:extension");
+                		Element extension = (Element) simpleContent.getElementsByTagName("xsd:extension").item(0);
                 		baseName = extension.getAttribute("base");
                 	}
             	}
@@ -116,8 +114,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
             	Node baseNode = bizDTXP.getNode("//xsd:simpleType[@name='"+baseName+"'] | //xsd:complexType[@name='"+baseName+"']");
             	Element baseElem = (Element) baseNode;           	
             	baseGuid = baseElem.getAttribute("id");
-            	definition="";
-            	ccDefinition="";
+            	definition=null;
+            	ccDefinition=null;
             	
             }
         }
@@ -266,13 +264,13 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
         		assertTrue(getDT!=null);
         	}
         	else {
-        		DataType baseDT = dataTypeRepository.findOneByDtId(getDT.getBasedDtId());
-        		assertEquals(baseDT.getGuid(), value.getBaseGuid());
+        		DataType baseDT = dataTypeRepository.findOne(getDT.getBasedDtId());
+        		assertEquals(value.getBaseGuid(),baseDT.getGuid());
         		
-        		String den = Utility.denToTypeName(value.getTypeName());       		
-        		assertEquals(getDT.getDen(), den);
-        		assertEquals(getDT.getDefinition(), value.getDefinition());
-        		assertEquals(getDT.getContentComponentDefinition(), value.getCcDefinition());
+        		String DTTypeName = Utility.denToTypeName(getDT.getDen());       		
+        		assertEquals(value.getTypeName(),DTTypeName);         		
+        		assertEquals(value.getDefinition(),getDT.getDefinition());        
+        		assertEquals(value.getCcDefinition(),getDT.getContentComponentDefinition());
         	}
         }
 
