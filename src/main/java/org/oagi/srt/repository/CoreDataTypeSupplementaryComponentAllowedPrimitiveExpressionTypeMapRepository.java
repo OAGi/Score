@@ -1,18 +1,17 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository {
+public interface CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository
+        extends JpaRepository<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap, Integer> {
 
-    public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findAll();
-
+    @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap c where c.cdtScAwdPri = ?1")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findByCdtScAwdPri(int cdtScAwdPri);
 
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findOneByCdtScAwdPriXpsTypeMapId(int cdtScAwdPriXpsTypeMapId);
-
+    @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap c where c.cdtScAwdPri = ?1 and c.xbtId = ?2")
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findOneByCdtScAwdPriAndXbtId(int cdtScAwdPri, int xbtId);
-
-    public void save(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap);
 }

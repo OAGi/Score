@@ -27,9 +27,6 @@ import java.util.List;
 public class P_1_5_3_to_5_PopulateSCInDTSC {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private DataTypeRepository dataTypeRepository;
 
     @Autowired
@@ -46,6 +43,13 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
     @Autowired
     private CoreDataTypePrimitiveRepository cdtPriRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
+
 
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         List<DataType> srtObjects = dataTypeRepository.findByType(1);
@@ -356,9 +360,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     }
 
     public void populateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
             srtObjects = dataTypeRepository.findByType(1);
@@ -507,10 +508,10 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                         System.out.println("");
                                     }
 
-                                    aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.save(cdtSCAP);
+                                    cdtScAwdPriRepository.save(cdtSCAP);
 
                                     CoreDataTypeSupplementaryComponentAllowedPrimitive insertedCDTSCAP =
-                                            aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
+                                            cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
 
                                     List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAPXTMs =
                                             cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(cdtAP.getCdtAwdPriId());
@@ -519,7 +520,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                                         tmp.setXbtId(thisAPXTmap.getXbtId());
                                         tmp.setCdtScAwdPri(insertedCDTSCAP.getCdtScAwdPriId());
-                                        aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO.save(tmp);
+                                        cdtScAwdPriXpsTypeMapRepository.save(tmp);
                                     }
                                 }
                                 break;//if this is hit, that means dt sc is mapped to cdt sc
@@ -554,8 +555,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 
     public void validatePopulateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
             srtObjects = dataTypeRepository.findByType(1);
@@ -698,13 +697,13 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 //									System.out.println("");
 //								}
 
-                                //aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.insertObject(cdtSCAP);
+                                //cdtScAwdPriRepository.insertObject(cdtSCAP);
 
 
                                 System.out.println("        ** Pri:" + tmpPri.getName() + " Default:" + cdtSCAP.isDefault());
 
                                 CoreDataTypeSupplementaryComponentAllowedPrimitive insertedCDTSCAP =
-                                        aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
+                                        cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
 
                                 List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAPXTMs = cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(cdtAP.getCdtAwdPriId());
                                 for (int m = 0; m < cdtAPXTMs.size(); m++) {
@@ -715,7 +714,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                                     XSDBuiltInType xbt = xbtRepository.findOne(tmp.getXbtId());
 
-                                    //aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO.insertObject(tmp);
+                                    //cdtScAwdPriXpsTypeMapRepository.insertObject(tmp);
                                     System.out.println("          ** XBT:" + xbt.getBuiltInType());
 
                                 }

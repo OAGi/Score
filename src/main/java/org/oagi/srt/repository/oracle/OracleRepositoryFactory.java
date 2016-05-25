@@ -55,15 +55,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Autowired
     private OracleBasicBusinessInformationEntitySupplementaryComponentRepository oracleBasicBusinessInformationEntitySupplementaryComponentRepository;
 
-    @Autowired
-    private OracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository oracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-
-    @Autowired
-    private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
-
-    @Autowired
-    private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-
     @Override
     public ContextSchemeRepository contextSchemeRepository() {
         return oracleContextSchemeRepository;
@@ -142,20 +133,5 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public BasicBusinessInformationEntitySupplementaryComponentRepository basicBusinessInformationEntitySupplementaryComponentRepository() {
         return oracleBasicBusinessInformationEntitySupplementaryComponentRepository;
-    }
-
-    @Override
-    public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository() {
-        return oracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-    }
-
-    @Override
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository coreDataTypeSupplementaryComponentAllowedPrimitiveRepository() {
-        return oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
-    }
-
-    @Override
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
-        return oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
     }
 }

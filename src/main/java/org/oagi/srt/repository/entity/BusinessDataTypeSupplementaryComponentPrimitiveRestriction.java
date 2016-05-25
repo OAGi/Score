@@ -1,15 +1,31 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "bdt_sc_pri_restri")
 public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "BDT_SC_PRI_RESTRI_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BDT_SC_PRI_RESTRI_ID_SEQ", sequenceName = "BDT_SC_PRI_RESTRI_ID_SEQ", allocationSize = 1)
     private int bdtScPriRestriId;
+
+    @Column(nullable = false)
     private int bdtScId;
-    private int cdtScAwdPriXpsTypeMapId;
-    private int codeListId;
+
+    @Column
+    private Integer cdtScAwdPriXpsTypeMapId;
+
+    @Column
+    private Integer codeListId;
+
+    @Column(name = "is_default", nullable = false)
     private boolean isDefault;
-    private int agencyIdListId;
+
+    @Column
+    private Integer agencyIdListId;
 
     public int getBdtScPriRestriId() {
         return bdtScPriRestriId;
@@ -28,7 +44,7 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     public int getCdtScAwdPriXpsTypeMapId() {
-        return cdtScAwdPriXpsTypeMapId;
+        return (cdtScAwdPriXpsTypeMapId == null) ? 0 : cdtScAwdPriXpsTypeMapId;
     }
 
     public void setCdtScAwdPriXpsTypeMapId(int cdtScAwdPriXpsTypeMapId) {
@@ -36,7 +52,7 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     public int getCodeListId() {
-        return codeListId;
+        return (codeListId == null) ? 0 : codeListId;
     }
 
     public void setCodeListId(int codeListId) {
@@ -52,7 +68,7 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     public int getAgencyIdListId() {
-        return agencyIdListId;
+        return (agencyIdListId == null) ? 0 : agencyIdListId;
     }
 
     public void setAgencyIdListId(int agencyIdListId) {

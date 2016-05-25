@@ -56,15 +56,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Autowired
     private BaseBasicBusinessInformationEntitySupplementaryComponentRepository baseBasicBusinessInformationEntitySupplementaryComponentRepository;
 
-    @Autowired
-    private BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository baseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-
-    @Autowired
-    private BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository baseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
-
-    @Autowired
-    private BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-
     @Override
     public ContextSchemeRepository contextSchemeRepository() {
         return baseContextSchemeRepository;
@@ -143,20 +134,5 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public BasicBusinessInformationEntitySupplementaryComponentRepository basicBusinessInformationEntitySupplementaryComponentRepository() {
         return baseBasicBusinessInformationEntitySupplementaryComponentRepository;
-    }
-
-    @Override
-    public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository() {
-        return baseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-    }
-
-    @Override
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository coreDataTypeSupplementaryComponentAllowedPrimitiveRepository() {
-        return baseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
-    }
-
-    @Override
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
-        return baseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
     }
 }

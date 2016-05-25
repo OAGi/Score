@@ -68,19 +68,21 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
 
-    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO;
-    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO;
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
 
     @Autowired
     private CoreDataTypePrimitiveRepository cdtPriRepository;
-    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtSCPRDAO;
+
+    @Autowired
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     @PostConstruct
     public void init() throws Exception {
         bccpDAO = repositoryFactory.basicCoreComponentPropertyRepository();
-        bdtSCPRDAO = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
-        aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-        cdtSCAPMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
 
         fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -121,7 +123,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> getCdtSCAPMap(int cdtSCAllowedPrimitiveId) throws Exception {
-        return cdtSCAPMapDAO.findByCdtScAwdPri(cdtSCAllowedPrimitiveId);
+        return cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(cdtSCAllowedPrimitiveId);
     }
 
     private void insertDTwithoutElement() throws Exception {
@@ -213,7 +215,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO) throws Exception {
-        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = bdtSCPRDAO.findByBdtScId(dtscVO.getBasedDtScId());
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = bdtScPriRestriRepository.findByBdtScId(dtscVO.getBasedDtScId());
         if (bdtscs.isEmpty()) {
             if (dtscVO.getBasedDtScId() == 0) {
                 return Collections.emptyList();
@@ -236,7 +238,7 @@ public class P_1_7_PopulateQBDTInDT {
                 bdtSCPRVO.setCodeListId(parent.getCodeListId());
                 bdtSCPRVO.setDefault(parent.isDefault());
                 bdtSCPRVO.setAgencyIdListId(parent.getAgencyIdListId());
-                bdtSCPRDAO.save(bdtSCPRVO);
+                bdtScPriRestriRepository.save(bdtSCPRVO);
             }
 
         } else { // else if (new SC)
@@ -309,12 +311,12 @@ public class P_1_7_PopulateQBDTInDT {
                             bdtscprimitiverestionvo.setDefault(true);
                         else
                             bdtscprimitiverestionvo.setDefault(false);
-                        //bdtSCPRDAO.save(bdtscprimitiverestionvo);
+                        //bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
 
 //						// add code_list id for this case
 //						bdtscprimitiverestionvo.setCodeListId(getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
 //						bdtscprimitiverestionvo.setDefault(false);
-//						bdtSCPRDAO.save(bdtscprimitiverestionvo);
+//						bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
 //						continue;
 
                     } else if (name.equalsIgnoreCase("listAgencyID")) {
@@ -322,16 +324,16 @@ public class P_1_7_PopulateQBDTInDT {
                             bdtscprimitiverestionvo.setDefault(true);
                         else
                             bdtscprimitiverestionvo.setDefault(false);
-                        //bdtSCPRDAO.save(bdtscprimitiverestionvo);
+                        //bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
 
 //						// add agency_id_list id for this case
 //						bdtscprimitiverestionvo.setAgencyIdListId(getAgencyListID());
 //						bdtscprimitiverestionvo.setDefault(false);
-//						bdtSCPRDAO.save(bdtscprimitiverestionvo);
+//						bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
 //						continue;
                     }
 
-                    bdtSCPRDAO.save(bdtscprimitiverestionvo);
+                    bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
 
                 }
             }
@@ -342,7 +344,7 @@ public class P_1_7_PopulateQBDTInDT {
                 bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
                 bdtscprimitiverestionvo.setCodeListId(getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
                 bdtscprimitiverestionvo.setDefault(false);
-                bdtSCPRDAO.save(bdtscprimitiverestionvo);
+                bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
             }
 
             if (name.equalsIgnoreCase("listAgencyID")) {
@@ -351,7 +353,7 @@ public class P_1_7_PopulateQBDTInDT {
                 bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
                 bdtscprimitiverestionvo.setAgencyIdListId(getAgencyListID());
                 bdtscprimitiverestionvo.setDefault(false);
-                bdtSCPRDAO.save(bdtscprimitiverestionvo);
+                bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
             }
         }
     }
@@ -665,11 +667,11 @@ public class P_1_7_PopulateQBDTInDT {
                     for (CoreDataTypeAllowedPrimitive svo : cdtallowedprimitivelist) {
                         cdtSCAllowedVO.setCdtPriId(svo.getCdtPriId());
                         cdtSCAllowedVO.setDefault(svo.isDefault());
-                        aCDTSCAllowedPrimitiveDAO.save(cdtSCAllowedVO);
+                        cdtScAwdPriRepository.save(cdtSCAllowedVO);
 
                         // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
                         int cdtSCAllowedPrimitiveId =
-                                aCDTSCAllowedPrimitiveDAO
+                                cdtScAwdPriRepository
                                         .findOneByCdtScIdAndCdtPriId(cdtSCAllowedVO.getCdtScId(), cdtSCAllowedVO.getCdtPriId())
                                         .getCdtScAwdPriId();
 
@@ -680,7 +682,7 @@ public class P_1_7_PopulateQBDTInDT {
                             mapVO.setCdtScAwdPri(cdtSCAllowedPrimitiveId);
                             int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
                             mapVO.setXbtId(xdtBuiltTypeId);
-                            cdtSCAPMapDAO.save(mapVO);
+                            cdtScAwdPriXpsTypeMapRepository.save(mapVO);
                         }
                     }
 
@@ -755,7 +757,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) throws Exception {
-        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = aCDTSCAllowedPrimitiveDAO.findByCdtScId(dt_sc_id);
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
             DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
             res = getCdtSCAllowedPrimitiveID(dtscVO.getBasedDtScId());

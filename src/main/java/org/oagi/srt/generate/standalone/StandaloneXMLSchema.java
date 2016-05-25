@@ -54,6 +54,12 @@ public class StandaloneXMLSchema {
     @Autowired
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -657,17 +663,13 @@ public class StandaloneXMLSchema {
     }
 
     public Attr setCodeListRestrictionAttr(DataTypeSupplementaryComponent gSC, Attr base) throws Exception {
-        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao =
-                repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction dPrim =
-                dao.findOneByBdtScIdAndDefault(gSC.getDtScId(), true);
+                bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gSC.getDtScId(), true);
         if (dPrim.getCodeListId() != 0) {
             base.setNodeValue("xsd:token");
         } else {
-            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository dao2 =
-                    repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
-                    dao2.findOneByCdtScAwdPriXpsTypeMapId(dPrim.getCdtScAwdPriXpsTypeMapId());
+                    cdtScAwdPriXpsTypeMapRepository.findOne(dPrim.getCdtScAwdPriXpsTypeMapId());
 
             XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
             base.setNodeValue(aXSDBuiltInType.getBuiltInType());
@@ -788,20 +790,16 @@ public class StandaloneXMLSchema {
     }
 
     public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
-        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
-
         DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
 
-        CodeList aCL = new CodeList();
-        try {
-            aCL = codeListRepository.findOne(gBBIESC.getCodeListId());
-        } catch (EmptyResultDataAccessException e) {
+        CodeList aCL = codeListRepository.findOne(gBBIESC.getCodeListId());
+        if (aCL == null) {
+            aCL = new CodeList();
         }
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
-                new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-        try {
-            aBDTSCPrimitiveRestriction = dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
-        } catch (EmptyResultDataAccessException e) {
+                bdtScPriRestriRepository.findOne(gBBIESC.getDtScPriRestriId());
+        if (aBDTSCPrimitiveRestriction == null) {
+            aBDTSCPrimitiveRestriction = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
         }
 
         if (aCL.getCodeListId() != 0) {
@@ -810,61 +808,36 @@ public class StandaloneXMLSchema {
             aCL = codeListRepository.findOne(aBDTSCPrimitiveRestriction.getCodeListId());
         } else if (aCL.getCodeListId() == 0 && aBDTSCPrimitiveRestriction.getBdtScPriRestriId() == 0) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
-                    dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
-            try {
-                aCL = codeListRepository.findOne(bBDTSCPrimitiveRestriction.getCodeListId());
-            } catch (EmptyResultDataAccessException e) {
-                return null;
-            }
+                    bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+            aCL = codeListRepository.findOne(bBDTSCPrimitiveRestriction.getCodeListId());
         }
         return aCL;
     }
 
     public AgencyIdList getAgencyIdList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
-        AgencyIdList aAL = null;
-        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
-                dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
+                bdtScPriRestriRepository.findOne(gBBIESC.getDtScPriRestriId());
         DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
 
-        boolean firstCheck = true;
-        try {
-            aAL = agencyIdListRepository.findOne(gBBIESC.getAgencyIdListId());
-        } catch (EmptyResultDataAccessException e) {
-            firstCheck = false;
-        }
-
-        boolean secondCheck = true;
+        AgencyIdList aAL = agencyIdListRepository.findOne(gBBIESC.getAgencyIdListId());
         if (aAL == null) {
-            try {
-                aAL = agencyIdListRepository.findOne(aBDTSCPrimitiveRestriction.getAgencyIdListId());
-            } catch (EmptyResultDataAccessException e) {
-                secondCheck = false;
-            }
+            aAL = agencyIdListRepository.findOne(aBDTSCPrimitiveRestriction.getAgencyIdListId());
         }
 
-        if (!firstCheck && !secondCheck) {
+        if (aAL == null) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
-                    dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
-            try {
-                aAL = agencyIdListRepository.findOne(bBDTSCPrimitiveRestriction.getAgencyIdListId());
-            } catch (EmptyResultDataAccessException e) {
-                return null;
-            }
+                    bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+            aAL = agencyIdListRepository.findOne(bBDTSCPrimitiveRestriction.getAgencyIdListId());
         }
         return aAL;
     }
 
     public Element setBBIESCType(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
         DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
-        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 =
-                repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
-                dao3.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository dao5 =
-                repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+                bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
-                dao5.findOneByCdtScAwdPriXpsTypeMapId(bBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
+                cdtScAwdPriXpsTypeMapRepository.findOne(bBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
@@ -876,13 +849,10 @@ public class StandaloneXMLSchema {
     }
 
     public Element setBBIESCType2(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
-        BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 =
-                repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction = dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository dao5 =
-                repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
+                bdtScPriRestriRepository.findOne(gBBIESC.getDtScPriRestriId());
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
-                        dao5.findOneByCdtScAwdPriXpsTypeMapId(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
+                        cdtScAwdPriXpsTypeMapRepository.findOne(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");

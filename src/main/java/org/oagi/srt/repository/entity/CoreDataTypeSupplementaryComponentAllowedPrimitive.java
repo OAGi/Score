@@ -1,12 +1,24 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "cdt_sc_awd_pri")
 public class CoreDataTypeSupplementaryComponentAllowedPrimitive implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "CDT_SC_AWD_PRI_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CDT_SC_AWD_PRI_ID_SEQ", sequenceName = "CDT_SC_AWD_PRI_ID_SEQ", allocationSize = 1)
     private int cdtScAwdPriId;
+
+    @Column(nullable = false)
     private int cdtScId;
+
+    @Column(nullable = false)
     private int cdtPriId;
+
+    @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
     public int getCdtScAwdPriId() {
