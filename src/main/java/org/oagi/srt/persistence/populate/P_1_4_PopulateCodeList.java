@@ -4,7 +4,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.CodeListRepository;
+import org.oagi.srt.repository.CodeListValueRepository;
+import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +29,6 @@ import java.util.List;
  */
 @Component
 public class P_1_4_PopulateCodeList {
-
-    @Autowired
-    private RepositoryFactory repositoryFactory;
 
     @Autowired
     private UserRepository userRepository;

@@ -57,19 +57,7 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     private BaseBasicBusinessInformationEntitySupplementaryComponentRepository baseBasicBusinessInformationEntitySupplementaryComponentRepository;
 
     @Autowired
-    private BaseBusinessDataTypePrimitiveRestrictionRepository baseBusinessDataTypePrimitiveRestrictionRepository;
-
-    @Autowired
     private BaseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository baseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-
-    @Autowired
-    private BaseCoreDataTypePrimitiveRepository baseCoreDataTypePrimitiveRepository;
-
-    @Autowired
-    private BaseCoreDataTypeAllowedPrimitiveRepository baseCoreDataTypeAllowedPrimitiveRepository;
-
-    @Autowired
-    private BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
 
     @Autowired
     private BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository baseCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
@@ -158,28 +146,8 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository() {
-        return baseBusinessDataTypePrimitiveRestrictionRepository;
-    }
-
-    @Override
     public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository() {
         return baseBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-    }
-
-    @Override
-    public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository() {
-        return baseCoreDataTypePrimitiveRepository;
-    }
-
-    @Override
-    public CoreDataTypeAllowedPrimitiveRepository coreDataTypeAllowedPrimitiveRepository() {
-        return baseCoreDataTypeAllowedPrimitiveRepository;
-    }
-
-    @Override
-    public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository() {
-        return baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
     }
 
     @Override

@@ -25,6 +25,12 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
     private AssociationCoreComponent ascc;
     private AssociationCoreComponentProperty asccp;
     private AggregateCoreComponent acc;
@@ -95,9 +101,6 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     }
 
     public Map<String, Integer> getBdtPrimitiveRestrictions() {
-        BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-
         List<BusinessDataTypePrimitiveRestriction> ccs = bdtPriRestriRepository.findByBdtId(bccp.getBdtId());
         // Implicitly declaration. Why does it need to be here?
         // Because of this code, Add 'setBccpVO_BbieVO' method.
@@ -107,10 +110,8 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
             if (cc.getCdtAwdPriXpsTypeMapId() > 0) {
                 primitiveType = "XSD Builtin Type";
 
-                CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
-                        repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
                 CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
-                        cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(cc.getCdtAwdPriXpsTypeMapId());
+                        cdtAwdPriXpsTypeMapRepository.findOne(cc.getCdtAwdPriXpsTypeMapId());
 
                 XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
                 bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());

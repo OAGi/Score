@@ -58,24 +58,29 @@ public class P_1_7_PopulateQBDTInDT {
     private File f1;
 
     private BasicCoreComponentPropertyRepository bccpDAO;
-    private BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO;
-    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO;
-    private CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO;
+
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO;
-    private CoreDataTypePrimitiveRepository aCDTPrimitiveDAO;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtSCPRDAO;
 
     @PostConstruct
     public void init() throws Exception {
         bccpDAO = repositoryFactory.basicCoreComponentPropertyRepository();
         bdtSCPRDAO = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
-        aBDTPrimitiveRestrictionDAO = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-        aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-        aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         cdtSCAPMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
-        aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
 
         fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -426,7 +431,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertBDTPrimitiveRestriction(DataType dVO, String base) throws Exception {
-        List<BusinessDataTypePrimitiveRestriction> al = aBDTPrimitiveRestrictionDAO.findByBdtId(dVO.getBasedDtId());
+        List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(dVO.getBasedDtId());
 
 //		//the previous condition below cannot classify the cases correctly.
 //		//we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
@@ -446,7 +451,7 @@ public class P_1_7_PopulateQBDTInDT {
                 }
             }
             theBDT_Primitive_RestrictionVO.setDefault(false);
-            aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+            bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
         }
 
         if (dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
@@ -454,7 +459,7 @@ public class P_1_7_PopulateQBDTInDT {
             theBDT_Primitive_RestrictionVO.setBdtId(dVO.getDtId());
             theBDT_Primitive_RestrictionVO.setAgencyIdListId(getAgencyListID());
             theBDT_Primitive_RestrictionVO.setDefault(false);
-            aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+            bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
         }
 
         if (!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))) {
@@ -473,10 +478,10 @@ public class P_1_7_PopulateQBDTInDT {
 //					theBDT_Primitive_RestrictionVO.setDefault(false);
 //				else
 //					theBDT_Primitive_RestrictionVO.setDefault(aBusinessDataTypePrimitiveRestriction.isDefault());
-//				aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+//				bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
 
                 theBDT_Primitive_RestrictionVO.setDefault(aBusinessDataTypePrimitiveRestriction.isDefault());
-                aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+                bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
 
             }
         }
@@ -489,7 +494,7 @@ public class P_1_7_PopulateQBDTInDT {
 //				theBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 //				theBDT_Primitive_RestrictionVO.setDefault(aBusinessDataTypePrimitiveRestriction.isDefault());
 //				
-//				aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+//				bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
 //			}
 //		} else {
 //			BusinessDataTypePrimitiveRestriction theBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
@@ -506,7 +511,7 @@ public class P_1_7_PopulateQBDTInDT {
 //				}
 //			}
 //			theBDT_Primitive_RestrictionVO.setDefault(true);
-//			aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+//			bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
 //		}
     }
 
@@ -737,16 +742,16 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public String getPrimitiveName(int CdtPriId) throws Exception {
-        return aCDTPrimitiveDAO.findOneByCdtPriId(CdtPriId).getName();
+        return cdtPriRepository.findOne(CdtPriId).getName();
     }
 
 
     public int getCdtPriId(String name) throws Exception {
-        return aCDTPrimitiveDAO.findOneByName(name).getCdtPriId();
+        return cdtPriRepository.findOneByName(name).getCdtPriId();
     }
 
     public List<CoreDataTypeAllowedPrimitive> getCDTAllowedPrimitiveIDs(int cdt_id) throws Exception {
-        return aCDTAllowedPrimitiveDAO.findByCdtId(cdt_id);
+        return cdtAwdPriRepository.findByCdtId(cdt_id);
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) throws Exception {
@@ -764,7 +769,7 @@ public class P_1_7_PopulateQBDTInDT {
 
     public boolean checkTokenofXBT(int cdt_awd_pri_xps_type_map_id) throws Exception {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
-                aCDTAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtAwdPriXpsTypeMapId(cdt_awd_pri_xps_type_map_id);
+                cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
         XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(
                 aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getName().equalsIgnoreCase("token"))

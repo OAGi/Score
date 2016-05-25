@@ -1,9 +1,6 @@
 package org.oagi.srt.repository.oracle;
 
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.impl.BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
-import org.oagi.srt.repository.impl.BaseCoreDataTypeAllowedPrimitiveRepository;
-import org.oagi.srt.repository.impl.BaseCoreDataTypePrimitiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,19 +56,7 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleBasicBusinessInformationEntitySupplementaryComponentRepository oracleBasicBusinessInformationEntitySupplementaryComponentRepository;
 
     @Autowired
-    private OracleBusinessDataTypePrimitiveRestrictionRepository oracleBusinessDataTypePrimitiveRestrictionRepository;
-
-    @Autowired
     private OracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository oracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-
-    @Autowired
-    private BaseCoreDataTypePrimitiveRepository baseCoreDataTypePrimitiveRepository;
-
-    @Autowired
-    private BaseCoreDataTypeAllowedPrimitiveRepository baseCoreDataTypeAllowedPrimitiveRepository;
-
-    @Autowired
-    private BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
 
     @Autowired
     private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
@@ -160,28 +145,8 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository() {
-        return oracleBusinessDataTypePrimitiveRestrictionRepository;
-    }
-
-    @Override
     public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository() {
         return oracleBusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository;
-    }
-
-    @Override
-    public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository() {
-        return baseCoreDataTypePrimitiveRepository;
-    }
-
-    @Override
-    public CoreDataTypeAllowedPrimitiveRepository coreDataTypeAllowedPrimitiveRepository() {
-        return baseCoreDataTypeAllowedPrimitiveRepository;
-    }
-
-    @Override
-    public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository() {
-        return baseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
     }
 
     @Override

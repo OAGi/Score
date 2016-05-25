@@ -43,6 +43,18 @@ public class DataTypeTest {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
     public DataType validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) {
         try {
             return dataTypeRepository.findOneByGuid(id);
@@ -368,18 +380,11 @@ public class DataTypeTest {
     }
 
     private void validateInsertBDTPrimitiveRestriction(int cdtID, int bdtID, int defaultId) {
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO =
-                repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-        CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO =
-                repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        BusinessDataTypePrimitiveRestrictionRepository aBDTAllowedPrimitiveDAO =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-
-        List<CoreDataTypeAllowedPrimitive> al3 = aCDTAllowedPrimitiveDAO.findByCdtId(cdtID);
+        List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
 
         for (CoreDataTypeAllowedPrimitive aCoreDataTypeAllowedPrimitive : al3) {
 
-            List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 = aCDTAllowedPrimitiveExpressionTypeMapDAO.findByCdtAwdPriId(
+            List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 = cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(
                     aCoreDataTypeAllowedPrimitive.getCdtAwdPriId());
 
             for (CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap : al4) {
@@ -389,7 +394,7 @@ public class DataTypeTest {
                 aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriXpsTypeMapId());
 
                 try {
-                    aBDTAllowedPrimitiveDAO.findOneByBdtIdAndCdtAwdPriXpsTypeMapId(bdtID, aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriXpsTypeMapId());
+                    bdtPriRestriRepository.findOneByBdtIdAndCdtAwdPriXpsTypeMapId(bdtID, aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriXpsTypeMapId());
                 } catch (EmptyResultDataAccessException e) {
                     System.err.println("Error!  bdt_id = " + bdtID + "   cdt_awd_pri_xps_type_map_id = " + aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriXpsTypeMapId());
                 }
@@ -419,10 +424,7 @@ public class DataTypeTest {
     }
 
     private void validateInsertBDTPrimitiveRestriction(int basedBdtId, int bdtId) {
-        BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-
-        List<BusinessDataTypePrimitiveRestriction> al = aBDTPrimitiveRestrictionDAO.findByBdtId(basedBdtId);
+        List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(basedBdtId);
 
         for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
             int cdtAwdPriXpsTypeMapId = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
@@ -430,11 +432,11 @@ public class DataTypeTest {
 
             try {
                 if (cdtAwdPriXpsTypeMapId != 0 && codeListId != 0) {
-                    aBDTPrimitiveRestrictionDAO.findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(codeListId, cdtAwdPriXpsTypeMapId);
+                    bdtPriRestriRepository.findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(codeListId, cdtAwdPriXpsTypeMapId);
                 } else if (cdtAwdPriXpsTypeMapId != 0) {
-                    aBDTPrimitiveRestrictionDAO.findOneByCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
+                    bdtPriRestriRepository.findOne(cdtAwdPriXpsTypeMapId);
                 } else if (codeListId != 0) {
-                    aBDTPrimitiveRestrictionDAO.findOneByCodeListId(codeListId);
+                    bdtPriRestriRepository.findOneByCodeListId(codeListId);
                 }
             } catch (EmptyResultDataAccessException e) {
                 System.err.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
@@ -911,15 +913,13 @@ public class DataTypeTest {
     }
 
     private void validateInsertQBDTPrimitiveRestriction(DataType dVO, String base) {
-        BusinessDataTypePrimitiveRestrictionRepository BDTPriRestrisVO =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
         //To validate bdt_pri_restri,
         //check it inherit base's bdt_pri_restri successfully (except id itself)
 
-        List<BusinessDataTypePrimitiveRestriction> baseBDTPriRestriList = BDTPriRestrisVO.findByBdtId(dVO.getBasedDtId());
+        List<BusinessDataTypePrimitiveRestriction> baseBDTPriRestriList = bdtPriRestriRepository.findByBdtId(dVO.getBasedDtId());
         //get base's bdt_pri_restri records
 
-        List<BusinessDataTypePrimitiveRestriction> thisBDTPriRestriList = BDTPriRestrisVO.findByBdtId(dVO.getDtId());
+        List<BusinessDataTypePrimitiveRestriction> thisBDTPriRestriList = bdtPriRestriRepository.findByBdtId(dVO.getDtId());
         //get this's bdt_pri_restri records
 
         //if CodeContentType QBDT-->inherit from CodeContentType & add codeListID  
@@ -1388,20 +1388,11 @@ public class DataTypeTest {
     }
 
     public String getPrimitiveName(int CDTPrimitiveID) {
-        CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        return aCDTPrimitiveDAO.findOneByCdtPriId(CDTPrimitiveID).getName();
-    }
-
-
-    public int getCdtPriId(String name) {
-        CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        return aCDTPrimitiveDAO.findOneByName(name).getCdtPriId();
+        return cdtPriRepository.findOne(CDTPrimitiveID).getName();
     }
 
     public List<CoreDataTypeAllowedPrimitive> getCDTAllowedPrimitiveIDs(int cdt_id) {
-        CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO =
-                repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        return aCDTAllowedPrimitiveDAO.findByCdtId(cdt_id);
+        return cdtAwdPriRepository.findByCdtId(cdt_id);
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) {
@@ -1440,10 +1431,8 @@ public class DataTypeTest {
     private void validate_bdt_pri_resti(String datatype) {
         DataType dataType = dataTypeRepository.findOneByDen(Utility.typeToDen(datatype));
         int bdt_id = dataType.getDtId();
-        BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
 
-        List<BusinessDataTypePrimitiveRestriction> bdt_pri_resti_list = aBDTPrimitiveRestrictionDAO.findByBdtId(bdt_id);
+        List<BusinessDataTypePrimitiveRestriction> bdt_pri_resti_list = bdtPriRestriRepository.findByBdtId(bdt_id);
 
         List<String> bdt_pri_list = new ArrayList<String>();
 
@@ -1530,11 +1519,9 @@ public class DataTypeTest {
         String xsdBuiltInType;
 
         public BdtPriResti(int id) {
-            BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestriction =
-                    repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
 
             BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction =
-                    aBDTPrimitiveRestriction.findOneByBdtPriRestriId(id);
+                    bdtPriRestriRepository.findOne(id);
             int bdt_id = aBusinessDataTypePrimitiveRestriction.getBdtId();
 
             DataType aDataType = dataTypeRepository.findOne(bdt_id);
@@ -1543,20 +1530,15 @@ public class DataTypeTest {
 
             int cdt_awd_pri_xps_type_map_id = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
 
-            CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMap
-                    = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
-                    aCDTAllowedPrimitiveExpressionTypeMap.findOneByCdtAwdPriXpsTypeMapId(cdt_awd_pri_xps_type_map_id);
+                    cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
 
             int cdt_awd_pri_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriId();
             int xbt_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId();
 
-            CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitive =
-                    repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-            CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = aCDTAllowedPrimitive.findOneByCdtAwdPriId(cdt_awd_pri_id);
+            CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = cdtAwdPriRepository.findOne(cdt_awd_pri_id);
 
-            CoreDataTypePrimitiveRepository aCDTPrimitive = repositoryFactory.coreDataTypePrimitiveRepository();
-            CoreDataTypePrimitive cdtPrimitiveVO = aCDTPrimitive.findOneByCdtPriId(cdtAllowedPrimitiveVO.getCdtPriId());
+            CoreDataTypePrimitive cdtPrimitiveVO = cdtPriRepository.findOne(cdtAllowedPrimitiveVO.getCdtPriId());
             cdtPriTerm = cdtPrimitiveVO.getName();
 
             DataType cdtVO = dataTypeRepository.findOne(cdtAllowedPrimitiveVO.getCdtId());

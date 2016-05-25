@@ -38,6 +38,15 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         List<DataType> srtObjects = dataTypeRepository.findByType(1);
         for (DataType dt : srtObjects) {
@@ -348,10 +357,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
     public void populateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CoreDataTypePrimitiveRepository aCoreDataTypePrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
 
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
@@ -479,7 +485,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                         for (int j = 0; j < DataTypewDataTypeTerm.size(); j++) {
                             DataType aDataType = DataTypewDataTypeTerm.get(j);
-                            List<CoreDataTypeAllowedPrimitive> CDTAwdPris = aCDTAllowedPrimitiveDAO.findByCdtId(aDataType.getDtId());
+                            List<CoreDataTypeAllowedPrimitive> CDTAwdPris = cdtAwdPriRepository.findByCdtId(aDataType.getDtId());
 
                             if (CDTAwdPris.size() > 0 && !CDTAwdPris.isEmpty()) {
                                 for (int k = 0; k < CDTAwdPris.size(); k++) {
@@ -489,7 +495,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
                                     cdtSCAP.setDefault(cdtAP.isDefault());
 
-                                    CoreDataTypePrimitive tmpPri = aCoreDataTypePrimitiveDAO.findOneByCdtPriId(cdtAP.getCdtPriId());
+                                    CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
 
 
                                     String expressionLanguageOrActionCode = insertedSC.getPropertyTerm();
@@ -507,7 +513,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                             aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
 
                                     List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAPXTMs =
-                                            aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO.findByCdtAwdPriId(cdtAP.getCdtAwdPriId());
+                                            cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(cdtAP.getCdtAwdPriId());
                                     for (int m = 0; m < cdtAPXTMs.size(); m++) {
                                         CoreDataTypeAllowedPrimitiveExpressionTypeMap thisAPXTmap = cdtAPXTMs.get(m);
                                         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
@@ -548,11 +554,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 
     public void validatePopulateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CoreDataTypePrimitiveRepository aCoreDataTypePrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
 
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
@@ -673,7 +675,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                     for (int j = 0; j < DataTypewDataTypeTerm.size(); j++) {
                         DataType aDataType = (DataType) DataTypewDataTypeTerm.get(j);
-                        List<CoreDataTypeAllowedPrimitive> CDTAwdPris = aCDTAllowedPrimitiveDAO.findByCdtId(aDataType.getDtId());
+                        List<CoreDataTypeAllowedPrimitive> CDTAwdPris = cdtAwdPriRepository.findByCdtId(aDataType.getDtId());
 
                         if (CDTAwdPris.size() > 0 && !CDTAwdPris.isEmpty()) {
                             for (int k = 0; k < CDTAwdPris.size(); k++) {
@@ -683,7 +685,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                 cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
                                 cdtSCAP.setDefault(cdtAP.isDefault());
 
-                                CoreDataTypePrimitive tmpPri = aCoreDataTypePrimitiveDAO.findOneByCdtPriId(cdtAP.getCdtPriId());
+                                CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
 
                                 String expressionLanguageOrActionCode = "";
                                 expressionLanguageOrActionCode = insertedSC.getPropertyTerm();
@@ -704,7 +706,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                 CoreDataTypeSupplementaryComponentAllowedPrimitive insertedCDTSCAP =
                                         aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
 
-                                List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAPXTMs = aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO.findByCdtAwdPriId(cdtAP.getCdtAwdPriId());
+                                List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAPXTMs = cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(cdtAP.getCdtAwdPriId());
                                 for (int m = 0; m < cdtAPXTMs.size(); m++) {
                                     CoreDataTypeAllowedPrimitiveExpressionTypeMap thisAPXTmap = cdtAPXTMs.get(m);
                                     CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
@@ -778,7 +780,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     System.out.println("");
                 }
                 for (int i = baseDefaultDTSCs.size() - 1; i > -1; i--) {
-                    DataTypeSupplementaryComponent bdtsc = (DataTypeSupplementaryComponent) baseDefaultDTSCs.get(i);
+                    DataTypeSupplementaryComponent bdtsc = baseDefaultDTSCs.get(i);
                     System.out.println("@@@@ " + bdtsc.getPropertyTerm() + " " + bdtsc.getRepresentationTerm() + " is not inherited! Check Unqualified BDT: " + dt.getGuid());
                 }
             }

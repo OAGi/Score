@@ -36,6 +36,15 @@ public class CDTTest {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
     public int getCodeListId(String codeName) throws Exception {
         CodeList codelist = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelist.getCodeListId();
@@ -74,22 +83,16 @@ public class CDTTest {
     }
 
     public String getPrimitiveName(int CdtPriId) throws Exception {
-        CoreDataTypePrimitiveRepository aCdtPrimitiveDAO =
-                repositoryFactory.coreDataTypePrimitiveRepository();
-        return aCdtPrimitiveDAO.findOneByCdtPriId(CdtPriId).getName();
+        return cdtPriRepository.findOne(CdtPriId).getName();
     }
 
 
     public int getCdtPriId(String name) throws Exception {
-        CoreDataTypePrimitiveRepository aCdtPrimitiveDAO =
-                repositoryFactory.coreDataTypePrimitiveRepository();
-        return aCdtPrimitiveDAO.findOneByName(name).getCdtPriId();
+        return cdtPriRepository.findOneByName(name).getCdtPriId();
     }
 
     public List<CoreDataTypeAllowedPrimitive> getCdtAllowedPrimitiveIds(int cdt_id) throws Exception {
-        CoreDataTypeAllowedPrimitiveRepository aCdtAllowedPrimitiveDAO =
-                repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        return aCdtAllowedPrimitiveDAO.findByCdtId(cdt_id);
+        return cdtAwdPriRepository.findByCdtId(cdt_id);
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveId(int dt_sc_id) throws Exception {
@@ -463,10 +466,8 @@ public class CDTTest {
         xpsMapData.add("VideoBinaryxsd:base64Binary");
         xpsMapData.add("VideoBinaryxsd:hexBinary");
 
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCdtAllowedPrimitiveExpressionTypeMap =
-                repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAllowedPrimitiveExpressionTypeMapList =
-                aCdtAllowedPrimitiveExpressionTypeMap.findAll();
+                cdtAwdPriXpsTypeMapRepository.findAll();
         List<String> xpsMapDataFromDB = new ArrayList();
         for (CoreDataTypeAllowedPrimitiveExpressionTypeMap xpsMap : cdtAllowedPrimitiveExpressionTypeMapList) {
             CdtPrimitiveExpressionTypeMap cdtPrimitiveExpressionTypeMap = new CdtPrimitiveExpressionTypeMap(xpsMap.getCdtAwdPriXpsTypeMapId());
@@ -521,18 +522,14 @@ public class CDTTest {
         String builtInType;
 
         public CdtPrimitiveExpressionTypeMap(int id) throws Exception {
-            CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCdtAllowedPrimitiveExpressionTypeMap =
-                    repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
             CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAllowedPrimitiveExpressionTypeMap =
-                    aCdtAllowedPrimitiveExpressionTypeMap.findOneByCdtAwdPriXpsTypeMapId(id);
+                    cdtAwdPriXpsTypeMapRepository.findOne(id);
             int awdPriId = cdtAllowedPrimitiveExpressionTypeMap.getCdtAwdPriId();
             int xbtId = cdtAllowedPrimitiveExpressionTypeMap.getXbtId();
 
-            CoreDataTypeAllowedPrimitiveRepository aCdtAllowedPrimitive = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-            CoreDataTypeAllowedPrimitive cdtAllowedPrimitive = aCdtAllowedPrimitive.findOneByCdtAwdPriId(awdPriId);
+            CoreDataTypeAllowedPrimitive cdtAllowedPrimitive = cdtAwdPriRepository.findOne(awdPriId);
 
-            CoreDataTypePrimitiveRepository aCdtPrimitive = repositoryFactory.coreDataTypePrimitiveRepository();
-            CoreDataTypePrimitive cdtPrimitive = aCdtPrimitive.findOneByCdtPriId(cdtAllowedPrimitive.getCdtPriId());
+            CoreDataTypePrimitive cdtPrimitive = cdtPriRepository.findOne(cdtAllowedPrimitive.getCdtPriId());
             primitiveName = cdtPrimitive.getName();
 
             DataType cdt = dataTypeRepository.findOne(cdtAllowedPrimitive.getCdtId());
@@ -568,8 +565,7 @@ public class CDTTest {
                     repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
             CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri = cdtScAwdPriRepository.findOneByCdtScAwdPriId(cdtScAwdPriId);
 
-            CoreDataTypePrimitiveRepository aCdtPrimitive = repositoryFactory.coreDataTypePrimitiveRepository();
-            CoreDataTypePrimitive cdtPrimitive = aCdtPrimitive.findOneByCdtPriId(cdtScAwdPri.getCdtPriId());
+            CoreDataTypePrimitive cdtPrimitive = cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId());
             primitiveName = cdtPrimitive.getName();
 
             DataTypeSupplementaryComponent cdtsc = dtScRepository.findOne(cdtScAwdPri.getCdtScId());

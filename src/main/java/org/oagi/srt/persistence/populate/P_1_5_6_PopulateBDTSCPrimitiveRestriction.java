@@ -44,6 +44,15 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
     public int getAgencyListID() throws Exception {
         AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyIdList.getAgencyIdListId();
@@ -61,10 +70,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     public void populateBDTSCPrimitiveRestriction(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository aBDTSCPrimitiveRestrictionDAO = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCDTSCAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
 
         List<DataTypeSupplementaryComponent> al = dtScRepository.findAll();
         List<DataTypeSupplementaryComponent> al_meta = new ArrayList();
@@ -113,9 +119,10 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                 if (ele != null && ele.getAttribute("type") != null) {
                     String attrTypeName = ele.getAttribute("type").replaceAll("ContentType", "");
                     String typeName = ele.getAttribute("type").replaceAll("ContentType", "");
-                    try {
-                        codeListId = codeListRepository.findOneByName(typeName).getCodeListId();
-                    } catch (EmptyResultDataAccessException e) {
+                    CodeList codeList = codeListRepository.findOneByName(typeName);
+                    if (codeList != null) {
+                        codeListId = codeList.getCodeListId();
+                    } else {
                         codeListId = 0;
                     }
                     ele_name = ele.getAttribute("name");
@@ -199,7 +206,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     //System.out.println("Populating bdt sc primitive restriction for bdt sc = "+aDataTypeSupplementaryComponent.getPropertyTerm()+aDataTypeSupplementaryComponent.getRepresentationTerm()+" owner dt den = "+getDen(aDataTypeSupplementaryComponent.getOwnerDtId())+" code list id = "+bVO.getCodeListId()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.isDefault());
                     aBDTSCPrimitiveRestrictionDAO.save(bVO);
 
-                    int CDT_Primitive_id = aCDTPrimitiveDAO.findOneByName("Token").getCdtPriId();
+                    int CDT_Primitive_id = cdtPriRepository.findOneByName("Token").getCdtPriId();
 
                     int xbt_id = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
 
@@ -381,8 +388,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public String getCDTPrimitiveName(int id) throws Exception {
-        CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        return aCDTPrimitiveDAO.findOneByCdtPriId(id).getName();
+        return cdtPriRepository.findOne(id).getName();
     }
 
     public XSDBuiltInType getXbtId(int id) throws Exception {

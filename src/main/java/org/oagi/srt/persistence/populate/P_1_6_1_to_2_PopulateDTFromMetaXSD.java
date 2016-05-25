@@ -6,7 +6,6 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
 import org.oagi.srt.repository.DataTypeRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.entity.DataType;
@@ -33,13 +32,13 @@ import java.util.List;
 public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
-
-	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
 	private DataTypeRepository dataTypeRepository;
+
+	@Autowired
+	private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
 	
 	public void importAdditionalBDT(XPathHandler xh) throws Exception {
 		DataType dtVO = new DataType();
@@ -93,8 +92,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 	}
 	
 	private void insertBDTPrimitiveRestriction(int basedBdtId, int bdtId) throws Exception {
-		BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-		List<BusinessDataTypePrimitiveRestriction> al = aBDTPrimitiveRestrictionDAO.findByBdtId(basedBdtId);
+		List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(basedBdtId);
 		
 		for(BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
 			BusinessDataTypePrimitiveRestriction theBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
@@ -102,7 +100,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 			theBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 			theBDT_Primitive_RestrictionVO.setDefault(aBusinessDataTypePrimitiveRestriction.isDefault());
 			System.out.println("Populating BDT Primitive Restriction for bdt id = " + bdtId+ " cdt primitive expression type map = "+theBDT_Primitive_RestrictionVO.getCdtAwdPriXpsTypeMapId()+" is_default = " + theBDT_Primitive_RestrictionVO.isDefault());
-			aBDTPrimitiveRestrictionDAO.save(theBDT_Primitive_RestrictionVO);
+			bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
 		}
 	}
 

@@ -77,6 +77,8 @@ public class TopLevelABIEHandler implements Serializable {
 
     private BusinessContextRepository businessContextRepository;
     private BusinessContextValueRepository businessContextValueRepository;
+
+    @Autowired
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
 
     @Autowired
@@ -127,8 +129,6 @@ public class TopLevelABIEHandler implements Serializable {
 
         businessContextRepository = repositoryFactory.businessContextRepository();
         businessContextValueRepository = repositoryFactory.businessContextValueRepository();
-        bdtPriRestriRepository =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
 
         maxABIEId = asbieRepository.findGreatestId();
         maxASBIEPId = asbiepRepository.findGreatestId();
@@ -1360,7 +1360,7 @@ public class TopLevelABIEHandler implements Serializable {
             aABIEView.getBdtPrimitiveRestrictions();
 
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
-                    bdtPriRestriRepository.findOneByBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
+                    bdtPriRestriRepository.findOne(aABIEView.getBdtPrimitiveRestrictionId());
             CodeList codeList = codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId());
             codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
@@ -1503,7 +1503,7 @@ public class TopLevelABIEHandler implements Serializable {
             aABIEView.getBdtPrimitiveRestrictions();
 
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
-                    bdtPriRestriRepository.findOneByBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
+                    bdtPriRestriRepository.findOne(aABIEView.getBdtPrimitiveRestrictionId());
             CodeList codeList = codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId());
             codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         }
@@ -1581,7 +1581,7 @@ public class TopLevelABIEHandler implements Serializable {
         options.put("contentHeight", 800);
 
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
-                bdtPriRestriRepository.findOneByBdtPriRestriId(bdtPrimitiveRestrictionId);
+                bdtPriRestriRepository.findOne(bdtPrimitiveRestrictionId);
         CodeList codeList = codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId());
         codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
 

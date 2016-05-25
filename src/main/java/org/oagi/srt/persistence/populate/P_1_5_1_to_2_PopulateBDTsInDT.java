@@ -31,9 +31,6 @@ import java.util.List;
 public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -41,6 +38,18 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
+
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
     public static void main(String[] args) throws Exception {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
@@ -223,13 +232,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void insertBDTPrimitiveRestriction(int cdtId, int bdtID, int defaultId) throws Exception {
-        BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-        CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository =
-                repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
-                repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtId);
 
         for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
@@ -887,15 +889,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void insertBDTPrimitiveRestrictionForExceptionalBDT(int cdtID, int bdtID, int defaultId) throws Exception {
-        BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-        CoreDataTypePrimitiveRepository cdtPriRepository =
-                repositoryFactory.coreDataTypePrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository =
-                repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
-                repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
         for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
 
@@ -1300,15 +1293,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void validateInsertBDTPrimitiveRestriction(int basedtID, int bdtId, boolean unionExist, String baseName) throws Exception {
-        BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
-                repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
-        CoreDataTypePrimitiveRepository cdtPriRepository =
-                repositoryFactory.coreDataTypePrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository =
-                repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
-                repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-
         DataType baseDataType = dataTypeRepository.findOne(basedtID);
         if (baseDataType.getType() == 0) {//if the base is CDT and this is default
 
@@ -1336,9 +1320,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                             if (defaultBDTPri.get(j).isDefault()) {
                                 defaultCount++;
                                 CoreDataTypeAllowedPrimitiveExpressionTypeMap mapFromBDT =
-                                        cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(thisCDTAwdPriXpsTypeMapId);
-                                CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findOneByCdtAwdPriId(mapFromBDT.getCdtAwdPriId());
-                                CoreDataTypePrimitive aCDTP = cdtPriRepository.findOneByCdtPriId(aCDTAP.getCdtPriId());
+                                        cdtAwdPriXpsTypeMapRepository.findOne(thisCDTAwdPriXpsTypeMapId);
+                                CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findOne(mapFromBDT.getCdtAwdPriId());
+                                CoreDataTypePrimitive aCDTP = cdtPriRepository.findOne(aCDTAP.getCdtPriId());
                                 XSDBuiltInType xbt = xbtRepository.findOne(mapFromBDT.getXbtId());
 
                                 if (unionExist) {

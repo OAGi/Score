@@ -23,11 +23,7 @@ public interface RepositoryFactory {
     public BasicBusinessInformationEntityPropertyRepository basicBusinessInformationEntityPropertyRepository();
     public BasicBusinessInformationEntitySupplementaryComponentRepository basicBusinessInformationEntitySupplementaryComponentRepository();
 
-    public BusinessDataTypePrimitiveRestrictionRepository businessDataTypePrimitiveRestrictionRepository();
     public BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
-    public CoreDataTypePrimitiveRepository coreDataTypePrimitiveRepository();
-    public CoreDataTypeAllowedPrimitiveRepository coreDataTypeAllowedPrimitiveRepository();
-    public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
 }
