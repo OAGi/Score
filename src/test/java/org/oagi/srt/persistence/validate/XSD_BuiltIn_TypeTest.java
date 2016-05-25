@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.Application;
 import org.oagi.srt.persistence.validate.data.TableData;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.oagi.srt.repository.entity.XSDBuiltInType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,6 @@ import static org.junit.Assert.fail;
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest
 public class XSD_BuiltIn_TypeTest {
-
-    @Autowired
-    private RepositoryFactory repositoryFactory;
 
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;

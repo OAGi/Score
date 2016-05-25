@@ -40,7 +40,7 @@ public class BasicCoreComponentProperty implements Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private int createdBy;
 
     @Column(nullable = false)
@@ -49,11 +49,11 @@ public class BasicCoreComponentProperty implements Serializable {
     @Column(nullable = false)
     private int lastUpdatedBy;
 
-    @Column(nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
 
-    @Column(nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 

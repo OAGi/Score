@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository extends JpaRepository<CoreDataTypeAllowedPrimitiveExpressionTypeMap, Integer> {
+public interface CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository
+        extends JpaRepository<CoreDataTypeAllowedPrimitiveExpressionTypeMap, Integer> {
 
     @Query("select c from CoreDataTypeAllowedPrimitiveExpressionTypeMap c where c.cdtAwdPriId = ?1")
     public List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> findByCdtAwdPriId(int cdtAwdPriId);

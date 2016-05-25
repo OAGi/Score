@@ -24,26 +24,26 @@ import java.util.stream.Collectors;
 public class ContextSchemeHandler {
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
-
-	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
 	private ContextSchemeRepository contextSchemeRepository;
+
+	@Autowired
 	private ContextSchemeValueRepository contextSchemeValueRepository;
+
+	@Autowired
 	private BusinessContextRepository businessContextRepository;
+
+	@Autowired
 	private BusinessContextValueRepository businessContextValueRepository;
+
+	@Autowired
 	private ContextCategoryRepository contextCategoryRepository;
 
 	@PostConstruct
 	private void init() {
-		userId = userRepository.findOneByLoginId("oagis").getAppUserId();
-
-		contextSchemeRepository = repositoryFactory.contextSchemeRepository();
-		contextSchemeValueRepository = repositoryFactory.contextSchemeValueRepository();
-		businessContextRepository = repositoryFactory.businessContextRepository();
-		businessContextValueRepository = repositoryFactory.businessContextValueRepository();
-		contextCategoryRepository = repositoryFactory.contextCategoryRepository();
+		userId = userRepository.findAppUserIdByLoginId("oagis");
 	}
 
 	private String value;
@@ -69,7 +69,7 @@ public class ContextSchemeHandler {
 
 	public List<ContextSchemeValue> getSelectedCSValues() {
 		if (selectedScheme != null) {
-			selectedCSValues = contextSchemeValueRepository.findByContextSchemeId(
+			selectedCSValues = contextSchemeValueRepository.findByOwnerCtxSchemeId(
 					selectedScheme.getClassificationCtxSchemeId());
 		}
 		return selectedCSValues;
@@ -191,11 +191,11 @@ public class ContextSchemeHandler {
 		contextScheme.setCreatedBy(userId);
 		contextScheme.setLastUpdatedBy(userId);
 
-		contextSchemeRepository.update(contextScheme);
+		contextSchemeRepository.save(contextScheme);
 		contextSchemes = contextSchemeRepository.findAll();
 
 		List<ContextSchemeValue> contextSchemeValues =
-				contextSchemeValueRepository.findByContextSchemeId(contextScheme.getClassificationCtxSchemeId());
+				contextSchemeValueRepository.findByOwnerCtxSchemeId(contextScheme.getClassificationCtxSchemeId());
 		for (ContextSchemeValue source : contextSchemeValues) {
 			boolean deleted = true;
 			for (ContextSchemeValue target : csValues) {
@@ -205,7 +205,7 @@ public class ContextSchemeHandler {
 				}
 			}
 			if (deleted) {
-				contextSchemeValueRepository.deleteByContextSchemeId(source.getCtxSchemeValueId());
+				contextSchemeValueRepository.deleteByOwnerCtxSchemeId(source.getCtxSchemeValueId());
 			}
 		}
 
@@ -228,7 +228,7 @@ public class ContextSchemeHandler {
 
 	@Transactional(rollbackFor = Throwable.class)
 	public void deleteCSV(String guid, int id) {
-		List<BusinessContextValue> businessContextValues = businessContextValueRepository.findByContextSchemeValueId(id);
+		List<BusinessContextValue> businessContextValues = businessContextValueRepository.findByCtxSchemeValueId(id);
 		if (!businessContextValues.isEmpty()) {
 			String msg = partResult(businessContextValues);
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_SCHEME + msg, null);
@@ -307,10 +307,10 @@ public class ContextSchemeHandler {
 		setMeaning("");
 
 		List<ContextSchemeValue> contextSchemeValues =
-				contextSchemeValueRepository.findByContextSchemeId(contextSchemeId);
+				contextSchemeValueRepository.findByOwnerCtxSchemeId(contextSchemeId);
 		for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
 			List<BusinessContextValue> businessContextValues =
-					businessContextValueRepository.findByContextSchemeValueId(contextSchemeValue.getCtxSchemeValueId());
+					businessContextValueRepository.findByCtxSchemeValueId(contextSchemeValue.getCtxSchemeValueId());
 			if (!businessContextValues.isEmpty()) {
 				String msg = partResult(businessContextValues);
 				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_SCHEME + msg,  null);
@@ -321,9 +321,9 @@ public class ContextSchemeHandler {
 		}
 
 		for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
-			contextSchemeValueRepository.deleteByContextSchemeValueId(contextSchemeValue.getCtxSchemeValueId());
+			contextSchemeValueRepository.deleteByOwnerCtxSchemeId(contextSchemeValue.getCtxSchemeValueId());
 		}
-		contextSchemeRepository.deleteByContextSchemeId(contextScheme.getClassificationCtxSchemeId());
+		contextSchemeRepository.delete(contextScheme.getClassificationCtxSchemeId());
 		contextSchemes = contextSchemeRepository.findAll();
     }
 
@@ -336,7 +336,7 @@ public class ContextSchemeHandler {
 
 		for (int businessContextId : hm.keySet()) {
 			BusinessContext businessContext =
-					businessContextRepository.findOneByBusinessContextId(businessContextId);
+					businessContextRepository.findOne(businessContextId);
 			sb.append(businessContext.getName() + ", ");
 		}
 

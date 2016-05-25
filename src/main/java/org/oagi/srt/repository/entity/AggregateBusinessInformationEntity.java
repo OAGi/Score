@@ -1,27 +1,78 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "abie")
 public class AggregateBusinessInformationEntity implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "ABIE_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ABIE_ID_SEQ", sequenceName = "ABIE_ID_SEQ", allocationSize = 1)
     private int abieId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int basedAccId;
+
+    @Column(name = "is_top_level", nullable = false)
     private boolean topLevel;
+
+    @Column(nullable = false)
     private int bizCtxId;
+
+    @Transient
     private String bizCtxName;
+
+    @Column
     private String definition;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column
     private int state;
-    private int clientId;
+
+    @Column
+    private Integer clientId;
+
+    @Column
     private String version;
+
+    @Column
     private String status;
+
+    @Column
     private String remark;
+
+    @Column
     private String bizTerm;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAbieId() {
         return abieId;
@@ -120,7 +171,7 @@ public class AggregateBusinessInformationEntity implements Serializable {
     }
 
     public int getClientId() {
-        return clientId;
+        return (clientId == null) ? 0 : clientId;
     }
 
     public void setClientId(int clientId) {

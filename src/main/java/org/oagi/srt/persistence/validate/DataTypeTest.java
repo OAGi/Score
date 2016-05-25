@@ -26,9 +26,6 @@ import java.util.Map;
 public class DataTypeTest {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
     @Autowired

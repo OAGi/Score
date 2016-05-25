@@ -26,7 +26,8 @@ public class BlobContent implements Serializable {
     @Column(nullable = false)
     private String module;
 
-    public BlobContent() {}
+    public BlobContent() {
+    }
 
     public BlobContent(File file) throws IOException {
         setModule(extractModuleFromFile(file));

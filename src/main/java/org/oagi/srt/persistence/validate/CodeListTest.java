@@ -5,7 +5,6 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,6 @@ import java.util.List;
 
 @Component
 public class CodeListTest {
-
-    @Autowired
-    private RepositoryFactory repositoryFactory;
 
     @Autowired
     private UserRepository userRepository;
@@ -103,7 +99,7 @@ public class CodeListTest {
     }
 
     public int getUserID(String userName) {
-        return userRepository.findOneByLoginId(userName).getAppUserId();
+        return userRepository.findAppUserIdByLoginId(userName);
     }
 
     public int getCodeListId(String codelistGuid, String enumTypeguid, String name) {

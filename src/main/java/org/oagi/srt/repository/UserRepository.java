@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
+    @Query("select u.appUserId from User u where u.loginId = ?1")
+    public int findAppUserIdByLoginId(String loginId);
+
     @Query("select u from User u where u.loginId = ?1")
     public User findOneByLoginId(String loginId);
 

@@ -75,7 +75,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    dtVO.setRevisionDoc(null);
 		    dtVO.setState(3);
 
-			int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+			int userId = userRepository.findAppUserIdByLoginId("oagis");
 			dtVO.setCreatedBy(userId);
 			dtVO.setLastUpdatedBy(userId);
 			dtVO.setOwnerUserId(userId);

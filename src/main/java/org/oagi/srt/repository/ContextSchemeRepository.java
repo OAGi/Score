@@ -1,20 +1,13 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.ContextScheme;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ContextSchemeRepository {
+public interface ContextSchemeRepository extends JpaRepository<ContextScheme, Integer> {
 
-    public List<ContextScheme> findAll();
-
-    public List<ContextScheme> findByContextCategoryId(int contextCategoryId);
-
-    public ContextScheme findOneByContextSchemeId(int contextSchemeId);
-
-    public void update(ContextScheme contextScheme);
-
-    public void save(ContextScheme contextScheme);
-
-    public void deleteByContextSchemeId(int contextSchemeId);
+    @Query("select c from ContextScheme c where c.ctxCategoryId = ?1")
+    public List<ContextScheme> findByCtxCategoryId(int ctxCategoryId);
 }

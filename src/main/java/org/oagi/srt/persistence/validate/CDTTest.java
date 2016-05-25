@@ -16,9 +16,6 @@ import java.util.List;
 public class CDTTest {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
     @Autowired

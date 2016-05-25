@@ -1,18 +1,17 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BasicBusinessInformationEntitySupplementaryComponentRepository {
+public interface BasicBusinessInformationEntitySupplementaryComponentRepository
+        extends JpaRepository<BasicBusinessInformationEntitySupplementaryComponent, Integer> {
 
-    public int findGreatestId();
-
+    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(int bbieId);
 
+    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1 and b.used = ?2")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieIdAndUsed(int bbieId, boolean used);
-
-    public void save(BasicBusinessInformationEntitySupplementaryComponent basicBusinessInformationEntitySupplementaryComponent);
-
-    public void update(BasicBusinessInformationEntitySupplementaryComponent basicBusinessInformationEntitySupplementaryComponent);
 }

@@ -1,14 +1,28 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "ctx_scheme_value")
 public class ContextSchemeValue implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "CTX_SCHEME_VALUE_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CTX_SCHEME_VALUE_ID_SEQ", sequenceName = "CTX_SCHEME_VALUE_ID_SEQ", allocationSize = 1)
     private int ctxSchemeValueId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private String value;
+
+    @Column
     private String meaning;
-    private int ownerCtxSchemeId;
+
+    @Column
+    private Integer ownerCtxSchemeId;
 
     public int getCtxSchemeValueId() {
         return ctxSchemeValueId;
@@ -43,7 +57,7 @@ public class ContextSchemeValue implements Serializable {
     }
 
     public int getOwnerCtxSchemeId() {
-        return ownerCtxSchemeId;
+        return (ownerCtxSchemeId == null) ? 0 : ownerCtxSchemeId;
     }
 
     public void setOwnerCtxSchemeId(int ownerCtxSchemeId) {

@@ -1,20 +1,57 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "bbiep")
 public class BasicBusinessInformationEntityProperty implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "BBIEP_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BBIEP_ID_SEQ", sequenceName = "BBIEP_ID_SEQ", allocationSize = 1)
     private int bbiepId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int basedBccpId;
+
+    @Column(nullable = false)
     private String definition;
+
+    @Column(nullable = false)
     private String remark;
+
+    @Column(nullable = false)
     private String bizTerm;
+
+    @Column(nullable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getBbiepId() {
         return bbiepId;

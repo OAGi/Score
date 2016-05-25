@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -31,21 +30,19 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 	private static final long serialVersionUID = 8706516047982751653L;
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
 	private BusinessContextRepository businessContextRepository;
-	private BusinessContextValueRepository businessContextValueRepository;
-	private ContextCategoryRepository contextCategoryRepository;
-	private ContextSchemeRepository contextSchemeRepository;
-	private ContextSchemeValueRepository contextSchemeValueRepository;
 
-	@PostConstruct
-	public void init() {
-		businessContextRepository = repositoryFactory.businessContextRepository();
-		businessContextValueRepository = repositoryFactory.businessContextValueRepository();
-		contextCategoryRepository = repositoryFactory.contextCategoryRepository();
-		contextSchemeRepository = repositoryFactory.contextSchemeRepository();
-		contextSchemeValueRepository = repositoryFactory.contextSchemeValueRepository();
-	}
+	@Autowired
+	private BusinessContextValueRepository businessContextValueRepository;
+
+	@Autowired
+	private ContextCategoryRepository contextCategoryRepository;
+
+	@Autowired
+	private ContextSchemeRepository contextSchemeRepository;
+
+	@Autowired
+	private ContextSchemeValueRepository contextSchemeValueRepository;
 	
 	private String name;
 	private String ccName;
@@ -235,7 +232,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
 		selected = contextCategory;
-		contextSchemes = contextSchemeRepository.findByContextCategoryId(contextCategory.getCtxCategoryId());
+		contextSchemes = contextSchemeRepository.findByCtxCategoryId(contextCategory.getCtxCategoryId());
 		contextValues = new ArrayList();
 		selected1 = null;
 		selected2 = null;
@@ -253,7 +250,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
 		selected1 = contextScheme;
-		contextValues = contextSchemeValueRepository.findByContextSchemeId(contextScheme.getClassificationCtxSchemeId());
+		contextValues = contextSchemeValueRepository.findByOwnerCtxSchemeId(contextScheme.getClassificationCtxSchemeId());
     }
     
     public void onRowUnselect1(UnselectEvent event) {
@@ -308,18 +305,18 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 		bcDetails = new ArrayList();
 		if (bcDetail != null) {
 			bcId = bcDetail.getBizCtxId();
-			BusinessContext bcVO = businessContextRepository.findOneByBusinessContextId(bcDetail.getBizCtxId());
-			List<BusinessContextValue> bcvVOList = businessContextValueRepository.findByBusinessContextId(bcDetail.getBizCtxId());
+			BusinessContext bcVO = businessContextRepository.findOne(bcDetail.getBizCtxId());
+			List<BusinessContextValue> bcvVOList = businessContextValueRepository.findByBizCtxId(bcDetail.getBizCtxId());
 			for (BusinessContextValue businessContextValue : bcvVOList) {
 				BusinessContextValues businessContextValues = new BusinessContextValues();
 
-				ContextSchemeValue contextSchemeValue = contextSchemeValueRepository.findOneByContextSchemeValueId(businessContextValue.getCtxSchemeValueId());
+				ContextSchemeValue contextSchemeValue = contextSchemeValueRepository.findOne(businessContextValue.getCtxSchemeValueId());
 				businessContextValues.setCsvVO(contextSchemeValue);
 
-				ContextScheme contextScheme = contextSchemeRepository.findOneByContextSchemeId(contextSchemeValue.getOwnerCtxSchemeId());
+				ContextScheme contextScheme = contextSchemeRepository.findOne(contextSchemeValue.getOwnerCtxSchemeId());
 				businessContextValues.setCsVO(contextScheme);
 
-				ContextCategory contextCategory = contextCategoryRepository.findOneByContextCategoryId(contextScheme.getCtxCategoryId());
+				ContextCategory contextCategory = contextCategoryRepository.findOne(contextScheme.getCtxCategoryId());
 				businessContextValues.setCcVO(contextCategory);
 
 				bcDetails.add(businessContextValues);

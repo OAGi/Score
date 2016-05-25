@@ -1,31 +1,90 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "ascc")
 public class AssociationCoreComponent extends CoreComponent implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "ASCC_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ASCC_ID_SEQ", sequenceName = "ASCC_ID_SEQ", allocationSize = 1)
     private int asccId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int cardinalityMin;
+
+    @Column(nullable = false)
     private int cardinalityMax;
+
+    @Column(nullable = false)
     private int seqKey;
+
+    @Column(nullable = false)
     private int fromAccId;
+
+    @Column(nullable = false)
     private int toAsccpId;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column
     private String definition;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int state;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentAsccId;
+
+    @Column
+    private Integer revisionAction;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentAsccId;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAsccId() {
         return asccId;
@@ -172,7 +231,7 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public int getRevisionAction() {
-        return revisionAction;
+        return (revisionAction == null) ? 0 : revisionAction;
     }
 
     public void setRevisionAction(int revisionAction) {
@@ -180,7 +239,7 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -188,7 +247,7 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public int getCurrentAsccId() {
-        return currentAsccId;
+        return (currentAsccId == null) ? 0 : currentAsccId;
     }
 
     public void setCurrentAsccId(int currentAsccId) {

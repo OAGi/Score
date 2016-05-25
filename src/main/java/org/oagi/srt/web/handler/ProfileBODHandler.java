@@ -4,7 +4,6 @@ import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
 import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
@@ -18,7 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -41,19 +39,13 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private ApplicationContext applicationContext;
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
-
-	@Autowired
 	private AssociationCoreComponentPropertyRepository asccpRepository;
 
+	@Autowired
 	private AggregateBusinessInformationEntityRepository abieRepository;
-	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
 
-	@PostConstruct
-	public void init() {
-		abieRepository = repositoryFactory.aggregateBusinessInformationEntityRepository();
-		asbiepRepository = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
-	}
+	@Autowired
+	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
 
 	private ABIEView selectedABIEView;
 	private List<ABIEView> abieViewList = new ArrayList<ABIEView>();

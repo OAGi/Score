@@ -25,9 +25,6 @@ import java.util.*;
 public class StandaloneXMLSchema {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
     @Autowired
@@ -74,6 +71,21 @@ public class StandaloneXMLSchema {
 
     @Autowired
     private AssociationCoreComponentRepository asccRepository;
+
+    @Autowired
+    private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+
+    @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
+
+    @Autowired
+    private AssociationBusinessInformationEntityRepository asbieRepository;
+
+    @Autowired
+    private BasicBusinessInformationEntityRepository bbieRepository;
+
+    @Autowired
+    private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
 
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
@@ -1005,17 +1017,15 @@ public class StandaloneXMLSchema {
     }
 
     public AssociationBusinessInformationEntityProperty receiveASBIEP(int ABIE_Id) throws Exception {
-        AssociationBusinessInformationEntityPropertyRepository dao = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
-        AssociationBusinessInformationEntityProperty aAssociationBusinessInformationEntityProperty = dao.findOneByRoleOfAbieId(ABIE_Id);
+        AssociationBusinessInformationEntityProperty aAssociationBusinessInformationEntityProperty =
+                asbiepRepository.findOneByRoleOfAbieId(ABIE_Id);
         return aAssociationBusinessInformationEntityProperty;
     }
 
     public List<AggregateBusinessInformationEntity> receiveABIE(List<Integer> abie_ids) throws Exception {
-        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
-
         List<AggregateBusinessInformationEntity> aAggregateBusinessInformationEntity = new ArrayList();
         for (int i = 0; i < abie_ids.size(); i++) {
-            aAggregateBusinessInformationEntity.add(dao.findOneByAbieId(abie_ids.get(i)));
+            aAggregateBusinessInformationEntity.add(abieRepository.findOne(abie_ids.get(i)));
         }
         return aAggregateBusinessInformationEntity;
     }
@@ -1043,22 +1053,19 @@ public class StandaloneXMLSchema {
     }
 
     public AggregateBusinessInformationEntity queryTargetABIE(AssociationBusinessInformationEntityProperty gASBIEP) {
-        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
-        AggregateBusinessInformationEntity abievo = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
+        AggregateBusinessInformationEntity abievo = abieRepository.findOne(gASBIEP.getRoleOfAbieId());
         return abievo;
     }
 
     public AggregateCoreComponent queryTargetACC(AssociationBusinessInformationEntityProperty gASBIEP) {
-        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
-        AggregateBusinessInformationEntity abievo = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
+        AggregateBusinessInformationEntity abievo = abieRepository.findOne(gASBIEP.getRoleOfAbieId());
 
         AggregateCoreComponent aAggregateCoreComponent = accRepository.findOne(abievo.getBasedAccId());
         return aAggregateCoreComponent;
     }
 
     public AggregateBusinessInformationEntity queryTargetABIE2(AssociationBusinessInformationEntityProperty gASBIEP) {
-        AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
-        AggregateBusinessInformationEntity abieVO = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
+        AggregateBusinessInformationEntity abieVO = abieRepository.findOne(gASBIEP.getRoleOfAbieId());
         return abieVO;
     }
 
@@ -1068,10 +1075,8 @@ public class StandaloneXMLSchema {
         ValueComparator bvc = new ValueComparator(sequence);
         Map<BusinessInformationEntity, Integer> ordered_sequence = new TreeMap(bvc);
 
-        AssociationBusinessInformationEntityRepository dao = repositoryFactory.associationBusinessInformationEntityRepository();
-        List<AssociationBusinessInformationEntity> asbievo = dao.findByFromAbieIdAndUsed(gABIE.getAbieId(), true);
-        BasicBusinessInformationEntityRepository dao2 = repositoryFactory.basicBusinessInformationEntityRepository();
-        List<BasicBusinessInformationEntity> bbievo = dao2.findByFromAbieIdAndUsed(gABIE.getAbieId(), true);
+        List<AssociationBusinessInformationEntity> asbievo = asbieRepository.findByFromAbieIdAndUsed(gABIE.getAbieId(), true);
+        List<BasicBusinessInformationEntity> bbievo = bbieRepository.findByFromAbieIdAndUsed(gABIE.getAbieId(), true);
         List<BusinessInformationEntity> result = new ArrayList();
 
         for (BasicBusinessInformationEntity aBasicBusinessInformationEntity : bbievo) {
@@ -1114,8 +1119,7 @@ public class StandaloneXMLSchema {
     }
 
     public AssociationBusinessInformationEntityProperty queryAssocToASBIEP(AssociationBusinessInformationEntity gASBIE) {
-        AssociationBusinessInformationEntityPropertyRepository dao = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
-        AssociationBusinessInformationEntityProperty asbiepVO = dao.findOneByAsbiepId(gASBIE.getToAsbiepId());
+        AssociationBusinessInformationEntityProperty asbiepVO = asbiepRepository.findOne(gASBIE.getToAsbiepId());
         return asbiepVO;
     }
 
@@ -1129,8 +1133,7 @@ public class StandaloneXMLSchema {
 
     //Get only SCs whose is_used is true.
     public List<BasicBusinessInformationEntitySupplementaryComponent> queryBBIESCs(BasicBusinessInformationEntity gBBIE) {
-        BasicBusinessInformationEntitySupplementaryComponentRepository dao = repositoryFactory.basicBusinessInformationEntitySupplementaryComponentRepository();
-        return dao.findByBbieIdAndUsed(gBBIE.getBbieId(), true);
+        return bbieScRepository.findByBbieIdAndUsed(gBBIE.getBbieId(), true);
     }
 
     public boolean isCodeListGenerated(CodeList gCL) throws Exception {

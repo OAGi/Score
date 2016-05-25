@@ -1,26 +1,75 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "asbie")
 public class AssociationBusinessInformationEntity implements Serializable, BusinessInformationEntity {
 
+    @Id
+    @GeneratedValue(generator = "ASBIE_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ASBIE_ID_SEQ", sequenceName = "ASBIE_ID_SEQ", allocationSize = 1)
     private int asbieId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int fromAbieId;
+
+    @Column(nullable = false)
     private int toAsbiepId;
+
+    @Column(nullable = false)
     private int basedAscc;
+
+    @Column
     private String definition;
+
+    @Column(nullable = false)
     private int cardinalityMin;
+
+    @Column(nullable = false)
     private int cardinalityMax;
+
+    @Column(nullable = false)
     private boolean nillable;
+
+    @Column
     private String remark;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int seqKey;
+
+    @Column(name = "is_used", nullable = false)
     private boolean used;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAsbieId() {
         return asbieId;

@@ -1,12 +1,12 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.CodeList;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface CodeListRepository extends CrudRepository<CodeList, Integer> {
+public interface CodeListRepository extends JpaRepository<CodeList, Integer> {
 
     @Query("select c from CodeList c order by c.creationTimestamp desc")
     public List<CodeList> findAllOrderByCreationTimestampDesc();

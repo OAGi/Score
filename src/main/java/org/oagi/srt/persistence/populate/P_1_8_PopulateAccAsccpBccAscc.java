@@ -163,7 +163,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             accpVO.setDen(den);
             accpVO.setState(state);
             accpVO.setModule(module);
-            int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+            int userId = userRepository.findAppUserIdByLoginId("oagis");
             accpVO.setCreatedBy(userId);
             accpVO.setLastUpdatedBy(userId);
             accpVO.setOwnerUserId(userId);
@@ -205,7 +205,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         accpVO.setDen(den);
         accpVO.setState(state);
         accpVO.setModule(module);
-        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
         accpVO.setCreatedBy(userId);
         accpVO.setLastUpdatedBy(userId);
         accpVO.setOwnerUserId(userId);
@@ -507,7 +507,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         bccpVO.setRepresentationTerm(representationTerm);
         bccpVO.setDen(den);
         bccpVO.setState(3);
-        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
         bccpVO.setCreatedBy(userId);
         bccpVO.setLastUpdatedBy(userId);
         bccpVO.setOwnerUserId(userId);
@@ -553,7 +553,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             aAggregateCoreComponent.setDefinition("Group");
             aAggregateCoreComponent.setOagisComponentType(oagisComponentType);
             aAggregateCoreComponent.setBasedAccId(-1);
-            int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+            int userId = userRepository.findAppUserIdByLoginId("oagis");
             aAggregateCoreComponent.setCreatedBy(userId);
             aAggregateCoreComponent.setLastUpdatedBy(userId);
             aAggregateCoreComponent.setOwnerUserId(userId);
@@ -586,7 +586,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             asccpVO.setDen(Utility.spaceSeparator(propertyTerm + ". " + Utility.first(accDen)));
             asccpVO.setState(3);
             asccpVO.setModule(module);
-            int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+            int userId = userRepository.findAppUserIdByLoginId("oagis");
             asccpVO.setCreatedBy(userId);
             asccpVO.setLastUpdatedBy(userId);
             asccpVO.setOwnerUserId(userId);
@@ -682,7 +682,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         aAggregateCoreComponent.setDefinition(definition);
         aAggregateCoreComponent.setBasedAccId(basedAccId);
         aAggregateCoreComponent.setOagisComponentType(oagisComponentType);
-        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
         aAggregateCoreComponent.setCreatedBy(userId);
         aAggregateCoreComponent.setLastUpdatedBy(userId);
         aAggregateCoreComponent.setOwnerUserId(userId);

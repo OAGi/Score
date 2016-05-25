@@ -1,18 +1,16 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.ContextSchemeValue;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ContextSchemeValueRepository {
+public interface ContextSchemeValueRepository extends JpaRepository<ContextSchemeValue, Integer> {
 
-    public List<ContextSchemeValue> findByContextSchemeId(int contextSchemeId);
+    @Query("select c from ContextSchemeValue c where c.ownerCtxSchemeId = ?1")
+    public List<ContextSchemeValue> findByOwnerCtxSchemeId(int ownerCtxSchemeId);
 
-    public ContextSchemeValue findOneByContextSchemeValueId(int contextSchemeValueId);
-
-    public void save(ContextSchemeValue contextSchemeValue);
-
-    public void deleteByContextSchemeId(int contextSchemeId);
-
-    public void deleteByContextSchemeValueId(int contextSchemeValueId);
+    @Query("delete from ContextSchemeValue c where c.ownerCtxSchemeId = ?1")
+    public void deleteByOwnerCtxSchemeId(int ownerCtxSchemeId);
 }

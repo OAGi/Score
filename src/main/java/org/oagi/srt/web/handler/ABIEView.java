@@ -1,6 +1,9 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
+import org.oagi.srt.repository.CodeListRepository;
+import org.oagi.srt.repository.CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
+import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -15,9 +18,6 @@ import java.util.Map;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ABIEView implements Serializable, Comparable<ABIEView> {
-
-    @Autowired
-    private RepositoryFactory repositoryFactory;
 
     @Autowired
     private CodeListRepository codeListRepository;

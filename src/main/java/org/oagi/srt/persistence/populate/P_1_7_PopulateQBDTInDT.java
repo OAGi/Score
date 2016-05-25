@@ -411,7 +411,7 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setDefinition(definition);
         dtVO.setContentComponentDefinition(null);
         dtVO.setState(3);
-        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);
@@ -525,7 +525,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccpVO.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dtVO.getDataTypeTerm());
         bccpVO.setDefinition(definition);
         bccpVO.setState(3);
-        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);
@@ -885,7 +885,7 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setDefinition(definition);
         dtVO.setContentComponentDefinition(null);
         dtVO.setState(3);
-        int userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);

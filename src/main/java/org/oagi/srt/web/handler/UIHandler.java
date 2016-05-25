@@ -16,7 +16,7 @@ public class UIHandler {
 
 	@PostConstruct
 	public void init() {
-		userId = userRepository.findOneByLoginId("oagis").getAppUserId();
+		userId = userRepository.findAppUserIdByLoginId("oagis");
 	}
 
 	public void closeDialog() {

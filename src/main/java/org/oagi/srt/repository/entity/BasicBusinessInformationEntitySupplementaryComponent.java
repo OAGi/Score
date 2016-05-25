@@ -1,22 +1,54 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "bbie_sc")
 public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "BBIE_SC_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BBIE_SC_ID_SEQ", sequenceName = "BBIE_SC_ID_SEQ", allocationSize = 1)
     private int bbieScId;
+
+    @Column(nullable = false)
     private int bbieId;
+
+    @Column(nullable = false)
     private int dtScId;
-    private int dtScPriRestriId;
-    private int codeListId;
-    private int agencyIdListId;
+
+    @Column
+    private Integer dtScPriRestriId;
+
+    @Column
+    private Integer codeListId;
+
+    @Column
+    private Integer agencyIdListId;
+
+    @Column(nullable = false)
     private int minCardinality;
+
+    @Column
     private int maxCardinality;
+
+    @Column
     private String defaultValue;
+
+    @Column
     private String fixedValue;
+
+    @Column
     private String definition;
+
+    @Column
     private String remark;
+
+    @Column
     private String bizTerm;
+
+    @Column(name = "is_used", nullable = false)
     private boolean used;
 
     public int getBbieScId() {
@@ -44,7 +76,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public int getDtScPriRestriId() {
-        return dtScPriRestriId;
+        return (dtScPriRestriId == null) ? 0 : dtScPriRestriId;
     }
 
     public void setDtScPriRestriId(int dtScPriRestriId) {
@@ -52,7 +84,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public int getCodeListId() {
-        return codeListId;
+        return (codeListId == null) ? 0 : codeListId;
     }
 
     public void setCodeListId(int codeListId) {
@@ -60,7 +92,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public int getAgencyIdListId() {
-        return agencyIdListId;
+        return (agencyIdListId == null) ? 0 : agencyIdListId;
     }
 
     public void setAgencyIdListId(int agencyIdListId) {

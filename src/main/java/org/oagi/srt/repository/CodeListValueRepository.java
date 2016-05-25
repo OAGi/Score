@@ -1,12 +1,12 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.CodeListValue;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface CodeListValueRepository extends CrudRepository<CodeListValue, Integer> {
+public interface CodeListValueRepository extends JpaRepository<CodeListValue, Integer> {
 
     @Query("select c from CodeListValue c where c.codeListId = ?1")
     public List<CodeListValue> findByCodeListId(int codeListId);

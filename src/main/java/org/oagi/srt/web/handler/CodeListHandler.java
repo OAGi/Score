@@ -4,7 +4,6 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.primefaces.context.RequestContext;
@@ -28,9 +27,6 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class CodeListHandler extends UIHandler {
-
-    @Autowired
-    private RepositoryFactory repositoryFactory;
 
     @Autowired
     private CodeListRepository codeListRepository;

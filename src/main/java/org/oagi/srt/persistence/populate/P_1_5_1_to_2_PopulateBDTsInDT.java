@@ -84,7 +84,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private int getUserID(String userName) {
-        return userRepository.findOneByLoginId(userName).getAppUserId();
+        return userRepository.findAppUserIdByLoginId(userName);
     }
 
     private void importDataTypeList(String dataType) throws Exception {

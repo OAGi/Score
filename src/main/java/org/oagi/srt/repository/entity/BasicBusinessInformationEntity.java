@@ -1,31 +1,90 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "bbie")
 public class BasicBusinessInformationEntity implements Serializable, BusinessInformationEntity {
 
+    @Id
+    @GeneratedValue(generator = "BBIE_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BBIE_ID_SEQ", sequenceName = "BBIE_ID_SEQ", allocationSize = 1)
     private int bbieId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int basedBccId;
+
+    @Column(nullable = false)
     private int fromAbieId;
+
+    @Column(nullable = false)
     private int toBbiepId;
-    private int bdtPriRestriId;
-    private int codeListId;
+
+    @Column
+    private Integer bdtPriRestriId;
+
+    @Column
+    private Integer codeListId;
+
+    @Column(nullable = false)
     private int cardinalityMin;
+
+    @Column
     private int cardinalityMax;
+
+    @Column
     private String defaultValue;
+
+    @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
+
+    @Column
     private String fixedValue;
+
+    @Column(name = "is_null", nullable = false)
     private boolean nill;
+
+    @Column
     private String definition;
+
+    @Column
     private String remark;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int seqKey;
+
+    @Column(name = "is_used", nullable = false)
     private boolean used;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getBbieId() {
         return bbieId;
@@ -68,7 +127,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     }
 
     public int getBdtPriRestriId() {
-        return bdtPriRestriId;
+        return (bdtPriRestriId == null) ? 0 : bdtPriRestriId;
     }
 
     public void setBdtPriRestriId(int bdtPriRestriId) {
@@ -76,7 +135,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     }
 
     public int getCodeListId() {
-        return codeListId;
+        return (codeListId == null) ? 0 : codeListId;
     }
 
     public void setCodeListId(int codeListId) {

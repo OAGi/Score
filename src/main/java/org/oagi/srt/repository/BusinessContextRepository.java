@@ -1,14 +1,7 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.BusinessContext;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface BusinessContextRepository {
-
-    public List<BusinessContext> findAll();
-
-    public BusinessContext findOneByBusinessContextId(int businessContextId);
-
-    public void save(BusinessContext businessContext);
+public interface BusinessContextRepository extends JpaRepository<BusinessContext, Integer> {
 }

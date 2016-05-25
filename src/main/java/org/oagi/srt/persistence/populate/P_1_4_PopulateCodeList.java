@@ -194,7 +194,7 @@ public class P_1_4_PopulateCodeList {
     }
 
     private int getUserID(String userName) {
-        return userRepository.findOneByLoginId(userName).getAppUserId();
+        return userRepository.findAppUserIdByLoginId(userName);
     }
 
     private void updateBasedCodeListID(String fileinput, int agencyId) throws Exception {

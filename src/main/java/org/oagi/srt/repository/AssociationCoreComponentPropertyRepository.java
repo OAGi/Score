@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface AssociationCoreComponentPropertyRepository extends JpaRepository<AssociationCoreComponentProperty, Integer> {
 
+    @Query("select a from AssociationCoreComponentProperty a order by a.propertyTerm asc")
+    public List<AssociationCoreComponentProperty> findAllOrderByPropertyTermAsc();
+
     @Query("select a from AssociationCoreComponentProperty a where a.propertyTerm = ?1")
     public List<AssociationCoreComponentProperty> findByPropertyTermContaining(String propertyTerm);
 

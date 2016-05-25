@@ -48,9 +48,6 @@ public class TopLevelABIEHandler implements Serializable {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private CodeListRepository codeListRepository;
 
     @Autowired
@@ -77,14 +74,28 @@ public class TopLevelABIEHandler implements Serializable {
     @Autowired
     private BasicCoreComponentPropertyRepository bccpRepository;
 
+    @Autowired
     private AggregateBusinessInformationEntityRepository abieRepository;
+
+    @Autowired
     private AssociationBusinessInformationEntityRepository asbieRepository;
+
+    @Autowired
     private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+
+    @Autowired
     private BasicBusinessInformationEntityRepository bbieRepository;
+
+    @Autowired
     private BasicBusinessInformationEntityPropertyRepository bbiepRepository;
+
+    @Autowired
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbiescRepository;
 
+    @Autowired
     private BusinessContextRepository businessContextRepository;
+
+    @Autowired
     private BusinessContextValueRepository businessContextValueRepository;
 
     @Autowired
@@ -110,36 +121,21 @@ public class TopLevelABIEHandler implements Serializable {
     private AssociationCoreComponentProperty selected;
     private BusinessContext bCSelected;
 
-    private int maxABIEId;
-    private int maxASBIEPId;
-    private int maxBIEPID;
-    private int maxBIEID;
-    private int maxBBIESCID;
+    private long maxABIEId;
+    private long maxASBIEPId;
+    private long maxBIEPID;
+    private long maxBIEID;
+    private long maxBBIESCID;
 
     @PostConstruct
     private void init() {
-        abieRepository = repositoryFactory.aggregateBusinessInformationEntityRepository();
-        asbieRepository =
-                repositoryFactory.associationBusinessInformationEntityRepository();
-        asbiepRepository =
-                repositoryFactory.associationBusinessInformationEntityPropertyRepository();
-        bbieRepository =
-                repositoryFactory.basicBusinessInformationEntityRepository();
-        bbiepRepository =
-                repositoryFactory.basicBusinessInformationEntityPropertyRepository();
-        bbiescRepository =
-                repositoryFactory.basicBusinessInformationEntitySupplementaryComponentRepository();
+        maxABIEId = asbieRepository.count();
+        maxASBIEPId = asbiepRepository.count();
+        maxBIEPID = bbiepRepository.count();
+        maxBIEID = bbieRepository.count();
+        maxBBIESCID = bbiescRepository.count();
 
-        businessContextRepository = repositoryFactory.businessContextRepository();
-        businessContextValueRepository = repositoryFactory.businessContextValueRepository();
-
-        maxABIEId = asbieRepository.findGreatestId();
-        maxASBIEPId = asbiepRepository.findGreatestId();
-        maxBIEPID = bbiepRepository.findGreatestId();
-        maxBIEID = bbieRepository.findGreatestId();
-        maxBBIESCID = bbiescRepository.findGreatestId();
-
-        asccpVOs = asccpRepository.findAll();
+        asccpVOs = asccpRepository.findAllOrderByPropertyTermAsc();
     }
 
     public BarChartModel getBarModel() {
@@ -280,7 +276,7 @@ public class TopLevelABIEHandler implements Serializable {
                         asccpRepository.findOne(associationBusinessInformationEntityProperty.getBasedAsccpId());
 
                 BusinessContext businessContext =
-                        businessContextRepository.findOneByBusinessContextId(aggregateBusinessInformationEntity.getBizCtxId());
+                        businessContextRepository.findOne(aggregateBusinessInformationEntity.getBizCtxId());
 
                 aggregateBusinessInformationEntity.setBizCtxName(businessContext.getName());
                 ABIEView aABIEView = applicationContext.getBean(ABIEView.class,
@@ -871,7 +867,7 @@ public class TopLevelABIEHandler implements Serializable {
 
         for (BasicBusinessInformationEntity basicBusinessInformationEntity : basicBusinessInformationEntities) {
             BasicBusinessInformationEntityProperty oBBIEPVO =
-                    bbiepRepository.findOneByBbiepId(basicBusinessInformationEntity.getToBbiepId());
+                    bbiepRepository.findOne(basicBusinessInformationEntity.getToBbiepId());
             BasicBusinessInformationEntityProperty nBBIEPVO = copyBBIEP(oBBIEPVO);
             BasicBusinessInformationEntity nBasicBusinessInformationEntity =
                     copyBBIE(basicBusinessInformationEntity, nabieVO.getAbieId(), nBBIEPVO.getBbiepId());
@@ -896,9 +892,9 @@ public class TopLevelABIEHandler implements Serializable {
         List<AssociationBusinessInformationEntity> asbie = getASBIEsFromABIE(oabieVO.getAbieId());
         for (AssociationBusinessInformationEntity oASBIEVO : asbie) {
             AssociationBusinessInformationEntityProperty o_next_asbiepVO =
-                    asbiepRepository.findOneByAsbiepId(oASBIEVO.getToAsbiepId());
+                    asbiepRepository.findOne(oASBIEVO.getToAsbiepId());
             AggregateBusinessInformationEntity o_next_abieVO =
-                    abieRepository.findOneByAbieId(o_next_asbiepVO.getRoleOfAbieId());
+                    abieRepository.findOne(o_next_asbiepVO.getRoleOfAbieId());
             AggregateBusinessInformationEntity n_next_abieVO = copyABIE(o_next_abieVO, bCSelected.getBizCtxId(), false);
             AssociationBusinessInformationEntityProperty n_next_asbiepVO = copyASBIEP(o_next_asbiepVO, n_next_abieVO.getAbieId());
             AssociationBusinessInformationEntity nASBIEVO = copyASBIE(oASBIEVO, nabieVO.getAbieId(), n_next_asbiepVO.getAsbiepId());
@@ -1286,7 +1282,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private void showBBIETree(BasicBusinessInformationEntity bbieVO, TreeNode tNode) {
-        BasicBusinessInformationEntityProperty bbiepVO = bbiepRepository.findOneByBbiepId(bbieVO.getToBbiepId());
+        BasicBusinessInformationEntityProperty bbiepVO = bbiepRepository.findOne(bbieVO.getToBbiepId());
         BasicCoreComponentProperty bccpVO = bccpRepository.findOne(bbiepVO.getBasedBccpId());
         BasicCoreComponent bccVO = bccRepository.findOne(bbieVO.getBasedBccId());
 
@@ -1302,10 +1298,10 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private void showASBIETree(AssociationBusinessInformationEntity asbieVO, TreeNode tNode) {
-        AssociationBusinessInformationEntityProperty asbiepVO = asbiepRepository.findOneByAsbiepId(asbieVO.getToAsbiepId());
+        AssociationBusinessInformationEntityProperty asbiepVO = asbiepRepository.findOne(asbieVO.getToAsbiepId());
         AssociationCoreComponentProperty asccpVO = asccpRepository.findOne(asbiepVO.getBasedAsccpId());
         AssociationCoreComponent asccVO = asccRepository.findOne(asbieVO.getBasedAscc());
-        AggregateBusinessInformationEntity abieVO = abieRepository.findOneByAbieId(asbiepVO.getRoleOfAbieId());
+        AggregateBusinessInformationEntity abieVO = abieRepository.findOne(asbiepVO.getRoleOfAbieId());
         AggregateCoreComponent accVO = accRepository.findOne(abieVO.getBasedAccId());
 
         ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
@@ -1452,8 +1448,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private int getUserId() {
-        User user = userRepository.findOneByLoginId("oagis");
-        return user.getAppUserId();
+        return userRepository.findAppUserIdByLoginId("oagis");
     }
 
     private int min;
@@ -1542,8 +1537,8 @@ public class TopLevelABIEHandler implements Serializable {
             }
         }
 
-        bbieRepository.update(bbieVO);
-        bbiepRepository.update(bbiepVO);
+        bbieRepository.save(bbieVO);
+        bbiepRepository.save(bbiepVO);
     }
 
     public void chooseCodeForTLBIE() {
@@ -1667,7 +1662,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     private void saveBBIESCChanges(ABIEView aABIEView) {
         BasicBusinessInformationEntitySupplementaryComponent bbiescVO = aABIEView.getBbiesc();
-        bbiescRepository.update(bbiescVO);
+        bbiescRepository.save(bbiescVO);
     }
 
     public void closeDialog() {
@@ -1679,14 +1674,14 @@ public class TopLevelABIEHandler implements Serializable {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
         AssociationBusinessInformationEntityProperty asbiepVO = aABIEView.getAsbiep();
 
-        asbieRepository.update(asbieVO);
-        asbiepRepository.update(asbiepVO);
-        abieRepository.update(abieVO);
+        asbieRepository.save(asbieVO);
+        asbiepRepository.save(asbiepVO);
+        abieRepository.save(abieVO);
     }
 
     private void saveABIEChanges(ABIEView aABIEView) {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
-        abieRepository.update(abieVO);
+        abieRepository.save(abieVO);
     }
 
 }
