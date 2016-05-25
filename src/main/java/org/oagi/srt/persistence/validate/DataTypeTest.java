@@ -40,6 +40,9 @@ public class DataTypeTest {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     public DataType validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) {
         try {
             return dataTypeRepository.findOneByGuid(id);
@@ -53,7 +56,6 @@ public class DataTypeTest {
     public void validatePopulateAdditionalDefault_BDTStatement(XPathHandler filename) throws Exception {
         NodeList xsd_node = filename.getNodeList("//xsd:attribute");
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
-        XSDBuiltInTypeRepository daoXSD = repositoryFactory.xsdBuiltInTypeRepository();
         for (int i = 0; i < xsd_node.getLength(); i++) {
             Element tmp = (Element) xsd_node.item(i);
             String typeName = tmp.getAttribute("type");
@@ -103,7 +105,7 @@ public class DataTypeTest {
                     int defaultId = -1;
 
                     if (union != null) {
-                        defaultId = daoXSD.findOneByName("token").getXbtId();
+                        defaultId = xbtRepository.findOneByName("token").getXbtId();
                     } else {
                         Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
                         if (xsdTypeNameNode == null)
@@ -112,10 +114,10 @@ public class DataTypeTest {
                             Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                             xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                            defaultId = daoXSD.findOneByBuiltInType(xsdTypeName).getXbtId();
+                            defaultId = xbtRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
                             if (defaultId == 0) {
                                 Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                                defaultId = daoXSD.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                                defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                             }
                         }
                     }
@@ -170,9 +172,8 @@ public class DataTypeTest {
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
         int defaultId = -1;
-        XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
         if (union != null) {
-            defaultId = dao.findOneByName("token").getXbtId();
+            defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
             Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
             if (xsdTypeNameNode == null)
@@ -181,10 +182,10 @@ public class DataTypeTest {
                 Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                 xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                defaultId = dao.findOneByBuiltInType(xsdTypeName).getXbtId();
+                defaultId = xbtRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
                 if (defaultId == 0) {
                     Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                    defaultId = dao.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                    defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                 }
             }
         }
@@ -261,9 +262,8 @@ public class DataTypeTest {
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
         int defaultId = -1;
-        XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
         if (union != null) {
-            defaultId = dao.findOneByName("token").getXbtId();
+            defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
             Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
             if (xsdTypeNameNode == null)
@@ -272,10 +272,10 @@ public class DataTypeTest {
                 Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                 xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                defaultId = dao.findOneByBuiltInType(xsdTypeName).getXbtId();
+                defaultId = xbtRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
                 if (defaultId == 0) {
                     Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                    defaultId = dao.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                    defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                 }
             }
         }
@@ -331,9 +331,8 @@ public class DataTypeTest {
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
         int defaultId = -1;
-        XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
         if (union != null) {
-            defaultId = dao.findOneByName("token").getXbtId();
+            defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
             Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
             if (xsdTypeNameNode == null)
@@ -342,10 +341,10 @@ public class DataTypeTest {
                 Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                 xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                defaultId = dao.findOneByBuiltInType(xsdTypeName).getXbtId();
+                defaultId = xbtRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
                 if (defaultId == 0) {
                     Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                    defaultId = dao.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                    defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                 }
             }
         }
@@ -1168,13 +1167,8 @@ public class DataTypeTest {
 
     private void validateAddToDTSCForContentType(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
         //if QBDT is based on CodeContentType or IDContentType, check inherit sc of base & sc max card = 0
-
         if (!qbdtVO.getDen().contains("_"))
             qbdtVO = getDataType(qbdtVO.getBasedDtId());
-
-        XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO =
-                repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
 
         int owner_dT_iD = qbdtVO.getDtId();
 
@@ -1207,7 +1201,6 @@ public class DataTypeTest {
         if (!qbdtVO.getDen().contains("_"))
             qbdtVO = getDataType(qbdtVO.getBasedDtId());
 
-        XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO =
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
 
@@ -1327,7 +1320,7 @@ public class DataTypeTest {
                         int cdtSCAllowedPrimitiveId = aCDTSCAllowedPrimitiveDAO.findOneByCdtScIdAndCdtPriId(cdtSCAllowedVO.getCdtScId(), cdtSCAllowedVO.getCdtPriId()).getCdtScAwdPriId();
                         List<String> xsdbs = Types.getCorrespondingXSDBuiltType(getPrimitiveName(cdtSCAllowedVO.getCdtPriId()));
                         for (String xbt : xsdbs) {
-                            int xdtBuiltTypeId = aXSDBuiltInTypeDAO.findOneByBuiltInType(xbt).getXbtId();
+                            int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
 
                             try {
                                 cdtSCAPMapDAO.findOneByCdtScAwdPriAndXbtId(cdtSCAllowedPrimitiveId, xdtBuiltTypeId);
@@ -1424,8 +1417,7 @@ public class DataTypeTest {
     }
 
     public int getXSDBuiltInTypeID(String BuiltIntype) {
-        XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        return aXSDBuiltInTypeDAO.findOneByBuiltInType(BuiltIntype).getXbtId();
+        return xbtRepository.findOneByBuiltInType(BuiltIntype).getXbtId();
     }
 
     private DataType getDataTypeWithDen(String den) {
@@ -1570,8 +1562,7 @@ public class DataTypeTest {
             DataType cdtVO = dataTypeRepository.findOne(cdtAllowedPrimitiveVO.getCdtId());
             cdtDen = cdtVO.getDen();
 
-            XSDBuiltInTypeRepository aXbt = repositoryFactory.xsdBuiltInTypeRepository();
-            XSDBuiltInType xsdBuiltInTypeVO = aXbt.findOneByXbtId(xbt_id);
+            XSDBuiltInType xsdBuiltInTypeVO = xbtRepository.findOne(xbt_id);
             xsdBuiltInType = xsdBuiltInTypeVO.getBuiltInType();
 
         }

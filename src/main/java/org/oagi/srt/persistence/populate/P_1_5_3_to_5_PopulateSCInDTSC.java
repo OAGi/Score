@@ -35,6 +35,9 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         List<DataType> srtObjects = dataTypeRepository.findByType(1);
         for (DataType dt : srtObjects) {
@@ -349,7 +352,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypePrimitiveRepository aCoreDataTypePrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
 
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
@@ -551,7 +553,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypePrimitiveRepository aCoreDataTypePrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
 
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
@@ -710,7 +711,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     tmp.setXbtId(thisAPXTmap.getXbtId());
                                     tmp.setCdtScAwdPri(insertedCDTSCAP.getCdtScAwdPriId());
 
-                                    XSDBuiltInType xbt = aXBTDAO.findOneByXbtId(tmp.getXbtId());
+                                    XSDBuiltInType xbt = xbtRepository.findOne(tmp.getXbtId());
 
                                     //aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO.insertObject(tmp);
                                     System.out.println("          ** XBT:" + xbt.getBuiltInType());

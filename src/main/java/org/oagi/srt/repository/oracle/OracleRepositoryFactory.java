@@ -4,7 +4,6 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.impl.BaseCoreDataTypeAllowedPrimitiveExpressionTypeMapRepository;
 import org.oagi.srt.repository.impl.BaseCoreDataTypeAllowedPrimitiveRepository;
 import org.oagi.srt.repository.impl.BaseCoreDataTypePrimitiveRepository;
-import org.oagi.srt.repository.impl.BaseXSDBuiltInTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -79,9 +78,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
 
     @Autowired
     private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-
-    @Autowired
-    private BaseXSDBuiltInTypeRepository baseXSDBuiltInTypeRepository;
 
     @Autowired
     private OracleReleaseRepository oracleReleaseRepository;
@@ -202,11 +198,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
         return oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-    }
-
-    @Override
-    public XSDBuiltInTypeRepository xsdBuiltInTypeRepository() {
-        return baseXSDBuiltInTypeRepository;
     }
 
     @Override

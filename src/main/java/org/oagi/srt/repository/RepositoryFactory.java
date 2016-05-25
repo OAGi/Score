@@ -30,7 +30,6 @@ public interface RepositoryFactory {
     public CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
-    public XSDBuiltInTypeRepository xsdBuiltInTypeRepository();
 
     public ReleaseRepository releaseRepository();
     public BlobContentRepository blobContentRepository();

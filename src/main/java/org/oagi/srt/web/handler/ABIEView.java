@@ -2,17 +2,28 @@ package org.oagi.srt.web.handler;
 
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ABIEView implements Serializable, Comparable<ABIEView> {
 
+    @Autowired
     private RepositoryFactory repositoryFactory;
 
+    @Autowired
     private CodeListRepository codeListRepository;
+
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
 
     private AssociationCoreComponent ascc;
     private AssociationCoreComponentProperty asccp;
@@ -38,13 +49,10 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     private int codeListId;
     private String restrictionType;
 
-    public ABIEView(RepositoryFactory repositoryFactory, CodeListRepository codeListRepository) {
-        this.repositoryFactory = repositoryFactory;
+    public ABIEView() {
     }
 
-    public ABIEView(RepositoryFactory repositoryFactory, CodeListRepository codeListRepository, String name, int id, String type) {
-        this.repositoryFactory = repositoryFactory;
-        this.codeListRepository = codeListRepository;
+    public ABIEView(String name, int id, String type) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -104,8 +112,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
                 CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
                         cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(cc.getCdtAwdPriXpsTypeMapId());
 
-                XSDBuiltInTypeRepository xsdBuiltInTypeRepository = repositoryFactory.xsdBuiltInTypeRepository();
-                XSDBuiltInType xbt = xsdBuiltInTypeRepository.findOneByXbtId(vo.getXbtId());
+                XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
                 bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
             } else {
                 primitiveType = "Code List";

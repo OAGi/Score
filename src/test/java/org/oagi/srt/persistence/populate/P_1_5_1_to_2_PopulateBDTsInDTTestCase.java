@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest
 public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactionalJUnit4SpringContextTests {
+
    @Autowired
     private DataTypeRepository dataTypeRepository;
 

@@ -39,6 +39,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     public static void main(String[] args) throws Exception {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
@@ -146,9 +149,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
         int defaultId = -1;
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository = repositoryFactory.xsdBuiltInTypeRepository();
         if (union != null) {
-            defaultId = xsdBuiltInTypeRepository.findOneByName("token").getXbtId();
+            defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
             Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
             if (xsdTypeNameNode == null)
@@ -157,11 +159,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                 xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                try {
-                    defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
-                } catch (EmptyResultDataAccessException e) {
+                XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsdTypeName);
+                if (xbt != null) {
+                    defaultId = xbt.getXbtId();
+                } else {
                     Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                    defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                    defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                 }
             }
         }
@@ -251,9 +254,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private String getXsdBuiltinType(int id) {
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
-                repositoryFactory.xsdBuiltInTypeRepository();
-        return xsdBuiltInTypeRepository.findOneByXbtId(id).getBuiltInType();
+        return xbtRepository.findOne(id).getBuiltInType();
     }
 
     public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws Exception {
@@ -314,8 +315,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     public void populateAdditionalDefault_BDTStatement(XPathHandler filename) throws Exception {
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository = repositoryFactory.xsdBuiltInTypeRepository();
-
         NodeList xsd_node = filename.getNodeList("//xsd:attribute");
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
         for (int i = 0; i < xsd_node.getLength(); i++) {
@@ -366,7 +365,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                     int defaultId = -1;
 
                     if (union != null) {
-                        defaultId = xsdBuiltInTypeRepository.findOneByName("token").getXbtId();
+                        defaultId = xbtRepository.findOneByName("token").getXbtId();
                     } else {
                         Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
                         if (xsdTypeNameNode == null)
@@ -375,11 +374,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                             Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                             xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                            try {
-                                defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
-                            } catch (EmptyResultDataAccessException e) {
+                            XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsdTypeName);
+                            if (xbt != null) {
+                                defaultId = xbt.getXbtId();
+                            } else {
                                 Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                                defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                                defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                             }
                         }
                     }
@@ -725,9 +725,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
         int defaultId = -1;
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository = repositoryFactory.xsdBuiltInTypeRepository();
         if (union != null) {
-            defaultId = xsdBuiltInTypeRepository.findOneByName("token").getXbtId();
+            defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
             Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
             if (xsdTypeNameNode == null)
@@ -736,11 +735,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                 xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                try {
-                    defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
-                } catch (EmptyResultDataAccessException e) {
+                XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsdTypeName);
+                if (xbt != null) {
+                    defaultId = xbt.getXbtId();
+                } else {
                     Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                    defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                    defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                 }
             }
         }
@@ -771,7 +771,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void importExceptionalDataTypeList() throws Exception {
-        XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
         String typeName;
         String xsdTypeName;
         String dataTypeTerm = "";
@@ -838,7 +837,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             int defaultId = -1;
 
             if (union != null) {
-                defaultId = dao.findOneByName("token").getXbtId();
+                defaultId = xbtRepository.findOneByName("token").getXbtId();
             } else {
                 Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
                 if (xsdTypeNameNode == null)
@@ -847,11 +846,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                     Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                     xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-                    try {
-                        defaultId = dao.findOneByBuiltInType(xsdTypeName).getXbtId();
-                    } catch (EmptyResultDataAccessException e) {
+                    XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsdTypeName);
+                    if (xbt != null) {
+                        defaultId = xbt.getXbtId();
+                    } else {
                         Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                        defaultId = dao.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                        defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
                     }
                 }
             }
@@ -895,8 +895,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
                 repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
-                repositoryFactory.xsdBuiltInTypeRepository();
 
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
         for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
@@ -930,8 +928,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void validateImportExceptionalDataTypeList() throws Exception {
-        XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
-
         String typeName;
         String xsdTypeName;
         String dataTypeTerm = "";
@@ -1312,8 +1308,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository =
                 repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
-                repositoryFactory.xsdBuiltInTypeRepository();
 
         DataType baseDataType = dataTypeRepository.findOne(basedtID);
         if (baseDataType.getType() == 0) {//if the base is CDT and this is default
@@ -1345,7 +1339,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                                         cdtAwdPriXpsTypeMapRepository.findOneByCdtAwdPriXpsTypeMapId(thisCDTAwdPriXpsTypeMapId);
                                 CoreDataTypeAllowedPrimitive aCDTAP = cdtAwdPriRepository.findOneByCdtAwdPriId(mapFromBDT.getCdtAwdPriId());
                                 CoreDataTypePrimitive aCDTP = cdtPriRepository.findOneByCdtPriId(aCDTAP.getCdtPriId());
-                                XSDBuiltInType xbt = xsdBuiltInTypeRepository.findOneByXbtId(mapFromBDT.getXbtId());
+                                XSDBuiltInType xbt = xbtRepository.findOne(mapFromBDT.getXbtId());
 
                                 if (unionExist) {
                                     if (!xbt.getBuiltInType().equals("xsd:token")) {//xsd:token but is not default
@@ -1436,19 +1430,17 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         //Unqualified Data Type Term
         String unQualifiedDataTypeTerm = baseDataTypeTerm;
 
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
-                repositoryFactory.xsdBuiltInTypeRepository();
-
         Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:restriction");
         if (xsdTypeNameNode != null) {
             Element xsdTypeNameElement = (Element) xsdTypeNameNode;
             xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-            try {
-                defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
-            } catch (EmptyResultDataAccessException e) {
+            XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsdTypeName);
+            if (xbt != null) {
+                defaultId = xbt.getXbtId();
+            } else {
                 Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
             }
         }
 
@@ -1490,8 +1482,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         //Unqualified Data Type Term
         String unQualifiedDataTypeTerm = baseDataTypeTerm;
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
-                repositoryFactory.xsdBuiltInTypeRepository();
 
         Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:simpleType[@name = '" + typeName + "']//xsd:extension");
         if (xsdTypeNameNode == null)
@@ -1500,11 +1490,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             Element xsdTypeNameElement = (Element) xsdTypeNameNode;
             xsdTypeName = xsdTypeNameElement.getAttribute("base");
 
-            try {
-                defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdTypeName).getXbtId();
-            } catch (EmptyResultDataAccessException e) {
+            XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsdTypeName);
+            if (xbt != null) {
+                defaultId = xbt.getXbtId();
+            } else {
                 Node xbtNode = xbt_xsd.getNode("//xsd:simpleType[@name = '" + xsdTypeName + "']/xsd:restriction");
-                defaultId = xsdBuiltInTypeRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
+                defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
             }
         }
         DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
@@ -1512,12 +1503,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private int getXSDBuiltInTypeId(String xsd_buitintype) {
-        XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
-                repositoryFactory.xsdBuiltInTypeRepository();
-        try {
-            return xsdBuiltInTypeRepository.findOneByBuiltInType(xsd_buitintype).getXbtId();
-        } catch (EmptyResultDataAccessException e) {
-            return 0;
-        }
+        XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsd_buitintype);
+        return (xbt != null) ? xbt.getXbtId() : 0;
     }
 }

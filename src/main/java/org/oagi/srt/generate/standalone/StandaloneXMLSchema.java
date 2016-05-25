@@ -45,6 +45,9 @@ public class StandaloneXMLSchema {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -211,8 +214,7 @@ public class StandaloneXMLSchema {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
         base.setValue(aXSDBuiltInType.getBuiltInType());
 
         return base;
@@ -227,8 +229,7 @@ public class StandaloneXMLSchema {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
         base.setValue(aXSDBuiltInType.getBuiltInType());
 
@@ -244,8 +245,7 @@ public class StandaloneXMLSchema {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             Attr type = gNode.getOwnerDocument().createAttribute("type");
             type.setValue(aXSDBuiltInType.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInType.getName())+"Type");
@@ -262,8 +262,7 @@ public class StandaloneXMLSchema {
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository dao4 = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             Attr type = gNode.getOwnerDocument().createAttribute("type");
             type.setValue(aXSDBuiltInType.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInType.getName())+"Type");
@@ -487,8 +486,7 @@ public class StandaloneXMLSchema {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
         tNode.setValue(aXSDBuiltInType.getBuiltInType());
         if (aXSDBuiltInType.getBuiltInType() != null)
@@ -506,8 +504,7 @@ public class StandaloneXMLSchema {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 dao4.findOneByCdtAwdPriXpsTypeMapId(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
 
-        XSDBuiltInTypeRepository dao5 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao5.findOneByXbtId(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
         tNode.setValue(aXSDBuiltInType.getBuiltInType());
         if (aXSDBuiltInType.getBuiltInType() != null)
@@ -663,8 +660,7 @@ public class StandaloneXMLSchema {
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMap =
                     dao2.findOneByCdtAwdPriXpsTypeMapId(dPrim.getCdtAwdPriXpsTypeMapId());
 
-            XSDBuiltInTypeRepository dao3 = repositoryFactory.xsdBuiltInTypeRepository();
-            XSDBuiltInType aXSDBuiltInType = dao3.findOneByXbtId(aCDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+            XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTAllowedPrimitiveExpressionTypeMap.getXbtId());
             base.setNodeValue(aXSDBuiltInType.getBuiltInType());
         }
         return base;
@@ -682,8 +678,7 @@ public class StandaloneXMLSchema {
             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
                     dao2.findOneByCdtScAwdPriXpsTypeMapId(dPrim.getCdtScAwdPriXpsTypeMapId());
 
-            XSDBuiltInTypeRepository dao3 = repositoryFactory.xsdBuiltInTypeRepository();
-            XSDBuiltInType aXSDBuiltInType = dao3.findOneByXbtId(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
+            XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
             base.setNodeValue(aXSDBuiltInType.getBuiltInType());
         }
         return base;
@@ -879,8 +874,7 @@ public class StandaloneXMLSchema {
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
                 dao5.findOneByCdtScAwdPriXpsTypeMapId(bBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
-        XSDBuiltInTypeRepository dao6 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao6.findOneByXbtId(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
             aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
@@ -898,8 +892,7 @@ public class StandaloneXMLSchema {
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
                         dao5.findOneByCdtScAwdPriXpsTypeMapId(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
-        XSDBuiltInTypeRepository dao6 = repositoryFactory.xsdBuiltInTypeRepository();
-        XSDBuiltInType aXSDBuiltInType = dao6.findOneByXbtId(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
             Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
             aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());

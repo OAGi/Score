@@ -41,6 +41,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     public int getAgencyListID() throws Exception {
         AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyIdList.getAgencyIdListId();
@@ -62,7 +65,6 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
-        XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
 
         List<DataTypeSupplementaryComponent> al = dtScRepository.findAll();
         List<DataTypeSupplementaryComponent> al_meta = new ArrayList();
@@ -140,7 +142,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap CDTSCAPX = aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(aBDTSCPri.getCdtScAwdPriXpsTypeMapId());
 
-                            XSDBuiltInType xbt = aXBTDAO.findOneByBuiltInType("xsd:token");
+                            XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType("xsd:token");
 
                             if (CDTSCAPX.getXbtId() == xbt.getXbtId()) {//if it is token
                                 bVO.setDefault(true);
@@ -148,7 +150,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 bVO.setDefault(false);
                             }
 
-                            XSDBuiltInType xbtName = aXBTDAO.findOneByXbtId(CDTSCAPX.getXbtId());
+                            XSDBuiltInType xbtName = xbtRepository.findOne(CDTSCAPX.getXbtId());
                             System.out.println("     %%%%% Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + xbtName.getBuiltInType() + " is default = " + bVO.isDefault());
                             aBDTSCPrimitiveRestrictionDAO.save(bVO);
                         }
@@ -199,7 +201,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                     int CDT_Primitive_id = aCDTPrimitiveDAO.findOneByName("Token").getCdtPriId();
 
-                    int xbt_id = aXBTDAO.findOneByBuiltInType("xsd:token").getXbtId();
+                    int xbt_id = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
 
                     int cdt_id = 0;
                     DataTypeSupplementaryComponent stscVO = dtScRepository.findOne(aDataTypeSupplementaryComponent.getBasedDtScId());
@@ -242,7 +244,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     if (aCDTSCPAX == null) {
                         aXBT = new XSDBuiltInType();
                     } else {
-                        aXBT = aXBTDAO.findOneByXbtId(aCDTSCPAX.getXbtId());
+                        aXBT = xbtRepository.findOne(aCDTSCPAX.getXbtId());
                     }
                     System.out.println("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " xbt = " + aXBT.getBuiltInType() + "  is default = " + bVO1.isDefault());
                     aBDTSCPrimitiveRestrictionDAO.save(bVO1);
@@ -340,7 +342,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                     aCDTSCAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtScAwdPriXpsTypeMapId(bVO.getCdtScAwdPriXpsTypeMapId());
 
 
-                            XSDBuiltInType aXBT = aXBTDAO.findOneByXbtId(aCDTSCPAX.getXbtId());
+                            XSDBuiltInType aXBT = xbtRepository.findOne(aCDTSCPAX.getXbtId());
 
                             //exceptional case
                             if (ele != null && ele.getAttribute("type") != null && ele.getAttribute("type").equalsIgnoreCase("NumberType_B98233")) {
@@ -384,8 +386,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public XSDBuiltInType getXbtId(int id) throws Exception {
-        XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        return aXSDBuiltInTypeDAO.findOneByXbtId(id);
+        return xbtRepository.findOne(id);
     }
 
     public static void main(String args[]) throws Exception {

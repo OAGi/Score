@@ -33,6 +33,9 @@ public class CDTTest {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     public int getCodeListId(String codeName) throws Exception {
         CodeList codelist = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelist.getCodeListId();
@@ -108,8 +111,7 @@ public class CDTTest {
     }
 
     private void check_number_of_XBT() throws Exception {
-        XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        List<XSDBuiltInType> xsd = aXSDBuiltInTypeDAO.findAll();
+        List<XSDBuiltInType> xsd = xbtRepository.findAll();
         System.out.println("# of XBTs in catalog : " + xsd.size());
         for (int i = 0; i < xsd.size(); i++) {
             for (int j = i + 1; j < xsd.size(); j++) {
@@ -536,8 +538,7 @@ public class CDTTest {
             DataType cdt = dataTypeRepository.findOne(cdtAllowedPrimitive.getCdtId());
             cdtDataTypeTerm = cdt.getDataTypeTerm();
 
-            XSDBuiltInTypeRepository aXbt = repositoryFactory.xsdBuiltInTypeRepository();
-            XSDBuiltInType xsdBuiltInType = aXbt.findOneByXbtId(xbtId);
+            XSDBuiltInType xsdBuiltInType = xbtRepository.findOne(xbtId);
             builtInType = xsdBuiltInType.getBuiltInType();
 
         }
@@ -578,8 +579,7 @@ public class CDTTest {
             DataType cdt = dataTypeRepository.findOne(cdtsc.getOwnerDtId());
             cdtDataTypeTerm = cdt.getDataTypeTerm();
 
-            XSDBuiltInTypeRepository aXbt = repositoryFactory.xsdBuiltInTypeRepository();
-            XSDBuiltInType xsdBuiltInType = aXbt.findOneByXbtId(xbtId);
+            XSDBuiltInType xsdBuiltInType = xbtRepository.findOne(xbtId);
             builtInType = xsdBuiltInType.getBuiltInType();
 
         }

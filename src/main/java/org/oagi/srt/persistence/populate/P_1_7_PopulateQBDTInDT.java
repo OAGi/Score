@@ -48,6 +48,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
     private XPathHandler businessdatatype_xsd;
@@ -59,7 +62,6 @@ public class P_1_7_PopulateQBDTInDT {
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO;
     private CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO;
-    private XSDBuiltInTypeRepository aXSDBuiltInTypeDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO;
     private CoreDataTypePrimitiveRepository aCDTPrimitiveDAO;
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtSCPRDAO;
@@ -72,7 +74,6 @@ public class P_1_7_PopulateQBDTInDT {
         aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
-        aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
         cdtSCAPMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
 
@@ -672,7 +673,7 @@ public class P_1_7_PopulateQBDTInDT {
                             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap mapVO =
                                     new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                             mapVO.setCdtScAwdPri(cdtSCAllowedPrimitiveId);
-                            int xdtBuiltTypeId = aXSDBuiltInTypeDAO.findOneByBuiltInType(xbt).getXbtId();
+                            int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
                             mapVO.setXbtId(xdtBuiltTypeId);
                             cdtSCAPMapDAO.save(mapVO);
                         }
@@ -758,13 +759,13 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public int getXbtId(String BuiltIntype) throws Exception {
-        return aXSDBuiltInTypeDAO.findOneByBuiltInType(BuiltIntype).getXbtId();
+        return xbtRepository.findOneByBuiltInType(BuiltIntype).getXbtId();
     }
 
     public boolean checkTokenofXBT(int cdt_awd_pri_xps_type_map_id) throws Exception {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
                 aCDTAllowedPrimitiveExpressionTypeMapDAO.findOneByCdtAwdPriXpsTypeMapId(cdt_awd_pri_xps_type_map_id);
-        XSDBuiltInType aXSDBuiltInType = aXSDBuiltInTypeDAO.findOneByXbtId(
+        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(
                 aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getName().equalsIgnoreCase("token"))
             return true;

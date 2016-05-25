@@ -1,7 +1,10 @@
 package org.oagi.srt.web.handler;
 
 import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
+import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
+import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
+import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
@@ -11,6 +14,7 @@ import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -34,10 +38,10 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private static final long serialVersionUID = 4424008438705914095L;
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
+	private ApplicationContext applicationContext;
 
 	@Autowired
-	private CodeListRepository codeListRepository;
+	private RepositoryFactory repositoryFactory;
 
 	private AggregateBusinessInformationEntityRepository abieRepository;
 	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
@@ -128,7 +132,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().equals(abieName)) {
-				ABIEView av = new ABIEView(repositoryFactory, codeListRepository, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
+				ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
 				av.setAsccp(asccpVO);
 				av.setAbie(abieVO);
 				av.setAsbiep(asbiepVO);
