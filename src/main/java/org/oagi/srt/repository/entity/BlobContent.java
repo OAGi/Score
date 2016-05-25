@@ -3,15 +3,27 @@ package org.oagi.srt.repository.entity;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.persistence.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "blob_content")
 public class BlobContent implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "BLOB_CONTENT_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BLOB_CONTENT_ID_SEQ", sequenceName = "BLOB_CONTENT_ID_SEQ", allocationSize = 1)
     private int blobContentId;
+
+    @Column(nullable = false)
     private byte[] content;
+
+    @Column(nullable = false)
     private int releaseId;
+
+    @Column(nullable = false)
     private String module;
 
     public BlobContent() {}

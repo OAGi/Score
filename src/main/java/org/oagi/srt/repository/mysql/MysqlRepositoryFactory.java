@@ -77,12 +77,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Autowired
     private BaseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository baseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
 
-    @Autowired
-    private BaseReleaseRepository baseReleaseRepository;
-
-    @Autowired
-    private BaseBlobContentRepository baseBlobContentRepository;
-
     @Override
     public ContextSchemeRepository contextSchemeRepository() {
         return baseContextSchemeRepository;
@@ -196,15 +190,5 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
         return baseCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-    }
-
-    @Override
-    public ReleaseRepository releaseRepository() {
-        return baseReleaseRepository;
-    }
-
-    @Override
-    public BlobContentRepository blobContentRepository() {
-        return baseBlobContentRepository;
     }
 }

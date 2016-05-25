@@ -79,12 +79,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Autowired
     private OracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
 
-    @Autowired
-    private OracleReleaseRepository oracleReleaseRepository;
-
-    @Autowired
-    private OracleBlobContentRepository oracleBlobContentRepository;
-
     @Override
     public ContextSchemeRepository contextSchemeRepository() {
         return oracleContextSchemeRepository;
@@ -198,15 +192,5 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository() {
         return oracleCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-    }
-
-    @Override
-    public ReleaseRepository releaseRepository() {
-        return oracleReleaseRepository;
-    }
-
-    @Override
-    public BlobContentRepository blobContentRepository() {
-        return oracleBlobContentRepository;
     }
 }

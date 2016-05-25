@@ -1,12 +1,24 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
+@Table(name = "release")
 public class Release implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "RELEASE_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "RELEASE_ID_SEQ", sequenceName = "RELEASE_ID_SEQ", allocationSize = 1)
     private int releaseId;
+
+    @Column(nullable = false)
     private String releaseNum;
+
+    @Column
     private String releaseNote;
+
+    @Column(nullable = false)
     private int namespaceId;
 
     public int getReleaseId() {

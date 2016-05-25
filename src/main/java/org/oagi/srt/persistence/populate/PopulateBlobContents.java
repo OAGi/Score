@@ -4,7 +4,6 @@ import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.repository.BlobContentRepository;
 import org.oagi.srt.repository.ReleaseRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.BlobContent;
 import org.oagi.srt.repository.entity.Release;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +21,14 @@ import java.io.IOException;
 public class PopulateBlobContents {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-    private BlobContentRepository blobContentRepository;
     private ReleaseRepository releaseRepository;
+
+    @Autowired
+    private BlobContentRepository blobContentRepository;
     private File baseDataDirectory;
 
     @PostConstruct
     public void init() {
-        blobContentRepository = repositoryFactory.blobContentRepository();
-        releaseRepository = repositoryFactory.releaseRepository();
-
         baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH).getAbsoluteFile();
         if (!baseDataDirectory.exists()) {
             throw new IllegalStateException("Couldn't find data directory. Please check your environments.");
