@@ -23,21 +23,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleContextCategoryRepository oracleContextCategoryRepository;
 
     @Autowired
-    private OracleAssociationCoreComponentRepository oracleAssociationCoreComponentRepository;
-
-    @Autowired
-    private OracleBasicCoreComponentRepository oracleBasicCoreComponentRepository;
-
-    @Autowired
-    private OracleAggregateCoreComponentRepository oracleAggregateCoreComponentRepository;
-
-    @Autowired
-    private OracleAssociationCoreComponentPropertyRepository oracleAssociationCoreComponentPropertyRepository;
-
-    @Autowired
-    private OracleBasicCoreComponentPropertyRepository oracleBasicCoreComponentPropertyRepository;
-
-    @Autowired
     private OracleAggregateBusinessInformationEntityRepository oracleAggregateBusinessInformationEntityRepository;
 
     @Autowired
@@ -78,31 +63,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public ContextCategoryRepository contextCategoryRepository() {
         return oracleContextCategoryRepository;
-    }
-
-    @Override
-    public AssociationCoreComponentRepository associationCoreComponentRepository() {
-        return oracleAssociationCoreComponentRepository;
-    }
-
-    @Override
-    public BasicCoreComponentRepository basicCoreComponentRepository() {
-        return oracleBasicCoreComponentRepository;
-    }
-
-    @Override
-    public AggregateCoreComponentRepository aggregateCoreComponentRepository() {
-        return oracleAggregateCoreComponentRepository;
-    }
-
-    @Override
-    public AssociationCoreComponentPropertyRepository associationCoreComponentPropertyRepository() {
-        return oracleAssociationCoreComponentPropertyRepository;
-    }
-
-    @Override
-    public BasicCoreComponentPropertyRepository basicCoreComponentPropertyRepository() {
-        return oracleBasicCoreComponentPropertyRepository;
     }
 
     @Override

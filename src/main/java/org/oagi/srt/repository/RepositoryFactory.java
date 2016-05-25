@@ -10,12 +10,6 @@ public interface RepositoryFactory {
 
     public ContextCategoryRepository contextCategoryRepository();
 
-    public AssociationCoreComponentRepository associationCoreComponentRepository();
-    public BasicCoreComponentRepository basicCoreComponentRepository();
-    public AggregateCoreComponentRepository aggregateCoreComponentRepository();
-    public AssociationCoreComponentPropertyRepository associationCoreComponentPropertyRepository();
-    public BasicCoreComponentPropertyRepository basicCoreComponentPropertyRepository();
-
     public AggregateBusinessInformationEntityRepository aggregateBusinessInformationEntityRepository();
     public AssociationBusinessInformationEntityRepository associationBusinessInformationEntityRepository();
     public AssociationBusinessInformationEntityPropertyRepository associationBusinessInformationEntityPropertyRepository();

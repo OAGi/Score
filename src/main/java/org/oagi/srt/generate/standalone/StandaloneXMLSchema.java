@@ -60,6 +60,21 @@ public class StandaloneXMLSchema {
     @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
+
+    @Autowired
+    private AggregateCoreComponentRepository accRepository;
+
+    @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
+
+    @Autowired
+    private BasicCoreComponentRepository bccRepository;
+
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -341,8 +356,7 @@ public class StandaloneXMLSchema {
     }
 
     public Element generateASBIEP(AssociationBusinessInformationEntityProperty gASBIEP, Element gElementNode) throws Exception {
-        AssociationCoreComponentPropertyRepository dao = repositoryFactory.associationCoreComponentPropertyRepository();
-        AssociationCoreComponentProperty asccp = dao.findOneByAsccpId(gASBIEP.getBasedAsccpId());
+        AssociationCoreComponentProperty asccp = asccpRepository.findOne(gASBIEP.getBasedAsccpId());
         gElementNode.setAttribute("name", Utility.first(asccp.getDen(), true));
         //gElementNode.setAttribute("type", Utility.second(asccp.getDen())+"Type");
         return gElementNode;
@@ -350,8 +364,7 @@ public class StandaloneXMLSchema {
     }
 
     public BasicCoreComponent queryBasedBCC(BasicBusinessInformationEntity gBBIE) throws Exception {
-        BasicCoreComponentRepository dao = repositoryFactory.basicCoreComponentRepository();
-        BasicCoreComponent bccVO = dao.findOneByBccId(gBBIE.getBasedBccId());
+        BasicCoreComponent bccVO = bccRepository.findOne(gBBIE.getBasedBccId());
         return bccVO;
     }
 
@@ -1008,29 +1021,24 @@ public class StandaloneXMLSchema {
     }
 
     public DataType queryBDT(BasicBusinessInformationEntity gBBIE) throws Exception {
-        BasicCoreComponentRepository dao3 = repositoryFactory.basicCoreComponentRepository();
-        BasicCoreComponent gBCC = dao3.findOneByBccId(gBBIE.getBasedBccId());
-        BasicCoreComponentPropertyRepository dao = repositoryFactory.basicCoreComponentPropertyRepository();
-        BasicCoreComponentProperty aBasicCoreComponentProperty = dao.findOneByBccpId(gBCC.getToBccpId());
+        BasicCoreComponent gBCC = bccRepository.findOne(gBBIE.getBasedBccId());
+        BasicCoreComponentProperty aBasicCoreComponentProperty = bccpRepository.findOne(gBCC.getToBccpId());
         DataType bDT = dataTypeRepository.findOne(aBasicCoreComponentProperty.getBdtId());
         return bDT;
     }
 
     public AssociationCoreComponentProperty queryBasedASCCP(AssociationBusinessInformationEntityProperty gASBIEP) throws Exception {
-        AssociationCoreComponentPropertyRepository dao = repositoryFactory.associationCoreComponentPropertyRepository();
-        AssociationCoreComponentProperty asccpVO = dao.findOneByAsccpId(gASBIEP.getBasedAsccpId());
+        AssociationCoreComponentProperty asccpVO = asccpRepository.findOne(gASBIEP.getBasedAsccpId());
         return asccpVO;
     }
 
     public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity gABIE) throws Exception {
-        AggregateCoreComponentRepository dao = repositoryFactory.aggregateCoreComponentRepository();
-        AggregateCoreComponent gACC = dao.findOneByAccId(gABIE.getBasedAccId());
+        AggregateCoreComponent gACC = accRepository.findOne(gABIE.getBasedAccId());
         return gACC;
     }
 
     public AssociationCoreComponent queryBasedASCC(AssociationBusinessInformationEntity gASBIE) throws Exception {
-        AssociationCoreComponentRepository dao = repositoryFactory.associationCoreComponentRepository();
-        AssociationCoreComponent gASCC = dao.findOneByAsccId(gASBIE.getBasedAscc());
+        AssociationCoreComponent gASCC = asccRepository.findOne(gASBIE.getBasedAscc());
         return gASCC;
     }
 
@@ -1044,8 +1052,7 @@ public class StandaloneXMLSchema {
         AggregateBusinessInformationEntityRepository dao = repositoryFactory.aggregateBusinessInformationEntityRepository();
         AggregateBusinessInformationEntity abievo = dao.findOneByAbieId(gASBIEP.getRoleOfAbieId());
 
-        AggregateCoreComponentRepository dao2 = repositoryFactory.aggregateCoreComponentRepository();
-        AggregateCoreComponent aAggregateCoreComponent = dao2.findOneByAccId(abievo.getBasedAccId());
+        AggregateCoreComponent aAggregateCoreComponent = accRepository.findOne(abievo.getBasedAccId());
         return aAggregateCoreComponent;
     }
 
@@ -1113,12 +1120,8 @@ public class StandaloneXMLSchema {
     }
 
     public DataType queryAssocBDT(BasicBusinessInformationEntity gBBIE) throws Exception {
-        BasicCoreComponentRepository dao = repositoryFactory.basicCoreComponentRepository();
-        BasicCoreComponent bccVO = dao.findOneByBccId(gBBIE.getBasedBccId());
-
-        BasicCoreComponentPropertyRepository dao2 = repositoryFactory.basicCoreComponentPropertyRepository();
-        BasicCoreComponentProperty bccpVO = dao2.findOneByBccpId(bccVO.getToBccpId());
-
+        BasicCoreComponent bccVO = bccRepository.findOne(gBBIE.getBasedBccId());
+        BasicCoreComponentProperty bccpVO = bccpRepository.findOne(bccVO.getToBccpId());
         DataType aBDT = dataTypeRepository.findOne(bccpVO.getBdtId());
 
         return aBDT;
@@ -1160,8 +1163,7 @@ public class StandaloneXMLSchema {
                 AssociationBusinessInformationEntityProperty aAssociationBusinessInformationEntityProperty = receiveASBIEP(aAggregateBusinessInformationEntity.getAbieId());
                 System.out.println("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + aAssociationBusinessInformationEntityProperty.getAsbiepId());
                 doc = generateTopLevelABIE(aAssociationBusinessInformationEntityProperty, doc, schemaNode);
-                AssociationCoreComponentPropertyRepository dao = repositoryFactory.associationCoreComponentPropertyRepository();
-                AssociationCoreComponentProperty asccpvo = dao.findOneByAsccpId(aAssociationBusinessInformationEntityProperty.getBasedAsccpId());
+                AssociationCoreComponentProperty asccpvo = asccpRepository.findOne(aAssociationBusinessInformationEntityProperty.getBasedAsccpId());
                 filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
             }
             filepath = writeXSDFile(doc, filename + "_standalone");

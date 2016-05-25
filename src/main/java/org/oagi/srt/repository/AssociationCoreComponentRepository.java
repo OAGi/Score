@@ -1,24 +1,25 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface AssociationCoreComponentRepository {
+public interface AssociationCoreComponentRepository extends JpaRepository<AssociationCoreComponent, Integer> {
 
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1")
     public List<AssociationCoreComponent> findByFromAccId(int fromAccId);
 
+    @Query("select a from AssociationCoreComponent a where a.definition = ?1")
     public List<AssociationCoreComponent> findByDefinition(String definition);
 
+    @Query("select a from AssociationCoreComponent a where a.den like ?1%")
     public List<AssociationCoreComponent> findByDenStartsWith(String den);
 
+    @Query("select a from AssociationCoreComponent a where a.den like %?1%")
     public List<AssociationCoreComponent> findByDenContaining(String den);
 
-    public AssociationCoreComponent findOneByAsccId(int asccId);
-
+    @Query("select a from AssociationCoreComponent a where a.guid = ?1")
     public AssociationCoreComponent findOneByGuid(String guid);
-
-    public void save(AssociationCoreComponent associationCoreComponent);
-
-    public void update(AssociationCoreComponent associationCoreComponent);
 }

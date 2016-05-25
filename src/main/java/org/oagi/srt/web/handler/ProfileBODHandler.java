@@ -43,15 +43,16 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	@Autowired
 	private RepositoryFactory repositoryFactory;
 
+	@Autowired
+	private AssociationCoreComponentPropertyRepository asccpRepository;
+
 	private AggregateBusinessInformationEntityRepository abieRepository;
 	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
-	private AssociationCoreComponentPropertyRepository asccpRepository;
 
 	@PostConstruct
 	public void init() {
 		abieRepository = repositoryFactory.aggregateBusinessInformationEntityRepository();
 		asbiepRepository = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
-		asccpRepository = repositoryFactory.associationCoreComponentPropertyRepository();
 	}
 
 	private ABIEView selectedABIEView;
@@ -113,7 +114,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			AssociationBusinessInformationEntityProperty asbiepVO =
 					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
 			AssociationCoreComponentProperty asccpVO =
-					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
+					asccpRepository.findOne(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().contains(query)) {
 				results.add(asccpVO.getPropertyTerm());
@@ -129,7 +130,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			AssociationBusinessInformationEntityProperty asbiepVO =
 					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
 			AssociationCoreComponentProperty asccpVO =
-					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
+					asccpRepository.findOne(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().equals(abieName)) {
 				ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");

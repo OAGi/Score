@@ -31,9 +31,6 @@ import java.util.List;
 public class P_1_7_PopulateQBDTInDT {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -51,13 +48,8 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
-    private XPathHandler fields_xsd;
-    private XPathHandler meta_xsd;
-    private XPathHandler businessdatatype_xsd;
-    private XPathHandler component_xsd;
-    private File f1;
-
-    private BasicCoreComponentPropertyRepository bccpDAO;
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
 
     @Autowired
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
@@ -80,10 +72,14 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
+    private XPathHandler fields_xsd;
+    private XPathHandler meta_xsd;
+    private XPathHandler businessdatatype_xsd;
+    private XPathHandler component_xsd;
+    private File f1;
+
     @PostConstruct
     public void init() throws Exception {
-        bccpDAO = repositoryFactory.basicCoreComponentPropertyRepository();
-
         fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
         businessdatatype_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
@@ -533,7 +529,7 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setCreatedBy(userId);
         dtVO.setLastUpdatedBy(userId);
         dtVO.setOwnerUserId(userId);
-        bccpDAO.save(bccpVO);
+        bccpRepository.save(bccpVO);
 
     }
 
