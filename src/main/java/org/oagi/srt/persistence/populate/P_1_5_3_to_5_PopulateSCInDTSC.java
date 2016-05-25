@@ -32,8 +32,10 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
-        DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
         List<DataType> srtObjects = dataTypeRepository.findByType(1);
         for (DataType dt : srtObjects) {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
@@ -41,7 +43,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             // default BDT
             if (dt2.getType() == 0) {
                 System.out.println("Popuating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
-                List<DataTypeSupplementaryComponent> cdtSCList = daoDTSC.findByOwnerDtId(dt2.getDtId());
+                List<DataTypeSupplementaryComponent> cdtSCList = dtScRepository.findByOwnerDtId(dt2.getDtId());
 
                 NodeList attributeNodeList = xh2.getNodeList("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
                 if (attributeNodeList == null || attributeNodeList.getLength() < 1) {
@@ -119,7 +121,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     if (baseInd > -1) {
                         cdtSCList.remove(baseInd);
                         System.out.println("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This sc has corresponding base!");
-                        daoDTSC.save(vo);
+                        dtScRepository.save(vo);
                     } else {
                         String propertyTerm = "";
                         String representationTerm = "";
@@ -143,7 +145,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         vo.setRepresentationTerm(representationTerm);
                         vo.setDefinition(definition);
                         System.out.println("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by default BDT is new from Attribute!");
-                        daoDTSC.save(vo);
+                        dtScRepository.save(vo);
                     }
                 }
 
@@ -166,18 +168,16 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     vo.setMaxCardinality(0);
                     vo.setBasedDtScId(baseCDTSC.getDtScId());
                     System.out.println("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
-                    daoDTSC.save(vo);
+                    dtScRepository.save(vo);
                 }
             }
         }
     }
 
     private void validatePopulateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
-        DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
         List<DataType> srtObjects = dataTypeRepository.findByType(1);
         for (DataType dt : srtObjects) {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
-
 
             // default BDT
             if (dt2.getType() == 0) {
@@ -257,7 +257,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 
                         String fromDBStr = "";
-                        DataTypeSupplementaryComponent adtsc = daoDTSC.findOneByGuid(attrNode.getAttribute("id"));
+                        DataTypeSupplementaryComponent adtsc = dtScRepository.findOneByGuid(attrNode.getAttribute("id"));
 
                         if (adtsc == null) {
                             System.out.println("@@@@ DTSC from Attributes is not imported! Check DTSC (guid=" + attrNode.getAttribute("id") + ")");
@@ -280,8 +280,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                 //Copy the CDT's SC
                 //Check BDT SC >= CDT SC (it could be if it's from attr)
 
-                List<DataTypeSupplementaryComponent> CDTSCs = daoDTSC.findByOwnerDtId(dt.getBasedDtId());
-                List<DataTypeSupplementaryComponent> BDTSCs = daoDTSC.findByOwnerDtId(dt.getDtId());
+                List<DataTypeSupplementaryComponent> CDTSCs = dtScRepository.findByOwnerDtId(dt.getBasedDtId());
+                List<DataTypeSupplementaryComponent> BDTSCs = dtScRepository.findByOwnerDtId(dt.getDtId());
 
                 for (int i = CDTSCs.size() - 1; i > -1; i--) {
                     DataTypeSupplementaryComponent cdtsc = CDTSCs.get(i);
@@ -344,7 +344,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     }
 
     public void populateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
@@ -383,7 +382,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                 DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
                 int based_dt_id = basedDt.getDtId();
-                List<DataTypeSupplementaryComponent> baseDefaultDTSCs = daoDTSC.findByOwnerDtId(based_dt_id);
+                List<DataTypeSupplementaryComponent> baseDefaultDTSCs = dtScRepository.findByOwnerDtId(based_dt_id);
 
                 //adding additional SCs for attributes
                 NodeList attributeList = xh2.getNodeList("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -442,7 +441,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     if (baseInd > -1) {
                         baseDefaultDTSCs.remove(baseInd);
                         System.out.println("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT has corresponding base!");
-                        daoDTSC.save(vo);
+                        dtScRepository.save(vo);
                     } else {
 
                         String propertyTerm = "";
@@ -468,11 +467,11 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         vo.setDefinition(definition);
                         System.out.println("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
-                        daoDTSC.save(vo);
+                        dtScRepository.save(vo);
 
                         //if it has new attribute extension,
                         //it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map
-                        DataTypeSupplementaryComponent insertedSC = daoDTSC.findOneByGuid(vo.getGuid());
+                        DataTypeSupplementaryComponent insertedSC = dtScRepository.findOneByGuid(vo.getGuid());
 
                         List<DataType> DataTypewDataTypeTerm = dataTypeRepository.findByDataTypeTerm(vo.getRepresentationTerm());
 
@@ -539,7 +538,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     vo.setMaxCardinality(baseDefaultBDTSC.getMaxCardinality());
                     vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
                     System.out.println("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
-                    daoDTSC.save(vo);
+                    dtScRepository.save(vo);
                 }
             }
         }
@@ -547,7 +546,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 
     public void validatePopulateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
@@ -585,7 +583,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                 DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
                 int based_dt_id = basedDt.getDtId();
-                List<DataTypeSupplementaryComponent> baseDefaultDTSCs = daoDTSC.findByOwnerDtId(based_dt_id);
+                List<DataTypeSupplementaryComponent> baseDefaultDTSCs = dtScRepository.findByOwnerDtId(based_dt_id);
 
                 //adding additional SCs for attributes
                 NodeList attributeList = xh2.getNodeList("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -646,7 +644,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     fromXSD = fromXSD + min_cardinality;
                     fromXSD = fromXSD + max_cardinality;
 
-                    DataTypeSupplementaryComponent dtsc = daoDTSC.findOneByGuid(attribute_id);
+                    DataTypeSupplementaryComponent dtsc = dtScRepository.findOneByGuid(attribute_id);
 
                     if (dtsc == null) {
                         System.out.println("@@@@ The Attribute is not imported! Check DT: " + dt.getGuid());
@@ -668,7 +666,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                     //if it has new attribute extension,
                     //it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map
-                    DataTypeSupplementaryComponent insertedSC = daoDTSC.findOneByGuid(vo.getGuid());
+                    DataTypeSupplementaryComponent insertedSC = dtScRepository.findOneByGuid(vo.getGuid());
 
                     List DataTypewDataTypeTerm = dataTypeRepository.findByDataTypeTerm(insertedSC.getRepresentationTerm());
 
@@ -727,7 +725,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                 //Inherit From the remain SCs based on default bdt because they don't have corresponding attributes
                 //Just copy and get the values from remain baseDefaultDTSCs
 
-                List<DataTypeSupplementaryComponent> unqaulifiedDTSCs = daoDTSC.findByOwnerDtId(dt.getDtId());
+                List<DataTypeSupplementaryComponent> unqaulifiedDTSCs = dtScRepository.findByOwnerDtId(dt.getDtId());
 
                 for (int i = baseDefaultDTSCs.size() - 1; i > -1; i--) {
                     DataTypeSupplementaryComponent baseDefaultDTSC = baseDefaultDTSCs.get(i);
@@ -820,7 +818,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                 SpringApplication.run(Application.class, args);) {
             P_1_5_3_to_5_PopulateSCInDTSC populateSCInDTSC = ctx.getBean(P_1_5_3_to_5_PopulateSCInDTSC.class);
             populateSCInDTSC.run(ctx);
-            populateSCInDTSC.validate();
+            //populateSCInDTSC.validate();
         }
     }
 }

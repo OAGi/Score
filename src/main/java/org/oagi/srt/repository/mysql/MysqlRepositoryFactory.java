@@ -57,9 +57,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     private BaseBasicBusinessInformationEntitySupplementaryComponentRepository baseBasicBusinessInformationEntitySupplementaryComponentRepository;
 
     @Autowired
-    private BaseDataTypeSupplementaryComponentRepository baseDataTypeSupplementaryComponentRepository;
-
-    @Autowired
     private BaseBusinessDataTypePrimitiveRestrictionRepository baseBusinessDataTypePrimitiveRestrictionRepository;
 
     @Autowired
@@ -167,11 +164,6 @@ public class MysqlRepositoryFactory implements RepositoryFactory {
     @Override
     public BasicBusinessInformationEntitySupplementaryComponentRepository basicBusinessInformationEntitySupplementaryComponentRepository() {
         return baseBasicBusinessInformationEntitySupplementaryComponentRepository;
-    }
-
-    @Override
-    public DataTypeSupplementaryComponentRepository dataTypeSupplementaryComponentRepository() {
-        return baseDataTypeSupplementaryComponentRepository;
     }
 
     @Override

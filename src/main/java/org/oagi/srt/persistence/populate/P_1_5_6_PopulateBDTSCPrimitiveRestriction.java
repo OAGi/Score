@@ -38,6 +38,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     public int getAgencyListID() throws Exception {
         AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyIdList.getAgencyIdListId();
@@ -53,7 +56,6 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public void populateBDTSCPrimitiveRestriction(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        DataTypeSupplementaryComponentRepository dao = repositoryFactory.dataTypeSupplementaryComponentRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository aBDTSCPrimitiveRestrictionDAO = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCDTSCAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
@@ -62,7 +64,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
         XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
 
-        List<DataTypeSupplementaryComponent> al = dao.findAll();
+        List<DataTypeSupplementaryComponent> al = dtScRepository.findAll();
         List<DataTypeSupplementaryComponent> al_meta = new ArrayList();
         if (is_fields_xsd) {
 
@@ -123,7 +125,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                 if (!is_fields_xsd) {
                     DataType dtVO = dataTypeRepository.findOne(aDataTypeSupplementaryComponent.getOwnerDtId());
                     DataType defaultTextBDT = dataTypeRepository.findOne(dtVO.getBasedDtId());
-                    List<DataTypeSupplementaryComponent> baseDTSCs = dao.findByOwnerDtId(defaultTextBDT.getDtId());
+                    List<DataTypeSupplementaryComponent> baseDTSCs = dtScRepository.findByOwnerDtId(defaultTextBDT.getDtId());
 
                     for (int i = 0; i < baseDTSCs.size(); i++) {
                         DataTypeSupplementaryComponent adtscVO = baseDTSCs.get(i);
@@ -200,10 +202,8 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     int xbt_id = aXBTDAO.findOneByBuiltInType("xsd:token").getXbtId();
 
                     int cdt_id = 0;
-                    DataTypeSupplementaryComponent stscVO = null;
-                    try {
-                        stscVO = dao.findOneByDtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
-                    } catch (EmptyResultDataAccessException e) {
+                    DataTypeSupplementaryComponent stscVO = dtScRepository.findOne(aDataTypeSupplementaryComponent.getBasedDtScId());
+                    if (stscVO == null) {
                         stscVO = new DataTypeSupplementaryComponent();
                     }
                     if (stscVO.getBasedDtScId() < 1) {
@@ -294,7 +294,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     } else { // DTSC is based on other dt_sc
                         al3 = aCDTSCAllowedPrimitiveDAO.findByCdtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
                         if (al3.isEmpty()) {
-                            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = dao.findOneByDtScId(aDataTypeSupplementaryComponent.getBasedDtScId());
+                            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = dtScRepository.findOne(aDataTypeSupplementaryComponent.getBasedDtScId());
                             al3 = aCDTSCAllowedPrimitiveDAO.findByCdtScId(dataTypeSupplementaryComponent.getBasedDtScId());
                         }
                     }
@@ -363,8 +363,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public DataTypeSupplementaryComponent getDTSC(int id) throws Exception {
-        DataTypeSupplementaryComponentRepository aDTDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        return aDTDAO.findOneByDtScId(id);
+        return dtScRepository.findOne(id);
     }
 
     public String getDen(int id) throws Exception {

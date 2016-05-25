@@ -45,6 +45,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
     private XPathHandler businessdatatype_xsd;
@@ -56,7 +59,6 @@ public class P_1_7_PopulateQBDTInDT {
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO;
     private CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO;
-    private DataTypeSupplementaryComponentRepository aDTSCDAO;
     private XSDBuiltInTypeRepository aXSDBuiltInTypeDAO;
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO;
     private CoreDataTypePrimitiveRepository aCDTPrimitiveDAO;
@@ -69,7 +71,6 @@ public class P_1_7_PopulateQBDTInDT {
         aBDTPrimitiveRestrictionDAO = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
         aCDTAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
         aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
-        aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
         aCDTSCAllowedPrimitiveDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
         cdtSCAPMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
@@ -211,7 +212,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (dtscVO.getBasedDtScId() == 0) {
                 return Collections.emptyList();
             }
-            DataTypeSupplementaryComponent vo = aDTSCDAO.findOneByDtScId(dtscVO.getBasedDtScId());
+            DataTypeSupplementaryComponent vo = dtScRepository.findOne(dtscVO.getBasedDtScId());
             bdtscs = getBDTSCPrimitiveRestriction(vo);
         }
         return bdtscs;
@@ -533,7 +534,7 @@ public class P_1_7_PopulateQBDTInDT {
         // inherit from the base BDT
         int owner_dT_iD = qbdtVO.getDtId();
 
-        List<DataTypeSupplementaryComponent> dtsc_vos = aDTSCDAO.findByOwnerDtId(qbdtVO.getBasedDtId());
+        List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent dtsc_vo : dtsc_vos) {
             DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
             vo.setGuid(dtsc_vo.getGuid());
@@ -545,7 +546,7 @@ public class P_1_7_PopulateQBDTInDT {
             vo.setMaxCardinality(dtsc_vo.getMaxCardinality());
             vo.setBasedDtScId(dtsc_vo.getDtScId());
 
-            aDTSCDAO.save(vo);
+            dtScRepository.save(vo);
 
             insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dtsc_vo.getGuid(), owner_dT_iD), 1, "", "");
         }
@@ -645,10 +646,10 @@ public class P_1_7_PopulateQBDTInDT {
 
                 DataTypeSupplementaryComponent duplicate = checkDuplicate(vo);
                 if (duplicate == null) {
-                    aDTSCDAO.save(vo);
+                    dtScRepository.save(vo);
 
                     // populate CDT_SC_Allowed_Primitives
-                    DataTypeSupplementaryComponent dtscVO = aDTSCDAO.findOneByGuidAndOwnerDtId(vo.getGuid(), vo.getOwnerDtId());
+                    DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuidAndOwnerDtId(vo.getGuid(), vo.getOwnerDtId());
                     String representationTerm = dtscVO.getRepresentationTerm();
                     DataType dtVO = getDataTypeWithRepresentationTerm(representationTerm);
 
@@ -681,7 +682,7 @@ public class P_1_7_PopulateQBDTInDT {
                 } else {
                     vo.setDtScId(duplicate.getDtScId());
                     vo.setBasedDtScId(duplicate.getBasedDtScId());
-                    aDTSCDAO.update(vo);
+                    dtScRepository.save(vo);
                 }
             }
         }
@@ -689,7 +690,7 @@ public class P_1_7_PopulateQBDTInDT {
 
     private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtVO) throws Exception {
         try {
-            return aDTSCDAO.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
+            return dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
                     dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -715,11 +716,11 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid) throws Exception {
-        return aDTSCDAO.findOneByGuid(guid);
+        return dtScRepository.findOneByGuid(guid);
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, int ownerId) throws Exception {
-        return aDTSCDAO.findOneByGuidAndOwnerDtId(guid, ownerId);
+        return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
     public int getDtId(String DataTypeTerm) throws Exception {
@@ -729,7 +730,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public String getRepresentationTerm(String Guid) throws Exception {
-        DataTypeSupplementaryComponent dtscVO = aDTSCDAO.findOneByGuid(Guid);
+        DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuid(Guid);
         String term = dtscVO.getRepresentationTerm();
         return term;
     }
@@ -750,7 +751,7 @@ public class P_1_7_PopulateQBDTInDT {
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) throws Exception {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = aCDTSCAllowedPrimitiveDAO.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtscVO = aDTSCDAO.findOneByDtScId(dt_sc_id);
+            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
             res = getCdtSCAllowedPrimitiveID(dtscVO.getBasedDtScId());
         }
         return res;
@@ -902,7 +903,7 @@ public class P_1_7_PopulateQBDTInDT {
         // inherit from the base BDT
         int owner_dT_iD = qbdtVO.getDtId();
 
-        List<DataTypeSupplementaryComponent> dtsc_vos = aDTSCDAO.findByOwnerDtId(qbdtVO.getBasedDtId());
+        List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent dtsc_vo : dtsc_vos) {
             DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
             vo.setGuid(dtsc_vo.getGuid());
@@ -915,7 +916,7 @@ public class P_1_7_PopulateQBDTInDT {
             vo.setMaxCardinality(0);
             vo.setBasedDtScId(dtsc_vo.getDtScId());
 
-            aDTSCDAO.save(vo);
+            dtScRepository.save(vo);
 
             insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dtsc_vo.getGuid(), owner_dT_iD), 1, "", "");
 

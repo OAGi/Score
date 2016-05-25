@@ -42,6 +42,9 @@ public class StandaloneXMLSchema {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -775,8 +778,7 @@ public class StandaloneXMLSchema {
         }
         // Generate a DOM Attribute node
         Attr aNameNode = aNode.getOwnerDocument().createAttribute("name");
-        DataTypeSupplementaryComponentRepository dao = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        DataTypeSupplementaryComponent aDTSC = dao.findOneByDtScId(aBBIESC.getDtScId());
+        DataTypeSupplementaryComponent aDTSC = dtScRepository.findOne(aBBIESC.getDtScId());
         if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
             aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
         else if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
@@ -802,8 +804,7 @@ public class StandaloneXMLSchema {
     public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
 
-        DataTypeSupplementaryComponentRepository dao4 = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        DataTypeSupplementaryComponent gDTSC = dao4.findOneByDtScId(gBBIESC.getDtScId());
+        DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
 
         CodeList aCL = new CodeList();
         try {
@@ -838,8 +839,7 @@ public class StandaloneXMLSchema {
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
                 dao3.findOneByBdtScPriRestriId(gBBIESC.getDtScPriRestriId());
-        DataTypeSupplementaryComponentRepository dao5 = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        DataTypeSupplementaryComponent gDTSC = dao5.findOneByDtScId(gBBIESC.getDtScId());
+        DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
 
         boolean firstCheck = true;
         try {
@@ -870,8 +870,7 @@ public class StandaloneXMLSchema {
     }
 
     public Element setBBIESCType(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
-        DataTypeSupplementaryComponentRepository dao2 = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        DataTypeSupplementaryComponent gDTSC = dao2.findOneByDtScId(gBBIESC.getDtScId());
+        DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
         BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository dao3 =
                 repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
@@ -974,8 +973,7 @@ public class StandaloneXMLSchema {
                 }
             } else { //aCL = null?
                 if (!isCodeListGenerated(aCL)) {
-                    DataTypeSupplementaryComponentRepository dao = repositoryFactory.dataTypeSupplementaryComponentRepository();
-                    DataTypeSupplementaryComponent aDTSC = dao.findOneByDtScId(aBBIESC.getDtScId());
+                    DataTypeSupplementaryComponent aDTSC = dtScRepository.findOne(aBBIESC.getDtScId());
                     generateCodeList(aCL, aDTSC, gSchemaNode);
                 }
                 if (getCodeListTypeName(aCL) != null) {

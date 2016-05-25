@@ -30,6 +30,9 @@ public class CDTTest {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     public int getCodeListId(String codeName) throws Exception {
         CodeList codelist = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelist.getCodeListId();
@@ -41,13 +44,11 @@ public class CDTTest {
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid) throws Exception {
-        DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponentDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        return aDataTypeSupplementaryComponentDAO.findOneByGuid(guid);
+        return dtScRepository.findOneByGuid(guid);
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, int ownerId) throws Exception {
-        DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponentDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        return aDataTypeSupplementaryComponentDAO.findOneByGuidAndOwnerDtId(guid, ownerId);
+        return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
     public int getDataTypeId(String DataTypeTerm) throws Exception {
@@ -64,8 +65,7 @@ public class CDTTest {
     }
 
     public String getRepresentationTerm(String DataTypeSupplementaryComponentGUId) throws Exception {
-        DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponentDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        DataTypeSupplementaryComponent dtsc = aDataTypeSupplementaryComponentDAO.findOneByGuid(DataTypeSupplementaryComponentGUId);
+        DataTypeSupplementaryComponent dtsc = dtScRepository.findOneByGuid(DataTypeSupplementaryComponentGUId);
         String term = dtsc.getRepresentationTerm();
         return term;
     }
@@ -90,12 +90,11 @@ public class CDTTest {
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveId(int dt_sc_id) throws Exception {
-        DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponentDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO =
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = aCoreDataTypeSupplementaryComponentAllowedPrimitiveDAO.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtsc = aDataTypeSupplementaryComponentDAO.findOneByDtScId(dt_sc_id);
+            DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(dt_sc_id);
             res = getCdtSCAllowedPrimitiveId(dtsc.getBasedDtScId());
         }
         return res;
@@ -166,10 +165,7 @@ public class CDTTest {
         List<String> cdtscFromDB = new ArrayList();
         List<DataTypeSupplementaryComponent> cdtsclistfromDB = new ArrayList();
         for (DataType cdt : cdtlist) {
-            DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponentDAO =
-                    repositoryFactory.dataTypeSupplementaryComponentRepository();
-            aDataTypeSupplementaryComponentDAO.findByOwnerDtId(cdt.getDtId());
-            cdtsclistfromDB.addAll(aDataTypeSupplementaryComponentDAO.findByOwnerDtId(cdt.getDtId()));
+            cdtsclistfromDB.addAll(dtScRepository.findByOwnerDtId(cdt.getDtId()));
         }
 
         for (DataTypeSupplementaryComponent cdtsc : cdtsclistfromDB) {
@@ -497,8 +493,7 @@ public class CDTTest {
         int maxCardinality;
 
         public Cdt(int id) throws Exception {
-            DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponent = repositoryFactory.dataTypeSupplementaryComponentRepository();
-            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = aDataTypeSupplementaryComponent.findOneByDtScId(id);
+            DataTypeSupplementaryComponent dataTypeSupplementaryComponent = dtScRepository.findOne(id);
             int dt_id = dataTypeSupplementaryComponent.getOwnerDtId();
 
             DataType aDataType = dataTypeRepository.findOne(dt_id);
@@ -576,8 +571,7 @@ public class CDTTest {
             CoreDataTypePrimitive cdtPrimitive = aCdtPrimitive.findOneByCdtPriId(cdtScAwdPri.getCdtPriId());
             primitiveName = cdtPrimitive.getName();
 
-            DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponent = repositoryFactory.dataTypeSupplementaryComponentRepository();
-            DataTypeSupplementaryComponent cdtsc = aDataTypeSupplementaryComponent.findOneByDtScId(cdtScAwdPri.getCdtScId());
+            DataTypeSupplementaryComponent cdtsc = dtScRepository.findOne(cdtScAwdPri.getCdtScId());
             scPropertyTerm = cdtsc.getPropertyTerm();
             scRepresentationTerm = cdtsc.getRepresentationTerm();
 

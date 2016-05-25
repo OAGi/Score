@@ -1,28 +1,27 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface DataTypeSupplementaryComponentRepository {
+public interface DataTypeSupplementaryComponentRepository extends JpaRepository<DataTypeSupplementaryComponent, Integer> {
 
-    public List<DataTypeSupplementaryComponent> findAll();
-
+    @Query("select d from DataTypeSupplementaryComponent d where d.ownerDtId = ?1")
     public List<DataTypeSupplementaryComponent> findByOwnerDtId(int ownerDtId);
 
+    @Query("select d from DataTypeSupplementaryComponent d where d.guid = ?1")
     public DataTypeSupplementaryComponent findOneByGuid(String guid);
 
-    public DataTypeSupplementaryComponent findOneByDtScId(int dtScId);
-
+    @Query("select d from DataTypeSupplementaryComponent d where d.guid = ?1 and d.ownerDtId = ?2")
     public DataTypeSupplementaryComponent findOneByGuidAndOwnerDtId(String guid, int ownerDtId);
 
+    @Query("select d from DataTypeSupplementaryComponent d where d.ownerDtId = ?1 and d.propertyTerm = ?2 and d.representationTerm = ?3")
     public DataTypeSupplementaryComponent findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
             int ownerDtId, String propertyTerm, String representationTerm
     );
 
+    @Query("select d from DataTypeSupplementaryComponent d where d.ownerDtId = ?1 and d.basedDtScId = ?2")
     public DataTypeSupplementaryComponent findOneByOwnerDtIdAndBasedDtScId(int ownerDtId, int basedDtScId);
-
-    public void save(DataTypeSupplementaryComponent dataTypeSupplementaryComponent);
-
-    public void update(DataTypeSupplementaryComponent dataTypeSupplementaryComponent);
 }

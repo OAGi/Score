@@ -52,6 +52,9 @@ public class TopLevelABIEHandler implements Serializable {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     @Value("${spring.datasource.platform}")
     private String platform;
 
@@ -67,7 +70,6 @@ public class TopLevelABIEHandler implements Serializable {
     private BasicBusinessInformationEntityRepository bbieRepository;
     private BasicBusinessInformationEntityPropertyRepository bbiepRepository;
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbiescRepository;
-    private DataTypeSupplementaryComponentRepository dtScRepository;
 
     private BusinessContextRepository businessContextRepository;
     private BusinessContextValueRepository businessContextValueRepository;
@@ -118,7 +120,6 @@ public class TopLevelABIEHandler implements Serializable {
                 repositoryFactory.basicBusinessInformationEntityPropertyRepository();
         bbiescRepository =
                 repositoryFactory.basicBusinessInformationEntitySupplementaryComponentRepository();
-        dtScRepository = repositoryFactory.dataTypeSupplementaryComponentRepository();
 
         businessContextRepository = repositoryFactory.businessContextRepository();
         businessContextValueRepository = repositoryFactory.businessContextValueRepository();
@@ -1040,7 +1041,7 @@ public class TopLevelABIEHandler implements Serializable {
         bbiescRepository.save(nbbiescVO);
         bbiescCount++;
 
-        DataTypeSupplementaryComponent dtscvo = dtScRepository.findOneByDtScId(nbbiescVO.getDtScId());
+        DataTypeSupplementaryComponent dtscvo = dtScRepository.findOne(nbbiescVO.getDtScId());
 
         ABIEView av = new ABIEView(repositoryFactory,
                 codeListRepository, dtscvo.getPropertyTerm(), nbbiescVO.getBbieScId(), "BBIESC");
@@ -1324,7 +1325,7 @@ public class TopLevelABIEHandler implements Serializable {
         List<BasicBusinessInformationEntitySupplementaryComponent> list_01 =
                 bbiescRepository.findByBbieId(bbieVO.getBbieId());
         for (BasicBusinessInformationEntitySupplementaryComponent bbiescVO : list_01) {
-            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByDtScId(bbiescVO.getDtScId());
+            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(bbiescVO.getDtScId());
 
             ABIEView av_01 = new ABIEView(repositoryFactory, codeListRepository, dtscVO.getPropertyTerm(), bbiescVO.getBbieScId(), "BBIESC");
             av_01.setDtsc(dtscVO);

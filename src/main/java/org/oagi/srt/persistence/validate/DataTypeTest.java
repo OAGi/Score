@@ -37,6 +37,9 @@ public class DataTypeTest {
     @Autowired
     private DataTypeRepository dataTypeRepository;
 
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
     public DataType validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) {
         try {
             return dataTypeRepository.findOneByGuid(id);
@@ -1169,16 +1172,15 @@ public class DataTypeTest {
         if (!qbdtVO.getDen().contains("_"))
             qbdtVO = getDataType(qbdtVO.getBasedDtId());
 
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
         XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO =
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
 
         int owner_dT_iD = qbdtVO.getDtId();
 
-        List<DataTypeSupplementaryComponent> basedtsc_vos = aDTSCDAO.findByOwnerDtId(qbdtVO.getBasedDtId());
+        List<DataTypeSupplementaryComponent> basedtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent basedtsc_vo : basedtsc_vos) {
-            DataTypeSupplementaryComponent thisdtsc_vo = aDTSCDAO.findOneByOwnerDtIdAndBasedDtScId(qbdtVO.getDtId(), basedtsc_vo.getDtScId());
+            DataTypeSupplementaryComponent thisdtsc_vo = dtScRepository.findOneByOwnerDtIdAndBasedDtScId(qbdtVO.getDtId(), basedtsc_vo.getDtScId());
 
             String fromBaseDTSCStr = "";
             String thisDTSCStr = "";
@@ -1205,14 +1207,13 @@ public class DataTypeTest {
         if (!qbdtVO.getDen().contains("_"))
             qbdtVO = getDataType(qbdtVO.getBasedDtId());
 
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
         XSDBuiltInTypeRepository aXSDBuiltInTypeDAO = repositoryFactory.xsdBuiltInTypeRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAPMapDAO =
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
 
         int owner_dT_iD = qbdtVO.getDtId();
 
-        List<DataTypeSupplementaryComponent> dtsc_vos = aDTSCDAO.findByOwnerDtId(qbdtVO.getBasedDtId());
+        List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent dtsc_vo : dtsc_vos) {
             validateInsertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dtsc_vo.getGuid(), owner_dT_iD), 1, "", "");
         }
@@ -1305,7 +1306,7 @@ public class DataTypeTest {
 
                 DataTypeSupplementaryComponent duplicate = checkDuplicate(vo);
                 if (duplicate != null) {
-                    DataTypeSupplementaryComponent dtscVO = aDTSCDAO.findOneByGuidAndOwnerDtId(vo.getGuid(), vo.getOwnerDtId());
+                    DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuidAndOwnerDtId(vo.getGuid(), vo.getOwnerDtId());
                     String representationTerm = dtscVO.getRepresentationTerm();
                     DataType dtVO = getDataTypeWithRepresentationTerm(representationTerm);
 
@@ -1351,8 +1352,7 @@ public class DataTypeTest {
     }
 
     private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtVO) {
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        return aDTSCDAO.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
+        return dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
     }
 
     public int getCodeListId(String codeName) {
@@ -1366,13 +1366,11 @@ public class DataTypeTest {
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid) {
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        return aDTSCDAO.findOneByGuid(guid);
+        return dtScRepository.findOneByGuid(guid);
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, int ownerId) {
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        return aDTSCDAO.findOneByGuidAndOwnerDtId(guid, ownerId);
+        return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
     public int getDtId(String DataTypeTerm) {
@@ -1391,8 +1389,7 @@ public class DataTypeTest {
     }
 
     public String getRepresentationTerm(String Guid) {
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        DataTypeSupplementaryComponent dtscVO = aDTSCDAO.findOneByGuid(Guid);
+        DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuid(Guid);
         String term = dtscVO.getRepresentationTerm();
         return term;
     }
@@ -1415,13 +1412,12 @@ public class DataTypeTest {
     }
 
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) {
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository aCDTSCAllowedPrimitiveDAO =
                 repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveRepository();
 
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = aCDTSCAllowedPrimitiveDAO.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
-            DataTypeSupplementaryComponent dtscVO = aDTSCDAO.findOneByDtScId(dt_sc_id);
+            DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
             res = getCdtSCAllowedPrimitiveID(dtscVO.getBasedDtScId());
         }
         return res;
@@ -1587,9 +1583,7 @@ public class DataTypeTest {
     }
 
     private void validteDTSC() {
-        DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
-
-        List<DataTypeSupplementaryComponent> DTSCList = aDTSCDAO.findAll();
+        List<DataTypeSupplementaryComponent> DTSCList = dtScRepository.findAll();
         Map<DataTypeSupplementaryComponent, Boolean> map = new HashMap();
         for (DataTypeSupplementaryComponent DTSC : DTSCList)
             map.put(DTSC, false);
@@ -1605,7 +1599,7 @@ public class DataTypeTest {
 
             DataType ownerDT = dataTypeRepository.findOne(dt_id);
             if (ownerDT.getDen().contains("_")) {// if BDT is default BDT
-                DataTypeSupplementaryComponent basedDTscvo = aDTSCDAO.findOneByDtScId(dtscvo.getBasedDtScId());
+                DataTypeSupplementaryComponent basedDTscvo = dtScRepository.findOne(dtscvo.getBasedDtScId());
                 if (basedDTscvo.getOwnerDtId() != ownerDT.getBasedDtId())
                     System.out.println("DTSC based on default BDT is wrong when dt_sc_id = " + dtscvo.getDtScId());
                 else
