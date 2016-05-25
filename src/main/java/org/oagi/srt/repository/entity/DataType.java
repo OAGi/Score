@@ -1,36 +1,105 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table(name = "dt")
 public class DataType implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "DT_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "DT_ID_SEQ", sequenceName = "DT_ID_SEQ", allocationSize = 1)
     private int dtId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int type;
+
+    @Column(nullable = false)
     private String versionNum;
-    private int previousVersionDtId;
+
+    @Column
+    private Integer previousVersionDtId;
+
+    @Column
     private String dataTypeTerm;
+
+    @Column
     private String qualifier;
-    private int basedDtId;
+
+    @Column
+    private Integer basedDtId;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column
     private String contentComponentDen;
+
+    @Column
     private String definition;
+
+    @Column
     private String contentComponentDefinition;
+
+    @Column
     private String revisionDoc;
+
+    @Column
     private String module;
+
+    @Column
     private int state;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentBdtId;
+
+    @Column
+    private Integer revisionAction;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentBdtId;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getDtId() {
         return dtId;
@@ -65,7 +134,7 @@ public class DataType implements Serializable {
     }
 
     public int getPreviousVersionDtId() {
-        return previousVersionDtId;
+        return (previousVersionDtId == null) ? 0 : previousVersionDtId;
     }
 
     public void setPreviousVersionDtId(int previousVersionDtId) {
@@ -89,7 +158,7 @@ public class DataType implements Serializable {
     }
 
     public int getBasedDtId() {
-        return basedDtId;
+        return (basedDtId == null) ? 0 : basedDtId;
     }
 
     public void setBasedDtId(int basedDtId) {
@@ -209,7 +278,7 @@ public class DataType implements Serializable {
     }
 
     public int getRevisionAction() {
-        return revisionAction;
+        return (revisionAction == null) ? 0 : revisionAction;
     }
 
     public void setRevisionAction(int revisionAction) {
@@ -217,7 +286,7 @@ public class DataType implements Serializable {
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -225,7 +294,7 @@ public class DataType implements Serializable {
     }
 
     public int getCurrentBdtId() {
-        return currentBdtId;
+        return (currentBdtId == null) ? 0 : currentBdtId;
     }
 
     public void setCurrentBdtId(int currentBdtId) {

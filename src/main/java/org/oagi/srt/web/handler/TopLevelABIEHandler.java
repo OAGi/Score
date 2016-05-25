@@ -49,6 +49,9 @@ public class TopLevelABIEHandler implements Serializable {
     @Autowired
     private CodeListRepository codeListRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     @Value("${spring.datasource.platform}")
     private String platform;
 
@@ -64,7 +67,6 @@ public class TopLevelABIEHandler implements Serializable {
     private BasicBusinessInformationEntityRepository bbieRepository;
     private BasicBusinessInformationEntityPropertyRepository bbiepRepository;
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbiescRepository;
-    private DataTypeRepository dtRepository;
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
     private BusinessContextRepository businessContextRepository;
@@ -116,7 +118,6 @@ public class TopLevelABIEHandler implements Serializable {
                 repositoryFactory.basicBusinessInformationEntityPropertyRepository();
         bbiescRepository =
                 repositoryFactory.basicBusinessInformationEntitySupplementaryComponentRepository();
-        dtRepository = repositoryFactory.dataTypeRepository();
         dtScRepository = repositoryFactory.dataTypeSupplementaryComponentRepository();
 
         businessContextRepository = repositoryFactory.businessContextRepository();
@@ -670,7 +671,7 @@ public class TopLevelABIEHandler implements Serializable {
         int bdtPrimitiveRestrictionId = aBDTPrimitiveRestrictionVO.getBdtPriRestriId();
 
         BasicBusinessInformationEntity bbieVO = createBBIE(bccVO, abie, bbiepVO.getBbiepId(), seqKey, bdtPrimitiveRestrictionId);
-        DataType dtVO = dtRepository.findOneByDtId(bccpVO.getBdtId());
+        DataType dtVO = dataTypeRepository.findOne(bccpVO.getBdtId());
 
         int bbieID = bbieVO.getBbieId();
         createBBIESC(bbieID, bccpVO.getBdtId());
@@ -878,7 +879,7 @@ public class TopLevelABIEHandler implements Serializable {
             av.setBbiep(nBBIEPVO);
             av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, nBasicBusinessInformationEntity);
 
-            DataType dtVO = dtRepository.findOneByDtId(bccpVO.getBdtId());
+            DataType dtVO = dataTypeRepository.findOne(bccpVO.getBdtId());
             av.setBdtName(dtVO.getDen());
             av.setColor("green");
             TreeNode tNode2 = new DefaultTreeNode(av, tNode);
@@ -1295,7 +1296,7 @@ public class TopLevelABIEHandler implements Serializable {
         av.setBbiep(bbiepVO);
         av.setBasicCoreComponentPropertyAndBasicBusinessInformationEntity(bccpVO, bbieVO);
 
-        DataType dtVO = dtRepository.findOneByDtId(bccpVO.getBdtId());
+        DataType dtVO = dataTypeRepository.findOne(bccpVO.getBdtId());
         av.setBdtName(dtVO.getDen());
         av.setColor("green");
         TreeNode tNode2 = new DefaultTreeNode(av, tNode);

@@ -27,6 +27,9 @@ public class CDTTest {
     @Autowired
     private CodeListRepository codeListRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     public int getCodeListId(String codeName) throws Exception {
         CodeList codelist = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelist.getCodeListId();
@@ -48,8 +51,7 @@ public class CDTTest {
     }
 
     public int getDataTypeId(String DataTypeTerm) throws Exception {
-        DataTypeRepository aDataTypeDAO = repositoryFactory.dataTypeRepository();
-        DataType dt = aDataTypeDAO.findOneByDataTypeTermAndType(DataTypeTerm, 0);
+        DataType dt = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
         return dt.getDtId();
     }
 
@@ -100,8 +102,7 @@ public class CDTTest {
     }
 
     private void check_number_of_cdt() throws Exception {
-        DataTypeRepository aDataTypeDAO = repositoryFactory.dataTypeRepository();
-        List<DataType> cdt = aDataTypeDAO.findByType(0);
+        List<DataType> cdt = dataTypeRepository.findByType(0);
         System.out.println("# of cdts in catalog : " + cdt.size());
         if (cdt.size() == 23)
             System.out.println("Validated");
@@ -122,8 +123,7 @@ public class CDTTest {
     }
 
     private void validate_cdt_sc() throws Exception {
-        DataTypeRepository aDataTypeDAO = repositoryFactory.dataTypeRepository();
-        List<DataType> cdtlist = aDataTypeDAO.findByType(0);
+        List<DataType> cdtlist = dataTypeRepository.findByType(0);
         List<String> cdt_sc_list = new ArrayList();
 
         cdt_sc_list.add("AmountCurrencyCode01");
@@ -497,12 +497,11 @@ public class CDTTest {
         int maxCardinality;
 
         public Cdt(int id) throws Exception {
-            DataTypeRepository dataTypeRepository = repositoryFactory.dataTypeRepository();
             DataTypeSupplementaryComponentRepository aDataTypeSupplementaryComponent = repositoryFactory.dataTypeSupplementaryComponentRepository();
             DataTypeSupplementaryComponent dataTypeSupplementaryComponent = aDataTypeSupplementaryComponent.findOneByDtScId(id);
             int dt_id = dataTypeSupplementaryComponent.getOwnerDtId();
 
-            DataType aDataType = dataTypeRepository.findOneByDtId(dt_id);
+            DataType aDataType = dataTypeRepository.findOne(dt_id);
 
             cdtDataTypeTerm = aDataType.getDataTypeTerm();
 
@@ -539,8 +538,7 @@ public class CDTTest {
             CoreDataTypePrimitive cdtPrimitive = aCdtPrimitive.findOneByCdtPriId(cdtAllowedPrimitive.getCdtPriId());
             primitiveName = cdtPrimitive.getName();
 
-            DataTypeRepository aDataType = repositoryFactory.dataTypeRepository();
-            DataType cdt = aDataType.findOneByDtId(cdtAllowedPrimitive.getCdtId());
+            DataType cdt = dataTypeRepository.findOne(cdtAllowedPrimitive.getCdtId());
             cdtDataTypeTerm = cdt.getDataTypeTerm();
 
             XSDBuiltInTypeRepository aXbt = repositoryFactory.xsdBuiltInTypeRepository();
@@ -583,8 +581,7 @@ public class CDTTest {
             scPropertyTerm = cdtsc.getPropertyTerm();
             scRepresentationTerm = cdtsc.getRepresentationTerm();
 
-            DataTypeRepository aDataType = repositoryFactory.dataTypeRepository();
-            DataType cdt = aDataType.findOneByDtId(cdtsc.getOwnerDtId());
+            DataType cdt = dataTypeRepository.findOne(cdtsc.getOwnerDtId());
             cdtDataTypeTerm = cdt.getDataTypeTerm();
 
             XSDBuiltInTypeRepository aXbt = repositoryFactory.xsdBuiltInTypeRepository();

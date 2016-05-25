@@ -42,13 +42,15 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private CodeListRepository codeListRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
     private XPathHandler businessdatatype_xsd;
     private XPathHandler component_xsd;
     private File f1;
 
-    private DataTypeRepository aDTDAO;
     private BasicCoreComponentPropertyRepository bccpDAO;
     private BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO;
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCDTAllowedPrimitiveExpressionTypeMapDAO;
@@ -62,7 +64,6 @@ public class P_1_7_PopulateQBDTInDT {
 
     @PostConstruct
     public void init() throws Exception {
-        aDTDAO = repositoryFactory.dataTypeRepository();
         bccpDAO = repositoryFactory.basicCoreComponentPropertyRepository();
         bdtSCPRDAO = repositoryFactory.businessDataTypeSupplementaryComponentPrimitiveRestrictionRepository();
         aBDTPrimitiveRestrictionDAO = repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
@@ -125,7 +126,7 @@ public class P_1_7_PopulateQBDTInDT {
             Node simpleContent = fields_xsd.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
             if (simpleContent != null) {
                 try {
-                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                    DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
                 } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDT(typeGuid, type, typeNode, fields_xsd);
@@ -186,7 +187,7 @@ public class P_1_7_PopulateQBDTInDT {
                 }
                 String typeGuid = ((Element) typeNode).getAttribute("id");
                 try {
-                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                    DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
 
                     // add BCCP
                     addToBCCP(guid, bccp, dtVO, definition);
@@ -413,9 +414,9 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setRevisionNum(0);
         dtVO.setRevisionTrackingNum(0);
         dtVO.setDeprecated(false);
-        aDTDAO.save(dtVO);
+        dataTypeRepository.save(dtVO);
 
-        DataType res = aDTDAO.findOneByGuid(guid);
+        DataType res = dataTypeRepository.findOneByGuid(guid);
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(res, base);
 
@@ -722,7 +723,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public int getDtId(String DataTypeTerm) throws Exception {
-        DataType dtVO = aDTDAO.findOneByDataTypeTermAndType(DataTypeTerm, 0);
+        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
         int id = dtVO.getDtId();
         return id;
     }
@@ -772,19 +773,19 @@ public class P_1_7_PopulateQBDTInDT {
 
     private DataType getDataTypeWithDen(String den) throws Exception {
         try {
-            return aDTDAO.findOneByTypeAndDen(1, den);
+            return dataTypeRepository.findOneByTypeAndDen(1, den);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
     private DataType getDataTypeWithRepresentationTerm(String representationTerm) throws Exception {
-        return aDTDAO.findOneByDataTypeTermAndType(representationTerm, 0);
+        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, 0);
     }
 
     private DataType getDataTypeWithGUID(String guid) throws Exception {
         try {
-            return aDTDAO.findOneByGuid(guid);
+            return dataTypeRepository.findOneByGuid(guid);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -800,7 +801,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (type.endsWith(dataType) && !type.equals(dataType)) {
                 String typeGuid = ((Element) typeNode).getAttribute("id");
                 try {
-                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                    DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
                 } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
@@ -822,7 +823,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (type.endsWith(dataType) && !type.equals(dataType)) {
                 String typeGuid = ((Element) typeNode).getAttribute("id");
                 try {
-                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                    DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
                 } catch (EmptyResultDataAccessException e) {
                     // add new QBDT
                     DataType dVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
@@ -887,9 +888,9 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setRevisionNum(0);
         dtVO.setRevisionTrackingNum(0);
         dtVO.setDeprecated(false);
-        aDTDAO.save(dtVO);
+        dataTypeRepository.save(dtVO);
 
-        DataType res = aDTDAO.findOneByGuid(guid);
+        DataType res = dataTypeRepository.findOneByGuid(guid);
         // add to BDTPrimitiveRestriction
         insertBDTPrimitiveRestriction(res, base);
 

@@ -29,13 +29,14 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     @Autowired
     private RepositoryFactory repositoryFactory;
 
-    private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
 
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
+    private void populateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
         DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        List<DataType> srtObjects = dao.findByType(1);
+        List<DataType> srtObjects = dataTypeRepository.findByType(1);
         for (DataType dt : srtObjects) {
-            DataType dt2 = dao.findOneByDtId(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
 
             // default BDT
             if (dt2.getType() == 0) {
@@ -172,11 +173,10 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     }
 
     private void validatePopulateDTSCforDefaultBDT(XPathHandler xh, XPathHandler xh2) throws Exception {
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
         DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
-        List<DataType> srtObjects = dao.findByType(1);
+        List<DataType> srtObjects = dataTypeRepository.findByType(1);
         for (DataType dt : srtObjects) {
-            DataType dt2 = dao.findOneByDtId(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
 
 
             // default BDT
@@ -344,7 +344,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     }
 
     public void populateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
         DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
@@ -352,20 +351,19 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypePrimitiveRepository aCoreDataTypePrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
         XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
 
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
-            srtObjects = dao.findByType(1);
+            srtObjects = dataTypeRepository.findByType(1);
         } else {
             String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
             for (int k = 0; k < metalist.length; k++) {
-                srtObjects.add(k, dao.findOneByTypeAndDen(1, Utility.typeToDen(metalist[k])));
+                srtObjects.add(k, dataTypeRepository.findOneByTypeAndDen(1, Utility.typeToDen(metalist[k])));
             }
         }
 
         for (DataType dt : srtObjects) {
-            DataType dt2 = dao.findOneByDtId(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
             // unqualified BDT
             if (dt2.getType() != 0) {
                 //inheritance
@@ -383,7 +381,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                 if (baseNode == null)
                     baseNode = xh.getNode("//xsd:simpleType[@name = '" + base + "']");
 
-                DataType basedDt = dao.findOneByGuid(((Element) baseNode).getAttribute("id"));
+                DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
                 int based_dt_id = basedDt.getDtId();
                 List<DataTypeSupplementaryComponent> baseDefaultDTSCs = daoDTSC.findByOwnerDtId(based_dt_id);
 
@@ -476,7 +474,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         //it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map
                         DataTypeSupplementaryComponent insertedSC = daoDTSC.findOneByGuid(vo.getGuid());
 
-                        List<DataType> DataTypewDataTypeTerm = dao.findByDataTypeTerm(vo.getRepresentationTerm());
+                        List<DataType> DataTypewDataTypeTerm = dataTypeRepository.findByDataTypeTerm(vo.getRepresentationTerm());
 
                         for (int j = 0; j < DataTypewDataTypeTerm.size(); j++) {
                             DataType aDataType = DataTypewDataTypeTerm.get(j);
@@ -549,7 +547,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 
     public void validatePopulateDTSCforUnqualifiedBDT(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
         DataTypeSupplementaryComponentRepository daoDTSC = repositoryFactory.dataTypeSupplementaryComponentRepository();
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository();
         CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository aCoreDataTypeAllowedPrimitiveExpressionTypeMapDAO = repositoryFactory.coreDataTypeAllowedPrimitiveExpressionTypeMapRepository();
@@ -557,20 +554,19 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypePrimitiveRepository aCoreDataTypePrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
         XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
 
         List<DataType> srtObjects = new ArrayList();
         if (is_fields_xsd) {
-            srtObjects = dao.findByType(1);
+            srtObjects = dataTypeRepository.findByType(1);
         } else {
             String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
             for (int k = 0; k < metalist.length; k++) {
-                srtObjects.add(k, dao.findOneByTypeAndDen(1, Utility.typeToDen(metalist[k])));
+                srtObjects.add(k, dataTypeRepository.findOneByTypeAndDen(1, Utility.typeToDen(metalist[k])));
             }
         }
 
         for (DataType dt : srtObjects) {
-            DataType dt2 = dao.findOneByDtId(dt.getBasedDtId());
+            DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
             // unqualified BDT
             if (dt2.getType() != 0) {
                 String denType = Utility.DenToName(dt.getDen());
@@ -587,7 +583,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                 if (baseNode == null)
                     baseNode = xh.getNode("//xsd:simpleType[@name = '" + base + "']");
 
-                DataType basedDt = dao.findOneByGuid(((Element) baseNode).getAttribute("id"));
+                DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
                 int based_dt_id = basedDt.getDtId();
                 List<DataTypeSupplementaryComponent> baseDefaultDTSCs = daoDTSC.findByOwnerDtId(based_dt_id);
 
@@ -674,7 +670,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     //it needs to have records in cdt_sc_awd_pri and cdt_sc_awd_pri_xps_type_map
                     DataTypeSupplementaryComponent insertedSC = daoDTSC.findOneByGuid(vo.getGuid());
 
-                    List DataTypewDataTypeTerm = dao.findByDataTypeTerm(insertedSC.getRepresentationTerm());
+                    List DataTypewDataTypeTerm = dataTypeRepository.findByDataTypeTerm(insertedSC.getRepresentationTerm());
 
                     for (int j = 0; j < DataTypewDataTypeTerm.size(); j++) {
                         DataType aDataType = (DataType) DataTypewDataTypeTerm.get(j);

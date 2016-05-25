@@ -8,7 +8,8 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "APP_USER_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "APP_USER_ID_SEQ", sequenceName = "APP_USER_ID_SEQ", allocationSize = 1)
     private int appUserId;
 
     @Column(nullable = false)

@@ -39,6 +39,9 @@ public class StandaloneXMLSchema {
     @Autowired
     private CodeListValueRepository codeListValueRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     public static List<Integer> abie_ids = new ArrayList();
     public static boolean schema_package_flag = false;
     private List<String> StoredCC = new ArrayList();
@@ -1057,8 +1060,7 @@ public class StandaloneXMLSchema {
         BasicCoreComponent gBCC = dao3.findOneByBccId(gBBIE.getBasedBccId());
         BasicCoreComponentPropertyRepository dao = repositoryFactory.basicCoreComponentPropertyRepository();
         BasicCoreComponentProperty aBasicCoreComponentProperty = dao.findOneByBccpId(gBCC.getToBccpId());
-        DataTypeRepository dao2 = repositoryFactory.dataTypeRepository();
-        DataType bDT = dao2.findOneByDtId(aBasicCoreComponentProperty.getBdtId());
+        DataType bDT = dataTypeRepository.findOne(aBasicCoreComponentProperty.getBdtId());
         return bDT;
     }
 
@@ -1165,8 +1167,7 @@ public class StandaloneXMLSchema {
         BasicCoreComponentPropertyRepository dao2 = repositoryFactory.basicCoreComponentPropertyRepository();
         BasicCoreComponentProperty bccpVO = dao2.findOneByBccpId(bccVO.getToBccpId());
 
-        DataTypeRepository dao3 = repositoryFactory.dataTypeRepository();
-        DataType aBDT = dao3.findOneByDtId(bccpVO.getBdtId());
+        DataType aBDT = dataTypeRepository.findOne(bccpVO.getBdtId());
 
         return aBDT;
     }

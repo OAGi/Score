@@ -60,9 +60,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     private OracleBasicBusinessInformationEntitySupplementaryComponentRepository oracleBasicBusinessInformationEntitySupplementaryComponentRepository;
 
     @Autowired
-    private OracleDataTypeRepository oracleDataTypeRepository;
-
-    @Autowired
     private OracleDataTypeSupplementaryComponentRepository oracleDataTypeSupplementaryComponentRepository;
 
     @Autowired
@@ -173,11 +170,6 @@ public class OracleRepositoryFactory implements RepositoryFactory {
     @Override
     public BasicBusinessInformationEntitySupplementaryComponentRepository basicBusinessInformationEntitySupplementaryComponentRepository() {
         return oracleBasicBusinessInformationEntitySupplementaryComponentRepository;
-    }
-
-    @Override
-    public DataTypeRepository dataTypeRepository() {
-        return oracleDataTypeRepository;
     }
 
     @Override

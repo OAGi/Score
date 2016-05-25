@@ -1,6 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.Application;
@@ -20,20 +19,13 @@ import static org.oagi.srt.common.util.Utility.generateGUID;
 public class DataTypeRepositoryTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
-
     private DataTypeRepository dataTypeRepository;
-
-    @Before
-    public void before() {
-        dataTypeRepository = repositoryFactory.dataTypeRepository();
-    }
 
     @Test
     public void test_findOneByDtId() {
         int dtId = 1;
         String expectedGuid = "oagis-id-3bfbbc07cffc47a886496961b0f6b292";
-        DataType dataType = dataTypeRepository.findOneByDtId(dtId);
+        DataType dataType = dataTypeRepository.findOne(dtId);
         String actualGuid = dataType.getGuid();
 
         assertEquals(expectedGuid, actualGuid);
@@ -49,7 +41,7 @@ public class DataTypeRepositoryTestCase extends AbstractTransactionalJUnit4Sprin
 
         dataTypeRepository.save(expectedDataType);
 
-        DataType actualDataType = dataTypeRepository.findOneByDtId(expectedDataType.getDtId());
+        DataType actualDataType = dataTypeRepository.findOne(expectedDataType.getDtId());
 
         assertEquals(expectedDataType.getGuid(), actualDataType.getGuid());
         assertEquals(expectedDataType.getVersionNum(), actualDataType.getVersionNum());

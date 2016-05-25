@@ -36,12 +36,15 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     public static void main(String[] args) throws Exception {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
             P_1_5_1_to_2_PopulateBDTsInDT populateBDTsInDT = ctx.getBean(P_1_5_1_to_2_PopulateBDTsInDT.class);
-            //populateBDTsInDT.run(ctx);
-            populateBDTsInDT.validate();
+            populateBDTsInDT.run(ctx);
+            //populateBDTsInDT.validate();
         }
     }
 
@@ -181,13 +184,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition, String id) throws Exception {
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
-
-        int basedDTID = dtRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
-        DataType dtVO;
-        try {
-            dtVO = dtRepository.findOneByGuid(id);
-        } catch (EmptyResultDataAccessException e) {
+        int basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
+        DataType dtVO = dataTypeRepository.findOneByGuid(id);
+        if (dtVO == null) {
             System.out.println("Inserting default bdt whose name is " + typeName);
 
             dtVO = new DataType();
@@ -214,7 +213,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setRevisionTrackingNum(0);
             dtVO.setDeprecated(false);
 
-            dtRepository.save(dtVO);
+            dtVO = dataTypeRepository.saveAndFlush(dtVO);
         }
 
         return dtVO;
@@ -258,14 +257,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws Exception {
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
+        int basedDTID = dataTypeRepository.findOneByGuid(defaultGUID).getDtId();
 
-        int basedDTID = dtRepository.findOneByGuid(defaultGUID).getDtId();
-
-        DataType dtVO;
-        try {
-            dtVO = dtRepository.findOneByGuid(id);
-        } catch (EmptyResultDataAccessException e) {
+        DataType dtVO = dataTypeRepository.findOneByGuid(id);
+        if (dtVO == null) {
             dtVO = new DataType();
 
             dtVO.setGuid(id);
@@ -287,7 +282,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setRevisionNum(0);
             dtVO.setRevisionTrackingNum(0);
             dtVO.setDeprecated(false);
-            dtRepository.save(dtVO);
+            dtVO = dataTypeRepository.saveAndFlush(dtVO);
         }
 
         return dtVO;
@@ -315,17 +310,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     public boolean check_BDT(String id) {
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
-        try {
-            dtRepository.findOneByGuid(id);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+        return (dataTypeRepository.findOneByGuid(id) == null) ? false : true;
     }
 
     public void populateAdditionalDefault_BDTStatement(XPathHandler filename) throws Exception {
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
         XSDBuiltInTypeRepository xsdBuiltInTypeRepository = repositoryFactory.xsdBuiltInTypeRepository();
 
         NodeList xsd_node = filename.getNodeList("//xsd:attribute");
@@ -336,7 +324,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             System.out.println(typeName);
             String den = Utility.typeToDen(tmp.getAttribute("type"));
 
-            if (dtRepository.findOneByDen(den) == null) { // && duplicate_check == false) {
+            if (dataTypeRepository.findOneByDen(den) == null) { // && duplicate_check == false) {
                 XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
                 String type = "complex";
                 String xsdTypeName = typeName;
@@ -531,10 +519,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             baseName = base.getTextContent();
         }
 
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
         DataType dtvoFromDB;
         try {
-            dtvoFromDB = dtRepository.findOneByGuid(aElementBDT.getAttribute("id"));
+            dtvoFromDB = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
 
             defaultFromDB = "";
             defaultFromDB = defaultFromDB + dtvoFromDB.getGuid();//guid
@@ -544,7 +531,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             defaultFromDB = defaultFromDB + dtvoFromDB.getDataTypeTerm();//data type term
             defaultFromDB = defaultFromDB + dtvoFromDB.getQualifier();//qualifier
 
-            DataType baseDataType = dtRepository.findOneByDtId(dtvoFromDB.getBasedDtId());
+            DataType baseDataType = dataTypeRepository.findOne(dtvoFromDB.getBasedDtId());
 
             defaultFromDB = defaultFromDB + Utility.denToTypeName(baseDataType.getDen());//base cdt den instead of base dt id
             defaultFromDB = defaultFromDB + Utility.denToTypeName(dtvoFromDB.getDen());//type name instead of den
@@ -612,7 +599,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         unqualifiedFromXSD = unqualifiedFromXSD.replace("ID", "Identifier");
 
         try {
-            dtvoFromDB = dtRepository.findOneByGuid(aElementTN.getAttribute("id"));
+            dtvoFromDB = dataTypeRepository.findOneByGuid(aElementTN.getAttribute("id"));
 
             unqualifiedFromDB = "";
             unqualifiedFromDB = unqualifiedFromDB + dtvoFromDB.getGuid();//guid
@@ -622,7 +609,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             unqualifiedFromDB = unqualifiedFromDB + dtvoFromDB.getDataTypeTerm();//data type term
             unqualifiedFromDB = unqualifiedFromDB + dtvoFromDB.getQualifier();//qualifier
 
-            DataType baseDataType = dtRepository.findOneByDtId(dtvoFromDB.getBasedDtId());
+            DataType baseDataType = dataTypeRepository.findOne(dtvoFromDB.getBasedDtId());
 
             unqualifiedFromDB = unqualifiedFromDB + Utility.denToTypeName(baseDataType.getDen());//base dt name instead of base dt id
             unqualifiedFromDB = unqualifiedFromDB + Utility.denToTypeName(dtvoFromDB.getDen());//type name instead of den
@@ -762,9 +749,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         if (check_BDT(aElementBDT.getAttribute("id"))) {
             System.out.println("Default BDT is already existing");
-
-            DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
-            dVO1 = dtRepository.findOneByGuid(aElementBDT.getAttribute("id"));
+            dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
         } else {
             dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
             System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
@@ -786,7 +771,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void importExceptionalDataTypeList() throws Exception {
-        DataTypeRepository DTDao = repositoryFactory.dataTypeRepository();
         XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
         String typeName;
         String xsdTypeName;
@@ -880,7 +864,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
             if (check_BDT(aElementBDT.getAttribute("id"))) {
                 System.out.println("Default BDT is already existing");
-                dVO1 = DTDao.findOneByGuid(aElementBDT.getAttribute("id"));
+                dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
             } else {
                 dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
                 System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
@@ -903,8 +887,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void insertBDTPrimitiveRestrictionForExceptionalBDT(int cdtID, int bdtID, int defaultId) throws Exception {
-
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
         BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
                 repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
         CoreDataTypePrimitiveRepository cdtPriRepository =
@@ -948,7 +930,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void validateImportExceptionalDataTypeList() throws Exception {
-        DataTypeRepository dataTypeRepository = repositoryFactory.dataTypeRepository();
         XSDBuiltInTypeRepository dao = repositoryFactory.xsdBuiltInTypeRepository();
 
         String typeName;
@@ -1097,7 +1078,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 defaultFromDB = defaultFromDB + dtvoFromDB.getDataTypeTerm();//data type term
                 defaultFromDB = defaultFromDB + dtvoFromDB.getQualifier();//qualifier
 
-                DataType baseDataType = dataTypeRepository.findOneByDtId(dtvoFromDB.getBasedDtId());
+                DataType baseDataType = dataTypeRepository.findOne(dtvoFromDB.getBasedDtId());
 
                 defaultFromDB = defaultFromDB + Utility.denToTypeName(baseDataType.getDen());//base cdt den instead of base dt id
                 defaultFromDB = defaultFromDB + Utility.denToTypeName(dtvoFromDB.getDen());//type name instead of den
@@ -1182,7 +1163,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 unqualifiedFromDB = unqualifiedFromDB + dtvoFromDB.getDataTypeTerm();//data type term
                 unqualifiedFromDB = unqualifiedFromDB + dtvoFromDB.getQualifier();//qualifier
 
-                DataType baseDataType = dataTypeRepository.findOneByDtId(dtvoFromDB.getBasedDtId());
+                DataType baseDataType = dataTypeRepository.findOne(dtvoFromDB.getBasedDtId());
 
                 unqualifiedFromDB = unqualifiedFromDB + Utility.denToTypeName(baseDataType.getDen());//base dt name instead of base dt id
                 unqualifiedFromDB = unqualifiedFromDB + Utility.denToTypeName(dtvoFromDB.getDen());//type name instead of den
@@ -1293,7 +1274,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             defaultFromDB = defaultFromDB + dtvoFromDB.getDataTypeTerm();//data type term
             defaultFromDB = defaultFromDB + dtvoFromDB.getQualifier();//qualifier
 
-            DataType baseDataType = dataTypeRepository.findOneByDtId(dtvoFromDB.getBasedDtId());
+            DataType baseDataType = dataTypeRepository.findOne(dtvoFromDB.getBasedDtId());
 
             defaultFromDB = defaultFromDB + Utility.denToTypeName(baseDataType.getDen());//base cdt den instead of base dt id
             defaultFromDB = defaultFromDB + Utility.denToTypeName(dtvoFromDB.getDen());//type name instead of den
@@ -1323,7 +1304,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void validateInsertBDTPrimitiveRestriction(int basedtID, int bdtId, boolean unionExist, String baseName) throws Exception {
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
         BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository =
                 repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
         CoreDataTypePrimitiveRepository cdtPriRepository =
@@ -1335,7 +1315,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XSDBuiltInTypeRepository xsdBuiltInTypeRepository =
                 repositoryFactory.xsdBuiltInTypeRepository();
 
-        DataType baseDataType = dtRepository.findOneByDtId(basedtID);
+        DataType baseDataType = dataTypeRepository.findOne(basedtID);
         if (baseDataType.getType() == 0) {//if the base is CDT and this is default
 
             List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = cdtAwdPriRepository.findByCdtId(basedtID);
@@ -1444,9 +1424,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         aElementTN = (Element) aNodeTN;
         typeName = aElementTN.getAttribute("base");
 
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
         String den = Utility.typeToDen(typeName);
-        DataType dVO1 = dtRepository.findOneByDen(den);
+        DataType dVO1 = dataTypeRepository.findOneByDen(den);
         baseDataTypeTerm = dVO1.getDataTypeTerm();
         baseGUID = dVO1.getGuid();
 
@@ -1500,9 +1479,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         aElementTN = (Element) aNodeTN;
         typeName = aElementTN.getAttribute("base");
 
-        DataTypeRepository dtRepository = repositoryFactory.dataTypeRepository();
         String den = Utility.typeToDen(typeName);
-        DataType dVO1 = dtRepository.findOneByDen(den);
+        DataType dVO1 = dataTypeRepository.findOneByDen(den);
         baseDataTypeTerm = dVO1.getDataTypeTerm();
         baseGUID = dVO1.getGuid();
 

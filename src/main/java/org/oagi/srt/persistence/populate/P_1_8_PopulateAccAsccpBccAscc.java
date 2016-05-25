@@ -40,12 +40,14 @@ public class P_1_8_PopulateAccAsccpBccAscc {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     private AggregateCoreComponentRepository accDao;
     private AssociationCoreComponentPropertyRepository asccpDao;
     private BasicCoreComponentPropertyRepository bccpDao;
     private BasicCoreComponentRepository bccDao;
     private AssociationCoreComponentRepository asccDao;
-    private DataTypeRepository dtDao;
 
     private BODSchemaHandler bodSchemaHandler;
     private String bodPath;
@@ -60,7 +62,6 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         asccpDao = repositoryFactory.associationCoreComponentPropertyRepository();
         bccpDao = repositoryFactory.basicCoreComponentPropertyRepository();
         bccDao = repositoryFactory.basicCoreComponentRepository();
-        dtDao = repositoryFactory.dataTypeRepository();
     }
 
     private void populate() throws Exception {
@@ -489,7 +490,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
         DataType dtVO;
         try {
-            dtVO = dtDao.findOneByGuidAndType(id, 1);
+            dtVO = dataTypeRepository.findOneByGuidAndType(id, 1);
         } catch (EmptyResultDataAccessException e) {
             System.out.println("!!!! DT is null where name is  = " + name + " and id is = " + id);
             return null;

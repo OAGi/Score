@@ -1,28 +1,34 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.DataType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface DataTypeRepository {
+public interface DataTypeRepository extends JpaRepository<DataType, Integer> {
 
+    @Query("select d from DataType d where d.type = ?1")
     public List<DataType> findByType(int type);
 
+    @Query("select d from DataType d where d.dataTypeTerm = ?1")
     public List<DataType> findByDataTypeTerm(String dataTypeTerm);
 
-    public DataType findOneByDtId(int dtId);
-
+    @Query("select d from DataType d where d.dataTypeTerm = ?1 and d.type = ?2")
     public DataType findOneByDataTypeTermAndType(String dataTypeTerm, int type);
 
+    @Query("select d from DataType d where d.guid = ?1")
     public DataType findOneByGuid(String guid);
 
+    @Query("select d from DataType d where d.guid = ?1 and d.type = ?2")
     public DataType findOneByGuidAndType(String guid, int type);
 
+    @Query("select d from DataType d where d.den = ?1")
     public DataType findOneByDen(String den);
 
+    @Query("select d from DataType d where d.type = ?1 and d.den = ?2")
     public DataType findOneByTypeAndDen(int type, String den);
 
+    @Query("select d from DataType d where d.guid = ?1 and d.den = ?2")
     public DataType findOneByGuidAndDen(String guid, String den);
-
-    public void save(DataType dataType);
 }

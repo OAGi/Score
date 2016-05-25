@@ -34,9 +34,10 @@ public class DataTypeTest {
     @Autowired
     private CodeListRepository codeListRepository;
 
-    public DataType validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) {
-        DataTypeRepository dataTypeRepository = repositoryFactory.dataTypeRepository();
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
 
+    public DataType validateInsertDefault_BDTStatement(String typeName, String dataTypeTerm, String id) {
         try {
             return dataTypeRepository.findOneByGuid(id);
             // System.out.println("Success!!");
@@ -47,8 +48,6 @@ public class DataTypeTest {
     }
 
     public void validatePopulateAdditionalDefault_BDTStatement(XPathHandler filename) throws Exception {
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
-
         NodeList xsd_node = filename.getNodeList("//xsd:attribute");
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
         XSDBuiltInTypeRepository daoXSD = repositoryFactory.xsdBuiltInTypeRepository();
@@ -59,7 +58,7 @@ public class DataTypeTest {
             String den = tmp.getAttribute("type").replaceAll("Type", "") + ". Type";
 
             try {
-                dao.findOneByDen(den);
+                dataTypeRepository.findOneByDen(den);
             } catch (EmptyResultDataAccessException e) {
                 XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
                 String type = "complex";
@@ -129,9 +128,8 @@ public class DataTypeTest {
     }
 
     public DataType validateInsertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) {
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
         try {
-            return dao.findOneByGuid(id);
+            return dataTypeRepository.findOneByGuid(id);
         } catch (EmptyResultDataAccessException e) {
             System.err.println("Error!" + e.getStackTrace()[0].getLineNumber());
             return null;
@@ -400,7 +398,6 @@ public class DataTypeTest {
     public void validateImportAdditionalBDT() throws Exception {
         XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 
-        DataTypeRepository dao = repositoryFactory.dataTypeRepository();
         NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
 
         for (int i = 0; i < result.getLength(); i++) {
@@ -410,9 +407,9 @@ public class DataTypeTest {
             String den = name.substring(0, name.lastIndexOf("Type")) + ". Type";
             DataType dtVO;
             try {
-                dtVO = dao.findOneByGuidAndDen(guid, den);
+                dtVO = dataTypeRepository.findOneByGuidAndDen(guid, den);
                 // BDT_Primitive_Restriction
-                validateInsertBDTPrimitiveRestriction(dtVO.getDtId(), dao.findOneByGuid(dtVO.getGuid()).getDtId());
+                validateInsertBDTPrimitiveRestriction(dtVO.getDtId(), dataTypeRepository.findOneByGuid(dtVO.getGuid()).getDtId());
             } catch (EmptyResultDataAccessException e) {
                 System.out.println("Error in line # " + new Exception().getStackTrace()[0].getLineNumber());
             }
@@ -469,9 +466,8 @@ public class DataTypeTest {
                 if (simpleType != null) {
                     Node typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + name + "']");
 
-                    DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
                     String typeGuid = ((Element) typeNode).getAttribute("id");
-                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                    DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
 
                     if (dtVO != null) {
                         DataType dVO = validateAddToDTForCodeContentQBDT(dtVO, name, typeNode, xHandler);
@@ -501,9 +497,8 @@ public class DataTypeTest {
                 if (simpleType != null) {
                     Node typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + name + "']");
 
-                    DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
                     String typeGuid = ((Element) typeNode).getAttribute("id");
-                    DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                    DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
 
                     if (dtVO != null) {
                         DataType dVO = validateAddToDTForIDContentQBDT(dtVO, name, typeNode, xHandler);
@@ -545,14 +540,13 @@ public class DataTypeTest {
                     typeNode = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
                 }
 
-                DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
                 String typeGuid = ((Element) typeNode).getAttribute("id");
-                DataType dtVO = aDTDAO.findOneByGuid(typeGuid);
+                DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
 
                 if (dtVO != null) {
 
                     if (dtVO.getQualifier() != null) {
-                        DataType basedtVO = aDTDAO.findOneByDtId(dtVO.getBasedDtId());
+                        DataType basedtVO = dataTypeRepository.findOne(dtVO.getBasedDtId());
                         boolean checkAlready = false;
 
                         if (basedtVO.getDen().equals("Code Content. Type") || basedtVO.getDen().equals("Identifier Content. Type")) {
@@ -675,8 +669,7 @@ public class DataTypeTest {
 
         //To validate bdt_pri_restri,
         //check it inherit base's bdt_pri_restri successfully (except id itself)
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        DataType baseDataType = aDTDAO.findOneByDtId(queriedQBDataType.getBasedDtId());
+        DataType baseDataType = dataTypeRepository.findOne(queriedQBDataType.getBasedDtId());
 
         fromDataType = fromDataType + "type=" + queriedQBDataType.getType()
                 + " version_number=" + queriedQBDataType.getVersionNum()
@@ -746,8 +739,7 @@ public class DataTypeTest {
         denFromDataType = denFromDataType.replaceAll(" ", "");
         denFromDataType = denFromDataType.replace(".Content", "Type");
 
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        DataType baseDataType = aDTDAO.findOneByDtId(queriedQBDataType.getBasedDtId());
+        DataType baseDataType = dataTypeRepository.findOne(queriedQBDataType.getBasedDtId());
 
         fromDataType = fromDataType + "type=" + queriedQBDataType.getType()
                 + " version_number=" + queriedQBDataType.getVersionNum()
@@ -875,8 +867,7 @@ public class DataTypeTest {
             denFromDataType = denFromDataType.replace("String", "");
         }
 
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        DataType baseDataType = aDTDAO.findOneByDtId(queriedQBDataType.getBasedDtId());
+        DataType baseDataType = dataTypeRepository.findOne(queriedQBDataType.getBasedDtId());
         String baseTypeName = "";
         baseTypeName = baseDataType.getContentComponentDen();
         baseTypeName = baseTypeName.replaceAll("_", "");
@@ -1385,8 +1376,7 @@ public class DataTypeTest {
     }
 
     public int getDtId(String DataTypeTerm) {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        DataType dtVO = aDTDAO.findOneByDataTypeTermAndType(DataTypeTerm, 0);
+        DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
         int id = dtVO.getDtId();
         return id;
     }
@@ -1443,28 +1433,24 @@ public class DataTypeTest {
     }
 
     private DataType getDataTypeWithDen(String den) {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
         if (den.equalsIgnoreCase("MatchCode. Type"))
             den = "Match_ Code. Type";
         else if (den.equalsIgnoreCase("Description. Type"))
             den = "Description_ Text. Type";
 
-        return aDTDAO.findOneByTypeAndDen(1, den);
+        return dataTypeRepository.findOneByTypeAndDen(1, den);
     }
 
     private DataType getDataTypeWithRepresentationTerm(String representationTerm) {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        return aDTDAO.findOneByDataTypeTermAndType(representationTerm, 0);
+        return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, 0);
     }
 
     private DataType getDataType(int dtid) {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        return aDTDAO.findOneByDtId(dtid);
+        return dataTypeRepository.findOne(dtid);
     }
 
     private void validate_bdt_pri_resti(String datatype) {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        DataType dataType = aDTDAO.findOneByDen(Utility.typeToDen(datatype));
+        DataType dataType = dataTypeRepository.findOneByDen(Utility.typeToDen(datatype));
         int bdt_id = dataType.getDtId();
         BusinessDataTypePrimitiveRestrictionRepository aBDTPrimitiveRestrictionDAO =
                 repositoryFactory.businessDataTypePrimitiveRestrictionRepository();
@@ -1504,8 +1490,6 @@ public class DataTypeTest {
     }
 
     private void validate_default_bdt() {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-
         List<String> default_bdt = new ArrayList();
         default_bdt.add(Utility.typeToDen("AmountType_0723C8"));
         default_bdt.add(Utility.typeToDen("BinaryObjectType_290B4F"));
@@ -1543,7 +1527,7 @@ public class DataTypeTest {
 
         for (int i = 0; i < default_bdt.size(); i++) {
             try {
-                aDTDAO.findOneByDen(default_bdt.get(i));
+                dataTypeRepository.findOneByDen(default_bdt.get(i));
             } catch (EmptyResultDataAccessException e) {
                 System.err.println("There is no default bdt in dt table : " + default_bdt.get(i));
             }
@@ -1565,8 +1549,7 @@ public class DataTypeTest {
                     aBDTPrimitiveRestriction.findOneByBdtPriRestriId(id);
             int bdt_id = aBusinessDataTypePrimitiveRestriction.getBdtId();
 
-            DataTypeRepository aDT = repositoryFactory.dataTypeRepository();
-            DataType aDataType = aDT.findOneByDtId(bdt_id);
+            DataType aDataType = dataTypeRepository.findOne(bdt_id);
 
             bdtDen = aDataType.getDen();
 
@@ -1588,7 +1571,7 @@ public class DataTypeTest {
             CoreDataTypePrimitive cdtPrimitiveVO = aCDTPrimitive.findOneByCdtPriId(cdtAllowedPrimitiveVO.getCdtPriId());
             cdtPriTerm = cdtPrimitiveVO.getName();
 
-            DataType cdtVO = aDT.findOneByDtId(cdtAllowedPrimitiveVO.getCdtId());
+            DataType cdtVO = dataTypeRepository.findOne(cdtAllowedPrimitiveVO.getCdtId());
             cdtDen = cdtVO.getDen();
 
             XSDBuiltInTypeRepository aXbt = repositoryFactory.xsdBuiltInTypeRepository();
@@ -1604,7 +1587,6 @@ public class DataTypeTest {
     }
 
     private void validteDTSC() {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
         DataTypeSupplementaryComponentRepository aDTSCDAO = repositoryFactory.dataTypeSupplementaryComponentRepository();
 
         List<DataTypeSupplementaryComponent> DTSCList = aDTSCDAO.findAll();
@@ -1621,7 +1603,7 @@ public class DataTypeTest {
                 continue;
             int dt_id = dtscvo.getOwnerDtId();
 
-            DataType ownerDT = aDTDAO.findOneByDtId(dt_id);
+            DataType ownerDT = dataTypeRepository.findOne(dt_id);
             if (ownerDT.getDen().contains("_")) {// if BDT is default BDT
                 DataTypeSupplementaryComponent basedDTscvo = aDTSCDAO.findOneByDtScId(dtscvo.getBasedDtScId());
                 if (basedDTscvo.getOwnerDtId() != ownerDT.getBasedDtId())

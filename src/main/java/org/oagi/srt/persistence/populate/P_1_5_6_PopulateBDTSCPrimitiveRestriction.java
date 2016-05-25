@@ -35,6 +35,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private CodeListRepository codeListRepository;
 
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
+
     public int getAgencyListID() throws Exception {
         AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyIdList.getAgencyIdListId();
@@ -58,7 +61,6 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         CoreDataTypeAllowedPrimitiveRepository aCDTAllowedPrimitiveDAO = repositoryFactory.coreDataTypeAllowedPrimitiveRepository();
         CoreDataTypePrimitiveRepository aCDTPrimitiveDAO = repositoryFactory.coreDataTypePrimitiveRepository();
         XSDBuiltInTypeRepository aXBTDAO = repositoryFactory.xsdBuiltInTypeRepository();
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
 
         List<DataTypeSupplementaryComponent> al = dao.findAll();
         List<DataTypeSupplementaryComponent> al_meta = new ArrayList();
@@ -66,7 +68,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
         } else {
             for (DataTypeSupplementaryComponent aDataTypeSupplementaryComponent : al) {
-                DataType dtVO = aDTDAO.findOneByDtId(aDataTypeSupplementaryComponent.getOwnerDtId());
+                DataType dtVO = dataTypeRepository.findOne(aDataTypeSupplementaryComponent.getOwnerDtId());
 
                 String metalist[] = {"ExpressionType", "ActionExpressionType", "ResponseExpressionType"};
                 for (int k = 0; k < metalist.length; k++) {
@@ -119,8 +121,8 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                 }
 
                 if (!is_fields_xsd) {
-                    DataType dtVO = aDTDAO.findOneByDtId(aDataTypeSupplementaryComponent.getOwnerDtId());
-                    DataType defaultTextBDT = aDTDAO.findOneByDtId(dtVO.getBasedDtId());
+                    DataType dtVO = dataTypeRepository.findOne(aDataTypeSupplementaryComponent.getOwnerDtId());
+                    DataType defaultTextBDT = dataTypeRepository.findOne(dtVO.getBasedDtId());
                     List<DataTypeSupplementaryComponent> baseDTSCs = dao.findByOwnerDtId(defaultTextBDT.getDtId());
 
                     for (int i = 0; i < baseDTSCs.size(); i++) {
@@ -366,14 +368,11 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     }
 
     public String getDen(int id) throws Exception {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-        return aDTDAO.findOneByDtId(id).getDen();
+        return dataTypeRepository.findOne(id).getDen();
     }
 
     public boolean isBDTSC(int id) throws Exception {
-        DataTypeRepository aDTDAO = repositoryFactory.dataTypeRepository();
-
-        DataType tmp = aDTDAO.findOneByDtId(id);
+        DataType tmp = dataTypeRepository.findOne(id);
 
         if (tmp != null && tmp.getType() == 1)
             return true;

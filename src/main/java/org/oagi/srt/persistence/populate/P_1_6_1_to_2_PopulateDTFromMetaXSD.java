@@ -37,9 +37,11 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private DataTypeRepository dataTypeRepository;
 	
 	public void importAdditionalBDT(XPathHandler xh) throws Exception {
-		DataTypeRepository dao = repositoryFactory.dataTypeRepository();
 		DataType dtVO = new DataType();
 
 		NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
@@ -55,7 +57,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 		    
 		    Node extension = xh.getNode("//xsd:complexType[@name = '" + name + "']/xsd:simpleContent/xsd:extension");
 		    String base = Utility.typeToDen(((Element)extension).getAttribute("base"));
-			DataType dtVO_01 = dao.findOneByDen(base);
+			DataType dtVO_01 = dataTypeRepository.findOneByDen(base);
 		    
 		    
 		    dtVO.setBasedDtId(dtVO_01.getDtId());
@@ -83,10 +85,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 			dtVO.setRevisionTrackingNum(0);
 			dtVO.setDeprecated(false);
 			System.out.println("Populating additonal BDTs from meta whose name is "+ name);
-		    dao.save(dtVO);
+			dataTypeRepository.save(dtVO);
 		    
 		    // BDT_Primitive_Restriction
-			insertBDTPrimitiveRestriction(dtVO_01.getDtId(), dao.findOneByGuid(dtVO.getGuid()).getDtId());
+			insertBDTPrimitiveRestriction(dtVO_01.getDtId(), dataTypeRepository.findOneByGuid(dtVO.getGuid()).getDtId());
 	    }
 	}
 	
