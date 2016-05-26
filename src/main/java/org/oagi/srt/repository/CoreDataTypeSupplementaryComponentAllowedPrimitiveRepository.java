@@ -4,6 +4,7 @@ import org.oagi.srt.repository.entity.CoreDataTypeSupplementaryComponentAllowedP
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository
@@ -11,6 +12,9 @@ public interface CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository
 
     @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitive c where c.cdtScId = ?1")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findByCdtScId(int cdtScId);
+
+    @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitive c where c.cdtScId in ?1")
+    public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findByCdtScIdIn(Collection<Integer> cdtScIds);
 
     @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitive c where c.cdtPriId = ?1")
     public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> findByCdtPriId(int cdtPriId);

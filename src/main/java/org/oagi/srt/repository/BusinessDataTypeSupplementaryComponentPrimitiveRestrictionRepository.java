@@ -4,6 +4,7 @@ import org.oagi.srt.repository.entity.BusinessDataTypeSupplementaryComponentPrim
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository extends
@@ -11,6 +12,9 @@ public interface BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepos
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1")
     public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScId(int bdtScId);
+
+    @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId in ?1")
+    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScIdIn(Collection<Integer> bdtScIds);
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1 and b.isDefault = ?2")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndDefault(int bdtScId, boolean isDefault);

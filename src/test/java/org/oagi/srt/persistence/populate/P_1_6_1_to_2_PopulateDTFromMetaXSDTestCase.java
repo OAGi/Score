@@ -1,12 +1,11 @@
 package org.oagi.srt.persistence.populate;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.Application;
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
-import org.oagi.srt.repository.entity.CoreDataTypeAllowedPrimitiveExpressionTypeMap;
-import org.oagi.srt.repository.entity.DataType;
+import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -19,8 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
@@ -37,10 +35,16 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
     @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
+    @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
     @Autowired
     private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypePrimitiveRepository cdtPriRepository;
 
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
@@ -52,7 +56,57 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     @Autowired
+    private CodeListRepository codeListRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
+    private DataType defaultTextBDT;
+
+    private List<String> targetGuids;
+
+    private DataTypeSupplementaryComponent dtScOfTextDefaultBDT;
+
+    private DataType targetTextCDT;
+    private List<CoreDataTypeAllowedPrimitive> targetTextCDTAwdPriList;
+    private List<CoreDataTypePrimitive> targetTextCDTPriList;
+
+    @Before
+    public void setUp() {
+        defaultTextBDT = dtRepository.findOneByDen("Text_0F0ZX1. Type");
+        assertNotNull(defaultTextBDT);
+
+        targetTextCDT = dtRepository.findOneByTypeAndDen(0, "Text. Type");
+        assertNotNull(targetTextCDT);
+
+        assertEquals(defaultTextBDT.getBasedDtId(), targetTextCDT.getDtId());
+
+        targetTextCDTAwdPriList = cdtAwdPriRepository.findByCdtId(targetTextCDT.getDtId());
+        assertEquals(3, targetTextCDTAwdPriList.size());
+
+        targetTextCDTPriList = cdtPriRepository.findByCdtPriIdIn(
+                targetTextCDTAwdPriList.stream()
+                        .mapToInt(CoreDataTypeAllowedPrimitive::getCdtPriId)
+                        .boxed()
+                        .collect(Collectors.toList())
+        );
+
+        List<String> targetTextCDTPriNameList =
+                targetTextCDTPriList.stream().map(CoreDataTypePrimitive::getName).collect(Collectors.toList());
+
+        assertTrue(targetTextCDTPriNameList.contains("NormalizedString"));
+        assertTrue(targetTextCDTPriNameList.contains("String"));
+        assertTrue(targetTextCDTPriNameList.contains("Token"));
+
+        targetGuids = Arrays.asList(
+                "oagis-id-0b8c80e1ef33491eb13c2a2de2db5d77",
+                "oagis-id-c7fd61d128ab4eb5b44e1607359e6510",
+                "oagis-id-9d98ebc34cf543d68b438e5321d21696");
+
+        dtScOfTextDefaultBDT = dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
+                defaultTextBDT.getDtId(), "Language", "Code");
+        assertNotNull(dtScOfTextDefaultBDT);
+    }
 
     private class ExpectedDataType {
         private String guid;
@@ -110,9 +164,6 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                         "The expressionLanguage indicates the expression language being used. In order for the ReturnCriteria expression to be evaluable by the BOD recipient, the recipient must be capable of processing and interpreting the specified expression language. XPath is the default, due to its ubiquity among XML processing technologies. ")
         );
 
-        DataType defaultTextBDT = dtRepository.findOneByDen("Text_0F0ZX1. Type");
-        assertNotNull(defaultTextBDT);
-
         expectedDataTypeList.forEach(expectedDataType -> {
             DataType actualDataType = dtRepository.findOneByGuid(expectedDataType.getGuid());
             assertNotNull(actualDataType);
@@ -166,16 +217,9 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
 
     @Test
     public void test_Populate_bdt_pri_restri_Table() {
-        List<String> targetGuids = Arrays.asList(
-                "oagis-id-0b8c80e1ef33491eb13c2a2de2db5d77",
-                "oagis-id-c7fd61d128ab4eb5b44e1607359e6510",
-                "oagis-id-9d98ebc34cf543d68b438e5321d21696");
-
-        DataType defaultTextBDT = dtRepository.findOneByDen("Text_0F0ZX1. Type");
-        assertNotNull(defaultTextBDT);
         List<BusinessDataTypePrimitiveRestriction> basedBdtPriRestri =
                 bdtPriRestriRepository.findByBdtId(defaultTextBDT.getDtId());
-        assertEquals(3, basedBdtPriRestri.size());
+        assertEquals(targetGuids.size(), basedBdtPriRestri.size());
 
         Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriListMap = basedBdtPriRestri.stream()
                 .collect(Collectors.toMap(
@@ -184,7 +228,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
 
         List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> targetCdtAwdPriXpsTypeMaps =
                 cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriXpsTypeMapIdIn(bdtPriRestriListMap.keySet());
-        assertEquals(3, targetCdtAwdPriXpsTypeMaps.size());
+        assertEquals(targetGuids.size(), targetCdtAwdPriXpsTypeMaps.size());
 
         List<ExpectedBusinessDataTypePrimitiveRestriction> expectedBdtPriRestriList =
                 targetGuids.stream().map(guid ->
@@ -195,7 +239,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                                         bdtPriRestriListMap.get(cdtAwdPriXpsTypeMap.getCdtAwdPriXpsTypeMapId()).isDefault()
                                 )).collect(Collectors.toList())
                 ).flatMap(e -> e.stream()).collect(Collectors.toList());
-        assertEquals(9, expectedBdtPriRestriList.size());
+        assertEquals(targetGuids.size() * targetTextCDTAwdPriList.size(), expectedBdtPriRestriList.size());
 
         expectedBdtPriRestriList.forEach(expectedBdtPriRestri -> {
             BusinessDataTypePrimitiveRestriction actualBdtPriRestri =
@@ -205,26 +249,297 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                     );
             assertNotNull(actualBdtPriRestri);
             assertEquals(expectedBdtPriRestri.isDefault(), actualBdtPriRestri.isDefault());
+
+            CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
+                    cdtAwdPriXpsTypeMapRepository.findOne(actualBdtPriRestri.getCdtAwdPriXpsTypeMapId());
+            XSDBuiltInType xbt = xbtRepository.findOne(cdtAwdPriXpsTypeMap.getXbtId());
+
+            if (actualBdtPriRestri.isDefault()) {
+                assertEquals("xsd:token", xbt.getBuiltInType());
+            } else {
+                assertTrue(Arrays.asList("xsd:normalizedString", "xsd:string").contains(xbt.getBuiltInType()));
+            }
         });
     }
 
     @Test
     public void test_PopulateSCinThe_dt_sc_Table() {
+        List<DataType> targetDataTypes = dtRepository.findByGuidIn(targetGuids);
+        assertEquals(3, targetDataTypes.size());
 
+        targetDataTypes.forEach(dataType -> {
+            DataTypeSupplementaryComponent actualLanguageCodeDtSc =
+                    dtScRepository.findOneByOwnerDtIdAndBasedDtScId(dataType.getDtId(), dtScOfTextDefaultBDT.getDtScId());
+            assertNotNull(actualLanguageCodeDtSc);
+
+            assertEquals(dtScOfTextDefaultBDT.getPropertyTerm(), actualLanguageCodeDtSc.getPropertyTerm());
+            assertEquals(dtScOfTextDefaultBDT.getRepresentationTerm(), actualLanguageCodeDtSc.getRepresentationTerm());
+            assertEquals(dtScOfTextDefaultBDT.getDefinition(), actualLanguageCodeDtSc.getDefinition());
+            assertEquals(dtScOfTextDefaultBDT.getMinCardinality(), actualLanguageCodeDtSc.getMinCardinality());
+            assertEquals(0, actualLanguageCodeDtSc.getMaxCardinality());
+
+            List<DataTypeSupplementaryComponent> actualDtScList = dtScRepository.findByOwnerDtId(dataType.getDtId());
+            switch (dataType.getDen()) {
+                case "Expression. Type":
+                    assertEquals(2, actualDtScList.size());
+                    actualDtScList.forEach(actualDtSc -> {
+                        if (dtScOfTextDefaultBDT.getPropertyTerm().equals(actualDtSc.getPropertyTerm())) {
+                            return;
+                        }
+
+                        assertEquals("oagis-id-99f7c6c49493417191e281586fbe9223", actualDtSc.getGuid());
+                        test_PopulateSCinThe_dt_sc_Table_for_details(actualDtSc, "expressionLanguage", "optional");
+                    });
+                    break;
+                case "Action Expression. Type":
+                    assertEquals(3, actualDtScList.size());
+                    actualDtScList.forEach(actualDtSc -> {
+                        if (dtScOfTextDefaultBDT.getPropertyTerm().equals(actualDtSc.getPropertyTerm())) {
+                            return;
+                        }
+
+                        switch(actualDtSc.getGuid()) {
+                            case "oagis-id-c05ff56ed80d42d59fdeabddb5891126":
+                                test_PopulateSCinThe_dt_sc_Table_for_details(actualDtSc, "actionCode", "required");
+                                break;
+                            case "oagis-id-314bd79fb54147c993bafd54d37101aa":
+                                test_PopulateSCinThe_dt_sc_Table_for_details(actualDtSc, "expressionLanguage", "optional");
+                                break;
+                            default:
+                                throw new AssertionError();
+                        }
+                    });
+                    break;
+                case "Response Expression. Type":
+                    assertEquals(3, actualDtScList.size());
+                    actualDtScList.forEach(actualDtSc -> {
+                        if (dtScOfTextDefaultBDT.getPropertyTerm().equals(actualDtSc.getPropertyTerm())) {
+                            return;
+                        }
+
+                        switch(actualDtSc.getGuid()) {
+                            case "oagis-id-1c020ca70a2440a0b490fabaed6100a5":
+                                test_PopulateSCinThe_dt_sc_Table_for_details(actualDtSc, "actionCode", "required");
+                                break;
+                            case "oagis-id-d3f9ec6ec1974ffd93168e4d39262ed1":
+                                test_PopulateSCinThe_dt_sc_Table_for_details(actualDtSc, "expressionLanguage", "optional");
+                                break;
+                            default:
+                                throw new AssertionError();
+                        }
+                    });
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+        });
+    }
+
+    private void test_PopulateSCinThe_dt_sc_Table_for_details(DataTypeSupplementaryComponent actualDtSc,
+                                                              String expectedName, String expectedUse) {
+        switch (expectedName) {
+            case "expressionLanguage":
+                assertEquals("Expression Language", actualDtSc.getPropertyTerm());
+                assertEquals("Text", actualDtSc.getRepresentationTerm());
+                break;
+            case "actionCode":
+                assertEquals("Action", actualDtSc.getPropertyTerm());
+                assertEquals("Code", actualDtSc.getRepresentationTerm());
+                break;
+        }
+
+        switch (expectedUse) {
+            case "optional":
+                assertEquals(0, actualDtSc.getMinCardinality());
+                assertEquals(1, actualDtSc.getMaxCardinality());
+                break;
+            case "required":
+                assertEquals(1, actualDtSc.getMinCardinality());
+                assertEquals(1, actualDtSc.getMaxCardinality());
+                break;
+            case "prohibited":
+                assertEquals(0, actualDtSc.getMinCardinality());
+                assertEquals(0, actualDtSc.getMaxCardinality());
+                break;
+        }
+
+        assertEquals(0, actualDtSc.getBasedDtScId());
     }
 
     @Test
     public void test_Populate_cdt_sc_awd_pri_Table() {
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList = retrieveActualCdtScAwdPriList();
+        actualCdtScAwdPriList.forEach(cdtScAwdPri -> {
+            if (cdtScAwdPri.isDefault()) {
+                assertEquals("Token", cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName());
+            } else {
+                assertTrue(Arrays.asList("NormalizedString", "String")
+                        .contains(cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName()));
+            }
+        });
+    }
 
+    private List<CoreDataTypeSupplementaryComponentAllowedPrimitive> retrieveActualCdtScAwdPriList() {
+        int expectedDtScSize = 8; // it determines from the above testing, 'test_PopulateSCinThe_dt_sc_Table'
+        List<Integer> targetDtIds =
+                dtRepository.findByGuidIn(targetGuids).stream()
+                        .mapToInt(DataType::getDtId).boxed().collect(Collectors.toList());
+        List<DataTypeSupplementaryComponent> actualDtScList = dtScRepository.findByOwnerDtIdIn(targetDtIds);
+        assertEquals(expectedDtScSize, actualDtScList.size());
+
+        /*
+         * If the DataType has a based_dt_sc_id, it omits for insertion in cdt_sc_awd_pri
+         */
+        List<DataTypeSupplementaryComponent> targetDtScList =
+                actualDtScList.stream().filter(dt -> dt.getBasedDtScId() == 0).collect(Collectors.toList());
+
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList =
+                cdtScAwdPriRepository.findByCdtScIdIn(
+                        targetDtScList.stream()
+                                .mapToInt(DataTypeSupplementaryComponent::getDtScId)
+                                .boxed()
+                                .collect(Collectors.toList())
+                );
+
+        int expectedCdtScAwdPriSize = targetDtScList.size() * targetTextCDTAwdPriList.size();
+        assertEquals(expectedCdtScAwdPriSize, actualCdtScAwdPriList.size());
+
+        return actualCdtScAwdPriList;
     }
 
     @Test
     public void test_Populate_cdt_sc_awd_pri_xps_type_map_Table() {
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList = retrieveActualCdtScAwdPriList();
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> actualCdtScAwdPriXpsTypeMapList =
+                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                        actualCdtScAwdPriList.stream()
+                                .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                                .boxed()
+                                .collect(Collectors.toList())
+                );
 
+        List<XSDBuiltInType> actualXbtList = xbtRepository.findByXbtIdIn(
+                actualCdtScAwdPriXpsTypeMapList.stream()
+                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getXbtId)
+                        .boxed()
+                        .collect(Collectors.toList())
+        );
+        List<String> expectedXbtBuiltInTypes = Arrays.asList("xsd:string", "xsd:normalizedString", "xsd:token");
+        actualXbtList.forEach(xbt -> {
+            assertTrue(expectedXbtBuiltInTypes.contains(xbt.getBuiltInType()));
+        });
     }
 
     @Test
     public void test_PopulateThe_bdt_sc_pri_restri_Table() {
+        List<DataType> targetDtList = dtRepository.findByGuidIn(targetGuids);
+        List<DataTypeSupplementaryComponent> targetDtScList = dtScRepository.findByOwnerDtIdIn(
+                targetDtList.stream()
+                        .mapToInt(DataType::getDtId)
+                        .boxed()
+                        .collect(Collectors.toList())
+        );
+        Map<Integer, DataTypeSupplementaryComponent> targetDtScMap =
+                targetDtScList.stream().collect(Collectors.toMap(DataTypeSupplementaryComponent::getDtScId, Function.identity()));
 
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriList =
+                bdtScPriRestriRepository.findByBdtScIdIn(
+                        targetDtScList.stream()
+                                .mapToInt(DataTypeSupplementaryComponent::getDtScId)
+                                .boxed()
+                                .collect(Collectors.toList())
+                );
+
+        /*
+         * 'Language Code' Part
+         */
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> expectedInheritedBdtScPriRestriListForLanguageCode =
+                bdtScPriRestriRepository.findByBdtScId(dtScOfTextDefaultBDT.getDtScId());
+
+        CodeList expectedCodeListOfBdtScPriRestriForLanguageCode =
+                codeListRepository.findOneByName("clm56392A20081107_LanguageCode");
+
+        // check rows of count
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriListForLanguageCode =
+                actualBdtScPriRestriList.stream().filter(bdtScPriRestri -> {
+                    DataTypeSupplementaryComponent actualDtSc = targetDtScMap.get(bdtScPriRestri.getBdtScId());
+                    return "Language".equals(actualDtSc.getPropertyTerm());
+                }).collect(Collectors.toList());
+        assertEquals(
+                (expectedInheritedBdtScPriRestriListForLanguageCode.size() + 1) * targetGuids.size(),
+                actualBdtScPriRestriListForLanguageCode.size());
+
+        // check rows of value
+        int expectedSumValueForLanguageCode = (expectedInheritedBdtScPriRestriListForLanguageCode.stream()
+                .mapToInt(bdtScPriRestri ->
+                        (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() +
+                                bdtScPriRestri.getCodeListId() + (bdtScPriRestri.isDefault() ? 1 : 0))
+                )
+                .sum() + expectedCodeListOfBdtScPriRestriForLanguageCode.getCodeListId()) * targetGuids.size();
+
+        int actualSumValueForLanguageCode = actualBdtScPriRestriListForLanguageCode
+                .stream()
+                .mapToInt(bdtScPriRestri ->
+                        (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() +
+                                bdtScPriRestri.getCodeListId() + (bdtScPriRestri.isDefault() ? 1 : 0))
+                )
+                .sum();
+
+        assertEquals(expectedSumValueForLanguageCode, actualSumValueForLanguageCode);
+
+        expectedInheritedBdtScPriRestriListForLanguageCode.forEach(bdtScPriRestri -> {
+            if (bdtScPriRestri.isDefault()) {
+                assertEquals("xsd:token",
+                        xbtRepository.findOne(
+                                cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
+                        ).getBuiltInType());
+            } else {
+                assertTrue(Arrays.asList("xsd:string", "xsd:normalizedString").contains(
+                        xbtRepository.findOne(
+                                cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
+                        ).getBuiltInType())
+                );
+            }
+        });
+
+        /*
+         * 'Expression Language' Part
+         */
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriListForExpressionLanguage =
+                actualBdtScPriRestriList.stream().filter(bdtScPriRestri -> {
+                    DataTypeSupplementaryComponent actualDtSc = targetDtScMap.get(bdtScPriRestri.getBdtScId());
+                    return "Expression Language".equals(actualDtSc.getPropertyTerm());
+                }).collect(Collectors.toList());
+
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> targetCdtScAwdPriListForExpressionLanguage =
+                cdtScAwdPriRepository.findByCdtScIdIn(
+                        actualBdtScPriRestriListForExpressionLanguage.stream()
+                                .mapToInt(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId)
+                                .boxed()
+                                .collect(Collectors.toList())
+                );
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> targetCdtScAwdPriXpsTypeMapListForExpressionLanguage =
+                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                targetCdtScAwdPriListForExpressionLanguage.stream()
+                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                        .boxed()
+                        .collect(Collectors.toList())
+        );
+        // check rows of count
+        assertEquals(targetCdtScAwdPriXpsTypeMapListForExpressionLanguage.size(), actualBdtScPriRestriListForExpressionLanguage.size());
+
+        // check rows of value
+        int actualSumValueForExpressionLanguage = actualBdtScPriRestriListForExpressionLanguage.stream()
+                .mapToInt(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
+                .sum();
+        int expectedActionCodeCount = 2;
+        int expectedSumValueForExpressionLanguage = targetCdtScAwdPriXpsTypeMapListForExpressionLanguage.stream()
+                .mapToInt(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
+                .sum() * expectedActionCodeCount;
+        assertEquals(expectedSumValueForExpressionLanguage, actualSumValueForExpressionLanguage);
+
+        /*
+         * 'Action Code' Part
+         */
     }
 }
