@@ -1454,7 +1454,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedCodeListValue(null, "2007", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2008", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2009", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
-                new ExpectedCodeListValue(null, "2013", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
+                new ExpectedCodeListValue(null, "2012", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2013", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2014", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2015", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
@@ -1561,7 +1561,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedCodeListValue(null, "2256", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2257", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
                 new ExpectedCodeListValue(null, "2258", "oagis-id-369bb5cf4149492e84fb5b070a98a12b"),
-                new ExpectedCodeListValue(null, "2259", "oagis-id-8274b2e56a8941a6a235bb1faf227e74")
+                new ExpectedCodeListValue(null, "2259", "oagis-id-369bb5cf4149492e84fb5b070a98a12b")
         );
 
         assertEquals(877, expectedCodeListValues.size());
@@ -1574,7 +1574,9 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
 
             CodeListValue codeListValue =
                     codeListValueRepository.findOneByCodeListIdAndValue(codeList.getCodeListId(), expectedCodeListValue.getValue());
-            assertNotNull(codeListValue);
+            assertNotNull("It must be exist. Code List ID: " + codeList.getCodeListId() +
+                    " and Code List Value: " + expectedCodeListValue.getValue(),
+                    codeListValue);
         });
     }
 }
