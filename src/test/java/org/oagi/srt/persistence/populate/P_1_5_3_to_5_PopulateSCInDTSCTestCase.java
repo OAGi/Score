@@ -5,9 +5,14 @@ import org.junit.runner.RunWith;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
+import org.oagi.srt.repository.CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
+import org.oagi.srt.repository.CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
 import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.DataTypeSupplementaryComponentRepository;
+import org.oagi.srt.repository.entity.CoreDataTypeSupplementaryComponentAllowedPrimitive;
+import org.oagi.srt.repository.entity.CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap;
 import org.oagi.srt.repository.entity.DataType;
+import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -21,7 +26,9 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,80 +40,89 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
 @WebIntegrationTest
-public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
-    @Autowired
-    private DataTypeSupplementaryComponentRepository dataTypeSupplementaryComponentRepository;
-
-    private class ExpectedDataTypeSupplementaryComponent {
-        private String guid;
-        private String attributeName;
-        private String type;
-        private String definition;
-        private String use;
-
-        public ExpectedDataTypeSupplementaryComponent(String guid, String attributeName) throws Exception {
-            this.guid = guid;
-            this.attributeName = attributeName;
-
-            boolean isDefaultBDTSC = true;
-            XPathHandler fieldsXP = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
-            XPathHandler bizDTXP = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-            XPathHandler xbtXP = new XPathHandler(SRTConstants.XBT_FILE_PATH);
-
-            Node aDTSCNode = bizDTXP.getNode("//xsd:complexType//xsd:attribute[@id='" + guid + "']");
-            if (aDTSCNode == null) {
-                aDTSCNode = fieldsXP.getNode("//xsd:complexType//xsd:attribute[@id='" + guid + "']");
-                isDefaultBDTSC = false;
-            }
-
-            Element aDTSCElem = (Element) aDTSCNode;
-            type = aDTSCElem.getAttribute("type");
-
-            if (isDefaultBDTSC) {
-                Node defNode = bizDTXP.getNode("//xsd:complexType//xsd:attribute[@id='" + guid + "']//xsd:documentation/ccts_definition");
-                definition = defNode.getTextContent();
-            } else {
-                Node defNode = fieldsXP.getNode("//xsd:complexType//xsd:attribute[@id='" + guid + "']//xsd:documentation");
-                definition = defNode.getTextContent();
-            }
-            use = aDTSCElem.getAttribute("use");
-        }
-    }
-
-    @Test
-    public void testPopulateDTSCTable() throws Exception {
-        Map<String, ExpectedDataTypeSupplementaryComponent> expectedDTSCs = new HashMap();
-
-        expectedDTSCs.put("oagis-id-0dd62519460d4a91bfdbc1f7778befac", new ExpectedDataTypeSupplementaryComponent("oagis-id-0dd62519460d4a91bfdbc1f7778befac", "currencyCode"));
-        expectedDTSCs.put("oagis-id-4b87790af2ea49a7a5d1f92dec29335f", new ExpectedDataTypeSupplementaryComponent("oagis-id-4b87790af2ea49a7a5d1f92dec29335f", "mimeCode"));
-        expectedDTSCs.put("oagis-id-88d1b6e5f2d94dbda4d08793249cd878", new ExpectedDataTypeSupplementaryComponent("oagis-id-88d1b6e5f2d94dbda4d08793249cd878", "characterSetCode"));
-        expectedDTSCs.put("oagis-id-8ca03283b2ec469598af6bb115cf0bf2", new ExpectedDataTypeSupplementaryComponent("oagis-id-8ca03283b2ec469598af6bb115cf0bf2", "filenameName"));
-        expectedDTSCs.put("oagis-id-a269304987de4f3a845be02a78df41ae", new ExpectedDataTypeSupplementaryComponent("oagis-id-a269304987de4f3a845be02a78df41ae", "listID"));
-        expectedDTSCs.put("oagis-id-6521de84253e4428adfd742cc8cd4603", new ExpectedDataTypeSupplementaryComponent("oagis-id-6521de84253e4428adfd742cc8cd4603", "listAgencyID"));
-        expectedDTSCs.put("oagis-id-118b994c3a7b45f3b0f4f37d184cf0a6", new ExpectedDataTypeSupplementaryComponent("oagis-id-118b994c3a7b45f3b0f4f37d184cf0a6", "listVersionID"));
-        expectedDTSCs.put("oagis-id-deb5c8ba87004cd49e57010ad3ece3af", new ExpectedDataTypeSupplementaryComponent("oagis-id-deb5c8ba87004cd49e57010ad3ece3af", "mimeCode"));
-        expectedDTSCs.put("oagis-id-318dae29eff94cbc9c172448ce54fb34", new ExpectedDataTypeSupplementaryComponent("oagis-id-318dae29eff94cbc9c172448ce54fb34", "characterSetCode"));
-        expectedDTSCs.put("oagis-id-600fb9b394aa44c2ad17be7ce8aa2396", new ExpectedDataTypeSupplementaryComponent("oagis-id-600fb9b394aa44c2ad17be7ce8aa2396", "filenameName"));
-        expectedDTSCs.put("oagis-id-3233f3fb57c9482fb39255be78c495af", new ExpectedDataTypeSupplementaryComponent("oagis-id-3233f3fb57c9482fb39255be78c495af", "schemeID"));
-        expectedDTSCs.put("oagis-id-59ee9c5aa80641d7a0d78f5418ebcfa4", new ExpectedDataTypeSupplementaryComponent("oagis-id-59ee9c5aa80641d7a0d78f5418ebcfa4", "schemeVersionID"));
-        expectedDTSCs.put("oagis-id-cb2ac5b98b0847e785de08756c29de85", new ExpectedDataTypeSupplementaryComponent("oagis-id-cb2ac5b98b0847e785de08756c29de85", "schemeAgencyID"));
-        expectedDTSCs.put("oagis-id-d83591f0ee35430f95172883718499ff", new ExpectedDataTypeSupplementaryComponent("oagis-id-d83591f0ee35430f95172883718499ff", "unitCode"));
-        expectedDTSCs.put("oagis-id-42e59d799de147b8ab49c8a27ec85ff1", new ExpectedDataTypeSupplementaryComponent("oagis-id-42e59d799de147b8ab49c8a27ec85ff1", "languageCode"));
-        expectedDTSCs.put("oagis-id-9b0fbfcf9ac244b29dc8c7281607dc90", new ExpectedDataTypeSupplementaryComponent("oagis-id-9b0fbfcf9ac244b29dc8c7281607dc90", "unitCode"));
-        expectedDTSCs.put("oagis-id-7b304c647a924ce7973753eecdcb5d79", new ExpectedDataTypeSupplementaryComponent("oagis-id-7b304c647a924ce7973753eecdcb5d79", "mimeCode"));
-        expectedDTSCs.put("oagis-id-8bbefdeaf55d4daab08a48f32e0f4796", new ExpectedDataTypeSupplementaryComponent("oagis-id-8bbefdeaf55d4daab08a48f32e0f4796", "characterSetCode"));
-        expectedDTSCs.put("oagis-id-d6688838cedb4fd7aae20626c2ef27b0", new ExpectedDataTypeSupplementaryComponent("oagis-id-d6688838cedb4fd7aae20626c2ef27b0", "filenameName"));
-        expectedDTSCs.put("oagis-id-c8d0c7094d7d4fbeb7e50fd20a17c1b3", new ExpectedDataTypeSupplementaryComponent("oagis-id-c8d0c7094d7d4fbeb7e50fd20a17c1b3", "languageCode"));
-        expectedDTSCs.put("oagis-id-2c6f9ff650c24bfdbd0c49ac67de13bd", new ExpectedDataTypeSupplementaryComponent("oagis-id-2c6f9ff650c24bfdbd0c49ac67de13bd", "mimeCode"));
-        expectedDTSCs.put("oagis-id-b558001026164520b5ddda71d6360b09", new ExpectedDataTypeSupplementaryComponent("oagis-id-b558001026164520b5ddda71d6360b09", "characterSetCode"));
-        expectedDTSCs.put("oagis-id-3a765939c131448da1858fd6f1c339db", new ExpectedDataTypeSupplementaryComponent("oagis-id-3a765939c131448da1858fd6f1c339db", "filenameName"));
-        expectedDTSCs.put("oagis-id-84fa20db74b942449e1885cff79b24df", new ExpectedDataTypeSupplementaryComponent("oagis-id-84fa20db74b942449e1885cff79b24df", "sequenceNumber"));
-
+public class P_1_5_3_to_5_PopulateSCInDTSCTestCase {
+	 @Autowired
+	 private DataTypeSupplementaryComponentRepository dataTypeSupplementaryComponentRepository;
+	
+	 @Autowired	
+	 private DataTypeRepository dataTypeRepository;
+	 
+	 @Autowired
+	 private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtSCAllowedPrimitiveRepository;
+	 
+	 @Autowired
+	 private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAllowedPrimitiveExpressionTypeMapRepository;
+	 
+	 private class ExpectedNewDataTypeSupplementaryComponent {
+		 private String guid;
+		 private String attributeName;
+		 private String type;
+		 private String definition;
+		 private String use;
+		 XPathHandler fieldsXP = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+         XPathHandler bizDTXP = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+		 
+		 public ExpectedNewDataTypeSupplementaryComponent(String guid, String attributeName) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+			 this.guid=guid;
+			 this.attributeName=attributeName;
+			 
+			 boolean isDefaultBDTSC=true;
+			 
+             XPathHandler xbtXP = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+			 
+             Node aDTSCNode = bizDTXP.getNode("//xsd:complexType//xsd:attribute[@id='"+guid+"']");
+             if(aDTSCNode==null){
+             	aDTSCNode = fieldsXP.getNode("//xsd:complexType//xsd:attribute[@id='"+guid+"']");
+             	isDefaultBDTSC=false;
+             }
+			 
+             Element aDTSCElem = (Element) aDTSCNode;
+             type = aDTSCElem.getAttribute("type");
+             
+             if(isDefaultBDTSC){
+            	Node defNode =  bizDTXP.getNode("//xsd:complexType//xsd:attribute[@id='"+guid+"']//xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+            	definition = defNode.getTextContent();
+             }
+             else {
+            	 Node defNode =  fieldsXP.getNode("//xsd:complexType//xsd:attribute[@id='"+guid+"']//xsd:documentation");
+            	 definition = defNode.getTextContent();
+             }
+             use = aDTSCElem.getAttribute("use");
+		 }
+	 }
+	 
+	 @Test
+	 public void testPopulateNewDTSCsFromAttribute() throws XPathExpressionException, ParserConfigurationException, SAXException, IOException{
+	        Map<String, ExpectedNewDataTypeSupplementaryComponent> expectedDTSCs = new HashMap();
 	        
-	        
+	        expectedDTSCs.put("oagis-id-0dd62519460d4a91bfdbc1f7778befac", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-0dd62519460d4a91bfdbc1f7778befac","currencyCode"));
+	        expectedDTSCs.put("oagis-id-4b87790af2ea49a7a5d1f92dec29335f", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-4b87790af2ea49a7a5d1f92dec29335f","mimeCode"));
+	        expectedDTSCs.put("oagis-id-88d1b6e5f2d94dbda4d08793249cd878", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-88d1b6e5f2d94dbda4d08793249cd878","characterSetCode"));
+	        expectedDTSCs.put("oagis-id-8ca03283b2ec469598af6bb115cf0bf2", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-8ca03283b2ec469598af6bb115cf0bf2","filenameName"));
+	        expectedDTSCs.put("oagis-id-a269304987de4f3a845be02a78df41ae", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-a269304987de4f3a845be02a78df41ae","listID"));
+	        expectedDTSCs.put("oagis-id-6521de84253e4428adfd742cc8cd4603", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-6521de84253e4428adfd742cc8cd4603","listAgencyID"));
+	        expectedDTSCs.put("oagis-id-118b994c3a7b45f3b0f4f37d184cf0a6", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-118b994c3a7b45f3b0f4f37d184cf0a6","listVersionID"));
+	        expectedDTSCs.put("oagis-id-deb5c8ba87004cd49e57010ad3ece3af", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-deb5c8ba87004cd49e57010ad3ece3af","mimeCode"));
+	        expectedDTSCs.put("oagis-id-318dae29eff94cbc9c172448ce54fb34", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-318dae29eff94cbc9c172448ce54fb34","characterSetCode"));
+	        expectedDTSCs.put("oagis-id-600fb9b394aa44c2ad17be7ce8aa2396", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-600fb9b394aa44c2ad17be7ce8aa2396","filenameName"));
+	        expectedDTSCs.put("oagis-id-3233f3fb57c9482fb39255be78c495af", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-3233f3fb57c9482fb39255be78c495af","schemeID"));
+	        expectedDTSCs.put("oagis-id-59ee9c5aa80641d7a0d78f5418ebcfa4", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-59ee9c5aa80641d7a0d78f5418ebcfa4","schemeVersionID"));
+	        expectedDTSCs.put("oagis-id-cb2ac5b98b0847e785de08756c29de85", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-cb2ac5b98b0847e785de08756c29de85","schemeAgencyID"));
+	        expectedDTSCs.put("oagis-id-d83591f0ee35430f95172883718499ff", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-d83591f0ee35430f95172883718499ff","unitCode"));
+	        expectedDTSCs.put("oagis-id-42e59d799de147b8ab49c8a27ec85ff1", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-42e59d799de147b8ab49c8a27ec85ff1","languageCode"));
+	        expectedDTSCs.put("oagis-id-9b0fbfcf9ac244b29dc8c7281607dc90", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-9b0fbfcf9ac244b29dc8c7281607dc90","unitCode"));
+	        expectedDTSCs.put("oagis-id-7b304c647a924ce7973753eecdcb5d79", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-7b304c647a924ce7973753eecdcb5d79","mimeCode"));
+	        expectedDTSCs.put("oagis-id-8bbefdeaf55d4daab08a48f32e0f4796", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-8bbefdeaf55d4daab08a48f32e0f4796","characterSetCode"));
+	        expectedDTSCs.put("oagis-id-d6688838cedb4fd7aae20626c2ef27b0", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-d6688838cedb4fd7aae20626c2ef27b0","filenameName"));
+	        expectedDTSCs.put("oagis-id-c8d0c7094d7d4fbeb7e50fd20a17c1b3", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-c8d0c7094d7d4fbeb7e50fd20a17c1b3","languageCode"));
+	        expectedDTSCs.put("oagis-id-2c6f9ff650c24bfdbd0c49ac67de13bd", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-2c6f9ff650c24bfdbd0c49ac67de13bd","mimeCode"));
+	        expectedDTSCs.put("oagis-id-b558001026164520b5ddda71d6360b09", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-b558001026164520b5ddda71d6360b09","characterSetCode"));
+	        expectedDTSCs.put("oagis-id-3a765939c131448da1858fd6f1c339db", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-3a765939c131448da1858fd6f1c339db","filenameName"));
+	        expectedDTSCs.put("oagis-id-84fa20db74b942449e1885cff79b24df", new ExpectedNewDataTypeSupplementaryComponent("oagis-id-84fa20db74b942449e1885cff79b24df","sequenceNumber"));
+
 	        /*
-                //xsd:complexType[@id='oagis-id-109055a967bd4cf19ee3320755b01f8d']//xsd:attribute |
+		        //xsd:complexType[@id='oagis-id-109055a967bd4cf19ee3320755b01f8d']//xsd:attribute | 
 				//xsd:complexType[@id='oagis-id-f2c5dcba0088440d866ea23a81876280']//xsd:attribute | 
 				//xsd:complexType[@id='oagis-id-9ec6be30dabf45d5b53b765634be2412']//xsd:attribute | 
 				//xsd:complexType[@id='oagis-id-dc994532fe464847acf84a54548276ff']//xsd:attribute | 
@@ -194,7 +210,166 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
 				//xsd:complexType[@id='oagis-id-5646bf52a97b48adb50ded6ff8c38354']//xsd:attribute | 
 				//xsd:complexType[@id='oagis-id-08d6ade226fd42488b53c0815664e246']//xsd:attribute 
 			*/
+	        
+	        for(Map.Entry<String, ExpectedNewDataTypeSupplementaryComponent> entry: expectedDTSCs.entrySet()){
+	        	String key = entry.getKey();
+	        	ExpectedNewDataTypeSupplementaryComponent value = entry.getValue();
+	        	boolean isDefaultBDT = false;
+	        	DataTypeSupplementaryComponent dtsc = dataTypeSupplementaryComponentRepository.findOneByGuid(key);
+	        	DataType baseDT = dataTypeRepository.findOne(dtsc.getOwnerDtId());
+	        	if(baseDT.getDen().contains("_")){
+	        		isDefaultBDT = true;
+	        	}
+	        	
+	        	assertTrue(dtsc!=null);
+	        	
+	        	int dtscMinCard = dtsc.getMinCardinality();
+	        	int dtscMaxCard = dtsc.getMaxCardinality();
+	        	String dtscDefinition = dtsc.getDefinition();
+	        	String dtscPropertyTerm = dtsc.getPropertyTerm();
+	        	String dtscRepresentationTerm = dtsc.getRepresentationTerm();
+	        	
+	        	String expectedPropertyTerm = Utility.getPropertyTerm(value.attributeName);
+	        	String expectedRepresentationTerm = Utility.getRepresentationTerm(value.attributeName);
+	        	int expectedMinCard=-1;
+	        	int expectedMaxCard=-1;
+	        	
+	        	if(value.use.equalsIgnoreCase("optional")){
+	        		expectedMinCard = 0;
+	        		expectedMaxCard = 1;
+	        	}
+	        	else if (value.use.equalsIgnoreCase("required")){
+	        		expectedMinCard = 1;
+	        		expectedMaxCard = 1;
+	        	}
+	        	else if (value.use.equalsIgnoreCase("prohibited")){
+	        		expectedMinCard = 0;
+	        		expectedMaxCard = 0;
+	        	}
+	        	else if(value.use==null || value.use.equals("")){
+	        		expectedMinCard = 0;
+	        		expectedMaxCard = 1;
+	        	}
+	        	assertTrue(expectedMinCard!=-1);
+	        	assertTrue(expectedMaxCard!=-1);
+        	
+	        	if(isDefaultBDT){
+	        		DataTypeSupplementaryComponent baseDTSC = dataTypeSupplementaryComponentRepository.findOne(dtsc.getBasedDtScId());
+	        		expectedPropertyTerm = baseDTSC.getPropertyTerm();
+	        		expectedRepresentationTerm = baseDTSC.getRepresentationTerm();
+	        	}
+	        	
+	        	assertEquals(expectedPropertyTerm, dtscPropertyTerm);
+	        	assertEquals(expectedRepresentationTerm, dtscRepresentationTerm);
+	        	assertEquals(expectedMinCard, dtscMinCard);
+	        	assertEquals(expectedMaxCard, dtscMaxCard);
+	        }
+	 }
+	 
+	 
+	 
+	 @Test
+	 public void testPopulateDTSCsFromBase() throws XPathExpressionException, ParserConfigurationException, SAXException, IOException{
+		 XPathHandler fieldsXP = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+         XPathHandler bizDTXP = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);   
+		 
+	       List<DataTypeSupplementaryComponent> dtscList = dataTypeSupplementaryComponentRepository.findAll();
+	       
+	       for(int i=0; i<dtscList.size(); i++){
+			   DataTypeSupplementaryComponent aDTSC= dtscList.get(i);
+			   
+	    	   if(aDTSC.getOwnerDtId() > 23){ // There are 23 CDT
+	    		   boolean isDefaultBDTSC = false;
+	    		   DataType ownerDT = dataTypeRepository.findOne(aDTSC.getOwnerDtId());
+	    		   if(ownerDT.getBasedDtId() < 24) {
+	    			   isDefaultBDTSC = true;
+	    		   }
+	    		   //check whether it is inherited or new(redefined)
+	    		   Node exist = bizDTXP.getNode("//xsd:attribute[@id='"+aDTSC.getGuid()+"']");
+	    		   if(exist==null){
+	    			   exist=fieldsXP.getNode("//xsd:attribute[@id='"+aDTSC.getGuid()+"']");
+	    		   }
+	    		   
+	    		   if(exist==null){// if it exists, we already check it in testPopulateNewDTSCsFromAttribute()
+	    			   DataTypeSupplementaryComponent baseDTSC  = dataTypeSupplementaryComponentRepository.findOne(aDTSC.getBasedDtScId());
+	    			   
+	    			   assertTrue(baseDTSC!=null);
+	    			   assertEquals(baseDTSC.getPropertyTerm(), aDTSC.getPropertyTerm());
+	    			   assertEquals(baseDTSC.getRepresentationTerm(), aDTSC.getRepresentationTerm());
+	    			   assertEquals(baseDTSC.getDefinition(), aDTSC.getDefinition());
+	    			   
+	    			   if(isDefaultBDTSC) {
+		    			   assertEquals(0, aDTSC.getMinCardinality());
+		    			   assertEquals(0, aDTSC.getMaxCardinality());
+	    			   }
+	    			   else {
+	    				   assertEquals(baseDTSC.getMinCardinality(), aDTSC.getMinCardinality());
+		    			   assertEquals(baseDTSC.getMaxCardinality(), aDTSC.getMaxCardinality());
+	    			   }
+	    		   }
+	    	   }
+	       }
+ 
+	 }
+	 
+	 private class ExpectedInheritedCDTSCAllowedPrimitiveAndXpsTypeMap {
+		 
+		 private int cdtPriId;
+		 private int xbtId;
+		 private boolean isDefault;
+		 
+		 public ExpectedInheritedCDTSCAllowedPrimitiveAndXpsTypeMap(int cdtPriId, int xbtId, boolean isDefault){
+			 this.xbtId = xbtId;
+			 this.cdtPriId = cdtPriId;
+			 this.isDefault= isDefault;
+		 }
+	 }
+	
+	 @Test
+  	 public void testPopulateCDTSCAwdPriAndXPSTypeMap(){
+  	   
+		//In OAGIS 10.1, there is only one unqualified BDT that has an additional SC to its based default BDT – the NameType.		
+		 DataTypeSupplementaryComponent dtsc = dataTypeSupplementaryComponentRepository.findOneByGuid("oagis-id-84fa20db74b942449e1885cff79b24df");
+		 
+		 assertTrue(dtsc!=null);
+		 
+		 List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPris = cdtSCAllowedPrimitiveRepository.findByCdtScId(dtsc.getDtScId());
+		 assertTrue(cdtSCAwdPris.size()==4);
+		 
+		 for(int i=0; i<cdtSCAwdPris.size(); i++){
+			 
+			 int cdtPriId = cdtSCAwdPris.get(i).getCdtPriId();
+			 boolean isDefault = cdtSCAwdPris.get(i).isDefault();
+			 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtSCAwdPriXpsTypeMaps = cdtSCAllowedPrimitiveExpressionTypeMapRepository.findByCdtScAwdPri(cdtSCAwdPris.get(i).getCdtScAwdPriId());
+			 
+			 if(cdtPriId==3){ //CDTPrimitive = Decimal
+				 assertTrue(isDefault);
+				 assertTrue(cdtSCAwdPriXpsTypeMaps.size()==1);
+				 assertEquals(19, cdtSCAwdPriXpsTypeMaps.get(0).getXbtId());//xsd:decimal
+			 }
+			 
+			 else if(cdtPriId==4) { //CDTPrimitive = Double
+				 assertTrue(!isDefault);
+				 assertTrue(cdtSCAwdPriXpsTypeMaps.size()==2);
+				 assertEquals(23, cdtSCAwdPriXpsTypeMaps.get(0).getXbtId());//xsd:double
+				 assertEquals(18, cdtSCAwdPriXpsTypeMaps.get(1).getXbtId());//xsd:float
+			 }
+			 else if (cdtPriId==5){//CDTPrimitive = Float
+				 assertTrue(!isDefault);
+				 assertTrue(cdtSCAwdPriXpsTypeMaps.size()==1);
+				 assertEquals(18, cdtSCAwdPriXpsTypeMaps.get(0).getXbtId());//xsd:float
+			 }
+			 else if (cdtPriId ==6) { //CDTPrimitive = Integer
+				 assertTrue(!isDefault);
+				 assertTrue(cdtSCAwdPriXpsTypeMaps.size()==3);
+				 assertEquals(20, cdtSCAwdPriXpsTypeMaps.get(0).getXbtId());//xsd:integer
+				 assertEquals(22, cdtSCAwdPriXpsTypeMaps.get(1).getXbtId());//xsd:positiveInteger
+				 assertEquals(21, cdtSCAwdPriXpsTypeMaps.get(2).getXbtId());//xsd:nonNegativeInteger
 
-
-    }
+			 }
+			 else {
+				 assertTrue(false);
+			 }
+		 }
+     }
 }

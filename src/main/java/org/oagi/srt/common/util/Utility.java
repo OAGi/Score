@@ -156,6 +156,16 @@ public class Utility {
             representationTerm = "Text";
         return representationTerm;
     }
+    
+    public static String getPropertyTerm(String str) {
+       
+    	if(str.equals("languageCode") || str.equals("actionCode")){
+    		return Utility.spaceSeparatorBeforeStr(str, "Code");
+    	}
+    	else {
+    		return Utility.spaceSeparator(str);
+    	}
+    }
 
     public static String firstToUpperCase(String str) {
         String prefix = str.substring(0, 1);
