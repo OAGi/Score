@@ -682,9 +682,19 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                 CoreDataTypeAllowedPrimitive cdtAP = CDTAwdPris.get(k);
                                 cdtSCAP.setCdtScId(insertedSC.getDtScId());
                                 cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
-                                cdtSCAP.setDefault(cdtAP.isDefault());
-
                                 CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
+                                if(!is_fields_xsd){
+                                	if(tmpPri.equals("Token")){
+                                		cdtSCAP.setDefault(true);
+                                	}
+                                	else {
+                                		cdtSCAP.setDefault(false);
+                                	}
+                                }
+                                else {
+                                	cdtSCAP.setDefault(cdtAP.isDefault());
+                                }
+
 
                                 String expressionLanguageOrActionCode = "";
                                 expressionLanguageOrActionCode = insertedSC.getPropertyTerm();
