@@ -1202,7 +1202,7 @@
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
-			<xsd:enumeration value="2013">
+			<xsd:enumeration value="2012">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10">
 						<ccts_Name>PC8-Danish-Norwegian</ccts_Name>
