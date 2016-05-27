@@ -1,14 +1,11 @@
 package org.oagi.srt.persistence.populate;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.Application;
-import org.oagi.srt.repository.CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository;
-import org.oagi.srt.repository.CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository;
-import org.oagi.srt.repository.DataTypeRepository;
-import org.oagi.srt.repository.DataTypeSupplementaryComponentRepository;
-import org.oagi.srt.repository.entity.DataType;
-import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -40,10 +37,16 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
     @Autowired
-    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtSCAllowedPrimitiveRepository;
+    private CoreDataTypeAllowedPrimitiveRepository cdtAwdPriRepository;
 
     @Autowired
-    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtSCAllowedPrimitiveExpressionTypeMapRepository;
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
 
     private class ExpectedDataTypeSupplementaryComponent {
         private String guid;
@@ -70,14 +73,21 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
             return this.attributeName.substring(0, this.attributeName.indexOf('.'));
         }
 
+        public String getRepresentationTerm() {
+            return this.attributeName.substring(this.attributeName.indexOf('.') + 1, this.attributeName.length()).trim();
+        }
+
         public String getDefinition() {
             return definition;
         }
     }
 
-    @Test
-    public void test_PopulateSCin_dt_sc_table() {
-        Map<String, List<ExpectedDataTypeSupplementaryComponent>> predefinedDtScListForDefaultBDT = new HashMap();
+    private Map<String, List<ExpectedDataTypeSupplementaryComponent>> predefinedDtScListForDefaultBDT;
+    private Map<String, List<ExpectedDataTypeSupplementaryComponent>> additionalDtScMapForUnqualifiedBDT;
+
+    @Before
+    public void setUp() {
+        predefinedDtScListForDefaultBDT = new HashMap();
         predefinedDtScListForDefaultBDT.put("Amount_0723C8. Type", Arrays.asList(
                 new ExpectedDataTypeSupplementaryComponent("oagis-id-0dd62519460d4a91bfdbc1f7778befac", "optional", "Currency. Code", "The currency of the amount")));
         predefinedDtScListForDefaultBDT.put("Binary Object_4277E5. Type", Arrays.asList(
@@ -113,10 +123,13 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
         predefinedDtScListForDefaultBDT.put("Text_62S0B4. Type", Arrays.asList(
                 new ExpectedDataTypeSupplementaryComponent("oagis-id-c8d0c7094d7d4fbeb7e50fd20a17c1b3", "optional", "Language. Code", "The language used in the corresponding text string")));
 
-        Map<String, List<ExpectedDataTypeSupplementaryComponent>> additionalDtScMapForUnqualifiedBDT = new HashMap();
+        additionalDtScMapForUnqualifiedBDT = new HashMap();
         additionalDtScMapForUnqualifiedBDT.put("Name. Type", Arrays.asList(
                 new ExpectedDataTypeSupplementaryComponent("oagis-id-84fa20db74b942449e1885cff79b24df", "optional", "Sequence. Number", "When an object occurs multiple times, this sequence number can be used to provide the order.")));
+    }
 
+    @Test
+    public void test_PopulateSCin_dt_sc_table() {
         List<String> dtGuids =
                 expectedDataTypes.stream()
                         .map(P_1_5_1_to_2_PopulateBDTsInDTTestCase.ExpectedDataType::getGuid)
@@ -130,12 +143,25 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
             if (basedDt.getType() == 0) {
                 isDefaultBDT = true;
                 expectedDtScList = dtScRepository.findByOwnerDtId(basedDt.getDtId());
+                /*
+                 * Min Cardinality:
+                 * For the default BDTs, take the value from //xsd:attribute/@use.
+                 * 'optional' = 0. 'required' = 1, 'prohibited' = 0.
+                 * If the //xsd:attribute/@use does not exist, it means 0.
+                 *
+                 * Max Cardinality:
+                 * For the default BDTs, take the value from //xsd:attribute/@use.
+                 * 'optional' = 1. 'required' = 1, 'prohibited' = 0.
+                 * If the //xsd:attribute/@use does not exist, it means 1.
+                 */
                 if (predefinedDtScListForDefaultBDT.containsKey(dt.getDen())) {
                     predefinedDtScListForDefaultBDT.get(dt.getDen()).forEach(predefinedDtSc -> {
                         expectedDtScList.forEach(expectedDtSc -> {
                             if (expectedDtSc.getPropertyTerm().equals(predefinedDtSc.getPropertyTerm())) {
+                                // Set expected GUID and Definition to inherited DT SC
                                 expectedDtSc.setGuid(predefinedDtSc.getGuid());
                                 expectedDtSc.setDefinition(predefinedDtSc.getDefinition());
+
                                 switch (predefinedDtSc.getUse()) {
                                     case "optional":
                                         expectedDtSc.setMinCardinality(0);
@@ -157,7 +183,13 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
                             }
                         });
                     });
-                } else {
+                }
+                /*
+                 * Min/Max Cardinality:
+                 * For the SC (inherited from the base CDT) that has no corresponding xsd:attribute,
+                 * the value is 0.
+                 */
+                else {
                     expectedDtScList.forEach(expectedDtSc -> {
                         expectedDtSc.setMinCardinality(0);
                         expectedDtSc.setMaxCardinality(0);
@@ -230,13 +262,53 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
     }
 
     @Test
-    public void test_Populate_cdt_sc_awd_pri_Table() {
+    public void test_Populate_cdt_sc_awd_pri_And_cdt_sc_awd_pri_xps_type_map_Table() {
+        // In OAGIS 10.1, there is only one unqualified BDT that has an additional SC to its based default BDT – the NameType.
+        additionalDtScMapForUnqualifiedBDT.values().forEach(expectedDtScList -> {
+            expectedDtScList.forEach(expectedDtSc -> {
+                DataType targetCDT = dtRepository.findOneByDataTypeTermAndType(expectedDtSc.getRepresentationTerm(), 0);
 
+                // cdt_sc_awd_pri
+                List<CoreDataTypeAllowedPrimitive> expectedCdtAwdPriList =
+                        cdtAwdPriRepository.findByCdtId(targetCDT.getDtId());
+
+                List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList =
+                        cdtScAwdPriRepository.findByCdtScId(
+                                dtScRepository.findOneByGuid(expectedDtSc.getGuid()).getDtScId());
+
+                assertEquals(expectedCdtAwdPriList.size(), actualCdtScAwdPriList.size());
+                assertEquals(expectedCdtAwdPriList.stream()
+                                .mapToInt(CoreDataTypeAllowedPrimitive::getCdtPriId)
+                                .sum(),
+                        actualCdtScAwdPriList.stream()
+                                .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtPriId)
+                                .sum());
+
+                // cdt_sc_awd_pri_xps_type_map
+                List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> expectedCdtAwdPriXpsTypeMapList =
+                        cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriIdIn(
+                                expectedCdtAwdPriList.stream()
+                                        .mapToInt(CoreDataTypeAllowedPrimitive::getCdtAwdPriId)
+                                        .boxed()
+                                        .collect(Collectors.toList())
+                        );
+
+                List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> actualCdtScAwdPriXpsTypeMapList =
+                        cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                                actualCdtScAwdPriList.stream()
+                                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                                        .boxed()
+                                        .collect(Collectors.toList())
+                        );
+
+                assertEquals(expectedCdtAwdPriXpsTypeMapList.size(), actualCdtScAwdPriXpsTypeMapList.size());
+                assertEquals(expectedCdtAwdPriXpsTypeMapList.stream()
+                                .mapToInt(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getXbtId)
+                                .sum(),
+                        actualCdtScAwdPriXpsTypeMapList.stream()
+                                .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getXbtId)
+                                .sum());
+            });
+        });
     }
-
-    @Test
-    public void test_Populate_cdt_sc_awd_pri_xps_type_map_Table() {
-
-    }
-
 }
