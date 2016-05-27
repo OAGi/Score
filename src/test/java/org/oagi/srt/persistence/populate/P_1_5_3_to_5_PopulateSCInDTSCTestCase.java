@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.oagi.srt.persistence.populate.P_1_5_1_to_2_PopulateBDTsInDTTestCase.expectedDataTypes;
+import static org.oagi.srt.persistence.populate.P_1_5_1_to_2_PopulateBDTsInDTTestCase.EXPECTED_GUID_OF_BDT_LIST;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
@@ -130,11 +130,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
 
     @Test
     public void test_PopulateSCin_dt_sc_table() {
-        List<String> dtGuids =
-                expectedDataTypes.stream()
-                        .map(P_1_5_1_to_2_PopulateBDTsInDTTestCase.ExpectedDataType::getGuid)
-                        .collect(Collectors.toList());
-        List<DataType> targetDataTypes = dtRepository.findByGuidIn(dtGuids);
+        List<DataType> targetDataTypes = dtRepository.findByGuidIn(EXPECTED_GUID_OF_BDT_LIST);
 
         targetDataTypes.forEach(dt -> {
             DataType basedDt = dtRepository.findOne(dt.getBasedDtId());
