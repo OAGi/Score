@@ -233,26 +233,41 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     private void insertBDTPrimitiveRestriction(int cdtId, int bdtID, int defaultId) throws Exception {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtId);
+        DataType bdt = dataTypeRepository.findOne(bdtID);
+        
+        if(bdt.getBasedDtId()==cdtId) {//if default BDT
+        	for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
 
-        for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
+                List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 =
+                        cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(aCDTAllowedPrimitiveVO.getCdtAwdPriId());
 
-            List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 =
-                    cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(aCDTAllowedPrimitiveVO.getCdtAwdPriId());
-
-            for (CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMapVO : al4) {
-                // create insert statement
-                BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
-                aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
-                aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
-                boolean isDefault = false;
-                if (defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId())
-                    isDefault = true;
-                aBDT_Primitive_RestrictionVO.setDefault(isDefault);
-                System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
-                        getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = " + isDefault);
-                bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+                for (CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMapVO : al4) {
+                    // create insert statement
+                    BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
+                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
+                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
+                    boolean isDefault = false;
+                    if (defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId())
+                        isDefault = true;
+                    aBDT_Primitive_RestrictionVO.setDefault(isDefault);
+                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type in DefaultBDT" +
+                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = " + isDefault);
+                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+                }
             }
         }
+        else {
+        	List<BusinessDataTypePrimitiveRestriction> defaultBDTPri = bdtPriRestriRepository.findByBdtId(bdt.getBasedDtId());
+        	for(int i=0; i<defaultBDTPri.size(); i++){
+        		BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
+        		aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
+        		aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
+        		aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
+        		System.out.println("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
+                bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+        	}
+        }
+        
     }
 
     private String getXsdBuiltinType(int id) {
@@ -755,7 +770,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         } else {
             dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
             System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
-            insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
+            insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
         }
 
         if (check_BDT(aElementBDT.getAttribute("id")))
@@ -768,7 +783,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             String unQualifiedDataTypeTerm = dataTypeTerm;
             DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"));
             System.out.println("Inserting bdt primitive restriction for exceptional unqualified bdt");
-            insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+            insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
         }
     }
 
@@ -890,33 +905,60 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     private void insertBDTPrimitiveRestrictionForExceptionalBDT(int cdtID, int bdtID, int defaultId) throws Exception {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
-        for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
-
-            List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 =
-                    cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(aCDTAllowedPrimitiveVO.getCdtAwdPriId());
-
-            for (CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMapVO : al4) {
-                int idOfXsdToken = getXSDBuiltInTypeId("xsd:token");
-
-                if (defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) { // default
-                    BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
-                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
-                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
-                    aBDT_Primitive_RestrictionVO.setDefault(true);
-                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
-                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = true");
-                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
-                } else {
-                    BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
-                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
-                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
-                    aBDT_Primitive_RestrictionVO.setDefault(false);
-                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
-                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = false");
-                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
-
-                }
-            }
+        
+        DataType bdt = dataTypeRepository.findOne(bdtID);
+        if(bdt.getBasedDtId()==cdtID){
+	        boolean isTimePoint = false;
+	        if(bdt.getDen().equals(Utility.typeToDen("DateType_DB95C8")) 		//DayDateType
+	        || bdt.getDen().equals(Utility.typeToDen("DateType_0C267D"))		//MonthDateType
+	        || bdt.getDen().equals(Utility.typeToDen("DateType_5B057B"))		//MonthDayDateType
+	        || bdt.getDen().equals(Utility.typeToDen("DateType_57D5E1"))		//YearDateType
+	        || bdt.getDen().equals(Utility.typeToDen("DateType_BBCC14"))){		//YearMonthDateType
+	        	isTimePoint=true;
+	        }
+	        
+	        for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
+	
+	            List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 =
+	                    cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(aCDTAllowedPrimitiveVO.getCdtAwdPriId());
+	
+	            for (CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMapVO : al4) {
+	                int idOfXsdToken = getXSDBuiltInTypeId("xsd:token");
+	
+	                if (defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) { // default
+	                    BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
+	                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
+	                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
+	                    aBDT_Primitive_RestrictionVO.setDefault(true);
+	                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
+	                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = true");
+	                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+	                } 
+	                
+	                if(isTimePoint && idOfXsdToken==aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()){
+	                    BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
+	                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
+	                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
+	                    aBDT_Primitive_RestrictionVO.setDefault(false);
+	                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
+	                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = false");
+	                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+	                }
+	                
+	                //TODO: logic for default BDTs which don't have base type and only have union 
+	            }
+	        }
+        }
+        else {
+        	List<BusinessDataTypePrimitiveRestriction> defaultBDTPri = bdtPriRestriRepository.findByBdtId(bdt.getBasedDtId());
+        	for(int i=0; i<defaultBDTPri.size(); i++){
+        		BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
+        		aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
+        		aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
+        		aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
+        		System.out.println("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
+                bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
+        	}
         }
     }
 

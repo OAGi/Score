@@ -40,7 +40,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
-    public static class ExpectedDataType {
+    private class ExpectedDataType {
         private String guid;
         private String den;
         private int basedDtType;
@@ -93,9 +93,17 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
         }
     }
 
-    public static List<ExpectedDataType> expectedDataTypes = new ArrayList();
+    private List<ExpectedDataType> expectedDefaultDataTypes;
+    private List<ExpectedDataType> expectedUnqualifiedDataTypes;
 
-    static {
+    private List<ExpectedDataType> expectedExceptionalDefaultBDTs;
+    
+    @Before
+    public void setUp() {
+    	expectedDefaultDataTypes = new ArrayList();
+    	expectedUnqualifiedDataTypes = new ArrayList();
+        expectedExceptionalDefaultBDTs = new ArrayList();
+        
         // Unqualified DataTypes mapped with Core Data Type (20)
         List<ExpectedDataType> unqualifiedDataTypes = Arrays.asList(
                 new ExpectedDataType("oagis-id-109055a967bd4cf19ee3320755b01f8d", "Amount. Type", 1, "Amount_0723C8. Type"),
@@ -119,8 +127,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                 new ExpectedDataType("oagis-id-d006eb3550364c61bc10cac70763e677", "Value. Type", 1, "Value_D19E7B. Type"),
                 new ExpectedDataType("oagis-id-83d4cc94be8249a3b8cbe7e1c2ecb417", "Video. Type", 1, "Video_539B44. Type")
         );
-        expectedDataTypes.addAll(unqualifiedDataTypes);
-
+        expectedUnqualifiedDataTypes.addAll(unqualifiedDataTypes);
+        
         // Default DataTypes which are base of previous 20 unqualified DataTypes (20)
         List<ExpectedDataType> defaultBDTs = Arrays.asList(
                 new ExpectedDataType("oagis-id-e6f93bd0dc934ab2af11bd46888c1233", "Amount_0723C8. Type", 0, "Amount. Type", "An amount is a number of monetary units specified in a currency", "xsd:decimal"),
@@ -144,8 +152,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                 new ExpectedDataType("oagis-id-641fdee1d3114629a15902311d895ca2", "Value_D19E7B. Type", 0, "Value. Type", "A value is the concept of worth in general that is assigned or is determined by measurement, assessment or calculation.", "xsd:string"),
                 new ExpectedDataType("oagis-id-3292eaa5630b48ecb7c4249b0ddc760e", "Video_539B44. Type", 0, "Video. Type", "A video is a recording, reproducing or broadcasting of visual images on magnetic tape or digitally in binary notation (octets)", "xsd:base64Binary")
         );
-        expectedDataTypes.addAll(defaultBDTs);
-
+        expectedDefaultDataTypes.addAll(defaultBDTs);
+        
         // 3.1.1.8.1.1 Exceptional Unqualified BDTs (13)
         List<ExpectedDataType> exceptionalUnqualifiedBDTs = Arrays.asList(
                 new ExpectedDataType("oagis-id-5a2ed18041c04f3e995c773480b0076d", "Day Date. Type", 1, "Date_DB95C8. Type"),
@@ -162,47 +170,71 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                 new ExpectedDataType("oagis-id-ec9821a975e84ad9804265b0f082a36b", "Positive Integer Number. Type", 1, "Number_201301. Type"),
                 new ExpectedDataType("oagis-id-5a2ed18041c04f3e995c7734386ae380", "Day Of Week Hour Minute UTC. Type", 1, "Time_100DCA. Type")
         );
-        expectedDataTypes.addAll(exceptionalUnqualifiedBDTs);
-
-        // 3.1.1.8.1.1 Default BDTs of Exceptional Unqualified BDTs (11)
-        List<ExpectedDataType> modifiedDefaultBDTs = Arrays.asList(
+        expectedUnqualifiedDataTypes.addAll(exceptionalUnqualifiedBDTs);
+        
+        // 3.1.1.8.1.1 Default BDTs of Exceptional Unqualified BDTs (11 - 1)
+        List<ExpectedDataType> exceptionalDefaultBDTs = Arrays.asList(
                 new ExpectedDataType("oagis-id-3049eed90b924d699f1102b946843725", "Date_DB95C8. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: day of month", "xsd:gDay"),
                 new ExpectedDataType("oagis-id-3bc40b222d994d9b9fb5d4a33319a146", "Date_5B057B. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: month, day", "xsd:gMonthDay"),
                 new ExpectedDataType("oagis-id-52df32ab374440f0ac456a1abe66cb94", "Date_0C267D. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: month", "xsd:gMonth"),
                 new ExpectedDataType("oagis-id-6712fbca652e49ac9739396377b090cb", "Date_BBCC14. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: year, month", "xsd:gYearMonth"),
                 new ExpectedDataType("oagis-id-0a7f3544ea954099aa06afe488417136", "Date_57D5E1. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: year", "xsd:gYear"),
-                new ExpectedDataType("oagis-id-ff84535456d44233b6f0976d993b442d", "Identifier_B3F14E. Type", 0, "Identifier. Type", "An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency", "xsd:normalizedString"),
                 new ExpectedDataType("oagis-id-d614ed8726ff482c9c5a8183d735d9ed", "Number_B98233. Type", 0, "Number. Type", "A mathematical number that is assigned or is determined by calculation.", "xsd:integer"),
                 new ExpectedDataType("oagis-id-6b81b03c96cc47f08ccb26838853012d", "Number_201301. Type", 0, "Number. Type", "A mathematical number that is assigned or is determined by calculation.", "xsd:positiveInteger"),
                 new ExpectedDataType("oagis-id-89be97039be04d6f9cfda107d75926b5", "Text_62S0C1. Type", 0, "Text. Type", "Text is a character string such as a finite set of characters generally in  the form of words of a language", "xsd:string"),
                 new ExpectedDataType("oagis-id-42a03ed19450453da6c87fe8eadabfa4", "Text_0VCBZ5. Type", 0, "Text. Type", "A text is a character string such as a finite set of characters generally in the form of words of a language", "xsd:normalizedString"),
                 new ExpectedDataType("oagis-id-d5cb8551edf041389893fee25a496395", "Text_0F0ZX1. Type", 0, "Text. Type", "A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept", "xsd:token")
         );
-        expectedDataTypes.addAll(modifiedDefaultBDTs);
-
-        // 3.1.1.8.1.2 Additional Default BDTs (2)
+        expectedDefaultDataTypes.addAll(exceptionalDefaultBDTs);
+        expectedExceptionalDefaultBDTs.addAll(exceptionalDefaultBDTs);
+        
+        // 3.1.1.8.1.2 Additional Default BDTs (2 + 1)
         List<ExpectedDataType> additionalDefaultBDTs = Arrays.asList(
                 new ExpectedDataType("oagis-id-d2f721a297684b538e7dbb88cf5526bc", "Code_1E7368. Type", 0, "Code. Type", "A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values", "xsd:token"),
-                new ExpectedDataType("oagis-id-0fb76e8565244977b1239327ca436f76", "Value_039C44. Type", 0, "Value. Type", "A value is the concept of worth in general that is assigned or is determined by measurement, assessment or calculation.", "xsd:integer")
+                new ExpectedDataType("oagis-id-0fb76e8565244977b1239327ca436f76", "Value_039C44. Type", 0, "Value. Type", "A value is the concept of worth in general that is assigned or is determined by measurement, assessment or calculation.", "xsd:integer"),
+                new ExpectedDataType("oagis-id-ff84535456d44233b6f0976d993b442d", "Identifier_B3F14E. Type", 0, "Identifier. Type", "An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency", "xsd:normalizedString")
         );
-        expectedDataTypes.addAll(additionalDefaultBDTs);
-
+        expectedDefaultDataTypes.addAll(additionalDefaultBDTs);
+        
         // 3.1.1.8.1.3 CodeContentType (1)
-        expectedDataTypes.add(
+        expectedUnqualifiedDataTypes.add(
                 new ExpectedDataType("oagis-id-5646bf52a97b48adb50ded6ff8c38354", "Code Content. Type", 1, "Code_1E7368. Type")
         );
 
         // 3.1.1.8.1.4 IdentifierContentType (1)
-        expectedDataTypes.add(
+        expectedUnqualifiedDataTypes.add(
                 new ExpectedDataType("oagis-id-08d6ade226fd42488b53c0815664e246", "Identifier Content. Type", 1, "Identifier_B3F14E. Type")
         );
-
         // number of total tested DT case is 68
     }
 
+
     @Test
     public void testPopulateDTTable() {
-        expectedDataTypes.forEach(expectedDataType -> {
+    	expectedDefaultDataTypes.forEach(expectedDataType -> {
+            DataType actualDataType = dtRepository.findOneByGuid(expectedDataType.getGuid());
+            assertNotNull(actualDataType);
+
+            assertEquals(1, actualDataType.getType());
+            assertEquals("Data Type ID[" + actualDataType.getDtId() + "]'s den is different",
+                    expectedDataType.getDen(), actualDataType.getDen());
+            assertEquals("Data Type ID[" + actualDataType.getDtId() + "]'s content component den is different",
+                    expectedDataType.getContentComponentDen(), actualDataType.getContentComponentDen());
+            assertEquals("Data Type ID[" + actualDataType.getDtId() + "]'s definition is different",
+                    expectedDataType.getDefinition(), actualDataType.getDefinition());
+
+            DataType actualBasedDataType =
+                    dtRepository.findOneByTypeAndDen(expectedDataType.getBasedDtType(),
+                            expectedDataType.getBasedDtDen());
+            assertNotNull("Data Type ID[" + actualDataType.getDtId() + "]'s based data type can't found. " +
+                            "Based Data Type's type[" + expectedDataType.getBasedDtType() +
+                            "] and den[" + expectedDataType.getBasedDtDen() + "]",
+                    actualBasedDataType);
+
+            assertEquals(actualBasedDataType.getDtId(), actualDataType.getBasedDtId());
+        });
+        
+    	expectedUnqualifiedDataTypes.forEach(expectedDataType -> {
             DataType actualDataType = dtRepository.findOneByGuid(expectedDataType.getGuid());
             assertNotNull(actualDataType);
 
@@ -228,7 +260,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
 
     @Test
     public void testPopulateBDTPriRestriTable() {
-        expectedDataTypes.forEach(expectedDataType -> {
+    	
+    	//for Default BDTs
+    	expectedDefaultDataTypes.forEach(expectedDataType -> {
             DataType basedDataType =
                     dtRepository.findOneByTypeAndDen(expectedDataType.getBasedDtType(),
                             expectedDataType.getBasedDtDen());
@@ -247,12 +281,36 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                                     .boxed()
                                     .collect(Collectors.toList())
                     );
-
+            
+            if(expectedExceptionalDefaultBDTs.contains(expectedDataType)){ 
+                boolean isTimePoint = false;
+                if(expectedDataType.getDen().contains("Date")) { isTimePoint = true; }          	
+	            String defaultXSDBuiltInType = expectedDataType.getDefaultXSDBuiltInType();
+	            int xsdTokenId = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
+	            int defaultXBTId =  xbtRepository.findOneByBuiltInType(defaultXSDBuiltInType).getXbtId();
+	            
+	            for(int i=expectedCdtAwdPriXpsTypeMapList.size()-1; i>-1; i--){
+	            	boolean checkRemove=true;
+	            	if(isTimePoint){
+	            		if(expectedCdtAwdPriXpsTypeMapList.get(i).getXbtId()==xsdTokenId){
+	            			checkRemove=false;
+	            		}
+	            	}
+	            	
+	            	if(expectedCdtAwdPriXpsTypeMapList.get(i).getXbtId()==defaultXBTId){
+	            		checkRemove=false;
+	            	}
+	            	
+	            	if(checkRemove){
+	            		expectedCdtAwdPriXpsTypeMapList.remove(i);
+	            	}            	
+	            }
+            }
+            
             DataType bdt = dtRepository.findOneByGuid(expectedDataType.getGuid());
 
             List<BusinessDataTypePrimitiveRestriction> actualBdtPriRestriList =
                     bdtPriRestriRepository.findByBdtId(bdt.getDtId());
-
             assertEquals(expectedCdtAwdPriXpsTypeMapList.size(), actualBdtPriRestriList.size());
             assertEquals(expectedCdtAwdPriXpsTypeMapList.stream()
                             .mapToInt(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getCdtAwdPriXpsTypeMapId)
@@ -260,14 +318,62 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                     actualBdtPriRestriList.stream()
                             .mapToInt(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
                             .sum());
-
+          
             String defaultXSDBuiltInType = expectedDataType.getDefaultXSDBuiltInType();
             if (defaultXSDBuiltInType == null) { // if it is unqualified BDT, try to find from its base.
-                defaultXSDBuiltInType = expectedDataTypes.stream()
+                defaultXSDBuiltInType = expectedDefaultDataTypes.stream()
                         .filter(e -> e.getDen().equalsIgnoreCase(expectedDataType.getBasedDtDen()))
                         .findFirst()
                         .get().getDefaultXSDBuiltInType();
             }
+            XSDBuiltInType expectedDefaultXbt =
+                    xbtRepository.findOneByBuiltInType(defaultXSDBuiltInType);
+
+            List<BusinessDataTypePrimitiveRestriction> defaultOfActualBdtPriRestriList =
+                    actualBdtPriRestriList.stream()
+                            .filter(bdtPriRestri -> bdtPriRestri.isDefault())
+                            .collect(Collectors.toList());
+            assertEquals(1, defaultOfActualBdtPriRestriList.size());
+
+            XSDBuiltInType actualDefaultXbt = xbtRepository.findOne(
+                    cdtAwdPriXpsTypeMapRepository.findOne(
+                            defaultOfActualBdtPriRestriList.get(0).getCdtAwdPriXpsTypeMapId())
+                    .getXbtId());
+
+            assertNotNull(actualDefaultXbt);
+            assertEquals(expectedDefaultXbt.getXbtId(), actualDefaultXbt.getXbtId());
+        });
+    	
+    	//for Unqualified BDTs
+    	expectedUnqualifiedDataTypes.forEach(expectedDataType -> {
+
+            DataType bdt = dtRepository.findOneByGuid(expectedDataType.getGuid());
+
+            List<BusinessDataTypePrimitiveRestriction> actualBdtPriRestriList =
+                    bdtPriRestriRepository.findByBdtId(bdt.getDtId());
+
+            List<BusinessDataTypePrimitiveRestriction> expectedBdtPriRestriList =
+                    bdtPriRestriRepository.findByBdtId(bdt.getBasedDtId());
+            
+            assertEquals(expectedBdtPriRestriList.size(), actualBdtPriRestriList.size());
+            assertEquals(expectedBdtPriRestriList.stream()
+                            .mapToInt(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
+                            .sum(),
+                    actualBdtPriRestriList.stream()
+                            .mapToInt(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
+                            .sum());
+          
+            String defaultXSDBuiltInType = expectedDataType.getDefaultXSDBuiltInType();
+            
+            
+            
+            if (defaultXSDBuiltInType == null) { // if it is unqualified BDT, try to find from its base.
+                defaultXSDBuiltInType = expectedDefaultDataTypes.stream()
+                        .filter(e -> e.getDen().equalsIgnoreCase(expectedDataType.getBasedDtDen()))
+                        .findFirst()
+                        .get().getDefaultXSDBuiltInType();
+            }
+            
             XSDBuiltInType expectedDefaultXbt =
                     xbtRepository.findOneByBuiltInType(defaultXSDBuiltInType);
 

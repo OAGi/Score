@@ -463,7 +463,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         }
                         representationTerm = Utility.getRepresentationTerm(attribute_name);
 
-                        Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='" + attribute_id + "']/xsd:annotation/xsd:documentation/ccts_Definition");
+                        Node defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='" + attribute_id + "']/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
                         if (defNode == null) {
                             defNode = xh2.getNode("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute[@id='" + attribute_id + "']/xsd:annotation/xsd:documentation");
                         }
@@ -494,12 +494,19 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     CoreDataTypeAllowedPrimitive cdtAP = CDTAwdPris.get(k);
                                     cdtSCAP.setCdtScId(insertedSC.getDtScId());
                                     cdtSCAP.setCdtPriId(cdtAP.getCdtPriId());
-                                    cdtSCAP.setDefault(cdtAP.isDefault());
-
                                     CoreDataTypePrimitive tmpPri = cdtPriRepository.findOne(cdtAP.getCdtPriId());
-
-
-                                    String expressionLanguageOrActionCode = insertedSC.getPropertyTerm();
+     
+                                    if(!is_fields_xsd){ 
+                                    	if(tmpPri.getName().equals("Token")){
+                                    		cdtSCAP.setDefault(true);
+                                    	}
+                                    	else {
+                                    		cdtSCAP.setDefault(false);
+                                    	}
+                                    }
+                                    else {
+                                    	cdtSCAP.setDefault(cdtAP.isDefault());
+                                    }
 
                                     System.out.print("   ~~~" + insertedSC.getPropertyTerm() + " " + insertedSC.getRepresentationTerm() + " is " + tmpPri.getName());
                                     if (cdtSCAP.isDefault()) {

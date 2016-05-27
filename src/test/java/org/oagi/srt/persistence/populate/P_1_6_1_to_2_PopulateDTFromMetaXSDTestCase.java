@@ -70,6 +70,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     private DataType targetTextCDT;
     private List<CoreDataTypeAllowedPrimitive> targetTextCDTAwdPriList;
     private List<CoreDataTypePrimitive> targetTextCDTPriList;
+    private List<BusinessDataTypePrimitiveRestriction> defaultTextBDTPriList;
+    private CoreDataTypePrimitive defaultTextBDTCDTPrimitive;
+    private CoreDataTypeAllowedPrimitive defaultTextBDTCDTAwdPri;
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMap defaultTextBDTCDTAwdPriXpsTypeMap;
 
     @Before
     public void setUp() {
@@ -90,6 +94,17 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                         .boxed()
                         .collect(Collectors.toList())
         );
+        
+        defaultTextBDTPriList = bdtPriRestriRepository.findByBdtId(defaultTextBDT.getDtId());
+        assertEquals(1, defaultTextBDTPriList.size());
+        
+        defaultTextBDTCDTAwdPriXpsTypeMap = cdtAwdPriXpsTypeMapRepository.findOne(defaultTextBDTPriList.get(0).getCdtAwdPriXpsTypeMapId());
+        
+        defaultTextBDTCDTAwdPri = cdtAwdPriRepository.findOne(defaultTextBDTCDTAwdPriXpsTypeMap.getCdtAwdPriId());
+        
+        defaultTextBDTCDTPrimitive = cdtPriRepository.findOne(defaultTextBDTCDTAwdPri.getCdtPriId());
+        
+        assertEquals("Token",defaultTextBDTCDTPrimitive.getName());
 
         List<String> targetTextCDTPriNameList =
                 targetTextCDTPriList.stream().map(CoreDataTypePrimitive::getName).collect(Collectors.toList());
@@ -219,7 +234,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     public void test_Populate_bdt_pri_restri_Table() {
         List<BusinessDataTypePrimitiveRestriction> basedBdtPriRestri =
                 bdtPriRestriRepository.findByBdtId(defaultTextBDT.getDtId());
-        assertEquals(targetGuids.size(), basedBdtPriRestri.size());
+        assertEquals(1, basedBdtPriRestri.size());
 
         Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriListMap = basedBdtPriRestri.stream()
                 .collect(Collectors.toMap(
@@ -228,7 +243,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
 
         List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> targetCdtAwdPriXpsTypeMaps =
                 cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriXpsTypeMapIdIn(bdtPriRestriListMap.keySet());
-        assertEquals(targetGuids.size(), targetCdtAwdPriXpsTypeMaps.size());
+        assertEquals(1, targetCdtAwdPriXpsTypeMaps.size());
 
         List<ExpectedBusinessDataTypePrimitiveRestriction> expectedBdtPriRestriList =
                 targetGuids.stream().map(guid ->
@@ -239,7 +254,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                                         bdtPriRestriListMap.get(cdtAwdPriXpsTypeMap.getCdtAwdPriXpsTypeMapId()).isDefault()
                                 )).collect(Collectors.toList())
                 ).flatMap(e -> e.stream()).collect(Collectors.toList());
-        assertEquals(targetGuids.size() * targetTextCDTAwdPriList.size(), expectedBdtPriRestriList.size());
+        assertEquals(targetGuids.size() * defaultTextBDTPriList.size(), expectedBdtPriRestriList.size());
 
         expectedBdtPriRestriList.forEach(expectedBdtPriRestri -> {
             BusinessDataTypePrimitiveRestriction actualBdtPriRestri =
@@ -532,10 +547,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         int actualSumValueForExpressionLanguage = actualBdtScPriRestriListForExpressionLanguage.stream()
                 .mapToInt(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
                 .sum();
-        int expectedActionCodeCount = 2;
+       
         int expectedSumValueForExpressionLanguage = targetCdtScAwdPriXpsTypeMapListForExpressionLanguage.stream()
                 .mapToInt(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
-                .sum() * expectedActionCodeCount;
+                .sum() ;
         assertEquals(expectedSumValueForExpressionLanguage, actualSumValueForExpressionLanguage);
 
         /*
