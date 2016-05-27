@@ -40,7 +40,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
-    private class ExpectedDataType {
+    public static class ExpectedDataType {
         private String guid;
         private String den;
         private int basedDtType;
@@ -93,12 +93,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
         }
     }
 
-    private List<ExpectedDataType> expectedDataTypes;
+    public static List<ExpectedDataType> expectedDataTypes = new ArrayList();
 
-    @Before
-    public void setUp() {
-        expectedDataTypes = new ArrayList();
-
+    static {
         // Unqualified DataTypes mapped with Core Data Type (20)
         List<ExpectedDataType> unqualifiedDataTypes = Arrays.asList(
                 new ExpectedDataType("oagis-id-109055a967bd4cf19ee3320755b01f8d", "Amount. Type", 1, "Amount_0723C8. Type"),
@@ -202,7 +199,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
 
         // number of total tested DT case is 68
     }
-
 
     @Test
     public void testPopulateDTTable() {

@@ -18,6 +18,9 @@ public interface DataTypeSupplementaryComponentRepository extends JpaRepository<
     @Query("select d from DataTypeSupplementaryComponent d where d.guid = ?1")
     public DataTypeSupplementaryComponent findOneByGuid(String guid);
 
+    @Query("select d from DataTypeSupplementaryComponent d where d.guid in ?1")
+    public List<DataTypeSupplementaryComponent> findByGuidIn(Collection<String> guids);
+
     @Query("select d from DataTypeSupplementaryComponent d where d.guid = ?1 and d.ownerDtId = ?2")
     public DataTypeSupplementaryComponent findOneByGuidAndOwnerDtId(String guid, int ownerDtId);
 
