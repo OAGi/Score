@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface DataTypeRepository extends JpaRepository<DataType, Integer> {
 
+    @Query("select count(d) from DataType d where d.type = ?1")
+    public long countByType(int type);
+
     @Query("select d from DataType d where d.type = ?1")
     public List<DataType> findByType(int type);
 
