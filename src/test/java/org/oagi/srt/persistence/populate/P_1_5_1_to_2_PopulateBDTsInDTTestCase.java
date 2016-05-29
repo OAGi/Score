@@ -171,7 +171,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
         );
         expectedUnqualifiedDataTypes.addAll(exceptionalUnqualifiedBDTs);
 
-        // 3.1.1.8.1.1 Default BDTs of Exceptional Unqualified BDTs (11 - 1)
+        // 3.1.1.8.1.1 Default BDTs of Exceptional Unqualified BDTs (11)
         List<ExpectedDataType> exceptionalDefaultBDTs = Arrays.asList(
                 new ExpectedDataType("oagis-id-3049eed90b924d699f1102b946843725", "Date_DB95C8. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: day of month", "xsd:gDay"),
                 new ExpectedDataType("oagis-id-3bc40b222d994d9b9fb5d4a33319a146", "Date_5B057B. Type", 0, "Date. Type", "A date is a gregorian calendar representation in various common resolutions: month, day", "xsd:gMonthDay"),
@@ -182,19 +182,20 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                 new ExpectedDataType("oagis-id-6b81b03c96cc47f08ccb26838853012d", "Number_201301. Type", 0, "Number. Type", "A mathematical number that is assigned or is determined by calculation.", "xsd:positiveInteger"),
                 new ExpectedDataType("oagis-id-89be97039be04d6f9cfda107d75926b5", "Text_62S0C1. Type", 0, "Text. Type", "Text is a character string such as a finite set of characters generally in  the form of words of a language", "xsd:string"),
                 new ExpectedDataType("oagis-id-42a03ed19450453da6c87fe8eadabfa4", "Text_0VCBZ5. Type", 0, "Text. Type", "A text is a character string such as a finite set of characters generally in the form of words of a language", "xsd:normalizedString"),
-                new ExpectedDataType("oagis-id-d5cb8551edf041389893fee25a496395", "Text_0F0ZX1. Type", 0, "Text. Type", "A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept", "xsd:token")
+                new ExpectedDataType("oagis-id-d5cb8551edf041389893fee25a496395", "Text_0F0ZX1. Type", 0, "Text. Type", "A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept", "xsd:token"),
+                new ExpectedDataType("oagis-id-ff84535456d44233b6f0976d993b442d", "Identifier_B3F14E. Type", 0, "Identifier. Type", "An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency", "xsd:normalizedString")
         );
         expectedDefaultDataTypes.addAll(exceptionalDefaultBDTs);
         expectedExceptionalDefaultBDTs.addAll(exceptionalDefaultBDTs);
 
-        // 3.1.1.8.1.2 Additional Default BDTs (2 + 1)
+        // 3.1.1.8.1.2 Additional Default BDTs (2)
         List<ExpectedDataType> additionalDefaultBDTs = Arrays.asList(
                 new ExpectedDataType("oagis-id-d2f721a297684b538e7dbb88cf5526bc", "Code_1E7368. Type", 0, "Code. Type", "A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values", "xsd:token"),
-                new ExpectedDataType("oagis-id-0fb76e8565244977b1239327ca436f76", "Value_039C44. Type", 0, "Value. Type", "A value is the concept of worth in general that is assigned or is determined by measurement, assessment or calculation.", "xsd:integer"),
-                new ExpectedDataType("oagis-id-ff84535456d44233b6f0976d993b442d", "Identifier_B3F14E. Type", 0, "Identifier. Type", "An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency", "xsd:normalizedString")
+                new ExpectedDataType("oagis-id-0fb76e8565244977b1239327ca436f76", "Value_039C44. Type", 0, "Value. Type", "A value is the concept of worth in general that is assigned or is determined by measurement, assessment or calculation.", "xsd:integer")
         );
         expectedDefaultDataTypes.addAll(additionalDefaultBDTs);
-
+        expectedExceptionalDefaultBDTs.addAll(additionalDefaultBDTs);
+        
         // 3.1.1.8.1.3 CodeContentType (1)
         expectedUnqualifiedDataTypes.add(
                 new ExpectedDataType("oagis-id-5646bf52a97b48adb50ded6ff8c38354", "Code Content. Type", 1, "Code_1E7368. Type")

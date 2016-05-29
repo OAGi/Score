@@ -93,8 +93,8 @@ public class Types {
 		"ValueType",
 		"OrdinalType",
 		//"DayOfWeekHourMinuteUTCType",
-		"CodeContentType",
-		"IDContentType"
+		//"CodeContentType",
+		//"IDContentType"
 	};
 	
 	

@@ -78,7 +78,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         }
 
         importExceptionalDataTypeList();
+        importExceptionalDataTypeList2("CodeType_1E7368");
+        //importExceptionalDataTypeList2("IDType_B3F14E"); //already imported
         importExceptionalDataTypeList2("ValueType_039C44");
+        
+        importCodeContentType();
+        importIDContentType();
 
         System.out.println("### 1.5.1-2 End");
     }
@@ -770,7 +775,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         } else {
             dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
             System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
-            insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
+            insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
         }
 
         if (check_BDT(aElementBDT.getAttribute("id")))
@@ -783,7 +788,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             String unQualifiedDataTypeTerm = dataTypeTerm;
             DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"));
             System.out.println("Inserting bdt primitive restriction for exceptional unqualified bdt");
-            insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+            insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
         }
     }
 
@@ -874,10 +879,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             }
 
             DataType dVO1 = new DataType();
-
-            if (dataType.equals("DayOfWeekHourMinuteUTCType")) {
-                int a = 0;
-            }
 
             if (check_BDT(aElementBDT.getAttribute("id"))) {
                 System.out.println("Default BDT is already existing");
@@ -1436,7 +1437,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
-
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;
         id = aElementTN.getAttribute("id");
@@ -1451,7 +1451,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
 
         //Unqualified Type Name
-        String unQualifiedTypeName = dataType.replaceAll("Type", "");
+        String unQualifiedTypeName = dataType;
 
         //Unqualified Data Type Term
         String unQualifiedDataTypeTerm = baseDataTypeTerm;
@@ -1471,7 +1471,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         }
 
         DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
-        insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
     }
 
     private void importIDContentType() throws Exception {
@@ -1504,7 +1504,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
 
         //Unqualified Type Name
-        String unQualifiedTypeName = dataType.replaceAll("Type", "");
+        String unQualifiedTypeName = dataType;
 
         //Unqualified Data Type Term
         String unQualifiedDataTypeTerm = baseDataTypeTerm;
@@ -1525,7 +1525,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             }
         }
         DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
-        insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
+        insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
     }
 
     private int getXSDBuiltInTypeId(String xsd_buitintype) {
