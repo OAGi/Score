@@ -129,8 +129,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                 if (!is_fields_xsd) {
                 	DataType dtVO = dataTypeRepository.findOne(aDataTypeSupplementaryComponent.getOwnerDtId());
-                	XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType("xsd:token");
-                	
+                	XSDBuiltInType xbtToken = xbtRepository.findOneByBuiltInType("xsd:token");
+                	XSDBuiltInType xbtNormalizedString = xbtRepository.findOneByBuiltInType("xsd:normalizedString");
+
                 	if (aDataTypeSupplementaryComponent.getPropertyTerm().equals("Language")) {
                         DataType defaultTextBDT = dataTypeRepository.findOne(dtVO.getBasedDtId());
                         List<DataTypeSupplementaryComponent> baseDTSCs = dtScRepository.findByOwnerDtId(defaultTextBDT.getDtId());
@@ -149,7 +150,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap CDTSCAPX =
                                         cdtScAwdPriXpsTypeMapRepository.findOne(aBDTSCPri.getCdtScAwdPriXpsTypeMapId());
 
-                                if (CDTSCAPX.getXbtId() == xbt.getXbtId()) {//if it is token
+                                if (CDTSCAPX.getXbtId() == xbtToken.getXbtId()) {//if it is token
                                     bVO.setDefault(true);
                                 } else {
                                     bVO.setDefault(false);
@@ -180,7 +181,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                                 bVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
                                 bVO.setCdtScAwdPriXpsTypeMapId(cdtSCMaps.get(j).getCdtScAwdPriXpsTypeMapId());
-                                if (cdtSCMaps.get(j).getXbtId() == xbt.getXbtId()) {//if it is token
+                                if (cdtSCMaps.get(j).getXbtId() == xbtToken.getXbtId()) {//if it is token
                                     bVO.setDefault(true);
                                 } else {
                                     bVO.setDefault(false);
@@ -220,7 +221,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                                 bVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());
                                 bVO.setCdtScAwdPriXpsTypeMapId(cdtSCMaps.get(j).getCdtScAwdPriXpsTypeMapId());
-                                if (cdtSCMaps.get(j).getXbtId() == xbt.getXbtId()) {//if it is token
+                                if (cdtSCMaps.get(j).getXbtId() == xbtNormalizedString.getXbtId()) {//if it is normalizedString
                                     bVO.setDefault(true);
                                 } else {
                                     bVO.setDefault(false);
