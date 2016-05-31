@@ -387,12 +387,28 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     public void test_Populate_cdt_sc_awd_pri_Table() {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList = retrieveActualCdtScAwdPriList();
         actualCdtScAwdPriList.forEach(cdtScAwdPri -> {
-            if (cdtScAwdPri.isDefault()) {
-                assertEquals("Token", cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName());
-            } else {
-                assertTrue(Arrays.asList("NormalizedString", "String")
-                        .contains(cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName()));
-            }
+        	
+        	DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(cdtScAwdPri.getCdtScId());
+        	if(dtsc.getPropertyTerm().equals("Language") || dtsc.getPropertyTerm().equals("Action")){
+        		if (cdtScAwdPri.isDefault()) {
+                    assertEquals("Token", cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName());
+                } else {
+                    assertTrue(Arrays.asList("NormalizedString", "String")
+                            .contains(cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName()));
+                }
+        	}
+        	else if(dtsc.getPropertyTerm().equals("Expression Language")){
+        		if (cdtScAwdPri.isDefault()) {
+                    assertEquals("NormalizedString", cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName());
+                } else {
+                    assertTrue(Arrays.asList("Token", "String")
+                            .contains(cdtPriRepository.findOne(cdtScAwdPri.getCdtPriId()).getName()));
+                }
+        	}
+        	else {
+        		assertTrue(false);
+        	}
+            
         });
     }
 
@@ -519,9 +535,11 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
             }
         });
 
+        
         /*
          * 'Expression Language' Part
          */
+        
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriListForExpressionLanguage =
                 actualBdtScPriRestriList.stream().filter(bdtScPriRestri -> {
                     DataTypeSupplementaryComponent actualDtSc = targetDtScMap.get(bdtScPriRestri.getBdtScId());
@@ -554,9 +572,85 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                 .mapToInt(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
                 .sum() ;
         assertEquals(expectedSumValueForExpressionLanguage, actualSumValueForExpressionLanguage);
-
+        
+        actualBdtScPriRestriListForExpressionLanguage.forEach(bdtScPriRestri -> {
+            if (bdtScPriRestri.isDefault()) {
+                assertEquals("xsd:normalizedString",
+                        xbtRepository.findOne(
+                                cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
+                        ).getBuiltInType());
+            } else {
+                assertTrue(Arrays.asList("xsd:string", "xsd:token").contains(
+                        xbtRepository.findOne(
+                                cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
+                        ).getBuiltInType())
+                );
+            }
+        });
+        
         /*
          * 'Action Code' Part
          */
+        CodeList expectedCodeListOfBdtScPriRestriForActionCodeForActionExpression =
+                codeListRepository.findOneByName("oacl_ActionCode");
+        
+        CodeList expectedCodeListOfBdtScPriRestriForActionCodeForResponseActionExpression =
+                codeListRepository.findOneByName("oacl_ResponseActionCode");
+
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriListForActionCode =
+                actualBdtScPriRestriList.stream().filter(bdtScPriRestri -> {
+                    DataTypeSupplementaryComponent actualDtSc = targetDtScMap.get(bdtScPriRestri.getBdtScId());
+                    return "Action".equals(actualDtSc.getPropertyTerm());
+                }).collect(Collectors.toList());
+
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> targetCdtScAwdPriListForActionCode =
+                cdtScAwdPriRepository.findByCdtScIdIn(
+                        actualBdtScPriRestriListForActionCode.stream()
+                                .mapToInt(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId)
+                                .boxed()
+                                .collect(Collectors.toList())
+                );
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> targetCdtScAwdPriXpsTypeMapListForActionCode =
+                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                targetCdtScAwdPriListForActionCode.stream()
+                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                        .boxed()
+                        .collect(Collectors.toList())
+                );
+        
+        // check rows of count
+        assertEquals(targetCdtScAwdPriXpsTypeMapListForActionCode.size()+2, actualBdtScPriRestriListForActionCode.size());
+
+        // check rows of value
+        int actualSumValueForActionCode = actualBdtScPriRestriListForActionCode.stream()
+                .mapToInt(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
+                .sum();
+       
+        int expectedSumValueForActionCode = targetCdtScAwdPriXpsTypeMapListForActionCode.stream()
+                .mapToInt(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
+                .sum() 
+                + expectedCodeListOfBdtScPriRestriForActionCodeForActionExpression.getCodeListId() 
+                + expectedCodeListOfBdtScPriRestriForActionCodeForResponseActionExpression.getCodeListId();
+        
+        assertEquals(expectedSumValueForActionCode, actualSumValueForActionCode);
+
+        int expectedCodeListSum=0;
+        actualBdtScPriRestriListForActionCode.forEach(bdtScPriRestri -> {
+            if (bdtScPriRestri.isDefault()) {
+                assertEquals("xsd:token",
+                        xbtRepository.findOne(
+                                cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
+                        ).getBuiltInType());
+            } else if(bdtScPriRestri.getCodeListId()==0){
+                assertTrue(Arrays.asList("xsd:string", "xsd:normalizedString").contains(
+                        xbtRepository.findOne(
+                                cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
+                        ).getBuiltInType())
+                );
+            } 
+        });
+        
     }
+        
+        
 }
