@@ -93,7 +93,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
         expectedCodeLists.add(new ExpectedCodeList(
                 "Model\\Platform\\2_1\\Common\\CodeLists\\CodeList_CharacterSetCode_IANA_20070514.xsd",
                 "clmIANACharacterSetCode20070514_CharacterSetCode",
-                null,
+                "oagis-id-369bb5cf4149492e84fb5b070a98a12b",
                 null,
                 null,
                 20070514));
@@ -128,7 +128,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
         expectedCodeLists.add(new ExpectedCodeList(
                 "Model\\Platform\\2_1\\Common\\CodeLists\\CodeList_DateTimeFormatCode_1.xsd",
                 "clm6DateTimeFormatCode1_DateTimeFormatCode",
-                null,
+                "oagis-id-0b7cbca16b6741b58fb6920861ddd433",
                 null,
                 null,
                 1));
@@ -156,7 +156,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
         expectedCodeLists.add(new ExpectedCodeList(
                 "Model\\Platform\\2_1\\Common\\CodeLists\\CodeList_TimeZoneCode_1.xsd",
                 "clm6TimeZoneCode1_TimeZoneCode",
-                null,
+                "oagis-id-44ec8e62b49c44a997637034a5be4f2e",
                 null,
                 null,
                 1));
