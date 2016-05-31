@@ -79,7 +79,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
 
     @Before
     public void setUp() {
-        defaultTextBDT = dtRepository.findOneByDen("Text_0F0ZX1. Type");
+        defaultTextBDT = dtRepository.findOneByTypeAndDen(1, "Text_0F0ZX1. Type");
         assertNotNull(defaultTextBDT);
 
         targetTextCDT = dtRepository.findOneByTypeAndDen(0, "Text. Type");

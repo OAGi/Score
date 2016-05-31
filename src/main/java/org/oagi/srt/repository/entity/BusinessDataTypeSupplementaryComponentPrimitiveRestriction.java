@@ -48,7 +48,9 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     public void setCdtScAwdPriXpsTypeMapId(int cdtScAwdPriXpsTypeMapId) {
-        this.cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMapId;
+        if (cdtScAwdPriXpsTypeMapId > 0) {
+            this.cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMapId;
+        }
     }
 
     public int getCodeListId() {
@@ -56,7 +58,9 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     public void setCodeListId(int codeListId) {
-        this.codeListId = codeListId;
+        if (codeListId > 0) {
+            this.codeListId = codeListId;
+        }
     }
 
     public boolean isDefault() {
@@ -72,7 +76,9 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     public void setAgencyIdListId(int agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+        if (agencyIdListId > 0) {
+            this.agencyIdListId = agencyIdListId;
+        }
     }
 
     @Override

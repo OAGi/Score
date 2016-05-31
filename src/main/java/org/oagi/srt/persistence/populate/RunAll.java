@@ -28,8 +28,8 @@ public class RunAll {
             P_1_6_1_to_2_PopulateDTFromMetaXSD p7 = ctx.getBean(P_1_6_1_to_2_PopulateDTFromMetaXSD.class);
             p7.run(ctx);
 
-//            P_1_7_PopulateQBDTInDT p13 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
-//            p13.run(ctx);
+            P_1_7_PopulateQBDTInDT p13 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
+            p13.run(ctx);
 
 //            P_1_8_PopulateAccAsccpBccAscc p14 = ctx.getBean(P_1_8_PopulateAccAsccpBccAscc.class);
 //            p14.run(ctx);

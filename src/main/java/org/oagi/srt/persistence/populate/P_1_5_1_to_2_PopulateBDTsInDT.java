@@ -345,7 +345,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             System.out.println(typeName);
             String den = Utility.typeToDen(tmp.getAttribute("type"));
 
-            if (dataTypeRepository.findOneByDen(den) == null) { // && duplicate_check == false) {
+            if (dataTypeRepository.findByDen(den).isEmpty()) { // && duplicate_check == false) {
                 XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
                 String type = "complex";
                 String xsdTypeName = typeName;
@@ -1445,7 +1445,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         typeName = aElementTN.getAttribute("base");
 
         String den = Utility.typeToDen(typeName);
-        DataType dVO1 = dataTypeRepository.findOneByDen(den);
+        DataType dVO1 = dataTypeRepository.findByDen(den).get(0);
         baseDataTypeTerm = dVO1.getDataTypeTerm();
         baseGUID = dVO1.getGuid();
 
@@ -1498,7 +1498,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         typeName = aElementTN.getAttribute("base");
 
         String den = Utility.typeToDen(typeName);
-        DataType dVO1 = dataTypeRepository.findOneByDen(den);
+        DataType dVO1 = dataTypeRepository.findByDen(den).get(0);
         baseDataTypeTerm = dVO1.getDataTypeTerm();
         baseGUID = dVO1.getGuid();
 

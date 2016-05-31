@@ -80,9 +80,7 @@ public class DataTypeTest {
 
             String den = tmp.getAttribute("type").replaceAll("Type", "") + ". Type";
 
-            try {
-                dataTypeRepository.findOneByDen(den);
-            } catch (EmptyResultDataAccessException e) {
+            if (dataTypeRepository.findByDen(den) == null) {
                 XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
                 String type = "complex";
                 String xsdTypeName = typeName;
@@ -1419,7 +1417,7 @@ public class DataTypeTest {
     }
 
     private void validate_bdt_pri_resti(String datatype) {
-        DataType dataType = dataTypeRepository.findOneByDen(Utility.typeToDen(datatype));
+        DataType dataType = dataTypeRepository.findByDen(Utility.typeToDen(datatype)).get(0);
         int bdt_id = dataType.getDtId();
 
         List<BusinessDataTypePrimitiveRestriction> bdt_pri_resti_list = bdtPriRestriRepository.findByBdtId(bdt_id);
@@ -1493,9 +1491,7 @@ public class DataTypeTest {
         default_bdt.add(Utility.typeToDen("TextType_0F0ZX1"));
 
         for (int i = 0; i < default_bdt.size(); i++) {
-            try {
-                dataTypeRepository.findOneByDen(default_bdt.get(i));
-            } catch (EmptyResultDataAccessException e) {
+            if (dataTypeRepository.findByDen(default_bdt.get(i)).isEmpty()) {
                 System.err.println("There is no default bdt in dt table : " + default_bdt.get(i));
             }
         }

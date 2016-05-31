@@ -48,7 +48,9 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     }
 
     public void setCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId) {
-        this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
+        if (cdtAwdPriXpsTypeMapId > 0) {
+            this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
+        }
     }
 
     public int getCodeListId() {
@@ -56,7 +58,9 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     }
 
     public void setCodeListId(int codeListId) {
-        this.codeListId = codeListId;
+        if (codeListId > 0) {
+            this.codeListId = codeListId;
+        }
     }
 
     public boolean isDefault() {
@@ -72,7 +76,9 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     }
 
     public void setAgencyIdListId(int agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+        if (agencyIdListId > 0) {
+            this.agencyIdListId = agencyIdListId;
+        }
     }
 
     @Override

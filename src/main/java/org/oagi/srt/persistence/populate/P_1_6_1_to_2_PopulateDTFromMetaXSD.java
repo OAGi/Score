@@ -57,7 +57,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
             Node extension = xh.getNode("//xsd:complexType[@name = '" + name + "']/xsd:simpleContent/xsd:extension");
             String base = Utility.typeToDen(((Element) extension).getAttribute("base"));
-            DataType dtVO_01 = dataTypeRepository.findOneByDen(base);
+            DataType dtVO_01 = dataTypeRepository.findByDen(base).get(0);
 
             dataType.setBasedDtId(dtVO_01.getDtId());
             dataType.setDataTypeTerm(dtVO_01.getDataTypeTerm());
