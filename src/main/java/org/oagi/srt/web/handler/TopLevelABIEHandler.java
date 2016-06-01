@@ -434,9 +434,6 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private List<CoreComponent> queryNestedChildAssoc(AggregateCoreComponent aggregateCoreComponent) {
-        logger.debug("enter queryNestedChildAssoc(" + aggregateCoreComponent.getAccId() + ")");
-        long currentTimeMillis = System.currentTimeMillis();
-
         List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(aggregateCoreComponent.getAccId());
         List<AssociationCoreComponent> ascc_tmp_assoc = getASCC(aggregateCoreComponent.getAccId());
 
@@ -449,10 +446,6 @@ public class TopLevelABIEHandler implements Serializable {
         CoreComponent a = new CoreComponent();
         for (int i = 0; i < size; i++)
             assoc.add(a);
-
-        if ("oracle".equalsIgnoreCase(platform)) {
-            tmp_assoc = getAssocList(tmp_assoc);
-        }
 
         int attribute_cnt = 0;
         for (CoreComponent coreComponent : tmp_assoc) {
@@ -472,22 +465,10 @@ public class TopLevelABIEHandler implements Serializable {
 
         assoc.trimToSize();
 
-        try {
-            if ("mysql".equalsIgnoreCase(platform)) {
-                return getAssocList(assoc);
-            } else {
-                return assoc;
-            }
-        } finally {
-            logger.debug("leave queryNestedChildAssoc(" + aggregateCoreComponent.getAccId() + "), elapsed time(ms): " +
-                    (System.currentTimeMillis() - currentTimeMillis));
-        }
+        return getAssocList(assoc);
     }
 
     private List<CoreComponent> queryNestedChildAssoc_wo_attribute(AggregateCoreComponent aggregateCoreComponent) {
-        logger.debug("enter queryNestedChildAssoc_wo_attribute(" + aggregateCoreComponent.getAccId() + ")");
-        long currentTimeMillis = System.currentTimeMillis();
-
         List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(aggregateCoreComponent.getAccId());
         List<AssociationCoreComponent> ascc_tmp_assoc = getASCC(aggregateCoreComponent.getAccId());
         int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
@@ -503,27 +484,16 @@ public class TopLevelABIEHandler implements Serializable {
         for (CoreComponent coreComponent : tmp_assoc) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
-                if (basicCoreComponent.getSeqKey() > 0)
-                    logger.debug("BCC: " + basicCoreComponent.getFromAccId() + " ~ " + basicCoreComponent.getToBccpId() + " (" + basicCoreComponent.getSeqKey() + ")");
                 assoc.set(basicCoreComponent.getSeqKey() - 1, basicCoreComponent);
             } else {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
-                logger.debug("ASCC: " + associationCoreComponent.getFromAccId() + " ~ " + associationCoreComponent.getToAsccpId() + " (" + associationCoreComponent.getSeqKey() + ")");
                 assoc.set(associationCoreComponent.getSeqKey() - 1, associationCoreComponent);
             }
         }
 
         assoc.trimToSize();
 
-        try {
-            if ("mysql".equalsIgnoreCase(platform)) {
-                return getAssocList(assoc);
-            } else {
-                return assoc;
-            }
-        } finally {
-            logger.debug("leave queryNestedChildAssoc_wo_attribute(" + aggregateCoreComponent.getAccId() + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
-        }
+        return getAssocList(assoc);
     }
 
     private List<CoreComponent> queryChildAssoc(AggregateCoreComponent aggregateCoreComponent) {
@@ -747,7 +717,7 @@ public class TopLevelABIEHandler implements Serializable {
         if (topLevel)
             abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
 
-        abieRepository.save(abie);
+        abieRepository.saveAndFlush(abie);
         abieCount++;
 
         return abie;
@@ -765,7 +735,7 @@ public class TopLevelABIEHandler implements Serializable {
         asbiep.setLastUpdatedBy(userId);
         asbiep.setDefinition(associationCoreComponentProperty.getDefinition());
 
-        asbiepRepository.save(asbiep);
+        asbiepRepository.saveAndFlush(asbiep);
         asbiepCount++;
 
         return asbiep;
@@ -785,7 +755,7 @@ public class TopLevelABIEHandler implements Serializable {
         asbie.setLastUpdatedBy(userId);
         asbie.setSeqKey(seqKey);
 
-        asbieRepository.save(asbie);
+        asbieRepository.saveAndFlush(asbie);
         asbieCount++;
 
         return asbie;
@@ -800,7 +770,7 @@ public class TopLevelABIEHandler implements Serializable {
         bbiep.setLastUpdatedBy(userId);
         bbiep.setDefinition(bccpVO.getDefinition());
 
-        bbiepRepository.save(bbiep);
+        bbiepRepository.saveAndFlush(bbiep);
         bbiepCount++;
 
         return bbiep;
@@ -822,7 +792,7 @@ public class TopLevelABIEHandler implements Serializable {
         bbie.setLastUpdatedBy(userId);
         bbie.setSeqKey(seqKey);
 
-        bbieRepository.save(bbie);
+        bbieRepository.saveAndFlush(bbie);
         bbieCount++;
 
         return bbie;
@@ -832,7 +802,7 @@ public class TopLevelABIEHandler implements Serializable {
         List<DataTypeSupplementaryComponent> list =
                 dtScRepository.findByOwnerDtId(bdt);
 
-        HashMap<String, String> hm = new HashMap<String, String>();
+        Map<String, String> hm = new HashMap();
         for (DataTypeSupplementaryComponent dtsc : list) {
             if (dtsc.getMaxCardinality() == 0)
                 continue;
@@ -844,7 +814,7 @@ public class TopLevelABIEHandler implements Serializable {
             bbiescVO.setMinCardinality(dtsc.getMinCardinality());
             bbiescVO.setDefinition(dtsc.getDefinition());
 
-            bbiescRepository.save(bbiescVO);
+            bbiescRepository.saveAndFlush(bbiescVO);
             bbiescCount++;
 
             String sc_name = "";
@@ -932,7 +902,7 @@ public class TopLevelABIEHandler implements Serializable {
         if (topLevel)
             cloneAggregateBusinessInformationEntity.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
 
-        abieRepository.save(cloneAggregateBusinessInformationEntity);
+        abieRepository.saveAndFlush(cloneAggregateBusinessInformationEntity);
         abieCount++;
 
         return cloneAggregateBusinessInformationEntity;
@@ -950,7 +920,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAssociationBusinessInformationEntityProperty.setLastUpdatedBy(userId);
         cloneAssociationBusinessInformationEntityProperty.setDefinition(sourceAssociationBusinessInformationEntityProperty.getDefinition());
 
-        asbiepRepository.save(cloneAssociationBusinessInformationEntityProperty);
+        asbiepRepository.saveAndFlush(cloneAssociationBusinessInformationEntityProperty);
         asbiepCount++;
 
         return cloneAssociationBusinessInformationEntityProperty;
@@ -970,7 +940,7 @@ public class TopLevelABIEHandler implements Serializable {
         asbieVO.setLastUpdatedBy(userId);
         asbieVO.setSeqKey(oasbieVO.getSeqKey());
 
-        asbieRepository.save(asbieVO);
+        asbieRepository.saveAndFlush(asbieVO);
         asbieCount++;
 
         return asbieVO;
@@ -987,7 +957,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiepVO.setCreatedBy(userId);
         nbbiepVO.setLastUpdatedBy(userId);
 
-        bbiepRepository.save(nbbiepVO);
+        bbiepRepository.saveAndFlush(nbbiepVO);
         bbiepCount++;
 
         return nbbiepVO;
@@ -1014,7 +984,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbieVO.setCreatedBy(userId);
         nbbieVO.setLastUpdatedBy(userId);
 
-        bbieRepository.save(nbbieVO);
+        bbieRepository.saveAndFlush(nbbieVO);
         bbieCount++;
 
         return nbbieVO;
@@ -1035,7 +1005,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiescVO.setBizTerm(obbiescvo.getBizTerm());
 
         nbbiescVO.setBbieId(bbie);
-        bbiescRepository.save(nbbiescVO);
+        bbiescRepository.saveAndFlush(nbbiescVO);
         bbiescCount++;
 
         DataTypeSupplementaryComponent dtscvo = dtScRepository.findOne(nbbiescVO.getDtScId());
@@ -1084,7 +1054,7 @@ public class TopLevelABIEHandler implements Serializable {
                     nueACC.setState(1);
                     nueACC.setRevisionNum(0);
                     nueACC.setRevisionTrackingNum(0);
-                    accRepository.save(nueACC);
+                    accRepository.saveAndFlush(nueACC);
 
                     AssociationCoreComponentProperty nASCCP = new AssociationCoreComponentProperty();
                     nASCCP.setGuid(Utility.generateGUID());
@@ -1095,7 +1065,7 @@ public class TopLevelABIEHandler implements Serializable {
                     nASCCP.setReusableIndicator(false);
                     nASCCP.setRevisionNum(0);
                     nASCCP.setRevisionTrackingNum(0);
-                    asccpRepository.save(nASCCP);
+                    asccpRepository.saveAndFlush(nASCCP);
 
                     AssociationCoreComponent nASCC = new AssociationCoreComponent();
                     nASCC.setGuid(Utility.generateGUID());
@@ -1108,18 +1078,18 @@ public class TopLevelABIEHandler implements Serializable {
                     nASCC.setState(4);
                     nASCC.setRevisionNum(0);
                     nASCC.setRevisionTrackingNum(0);
-                    asccRepository.save(nASCC);
+                    asccRepository.saveAndFlush(nASCC);
                     //here : history record population
 
                     AssociationCoreComponentProperty hASCCP = new AssociationCoreComponentProperty(); // populate ASCCP history record
                     hASCCP.setRevisionNum(1);
                     hASCCP.setRevisionTrackingNum(1);
-                    asccpRepository.save(hASCCP);
+                    asccpRepository.saveAndFlush(hASCCP);
 
                     AssociationCoreComponent hASCC = new AssociationCoreComponent(); //populate ASCC history record
                     hASCC.setRevisionNum(1);
                     hASCC.setRevisionTrackingNum(1);
-                    asccRepository.save(hASCC);
+                    asccRepository.saveAndFlush(hASCC);
                 }
             } else {
                 if (ueACC.getState() == 1 && ueACC.getOwnerUserId() == userId) {
@@ -1403,14 +1373,14 @@ public class TopLevelABIEHandler implements Serializable {
         bcVO.setName(bcH.getName());
         String guid = Utility.generateGUID();
         bcVO.setGuid(guid);
-        businessContextRepository.save(bcVO);
+        businessContextRepository.saveAndFlush(bcVO);
 
         for (BusinessContextValues bcv : bcH.getBcValues()) {
             for (ContextSchemeValue cVO : bcv.getCsList()) {
                 BusinessContextValue bcvVO = new BusinessContextValue();
                 bcvVO.setBizCtxId(bcVO.getBizCtxId());
                 bcvVO.setCtxSchemeValueId(cVO.getCtxSchemeValueId());
-                businessContextValueRepository.save(bcvVO);
+                businessContextValueRepository.saveAndFlush(bcvVO);
             }
         }
 
@@ -1537,8 +1507,8 @@ public class TopLevelABIEHandler implements Serializable {
             }
         }
 
-        bbieRepository.save(bbieVO);
-        bbiepRepository.save(bbiepVO);
+        bbieRepository.saveAndFlush(bbieVO);
+        bbiepRepository.saveAndFlush(bbiepVO);
     }
 
     public void chooseCodeForTLBIE() {
@@ -1662,7 +1632,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     private void saveBBIESCChanges(ABIEView aABIEView) {
         BasicBusinessInformationEntitySupplementaryComponent bbiescVO = aABIEView.getBbiesc();
-        bbiescRepository.save(bbiescVO);
+        bbiescRepository.saveAndFlush(bbiescVO);
     }
 
     public void closeDialog() {
@@ -1674,14 +1644,14 @@ public class TopLevelABIEHandler implements Serializable {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
         AssociationBusinessInformationEntityProperty asbiepVO = aABIEView.getAsbiep();
 
-        asbieRepository.save(asbieVO);
-        asbiepRepository.save(asbiepVO);
-        abieRepository.save(abieVO);
+        asbieRepository.saveAndFlush(asbieVO);
+        asbiepRepository.saveAndFlush(asbiepVO);
+        abieRepository.saveAndFlush(abieVO);
     }
 
     private void saveABIEChanges(ABIEView aABIEView) {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
-        abieRepository.save(abieVO);
+        abieRepository.saveAndFlush(abieVO);
     }
 
 }
