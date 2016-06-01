@@ -110,6 +110,9 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     }
 
     public void setCardinalityMin(int cardinalityMin) {
+        if (cardinalityMin < 0) {
+            throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
+        }
         this.cardinalityMin = cardinalityMin;
     }
 
@@ -118,6 +121,9 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     }
 
     public void setCardinalityMax(int cardinalityMax) {
+        if (cardinalityMax < -1) {
+            throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
+        }
         this.cardinalityMax = cardinalityMax;
     }
 
@@ -126,7 +132,9 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     }
 
     public void setToBccpId(int toBccpId) {
-        this.toBccpId = toBccpId;
+        if (toBccpId > 0) {
+            this.toBccpId = toBccpId;
+        }
     }
 
     public int getFromAccId() {
@@ -134,7 +142,9 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     }
 
     public void setFromAccId(int fromAccId) {
-        this.fromAccId = fromAccId;
+        if (fromAccId > 0) {
+            this.fromAccId = fromAccId;
+        }
     }
 
     public int getSeqKey() {

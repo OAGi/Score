@@ -19,6 +19,7 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column(nullable = false)
     private String propertyTerm;
 
+    @Lob
     @Column(nullable = false)
     private String definition;
 

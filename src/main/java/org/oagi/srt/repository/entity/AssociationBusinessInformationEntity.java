@@ -34,7 +34,7 @@ public class AssociationBusinessInformationEntity implements Serializable, Busin
     @Column(nullable = false)
     private int cardinalityMax;
 
-    @Column(nullable = false)
+    @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
 
     @Column
@@ -124,6 +124,9 @@ public class AssociationBusinessInformationEntity implements Serializable, Busin
     }
 
     public void setCardinalityMin(int cardinalityMin) {
+        if (cardinalityMin < 0) {
+            throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
+        }
         this.cardinalityMin = cardinalityMin;
     }
 
@@ -132,6 +135,9 @@ public class AssociationBusinessInformationEntity implements Serializable, Busin
     }
 
     public void setCardinalityMax(int cardinalityMax) {
+        if (cardinalityMax < -1) {
+            throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
+        }
         this.cardinalityMax = cardinalityMax;
     }
 

@@ -107,6 +107,9 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public void setCardinalityMin(int cardinalityMin) {
+        if (cardinalityMin < 0) {
+            throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
+        }
         this.cardinalityMin = cardinalityMin;
     }
 
@@ -115,6 +118,9 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public void setCardinalityMax(int cardinalityMax) {
+        if (cardinalityMax < -1) {
+            throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
+        }
         this.cardinalityMax = cardinalityMax;
     }
 
@@ -131,7 +137,9 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public void setFromAccId(int fromAccId) {
-        this.fromAccId = fromAccId;
+        if (fromAccId > 0) {
+            this.fromAccId = fromAccId;
+        }
     }
 
     public int getToAsccpId() {
@@ -139,7 +147,9 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     }
 
     public void setToAsccpId(int toAsccpId) {
-        this.toAsccpId = toAsccpId;
+        if (toAsccpId > 0) {
+            this.toAsccpId = toAsccpId;
+        }
     }
 
     public String getDen() {

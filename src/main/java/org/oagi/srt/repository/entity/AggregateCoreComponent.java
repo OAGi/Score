@@ -134,7 +134,9 @@ public class AggregateCoreComponent implements Serializable {
     }
 
     public void setBasedAccId(int basedAccId) {
-        this.basedAccId = basedAccId;
+        if (basedAccId > 0) {
+            this.basedAccId = basedAccId;
+        }
     }
 
     public String getObjectClassQualifier() {
