@@ -95,7 +95,7 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the user of a given system.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="Party" id="oagis-id-c595941886fcb4ffabdf415d9c28ce848" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Party" id="oagis-id-c595941886fcb4ffabdf415d9c28ce84" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
