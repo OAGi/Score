@@ -17,7 +17,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,24 +72,15 @@ public class P_1_7_PopulateQBDTInDT {
 
     private XPathHandler fields_xsd;
     private XPathHandler meta_xsd;
-    private XPathHandler businessdatatype_xsd;
+    private XPathHandler businessDataType_xsd;
     private XPathHandler component_xsd;
-    private File f1;
 
     @PostConstruct
     public void init() throws Exception {
         fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-        businessdatatype_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         component_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
-
-        f1 = new File(SRTConstants.CODE_LIST_FILE_PATH);
-    }
-
-    private File[] getBODs(File f) {
-        return f.listFiles((dir, name) -> {
-            return name.matches(".*.xsd");
-        });
     }
 
     private void populate() throws Exception {
@@ -161,7 +151,7 @@ public class P_1_7_PopulateQBDTInDT {
                 }
             }
             if (simpleContent == null && simpleType == null)
-                xHandler = businessdatatype_xsd;
+                xHandler = businessDataType_xsd;
             simpleContent = xHandler.getNode("//xsd:complexType[@name = '" + type + "']/xsd:simpleContent");
             simpleType = xHandler.getNode("//xsd:simpleType[@name = '" + type + "']");
 
@@ -326,8 +316,6 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataType addToDT(String guid, String type, Node typeNode, XPathHandler xHandler) throws Exception {
-        DataType dVO = new DataType();
-
         DataType dtVO = new DataType();
         dtVO.setGuid(guid);
         dtVO.setType(1);
@@ -339,6 +327,7 @@ public class P_1_7_PopulateQBDTInDT {
         Element extension = (Element) ((Element) typeNode).getElementsByTagName("xsd:extension").item(0);
         String base = extension.getAttribute("base");
 
+        DataType dVO;
         if (base.endsWith("CodeContentType")) {
             dVO = getDataTypeWithDen("Code. Type");
         } else {
@@ -372,13 +361,14 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
         Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
         String definition = null;
-        if (((Element) definitionNode) != null)
-            definition = ((Element) definitionNode).getTextContent();
+        if (definitionNode != null)
+            definition = definitionNode.getTextContent();
         else if (xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]") != null) {
             definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
-            definition = ((Element) definitionNode).getTextContent();
-        } else
+            definition = definitionNode.getTextContent();
+        } else {
             definition = null;
+        }
         dtVO.setDefinition(definition);
         dtVO.setContentComponentDefinition(null);
         dtVO.setState(3);
@@ -557,9 +547,9 @@ public class P_1_7_PopulateQBDTInDT {
                 if (documentationNode != null) {
                     Node documentationFromCCTS = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
                     if (documentationFromCCTS != null)
-                        definition = ((Element) documentationFromCCTS).getTextContent();
+                        definition = documentationFromCCTS.getTextContent();
                     else
-                        definition = ((Element) documentationNode).getTextContent();
+                        definition = documentationNode.getTextContent();
                 } else {
                     definition = null;
                 }
@@ -719,25 +709,17 @@ public class P_1_7_PopulateQBDTInDT {
         String dataType = "CodeContentType";
         NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
 
-        for (int i = 0; i < simpleTypesFromFieldsXSD.getLength(); i++) {
-            Node typeNode = simpleTypesFromFieldsXSD.item(i);
-            String type = ((Element) typeNode).getAttribute("name");
-            if (type.endsWith(dataType) && !type.equals(dataType)) {
-                String typeGuid = ((Element) typeNode).getAttribute("id");
-                DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
-                if (dtVO == null) {
-                    dtVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
-                    // add DT_SC
-                    addToDTSCForContentType(fields_xsd, type, dtVO);
-                }
-            }
-        }
+        insertContentTypeFromNodeList(dataType, simpleTypesFromFieldsXSD);
     }
 
     private void insertIDContentTypeDT() throws Exception {
         String dataType = "IDContentType";
         NodeList simpleTypesFromFieldsXSD = fields_xsd.getNodeList("//xsd:simpleType");
 
+        insertContentTypeFromNodeList(dataType, simpleTypesFromFieldsXSD);
+    }
+
+    private void insertContentTypeFromNodeList(String dataType, NodeList simpleTypesFromFieldsXSD) throws Exception {
         for (int i = 0; i < simpleTypesFromFieldsXSD.getLength(); i++) {
             Node typeNode = simpleTypesFromFieldsXSD.item(i);
             String type = ((Element) typeNode).getAttribute("name");
@@ -745,9 +727,7 @@ public class P_1_7_PopulateQBDTInDT {
                 String typeGuid = ((Element) typeNode).getAttribute("id");
                 DataType dtVO = dataTypeRepository.findOneByGuid(typeGuid);
                 if (dtVO == null) {
-                    // add new QBDT
                     dtVO = addToDTForContentType(typeGuid, type, typeNode, fields_xsd);
-
                     // add DT_SC
                     addToDTSCForContentType(fields_xsd, type, dtVO);
                 }
@@ -790,11 +770,11 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
         String definition = null;
         Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
-        if (((Element) definitionNode) != null)
-            definition = ((Element) definitionNode).getTextContent();
+        if (definitionNode != null)
+            definition = definitionNode.getTextContent();
         else if (xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]") != null) {
             definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
-            definition = ((Element) definitionNode).getTextContent();
+            definition = definitionNode.getTextContent();
         } else
             definition = null;
         dtVO.setDefinition(definition);

@@ -6,7 +6,6 @@ import org.oagi.srt.common.util.Zip;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.*;
 
@@ -468,36 +467,25 @@ public class StandaloneXMLSchema {
         CodeList aCL = null;
 
         if (gBBIE.getCodeListId() != 0) {
-            try {
-                aCL = codeListRepository.findOne(gBBIE.getCodeListId());
-            } catch (EmptyResultDataAccessException e) {
-            }
+            aCL = codeListRepository.findOne(gBBIE.getCodeListId());
         }
 
         if (aCL == null) {
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                     bdtPriRestriRepository.findOne(gBBIE.getBdtPriRestriId());
             if (aBDTPrimitiveRestriction.getCodeListId() != 0) {
-                try {
-                    aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
-                } catch (EmptyResultDataAccessException e) {
-                }
+                aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
             }
         }
 
         if (aCL == null) {
-            try {
-                BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                        bdtPriRestriRepository.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
+            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                    bdtPriRestriRepository.findOneByBdtIdAndDefault(gBDT.getDtId(), true);
 
-                if (aBDTPrimitiveRestriction.getCodeListId() != 0)
-                    aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
-                else
-                    aCL = null;
-
-            } catch (EmptyResultDataAccessException e) {
+            if (aBDTPrimitiveRestriction.getCodeListId() != 0)
+                aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
+            else
                 aCL = null;
-            }
         }
         return aCL;
     }

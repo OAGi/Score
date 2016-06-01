@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
@@ -263,10 +262,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                     int cdt_sc_awd_pri_id = 0;
                     if (cdt_id > 0) {
-                        try {
-                            cdt_sc_awd_pri_id = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdt_id, CDT_Primitive_id).getCdtScAwdPriId();
-                        } catch (EmptyResultDataAccessException e) {
-                        }
+                        cdt_sc_awd_pri_id = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdt_id, CDT_Primitive_id).getCdtScAwdPriId();
                     }
 
                     int CDTSCAllowedPrimitiveExpressionTypeMapID = 0;
