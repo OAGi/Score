@@ -32,7 +32,7 @@ import java.util.ArrayList;
 public class P_1_3_PopulateAgencyIDList {
 	
 	public void agencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
+		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_D13A.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("AgencyIDList");
@@ -58,7 +58,7 @@ public class P_1_3_PopulateAgencyIDList {
 	public void validateImportAgencyIDList() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		System.out.println("@@ Validating agency_id_list..");
 		
-		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
+		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_D13A.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 		DAOFactory df = DAOFactory.getDAOFactory();
 		SRTDAO dao = df.getDAO("AgencyIDList");
@@ -131,7 +131,7 @@ public class P_1_3_PopulateAgencyIDList {
 	}
 
 	public void agencyIDListValue() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
+		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_D13A.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 
 		DAOFactory df = DAOFactory.getDAOFactory();
@@ -165,7 +165,7 @@ public class P_1_3_PopulateAgencyIDList {
 	public void validateImportAgencyIDListValue() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
 		System.out.println("@@ Validationg agency_id_list_value..");
 		
-		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
+		String path1 = SRTConstants.filepath("AgencyID")+"IdentifierScheme_AgencyIdentification_D13A.xsd";
 		XPathHandler xh = new XPathHandler(path1);
 
 		DAOFactory df = DAOFactory.getDAOFactory();
