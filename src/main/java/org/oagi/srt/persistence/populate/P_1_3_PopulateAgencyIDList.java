@@ -46,7 +46,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {
-        String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
+        String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_D13A.xsd";
         XPathHandler xh = new XPathHandler(path1);
 
         AgencyIdList agencyIdList = new AgencyIdList();
@@ -80,7 +80,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private Collection<AgencyIdListValue> agencyIDListValue(Collection<AgencyIdList> agencyIdLists) throws Exception {
-        String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B_merged.xsd";
+        String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_D13A.xsd";
         XPathHandler xh = new XPathHandler(path1);
 
         List<AgencyIdListValue> agencyIdListValues = new ArrayList();
