@@ -51,7 +51,7 @@ This may also require an Inventory event to occur to ensure the status of the go
 					<xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-510739fdceb140808bf9a92b7a5cbd43"/>
 					<xsd:element ref="ToBeInspectedQuantity" id="oagis-id-4740117812964d2ba9a47e4550107e7f" minOccurs="0"/>
 					<xsd:element ref="PriorityCode" id="oagis-id-3a6f5d17113e4408bb652784a6c7de51" minOccurs="0"/>
-					<xsd:group ref="InventoryTransactionGroup"/>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-5a4b8508f6ba4be38f3f17aae22397bc"/>
 					<xsd:element ref="RejectedQuantity" id="oagis-id-c21bb6ef702a4aeaa282907a2d485a97" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the quantity rejected for the specified Reason</xsd:documentation>

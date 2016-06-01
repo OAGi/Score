@@ -2053,7 +2053,7 @@ Kit</xsd:documentation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is reference to a ProductionOrder</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:group ref="ItemInstanceIDsGroup"/>
+					<xsd:group ref="ItemInstanceIDsGroup" id="oagis-id-75285328da664ab7aaa41f4817ad7237"/>
 					<xsd:element ref="ItemInstance" id="oagis-id-2c8fc58c0f9e428cabae1ce8fe00cf16" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-3d1989fe1d434dbd81731d5082023b8d"/>
@@ -4025,7 +4025,7 @@ For the supplier schedule to respond to the original demand schedule, the Respon
 					</xsd:element>
 					<xsd:element ref="PartnerRoleCodes" id="oagis-id-2e42835fe11948d39c497122deac2777" minOccurs="0"/>
 					<xsd:element ref="FinancialAccount" id="oagis-id-510739fdceb140808bf9a92b7a5cbd55" minOccurs="0" maxOccurs="unbounded"/>
-					<xsd:group ref="ReferencesGroup"/>
+					<xsd:group ref="ReferencesGroup" id="oagis-id-a94ebeb8550142c28f50dd54bc96e52f"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
