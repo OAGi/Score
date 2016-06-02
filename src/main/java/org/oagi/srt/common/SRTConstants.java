@@ -34,7 +34,7 @@ public class SRTConstants {
 	public static final String BOD_FILE_PATH_01 = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/BODs/";
 	public static final String BOD_FILE_PATH_02 = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/";
 
-	public static final String FILEDS_XSD_FILE_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields.xsd";
+	public static final String FIELDS_XSD_FILE_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields.xsd";
 	public static final String FILEDS_EXTENDED_XSD_FILE_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Fields_modified_extended.xsd";
 	public static final String META_XSD_FILE_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta.xsd";
 	public static final String META_EXTENDED_XSD_FILE_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Platform/2_1/Common/Components/Meta_extended.xsd";

@@ -60,7 +60,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xh2 = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler xh2 = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         System.out.println("### 1.5.6 Start");
         populateBDTSCPrimitiveRestriction(xh, xh2, true);
         System.out.println("### 1.5.6 End");

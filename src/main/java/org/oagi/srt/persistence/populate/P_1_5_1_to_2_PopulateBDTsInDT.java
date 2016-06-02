@@ -68,7 +68,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
         XPathHandler components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
 
         File f = new File(SRTConstants.NOUNS_FILE_PATH);
         File[] listOfFiles = f.listFiles();
@@ -100,7 +100,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -318,7 +318,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
         XPathHandler components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
 
         File f = new File(SRTConstants.NOUNS_FILE_PATH);
         File[] listOfFiles = f.listFiles();
@@ -430,7 +430,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -799,7 +799,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         String type = "simple";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -979,7 +979,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         String type = "simple";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -1433,7 +1433,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         String id;
         int defaultId = -1;
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -1485,7 +1485,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         String id;
         int defaultId = -1;
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 

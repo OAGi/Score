@@ -164,7 +164,7 @@ public class DataTypeTest {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -232,7 +232,7 @@ public class DataTypeTest {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
@@ -1575,7 +1575,7 @@ public class DataTypeTest {
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### DataType Validation Start");
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
         XPathHandler components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
 

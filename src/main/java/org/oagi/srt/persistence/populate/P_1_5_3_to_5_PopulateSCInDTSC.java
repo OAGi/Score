@@ -808,7 +808,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
     private void populateDTSC() throws Exception {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         populateDTSCforDefaultBDT(businessDataType_xsd, fields_xsd);
         populateDTSCforUnqualifiedBDT(businessDataType_xsd, fields_xsd, true);
     }
@@ -827,7 +827,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
         System.out.println("### 1.5.3-5 Start Validation");
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FILEDS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         validatePopulateDTSCforDefaultBDT(businessDataType_xsd, fields_xsd);
         validatePopulateDTSCforUnqualifiedBDT(businessDataType_xsd, fields_xsd, true);
 
