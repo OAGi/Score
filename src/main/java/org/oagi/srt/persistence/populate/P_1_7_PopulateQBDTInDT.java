@@ -208,10 +208,17 @@ public class P_1_7_PopulateQBDTInDT {
                 String dtGuid = idAttribute.getNodeValue();
 
                 Node definitionNode = (Node) xPath.compile(
-                        "./xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"] | " +
-                        "./xsd:annotation/xsd:documentation")
+                        "./xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]")
                         .evaluate(node, XPathConstants.NODE);
                 String definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
+                if (definition == null) {
+                    definitionNode = (Node) xPath.compile("./xsd:annotation/xsd:documentation")
+                            .evaluate(node, XPathConstants.NODE);
+                    definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
+                }
+                if (StringUtils.isEmpty(definition)) {
+                    definition = null;
+                }
 
                 Node baseTypeNode = (Node) xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
                 String baseTypeName = ((baseTypeNode != null) ? baseTypeNode.getAttributes().getNamedItem("base").getNodeValue() : null);
@@ -428,64 +435,64 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataType addToDT(DataTypeInfoHolder dataTypeInfoHolder, String type, XPathHandler xHandler) throws Exception {
-        DataType dtVO = new DataType();
-        String guid = dataTypeInfoHolder.getGuid();
-        dtVO.setGuid(guid);
-        dtVO.setType(1);
-        dtVO.setVersionNum("1.0");
-
         String base = dataTypeInfoHolder.getBaseTypeName();
-        if (base == null) { // if it doesn't QBDT
+        if (base == null) { // if it isn't QBDT
             return null;
         }
 
-        DataType dVO;
+        DataType dataType = new DataType();
+        String guid = dataTypeInfoHolder.getGuid();
+        dataType.setGuid(guid);
+        dataType.setType(1);
+        dataType.setVersionNum("1.0");
+
+        DataType baseDataType;
         if (base.endsWith("CodeContentType")) {
-            dVO = getDataTypeWithDen("Code. Type");
+            baseDataType = getDataTypeWithDen("Code. Type");
         } else {
-            String den = Utility.typeToDen(base);
-            dVO = getDataTypeWithDen(den);
+            String baseDen = Utility.typeToDen(base);
+            baseDataType = getDataTypeWithDen(baseDen);
 
             // QBDT is based on another QBDT
-            if (dVO == null) {
+            if (baseDataType == null) {
                 DataTypeInfoHolder baseDataTypeInfoHolder = dtiHolderMap.get(base);
                 if (baseDataTypeInfoHolder == null) {
                     throw new IllegalStateException("Unknown QBDT: " + base);
                 }
 
-                dVO = getDataTypeWithGUID(baseDataTypeInfoHolder.getGuid());
-                if (dVO == null) {
-                    dVO = addToDT(baseDataTypeInfoHolder, base, xHandler);
-                    if (dVO == null) {
+                baseDataType = getDataTypeWithGUID(baseDataTypeInfoHolder.getGuid());
+                if (baseDataType == null) {
+                    baseDataType = addToDT(baseDataTypeInfoHolder, base, xHandler);
+                    if (baseDataType == null) {
                         return null;
                     }
                 }
             }
         }
 
-        dtVO.setBasedDtId(dVO.getDtId());
-        dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
+        dataType.setBasedDtId(baseDataType.getDtId());
+        dataType.setDataTypeTerm(baseDataType.getDataTypeTerm());
 
-        String qualifier = Utility.qualifier(type, dVO);
+        String qualifier = Utility.qualifier(type, baseDataType);
         if (StringUtils.isEmpty(qualifier)) {
-            throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den:" + dVO.getDen());
+            throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den:" + baseDataType.getDen());
         }
 
-        dtVO.setQualifier(qualifier);
-        String den = Utility.denWithQualifier(qualifier, dVO.getDen());
-        dtVO.setDen(den);
-        dtVO.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
+        dataType.setQualifier(qualifier);
+        String den = Utility.denWithQualifier(qualifier, baseDataType.getDen());
+        dataType.setDen(den);
+        dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
 
         String definition = dataTypeInfoHolder.getDefinition();
-        dtVO.setDefinition(definition);
-        dtVO.setState(3);
-        dtVO.setCreatedBy(userId);
-        dtVO.setLastUpdatedBy(userId);
-        dtVO.setOwnerUserId(userId);
-        dtVO.setRevisionNum(0);
-        dtVO.setRevisionTrackingNum(0);
-        dtVO.setDeprecated(false);
-        dataTypeRepository.save(dtVO);
+        dataType.setDefinition(definition);
+        dataType.setState(3);
+        dataType.setCreatedBy(userId);
+        dataType.setLastUpdatedBy(userId);
+        dataType.setOwnerUserId(userId);
+        dataType.setRevisionNum(0);
+        dataType.setRevisionTrackingNum(0);
+        dataType.setDeprecated(false);
+        dataTypeRepository.save(dataType);
 
         DataType res = dataTypeRepository.findOneByGuid(guid);
         // add to BDTPrimitiveRestriction
