@@ -137,46 +137,46 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
     }
 
-    private void insertASCCP(XSElementDecl element, XSComplexTypeDecl complexType) throws Exception {
+    private AssociationCoreComponentProperty insertASCCP(XSElementDecl element, XSComplexTypeDecl complexType) throws Exception {
         String name = element.getName();
 
-        if (complexType != null) {
-            String asccpGuid = element.getFId();
-            String propertyTerm = Utility.spaceSeparator(name);
-            String definition = bodSchemaHandler.getAnnotation(element);
+        String asccpGuid = element.getFId();
+        String propertyTerm = Utility.spaceSeparator(name);
+        String definition = bodSchemaHandler.getAnnotation(element);
 
-            int roleOfAccId;
-            AggregateCoreComponent accVO = accRepository.findOneByGuid(complexType.getFId());
-            if (accVO == null) {
-                InsertACCResult insertACCResult = insertACC(complexType, bodPath);
-                accVO = insertACCResult.getAggregateCoreComponent();
-            }
-            roleOfAccId = accVO.getAccId();
-
-            String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDen()));
-            int state = 3;
-            String module = bodPath.substring(bodPath.indexOf("Model"));
-            module = module.replace("\\", "/");
-
-            AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
-            asccp.setGuid(asccpGuid);
-            asccp.setPropertyTerm(propertyTerm);
-            asccp.setDefinition(definition);
-            asccp.setRoleOfAccId(roleOfAccId);
-            asccp.setDen(den);
-            asccp.setState(state);
-            asccp.setModule(module);
-            asccp.setCreatedBy(userId);
-            asccp.setLastUpdatedBy(userId);
-            asccp.setOwnerUserId(userId);
-            asccp.setDeprecated(false);
-            asccp.setNamespaceId(1); //tmp
-            asccp.setReleaseId(releaseId);
-            asccpRepository.save(asccp);
+        int roleOfAccId;
+        AggregateCoreComponent accVO = accRepository.findOneByGuid(complexType.getFId());
+        if (accVO == null) {
+            InsertACCResult insertACCResult = insertACC(complexType, bodPath);
+            accVO = insertACCResult.getAggregateCoreComponent();
         }
+        roleOfAccId = accVO.getAccId();
+
+        String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDen()));
+        int state = 3;
+        String module = bodPath.substring(bodPath.indexOf("Model"));
+        module = module.replace("\\", "/");
+
+        AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
+        asccp.setGuid(asccpGuid);
+        asccp.setPropertyTerm(propertyTerm);
+        asccp.setDefinition(definition);
+        asccp.setRoleOfAccId(roleOfAccId);
+        asccp.setDen(den);
+        asccp.setState(state);
+        asccp.setModule(module);
+        asccp.setCreatedBy(userId);
+        asccp.setLastUpdatedBy(userId);
+        asccp.setOwnerUserId(userId);
+        asccp.setDeprecated(false);
+        asccp.setNamespaceId(1); //tmp
+        asccp.setReleaseId(releaseId);
+        asccpRepository.saveAndFlush(asccp);
+
+        return asccp;
     }
 
-    private void insertASCCPUnderGroup(BODElementVO bodVO) throws Exception {
+    private AssociationCoreComponentProperty insertASCCPUnderGroup(BODElementVO bodVO) throws Exception {
         String name = bodVO.getElement().getName();
 
         String asccpGuid = bodVO.getElement().getFId();
@@ -205,11 +205,12 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         asccp.setDeprecated(false);
         asccp.setNamespaceId(1); //tmp
         asccp.setReleaseId(releaseId);
-        asccpRepository.save(asccp);
+        asccpRepository.saveAndFlush(asccp);
+
+        return asccp;
     }
 
-    private void insertASCC(BODElementVO bodVO, String parentGuid, AssociationCoreComponentProperty asccpVO) throws Exception {
-
+    private boolean insertASCC(BODElementVO bodVO, String parentGuid, AssociationCoreComponentProperty asccpVO) throws Exception {
         AggregateCoreComponent accVO = accRepository.findOneByGuid(parentGuid);
         int assocFromACCId = accVO.getAccId();
 
@@ -241,7 +242,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             ascc.setLastUpdatedBy(userId);
             ascc.setOwnerUserId(userId);
             asccRepository.save(ascc);
+
+            return true;
         }
+        return false;
     }
 
     private void modifySequenceKeyforGroup() throws Exception {
@@ -315,9 +319,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         return asccpRepository.findOneByGuid(guid);
     }
 
-    private void insertBCC(BODElementVO bodVO, String parentGuid, BasicCoreComponentProperty bccpVO) throws Exception {
+    private boolean insertBCC(BODElementVO bodVO, String parentGuid, BasicCoreComponentProperty bccpVO) throws Exception {
         if (bccpVO == null)
-            return;
+            return false;
 
         String bccGuid = (bodVO.getRef() != null) ? bodVO.getRef() : bodVO.getId();
         int assocToBccpId = bccpVO.getBccpId();
@@ -349,7 +353,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             bcc.setLastUpdatedBy(userId);
             bcc.setOwnerUserId(userId);
             bccRepository.save(bcc);
+
+            return true;
         }
+        return false;
     }
 
     private void insertBCCWithAttr(XSAttributeDecl xad, XSComplexTypeDecl complexType) throws Exception {
@@ -410,7 +417,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
         DataType dtVO = dataTypeRepository.findOneByGuidAndType(id, 1);
         if (dtVO == null) {
-            System.out.println("!!!! DT is null where name is  = " + name + " and id is = " + id);
+            System.err.println("!!!! DT is null where name is  = " + name + " and id is = " + id);
             return null;
         }
 
@@ -437,13 +444,16 @@ public class P_1_8_PopulateAccAsccpBccAscc {
     }
 
 
-    private void insertForGroup(BODElementVO bodVO, String fullFilePath, String complexTypeId, int cnt) throws Exception {
+    private boolean insertForGroup(BODElementVO bodVO, String fullFilePath, String complexTypeId, int cnt) throws Exception {
         String objectClassName = Utility.spaceSeparator(bodVO.getGroupName().substring(0, (bodVO.getGroupName().indexOf("Type") > 0) ? bodVO.getGroupName().indexOf("Type") : bodVO.getGroupName().length()));
         String den = objectClassName + ". Details";
         int oagisComponentType = 1;
         if (Utility.first(den).endsWith("Base"))
             oagisComponentType = 0;
-        else if (Utility.first(den).endsWith("Extension") || Utility.first(den).equals("Open User Area") || Utility.first(den).equals("Any User Area") || Utility.first(den).equals("All Extension"))
+        else if (Utility.first(den).endsWith("Extension") ||
+                Utility.first(den).equals("Open User Area") ||
+                Utility.first(den).equals("Any User Area") ||
+                Utility.first(den).equals("All Extension"))
             oagisComponentType = 2;
         else if (Utility.first(den).endsWith("Group") || objectClassName.equalsIgnoreCase("Common Time Reporting"))
             oagisComponentType = 3;
@@ -452,9 +462,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         insertACCForGroup(bodVO, objectClassName, den, oagisComponentType, module);
 
         int groupAccId = accRepository.findOneByGuid(bodVO.getGroupId()).getAccId();
-        insertASCCPForGroup(bodVO, groupAccId, den, module);
+        AssociationCoreComponentProperty asccp = insertASCCPForGroup(bodVO, groupAccId, den, module);
 
-        insertASCCForGroup(bodVO, complexTypeId, cnt);
+        return insertASCCForGroup(bodVO, asccp, complexTypeId, cnt);
     }
 
     private void insertACCForGroup(BODElementVO bodVO, String objectClassName, String accDen, int oagisComponentType, String module) throws Exception {
@@ -478,11 +488,13 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
     }
 
-    private void insertASCCPForGroup(BODElementVO bodVO, int groupAccId, String accDen, String module) throws Exception {
-        if (getASCCP(bodVO.getGroupId()) == null) {
+    private AssociationCoreComponentProperty insertASCCPForGroup(
+            BODElementVO bodVO, int groupAccId, String accDen, String module) throws Exception {
+        AssociationCoreComponentProperty asccp = getASCCP(bodVO.getGroupId());
+        if (asccp == null) {
             String propertyTerm = Utility.spaceSeparator(bodVO.getGroupName());
 
-            AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
+            asccp = new AssociationCoreComponentProperty();
             asccp.setGuid(bodVO.getGroupId());
             asccp.setPropertyTerm(propertyTerm);
             asccp.setDefinition("Group");
@@ -496,12 +508,13 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             asccp.setDeprecated(false);
             asccp.setNamespaceId(1); //tmp
             asccp.setReleaseId(releaseId);
-            asccpRepository.save(asccp);
+            asccpRepository.saveAndFlush(asccp);
         }
+
+        return asccp;
     }
 
-    private void insertASCCForGroup(BODElementVO bodVO, String complexTypeId, int cnt) throws Exception {
-        AssociationCoreComponentProperty asccp = getASCCP(bodVO.getGroupId());
+    private boolean insertASCCForGroup(BODElementVO bodVO, AssociationCoreComponentProperty asccp, String complexTypeId, int cnt) throws Exception {
         int assocToASCCPId = asccp.getAsccpId();
 
         int accId = 0;
@@ -533,7 +546,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             ascc.setLastUpdatedBy(userId);
             ascc.setOwnerUserId(userId);
             asccRepository.save(ascc);
+
+            return true;
         }
+        return false;
     }
 
     private class InsertACCResult {
@@ -587,7 +603,10 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         int oagisComponentType = 1;
         if (Utility.first(den).endsWith("Base"))
             oagisComponentType = 0;
-        else if (Utility.first(den).endsWith("Extension") || Utility.first(den).equals("Open User Area") || Utility.first(den).equals("Any User Area") || Utility.first(den).equals("All Extension"))
+        else if (Utility.first(den).endsWith("Extension") ||
+                Utility.first(den).equals("Open User Area") ||
+                Utility.first(den).equals("Any User Area") ||
+                Utility.first(den).equals("All Extension"))
             oagisComponentType = 2;
         else if (Utility.first(den).endsWith("Group"))
             oagisComponentType = 3;
@@ -636,37 +655,42 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
                     if (bodVO.getGroupId() != null && !tempGroupId.equals(bodVO.getGroupId())) {
                         tempGroupId = bodVO.getGroupId();
-                        insertForGroup(bodVO, fullFilePath, complexType.getFId(), cnt);
+                        if (insertForGroup(bodVO, fullFilePath, complexType.getFId(), cnt)) {
+                            cnt++;
+                        }
                     }
 
+                    String parentGuid = (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId();
+                    boolean result;
                     AssociationCoreComponentProperty asccpVO = asccpRepository.findOneByGuid(bodVO.getId());
                     if (asccpVO == null) {
                         BasicCoreComponentProperty bccpVO = bccpRepository.findOneByGuid(bodVO.getId());
                         if (bccpVO == null) {
                             if (bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
+                                AssociationCoreComponentProperty asccp;
                                 if (bodVO.getGroupId() == null) {
-                                    insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()));
+                                    asccp = insertASCCP(bodVO.getElement(), bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()));
                                 } else {
-
                                     String propertyTerm = Utility.spaceSeparator(bodVO.getGroupName());
                                     den = propertyTerm + ". " + Utility.first(den);
-                                    insertASCCPUnderGroup(bodVO);
+                                    asccp = insertASCCPUnderGroup(bodVO);
                                 }
 
-                                AssociationCoreComponentProperty asccpVO1 = asccpRepository.findOneByGuid(bodVO.getId());
-                                insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO1);
-                            } else if (bodSchemaHandler.isComplexWithSimpleContent(bodVO.getTypeName())) {
+                                result = insertASCC(bodVO, parentGuid, asccp);
+                            } else {
                                 bccpVO = insertBCCP(bodVO.getName(), bodVO.getId());
-                                insertBCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), bccpVO);
+                                result = insertBCC(bodVO, parentGuid, bccpVO);
                             }
                         } else {
-                            insertBCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), bccpVO);
+                            result = insertBCC(bodVO, parentGuid, bccpVO);
                         }
                     } else {
-                        insertASCC(bodVO, (bodVO.getGroupId() != null) ? bodVO.getGroupId() : complexType.getFId(), asccpVO);
+                        result = insertASCC(bodVO, parentGuid, asccpVO);
                     }
 
-                    cnt++;
+                    if (result) {
+                        cnt++;
+                    }
                 }
             }
         }

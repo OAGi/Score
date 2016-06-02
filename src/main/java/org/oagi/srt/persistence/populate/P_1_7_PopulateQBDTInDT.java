@@ -147,13 +147,9 @@ public class P_1_7_PopulateQBDTInDT {
         component_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
-        prepare(SRTConstants.FIELDS_XSD_FILE_PATH,
-                SRTConstants.META_XSD_FILE_PATH,
-                SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
-                SRTConstants.COMPONENTS_XSD_FILE_PATH);
     }
 
-    private void prepare(String... systemIds) throws Exception {
+    private void prepareForBCCP(String... systemIds) throws Exception {
         dtiHolderMap = new HashMap();
 
         XSOMParser xsomParser = new XSOMParser(SAXParserFactory.newInstance());
@@ -232,6 +228,11 @@ public class P_1_7_PopulateQBDTInDT {
         NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
         NodeList elementsFromMetaXSD = meta_xsd.getNodeList("/xsd:schema/xsd:element");
         NodeList elementsFromComponentsXSD = component_xsd.getNodeList("/xsd:schema/xsd:element");
+
+        prepareForBCCP(SRTConstants.FIELDS_XSD_FILE_PATH,
+                SRTConstants.META_XSD_FILE_PATH,
+                SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
+                SRTConstants.COMPONENTS_XSD_FILE_PATH);
 
         insertCodeContentTypeDT();
         insertIDContentTypeDT();

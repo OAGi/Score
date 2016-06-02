@@ -257,8 +257,9 @@ public class StandaloneXMLSchema {
     }
 
     public Attr setBDTBase(BasicBusinessInformationEntity gBBIE, Attr base) throws Exception {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                bdtPriRestriRepository.findOne(gBBIE.getBdtPriRestriId());
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(gBBIE.getBdtPriRestriId());
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
 
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 cdtAwdPriXpsTypeMapRepository.findOne(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
@@ -287,8 +288,9 @@ public class StandaloneXMLSchema {
     }
 
     public Element setBBIE_Attr_Type(BasicBusinessInformationEntity gBBIE, Element gNode) throws Exception {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                bdtPriRestriRepository.findOne(gBBIE.getBdtPriRestriId());
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(gBBIE.getBdtPriRestriId());
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
 
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 cdtAwdPriXpsTypeMapRepository.findOne(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
@@ -471,9 +473,10 @@ public class StandaloneXMLSchema {
         }
 
         if (aCL == null) {
-            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
-                    bdtPriRestriRepository.findOne(gBBIE.getBdtPriRestriId());
-            if (aBDTPrimitiveRestriction.getCodeListId() != 0) {
+            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                    bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(gBBIE.getBdtPriRestriId());
+            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+            if (aBDTPrimitiveRestriction != null && aBDTPrimitiveRestriction.getCodeListId() != 0) {
                 aCL = codeListRepository.findOne(aBDTPrimitiveRestriction.getCodeListId());
             }
         }
@@ -510,7 +513,9 @@ public class StandaloneXMLSchema {
     public Element setBBIEType(BasicBusinessInformationEntity gBBIE, Element gNode) throws Exception {
         Attr tNode = gNode.getOwnerDocument().createAttribute("type");
 
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = bdtPriRestriRepository.findOne(gBBIE.getBdtPriRestriId());
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(gBBIE.getBdtPriRestriId());
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
 
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 cdtAwdPriXpsTypeMapRepository.findOne(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());

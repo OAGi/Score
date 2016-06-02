@@ -18,7 +18,7 @@ public interface BusinessDataTypePrimitiveRestrictionRepository extends JpaRepos
     public BusinessDataTypePrimitiveRestriction findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(int codeListId, int cdtAwdPriXpsTypeMapId);
 
     @Query("select b from BusinessDataTypePrimitiveRestriction b where b.cdtAwdPriXpsTypeMapId = ?1")
-    public BusinessDataTypePrimitiveRestriction findOne(int cdtAwdPriXpsTypeMapId);
+    public List<BusinessDataTypePrimitiveRestriction> findByCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId);
 
     @Query("select b from BusinessDataTypePrimitiveRestriction b where b.codeListId = ?1")
     public BusinessDataTypePrimitiveRestriction findOneByCodeListId(int codeListId);

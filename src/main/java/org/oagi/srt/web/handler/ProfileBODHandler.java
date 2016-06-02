@@ -47,6 +47,9 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	@Autowired
 	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
 
+	@Autowired
+	private StandaloneXMLSchema standaloneXMLSchema;
+
 	private ABIEView selectedABIEView;
 	private List<ABIEView> abieViewList = new ArrayList<ABIEView>();
 	private List<ABIEView> abieViewListForSelection = new ArrayList<ABIEView>();
@@ -159,18 +162,14 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 		this.abieName = abieName;
 	}
 
-	public void generate() {
-		StandaloneXMLSchema schema = new StandaloneXMLSchema();
+	public void generate() throws Exception {
 		ArrayList<Integer> al = new ArrayList<Integer>();
 		for (ABIEView av : abieViewList) {
 			al.add(av.getAbie().getAbieId());
 		}
-		try {
-			filePath = schema.generateXMLSchema(al, true);
-			System.out.println("### " + filePath);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		filePath = standaloneXMLSchema.generateXMLSchema(al, true);
+		System.out.println("### " + filePath);
 	}
 	
 	private StreamedContent file;

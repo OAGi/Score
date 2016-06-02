@@ -434,15 +434,17 @@ public class DataTypeTest {
             int cdtAwdPriXpsTypeMapId = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
             int codeListId = aBusinessDataTypePrimitiveRestriction.getCodeListId();
 
-            try {
-                if (cdtAwdPriXpsTypeMapId != 0 && codeListId != 0) {
-                    bdtPriRestriRepository.findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(codeListId, cdtAwdPriXpsTypeMapId);
-                } else if (cdtAwdPriXpsTypeMapId != 0) {
-                    bdtPriRestriRepository.findOne(cdtAwdPriXpsTypeMapId);
-                } else if (codeListId != 0) {
-                    bdtPriRestriRepository.findOneByCodeListId(codeListId);
-                }
-            } catch (EmptyResultDataAccessException e) {
+            Object result = null;
+            if (cdtAwdPriXpsTypeMapId != 0 && codeListId != 0) {
+                result = bdtPriRestriRepository.findOneByCodeListIdAndCdtAwdPriXpsTypeMapId(codeListId, cdtAwdPriXpsTypeMapId);
+            } else if (cdtAwdPriXpsTypeMapId != 0) {
+                List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                        bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
+                result = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+            } else if (codeListId != 0) {
+                result = bdtPriRestriRepository.findOneByCodeListId(codeListId);
+            }
+            if (result == null) {
                 System.err.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
             }
         }
@@ -1505,9 +1507,9 @@ public class DataTypeTest {
         String xsdBuiltInType;
 
         public BdtPriResti(int id) {
-
-            BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction =
-                    bdtPriRestriRepository.findOne(id);
+            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                    bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(id);
+            BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
             int bdt_id = aBusinessDataTypePrimitiveRestriction.getBdtId();
 
             DataType aDataType = dataTypeRepository.findOne(bdt_id);
