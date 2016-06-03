@@ -32,6 +32,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -335,25 +336,31 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Transactional(rollbackFor = Throwable.class)
     private void createBIEs() {
-        AggregateCoreComponent aggregateCoreComponent =
+        int userId = userRepository.findAppUserIdByLoginId("oagis");
+
+        AggregateCoreComponent acc =
                 accRepository.findOne(selected.getRoleOfAccId());
-        topAbieVO = createABIE(aggregateCoreComponent, bCSelected.getBizCtxId(), true);
+        topAbieVO = createABIE(userId, acc, bCSelected.getBizCtxId(), true);
         int abieId = topAbieVO.getAbieId();
 
         ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
         rootABIEView.setAbie(topAbieVO);
         root = new DefaultTreeNode(rootABIEView, null);
 
-        asbiepVO = createASBIEP(selected, abieId);
+        asbiepVO = createASBIEP(userId, selected, abieId);
 
         aABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
         aABIEView.setAbie(topAbieVO);
         aABIEView.setColor("blue");
-        aABIEView.setAcc(aggregateCoreComponent);
+        aABIEView.setAcc(acc);
         aABIEView.setAsbiep(asbiepVO);
 
         TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
-        createBIEs(selected.getRoleOfAccId(), abieId);
+
+        CreateBIEContext createBIEContext = new CreateBIEContext(userId);
+        createBIEs(createBIEContext, selected.getRoleOfAccId(), topAbieVO);
+        createBIEContext.save();
+
         createBIEChildren(abieId, toplevelNode);
     }
 
@@ -372,14 +379,15 @@ public class TopLevelABIEHandler implements Serializable {
             AssociationCoreComponentProperty associationCoreComponentProperty =
                     asccpRepository.findOneByRoleOfAccId(aggregateCoreComponent.getAccId());
 
-            topAbieVO = copyABIE(selectedAggregateBusinessInformationEntity, bCSelected.getBizCtxId(), true);
+            int userId = userRepository.findAppUserIdByLoginId("oagis");
+            topAbieVO = copyABIE(userId, selectedAggregateBusinessInformationEntity, bCSelected.getBizCtxId(), true);
             int abieId = topAbieVO.getAbieId();
 
             ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, associationCoreComponentProperty.getPropertyTerm(), abieId, "ABIE");
             rootABIEView.setAbie(topAbieVO);
             root = new DefaultTreeNode(rootABIEView, null);
             AssociationBusinessInformationEntityProperty associationBusinessInformationEntityProperty =
-                    copyASBIEP(asbiepRepository.
+                    copyASBIEP(userId, asbiepRepository.
                             findOneByRoleOfAbieId(selectedAggregateBusinessInformationEntity.getAbieId()), abieId);
             aABIEView = applicationContext.getBean(ABIEView.class, associationCoreComponentProperty.getPropertyTerm(), abieId, "ABIE");
             aABIEView.setAbie(topAbieVO);
@@ -387,7 +395,7 @@ public class TopLevelABIEHandler implements Serializable {
             aABIEView.setAsbiep(associationBusinessInformationEntityProperty);
             TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
 
-            copyBIEs(selectedAggregateBusinessInformationEntity, topAbieVO, associationBusinessInformationEntityProperty, -1, toplevelNode);
+            copyBIEs(userId, selectedAggregateBusinessInformationEntity, topAbieVO, associationBusinessInformationEntityProperty, -1, toplevelNode);
 
             createBarModel();
         }
@@ -418,24 +426,22 @@ public class TopLevelABIEHandler implements Serializable {
         this.progress = progress;
     }
 
-    private List<CoreComponent> getAssocList(List<CoreComponent> list) {
+    private List<CoreComponent> getAssocList(CreateBIEContext createBIEContext, List<CoreComponent> list) {
         for (int i = 0; i < list.size(); i++) {
             CoreComponent srt = list.get(i);
-            if (srt instanceof AssociationCoreComponent && groupcheck((AssociationCoreComponent) srt)) {
+            if (srt instanceof AssociationCoreComponent && groupcheck(createBIEContext, (AssociationCoreComponent) srt)) {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) srt;
-                AssociationCoreComponentProperty associationCoreComponentProperty =
-                        asccpRepository.findOne(associationCoreComponent.getToAsccpId());
-                AggregateCoreComponent aggregateCoreComponent =
-                        accRepository.findOne(associationCoreComponentProperty.getRoleOfAccId());
-                list = handleNestedGroup(aggregateCoreComponent, list, i);
+                AssociationCoreComponentProperty associationCoreComponentProperty = createBIEContext.getASCCP(associationCoreComponent.getToAsccpId());
+                AggregateCoreComponent aggregateCoreComponent = createBIEContext.getACC(associationCoreComponentProperty.getRoleOfAccId());
+                list = handleNestedGroup(createBIEContext, aggregateCoreComponent, list, i);
             }
         }
         return list;
     }
 
-    private List<CoreComponent> queryNestedChildAssoc(AggregateCoreComponent aggregateCoreComponent) {
-        List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(aggregateCoreComponent.getAccId());
-        List<AssociationCoreComponent> ascc_tmp_assoc = getASCC(aggregateCoreComponent.getAccId());
+    private List<CoreComponent> queryNestedChildAssoc(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
+        List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(createBIEContext, aggregateCoreComponent.getAccId());
+        List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(aggregateCoreComponent.getAccId());
 
         int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
         List<CoreComponent> tmp_assoc = new ArrayList(size);
@@ -465,12 +471,12 @@ public class TopLevelABIEHandler implements Serializable {
 
         assoc.trimToSize();
 
-        return getAssocList(assoc);
+        return getAssocList(createBIEContext, assoc);
     }
 
-    private List<CoreComponent> queryNestedChildAssoc_wo_attribute(AggregateCoreComponent aggregateCoreComponent) {
-        List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(aggregateCoreComponent.getAccId());
-        List<AssociationCoreComponent> ascc_tmp_assoc = getASCC(aggregateCoreComponent.getAccId());
+    private List<CoreComponent> queryNestedChildAssoc_wo_attribute(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
+        List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(createBIEContext, aggregateCoreComponent.getAccId());
+        List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(aggregateCoreComponent.getAccId());
         int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
         List<CoreComponent> tmp_assoc = new ArrayList(size);
         tmp_assoc.addAll(bcc_tmp_assoc);
@@ -493,12 +499,13 @@ public class TopLevelABIEHandler implements Serializable {
 
         assoc.trimToSize();
 
-        return getAssocList(assoc);
+        return getAssocList(createBIEContext, assoc);
     }
 
-    private List<CoreComponent> queryChildAssoc(AggregateCoreComponent aggregateCoreComponent) {
-        List<BasicCoreComponent> bcc_tmp_assoc = getBCC(aggregateCoreComponent.getAccId());
-        List<AssociationCoreComponent> ascc_tmp_assoc = getASCC(aggregateCoreComponent.getAccId());
+    private List<CoreComponent> queryChildAssoc(CreateBIEContext createBIEContext,
+                                                AggregateCoreComponent aggregateCoreComponent) {
+        List<BasicCoreComponent> bcc_tmp_assoc = createBIEContext.getBCC(aggregateCoreComponent.getAccId());
+        List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(aggregateCoreComponent.getAccId());
         int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
         List<CoreComponent> tmp_assoc = new ArrayList(size);
         tmp_assoc.addAll(bcc_tmp_assoc);
@@ -527,49 +534,176 @@ public class TopLevelABIEHandler implements Serializable {
         return assoc;
     }
 
-    private List<CoreComponent> handleNestedGroup(
-            AggregateCoreComponent aggregateCoreComponent, List<CoreComponent> coreComponents, int gPosition) {
+    private List<CoreComponent> handleNestedGroup(CreateBIEContext createBIEContext,
+                                                  AggregateCoreComponent aggregateCoreComponent,
+                                                  List<CoreComponent> coreComponents, int gPosition) {
         List<CoreComponent> list = new ArrayList();
         list.addAll(coreComponents);
 
-        List<CoreComponent> bList = queryChildAssoc(aggregateCoreComponent);
+        List<CoreComponent> bList = queryChildAssoc(createBIEContext, aggregateCoreComponent);
         list.addAll(gPosition, bList);
         list.remove(gPosition + bList.size());
 
         for (int i = 0; i < list.size(); i++) {
             CoreComponent coreComponent = list.get(i);
-            if (coreComponent instanceof AssociationCoreComponent && groupcheck((AssociationCoreComponent) coreComponent)) {
+            if (coreComponent instanceof AssociationCoreComponent && groupcheck(createBIEContext, (AssociationCoreComponent) coreComponent)) {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
-                AssociationCoreComponentProperty associationCoreComponentProperty =
-                        asccpRepository.findOne(associationCoreComponent.getToAsccpId());
-                list = handleNestedGroup(accRepository.findOne(
-                        associationCoreComponentProperty.getRoleOfAccId()), list, i);
+                AssociationCoreComponentProperty associationCoreComponentProperty = createBIEContext.getASCCP(associationCoreComponent.getToAsccpId());
+                list = handleNestedGroup(
+                        createBIEContext, createBIEContext.getACC(associationCoreComponentProperty.getRoleOfAccId()), list, i);
             }
         }
 
         return list;
     }
 
-    private boolean groupcheck(AssociationCoreComponent associationCoreComponent) {
+    private boolean groupcheck(CreateBIEContext createBIEContext, AssociationCoreComponent associationCoreComponent) {
         boolean check = false;
-        AssociationCoreComponentProperty asccp =
-                asccpRepository.findOne(associationCoreComponent.getToAsccpId());
-        AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+        AssociationCoreComponentProperty asccp = createBIEContext.getASCCP(associationCoreComponent.getToAsccpId());
+        AggregateCoreComponent acc = createBIEContext.getACC(asccp.getRoleOfAccId());
         if (acc.getOagisComponentType() == 3) {
             check = true;
         }
         return check;
     }
 
-    private void createBIEs(int accId, int abieId) {
-        logger.debug("enter createBIEs(" + accId + ", " + abieId + ")");
+    private class CreateBIEContext {
+        private ABIETaskHolder abieTaskHolder;
+        private BBIETreeTaskHolder bbieTreeTaskHolder;
+        private ASBIETreeTaskHolder asbieTreeTaskHolder;
+
+        private Map<Integer, AggregateCoreComponent> aggregateCoreComponentMap;
+        private Map<Integer, AssociationCoreComponentProperty> associationCoreComponentPropertyMap;
+        private Map<Integer, BasicCoreComponentProperty> basicCoreComponentPropertyMap;
+        private Map<Integer, BusinessDataTypePrimitiveRestriction> businessDataTypePrimitiveRestrictionMap;
+
+        private int userId;
+
+        private List<BasicCoreComponent> basicCoreComponents;
+        private List<AssociationCoreComponent> associationCoreComponents;
+        private List<DataTypeSupplementaryComponent> dataTypeSupplementaryComponents;
+
+        public CreateBIEContext(int userId) {
+            abieTaskHolder = new ABIETaskHolder();
+            bbieTreeTaskHolder = new BBIETreeTaskHolder();
+            asbieTreeTaskHolder = new ASBIETreeTaskHolder();
+            this.userId = userId;
+
+            aggregateCoreComponentMap =
+                    accRepository.findAll().stream()
+                            .filter(acc -> acc.getRevisionNum() == 0)
+                            .collect(Collectors.toMap(acc -> acc.getAccId(), Function.identity()));
+            associationCoreComponentPropertyMap =
+                    asccpRepository.findAll().stream()
+                            .filter(asccp -> asccp.getRevisionNum() == 0)
+                            .collect(Collectors.toMap(asccp -> asccp.getAsccpId(), Function.identity()));
+            basicCoreComponents = bccRepository.findAll();
+            associationCoreComponents = asccRepository.findAll();
+            dataTypeSupplementaryComponents = dtScRepository.findAll();
+
+            basicCoreComponentPropertyMap = bccpRepository.findAll().stream()
+                    .filter(bccp -> bccp.getRevisionNum() == 0)
+                    .collect(Collectors.toMap(bccp -> bccp.getBccpId(), Function.identity()));
+            businessDataTypePrimitiveRestrictionMap = bdtPriRestriRepository.findAll().stream()
+                    .filter(bdtPriRestri -> bdtPriRestri.isDefault())
+                    .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
+        }
+
+        public int getUserId() {
+            return userId;
+        }
+
+        public AggregateCoreComponent getACC(int accId) {
+            return aggregateCoreComponentMap.get(accId);
+        }
+
+        public AssociationCoreComponentProperty getASCCP(int asccpId) {
+            return associationCoreComponentPropertyMap.get(asccpId);
+        }
+
+        public AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc, int bizCtxId, boolean topLevel) {
+            return abieTaskHolder.createABIE(userId, acc, bizCtxId, topLevel);
+        }
+
+        public void createBBIETree(BasicCoreComponent bcc, AggregateBusinessInformationEntity abie, int seqKey) {
+            bbieTreeTaskHolder.createBBIETree(this, bcc, abie, seqKey);
+        }
+
+        public void createASBIETree(AssociationCoreComponent asccVO, AggregateBusinessInformationEntity abie, int seqKey) {
+            asbieTreeTaskHolder.createASBIETree(this, asccVO, abie, seqKey);
+        }
+
+        public List<BasicCoreComponent> getBCC(int fromAccId) {
+            return basicCoreComponents.stream()
+                    .filter(bcc -> bcc.getFromAccId() == fromAccId)
+                    .collect(Collectors.toList());
+        }
+
+        private List<AssociationCoreComponent> getASCC(int fromAccId) {
+            return associationCoreComponents.stream()
+                    .filter(acc -> acc.getFromAccId() == fromAccId)
+                    .collect(Collectors.toList());
+        }
+
+        public BasicCoreComponentProperty getBCCP(int toBccpId) {
+            return basicCoreComponentPropertyMap.get(toBccpId);
+        }
+
+        public int getBdtPrimitiveRestrictionId(int bdtId) {
+            return businessDataTypePrimitiveRestrictionMap.get(bdtId).getBdtPriRestriId();
+        }
+
+        public List<DataTypeSupplementaryComponent> findByOwnerDtId(int ownerDtId) {
+            return dataTypeSupplementaryComponents.stream()
+                    .filter(dtSc -> dtSc.getOwnerDtId() == ownerDtId)
+                    .collect(Collectors.toList());
+        }
+
+        public void save() {
+            abieTaskHolder.save();
+            bbieTreeTaskHolder.save();
+            asbieTreeTaskHolder.save();
+        }
+    }
+
+    private class ABIETaskHolder {
+
+        private List<AggregateBusinessInformationEntity> aggregateBusinessInformationEntitys = new ArrayList();
+
+        public AggregateBusinessInformationEntity createABIE(int userId, AggregateCoreComponent acc, int bizCtxId, boolean topLevel) {
+            AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
+            String abieGuid = Utility.generateGUID();
+            abie.setGuid(abieGuid);
+            abie.setBasedAccId(acc.getAccId());
+            abie.setDefinition(acc.getDefinition());
+            abie.setTopLevel(topLevel);
+            abie.setBizCtxId(bizCtxId);
+            abie.setCreatedBy(userId);
+            abie.setLastUpdatedBy(userId);
+            if (topLevel)
+                abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+
+            aggregateBusinessInformationEntitys.add(abie);
+
+            return abie;
+        }
+
+        public void save() {
+            abieRepository.save(aggregateBusinessInformationEntitys);
+            abieRepository.flush();
+        }
+
+    }
+
+    public void createBIEs(CreateBIEContext createBIEContext, int accId, AggregateBusinessInformationEntity abie) {
+        logger.debug("enter createBIEs(" + accId + ", " + abie.getGuid() + ")");
         long currentTimeMillis = System.currentTimeMillis();
 
         LinkedList<AggregateCoreComponent> accList = new LinkedList();
-        AggregateCoreComponent aggregateCoreComponent = getAggregateCoreComponent(accId);
+        AggregateCoreComponent aggregateCoreComponent = createBIEContext.getACC(accId);
         accList.add(aggregateCoreComponent);
         while (aggregateCoreComponent.getBasedAccId() > 0) {
-            aggregateCoreComponent = getAggregateCoreComponent(aggregateCoreComponent.getBasedAccId());
+            aggregateCoreComponent = createBIEContext.getACC(aggregateCoreComponent.getBasedAccId());
             accList.add(aggregateCoreComponent);
         }
 
@@ -577,17 +711,18 @@ public class TopLevelABIEHandler implements Serializable {
             aggregateCoreComponent = accList.pollFirst();
             int skb = 0;
             for (AggregateCoreComponent cnt_acc : accList) {
-                skb += queryNestedChildAssoc_wo_attribute(cnt_acc).size(); //here
+                skb += queryNestedChildAssoc_wo_attribute(createBIEContext, cnt_acc).size(); //here
             }
 
-            List<CoreComponent> childAssoc = queryNestedChildAssoc(aggregateCoreComponent);
-            int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(aggregateCoreComponent).size();
+            List<CoreComponent> childAssoc = queryNestedChildAssoc(createBIEContext, aggregateCoreComponent);
+            int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(createBIEContext, aggregateCoreComponent).size();
             for (int i = 0; i < childAssoc.size(); i++) {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
-                    if (bcc.getSeqKey() == 0)
-                        createBBIETree(bcc, abieId, skb);
+                    if (bcc.getSeqKey() == 0) {
+                        createBIEContext.createBBIETree(bcc, abie, skb);
+                    }
                 }
             }
 
@@ -595,16 +730,17 @@ public class TopLevelABIEHandler implements Serializable {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
-                    if (bcc.getSeqKey() > 0)
-                        createBBIETree(bcc, abieId, skb + i - attr_cnt);
+                    if (bcc.getSeqKey() > 0) {
+                        createBIEContext.createBBIETree(bcc, abie, skb + i - attr_cnt);
+                    }
                 } else if (assoc instanceof AssociationCoreComponent) {
                     AssociationCoreComponent ascc = (AssociationCoreComponent) assoc;
-                    createASBIETree(ascc, abieId, skb + i - attr_cnt, skb);
+                    createBIEContext.createASBIETree(ascc, abie, skb + i - attr_cnt);
                 }
             }
         }
 
-        logger.debug("leave createBIEs(" + accId + ", " + abieId + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
+        logger.debug("leave createBIEs(" + accId + ", " + abie.getGuid() + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
     class ValueComparator implements Comparator<BusinessInformationEntity> {
@@ -623,48 +759,276 @@ public class TopLevelABIEHandler implements Serializable {
                 return 1;
             } // returning 0 would merge keys
         }
-
     }
 
-    private void createBBIETree(BasicCoreComponent bccVO, int abie, int seqKey) {
-        logger.debug("enter createBBIETree(" + bccVO.getBccId() + ", " + abie + ", " + seqKey + ")");
+
+    private class CreateBBIETreeTask {
+
+        private BasicCoreComponent bcc;
+        private AggregateBusinessInformationEntity abie;
+        private int seqKey;
+
+        private BasicBusinessInformationEntityProperty bbiep;
+        private BasicBusinessInformationEntity bbie;
+        private List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList;
+
+        public CreateBBIETreeTask(CreateBIEContext createBIEContext, BasicCoreComponent bcc, AggregateBusinessInformationEntity abie, int seqKey) {
+            this.bcc = bcc;
+            this.abie = abie;
+            this.seqKey = seqKey;
+
+            BasicCoreComponentProperty bccp = createBIEContext.getBCCP(bcc.getToBccpId());
+            int bdtId = bccp.getBdtId();
+            int bdtPrimitiveRestrictionId = createBIEContext.getBdtPrimitiveRestrictionId(bdtId);
+
+            createBBIEP(createBIEContext.getUserId(), bccp);
+            createBBIE(createBIEContext.getUserId(), bdtPrimitiveRestrictionId);
+            createBBIESC(createBIEContext, bdtId);
+        }
+
+        private void createBBIEP(int userId, BasicCoreComponentProperty bccp) {
+            bbiep = new BasicBusinessInformationEntityProperty();
+            bbiep.setGuid(Utility.generateGUID());
+            bbiep.setBasedBccpId(bccp.getBccpId());
+            bbiep.setCreatedBy(userId);
+            bbiep.setLastUpdatedBy(userId);
+            bbiep.setDefinition(bccp.getDefinition());
+        }
+
+        private void createBBIE(int userId, int bdtPrimitiveRestrictionId) {
+            bbie = new BasicBusinessInformationEntity();
+            bbie.setGuid(Utility.generateGUID());
+            bbie.setBasedBccId(bcc.getBccId());
+            // bbie.setFromAbieId(abie);
+            // bbie.setToBbiepId(bbiepId);
+            bbie.setNillable(false);
+            bbie.setCardinalityMax(bcc.getCardinalityMax());
+            bbie.setCardinalityMin(bcc.getCardinalityMin());
+            bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
+            bbie.setCreatedBy(userId);
+            bbie.setLastUpdatedBy(userId);
+            bbie.setSeqKey(seqKey);
+        }
+
+        private void createBBIESC(CreateBIEContext createBIEContext, int bdtId) {
+            bbieScList = createBIEContext.findByOwnerDtId(bdtId)
+                    .stream()
+                    .filter(dtSc -> dtSc.getMaxCardinality() == 0)
+                    .map(dtSc -> {
+                        BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                                new BasicBusinessInformationEntitySupplementaryComponent();
+                        // bbieSc.setBbieId(bbieId);
+                        bbieSc.setDtScId(dtSc.getDtScId());
+                        bbieSc.setMaxCardinality(dtSc.getMaxCardinality());
+                        bbieSc.setMinCardinality(dtSc.getMinCardinality());
+                        bbieSc.setDefinition(dtSc.getDefinition());
+                        return bbieSc;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        public AggregateBusinessInformationEntity getAbie() {
+            return abie;
+        }
+
+        public BasicBusinessInformationEntityProperty getBbiep() {
+            return bbiep;
+        }
+
+        public BasicBusinessInformationEntity getBbie() {
+            return bbie;
+        }
+
+        public List<BasicBusinessInformationEntitySupplementaryComponent> getBbieScList() {
+            return bbieScList;
+        }
+    }
+
+    private class BBIETreeTaskHolder {
+        private List<CreateBBIETreeTask> createBBIETreeTasks = new ArrayList();
+
+        public void createBBIETree(CreateBIEContext createBIEContext, BasicCoreComponent bcc, AggregateBusinessInformationEntity abie, int seqKey) {
+            createBBIETreeTasks.add(new CreateBBIETreeTask(createBIEContext, bcc, abie, seqKey));
+        }
+
+        public void save() {
+            bbiepRepository.save(
+                    createBBIETreeTasks.stream()
+                            .map(task -> task.getBbiep())
+                            .collect(Collectors.toList()));
+            bbiepRepository.flush();
+            bbiepCount += createBBIETreeTasks.size();
+
+            createBBIETreeTasks.stream()
+                    .forEach(task -> {
+                        task.getBbie().setFromAbieId(task.getAbie().getAbieId());
+                        task.getBbie().setToBbiepId(task.getBbiep().getBbiepId());
+                    });
+
+            bbieRepository.save(
+                    createBBIETreeTasks.stream()
+                            .map(task -> task.getBbie())
+                            .collect(Collectors.toList()));
+            bbieRepository.flush();
+            bbieCount += createBBIETreeTasks.size();
+
+            createBBIETreeTasks.stream()
+                    .forEach(task -> {
+                        task.getBbieScList().forEach(bbieSc -> {
+                            bbieSc.setBbieId(task.getBbie().getBbieId());
+                        });
+                    });
+
+            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new ArrayList();
+            createBBIETreeTasks.stream()
+                    .forEach(task -> {
+                        bbieScList.addAll(task.getBbieScList());
+                    });
+            bbiescRepository.save(bbieScList);
+            bbiescCount += bbieScList.size();
+        }
+    }
+
+    private void createBBIETree(BasicCoreComponent bcc, int abie, int seqKey) {
+        logger.debug("enter createBBIETree(" + bcc.getBccId() + ", " + abie + ", " + seqKey + ")");
         long currentTimeMillis = System.currentTimeMillis();
 
-        BasicCoreComponentProperty bccpVO =
-                bccpRepository.findOneByBccpIdAndRevisionNum(bccVO.getToBccpId(), 0);
+//        BasicCoreComponentProperty bccp =
+//                bccpRepository.findBccpIdAndBdtIdAndDefinitionByBccpIdAndRevisionNum(bcc.getToBccpId(), 0);
+//        int bdtId = bccp.getBdtId();
+//        int bdtPrimitiveRestrictionId = bdtPriRestriRepository
+//                .findBdtPriRestriIdByBdtIdAndDefault(bdtId, true)
+//                .getBdtPriRestriId();
+//
+//        BasicBusinessInformationEntityProperty bbiep = createBBIEP(bccp);
+//        BasicBusinessInformationEntity bbie =
+//                createBBIE(bcc, abie, bbiep.getBbiepId(), seqKey, bdtPrimitiveRestrictionId);
+//        int bbieId = bbie.getBbieId();
+//
+//        createBBIESC(bbieId, bdtId);
 
-        BasicBusinessInformationEntityProperty bbiepVO = createBBIEP(bccpVO);
-
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO =
-                bdtPriRestriRepository.findOneByBdtIdAndDefault(bccpVO.getBdtId(), true);
-
-        int bdtPrimitiveRestrictionId = aBDTPrimitiveRestrictionVO.getBdtPriRestriId();
-
-        BasicBusinessInformationEntity bbieVO = createBBIE(bccVO, abie, bbiepVO.getBbiepId(), seqKey, bdtPrimitiveRestrictionId);
-        DataType dtVO = dataTypeRepository.findOne(bccpVO.getBdtId());
-
-        int bbieID = bbieVO.getBbieId();
-        createBBIESC(bbieID, bccpVO.getBdtId());
-
-        logger.debug("leave createBBIETree(" + bccVO.getBccId() + ", " + abie + ", " + seqKey +
+        logger.debug("leave createBBIETree(" + bcc.getBccId() + ", " + abie + ", " + seqKey +
                 "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
-    private void createASBIETree(AssociationCoreComponent asccVO, int abie, int seqKey, int seq_base) {
-        logger.debug("enter createASBIETree(" + asccVO.getAsccId() + ", " + abie + ", " + seqKey + ")");
+    private class CreateASBIETreeTask {
+
+        private AssociationCoreComponentProperty asccp;
+        private AggregateBusinessInformationEntity roleOfAbie;
+        private AssociationCoreComponent ascc;
+        private AggregateBusinessInformationEntity fromAbie;
+        private int seqKey;
+
+        private AssociationBusinessInformationEntityProperty asbiep;
+        private AssociationBusinessInformationEntity asbie;
+
+        public CreateASBIETreeTask(int userId, AssociationCoreComponentProperty asccp, AggregateBusinessInformationEntity roleOfAbie,
+                                   AssociationCoreComponent ascc, AggregateBusinessInformationEntity fromAbie, int seqKey) {
+            this.asccp = asccp;
+            this.roleOfAbie = roleOfAbie;
+            this.ascc = ascc;
+            this.fromAbie = fromAbie;
+            this.seqKey = seqKey;
+
+            createASBIEP(userId);
+            createASBIE(userId);
+        }
+
+        public void createASBIEP(int userId) {
+            asbiep = new AssociationBusinessInformationEntityProperty();
+            asbiep.setGuid(Utility.generateGUID());
+            asbiep.setBasedAsccpId(asccp.getAsccpId());
+            // asbiep.setRoleOfAbieId(roleOfAbieId);
+            asbiep.setCreatedBy(userId);
+            asbiep.setLastUpdatedBy(userId);
+            asbiep.setDefinition(asccp.getDefinition());
+        }
+
+        public void createASBIE(int userId) {
+            asbie = new AssociationBusinessInformationEntity();
+            asbie.setGuid(Utility.generateGUID());
+            // asbie.setFromAbieId(fromAbieId);
+            // asbie.setToAsbiepId(asbiep);
+            asbie.setBasedAscc(ascc.getAsccId());
+            asbie.setCardinalityMax(ascc.getCardinalityMax());
+            asbie.setCardinalityMin(ascc.getCardinalityMin());
+            asbie.setDefinition(ascc.getDefinition());
+            asbie.setCreatedBy(userId);
+            asbie.setLastUpdatedBy(userId);
+            asbie.setSeqKey(seqKey);
+        }
+
+        public AggregateBusinessInformationEntity getRoleOfAbie() {
+            return roleOfAbie;
+        }
+
+        public AggregateBusinessInformationEntity getFromAbie() {
+            return fromAbie;
+        }
+
+        public AssociationBusinessInformationEntityProperty getAsbiep() {
+            return asbiep;
+        }
+
+        public AssociationBusinessInformationEntity getAsbie() {
+            return asbie;
+        }
+    }
+
+    private class ASBIETreeTaskHolder {
+        private List<CreateASBIETreeTask> createASBIETreeTasks = new ArrayList();
+
+        public void createASBIETree(CreateBIEContext createBIEContext, AssociationCoreComponent asccVO, AggregateBusinessInformationEntity abie, int seqKey) {
+            AssociationCoreComponentProperty asccp = createBIEContext.getASCCP(asccVO.getToAsccpId());
+            AggregateCoreComponent acc = createBIEContext.getACC(asccp.getRoleOfAccId());
+
+            AggregateBusinessInformationEntity newAbie = createBIEContext.createABIE(acc, bCSelected.getBizCtxId(), false);
+
+            createASBIETreeTasks.add(new CreateASBIETreeTask(createBIEContext.getUserId(), asccp, newAbie, asccVO, abie, seqKey));
+            createBIEs(createBIEContext, acc.getAccId(), newAbie);
+        }
+
+        public void save() {
+            createASBIETreeTasks.stream()
+                    .forEach(task -> {
+                        task.getAsbiep().setRoleOfAbieId(task.getRoleOfAbie().getAbieId());
+                    });
+            asbiepRepository.save(
+                    createASBIETreeTasks.stream()
+                            .map(task -> task.getAsbiep())
+                            .collect(Collectors.toList()));
+            asbiepRepository.flush();
+            asbiepCount += createASBIETreeTasks.size();
+
+            createASBIETreeTasks.stream()
+                    .forEach(task -> {
+                        task.getAsbie().setFromAbieId(task.getFromAbie().getAbieId());
+                        task.getAsbie().setToAsbiepId(task.getAsbiep().getAsbiepId());
+                    });
+
+            asbieRepository.save(
+                    createASBIETreeTasks.stream()
+                            .map(task -> task.getAsbie())
+                            .collect(Collectors.toList()));
+            asbieCount += createASBIETreeTasks.size();
+        }
+    }
+
+    private void createASBIETree(int userId, CreateBIEContext createBIEContext, AssociationCoreComponent asccVO, int abieId, int seqKey, int seq_base) {
+        logger.debug("enter createASBIETree(" + asccVO.getAsccId() + ", " + abieId + ", " + seqKey + ")");
         long currentTimeMillis = System.currentTimeMillis();
 
-        AssociationCoreComponentProperty asccpVO = getASCCP(asccVO.getToAsccpId());
-        AggregateCoreComponent accVOFromASCCP = getAggregateCoreComponent(asccpVO.getRoleOfAccId());
+        AssociationCoreComponentProperty asccp =
+                asccpRepository.findAsccpIdAndRoleOfAccIdAndDefinitionByAsccpIdAndRevisionNum(asccVO.getToAsccpId(), 0);
+        AggregateCoreComponent acc = accRepository.findAccIdAndBasedAccIdAndDefinitionByAccIdAndRevisionNum(asccp.getRoleOfAccId(), 0);
 
-        AggregateBusinessInformationEntity abieVO = createABIE(accVOFromASCCP, bCSelected.getBizCtxId(), false);
-        AssociationBusinessInformationEntityProperty asbiepVO = createASBIEP(asccpVO, abieVO.getAbieId());
+        AggregateBusinessInformationEntity abie = createABIE(userId, acc, bCSelected.getBizCtxId(), false);
+        AssociationBusinessInformationEntityProperty asbiep = createASBIEP(userId, asccp, abie.getAbieId());
 
-        AssociationBusinessInformationEntity asbieVO = createASBIE(asccVO, abie, asbiepVO.getAsbiepId(), seqKey);
+        createASBIE(userId, asccVO, abieId, asbiep.getAsbiepId(), seqKey);
+        createBIEs(createBIEContext, acc.getAccId(), abie);
 
-        createBIEs(accVOFromASCCP.getAccId(), abieVO.getAbieId());
-
-        logger.debug("leave createASBIETree(" + asccVO.getAsccId() + ", " + abie + ", " + seqKey +
+        logger.debug("leave createASBIETree(" + asccVO.getAsccId() + ", " + abieId + ", " + seqKey +
                 "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
@@ -672,8 +1036,8 @@ public class TopLevelABIEHandler implements Serializable {
         return bccRepository.findByFromAccId(accId);
     }
 
-    private List<BasicCoreComponent> getBCCwoAttribute(int accId) {
-        return getBCC(accId).stream()
+    private List<BasicCoreComponent> getBCCwoAttribute(CreateBIEContext createBIEContext, int accId) {
+        return createBIEContext.getBCC(accId).stream()
                 .filter(basicCoreComponent -> basicCoreComponent.getSeqKey() > 0)
                 .collect(Collectors.toList());
     }
@@ -703,15 +1067,14 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
 
-    private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent aggregateCoreComponent, int bizCtxId, boolean topLevel) {
+    private AggregateBusinessInformationEntity createABIE(int userId, AggregateCoreComponent acc, int bizCtxId, boolean topLevel) {
         AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
         String abieGuid = Utility.generateGUID();
         abie.setGuid(abieGuid);
-        abie.setBasedAccId(aggregateCoreComponent.getAccId());
-        abie.setDefinition(aggregateCoreComponent.getDefinition());
+        abie.setBasedAccId(acc.getAccId());
+        abie.setDefinition(acc.getDefinition());
         abie.setTopLevel(topLevel);
         abie.setBizCtxId(bizCtxId);
-        int userId = getUserId();
         abie.setCreatedBy(userId);
         abie.setLastUpdatedBy(userId);
         if (topLevel)
@@ -723,17 +1086,15 @@ public class TopLevelABIEHandler implements Serializable {
         return abie;
     }
 
-    private AssociationBusinessInformationEntityProperty createASBIEP(
-            AssociationCoreComponentProperty associationCoreComponentProperty, int abieId) {
+    private AssociationBusinessInformationEntityProperty createASBIEP(int userId, AssociationCoreComponentProperty asccp, int abieId) {
         AssociationBusinessInformationEntityProperty asbiep =
                 new AssociationBusinessInformationEntityProperty();
         asbiep.setGuid(Utility.generateGUID());
-        asbiep.setBasedAsccpId(associationCoreComponentProperty.getAsccpId());
+        asbiep.setBasedAsccpId(asccp.getAsccpId());
         asbiep.setRoleOfAbieId(abieId);
-        int userId = getUserId();
         asbiep.setCreatedBy(userId);
         asbiep.setLastUpdatedBy(userId);
-        asbiep.setDefinition(associationCoreComponentProperty.getDefinition());
+        asbiep.setDefinition(asccp.getDefinition());
 
         asbiepRepository.saveAndFlush(asbiep);
         asbiepCount++;
@@ -741,16 +1102,15 @@ public class TopLevelABIEHandler implements Serializable {
         return asbiep;
     }
 
-    private AssociationBusinessInformationEntity createASBIE(AssociationCoreComponent asccVO, int abie, int asbiep, int seqKey) {
+    private AssociationBusinessInformationEntity createASBIE(int userId, AssociationCoreComponent asccVO, int abieId, int asbiep, int seqKey) {
         AssociationBusinessInformationEntity asbie = new AssociationBusinessInformationEntity();
         asbie.setGuid(Utility.generateGUID());
-        asbie.setFromAbieId(abie);
+        asbie.setFromAbieId(abieId);
         asbie.setToAsbiepId(asbiep);
         asbie.setBasedAscc(asccVO.getAsccId());
         asbie.setCardinalityMax(asccVO.getCardinalityMax());
         asbie.setCardinalityMin(asccVO.getCardinalityMin());
         asbie.setDefinition(asccVO.getDefinition());
-        int userId = getUserId();
         asbie.setCreatedBy(userId);
         asbie.setLastUpdatedBy(userId);
         asbie.setSeqKey(seqKey);
@@ -761,14 +1121,13 @@ public class TopLevelABIEHandler implements Serializable {
         return asbie;
     }
 
-    private BasicBusinessInformationEntityProperty createBBIEP(BasicCoreComponentProperty bccpVO) {
+    private BasicBusinessInformationEntityProperty createBBIEP(int userId, BasicCoreComponentProperty bbcp) {
         BasicBusinessInformationEntityProperty bbiep = new BasicBusinessInformationEntityProperty();
         bbiep.setGuid(Utility.generateGUID());
-        bbiep.setBasedBccpId(bccpVO.getBccpId());
-        int userId = getUserId();
+        bbiep.setBasedBccpId(bbcp.getBccpId());
         bbiep.setCreatedBy(userId);
         bbiep.setLastUpdatedBy(userId);
-        bbiep.setDefinition(bccpVO.getDefinition());
+        bbiep.setDefinition(bbcp.getDefinition());
 
         bbiepRepository.saveAndFlush(bbiep);
         bbiepCount++;
@@ -777,7 +1136,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private BasicBusinessInformationEntity createBBIE(
-            BasicCoreComponent bccVO, int abie, int bbiep, int seqKey, int bdtPrimitiveRestrictionId) {
+            int userId, BasicCoreComponent bccVO, int abie, int bbiep, int seqKey, int bdtPrimitiveRestrictionId) {
         BasicBusinessInformationEntity bbie = new BasicBusinessInformationEntity();
         bbie.setGuid(Utility.generateGUID());
         bbie.setBasedBccId(bccVO.getBccId());
@@ -787,7 +1146,6 @@ public class TopLevelABIEHandler implements Serializable {
         bbie.setCardinalityMax(bccVO.getCardinalityMax());
         bbie.setCardinalityMin(bccVO.getCardinalityMin());
         bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
-        int userId = getUserId();
         bbie.setCreatedBy(userId);
         bbie.setLastUpdatedBy(userId);
         bbie.setSeqKey(seqKey);
@@ -799,37 +1157,30 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private void createBBIESC(int bbie, int bdt) {
-        List<DataTypeSupplementaryComponent> list =
-                dtScRepository.findByOwnerDtId(bdt);
+        List<DataTypeSupplementaryComponent> dtScList = dtScRepository.findByOwnerDtId(bdt);
+        List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = new ArrayList();
 
-        Map<String, String> hm = new HashMap();
-        for (DataTypeSupplementaryComponent dtsc : list) {
-            if (dtsc.getMaxCardinality() == 0)
+        for (DataTypeSupplementaryComponent dtSc : dtScList) {
+            if (dtSc.getMaxCardinality() == 0)
                 continue;
 
-            BasicBusinessInformationEntitySupplementaryComponent bbiescVO = new BasicBusinessInformationEntitySupplementaryComponent();
-            bbiescVO.setBbieId(bbie);
-            bbiescVO.setDtScId(dtsc.getDtScId());
-            bbiescVO.setMaxCardinality(dtsc.getMaxCardinality());
-            bbiescVO.setMinCardinality(dtsc.getMinCardinality());
-            bbiescVO.setDefinition(dtsc.getDefinition());
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc =
+                    new BasicBusinessInformationEntitySupplementaryComponent();
+            bbieSc.setBbieId(bbie);
+            bbieSc.setDtScId(dtSc.getDtScId());
+            bbieSc.setMaxCardinality(dtSc.getMaxCardinality());
+            bbieSc.setMinCardinality(dtSc.getMinCardinality());
+            bbieSc.setDefinition(dtSc.getDefinition());
 
-            bbiescRepository.saveAndFlush(bbiescVO);
-            bbiescCount++;
-
-            String sc_name = "";
-            if (dtsc.getRepresentationTerm().equalsIgnoreCase("Text"))
-                sc_name = Utility.toLowerCamelCase(dtsc.getPropertyTerm());
-            else if (dtsc.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-                sc_name = Utility.toLowerCamelCase(dtsc.getPropertyTerm()).concat("ID");
-            else
-                sc_name = Utility.toLowerCamelCase(dtsc.getPropertyTerm()).concat(Utility.toCamelCase(dtsc.getRepresentationTerm()));
-
-            hm.put(dtsc.getPropertyTerm(), dtsc.getGuid());
+            bbieScList.add(bbieSc);
         }
+
+        bbiescRepository.save(bbieScList);
+        bbiescCount += bbieScList.size();
     }
 
     private void copyBIEs(
+            int userId,
             AggregateBusinessInformationEntity oabieVO,
             AggregateBusinessInformationEntity nabieVO,
             AssociationBusinessInformationEntityProperty nasbiepVO, int groupPosition, TreeNode tNode) {
@@ -838,9 +1189,9 @@ public class TopLevelABIEHandler implements Serializable {
         for (BasicBusinessInformationEntity basicBusinessInformationEntity : basicBusinessInformationEntities) {
             BasicBusinessInformationEntityProperty oBBIEPVO =
                     bbiepRepository.findOne(basicBusinessInformationEntity.getToBbiepId());
-            BasicBusinessInformationEntityProperty nBBIEPVO = copyBBIEP(oBBIEPVO);
+            BasicBusinessInformationEntityProperty nBBIEPVO = copyBBIEP(userId, oBBIEPVO);
             BasicBusinessInformationEntity nBasicBusinessInformationEntity =
-                    copyBBIE(basicBusinessInformationEntity, nabieVO.getAbieId(), nBBIEPVO.getBbiepId());
+                    copyBBIE(userId, basicBusinessInformationEntity, nabieVO.getAbieId(), nBBIEPVO.getBbiepId());
 
             BasicCoreComponentProperty bccpVO = bccpRepository.findOne(nBBIEPVO.getBasedBccpId());
 
@@ -865,9 +1216,9 @@ public class TopLevelABIEHandler implements Serializable {
                     asbiepRepository.findOne(oASBIEVO.getToAsbiepId());
             AggregateBusinessInformationEntity o_next_abieVO =
                     abieRepository.findOne(o_next_asbiepVO.getRoleOfAbieId());
-            AggregateBusinessInformationEntity n_next_abieVO = copyABIE(o_next_abieVO, bCSelected.getBizCtxId(), false);
-            AssociationBusinessInformationEntityProperty n_next_asbiepVO = copyASBIEP(o_next_asbiepVO, n_next_abieVO.getAbieId());
-            AssociationBusinessInformationEntity nASBIEVO = copyASBIE(oASBIEVO, nabieVO.getAbieId(), n_next_asbiepVO.getAsbiepId());
+            AggregateBusinessInformationEntity n_next_abieVO = copyABIE(userId, o_next_abieVO, bCSelected.getBizCtxId(), false);
+            AssociationBusinessInformationEntityProperty n_next_asbiepVO = copyASBIEP(userId, o_next_asbiepVO, n_next_abieVO.getAbieId());
+            AssociationBusinessInformationEntity nASBIEVO = copyASBIE(userId, oASBIEVO, nabieVO.getAbieId(), n_next_asbiepVO.getAsbiepId());
 
             AssociationCoreComponentProperty asccpVO =
                     asccpRepository.findOne(n_next_asbiepVO.getBasedAsccpId());
@@ -878,12 +1229,13 @@ public class TopLevelABIEHandler implements Serializable {
             av.setAsbie(nASBIEVO);
             av.setAsbiep(n_next_asbiepVO);
             TreeNode tNode2 = new DefaultTreeNode(av, tNode);
-            copyBIEs(o_next_abieVO, n_next_abieVO, n_next_asbiepVO, -1, tNode2);
+            copyBIEs(userId, o_next_abieVO, n_next_abieVO, n_next_asbiepVO, -1, tNode2);
         }
     }
 
-    private AggregateBusinessInformationEntity copyABIE(
-            AggregateBusinessInformationEntity sourceAggregateBusinessInformationEntity, int bizCtxId, boolean topLevel) {
+    private AggregateBusinessInformationEntity copyABIE(int userId,
+                                                        AggregateBusinessInformationEntity sourceAggregateBusinessInformationEntity,
+                                                        int bizCtxId, boolean topLevel) {
         AggregateBusinessInformationEntity cloneAggregateBusinessInformationEntity = new AggregateBusinessInformationEntity();
         String abieGuid = Utility.generateGUID();
         cloneAggregateBusinessInformationEntity.setGuid(abieGuid);
@@ -896,7 +1248,6 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAggregateBusinessInformationEntity.setStatus(sourceAggregateBusinessInformationEntity.getStatus());
         cloneAggregateBusinessInformationEntity.setRemark(sourceAggregateBusinessInformationEntity.getRemark());
         cloneAggregateBusinessInformationEntity.setBizTerm(sourceAggregateBusinessInformationEntity.getBizTerm());
-        int userId = getUserId();
         cloneAggregateBusinessInformationEntity.setCreatedBy(userId);
         cloneAggregateBusinessInformationEntity.setLastUpdatedBy(userId);
         if (topLevel)
@@ -908,14 +1259,14 @@ public class TopLevelABIEHandler implements Serializable {
         return cloneAggregateBusinessInformationEntity;
     }
 
-    private AssociationBusinessInformationEntityProperty copyASBIEP(
-            AssociationBusinessInformationEntityProperty sourceAssociationBusinessInformationEntityProperty, int abieId) {
+    private AssociationBusinessInformationEntityProperty copyASBIEP(int userId,
+                                                                    AssociationBusinessInformationEntityProperty sourceAssociationBusinessInformationEntityProperty,
+                                                                    int abieId) {
         AssociationBusinessInformationEntityProperty cloneAssociationBusinessInformationEntityProperty =
                 new AssociationBusinessInformationEntityProperty();
         cloneAssociationBusinessInformationEntityProperty.setGuid(Utility.generateGUID());
         cloneAssociationBusinessInformationEntityProperty.setBasedAsccpId(sourceAssociationBusinessInformationEntityProperty.getBasedAsccpId());
         cloneAssociationBusinessInformationEntityProperty.setRoleOfAbieId(abieId);
-        int userId = getUserId();
         cloneAssociationBusinessInformationEntityProperty.setCreatedBy(userId);
         cloneAssociationBusinessInformationEntityProperty.setLastUpdatedBy(userId);
         cloneAssociationBusinessInformationEntityProperty.setDefinition(sourceAssociationBusinessInformationEntityProperty.getDefinition());
@@ -926,7 +1277,7 @@ public class TopLevelABIEHandler implements Serializable {
         return cloneAssociationBusinessInformationEntityProperty;
     }
 
-    private AssociationBusinessInformationEntity copyASBIE(AssociationBusinessInformationEntity oasbieVO, int abieid, int asbiepid) {
+    private AssociationBusinessInformationEntity copyASBIE(int userId, AssociationBusinessInformationEntity oasbieVO, int abieid, int asbiepid) {
         AssociationBusinessInformationEntity asbieVO = new AssociationBusinessInformationEntity();
         asbieVO.setGuid(Utility.generateGUID());
         asbieVO.setFromAbieId(abieid);
@@ -935,7 +1286,6 @@ public class TopLevelABIEHandler implements Serializable {
         asbieVO.setCardinalityMax(oasbieVO.getCardinalityMax());
         asbieVO.setCardinalityMin(oasbieVO.getCardinalityMin());
         asbieVO.setDefinition(oasbieVO.getDefinition());
-        int userId = getUserId();
         asbieVO.setCreatedBy(userId);
         asbieVO.setLastUpdatedBy(userId);
         asbieVO.setSeqKey(oasbieVO.getSeqKey());
@@ -946,14 +1296,13 @@ public class TopLevelABIEHandler implements Serializable {
         return asbieVO;
     }
 
-    private BasicBusinessInformationEntityProperty copyBBIEP(BasicBusinessInformationEntityProperty obbiepVO) {
+    private BasicBusinessInformationEntityProperty copyBBIEP(int userId, BasicBusinessInformationEntityProperty obbiepVO) {
         BasicBusinessInformationEntityProperty nbbiepVO = new BasicBusinessInformationEntityProperty();
         nbbiepVO.setBasedBccpId(obbiepVO.getBasedBccpId());
         nbbiepVO.setDefinition(obbiepVO.getDefinition());
         nbbiepVO.setRemark(obbiepVO.getRemark());
         nbbiepVO.setBizTerm(obbiepVO.getBizTerm());
         nbbiepVO.setGuid(Utility.generateGUID());
-        int userId = getUserId();
         nbbiepVO.setCreatedBy(userId);
         nbbiepVO.setLastUpdatedBy(userId);
 
@@ -963,7 +1312,7 @@ public class TopLevelABIEHandler implements Serializable {
         return nbbiepVO;
     }
 
-    private BasicBusinessInformationEntity copyBBIE(BasicBusinessInformationEntity obbieVO, int abie, int bbiep) {
+    private BasicBusinessInformationEntity copyBBIE(int userId, BasicBusinessInformationEntity obbieVO, int abie, int bbiep) {
         BasicBusinessInformationEntity nbbieVO = new BasicBusinessInformationEntity();
         nbbieVO.setBasedBccId(obbieVO.getBasedBccId());
         nbbieVO.setBdtPriRestriId(obbieVO.getBdtPriRestriId());
@@ -980,7 +1329,6 @@ public class TopLevelABIEHandler implements Serializable {
         nbbieVO.setGuid(Utility.generateGUID());
         nbbieVO.setFromAbieId(abie);
         nbbieVO.setToBbiepId(bbiep);//come back
-        int userId = getUserId();
         nbbieVO.setCreatedBy(userId);
         nbbieVO.setLastUpdatedBy(userId);
 
@@ -1416,10 +1764,6 @@ public class TopLevelABIEHandler implements Serializable {
 
     public void setSelectedDocument(ABIEView selectedDocument) {
         this.selectedDocument = selectedDocument;
-    }
-
-    private int getUserId() {
-        return userRepository.findAppUserIdByLoginId("oagis");
     }
 
     private int min;

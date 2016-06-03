@@ -82,6 +82,12 @@ public class BasicCoreComponentProperty implements Serializable {
         this.den = den;
     }
 
+    public BasicCoreComponentProperty(int bccpId, int bdtId, String definition) {
+        this.bccpId = bccpId;
+        this.bdtId = bdtId;
+        this.definition = definition;
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

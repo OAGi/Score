@@ -83,6 +83,12 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.den = den;
     }
 
+    public AssociationCoreComponentProperty(int asccpId, int roleOfAccId, String definition) {
+        this.asccpId = asccpId;
+        this.roleOfAccId = roleOfAccId;
+        this.definition = definition;
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

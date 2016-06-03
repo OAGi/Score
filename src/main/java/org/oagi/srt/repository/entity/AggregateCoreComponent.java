@@ -85,6 +85,15 @@ public class AggregateCoreComponent implements Serializable {
         this.den = den;
     }
 
+    public AggregateCoreComponent(int accId, Integer basedAccId, String definition) {
+        this.accId = accId;
+        if (basedAccId != null) {
+
+        }
+        this.basedAccId = basedAccId;
+        this.definition = definition;
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

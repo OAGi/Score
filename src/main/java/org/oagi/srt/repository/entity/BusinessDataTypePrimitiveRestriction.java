@@ -27,6 +27,12 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     @Column
     private Integer agencyIdListId;
 
+    public BusinessDataTypePrimitiveRestriction() {}
+
+    public BusinessDataTypePrimitiveRestriction(int bdtPriRestriId) {
+        this.bdtPriRestriId = bdtPriRestriId;
+    }
+
     public int getBdtPriRestriId() {
         return bdtPriRestriId;
     }

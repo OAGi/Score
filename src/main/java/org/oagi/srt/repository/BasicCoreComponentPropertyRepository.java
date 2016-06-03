@@ -6,12 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface BasicCoreComponentPropertyRepository extends JpaRepository<BasicCoreComponentProperty, Integer> {
 
-    @Query("select b from BasicCoreComponentProperty b where b.bccpId = ?1 and b.revisionNum = ?2")
-    public BasicCoreComponentProperty findOneByBccpIdAndRevisionNum(int bccpId, int revisionNum);
-
-    @Query("select b from BasicCoreComponentProperty b where b.propertyTerm = ?1")
-    public BasicCoreComponentProperty findOneByPropertyTerm(String propertyTerm);
-
     @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.propertyTerm = ?1")
     public BasicCoreComponentProperty findBccpIdAndDenByPropertyTerm(String propertyTerm);
 
