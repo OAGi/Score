@@ -78,6 +78,13 @@ public class AggregateCoreComponent implements Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
+    public AggregateCoreComponent() {}
+
+    public AggregateCoreComponent(int accId, String den) {
+        this.accId = accId;
+        this.den = den;
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

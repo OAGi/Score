@@ -90,6 +90,13 @@ public class DataType implements Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
+    public DataType() {}
+
+    public DataType(int dtId, String dataTypeTerm) {
+        this.dtId = dtId;
+        this.dataTypeTerm = dataTypeTerm;
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

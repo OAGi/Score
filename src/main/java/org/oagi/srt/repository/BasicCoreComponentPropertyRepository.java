@@ -12,6 +12,12 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select b from BasicCoreComponentProperty b where b.propertyTerm = ?1")
     public BasicCoreComponentProperty findOneByPropertyTerm(String propertyTerm);
 
+    @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.propertyTerm = ?1")
+    public BasicCoreComponentProperty findBccpIdAndDenByPropertyTerm(String propertyTerm);
+
     @Query("select b from BasicCoreComponentProperty b where b.guid = ?1")
     public BasicCoreComponentProperty findOneByGuid(String guid);
+
+    @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.guid = ?1")
+    public BasicCoreComponentProperty findBccpIdAndDenByGuid(String guid);
 }

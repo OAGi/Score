@@ -76,6 +76,13 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column
     private Integer currentAsccpId;
 
+    public AssociationCoreComponentProperty() {}
+
+    public AssociationCoreComponentProperty(int asccpId, String den) {
+        this.asccpId = asccpId;
+        this.den = den;
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

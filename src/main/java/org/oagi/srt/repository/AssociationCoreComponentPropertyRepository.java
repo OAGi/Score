@@ -22,4 +22,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select a from AssociationCoreComponentProperty a where a.guid = ?1")
     public AssociationCoreComponentProperty findOneByGuid(String guid);
+
+    @Query("select new AssociationCoreComponentProperty(a.asccpId, a.den) from AssociationCoreComponentProperty a where a.guid = ?1")
+    public AssociationCoreComponentProperty findAsccpIdAndDenByGuid(String guid);
 }

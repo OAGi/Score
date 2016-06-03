@@ -9,6 +9,12 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select a from AggregateCoreComponent a where a.guid = ?1")
     public AggregateCoreComponent findOneByGuid(String guid);
 
+    @Query("select case when count(a) > 0 then true else false end from AggregateCoreComponent a where a.guid = ?1")
+    public boolean existsByGuid(String guid);
+
+    @Query("select new AggregateCoreComponent(a.accId, a.den) from AggregateCoreComponent a where a.guid = ?1")
+    public AggregateCoreComponent findAccIdAndDenByGuid(String guid);
+
     @Query("select a from AggregateCoreComponent a where a.accId = ?1 and a.revisionNum = ?2")
     public AggregateCoreComponent findOneByAccIdAndRevisionNum(int accId, int revisionNum);
 }

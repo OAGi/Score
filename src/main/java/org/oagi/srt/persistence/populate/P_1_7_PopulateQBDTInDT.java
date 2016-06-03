@@ -270,7 +270,6 @@ public class P_1_7_PopulateQBDTInDT {
                 // add DT_SC
                 addToDTSC(fields_xsd, type, dataType);
             }
-
         }
     }
 
@@ -318,120 +317,132 @@ public class P_1_7_PopulateQBDTInDT {
         return bdtscs;
     }
 
-    private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO, int mode, String name, String type) throws Exception {
+    private void insertBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtscVO,
+                                                 int mode, String name, String type) throws Exception {
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriListForSaving =
+                new ArrayList();
+
         // if (SC = inherit from the base BDT)
         if (mode == 1) {
             List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtscs = getBDTSCPrimitiveRestriction(dtscVO);
             for (BusinessDataTypeSupplementaryComponentPrimitiveRestriction parent : bdtscs) {
-                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPRVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtSCPRVO.setBdtScId(dtscVO.getDtScId());
-                bdtSCPRVO.setCdtScAwdPriXpsTypeMapId(parent.getCdtScAwdPriXpsTypeMapId());
-                bdtSCPRVO.setCodeListId(parent.getCodeListId());
-                bdtSCPRVO.setDefault(parent.isDefault());
-                bdtSCPRVO.setAgencyIdListId(parent.getAgencyIdListId());
-                bdtScPriRestriRepository.save(bdtSCPRVO);
+                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                        new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
+                bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(parent.getCdtScAwdPriXpsTypeMapId());
+                bdtScPriRestri.setCodeListId(parent.getCodeListId());
+                bdtScPriRestri.setDefault(parent.isDefault());
+                bdtScPriRestri.setAgencyIdListId(parent.getAgencyIdListId());
+                bdtScPriRestriListForSaving.add(bdtScPriRestri);
             }
 
         } else { // else if (new SC)
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtscprimitiverestionvo;
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri;
 
             List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtScAwdPriList = getCdtSCAllowedPrimitiveID(dtscVO.getDtScId());
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive svo : cdtScAwdPriList) {
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> maps = getCdtSCAPMap(svo.getCdtScAwdPriId());
                 for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap vo : maps) {
-                    bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                    bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
-                    bdtscprimitiverestionvo.setCdtScAwdPriXpsTypeMapId(vo.getCdtScAwdPriXpsTypeMapId());
+                    bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                    bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
+                    bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(vo.getCdtScAwdPriXpsTypeMapId());
 
                     if (type.equalsIgnoreCase("NumberType_B98233")) {
                         if (svo.getCdtPriId() == getCdtPriId("Decimal") && vo.getXbtId() == getXbtId("xsd:decimal"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
-                    } else if (type.equalsIgnoreCase("CodeType_1E7368") || type.equalsIgnoreCase("CodeContentType") || name.equalsIgnoreCase("countryCode")) {
+                    } else if (type.equalsIgnoreCase("CodeType_1E7368") ||
+                            type.equalsIgnoreCase("CodeContentType") ||
+                            name.equalsIgnoreCase("countryCode")) {
                         if (svo.getCdtPriId() == getCdtPriId("Token") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (type.equalsIgnoreCase("StringType")) {
                         if (svo.getCdtPriId() == getCdtPriId("String") && vo.getXbtId() == getXbtId("xsd:string"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (type.equalsIgnoreCase("NormalizedStringType")) {
                         if (svo.getCdtPriId() == getCdtPriId("String") && vo.getXbtId() == getXbtId("xsd:string"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
-                    } else if (name.equalsIgnoreCase("listID") || name.equalsIgnoreCase("listVersionID") || name.equalsIgnoreCase("unitCodeListVersionID")) {
+                    } else if (name.equalsIgnoreCase("listID") ||
+                            name.equalsIgnoreCase("listVersionID") ||
+                            name.equalsIgnoreCase("unitCodeListVersionID")) {
                         if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (type.equalsIgnoreCase("DateTimeType")) {
                         if (svo.getCdtPriId() == getCdtPriId("TimePoint") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (type.equalsIgnoreCase("IndicatorType")) {
                         if (svo.getCdtPriId() == getCdtPriId("Boolean") && vo.getXbtId() == getXbtId("xsd:boolean"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (type.equalsIgnoreCase("ValueType_E7171E")) {
                         if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (name.equalsIgnoreCase("name")) {
                         if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (type.contains("CodeContentType")) {
                         if (svo.getCdtPriId() == getCdtPriId("Token") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
 
                     } else if (name.equalsIgnoreCase("listAgencyID")) {
                         if (svo.getCdtPriId() == getCdtPriId("Token") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtscprimitiverestionvo.setDefault(true);
+                            bdtScPriRestri.setDefault(true);
                         else
-                            bdtscprimitiverestionvo.setDefault(false);
+                            bdtScPriRestri.setDefault(false);
                     }
 
-                    bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
-
+                    bdtScPriRestriListForSaving.add(bdtScPriRestri);
                 }
             }
 
             if (type.contains("CodeContentType")) {
                 // add code_list id for this case
-                bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
-                bdtscprimitiverestionvo.setCodeListId(getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
-                bdtscprimitiverestionvo.setDefault(false);
-                bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
+                bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
+                bdtScPriRestri.setCodeListId(getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
+                bdtScPriRestri.setDefault(false);
+                bdtScPriRestriListForSaving.add(bdtScPriRestri);
             }
 
             if (name.equalsIgnoreCase("listAgencyID")) {
                 // add agency_id_list id for this case
-                bdtscprimitiverestionvo = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtscprimitiverestionvo.setBdtScId(dtscVO.getDtScId());
-                bdtscprimitiverestionvo.setAgencyIdListId(getAgencyListID());
-                bdtscprimitiverestionvo.setDefault(false);
-                bdtScPriRestriRepository.save(bdtscprimitiverestionvo);
+                bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
+                bdtScPriRestri.setAgencyIdListId(getAgencyListID());
+                bdtScPriRestri.setDefault(false);
+                bdtScPriRestriListForSaving.add(bdtScPriRestri);
             }
+        }
+
+        if (!bdtScPriRestriListForSaving.isEmpty()) {
+            bdtScPriRestriRepository.save(bdtScPriRestriListForSaving);
         }
     }
 
@@ -493,76 +504,84 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setRevisionNum(0);
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
-        dataTypeRepository.save(dataType);
+        dataTypeRepository.saveAndFlush(dataType);
 
-        DataType res = dataTypeRepository.findOneByGuid(guid);
         // add to BDTPrimitiveRestriction
-        insertBDTPrimitiveRestriction(res, base);
+        insertBDTPrimitiveRestriction(dataType, base);
 
-        return res;
+        return dataType;
     }
 
-    private void insertBDTPrimitiveRestriction(DataType dVO, String base) throws Exception {
-        List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(dVO.getBasedDtId());
+    private void insertBDTPrimitiveRestriction(DataType dataType, String base) throws Exception {
+        List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(dataType.getBasedDtId());
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriListForSaving = new ArrayList();
+
+        String dataTypeTerm = dataType.getDataTypeTerm();
 
 //		//the previous condition below cannot classify the cases correctly.
 //		//we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
-//		if(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && !(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
-        if (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && !(dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.equalsIgnoreCase("CodeType"))) {
+        if (dataTypeTerm.equalsIgnoreCase("Code") &&
+                !(dataTypeTerm.equalsIgnoreCase("Code") &&
+                        base.equalsIgnoreCase("CodeType"))) {
             //same as (DataTypeTerm = "Code") & (base != "CodeType")
-            BusinessDataTypePrimitiveRestriction theBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
-            theBDT_Primitive_RestrictionVO.setBdtId(dVO.getDtId());
+            BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
+            bdtPriRestri.setBdtId(dataType.getDtId());
             if (base.endsWith("CodeContentType")) {
-                theBDT_Primitive_RestrictionVO.setCodeListId(getCodeListId(base.substring(0, base.indexOf("CodeContentType"))));
+                bdtPriRestri.setCodeListId(getCodeListId(base.substring(0, base.indexOf("CodeContentType"))));
             } else {//MatchCodeType, ResponseCodeType
                 for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
                     if (aBusinessDataTypePrimitiveRestriction.getCodeListId() > 0) {
-                        theBDT_Primitive_RestrictionVO.setCodeListId(aBusinessDataTypePrimitiveRestriction.getCodeListId());
+                        bdtPriRestri.setCodeListId(aBusinessDataTypePrimitiveRestriction.getCodeListId());
                         break;
                     }
                 }
             }
-            theBDT_Primitive_RestrictionVO.setDefault(false);
-            bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
+            bdtPriRestri.setDefault(false);
+            bdtPriRestriListForSaving.add(bdtPriRestri);
         }
 
-        if (dVO.getDataTypeTerm().equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
-            BusinessDataTypePrimitiveRestriction theBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
-            theBDT_Primitive_RestrictionVO.setBdtId(dVO.getDtId());
-            theBDT_Primitive_RestrictionVO.setAgencyIdListId(getAgencyListID());
-            theBDT_Primitive_RestrictionVO.setDefault(false);
-            bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
+        if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
+            BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
+            bdtPriRestri.setBdtId(dataType.getDtId());
+            bdtPriRestri.setAgencyIdListId(getAgencyListID());
+            bdtPriRestri.setDefault(false);
+            bdtPriRestriListForSaving.add(bdtPriRestri);
         }
 
-        if (!dVO.getDataTypeTerm().equalsIgnoreCase("Code") || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeType")) || (dVO.getDataTypeTerm().equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))) {
+        if (!dataTypeTerm.equalsIgnoreCase("Code") ||
+                (dataTypeTerm.equalsIgnoreCase("Code") && base.endsWith("CodeType")) ||
+                (dataTypeTerm.equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))) {
             //
             //third or condition is not fine because we might apply this code to base = "CodeContentType" not only end-with "CodeContentType"
-            for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
-                BusinessDataTypePrimitiveRestriction theBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
-                theBDT_Primitive_RestrictionVO.setBdtId(dVO.getDtId());
-                theBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
-                theBDT_Primitive_RestrictionVO.setDefault(aBusinessDataTypePrimitiveRestriction.isDefault());
-                bdtPriRestriRepository.save(theBDT_Primitive_RestrictionVO);
-
+            for (BusinessDataTypePrimitiveRestriction bdtPriRestri : al) {
+                BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
+                inheritedBdtPriRestri.setBdtId(dataType.getDtId());
+                inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(bdtPriRestri.getCdtAwdPriXpsTypeMapId());
+                inheritedBdtPriRestri.setDefault(bdtPriRestri.isDefault());
+                bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
             }
+        }
+
+        if (!bdtPriRestriListForSaving.isEmpty()) {
+            bdtPriRestriRepository.save(bdtPriRestriListForSaving);
         }
     }
 
-    private void addToBCCP(String guid, String bccp, DataType dtVO, String definition) throws Exception {
-        BasicCoreComponentProperty bccpVO = new BasicCoreComponentProperty();
-        bccpVO.setGuid(guid);
+    private void addToBCCP(String guid, String name, DataType dataType, String definition) throws Exception {
+        BasicCoreComponentProperty bccp = new BasicCoreComponentProperty();
+        bccp.setGuid(guid);
 
-        String propertyTerm = Utility.spaceSeparator(bccp.replaceAll("ID", "Identifier"));
-        bccpVO.setPropertyTerm(propertyTerm);
-        bccpVO.setRepresentationTerm(dtVO.getDataTypeTerm());
-        bccpVO.setBdtId(dtVO.getDtId());
-        bccpVO.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dtVO.getDataTypeTerm());
-        bccpVO.setDefinition(definition);
-        bccpVO.setState(3);
-        bccpVO.setCreatedBy(userId);
-        bccpVO.setLastUpdatedBy(userId);
-        bccpVO.setOwnerUserId(userId);
-        bccpRepository.save(bccpVO);
+        String propertyTerm = Utility.spaceSeparator(name.replaceAll("ID", "Identifier"));
+        bccp.setPropertyTerm(propertyTerm);
+        bccp.setRepresentationTerm(dataType.getDataTypeTerm());
+        bccp.setBdtId(dataType.getDtId());
+        bccp.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dataType.getDataTypeTerm());
+        bccp.setDefinition(definition);
+        bccp.setState(3);
+        bccp.setCreatedBy(userId);
+        bccp.setLastUpdatedBy(userId);
+        bccp.setOwnerUserId(userId);
+        bccpRepository.save(bccp);
     }
 
     private void addToDTSC(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
@@ -589,10 +608,7 @@ public class P_1_7_PopulateQBDTInDT {
 
         // new SC
         NodeList attributeList = xHandler.getNodeList("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
-
-        if (attributeList == null || attributeList.getLength() == 0) {
-            //System.out.println("##### " + "//xsd:"+"Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
-        } else {
+        if (attributeList != null && attributeList.getLength() > 0) {
             String dt_sc_guid = "";
             String property_term = "";
             String representation_term = "";
@@ -665,32 +681,31 @@ public class P_1_7_PopulateQBDTInDT {
                     definition = null;
                 }
 
-                DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
-                vo.setGuid(dt_sc_guid);
-                vo.setPropertyTerm(Utility.spaceSeparator(property_term));
-                vo.setRepresentationTerm(representation_term);
-                vo.setDefinition(definition);
-                vo.setOwnerDtId(ownerDtId);
+                DataTypeSupplementaryComponent dtSc = new DataTypeSupplementaryComponent();
+                dtSc.setGuid(dt_sc_guid);
+                dtSc.setPropertyTerm(Utility.spaceSeparator(property_term));
+                dtSc.setRepresentationTerm(representation_term);
+                dtSc.setDefinition(definition);
+                dtSc.setOwnerDtId(ownerDtId);
 
-                vo.setMinCardinality(min_cardinality);
-                vo.setMaxCardinality(max_cardinality);
+                dtSc.setMinCardinality(min_cardinality);
+                dtSc.setMaxCardinality(max_cardinality);
 
 //				Both based dtsc and target dtsc have listAgencyID
 //				target dtsc inherits all attrs from the base
 //				since the attr name is the same, it just update the guid
 //				in this case, the target dtsc is new? or not?
 
-                DataTypeSupplementaryComponent duplicate = checkDuplicate(vo);
+                DataTypeSupplementaryComponent duplicate = checkDuplicate(dtSc);
                 if (duplicate == null) {
-                    dtScRepository.save(vo);
+                    dtScRepository.saveAndFlush(dtSc);
 
                     // populate CDT_SC_Allowed_Primitives
-                    DataTypeSupplementaryComponent dtscVO = dtScRepository.findOneByGuidAndOwnerDtId(vo.getGuid(), vo.getOwnerDtId());
-                    String representationTerm = dtscVO.getRepresentationTerm();
+                    String representationTerm = dtSc.getRepresentationTerm();
                     DataType dtVO = getDataTypeWithRepresentationTerm(representationTerm);
 
                     CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAllowedVO = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
-                    cdtSCAllowedVO.setCdtScId(dtscVO.getDtScId());
+                    cdtSCAllowedVO.setCdtScId(dtSc.getDtScId());
                     List<CoreDataTypeAllowedPrimitive> cdtallowedprimitivelist = getCDTAllowedPrimitiveIDs(dtVO.getDtId());
                     for (CoreDataTypeAllowedPrimitive svo : cdtallowedprimitivelist) {
                         cdtSCAllowedVO.setCdtPriId(svo.getCdtPriId());
@@ -716,9 +731,9 @@ public class P_1_7_PopulateQBDTInDT {
 
                     insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 } else {
-                    vo.setDtScId(duplicate.getDtScId());
-                    vo.setBasedDtScId(duplicate.getBasedDtScId());
-                    dtScRepository.save(vo);
+                    dtSc.setDtScId(duplicate.getDtScId());
+                    dtSc.setBasedDtScId(duplicate.getBasedDtScId());
+                    dtScRepository.save(dtSc);
                 }
             }
         }
@@ -833,9 +848,13 @@ public class P_1_7_PopulateQBDTInDT {
     private void insertContentTypeFromNodeList(String dataType, NodeList simpleTypesFromFieldsXSD) throws Exception {
         for (int i = 0; i < simpleTypesFromFieldsXSD.getLength(); i++) {
             Node typeNode = simpleTypesFromFieldsXSD.item(i);
-            DataTypeInfoHolder dataTypeInfoHolder = dtiHolderMap.get(dataType);
+            String type = ((Element) typeNode).getAttribute("name");
+            if (!type.endsWith(dataType) || type.equals(dataType)) {
+                continue;
+            }
+            DataTypeInfoHolder dataTypeInfoHolder = dtiHolderMap.get(type);
             if (dataTypeInfoHolder == null) {
-                throw new IllegalStateException("Unknown QBDT: " + dataType);
+                throw new IllegalStateException("Unknown QBDT: " + type);
             }
 
             DataType dtVO = dataTypeRepository.findOneByGuid(dataTypeInfoHolder.getGuid());
@@ -859,7 +878,7 @@ public class P_1_7_PopulateQBDTInDT {
         DataType dVO;
         if (base.endsWith("CodeContentType")) {
             dVO = getDataTypeWithDen("Code Content. Type");
-        } else { //else if (base.endsWith("IDContentType")){
+        } else {
             dVO = getDataTypeWithDen("Identifier Content. Type");
             base = "IDContentType";
         }
@@ -869,23 +888,15 @@ public class P_1_7_PopulateQBDTInDT {
 
         String type = dataTypeInfoHolder.getTypeName();
         String qualifier = Utility.qualifier(type, dVO);
-        if (qualifier.length() == 0 || qualifier.isEmpty() || qualifier == null) {
-            System.out.println("!!Null Qualifier Detected During Import QBDT " + type + " based on Den: " + dVO.getDen());
+        if (StringUtils.isEmpty(qualifier)) {
+            throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den: " + dVO.getDen());
         }
 
         dtVO.setQualifier(qualifier);
         String den = Utility.denWithQualifier(qualifier, dVO.getDen());
         dtVO.setDen(den);
         dtVO.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
-        String definition = null;
-        Node definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation");
-        if (definitionNode != null)
-            definition = definitionNode.getTextContent();
-        else if (xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]") != null) {
-            definitionNode = xHandler.getNode("//xsd:simpleType[@name = '" + base + "']//xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
-            definition = definitionNode.getTextContent();
-        } else
-            definition = null;
+        String definition = dataTypeInfoHolder.getDefinition();
         dtVO.setDefinition(definition);
         dtVO.setState(3);
         dtVO.setCreatedBy(userId);

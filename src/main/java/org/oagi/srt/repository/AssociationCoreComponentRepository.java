@@ -22,4 +22,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select a from AssociationCoreComponent a where a.guid = ?1 and a.fromAccId = ?2 and a.toAsccpId = ?3")
     public AssociationCoreComponent findOneByGuidAndFromAccIdAndToAsccpId(String guid, int fromAccId, int toAsccpId);
+
+    @Query("select case when count(a) > 0 then true else false end from AssociationCoreComponent a where a.guid = ?1 and a.fromAccId = ?2 and a.toAsccpId = ?3")
+    public boolean existsByGuidAndFromAccIdAndToAsccpId(String guid, int fromAccId, int toAsccpId);
 }

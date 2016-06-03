@@ -27,8 +27,8 @@ public interface DataTypeRepository extends JpaRepository<DataType, Integer> {
     @Query("select d from DataType d where d.guid = ?1")
     public DataType findOneByGuid(String guid);
 
-    @Query("select d from DataType d where d.guid = ?1 and d.type = ?2")
-    public DataType findOneByGuidAndType(String guid, int type);
+    @Query("select new DataType(d.dtId, d.dataTypeTerm) from DataType d where d.guid = ?1 and d.type = ?2")
+    public DataType findDtIdAndDataTypeTermByGuidAndType(String guid, int type);
 
     @Query("select d from DataType d where d.den = ?1")
     public List<DataType> findByDen(String den);
