@@ -84,7 +84,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
     private void populate() throws Exception {
         populate1();
-        //populate2();
+        populate2();
     }
 
     private void populate1() throws Exception {
