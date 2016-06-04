@@ -17,6 +17,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.guid = ?1 and b.fromAccId = ?2 and b.toBccpId = ?3")
     public BasicCoreComponent findOneByGuidAndFromAccIdAndToBccpId(String guid, int fromAccId, int toBccpId);
 
+    @Query("select case when count(b) > 0 then true else false end from BasicCoreComponent b where b.guid = ?1 and b.toBccpId = ?2")
+    public boolean existsByGuidAndToBccpId(String guid, int toBccpId);
+
     @Query("select case when count(b) > 0 then true else false end from BasicCoreComponent b where b.guid = ?1 and b.fromAccId = ?2 and b.toBccpId = ?3")
     public boolean existsByGuidAndFromAccIdAndToBccpId(String guid, int fromAccId, int toBccpId);
 }

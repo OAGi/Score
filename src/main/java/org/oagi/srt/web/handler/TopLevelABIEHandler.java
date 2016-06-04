@@ -440,7 +440,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private List<CoreComponent> queryNestedChildAssoc(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
-        List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(createBIEContext, aggregateCoreComponent.getAccId());
+        List<BasicCoreComponent> bcc_tmp_assoc = createBIEContext.getBCC(aggregateCoreComponent.getAccId());
         List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(aggregateCoreComponent.getAccId());
 
         int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
@@ -454,13 +454,17 @@ public class TopLevelABIEHandler implements Serializable {
             assoc.add(a);
 
         int attribute_cnt = 0;
+        for (BasicCoreComponent basicCoreComponent : bcc_tmp_assoc) {
+            if (basicCoreComponent.getSeqKey() == 0) {
+                assoc.set(attribute_cnt, basicCoreComponent);
+                attribute_cnt++;
+            }
+        }
+
         for (CoreComponent coreComponent : tmp_assoc) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
-                if (basicCoreComponent.getSeqKey() == 0) {
-                    assoc.set(attribute_cnt, basicCoreComponent);
-                    attribute_cnt++;
-                } else if (basicCoreComponent.getSeqKey() > 0) {
+                if (basicCoreComponent.getSeqKey() > 0) {
                     assoc.set(basicCoreComponent.getSeqKey() - 1 + attribute_cnt, basicCoreComponent);
                 }
             } else {
@@ -521,12 +525,19 @@ public class TopLevelABIEHandler implements Serializable {
             if (basicCoreComponent.getSeqKey() == 0) {
                 assoc.set(attribute_cnt, basicCoreComponent);
                 attribute_cnt++;
-            } else if (basicCoreComponent.getSeqKey() > 0) {
-                assoc.set(basicCoreComponent.getSeqKey() - 1 + attribute_cnt, basicCoreComponent);
             }
         }
-        for (AssociationCoreComponent associationCoreComponent : ascc_tmp_assoc) {
-            assoc.set(associationCoreComponent.getSeqKey() - 1 + attribute_cnt, associationCoreComponent);
+
+        for (CoreComponent coreComponent : tmp_assoc) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
+                if (basicCoreComponent.getSeqKey() > 0) {
+                    assoc.set(basicCoreComponent.getSeqKey() - 1 + attribute_cnt, basicCoreComponent);
+                }
+            } else {
+                AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
+                assoc.set(associationCoreComponent.getSeqKey() - 1 + attribute_cnt, associationCoreComponent);
+            }
         }
 
         assoc.trimToSize();
@@ -537,24 +548,21 @@ public class TopLevelABIEHandler implements Serializable {
     private List<CoreComponent> handleNestedGroup(CreateBIEContext createBIEContext,
                                                   AggregateCoreComponent aggregateCoreComponent,
                                                   List<CoreComponent> coreComponents, int gPosition) {
-        List<CoreComponent> list = new ArrayList();
-        list.addAll(coreComponents);
-
         List<CoreComponent> bList = queryChildAssoc(createBIEContext, aggregateCoreComponent);
-        list.addAll(gPosition, bList);
-        list.remove(gPosition + bList.size());
+        coreComponents.addAll(gPosition, bList);
+        coreComponents.remove(gPosition + bList.size());
 
-        for (int i = 0; i < list.size(); i++) {
-            CoreComponent coreComponent = list.get(i);
+        for (int i = 0; i < coreComponents.size(); i++) {
+            CoreComponent coreComponent = coreComponents.get(i);
             if (coreComponent instanceof AssociationCoreComponent && groupcheck(createBIEContext, (AssociationCoreComponent) coreComponent)) {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
                 AssociationCoreComponentProperty associationCoreComponentProperty = createBIEContext.getASCCP(associationCoreComponent.getToAsccpId());
-                list = handleNestedGroup(
-                        createBIEContext, createBIEContext.getACC(associationCoreComponentProperty.getRoleOfAccId()), list, i);
+                coreComponents = handleNestedGroup(
+                        createBIEContext, createBIEContext.getACC(associationCoreComponentProperty.getRoleOfAccId()), coreComponents, i);
             }
         }
 
-        return list;
+        return coreComponents;
     }
 
     private boolean groupcheck(CreateBIEContext createBIEContext, AssociationCoreComponent associationCoreComponent) {

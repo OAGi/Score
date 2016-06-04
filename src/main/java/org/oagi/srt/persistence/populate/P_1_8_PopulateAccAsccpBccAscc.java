@@ -84,7 +84,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
     private void populate() throws Exception {
         populate1();
-        //populate2();
+        populate2();
     }
 
     private void populate1() throws Exception {
@@ -331,7 +331,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         AggregateCoreComponent accVO = accRepository.findOneByGuid(parentGuid);
         int assocFromACCId = accVO.getAccId();
 
-        if (bccRepository.findOneByGuidAndFromAccIdAndToBccpId(bccGuid, assocFromACCId, assocToBccpId) == null) {
+        if (!bccRepository.existsByGuidAndFromAccIdAndToBccpId(bccGuid, assocFromACCId, assocToBccpId)) {
             int cardinalityMin = bodVO.getMinOccur();
             int cardinalityMax = bodVO.getMaxOccur();
             int sequenceKey = bodVO.getOrder();
@@ -385,7 +385,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             AggregateCoreComponent accVO = accRepository.findAccIdAndDenByGuid(parentGuid);
             int assocFromACCId = accVO.getAccId();
 
-            if (!bccRepository.existsByGuidAndFromAccIdAndToBccpId(bccGuid, assocFromACCId, assocToBccpId)) {
+            if (!bccRepository.existsByGuidAndToBccpId(bccGuid, assocToBccpId)) {
                 int entityType = 0;
                 String den = Utility.first(accVO.getDen()) + ". " + bccpVO.getDen();
 
