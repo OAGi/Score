@@ -257,9 +257,8 @@ public class StandaloneXMLSchema {
     }
 
     public Attr setBDTBase(BasicBusinessInformationEntity gBBIE, Attr base) throws Exception {
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
-                bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(gBBIE.getBdtPriRestriId());
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                bdtPriRestriRepository.findOne(gBBIE.getBdtPriRestriId());
 
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 cdtAwdPriXpsTypeMapRepository.findOne(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
