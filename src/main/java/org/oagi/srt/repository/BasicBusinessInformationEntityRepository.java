@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BasicBusinessInformationEntityRepository extends JpaRepository<BasicBusinessInformationEntity, Integer> {
+public interface BasicBusinessInformationEntityRepository
+        extends JpaRepository<BasicBusinessInformationEntity, Integer>,
+        BulkInsertRepository<BasicBusinessInformationEntity> {
 
     @Query("select b from BasicBusinessInformationEntity b where b.fromAbieId = ?1")
     public List<BasicBusinessInformationEntity> findByFromAbieId(int fromAbieId);

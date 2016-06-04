@@ -6,11 +6,13 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bbiep")
-public class BasicBusinessInformationEntityProperty implements Serializable {
+public class BasicBusinessInformationEntityProperty implements Serializable, IGuidEntity {
+
+    public static final String SEQUENCE_NAME = "BBIEP_ID_SEQ";
 
     @Id
-    @GeneratedValue(generator = "BBIEP_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "BBIEP_ID_SEQ", sequenceName = "BBIEP_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int bbiepId;
 
     @Column(nullable = false)

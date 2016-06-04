@@ -6,11 +6,13 @@ import java.util.Date;
 
 @Entity
 @Table(name = "abie")
-public class AggregateBusinessInformationEntity implements Serializable {
+public class AggregateBusinessInformationEntity implements Serializable, IGuidEntity {
+
+    public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";
 
     @Id
-    @GeneratedValue(generator = "ABIE_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "ABIE_ID_SEQ", sequenceName = "ABIE_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int abieId;
 
     @Column(nullable = false)

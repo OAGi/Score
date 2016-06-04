@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "bbie_sc")
 public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable {
 
+    public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "BBIE_SC_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "BBIE_SC_ID_SEQ", sequenceName = "BBIE_SC_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int bbieScId;
 
     @Column(nullable = false)

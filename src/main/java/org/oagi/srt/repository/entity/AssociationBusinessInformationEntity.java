@@ -8,9 +8,11 @@ import java.util.Date;
 @Table(name = "asbie")
 public class AssociationBusinessInformationEntity implements Serializable, BusinessInformationEntity {
 
+    public static final String SEQUENCE_NAME = "ASBIE_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "ASBIE_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "ASBIE_ID_SEQ", sequenceName = "ASBIE_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int asbieId;
 
     @Column(nullable = false)

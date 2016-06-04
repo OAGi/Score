@@ -4,8 +4,6 @@ import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
 public interface AggregateCoreComponentRepository extends JpaRepository<AggregateCoreComponent, Integer> {
 
     @Query("select a from AggregateCoreComponent a where a.guid = ?1")
