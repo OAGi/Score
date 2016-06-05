@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "cdt_awd_pri")
 public class CoreDataTypeAllowedPrimitive implements Serializable {
 
+    public static final String SEQUENCE_NAME = "CDT_AWD_PRI_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "CDT_AWD_PRI_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "CDT_AWD_PRI_ID_SEQ", sequenceName = "CDT_AWD_PRI_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int cdtAwdPriId;
 
     @Column(nullable = false)

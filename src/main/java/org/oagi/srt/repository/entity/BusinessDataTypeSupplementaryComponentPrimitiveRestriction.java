@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "bdt_sc_pri_restri")
 public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implements Serializable {
 
+    public static final String SEQUENCE_NAME = "BDT_SC_PRI_RESTRI_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "BDT_SC_PRI_RESTRI_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "BDT_SC_PRI_RESTRI_ID_SEQ", sequenceName = "BDT_SC_PRI_RESTRI_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int bdtScPriRestriId;
 
     @Column(nullable = false)

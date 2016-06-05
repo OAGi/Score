@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "code_list_value")
 public class CodeListValue implements Serializable {
 
+    public static final String SEQUENCE_NAME = "CODE_LIST_VALUE_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "CODE_LIST_VALUE_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "CODE_LIST_VALUE_ID_SEQ", sequenceName = "CODE_LIST_VALUE_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int codeListValueId;
 
     @Column

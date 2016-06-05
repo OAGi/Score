@@ -8,9 +8,11 @@ import java.util.Date;
 @Table(name = "acc")
 public class AggregateCoreComponent implements Serializable {
 
+    public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "ACC_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "ACC_ID_SEQ", sequenceName = "ACC_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int accId;
 
     @Column(nullable = false)

@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "dt_sc")
 public class DataTypeSupplementaryComponent implements Serializable {
 
+    public static final String SEQUENCE_NAME = "DT_SC_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "DT_SC_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "DT_SC_ID_SEQ", sequenceName = "DT_SC_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int dtScId;
 
     @Column(nullable = false)

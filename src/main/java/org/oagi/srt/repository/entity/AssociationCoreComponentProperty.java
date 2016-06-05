@@ -8,9 +8,11 @@ import java.util.Date;
 @Table(name = "asccp")
 public class AssociationCoreComponentProperty implements Serializable {
 
+    public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "ASCCP_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "ASCCP_ID_SEQ", sequenceName = "ASCCP_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int asccpId;
 
     @Column(nullable = false)

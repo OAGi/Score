@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "cdt_awd_pri_xps_type_map")
 public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializable {
 
+    public static final String SEQUENCE_NAME = "CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ", sequenceName = "CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int cdtAwdPriXpsTypeMapId;
 
     @Column(nullable = false)

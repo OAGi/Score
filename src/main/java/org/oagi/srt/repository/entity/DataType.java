@@ -8,9 +8,11 @@ import java.util.Date;
 @Table(name = "dt")
 public class DataType implements Serializable {
 
+    public static final String SEQUENCE_NAME = "DT_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "DT_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "DT_ID_SEQ", sequenceName = "DT_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int dtId;
 
     @Column(nullable = false)

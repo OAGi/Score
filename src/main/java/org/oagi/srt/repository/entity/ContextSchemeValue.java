@@ -7,9 +7,11 @@ import java.io.Serializable;
 @Table(name = "ctx_scheme_value")
 public class ContextSchemeValue implements Serializable {
 
+    public static final String SEQUENCE_NAME = "CTX_SCHEME_VALUE_ID_SEQ";
+
     @Id
-    @GeneratedValue(generator = "CTX_SCHEME_VALUE_ID_SEQ", strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "CTX_SCHEME_VALUE_ID_SEQ", sequenceName = "CTX_SCHEME_VALUE_ID_SEQ", allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private int ctxSchemeValueId;
 
     @Column(nullable = false)
