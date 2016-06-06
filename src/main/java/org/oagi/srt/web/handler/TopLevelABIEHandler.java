@@ -703,9 +703,6 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void createBIEs(CreateBIEContext createBIEContext, int accId, AggregateBusinessInformationEntity abie) {
-        logger.debug("enter createBIEs(" + accId + ", " + abie.getGuid() + ")");
-        long currentTimeMillis = System.currentTimeMillis();
-
         LinkedList<AggregateCoreComponent> accList = new LinkedList();
         AggregateCoreComponent aggregateCoreComponent = createBIEContext.getACC(accId);
         accList.add(aggregateCoreComponent);
@@ -746,8 +743,6 @@ public class TopLevelABIEHandler implements Serializable {
                 }
             }
         }
-
-        logger.debug("leave createBIEs(" + accId + ", " + abie.getGuid() + "), elapsed time(ms): " + (System.currentTimeMillis() - currentTimeMillis));
     }
 
     class ValueComparator implements Comparator<BusinessInformationEntity> {
@@ -820,7 +815,7 @@ public class TopLevelABIEHandler implements Serializable {
         private void createBBIESC(CreateBIEContext createBIEContext, int bdtId) {
             bbieScList = createBIEContext.findByOwnerDtId(bdtId)
                     .stream()
-                    .filter(dtSc -> dtSc.getMaxCardinality() == 0)
+                    .filter(dtSc -> dtSc.getMaxCardinality() != 0)
                     .map(dtSc -> {
                         BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                                 new BasicBusinessInformationEntitySupplementaryComponent();
