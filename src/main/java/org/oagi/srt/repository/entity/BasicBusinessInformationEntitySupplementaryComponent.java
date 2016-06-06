@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "bbie_sc")
-public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable {
+public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable, IdEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";
 
@@ -52,6 +52,16 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     @Column(name = "is_used", nullable = false)
     private boolean used;
+
+    @Override
+    public int getId() {
+        return getBbieScId();
+    }
+
+    @Override
+    public void setId(int id) {
+        setBbieScId(id);
+    }
 
     public int getBbieScId() {
         return bbieScId;

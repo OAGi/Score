@@ -59,4 +59,9 @@ public class AssociationBusinessInformationEntityPropertyRepositoryImpl
         int id = rs.getInt("asbiep_id");
         entity.setAsbiepId(id);
     }
+
+    @Override
+    protected String getSequenceName() {
+        return AssociationBusinessInformationEntityProperty.SEQUENCE_NAME;
+    }
 }

@@ -58,4 +58,9 @@ public class BasicBusinessInformationEntityPropertyRepositoryImpl
         int id = rs.getInt("bbiep_id");
         entity.setBbiepId(id);
     }
+
+    @Override
+    protected String getSequenceName() {
+        return BasicBusinessInformationEntityProperty.SEQUENCE_NAME;
+    }
 }

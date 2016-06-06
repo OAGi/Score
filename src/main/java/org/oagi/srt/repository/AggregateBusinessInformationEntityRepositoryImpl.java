@@ -65,4 +65,9 @@ public class AggregateBusinessInformationEntityRepositoryImpl
         int id = rs.getInt("abie_id");
         entity.setAbieId(id);
     }
+
+    @Override
+    protected String getSequenceName() {
+        return AggregateBusinessInformationEntity.SEQUENCE_NAME;
+    }
 }

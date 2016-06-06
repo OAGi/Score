@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "asbiep")
-public class AssociationBusinessInformationEntityProperty implements Serializable, IGuidEntity {
+public class AssociationBusinessInformationEntityProperty implements Serializable, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "ASBIEP_ID_SEQ";
 
@@ -56,6 +56,16 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     @PreUpdate
     public void preUpdate() {
         lastUpdateTimestamp = new Date();
+    }
+
+    @Override
+    public int getId() {
+        return getAsbiepId();
+    }
+
+    @Override
+    public void setId(int id) {
+        setAsbiepId(id);
     }
 
     public int getAsbiepId() {

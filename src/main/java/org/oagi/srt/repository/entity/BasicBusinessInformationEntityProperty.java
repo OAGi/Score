@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bbiep")
-public class BasicBusinessInformationEntityProperty implements Serializable, IGuidEntity {
+public class BasicBusinessInformationEntityProperty implements Serializable, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "BBIEP_ID_SEQ";
 
@@ -53,6 +53,16 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IGu
     @PreUpdate
     public void preUpdate() {
         lastUpdateTimestamp = new Date();
+    }
+
+    @Override
+    public int getId() {
+        return getBbiepId();
+    }
+
+    @Override
+    public void setId(int id) {
+        setBbiepId(id);
     }
 
     public int getBbiepId() {

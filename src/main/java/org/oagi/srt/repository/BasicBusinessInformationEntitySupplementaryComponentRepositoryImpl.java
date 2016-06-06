@@ -46,4 +46,9 @@ public class BasicBusinessInformationEntitySupplementaryComponentRepositoryImpl
         args.add(entity.getRemark());
         args.add(entity.isUsed() ? 1 : 0);
     }
+
+    @Override
+    protected String getSequenceName() {
+        return BasicBusinessInformationEntitySupplementaryComponent.SEQUENCE_NAME;
+    }
 }

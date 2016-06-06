@@ -49,4 +49,9 @@ public class AssociationBusinessInformationEntityRepositoryImpl
         args.add(entity.getToAsbiepId());
         args.add(entity.isUsed() ? 1 : 0);
     }
+
+    @Override
+    protected String getSequenceName() {
+        return AssociationBusinessInformationEntity.SEQUENCE_NAME;
+    }
 }

@@ -3,8 +3,10 @@ package org.oagi.srt.repository;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.oagi.srt.repository.entity.IdEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
@@ -17,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public abstract class AbstractBulkInsertRepository<T>
+public abstract class AbstractBulkInsertRepository<T extends IdEntity>
         extends NamedParameterJdbcDaoSupport
         implements BulkInsertRepository<T> {
 
@@ -44,6 +46,7 @@ public abstract class AbstractBulkInsertRepository<T>
     protected abstract void prepare(Dialect dialect, T entity, List<Object> args);
     protected void postPersist(Collection<T> entities) {
     }
+    protected abstract String getSequenceName();
 
     @Override
     public void saveBulk(JpaRepository<T, Integer> jpaRepository, Collection<T> entities) {
@@ -66,7 +69,10 @@ public abstract class AbstractBulkInsertRepository<T>
                 prepare(dialect, entity, args);
 
                 if (count + 1 == maxBatchSize) {
-                    jdbcTemplate.update(sql.toString(), args.toArray(new Object[args.size()]));
+                    int rows = jdbcTemplate.update(sql.toString(), args.toArray(new Object[args.size()]));
+                    if (maxBatchSize != rows) {
+                        throw new IncorrectResultSizeDataAccessException(maxBatchSize, rows);
+                    }
                     count = 0;
                 } else {
                     sql.append(", ");
@@ -76,10 +82,24 @@ public abstract class AbstractBulkInsertRepository<T>
 
             if (count > 0) {
                 String s = sql.toString();
-                jdbcTemplate.update(s.substring(0, s.length() - 2), args.toArray(new Object[args.size()]));
+                int rows = jdbcTemplate.update(s.substring(0, s.length() - 2), args.toArray(new Object[args.size()]));
+                if (count != rows) {
+                    throw new IncorrectResultSizeDataAccessException(count, rows);
+                }
             }
 
             postPersist(entities);
+        } else if (dialect.toString().contains("Oracle")) {
+            List<Integer> idList = jdbcTemplate.queryForList("select " + getSequenceName() + ".nextval from dual connect by level <= ?",
+                    new Object[]{entities.size()}, Integer.class);
+            if (entities.size() != idList.size()) {
+                throw new IncorrectResultSizeDataAccessException(entities.size(), idList.size());
+            }
+            int index = 0;
+            for (T entity : entities) {
+                entity.setId(idList.get(index++));
+            }
+            jpaRepository.save(entities);
         } else {
             jpaRepository.save(entities);
             jpaRepository.flush();

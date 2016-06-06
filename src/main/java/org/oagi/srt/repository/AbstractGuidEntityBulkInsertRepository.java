@@ -1,6 +1,7 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.IGuidEntity;
+import org.oagi.srt.repository.entity.IdEntity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class AbstractGuidEntityBulkInsertRepository<T extends IGuidEntity>
+public abstract class AbstractGuidEntityBulkInsertRepository<T extends IdEntity & IGuidEntity>
         extends AbstractBulkInsertRepository<T> {
 
     protected abstract String getFindIdByGuidStatementForMysql();
