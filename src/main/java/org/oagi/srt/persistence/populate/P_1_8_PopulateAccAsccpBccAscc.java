@@ -368,13 +368,15 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         int cardinalityMax = (xad.getFUse() == null) ? 1 : (xad.getFUse().equals("optional") || xad.getFUse().equals("required")) ? 1 : (xad.getFUse().equals("prohibited")) ? 0 : 0;
         int sequenceKey = 0;
 
-        BasicCoreComponentProperty bccpVO = bccpRepository.findBccpIdAndDenByPropertyTerm(Utility.spaceSeparator(xad.getName()).replace("ID", "Identifier"));
+        String xadName = xad.getName();
+        XSSimpleTypeDecl xtd = (XSSimpleTypeDecl) xad.getTypeDefinition();
+        String typeGuid = xtd.getFId();
+        BasicCoreComponentProperty bccpVO = (typeGuid != null) ? bccpRepository.findOneByGuid(typeGuid) : null;
         if (bccpVO == null) {
-            XSSimpleTypeDecl xtd = (XSSimpleTypeDecl) xad.getTypeDefinition();
-            bccpVO = insertBCCP(xad.getName(), xtd.getFId());
+            bccpVO = insertBCCP(xadName, typeGuid);
 
             if (bccpVO == null) {
-                System.err.println("BCCP creation is failed in BCC attribute creation, Note -> Name : " + xad.getName() + "   guid : " + xtd.getFId());
+                System.err.println("BCCP creation is failed in BCC attribute creation, Note -> Name : " + xadName + "   guid : " + typeGuid);
                 return;
             }
         }
