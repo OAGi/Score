@@ -91,6 +91,9 @@ public class AggregateCoreComponent implements Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
+    @Column(name = "is_abstract", nullable = false)
+    private boolean isAbstract;
+
     public AggregateCoreComponent() {}
 
     public AggregateCoreComponent(int accId, String den) {
@@ -296,6 +299,14 @@ public class AggregateCoreComponent implements Serializable {
         this.deprecated = deprecated;
     }
 
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public void setAbstract(boolean anAbstract) {
+        isAbstract = anAbstract;
+    }
+
     @Override
     public String toString() {
         return "AggregateCoreComponent{" +
@@ -321,6 +332,7 @@ public class AggregateCoreComponent implements Serializable {
                 ", releaseId=" + releaseId +
                 ", currentAccId=" + currentAccId +
                 ", deprecated=" + deprecated +
+                ", isAbstract=" + isAbstract +
                 '}';
     }
 }
