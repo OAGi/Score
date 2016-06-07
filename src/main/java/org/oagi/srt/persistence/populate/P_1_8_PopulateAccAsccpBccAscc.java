@@ -28,6 +28,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Yunsu Lee
@@ -97,7 +99,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
 
         files.stream()
-                .filter(file -> file.getName().endsWith("AcknowledgeInvoice.xsd"))
+                .filter(file -> file.getName().equals("AcknowledgeInvoice.xsd"))
                 .forEach(file -> {
                     System.out.println(file.getName() + " ing...");
                     try {
@@ -118,7 +120,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
 
         files.stream()
-                .filter(file -> !file.getName().endsWith("AcknowledgeInvoice.xsd"))
+                .filter(file -> !file.getName().equals("AcknowledgeInvoice.xsd"))
                 .forEach(file -> {
                     System.out.println(file.getName() + " ing...");
                     try {
@@ -152,7 +154,9 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         int roleOfAccId;
         AggregateCoreComponent accVO = accRepository.findAccIdAndDenByGuid(complexType.getFId());
         if (accVO == null) {
-            InsertACCResult insertACCResult = insertACC(complexType, bodPath);
+            BCCWithAttrHolder bccWithAttrHolder = new BCCWithAttrHolder();
+            InsertACCResult insertACCResult = insertACC(bccWithAttrHolder, complexType, bodPath);
+            bccWithAttrHolder.save();
             accVO = insertACCResult.getAggregateCoreComponent();
         }
         roleOfAccId = accVO.getAccId();
@@ -361,7 +365,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         return false;
     }
 
-    private void insertBCCWithAttr(XSAttributeDecl xad, XSComplexTypeDecl complexType) throws Exception {
+    private void insertBCCWithAttr(XSAttributeDecl xad, XSComplexTypeDecl complexType) {
         String bccGuid = xad.getFId();
 
         int cardinalityMin = (xad.getFUse() == null) ? 0 : (xad.getFUse().equals("optional") || xad.getFUse().equals("prohibited")) ? 0 : (xad.getFUse().equals("required")) ? 1 : 0;
@@ -411,7 +415,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
     }
 
-    private BasicCoreComponentProperty insertBCCP(String name, String id) throws Exception {
+    private BasicCoreComponentProperty insertBCCP(String name, String id) {
         if (id == null) {
             System.err.println("!!!! id is null where name is  = " + name);
             return null;
@@ -579,7 +583,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
     }
 
-    private InsertACCResult insertACC(XSComplexTypeDecl complexType, String fullFilePath) throws Exception {
+    private InsertACCResult insertACC(BCCWithAttrHolder bccWithAttrHolder, XSComplexTypeDecl complexType, String fullFilePath) throws Exception {
         long s = System.currentTimeMillis();
         List<String> elements = new ArrayList();
 
@@ -596,7 +600,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
             AggregateCoreComponent basedAcc = accRepository.findAccIdAndDenByGuid(baseType.getFId());
             if (basedAcc == null) {
-                InsertACCResult insertACCResult = insertACC(baseType, fullFilePath);
+                InsertACCResult insertACCResult = insertACC(bccWithAttrHolder, baseType, fullFilePath);
                 elements = insertACCResult.getElements();
                 basedAccId = insertACCResult.getAggregateCoreComponent().getAccId();
             } else {
@@ -655,7 +659,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
                     if (bodSchemaHandler.isComplexWithoutSimpleContent(bodVO.getTypeName())) {
                         if (!accRepository.existsByGuid(bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()).getFId())) {
-                            insertACC(bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()), fullFilePath);
+                            insertACC(bccWithAttrHolder, bodSchemaHandler.getComplexTypeDefinition(bodVO.getTypeName()), fullFilePath);
                         }
                     }
 
@@ -706,12 +710,38 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
         XSObjectList xol = complexType.getAttributeUses();
         for (int i = 0; i < xol.getLength(); i++) {
-            XSAttributeUseImpl xui = (XSAttributeUseImpl) xol.get(i);
-            XSAttributeDecl xad = (XSAttributeDecl) xui.getAttrDeclaration();
-
-            insertBCCWithAttr(xad, complexType);
+            bccWithAttrHolder.add((XSAttributeUseImpl) xol.get(i), complexType);
         }
         return new InsertACCResult(acc, elements);
+    }
+
+    private class BCCWithAttrHolder {
+        private Map<Integer, Pair> attributeUseXSComplexTypeDeclMap = new TreeMap();
+        private class Pair {
+            private XSAttributeUseImpl xsAttributeUse;
+            private XSComplexTypeDecl xsComplexTypeDecl;
+
+            public Pair(XSAttributeUseImpl xsAttributeUse, XSComplexTypeDecl xsComplexTypeDecl) {
+                this.xsAttributeUse = xsAttributeUse;
+                this.xsComplexTypeDecl = xsComplexTypeDecl;
+            }
+        }
+
+        public void add(XSAttributeUseImpl xsAttributeUse, XSComplexTypeDecl xsComplexTypeDecl) {
+            if (!attributeUseXSComplexTypeDeclMap.containsKey(xsAttributeUse.hashCode())) {
+                attributeUseXSComplexTypeDeclMap.put(xsAttributeUse.hashCode(), new Pair(xsAttributeUse, xsComplexTypeDecl));
+            }
+        }
+
+        public void save() {
+            for (Pair pair : attributeUseXSComplexTypeDeclMap.values()) {
+                XSAttributeUseImpl xui = pair.xsAttributeUse;
+                XSAttributeDecl xad = (XSAttributeDecl) xui.getAttrDeclaration();
+                XSComplexTypeDecl complexType = pair.xsComplexTypeDecl;
+
+                insertBCCWithAttr(xad, complexType);
+            }
+        }
     }
 
     private File[] getBODs(File f) {
