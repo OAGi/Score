@@ -12,15 +12,21 @@ INSERT INTO `app_user` (`app_user_id`, `login_id`, `password`, `name`, `organiza
 VALUES
   (1, 'oagis', 'oagis', 'Open Applications Group Developer', 'Open Applications Group', 1);
 
+UPDATE `APP_USER_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `app_user`);
+
 -- 3.1.1.3	Populate the namespace table
 INSERT INTO `namespace` (`namespace_id`, `uri`, `prefix`, `description`, `is_std_nmsp`, `owner_user_id`, `created_by`, `last_updated_by`, `creation_timestamp`, `last_updated_timestamp`)
 VALUES
   (1, 'http://www.openapplications.org/oagis/10', '', 'OAGIS release 10 namespace', 1, 1, 1, 1, '2014-06-27 00:00:00', '2014-06-27 00:00:00');
 
+UPDATE `NAMESPACE_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `namespace`);
+
 -- 3.1.1.4	Populate the release table
 INSERT INTO `release` (`release_id`, `release_num`, `release_note`, `namespace_id`)
 VALUES
   (1, '10.1', 'Open Applications Group\nInterface Specification XMLSchemas and Sample XML Files\n\nOAGIS Release 10_1\n\n27 June 2014\n\n\nOAGIS Release 10_1 is a general availability release of OAGIS the release\ndate is 27 June 2014.\n\nThis release is the continuation of the focus on enabling integration that\nthe Open Applications Group and its members are known.\n\nPlease provide all feedback to the OAGI Architecture Team via the Feedback\nForum at: oagis@openapplications.org\n\nThese XML reference files continue to evolve.  Please feel\nfree to use them, but check www.openapplications.org for the most\nrecent updates.\n\nOAGIS Release 10_1 includes:\n\n  - Addition of more Open Parties and Quantities from implementation feedback.\n  - Updates to the ConfirmBOD to make easier to use.\n  - Addtion of DocumentReferences and Attachments for PartyMaster\n  - Support for UN/CEFACT Core Components 3.0.\n  - Support for UN/CEFACT XML Naming and Design Rules 3.0\n  - Support for UN/CEFACT Data Type Catalog 3.1\n  - Support for Standalone BODs using Local elements.\n\n\nNOTICE: We recommend that you install on your root directory drive as the\npaths may be too long otherwise.\n\nAs with all OAGIS releases OAGIS Release 10_1 contains XML Schema. To view\nXML Schema it is recommended that you use an XML IDE, as the complete structure\nof the Business Object Documents are not viewable from a single file.\n\nNote that the sample files were used to verify the XMLSchema\ndevelopment, and do not necessarily reflect actual business\ntransactions.  In many cases,the data entered in the XML files are just\nplaceholder text.  Real-world examples for each transaction will be\nprovided as they become available. If you are interested in providing\nreal-world examples please contact oagis@openapplications.org\n\nPlease send suggestions or bug reports to oagis@openapplications.org\n\nThank you for your interest and support.\n\nBest Regards,\nThe Open Applications Group Architecture Council\n', 1);
+
+UPDATE `RELEASE_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `release`);
 
 -- 3.1.1.5	Populate CDT data
 INSERT INTO `xbt` (`xbt_id`, `name`, `builtIn_type`, `subtype_of_xbt_id`)
@@ -50,6 +56,8 @@ VALUES
   (23, 'double', 'xsd:double', 2),
   (24, 'any uri', 'xsd:anyURI', 2);
 
+UPDATE `XBT_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `xbt`);
+
 -- 3.1.1.5.2	Populate the cdt_pri table
 INSERT INTO `cdt_pri` (`cdt_pri_id`, `name`)
 VALUES
@@ -64,6 +72,8 @@ VALUES
   (9, 'TimeDuration'),
   (10, 'TimePoint'),
   (11, 'Token');
+
+UPDATE `CDT_PRI_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `cdt_pri`);
 
 -- 3.1.1.5.3	Populate CDTs in the dt table
 INSERT INTO `dt` (`dt_id`, `guid`, `type`, `version_num`, `previous_version_dt_id`, `data_type_term`, `qualifier`, `based_dt_id`, `den`, `content_component_den`, `definition`, `content_component_definition`, `revision_doc`, `state`, `created_by`, `owner_user_id`, `last_updated_by`, `creation_timestamp`, `last_update_timestamp`, `revision_num`, `revision_tracking_num`, `revision_action`, `release_id`, `current_bdt_id`, `is_deprecated`)
@@ -91,6 +101,8 @@ VALUES
   (21, 'oagis-id-e80da4c59dbb441b915d70255427f33e', 0, '1.0', NULL, 'Time', NULL, NULL, 'Time. Type', 'Time. Content', 'CDT V3.1. Time is a time of day to various common resolutions ??hour, minute, second and fractions thereof.', 'The particular point in the progression of time.', '', 3, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, NULL, NULL, NULL, 0),
   (22, 'oagis-id-a06e726d98274399bd6c76fe82a5fbdc', 0, '1.0', NULL, 'Value', NULL, NULL, 'Value. Type', 'Value. Content', 'CDT V3.1. A value is the numerical amount denoted by an algebraic term; a magnitude, quantity, or number.', 'Numeric information that is assigned or is determined by value.', '', 3, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, NULL, NULL, NULL, 0),
   (23, 'oagis-id-ce7635625e75420d973bcda56bb80a9f', 0, '1.0', NULL, 'Video', NULL, NULL, 'Video. Type', 'Video. Content', 'CDT V3.1. A video is a recording, reproducing or broadcasting of visual images on magnetic tape or digitally in binary notation (octets).', 'A finite sequence of binary digits (bits) for videos.', '', 3, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, NULL, NULL, NULL, 0);
+
+UPDATE `DT_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `dt`);
 
 -- 3.1.1.5.4	Populate the cdt_awd_pri table
 INSERT INTO `cdt_awd_pri` (`cdt_awd_pri_id`, `cdt_id`, `cdt_pri_id`, `is_default`)
@@ -154,6 +166,8 @@ VALUES
   (57, 22, 8, 0),
   (58, 22, 11, 0),
   (59, 23, 1, 1);
+
+UPDATE `CDT_AWD_PRI_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `cdt_awd_pri`);
 
 -- 3.1.1.5.5	Populate the cdt_awd_pri_xps_type_map
 INSERT INTO `cdt_awd_pri_xps_type_map` (`cdt_awd_pri_xps_type_map_id`, `cdt_awd_pri_id`, `xbt_id`)
@@ -266,6 +280,8 @@ VALUES
   (106, 59, 16),
   (107, 59, 17);
 
+UPDATE `CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `cdt_awd_pri_xps_type_map`);
+
 -- 3.1.1.5.6	Populate CDTs’ supplementary component in the dt_sc table
 INSERT INTO `dt_sc` (`dt_sc_id`, `guid`, `property_term`, `representation_term`, `definition`, `owner_dt_id`, `min_cardinality`, `max_cardinality`, `based_dt_sc_id`)
 VALUES
@@ -303,6 +319,8 @@ VALUES
   (32, 'oagis-id-bedf3bf5c5dd4dd1981ed6e9bbdb716f', 'MIME', 'Code', 'The Multipurpose Internet Mail Extensions(MIME) media type of the video', 23, 0, 1, NULL),
   (33, 'oagis-id-2332e1819b294faa8837e9e86f4890b7', 'Character Set', 'Code', 'The character set of the binary object if the Multipurpose Internet Mail Extensions (MIME) type is text', 23, 0, 1, NULL),
   (34, 'oagis-id-3f192e1c1b724debb53a178bd2a2a497', 'Filename', 'Name', 'The filename of the video', 23, 0, 1, NULL);
+
+UPDATE `DT_SC_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `dt_sc`);
 
 -- 3.1.1.5.7	Populate the cdt_sc_awd_pri table
 INSERT INTO `cdt_sc_awd_pri` (`cdt_sc_awd_pri_id`, `cdt_sc_id`, `cdt_pri_id`, `is_default`)
@@ -409,6 +427,8 @@ VALUES
   (100, 34, 7, 0),
   (101, 34, 8, 0),
   (102, 34, 11, 1);
+
+UPDATE `CDT_SC_AWD_PRI_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `cdt_sc_awd_pri`);
 
 -- 3.1.1.5.8	Populate the cdt_sc_awd_pri_xps_type_map table
 INSERT INTO `cdt_sc_awd_pri_xps_type_map` (`cdt_sc_awd_pri_xps_type_map_id`, `cdt_sc_awd_pri`, `xbt_id`)
@@ -521,6 +541,8 @@ VALUES
   (106, 100, 13),
   (107, 101, 12),
   (108, 102, 14);
+
+UPDATE `CDT_SC_AW_PR_XPS_TYP_MP_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `cdt_sc_awd_pri_xps_type_map`);
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

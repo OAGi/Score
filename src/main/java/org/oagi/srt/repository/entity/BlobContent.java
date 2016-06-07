@@ -2,6 +2,7 @@ package org.oagi.srt.repository.entity;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.File;
@@ -15,8 +16,17 @@ public class BlobContent implements Serializable {
     public static final String SEQUENCE_NAME = "BLOB_CONTENT_ID_SEQ";
 
     @Id
-    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
+    @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
+    @GenericGenerator(
+            name = SEQUENCE_NAME,
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = SEQUENCE_NAME),
+                    @org.hibernate.annotations.Parameter(name = "optimizer", value = "pooled-lo"),
+                    @org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
+                    @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
+            }
+    )
     private int blobContentId;
 
     @Column(nullable = false)

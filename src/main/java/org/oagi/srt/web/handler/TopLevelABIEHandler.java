@@ -697,7 +697,7 @@ public class TopLevelABIEHandler implements Serializable {
         }
 
         public void save() {
-            abieRepository.saveBulk(abieRepository, aggregateBusinessInformationEntitys);
+            abieRepository.save(aggregateBusinessInformationEntitys);
         }
 
     }
@@ -854,7 +854,7 @@ public class TopLevelABIEHandler implements Serializable {
         }
 
         public void save() {
-            bbiepRepository.saveBulk(bbiepRepository, createBBIETreeTasks.stream()
+            bbiepRepository.save(createBBIETreeTasks.stream()
                     .map(task -> task.getBbiep())
                     .collect(Collectors.toList()));
             bbiepCount += createBBIETreeTasks.size();
@@ -865,7 +865,7 @@ public class TopLevelABIEHandler implements Serializable {
                         task.getBbie().setToBbiepId(task.getBbiep().getBbiepId());
                     });
 
-            bbieRepository.saveBulk(bbieRepository, createBBIETreeTasks.stream()
+            bbieRepository.save(createBBIETreeTasks.stream()
                     .map(task -> task.getBbie())
                     .collect(Collectors.toList()));
             bbieCount += createBBIETreeTasks.size();
@@ -882,7 +882,7 @@ public class TopLevelABIEHandler implements Serializable {
                     .forEach(task -> {
                         bbieScList.addAll(task.getBbieScList());
                     });
-            bbiescRepository.saveBulk(bbiescRepository, bbieScList);
+            bbiescRepository.save(bbieScList);
             bbiescCount += bbieScList.size();
         }
     }
@@ -991,7 +991,7 @@ public class TopLevelABIEHandler implements Serializable {
                     .forEach(task -> {
                         task.getAsbiep().setRoleOfAbieId(task.getRoleOfAbie().getAbieId());
                     });
-            asbiepRepository.saveBulk(asbiepRepository,
+            asbiepRepository.save(
                     createASBIETreeTasks.stream()
                             .map(task -> task.getAsbiep())
                             .collect(Collectors.toList()));
@@ -1003,7 +1003,7 @@ public class TopLevelABIEHandler implements Serializable {
                         task.getAsbie().setToAsbiepId(task.getAsbiep().getAsbiepId());
                     });
 
-            asbieRepository.saveBulk(asbieRepository,
+            asbieRepository.save(
                     createASBIETreeTasks.stream()
                             .map(task -> task.getAsbie())
                             .collect(Collectors.toList()));
