@@ -462,7 +462,13 @@ public class P_1_7_PopulateQBDTInDT {
         if (base.endsWith("CodeContentType")) {
             baseDataType = getDataTypeWithDen("Code. Type");
         } else {
-            String baseDen = Utility.typeToDen(base);
+            
+        	Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='"+type+"']/xsd:simpleContent");
+        	if(simpleContentNode==null){
+        		return null;
+        	}
+        	
+        	String baseDen = Utility.typeToDen(base);
             baseDataType = getDataTypeWithDen(baseDen);
 
             // QBDT is based on another QBDT

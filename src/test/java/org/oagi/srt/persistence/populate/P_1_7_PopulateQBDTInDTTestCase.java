@@ -141,7 +141,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
     @Test
     public void test_PopulateTheQualifiedCodeContentTypeInThe_dt_Table() {
-        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content");
+        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content. Type");
         assertNotNull(expectedBasedDt);
 
         test_dt("Code", expectedBasedDt, expectedContentTypes);
@@ -155,7 +155,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
             assertEquals(expectedContentType.getQualifier(), actualDataType.getQualifier());
             assertEquals(expectedBasedDt.getDtId(), actualDataType.getBasedDtId());
             assertEquals(expectedBasedDt.getDataTypeTerm(), actualDataType.getDataTypeTerm());
-            assertEquals(expectedContentType.getQualifier() + "_ " + dataTerm + " Content",
+            assertEquals(expectedContentType.getQualifier() + "_ " + dataTerm + " Content. Type",
                     actualDataType.getDen());
             assertEquals(expectedContentType.getQualifier() + "_ " + dataTerm + " Content. Content",
                     actualDataType.getContentComponentDen());
@@ -171,7 +171,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
     @Test
     public void test_PopulateThe_bdt_pri_restri_TableForTheQualifiedCodeContentType() {
-        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content");
+        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content. Type");
         assertNotNull(expectedBasedDt);
 
         test_bdt_pri_restri("Code", expectedBasedDt, expectedContentTypes);
@@ -225,7 +225,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
     @Test
     public void test_PopulateThe_dt_sc_table_ForTheQualifiedCodeContentType() {
-        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content");
+        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content. Type");
         assertNotNull(expectedBasedDt);
 
         test_dt_sc(expectedBasedDt, expectedContentTypes);
@@ -266,7 +266,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
     @Test
     public void test_PopulateThe_bdt_sc_pri_restri_TableTheQualifiedCodeContentType() {
-        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content");
+        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content. Type");
         assertNotNull(expectedBasedDt);
 
         test_bdt_sc_pri_restri(expectedBasedDt, expectedContentTypes);
@@ -321,7 +321,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedContentType("Agency", "oagis-id-0624ca38925d43929a6f7d8b7b7e4304", "clm63055D08B_AgencyIdentification")
         );
 
-        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Identifier Content");
+        DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Identifier Content. Type");
         assertNotNull(expectedBasedDt);
 
         // 'dt' table check
