@@ -1360,11 +1360,9 @@ public class TopLevelABIEHandler implements Serializable {
         av.setBbiesc(nbbiescVO);
         String sc_name = "";
         if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Text"))
-            sc_name = Utility.toLowerCamelCase(dtscvo.getPropertyTerm());
-        else if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-            sc_name = Utility.toLowerCamelCase(dtscvo.getPropertyTerm()).concat("ID");
+            sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm());
         else
-            sc_name = Utility.toLowerCamelCase(dtscvo.getPropertyTerm()).concat(Utility.toCamelCase(dtscvo.getRepresentationTerm()));
+            sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm()).concat(Utility.toCamelCase(dtscvo.getRepresentationTerm()));
         av.setName(sc_name);
 
         av.setColor("orange");
@@ -1642,11 +1640,9 @@ public class TopLevelABIEHandler implements Serializable {
 
             String sc_name = "";
             if (dtscVO.getRepresentationTerm().equalsIgnoreCase("Text"))
-                sc_name = Utility.toLowerCamelCase(dtscVO.getPropertyTerm());
-            else if (dtscVO.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-                sc_name = Utility.toLowerCamelCase(dtscVO.getPropertyTerm()).concat("ID");
+                sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm());
             else
-                sc_name = Utility.toLowerCamelCase(dtscVO.getPropertyTerm());
+                sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm().concat(dtscVO.getRepresentationTerm()));
             av_01.setName(sc_name);
 
             av_01.setColor("orange");
