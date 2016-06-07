@@ -489,6 +489,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             acc.setState(3);
             acc.setModule(module);
             acc.setDeprecated(false);
+            acc.setAbstract(false);
             acc.setNamespaceId(namespaceId);
             acc.setReleaseId(releaseId);
             accRepository.save(acc);
@@ -638,6 +639,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         acc.setState(state);
         acc.setModule(module);
         acc.setDeprecated(false);
+        acc.setAbstract(complexType.getAbstract());
         acc.setNamespaceId(namespaceId);
         acc.setReleaseId(releaseId);
         accRepository.saveAndFlush(acc);
