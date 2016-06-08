@@ -120,7 +120,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
         }
 
         files.stream()
-                .filter(file -> !file.getName().equals("AcknowledgeInvoice.xsd"))
+                .filter(file -> !file.getName().equals("AcknowledgeInvoice.xsd") && !file.getName().endsWith("IST.xsd"))
                 .forEach(file -> {
                     System.out.println(file.getName() + " ing...");
                     try {
