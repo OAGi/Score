@@ -437,7 +437,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedOtherQBDT("Match", "Code", "Code. Type", "oagis-id-a95a79c088ed4b7b8ebf0ed30d948f92"),
                 new ExpectedOtherQBDT("Match Document", "Code", "Code. Type", "oagis-id-a78f749cbd574e66bb7d2990c2f0f1e0"),
                 new ExpectedOtherQBDT("Marital Status", "Code", "Code. Type", "oagis-id-9b3d5038a87c4096ac38b3d8b446468e"),
-                new ExpectedOtherQBDT("Mime", "Code", "Code. Type", "oagis-id-481ad1c0f5e04ddaa1a9e6d124a81956"),
+                new ExpectedOtherQBDT("MIME", "Code", "Code. Type", "oagis-id-481ad1c0f5e04ddaa1a9e6d124a81956"),
                 new ExpectedOtherQBDT("Payment Basis", "Code", "Code. Type", "oagis-id-0f3c04d8c8954282a3946a2fef821f2d"),
                 new ExpectedOtherQBDT("Payment Method", "Code", "Code. Type", "oagis-id-a6f7038124ff455187957149eb6b20db"),
                 new ExpectedOtherQBDT("Payment Purpose", "Code", "Code. Type", "oagis-id-6726fb3e210a497e8b784ae82b39a88e"),
