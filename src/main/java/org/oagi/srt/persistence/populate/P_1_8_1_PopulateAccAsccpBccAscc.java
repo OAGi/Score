@@ -967,13 +967,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         String name = targetDecl.getName();
         String propertyTerm = Utility.spaceSeparator(name).replace("ID", "Identifier");
-        BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByPropertyTerm(propertyTerm);
-        if (bccp != null) {
-            return bccp;
-        }
 
         TypeDecl typeDecl = targetDecl.getTypeDecl();
-
         String typeGuid = typeDecl.getId();
         // Exceptional Cases
         {
@@ -993,6 +988,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         int bdtId = dt.getDtId();
+
+        BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByPropertyTermAndBdtId(propertyTerm, bdtId);
+        if (bccp != null) {
+            return bccp;
+        }
 
         String representationTerm = dt.getDataTypeTerm();
         String den = Utility.firstToUpperCase(propertyTerm) + ". " + representationTerm;
