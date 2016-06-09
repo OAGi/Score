@@ -31,7 +31,7 @@ public class RunAll {
             P_1_7_PopulateQBDTInDT p13 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
             p13.run(ctx);
 
-            P_1_8_PopulateAccAsccpBccAscc p14 = ctx.getBean(P_1_8_PopulateAccAsccpBccAscc.class);
+            P_1_8_1_PopulateAccAsccpBccAscc p14 = ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
             p14.run(ctx);
 
             PopulateBlobContents populateBlobContents = ctx.getBean(PopulateBlobContents.class);
