@@ -608,7 +608,7 @@ CREATE TABLE `bccp` (
   `current_bccp_id` int(11) unsigned DEFAULT NULL COMMENT 'This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose Revision_Number is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.\n\nIt is noted that although this is a foreign key by definition, we don''t specify a foreign key in the data model. This is because when an entity is deleted the current record won''t exist anymore.\n\nThe value of this column for the current record should be left NULL.',
   PRIMARY KEY (`bccp_id`),
   UNIQUE KEY `bccp_sc_uk1` (`guid`),
-  UNIQUE KEY `bccp_sc_uk2` (`property_term`),
+  UNIQUE KEY `bccp_sc_uk2` (`property_term`, `bdt_id`),
   KEY `bccp_bdt_id_fk` (`bdt_id`),
   KEY `bccp_namespace_id_fk` (`namespace_id`),
   KEY `bccp_created_by_fk` (`created_by`),
