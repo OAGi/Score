@@ -1,8 +1,8 @@
 package org.oagi.srt.persistence.populate;
 
-import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.CodeListRepository;
@@ -154,7 +154,7 @@ public class P_1_4_PopulateCodeList {
                 codeList.setCreatedBy(userId);
                 codeList.setLastUpdatedBy(userId);
                 codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-                codeList.setModule(extractModuleName(path1));
+                codeList.setModule(Utility.extractModuleName(path1));
                 codeLists.add(codeList);
             } else if (!name.endsWith("EnumerationType"))
                 System.out.println("Check !!  " + name);
@@ -182,11 +182,6 @@ public class P_1_4_PopulateCodeList {
             }
         }
         return null;
-    }
-
-    private String extractModuleName(String filePath) {
-        int idx = filePath.indexOf("Model");
-        return FilenameUtils.separatorsToWindows(filePath.substring(idx));
     }
 
     private int getAgencyID(int value) {

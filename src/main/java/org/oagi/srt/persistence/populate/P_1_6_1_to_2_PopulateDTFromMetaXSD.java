@@ -45,6 +45,8 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     public void importAdditionalBDT(XPathHandler xh) throws Exception {
         NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
 
+        String module = Utility.extractModuleName(SRTConstants.META_XSD_FILE_PATH);
+
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestris = new ArrayList();
         for (int i = 0; i < result.getLength(); i++) {
             Element ele = (Element) result.item(i);
@@ -83,6 +85,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             dataType.setRevisionNum(0);
             dataType.setRevisionTrackingNum(0);
             dataType.setDeprecated(false);
+            dataType.setModule(module);
             System.out.println("Populating additional BDTs from meta whose name is " + name);
             dataTypeRepository.saveAndFlush(dataType);
 

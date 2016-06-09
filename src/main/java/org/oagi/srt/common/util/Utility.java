@@ -1,5 +1,6 @@
 package org.oagi.srt.common.util;
 
+import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.repository.entity.DataType;
 
@@ -446,6 +447,10 @@ public class Utility {
     public static String format(int a) {
         String s = String.format("%02d", a);
         return s;
+    }
+
+    public static String extractModuleName(String path) {
+        return FilenameUtils.separatorsToWindows(path.substring(path.indexOf("Model")));
     }
 
     public static void main(String args[]) {

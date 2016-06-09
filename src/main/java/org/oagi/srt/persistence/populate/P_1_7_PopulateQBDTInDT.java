@@ -97,14 +97,17 @@ public class P_1_7_PopulateQBDTInDT {
         private String baseTypeName;
         private Element typeElement;
         private String uri;
+        private String module;
 
-        public DataTypeInfoHolder(String typeName, String guid, String definition, String baseTypeName, Element typeElement, String uri) {
+        public DataTypeInfoHolder(String typeName, String guid, String definition,
+                                  String baseTypeName, Element typeElement, String uri, String module) {
             this.typeName = typeName;
             this.guid = guid;
             this.definition = definition;
             this.baseTypeName = baseTypeName;
             this.typeElement = typeElement;
             this.uri = uri;
+            this.module = module;
         }
 
         public String getTypeName() {
@@ -123,6 +126,10 @@ public class P_1_7_PopulateQBDTInDT {
             return baseTypeName;
         }
 
+        public String getModule() {
+            return module;
+        }
+
         @Override
         public String toString() {
             return "DataTypeInfoHolder{" +
@@ -132,6 +139,7 @@ public class P_1_7_PopulateQBDTInDT {
                     ", baseTypeName='" + baseTypeName + '\'' +
                     ", typeElement=" + typeElement +
                     ", uri='" + uri + '\'' +
+                    ", module='" + module + '\'' +
                     '}';
         }
     }
@@ -218,7 +226,9 @@ public class P_1_7_PopulateQBDTInDT {
 
                 Node baseTypeNode = (Node) xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
                 String baseTypeName = ((baseTypeNode != null) ? baseTypeNode.getAttributes().getNamedItem("base").getNodeValue() : null);
-                DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, baseTypeName, (Element) node, systemId);
+
+                String module = Utility.extractModuleName(systemId);
+                DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, baseTypeName, (Element) node, systemId, module);
                 dtiHolderMap.put(typeName, dtiHolder);
             }
         }
@@ -510,6 +520,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setRevisionNum(0);
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
+        dataType.setModule(dataTypeInfoHolder.getModule());
         dataTypeRepository.saveAndFlush(dataType);
 
         // add to BDTPrimitiveRestriction
@@ -911,6 +922,7 @@ public class P_1_7_PopulateQBDTInDT {
         dtVO.setRevisionNum(0);
         dtVO.setRevisionTrackingNum(0);
         dtVO.setDeprecated(false);
+        dtVO.setModule(dataTypeInfoHolder.getModule());
         dataTypeRepository.save(dtVO);
 
         DataType res = dataTypeRepository.findOneByGuid(guid);

@@ -93,6 +93,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
+        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
+
         //Type Name
         Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + dataType + "']/xsd:simpleContent/xsd:extension");
         if (typeNameNode == null) {
@@ -175,7 +177,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         if (defaultId == -1 || defaultId == 0)
             System.out.println("Error getting the default BDT primitive restriction for the default BDT: " + typeName);
         System.out.println("data type term = " + dataTypeTerm);
-        DataType dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definition, ccDefinition, aElementBDT.getAttribute("id"));
+
+        DataType dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definition,
+                ccDefinition, aElementBDT.getAttribute("id"), module);
         System.out.println("Inserting bdt primitive restriction for default bdt");
         insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
 
@@ -184,12 +188,14 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         //Unqualified Data Type Term
         String unQualifiedDataTypeTerm = dataTypeTerm;
-        DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"));
+        DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm,
+                aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"), module);
         System.out.println("Inserting bdt primitive restriction for unqualfieid bdt");
         insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
     }
 
-    public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition, String ccDefinition, String id) throws Exception {
+    public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition,
+                                               String ccDefinition, String id, String module) throws Exception {
         int basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
@@ -218,6 +224,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setRevisionNum(0);
             dtVO.setRevisionTrackingNum(0);
             dtVO.setDeprecated(false);
+            dtVO.setModule(module);
 
             dtVO = dataTypeRepository.saveAndFlush(dtVO);
         }
@@ -268,7 +275,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         return xbtRepository.findOne(id).getBuiltInType();
     }
 
-    public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm, String id, String defaultGUID) throws Exception {
+    public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm,
+                                                   String id, String defaultGUID, String module) throws Exception {
         int basedDTID = dataTypeRepository.findOneByGuid(defaultGUID).getDtId();
 
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
@@ -294,6 +302,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setRevisionNum(0);
             dtVO.setRevisionTrackingNum(0);
             dtVO.setDeprecated(false);
+            dtVO.setModule(module);
             dtVO = dataTypeRepository.saveAndFlush(dtVO);
         }
 
@@ -311,6 +320,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+
+        String module = Utility.extractModuleName(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
 
         typeName = dataType;
         String type = "simple";
@@ -363,7 +374,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             System.out.println("Default BDT is already existing");
             dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
         } else {
-            dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+            dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(),
+                    (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"), module);
             System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
             insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
         }
@@ -376,7 +388,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
             //Unqualified Data Type Term
             String unQualifiedDataTypeTerm = dataTypeTerm;
-            DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"));
+            DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm,
+                    aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"), module);
             System.out.println("Inserting bdt primitive restriction for exceptional unqualified bdt");
             insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
         }
@@ -392,6 +405,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+
+        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
 
         //Type Name
         NodeList simpleTypeNodeList = fields_xsd.getNodeList("//xsd:simpleType");
@@ -474,7 +489,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 System.out.println("Default BDT is already existing");
                 dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
             } else {
-                dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(), (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"));
+                dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(),
+                        (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"), module);
                 System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
                 insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
             }
@@ -487,7 +503,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
                 //Unqualified Data Type Term
                 String unQualifiedDataTypeTerm = dataTypeTerm;
-                DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"));
+                DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm,
+                        aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"), module);
                 System.out.println("Inserting bdt primitive restriction for exceptional unqualified bdt");
                 insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
             }
@@ -568,6 +585,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
+        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
+
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;
         id = aElementTN.getAttribute("id");
@@ -601,7 +620,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             }
         }
 
-        DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
+        DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID, module);
         insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
     }
 
@@ -619,6 +638,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+
+        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
 
 
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
@@ -655,7 +676,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 defaultId = xbtRepository.findOneByBuiltInType(((Element) xbtNode).getAttribute("base")).getXbtId();
             }
         }
-        DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID);
+        DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm, id, baseGUID, module);
         insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
     }
 

@@ -163,8 +163,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
         String den = propertyTerm + ". " + Utility.spaceSeparator(Utility.first(accVO.getDen()));
         int state = 3;
-        String module = bodPath.substring(bodPath.indexOf("Model"));
-        module = module.replace("\\", "/");
+        String module = Utility.extractModuleName(bodPath);
 
         AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
         asccp.setGuid(asccpGuid);
@@ -198,8 +197,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
 
         String den = propertyTerm + ". " + Utility.first(accVO.getDen());
         int state = 3;
-        String module = bodPath.substring(bodPath.indexOf("Model"));
-        module = module.replace("\\", "/");
+        String module = Utility.extractModuleName(bodPath);
 
         AssociationCoreComponentProperty asccp = new AssociationCoreComponentProperty();
         asccp.setGuid(asccpGuid);
@@ -467,8 +465,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             oagisComponentType = 2;
         else if (Utility.first(den).endsWith("Group") || objectClassName.equalsIgnoreCase("Common Time Reporting"))
             oagisComponentType = 3;
-        String module = fullFilePath.substring(fullFilePath.indexOf("Model"));
-        module = module.replace("\\", "/");
+        String module = Utility.extractModuleName(fullFilePath);
         insertACCForGroup(bodVO, objectClassName, den, oagisComponentType, module);
 
         int groupAccId = accRepository.findAccIdAndDenByGuid(bodVO.getGroupId()).getAccId();
@@ -627,7 +624,7 @@ public class P_1_8_PopulateAccAsccpBccAscc {
             oagisComponentType = 3;
 
         int state = 3;
-        String module = fullFilePath.substring(fullFilePath.indexOf("Model"));
+        String module = Utility.extractModuleName(fullFilePath);
         module = module.replace("\\", "/");
 
         AggregateCoreComponent acc = new AggregateCoreComponent();

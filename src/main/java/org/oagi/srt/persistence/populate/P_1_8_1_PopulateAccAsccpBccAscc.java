@@ -2,7 +2,6 @@ package org.oagi.srt.persistence.populate;
 
 import com.sun.xml.internal.xsom.*;
 import com.sun.xml.internal.xsom.parser.XSOMParser;
-import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.OAGiNamespaceContext;
@@ -361,7 +360,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         @Override
         public String getModule() {
             String systemId = xsDeclaration.getLocator().getSystemId();
-            return FilenameUtils.separatorsToWindows(systemId.substring(systemId.indexOf("Model")));
+            return Utility.extractModuleName(systemId);
         }
 
         protected Collection<XSDeclaration> asXSDeclarations(XSTerm xsTerm) {
