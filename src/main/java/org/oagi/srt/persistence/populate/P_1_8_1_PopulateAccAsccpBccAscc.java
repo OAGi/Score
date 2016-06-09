@@ -314,7 +314,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         public String getDefinition() {
-            return context.evaluate("./xsd:annotation/xsd:documentation", this.element);
+            String definition = context.evaluate("./xsd:annotation/xsd:documentation/*[local-name()='ccts_Definition']", this.element);
+            if (StringUtils.isEmpty(definition)) {
+                definition = context.evaluate("./xsd:annotation/xsd:documentation", this.element);
+            }
+            return definition;
         }
 
         public int getMinOccur() {
