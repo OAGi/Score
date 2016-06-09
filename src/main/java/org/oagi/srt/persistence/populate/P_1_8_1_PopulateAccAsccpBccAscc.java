@@ -804,19 +804,18 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private AggregateCoreComponent createACC(Declaration declaration) {
         String name = declaration.getName();
         int idx = name.lastIndexOf("Type");
-        String objectClassName = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
-        String den = objectClassName + ". Details";
+        String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
+        String den = objectClassTerm + ". Details";
 
         int oagisComponentType = 1;
-        String firstOfDen = Utility.first(den);
-        if (firstOfDen.endsWith("Base")) {
+        if (objectClassTerm.endsWith("Base")) {
             oagisComponentType = 0;
-        } else if (firstOfDen.endsWith("Extension") ||
-                   firstOfDen.equals("Open User Area") ||
-                   firstOfDen.equals("Any User Area") ||
-                   firstOfDen.equals("All Extension")) {
+        } else if (objectClassTerm.endsWith("Extension") ||
+                   objectClassTerm.equals("Open User Area") ||
+                   objectClassTerm.equals("Any User Area") ||
+                   objectClassTerm.equals("All Extension")) {
             oagisComponentType = 2;
-        } else if (firstOfDen.endsWith("Group")) {
+        } else if (objectClassTerm.endsWith("Group")) {
             oagisComponentType = 3;
         }
 
@@ -827,12 +826,12 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         String typeGuid = declaration.getId();
         {
             // Exceptional Case in 'Model/Nouns/CreditTransferIST.xsd'
-            if ("Customer Credit Transfer Initiation V05".equals(objectClassName)) {
+            if ("Customer Credit Transfer Initiation V05".equals(objectClassTerm)) {
                 typeGuid = Utility.generateGUID();
             }
         }
         acc.setGuid(typeGuid);
-        acc.setObjectClassTerm(objectClassName);
+        acc.setObjectClassTerm(objectClassTerm);
         acc.setDen(den);
         acc.setDefinition(definition);
 
