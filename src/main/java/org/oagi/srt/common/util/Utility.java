@@ -13,7 +13,7 @@ public class Utility {
     }
 
     public static String first(String den, boolean upp) {
-        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ", "").replaceAll("Identifier", "ID");
+        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll("Identifier", "ID");
         if (upp == false)
             den = den.substring(0, 1).toLowerCase() + den.substring(1);
         return den;
@@ -32,7 +32,7 @@ public class Utility {
     }
 
     public static String first(String den) {
-        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ", "").replaceAll("Identifier", "ID");
+        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll("Identifier", "ID");
         return den;
     }
 
@@ -324,7 +324,7 @@ public class Utility {
 //			qualifier= p1.substring(0, pos);
 //		}
         qualifier = qualifier.trim();
-        if (qualifier.equals("MIME")) {
+        if (qualifier.equalsIgnoreCase("MIME")) {
             qualifier = "MIME";
         }
         //System.out.println("\t\t"+qualifier);
