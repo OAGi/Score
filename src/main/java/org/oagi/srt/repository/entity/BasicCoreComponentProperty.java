@@ -41,6 +41,7 @@ public class BasicCoreComponentProperty implements Serializable {
     @Column(nullable = false)
     private String den;
 
+    @Lob
     @Column
     private String definition;
 

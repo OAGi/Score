@@ -35,6 +35,7 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     @Column(nullable = false)
     private int roleOfAbieId;
 
+    @Lob
     @Column
     private String definition;
 

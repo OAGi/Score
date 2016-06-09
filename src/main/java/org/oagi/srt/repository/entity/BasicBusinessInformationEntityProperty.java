@@ -32,6 +32,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     @Column(nullable = false)
     private int basedBccpId;
 
+    @Lob
     @Column(nullable = false)
     private String definition;
 

@@ -45,6 +45,7 @@ public class CodeList implements Serializable {
     @Column(nullable = false)
     private String versionId;
 
+    @Lob
     @Column
     private String definition;
 

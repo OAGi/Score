@@ -31,6 +31,7 @@ public class ContextCategory implements Serializable {
     @Column
     private String name;
 
+    @Lob
     @Column
     private String description;
 

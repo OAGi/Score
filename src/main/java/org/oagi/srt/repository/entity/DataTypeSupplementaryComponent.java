@@ -34,6 +34,7 @@ public class DataTypeSupplementaryComponent implements Serializable {
     @Column
     private String representationTerm;
 
+    @Lob
     @Column
     private String definition;
 

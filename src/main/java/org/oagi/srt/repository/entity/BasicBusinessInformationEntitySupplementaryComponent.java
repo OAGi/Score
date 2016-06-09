@@ -52,6 +52,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column
     private String fixedValue;
 
+    @Lob
     @Column
     private String definition;
 

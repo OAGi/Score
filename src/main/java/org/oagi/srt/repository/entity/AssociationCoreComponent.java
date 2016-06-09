@@ -47,6 +47,7 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     @Column(nullable = false)
     private String den;
 
+    @Lob
     @Column
     private String definition;
 

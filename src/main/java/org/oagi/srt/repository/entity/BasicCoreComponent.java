@@ -50,6 +50,7 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     @Column(nullable = false)
     private String den;
 
+    @Lob
     @Column
     private String definition;
 

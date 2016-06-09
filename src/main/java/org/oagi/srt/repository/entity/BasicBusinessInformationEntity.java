@@ -62,6 +62,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     @Column(name = "is_null", nullable = false)
     private boolean nill;
 
+    @Lob
     @Column
     private String definition;
 

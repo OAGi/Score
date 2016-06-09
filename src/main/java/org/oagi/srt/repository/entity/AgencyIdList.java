@@ -43,6 +43,7 @@ public class AgencyIdList implements Serializable {
     @Column
     private String versionId;
 
+    @Lob
     @Column
     private String definition;
 

@@ -31,6 +31,7 @@ public class AgencyIdListValue implements Serializable {
     @Column
     private String name;
 
+    @Lob
     @Column
     private String definition;
 

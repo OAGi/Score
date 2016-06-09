@@ -31,6 +31,7 @@ public class ContextSchemeValue implements Serializable {
     @Column(nullable = false)
     private String value;
 
+    @Lob
     @Column
     private String meaning;
 

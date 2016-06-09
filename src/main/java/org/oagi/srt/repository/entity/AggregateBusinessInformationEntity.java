@@ -41,6 +41,7 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     @Transient
     private String bizCtxName;
 
+    @Lob
     @Column
     private String definition;
 

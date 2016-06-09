@@ -38,6 +38,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     @Column(nullable = false)
     private int basedAscc;
 
+    @Lob
     @Column
     private String definition;
 

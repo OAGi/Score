@@ -28,6 +28,7 @@ public class Release implements Serializable {
     @Column(nullable = false)
     private String releaseNum;
 
+    @Lob
     @Column
     private String releaseNote;
 

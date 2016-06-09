@@ -53,12 +53,15 @@ public class DataType implements Serializable {
     @Column
     private String contentComponentDen;
 
+    @Lob
     @Column
     private String definition;
 
+    @Lob
     @Column
     private String contentComponentDefinition;
 
+    @Lob
     @Column
     private String revisionDoc;
 

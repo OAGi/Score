@@ -34,6 +34,7 @@ public class CodeListValue implements Serializable {
     @Column
     private String name;
 
+    @Lob
     @Column
     private String definition;
 
