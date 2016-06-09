@@ -133,7 +133,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         for (File file : files) {
-            if (!file.getName().equals("AcknowledgeInvoice.xsd")) {
+            if (!file.getName().equals("AcknowledgeInvoice.xsd") &&
+                !file.getName().endsWith("IST.xsd")) {
                 System.out.println(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }
