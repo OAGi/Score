@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Utility {
+
     public static String generateGUID() {
         return "oagis-id-" + UUID.randomUUID().toString().replaceAll("-", "");
     }
@@ -63,11 +64,10 @@ public class Utility {
         return pre + ". Type";
     }
 
-
     public static String denToTypeName(String den) {
 
         int pos = den.indexOf("_");
-        den = den.replace("Identifier","ID");
+        den = den.replace("Identifier", "ID");
 
         if (pos >= 0) {
             String part1 = den.substring(0, den.indexOf("_"));
@@ -156,15 +156,14 @@ public class Utility {
             representationTerm = "Text";
         return representationTerm;
     }
-    
+
     public static String getPropertyTerm(String str) {
-       
-    	if(str.equals("languageCode") || str.equals("actionCode")){
-    		return Utility.spaceSeparatorBeforeStr(str, "Code");
-    	}
-    	else {
-    		return Utility.spaceSeparator(str);
-    	}
+
+        if (str.equals("languageCode") || str.equals("actionCode")) {
+            return Utility.spaceSeparatorBeforeStr(str, "Code");
+        } else {
+            return Utility.spaceSeparator(str);
+        }
     }
 
     public static String firstToUpperCase(String str) {
@@ -325,8 +324,8 @@ public class Utility {
 //			qualifier= p1.substring(0, pos);
 //		}
         qualifier = qualifier.trim();
-        if(qualifier.equals("MIME")){
-        	qualifier = "MIME";
+        if (qualifier.equals("MIME")) {
+            qualifier = "MIME";
         }
         //System.out.println("\t\t"+qualifier);
         return qualifier;
