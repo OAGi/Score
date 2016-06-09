@@ -415,7 +415,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                         particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
                     }
 
-                    createASCCP(particle);
+                    createASCCP(particle, false);
                 }
 
                 if (!isLocalElement) {
@@ -692,10 +692,14 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     private AssociationCoreComponentProperty createASCCP(Declaration declaration) {
-        return createASCCP(declaration, null);
+        return createASCCP(declaration, null, true);
     }
 
-    private AssociationCoreComponentProperty createASCCP(Declaration declaration, AggregateCoreComponent acc) {
+    private AssociationCoreComponentProperty createASCCP(Declaration declaration, boolean reusableIndicator) {
+        return createASCCP(declaration, null, reusableIndicator);
+    }
+
+    private AssociationCoreComponentProperty createASCCP(Declaration declaration, AggregateCoreComponent acc, boolean reusableIndicator) {
         String asccpGuid = declaration.getId();
         String definition = declaration.getDefinition();
         String module = declaration.getModule();
@@ -737,6 +741,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setDeprecated(false);
         asccp.setNamespaceId(namespaceId);
         asccp.setReleaseId(releaseId);
+        asccp.setReusableIndicator(reusableIndicator);
         asccpRepository.saveAndFlush(asccp);
 
         return asccp;
@@ -778,7 +783,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                             sequenceKey++;
                         }
                     } else {
-                        createBCC(acc, asccOrBccElement, sequenceKey++);
+                        createBCC(acc, asccOrBccElement, sequenceKey++, 1);
                     }
                 }
             }
@@ -786,7 +791,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         for (AttrDecl bccpAttr : declaration.getAttributes()) {
             BasicCoreComponentProperty bccp = getOrCreateBCCP(bccpAttr);
-            createBCC(acc, bccp, bccpAttr);
+            createBCC(acc, bccp, bccpAttr, 0);
         }
 
         return acc;
@@ -899,15 +904,21 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
-                              Declaration declaration, int sequenceKey) {
+                              Declaration declaration, int sequenceKey, int entityType) {
         BasicCoreComponentProperty bccp = getOrCreateBCCP(declaration);
-        return createBCC(fromAcc, bccp, declaration, sequenceKey);
+        return createBCC(fromAcc, bccp, declaration, sequenceKey, entityType);
+    }
+
+    private boolean createBCC(AggregateCoreComponent fromAcc,
+                                         BasicCoreComponentProperty toBccp,
+                                         Declaration declaration, int entityType) {
+        return createBCC(fromAcc, toBccp, declaration, 0, entityType);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
                               BasicCoreComponentProperty toBccp,
-                              Declaration elementDecl, int sequenceKey) {
-        String guid = elementDecl.getId();
+                              Declaration declaration, int sequenceKey, int entityType) {
+        String guid = declaration.getId();
         int fromAccId = fromAcc.getAccId();
         int toBccpId = toBccp.getBccpId();
 
@@ -917,8 +928,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             return false;
         }
 
-        int cardinalityMin = elementDecl.getMinOccur();
-        int cardinalityMax = elementDecl.getMaxOccur();
+        int cardinalityMin = declaration.getMinOccur();
+        int cardinalityMax = declaration.getMaxOccur();
 
         String den = Utility.first(fromAcc.getDen()) + ". " + toBccp.getDen();
 
@@ -928,10 +939,13 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bcc.setCardinalityMax(cardinalityMax);
         bcc.setFromAccId(fromAcc.getAccId());
         bcc.setToBccpId(toBccp.getBccpId());
-        bcc.setSeqKey(sequenceKey);
-        bcc.setEntityType(1);
+        if (sequenceKey > 0) {
+            bcc.setSeqKey(sequenceKey);
+        }
+        bcc.setEntityType(entityType);
         bcc.setDen(den);
         bcc.setState(3);
+        bcc.setDefinition(declaration.getDefinition());
         bcc.setDeprecated(false);
         bcc.setReleaseId(releaseId);
         bcc.setCreatedBy(userId);
@@ -995,33 +1009,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bccp.setReleaseId(releaseId);
         bccpRepository.saveAndFlush(bccp);
         return bccp;
-    }
-
-    private BasicCoreComponent createBCC(AggregateCoreComponent fromAcc,
-                                         BasicCoreComponentProperty toBccp,
-                                         AttrDecl attrDecl) {
-        String guid = attrDecl.getId();
-        int cardinalityMin = attrDecl.getMinOccur();
-        int cardinalityMax = attrDecl.getMaxOccur();
-
-        String den = Utility.first(fromAcc.getDen()) + ". " + toBccp.getDen();
-
-        BasicCoreComponent bcc = new BasicCoreComponent();
-        bcc.setGuid(guid);
-        bcc.setCardinalityMin(cardinalityMin);
-        bcc.setCardinalityMax(cardinalityMax);
-        bcc.setFromAccId(fromAcc.getAccId());
-        bcc.setToBccpId(toBccp.getBccpId());
-        bcc.setEntityType(1);
-        bcc.setDen(den);
-        bcc.setState(3);
-        bcc.setDeprecated(false);
-        bcc.setReleaseId(releaseId);
-        bcc.setCreatedBy(userId);
-        bcc.setLastUpdatedBy(userId);
-        bcc.setOwnerUserId(userId);
-        bccRepository.saveAndFlush(bcc);
-        return bcc;
     }
 
 }
