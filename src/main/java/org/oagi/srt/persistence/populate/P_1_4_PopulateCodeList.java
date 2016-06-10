@@ -46,8 +46,7 @@ public class P_1_4_PopulateCodeList {
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.4 Start");
 
-        String tt[][] = {
-                {"CodeLists_1", "314"},
+        String tt[][] = {               
                 {"CodeList_ConditionTypeCode_1", "314"},
                 {"CodeList_ConstraintTypeCode_1", "314"},
                 {"CodeList_DateFormatCode_1", "314"},
@@ -61,7 +60,8 @@ public class P_1_4_PopulateCodeList {
                 {"CodeList_LanguageCode_ISO_7_04", "5"},
                 {"CodeList_TimeZoneCode_1", "5"},
 
-                {"CodeList_UnitCode_UNECE_7_04", "6"}
+                {"CodeList_UnitCode_UNECE_7_04", "6"},
+                {"CodeLists_1", "314"}
         };
 
         List<CodeList> codeLists = new ArrayList();
@@ -257,9 +257,9 @@ public class P_1_4_PopulateCodeList {
                     //Get code_list_value from enumerationType
                     enumeration = xh.getNodeList("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration");
                     if (enumeration.getLength() < 1) {
-                        System.out.println("   EnumerationType " + codeList.getEnumTypeGuid() + " has no enumerations");
+                        System.out.println("   EnumerationType for " + codeList.getName() + " has no enumerations");
                     } else {
-                        System.out.println("   Start import from EnumerationType: " + codeList.getEnumTypeGuid());
+                        System.out.println("   Start import from EnumerationType to: " + codeList.getName());
                     }
                 } else {//if enum_type_guid is null
                     if (codeList.getBasedCodeListId() > 0) {
@@ -267,10 +267,18 @@ public class P_1_4_PopulateCodeList {
                         List<CodeListValue> codeListValuesFromBase = codeListValueRepository.findByCodeListId(codeList.getBasedCodeListId());
 
                         if (codeListValuesFromBase.size() > 0) {
-                            System.out.println("   Start inherit from BasedCodeList: " + codeList.getName());
+                            System.out.println("   Start inherit from BasedCodeList to : " + codeList.getName());
                             for (int j = 0; j < codeListValuesFromBase.size(); j++) {
-                                CodeListValue codeListValue = codeListValuesFromBase.get(j);
+                                CodeListValue codeListValue = new CodeListValue();
+                                CodeListValue codeListValueFromBase = codeListValuesFromBase.get(j);
                                 codeListValue.setCodeListId(codeList.getCodeListId());
+                                codeListValue.setDefinition(codeListValueFromBase.getDefinition());
+                                codeListValue.setDefinitionSource(codeListValueFromBase.getDefinitionSource());
+                                codeListValue.setValue(codeListValueFromBase.getValue());
+                                codeListValue.setName(codeListValueFromBase.getName());
+                                codeListValue.setUsedIndicator(true);
+                                codeListValue.setLockedIndicator(false);
+                                codeListValue.setExtensionIndicator(false);
                                 codeListValueRepository.save(codeListValue);
                             }
                         }
@@ -278,14 +286,15 @@ public class P_1_4_PopulateCodeList {
                         //Get the values from local xsd:enumeration
                         enumeration = xh.getNodeList("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration");
                         if (enumeration.getLength() < 1) {
-                            System.out.println("   " + codeList.getEnumTypeGuid() + " has no enumerations");
+                            System.out.println("   " + codeList.getName() + " has no local enumerations");
                         } else {
                             System.out.println("   Start import from LocalEnumeration: ");
                         }
                     }
                 }
 
-                if (enumeration != null) {
+                if (enumeration != null && enumeration.getLength()>0) {
+                	int count=0;
                     for (int j = 0; j < enumeration.getLength(); j++) {
                         Element aEnum = (Element) enumeration.item(j);
                         CodeListValue codeListValue = new CodeListValue();
@@ -309,6 +318,10 @@ public class P_1_4_PopulateCodeList {
                             codeListValue.setDefinitionSource(null);
                         }
                         codeListValueRepository.save(codeListValue);
+                        count++;
+                    }
+                    if(count>0){
+                    	System.out.println("         "+count+" enumerations are imported!");
                     }
                 }
             }
