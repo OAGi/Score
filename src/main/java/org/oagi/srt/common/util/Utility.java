@@ -14,7 +14,7 @@ public class Utility {
     }
 
     public static String first(String den, boolean upp) {
-        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll("Identifier", "ID");
+        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ", "").replaceAll("Identifier", "ID");
         if (upp == false)
             den = den.substring(0, 1).toLowerCase() + den.substring(1);
         return den;
@@ -33,7 +33,7 @@ public class Utility {
     }
 
     public static String first(String den) {
-        den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll("Identifier", "ID");
+        den = den.substring(0, den.indexOf(".")).replace("_", " ");
         return den;
     }
 
