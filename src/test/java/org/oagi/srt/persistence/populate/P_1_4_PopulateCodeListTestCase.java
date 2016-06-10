@@ -1567,7 +1567,6 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
         );
 
         assertEquals(877, expectedCodeListValues.size());
-        assertEquals(877, codeListValueRepository.count());
 
         expectedCodeListValues.forEach(expectedCodeListValue -> {
             CodeList codeList = codeListRepository.findOneByGuid(expectedCodeListValue.getBaseCodeListGuid());
@@ -1580,5 +1579,28 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
                     " and Code List Value: " + expectedCodeListValue.getValue(),
                     codeListValue);
         });
+        
+        List<CodeList> allCodeList = codeListRepository.findAll();
+        
+        for(int i=0; i<allCodeList.size(); i++){
+        	CodeList aCodeList = allCodeList.get(i);
+        	if(aCodeList.getBasedCodeListId()>0){
+                List<CodeListValue> baseCodeListValues = codeListValueRepository.findByCodeListId(aCodeList.getBasedCodeListId());
+                List<CodeListValue> thisCodeListValues = codeListValueRepository.findByCodeListId(aCodeList.getCodeListId());
+                
+                assertEquals(baseCodeListValues.size(), thisCodeListValues.size());
+                for(int j=0; j<baseCodeListValues.size(); j++){
+                	CodeListValue aBaseCodeListValue = baseCodeListValues.get(j);
+                	CodeListValue aCodeListValue = thisCodeListValues.get(j);
+                	
+                	assertEquals(aBaseCodeListValue.getDefinition(), aCodeListValue.getDefinition());
+                	assertEquals(aBaseCodeListValue.getDefinitionSource(), aCodeListValue.getDefinitionSource());
+                	assertEquals(aBaseCodeListValue.getName(), aCodeListValue.getName());
+                	assertEquals(aBaseCodeListValue.getValue(), aCodeListValue.getValue());
+
+                }
+        	}
+        }
+        
     }
 }
