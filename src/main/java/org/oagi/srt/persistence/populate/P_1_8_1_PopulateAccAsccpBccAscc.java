@@ -20,18 +20,26 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.Locator;
 
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.*;
 
@@ -223,6 +231,14 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             Document document = loadDocument(xsComponent.getLocator());
             return evaluateElement(expression, document);
         }
+
+        public NodeList evaluateNodeList(String expression, Node item) {
+            try {
+                return (NodeList) xPath.evaluate(expression, item, XPathConstants.NODESET);
+            } catch (XPathExpressionException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
     }
 
     private interface Declaration {
@@ -257,6 +273,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         private Declaration reference;
         private TypeDecl type;
+        private Transformer transformer;
+        private final int INDENT_AMOUNT = 2;
 
         public AbstractDeclaration(Context context, XSDeclaration xsDeclaration, Element element) {
             if (context == null) {
@@ -272,6 +290,16 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             this.context = context;
             this.xsDeclaration = xsDeclaration;
             this.element = element;
+
+            TransformerFactory transFactory = TransformerFactory.newInstance();
+            try {
+                transformer = transFactory.newTransformer();
+            } catch (TransformerConfigurationException e) {
+                throw new IllegalStateException(e);
+            }
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(INDENT_AMOUNT));
         }
 
         @Override
@@ -313,11 +341,56 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         public String getDefinition() {
-            String definition = context.evaluate("./xsd:annotation/xsd:documentation/*[local-name()='ccts_Definition']", this.element);
-            if (StringUtils.isEmpty(definition)) {
-                definition = context.evaluate("./xsd:annotation/xsd:documentation", this.element);
+            Element element = context.evaluateElement(
+                    "./xsd:annotation/xsd:documentation", this.element);
+            if (element != null) {
+                NodeList nodeList = context.evaluateNodeList("//text()[normalize-space()='']", element);
+                for (int i = 0; i < nodeList.getLength(); ++i) {
+                    Node node = nodeList.item(i);
+                    node.getParentNode().removeChild(node);
+                }
+
+                try {
+                    StringWriter buffer = new StringWriter();
+                    transformer.transform(new DOMSource(element), new StreamResult(buffer));
+                    String definition = buffer.toString();
+                    definition = arrangeIndent(removeOAGiNamepsace(removeDocumentationNode(definition)));
+                    return (!StringUtils.isEmpty(definition)) ? definition.trim() : null;
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
             }
-            return definition;
+            return null;
+        }
+
+        private String removeDocumentationNode(String s) {
+            if (StringUtils.isEmpty(s)) {
+                return null;
+            }
+            int sIdx = s.indexOf('>');
+            int eIdx = s.lastIndexOf("</xsd:documentation>");
+            if (eIdx == -1) {
+                return null;
+            }
+            return s.substring(sIdx + 1, eIdx);
+        }
+
+        private String removeOAGiNamepsace(String s) {
+            if (StringUtils.isEmpty(s)) {
+                return null;
+            }
+            return s.replaceAll(" xmlns=\"" + SRTConstants.OAGI_NS + "\">", ">");
+        }
+
+        private String arrangeIndent(String s) {
+            if (StringUtils.isEmpty(s)) {
+                return null;
+            }
+            String regex = "";
+            for (int i = 0; i < INDENT_AMOUNT; ++i) {
+                regex += " ";
+            }
+            return s.replaceAll(regex + "<", "<");
         }
 
         public int getMinOccur() {
