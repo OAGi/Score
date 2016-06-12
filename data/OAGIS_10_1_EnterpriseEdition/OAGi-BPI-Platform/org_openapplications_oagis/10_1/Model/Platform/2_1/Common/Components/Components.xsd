@@ -6447,7 +6447,7 @@ Possible values:
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!---->
+	<!--
 	<xsd:complexType name="EMailType" abstract="false" id="oagis-id-e9002e73d32244fbab0724e062f0f7ea" mixed="false">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides the email address to be associated with a given element.</xsd:documentation>
@@ -6458,6 +6458,7 @@ Possible values:
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
+-->
 	<xsd:complexType name="EventBaseType" abstract="false" id="oagis-id-56adc9de89f642abaa1aa806f18dc0e3" mixed="false">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">Event Type for specifying information about an identifiable occurrence in time</xsd:documentation>
