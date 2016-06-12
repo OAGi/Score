@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10.1 Platform 2_1 
@@ -20,13 +21,16 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_LanguageCode_ISO_7_04.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:simpleType name="clm56392A20081107_LanguageCodeContentType" id="oagis-id-c5e8ac8c44894e54a147a870136da686">
 		<xsd:restriction base="xsd:normalizedString"/>
 	</xsd:simpleType>
+	<!--
 	<xsd:complexType name="clm56392A20081107_LanguageCodeType" id="oagis-id-7209aeacf8374178911c4d2eabea9dd8">
 		<xsd:simpleContent>
 			<xsd:extension base="clm56392A20081107_LanguageCodeContentType"/>
 		</xsd:simpleContent>
 	</xsd:complexType>
+-->
 </xsd:schema>

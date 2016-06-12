@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- ====================================================================== --><!-- =====  IANA_CharacterSetCode_20070514 - Code List Schema Module  ===== --><!-- ====================================================================== --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== -->
+<!-- =====  IANA_CharacterSetCode_20070514 - Code List Schema Module  ===== -->
+<!-- ====================================================================== -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10.1 Platform 2_1 
@@ -20,13 +24,16 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_CharacterSetCode_IANA_20070514.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3">
 	<!-- ====================================================================== -->
 	<!-- =====  Element Declarations				      ===== -->
 	<!-- ====================================================================== -->
 	<!-- =====  Root Element Declaration				      ===== -->
 	<!-- ====================================================================== -->
+	<!-- comment out for SRT model validation purpose 
 	<xsd:element name="CharacterSetCode" type="clmIANACharacterSetCode20070514_CharacterSetCodeContentType" id="oagis-id-5b00beeb417146f7b565e03c2346ce15"/>
+-->
 	<!-- ====================================================================== -->
 	<!-- =====  Type Definitions					      ===== -->
 	<!-- ====================================================================== -->
