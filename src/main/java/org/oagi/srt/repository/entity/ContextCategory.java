@@ -1,9 +1,24 @@
 package org.oagi.srt.repository.entity;
 
-public class ContextCategory {
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "ctx_category")
+public class ContextCategory implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "CTX_CATEGORY_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CTX_CATEGORY_ID_SEQ", sequenceName = "CTX_CATEGORY_ID_SEQ", allocationSize = 1)
     private int ctxCategoryId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column
     private String name;
+
+    @Column
     private String description;
 
     public int getCtxCategoryId() {
@@ -36,5 +51,15 @@ public class ContextCategory {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "ContextCategory{" +
+                "ctxCategoryId=" + ctxCategoryId +
+                ", guid='" + guid + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

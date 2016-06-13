@@ -1,30 +1,93 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasicCoreComponent extends CoreComponent {
+@Entity
+@Table(name = "bcc")
+public class BasicCoreComponent extends CoreComponent implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "BCC_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BCC_ID_SEQ", sequenceName = "BCC_ID_SEQ", allocationSize = 1)
     private int bccId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int cardinalityMin;
+
+    @Column
     private int cardinalityMax;
+
+    @Column(nullable = false)
     private int toBccpId;
+
+    @Column(nullable = false)
     private int fromAccId;
+
+    @Column
     private int seqKey;
+
+    @Column
     private int entityType;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column
     private String definition;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int state;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentBccId;
+
+    @Column
+    private Integer revisionAction;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentBccId;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getBccId() {
         return bccId;
@@ -47,6 +110,9 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public void setCardinalityMin(int cardinalityMin) {
+        if (cardinalityMin < 0) {
+            throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
+        }
         this.cardinalityMin = cardinalityMin;
     }
 
@@ -55,6 +121,9 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public void setCardinalityMax(int cardinalityMax) {
+        if (cardinalityMax < -1) {
+            throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
+        }
         this.cardinalityMax = cardinalityMax;
     }
 
@@ -63,7 +132,9 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public void setToBccpId(int toBccpId) {
-        this.toBccpId = toBccpId;
+        if (toBccpId > 0) {
+            this.toBccpId = toBccpId;
+        }
     }
 
     public int getFromAccId() {
@@ -71,7 +142,9 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public void setFromAccId(int fromAccId) {
-        this.fromAccId = fromAccId;
+        if (fromAccId > 0) {
+            this.fromAccId = fromAccId;
+        }
     }
 
     public int getSeqKey() {
@@ -171,7 +244,7 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public int getRevisionAction() {
-        return revisionAction;
+        return (revisionAction == null) ? 0 : revisionAction;
     }
 
     public void setRevisionAction(int revisionAction) {
@@ -179,7 +252,7 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -187,7 +260,7 @@ public class BasicCoreComponent extends CoreComponent {
     }
 
     public int getCurrentBccId() {
-        return currentBccId;
+        return (currentBccId == null) ? 0 : currentBccId;
     }
 
     public void setCurrentBccId(int currentBccId) {
@@ -200,5 +273,33 @@ public class BasicCoreComponent extends CoreComponent {
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicCoreComponent{" +
+                "bccId=" + bccId +
+                ", guid='" + guid + '\'' +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", toBccpId=" + toBccpId +
+                ", fromAccId=" + fromAccId +
+                ", seqKey=" + seqKey +
+                ", entityType=" + entityType +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentBccId=" + currentBccId +
+                ", deprecated=" + deprecated +
+                '}';
     }
 }

@@ -1,13 +1,31 @@
 package org.oagi.srt.repository.entity;
 
-public class BusinessDataTypePrimitiveRestriction {
+import javax.persistence.*;
+import java.io.Serializable;
 
+@Entity
+@Table(name = "bdt_pri_restri")
+public class BusinessDataTypePrimitiveRestriction implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "BDT_PRI_RESTRI_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BDT_PRI_RESTRI_ID_SEQ", sequenceName = "BDT_PRI_RESTRI_ID_SEQ", allocationSize = 1)
     private int bdtPriRestriId;
+
+    @Column(nullable = false)
     private int bdtId;
-    private int cdtAwdPriXpsTypeMapId;
-    private int codeListId;
+
+    @Column
+    private Integer cdtAwdPriXpsTypeMapId;
+
+    @Column
+    private Integer codeListId;
+
+    @Column(name = "is_default", nullable = false)
     private boolean isDefault;
-    private int agencyIdListId;
+
+    @Column
+    private Integer agencyIdListId;
 
     public int getBdtPriRestriId() {
         return bdtPriRestriId;
@@ -26,19 +44,23 @@ public class BusinessDataTypePrimitiveRestriction {
     }
 
     public int getCdtAwdPriXpsTypeMapId() {
-        return cdtAwdPriXpsTypeMapId;
+        return (cdtAwdPriXpsTypeMapId == null) ? 0 : cdtAwdPriXpsTypeMapId;
     }
 
     public void setCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId) {
-        this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
+        if (cdtAwdPriXpsTypeMapId > 0) {
+            this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
+        }
     }
 
     public int getCodeListId() {
-        return codeListId;
+        return (codeListId == null) ? 0 : codeListId;
     }
 
     public void setCodeListId(int codeListId) {
-        this.codeListId = codeListId;
+        if (codeListId > 0) {
+            this.codeListId = codeListId;
+        }
     }
 
     public boolean isDefault() {
@@ -50,10 +72,24 @@ public class BusinessDataTypePrimitiveRestriction {
     }
 
     public int getAgencyIdListId() {
-        return agencyIdListId;
+        return (agencyIdListId == null) ? 0 : agencyIdListId;
     }
 
     public void setAgencyIdListId(int agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+        if (agencyIdListId > 0) {
+            this.agencyIdListId = agencyIdListId;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "BusinessDataTypePrimitiveRestriction{" +
+                "bdtPriRestriId=" + bdtPriRestriId +
+                ", bdtId=" + bdtId +
+                ", cdtAwdPriXpsTypeMapId=" + cdtAwdPriXpsTypeMapId +
+                ", codeListId=" + codeListId +
+                ", isDefault=" + isDefault +
+                ", agencyIdListId=" + agencyIdListId +
+                '}';
     }
 }

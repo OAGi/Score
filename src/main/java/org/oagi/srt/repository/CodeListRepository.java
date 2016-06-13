@@ -1,31 +1,32 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.CodeList;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CodeListRepository {
+public interface CodeListRepository extends JpaRepository<CodeList, Integer> {
 
-    public List<CodeList> findAll();
+    @Query("select c from CodeList c order by c.creationTimestamp desc")
+    public List<CodeList> findAllOrderByCreationTimestampDesc();
 
     public List<CodeList> findByNameContaining(String name);
 
+    @Query("select c from CodeList c where c.name like %?1% and c.state = 'Published' and c.extensibleIndicator = 1")
     public List<CodeList> findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(String name);
 
-    public List<CodeList> findByCodeListId(int codeListId);
-
-    public CodeList findOneByGuidAndEnumTypeGuidAndNameAndDefinition(
-            String guid, String enumTypeGuid, String name, String definition
+    @Query("select c from CodeList c where c.guid = ?1 and c.enumTypeGuid = ?2 and c.name = ?3")
+    public CodeList findOneByGuidAndEnumTypeGuidAndName(
+            String guid, String enumTypeGuid, String name
     );
 
-    public CodeList findOneByGuidAndEnumTypeGuidAndCodeListIdAndNameAndDefinition(
-            String guid, String enumTypeGuid, int codeListId, String name, String definition
-    );
+    @Query("select c from CodeList c where c.guid = ?1")
+    public CodeList findOneByGuid(String guid);
 
-    public void update(CodeList codeList);
+    @Query("select c from CodeList c where c.name = ?1")
+    public CodeList findOneByName(String name);
 
+    @Query("update CodeList c set c.state = ?1 where c.codeListId = ?2")
     public void updateStateByCodeListId(String state, int codeListId);
-
-    public void save(CodeList codeList);
-
 }

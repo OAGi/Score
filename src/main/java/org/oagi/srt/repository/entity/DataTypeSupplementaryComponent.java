@@ -1,16 +1,40 @@
 package org.oagi.srt.repository.entity;
 
-public class DataTypeSupplementaryComponent {
+import javax.persistence.*;
+import java.io.Serializable;
 
+@Entity
+@Table(name = "dt_sc")
+public class DataTypeSupplementaryComponent implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "DT_SC_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "DT_SC_ID_SEQ", sequenceName = "DT_SC_ID_SEQ", allocationSize = 1)
     private int dtScId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column
     private String propertyTerm;
+
+    @Column
     private String representationTerm;
+
+    @Column
     private String definition;
+
+    @Column(nullable = false)
     private int ownerDtId;
+
+    @Column(nullable = false)
     private int minCardinality;
+
+    @Column
     private int maxCardinality;
-    private int basedDtScId;
+
+    @Column
+    private Integer basedDtScId;
 
     public int getDtScId() {
         return dtScId;
@@ -77,10 +101,25 @@ public class DataTypeSupplementaryComponent {
     }
 
     public int getBasedDtScId() {
-        return basedDtScId;
+        return (basedDtScId == null) ? 0 : basedDtScId;
     }
 
     public void setBasedDtScId(int basedDtScId) {
         this.basedDtScId = basedDtScId;
+    }
+
+    @Override
+    public String toString() {
+        return "DataTypeSupplementaryComponent{" +
+                "dtScId=" + dtScId +
+                ", guid='" + guid + '\'' +
+                ", propertyTerm='" + propertyTerm + '\'' +
+                ", representationTerm='" + representationTerm + '\'' +
+                ", definition='" + definition + '\'' +
+                ", ownerDtId=" + ownerDtId +
+                ", minCardinality=" + minCardinality +
+                ", maxCardinality=" + maxCardinality +
+                ", basedDtScId=" + basedDtScId +
+                '}';
     }
 }

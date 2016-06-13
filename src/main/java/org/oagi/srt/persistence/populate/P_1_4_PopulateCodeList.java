@@ -1,368 +1,330 @@
 package org.oagi.srt.persistence.populate;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Timestamp;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.chanchan.common.persistence.db.DBAgent;
-import org.oagi.srt.common.QueryCondition;
+import org.apache.commons.io.FilenameUtils;
+import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.persistence.dao.DAOFactory;
-import org.oagi.srt.persistence.dao.SRTDAO;
-import org.oagi.srt.persistence.dao.SRTDAOException;
-import org.oagi.srt.persistence.dto.AgencyIDListValueVO;
-import org.oagi.srt.persistence.dto.CodeListVO;
-import org.oagi.srt.persistence.dto.CodeListValueVO;
-import org.oagi.srt.persistence.dto.UserVO;
-import org.oagi.srt.web.startup.SRTInitializerException;
+import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.CodeListRepository;
+import org.oagi.srt.repository.CodeListValueRepository;
+import org.oagi.srt.repository.UserRepository;
+import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
-*
-* @author Jaehun Lee
-* @version 1.0
-*
-*/
-
+ * @author Jaehun Lee
+ * @version 1.0
+ */
+@Component
 public class P_1_4_PopulateCodeList {
-	
-	private static Connection conn = null;
 
-	public void codeList(String fileinput, int agencyid) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("CodeList") + fileinput;
-		XPathHandler xh = new XPathHandler(path1);
-		
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("CodeList");
-		CodeListVO codelistVO = new CodeListVO();
+    @Autowired
+    private UserRepository userRepository;
 
-		NodeList result = xh.getNodeList("//xsd:simpleType");
-	    NodeList definition = xh.getNodeList("//xsd:simpleType[xsd:annotation[xsd:documentation]]");	
-    	NodeList union = xh.getNodeList("//xsd:simpleType[xsd:union]");
-    	
-		Timestamp current_stamp = new Timestamp (System.currentTimeMillis());
-    	
-		for(int i = 0; i < result.getLength(); i++) {
-		    Element tmp = (Element)result.item(i);
-		    
-		    if(tmp.getAttribute("name").endsWith("CodeContentType")){
-		    	codelistVO.setCodeListGUID(tmp.getAttribute("id"));
-		    	
-		    	for(int j = 0; j < result.getLength(); j++) {
-		    		Element tmp2 = (Element)result.item(j);
+    @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
 
-	    			if(tmp2.getAttribute("name").endsWith("EnumerationType")) {
-	    				if(tmp2.getAttribute("name").substring(0, tmp2.getAttribute("name").lastIndexOf("EnumerationType")).equals(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")))) {
-		    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
-		    				break;
-		    			}
-		    		} else {
-	    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
-	    			}
-		    			
-		    	}
-		   
-		    	codelistVO.setName(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")));
-		    	codelistVO.setListID(tmp.getAttribute("id"));
-		    	codelistVO.setAgencyID(getAgencyID(agencyid));
-		    	
-		    	if(tmp.getAttribute("name").startsWith("oacl")) {
-		    		codelistVO.setVersionID("1");
-		    	} else if(tmp.getAttribute("name").equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
-		    		codelistVO.setVersionID("5");
-		    	} else {
-			    	for(int j = 0; j < tmp.getAttribute("name").length(); j++) {
-				    	if(tmp.getAttribute("name").charAt(j)>47 && tmp.getAttribute("name").charAt(j)<58) {
-				    		for(int k = j+1 ; k < tmp.getAttribute("name").length(); k++) {
-				    			if(tmp.getAttribute("name").charAt(k) == '_') {
-						    		String complicated_version = tmp.getAttribute("name").substring(j, k);
-						    		for(int l = complicated_version.length()-1 ; l >=0 ; l-- ) {
-						    			if(!(complicated_version.charAt(l) > 47 && complicated_version.charAt(l) < 58)){
-						    				complicated_version = complicated_version.substring(l+1);
-						    				break;
-						    			}
-						    		}
-				    				codelistVO.setVersionID(complicated_version);
-						    		break;
-				    			}
-				    		}
-				    	break;
-				    	}
-			    	}		    		
-		    	}
-		    	
-		    	for(int j = 0 ; j < definition.getLength(); j++) {
-		    		Element definition_element = (Element)definition.item(j);
-		    		if(definition_element.getAttribute("id") == tmp.getAttribute("id")) {
-		    			Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:annotation//xsd:documentation");	
-		    			Element definition_element2 = (Element)definition_node;
-		    			codelistVO.setDefinition(definition_element2.getTextContent());
-				    	codelistVO.setDefinitionSource(definition_element2.getAttribute("source"));
-				    	break;
-		    		}
-	    			codelistVO.setDefinition(null);
-			    	codelistVO.setDefinitionSource(null);				    	
-		    	}
-		    	
-		    	
-		    	codelistVO.setExtensibleIndicator(false); 
-		    	for(int j = 0; j < union.getLength(); j++) {
-				    Element tmp2 = (Element)union.item(j);
-				    if(tmp2.getAttribute("name").equals(tmp.getAttribute("name"))) {
-				    	codelistVO.setExtensibleIndicator(true);
-				    	break;
-				    }
-				}
+    @Autowired
+    private CodeListRepository codeListRepository;
 
-		    	int id = getUserID("oagis");
-				codelistVO.setCreatedByUserID(id);
-				codelistVO.setLastUpdatedByUserID(id);
-				codelistVO.setLastUpdateTimestamp(current_stamp);
-				codelistVO.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-	    		Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
-	    		if(union_check != null){
-		    		codelistVO.setExtensibleIndicator(true);
-	    		}
-	    		else
-	    			codelistVO.setExtensibleIndicator(false);
-	    		
-		    	dao.insertObject(codelistVO);
-		    }
-		    else
-		    	if(!tmp.getAttribute("name").endsWith("EnumerationType"))
-		    		System.out.println("Check !!  "+tmp.getAttribute("name"));
-		}
-	}
-	
-	public void codeListRevised(String fileinput, int agencyid) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("CodeList") + fileinput;
-		XPathHandler xh = new XPathHandler(path1);
-		
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("CodeList");
-		CodeListVO codelistVO = new CodeListVO();
+    @Autowired
+    private CodeListValueRepository codeListValueRepository;
 
-		NodeList result = xh.getNodeList("//xsd:simpleType");
-	    NodeList definition = xh.getNodeList("//xsd:simpleType[xsd:annotation[xsd:documentation]]");	
-    	NodeList union = xh.getNodeList("//xsd:simpleType[xsd:union]");
-    	
-		Timestamp current_stamp = new Timestamp (System.currentTimeMillis());
-    	
-		for(int i = 0; i < result.getLength(); i++) {
-		    Element tmp = (Element)result.item(i);
-		    
-		    if(tmp.getAttribute("name").endsWith("CodeContentType")){
-		    	codelistVO.setCodeListGUID(tmp.getAttribute("id"));
-		    	
-//		    	for(int j = 0; j < result.getLength(); j++) {
-//		    		Element tmp2 = (Element)result.item(j);
-//
-//	    			if(tmp2.getAttribute("name").endsWith("EnumerationType")) {
-//	    				if(tmp2.getAttribute("name").substring(0, tmp2.getAttribute("name").lastIndexOf("EnumerationType")).equals(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")))) {
-//		    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
-//		    				break;
-//		    			}
-//		    		} else {
-//	    				codelistVO.setEnumerationTypeGUID(tmp2.getAttribute("id"));
-//	    			}
-//		    			
-//		    	}
-		    	if(tmp.getAttribute("name").startsWith("oacl")) {
-		    		String xyz = tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("CodeContentType"));
-		    		
-		    		Node enumTypeIDNode = xh.getNode("//xsd:simpleType[@name='oacl_"+xyz+"CodeEnumerationType']/@id");
-		    		String enumerationTypeGUID = enumTypeIDNode.getTextContent();
-		    		codelistVO.setEnumerationTypeGUID(enumerationTypeGUID);
-		    	}
-		    	else{
-		    		codelistVO.setEnumerationTypeGUID(null);
-		    	}
-		    		
-		    	codelistVO.setName(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")));
-		    	codelistVO.setListID(tmp.getAttribute("id"));
-		    	codelistVO.setAgencyID(getAgencyID(agencyid));
-		    	
-		    	if(tmp.getAttribute("name").startsWith("oacl")) {
-		    		codelistVO.setVersionID("1");
-		    	} else if(tmp.getAttribute("name").equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
-		    		codelistVO.setVersionID("5");
-		    	} else {
-			    	for(int j = 0; j < tmp.getAttribute("name").length(); j++) {
-				    	if(tmp.getAttribute("name").charAt(j)>47 && tmp.getAttribute("name").charAt(j)<58) {
-				    		for(int k = j+1 ; k < tmp.getAttribute("name").length(); k++) {
-				    			if(tmp.getAttribute("name").charAt(k) == '_') {
-						    		String complicated_version = tmp.getAttribute("name").substring(j, k);
-						    		for(int l = complicated_version.length()-1 ; l >=0 ; l-- ) {
-						    			if(!(complicated_version.charAt(l) > 47 && complicated_version.charAt(l) < 58)){
-						    				complicated_version = complicated_version.substring(l+1);
-						    				break;
-						    			}
-						    		}
-				    				codelistVO.setVersionID(complicated_version);
-						    		break;
-				    			}
-				    		}
-				    	break;
-				    	}
-			    	}		    		
-		    	}
-		    	
-		    	for(int j = 0 ; j < definition.getLength(); j++) {
-		    		Element definition_element = (Element)definition.item(j);
-		    		if(definition_element.getAttribute("id") == tmp.getAttribute("id")) {
-		    			Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:annotation//xsd:documentation");	
-		    			Element definition_element2 = (Element)definition_node;
-		    			codelistVO.setDefinition(definition_element2.getTextContent());
-				    	codelistVO.setDefinitionSource(definition_element2.getAttribute("source"));
-				    	break;
-		    		}
-	    			codelistVO.setDefinition(null);
-			    	codelistVO.setDefinitionSource(null);				    	
-		    	}
-		    	
-		    	
-		    	codelistVO.setExtensibleIndicator(true); 
-//		    	for(int j = 0; j < union.getLength(); j++) {
-//				    Element tmp2 = (Element)union.item(j);
-//				    if(tmp2.getAttribute("name").equals(tmp.getAttribute("name"))) {
-//				    	codelistVO.setExtensibleIndicator(true);
-//				    	break;
-//				    }
-//				}
+    @Transactional(rollbackFor = Throwable.class)
+    public void run(ApplicationContext applicationContext) throws Exception {
+        System.out.println("### 1.4 Start");
 
-		    	int id = getUserID("oagis");
-				codelistVO.setCreatedByUserID(id);
-				codelistVO.setLastUpdatedByUserID(id);
-				codelistVO.setLastUpdateTimestamp(current_stamp);
-				codelistVO.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-//	    		Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
-//	    		if(union_check != null){
-//		    		codelistVO.setExtensibleIndicator(true);
-//	    		}
-//	    		else
-//	    			codelistVO.setExtensibleIndicator(false);
-	    		
-		    	dao.insertObject(codelistVO);
-		    }
-		    else
-		    	if(!tmp.getAttribute("name").endsWith("EnumerationType"))
-		    		System.out.println("Check !!  "+tmp.getAttribute("name"));
-		}
-	}
-	
-	public int getUserID(String userName) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("User");
-    	QueryCondition qc = new QueryCondition();
-		qc.add("login_id", userName);
-		UserVO userVO = (UserVO)dao.findObject(qc, conn);
-		int id = userVO.getUserID();
-		return id;
-	}
-	
-	public int getAgencyID(int valueid) throws SRTDAOException{
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("AgencyIDListValue");
-    	QueryCondition qc = new QueryCondition();
-    	qc.add("value", String.valueOf(valueid));
-		AgencyIDListValueVO agencyIDListValueVO = (AgencyIDListValueVO)dao.findObject(qc);
-		int id = agencyIDListValueVO.getAgencyIDListValueID();
-		return id;
-	}
-	
-	
-	public void codeListValue(String fileinput) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, XPathExpressionException, SRTInitializerException, SRTDAOException {
-		String path1 = SRTConstants.filepath("CodeList") + fileinput;
-		XPathHandler xh = new XPathHandler(path1);
-		
-		DAOFactory df = DAOFactory.getDAOFactory();
-		SRTDAO dao = df.getDAO("CodeListValue");
-		CodeListValueVO codelistvalueVO = new CodeListValueVO();
+        String tt[][] = {
+                {"CodeLists_1", "314"},
+                {"CodeList_ConditionTypeCode_1", "314"},
+                {"CodeList_ConstraintTypeCode_1", "314"},
+                {"CodeList_DateFormatCode_1", "314"},
+                {"CodeList_DateTimeFormatCode_1", "314"},
+                {"CodeList_TimeFormatCode_1", "314"},
 
-		NodeList result = xh.getNodeList("//xsd:simpleType");
-		NodeList enumeration = null;
-		
-		DAOFactory df2 = DAOFactory.getDAOFactory();
-		for(int i = 0; i < result.getLength(); i++) {
-		    Element tmp = (Element)result.item(i);
+                {"CodeList_CharacterSetCode_IANA_20070514", "379"},
+                {"CodeList_MIMEMediaTypeCode_IANA_7_04", "379"},
 
-	    	if(tmp.getAttribute("name").endsWith("CodeContentType")) {
-		    	SRTDAO dao2 = df2.getDAO("CodeList");
-			   	QueryCondition qc = new QueryCondition();
-				qc.add("GUID", new String(tmp.getAttribute("id")));
-				CodeListVO codelistVO = (CodeListVO)dao2.findObject(qc, conn);
-				enumeration = xh.getNodeList("//xsd:simpleType[@name = '" + tmp.getAttribute("name") +"']/xsd:restriction/xsd:enumeration");
-				if(enumeration.getLength() == 0) {
-		    		for(int j = 0; j < result.getLength(); j++) {
-			    		Element tmp2 = (Element)result.item(j);
-		    			if(tmp2.getAttribute("name").endsWith("EnumerationType")) 
-		    				if(tmp2.getAttribute("name").substring(0, tmp2.getAttribute("name").lastIndexOf("EnumerationType")).equals(tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")))) 
-		    		    			enumeration = xh.getNodeList("//xsd:simpleType[@name = '" + tmp2.getAttribute("name") + "']//xsd:enumeration");
-		    		}
-				}
-		    	for(int k = 0; k < enumeration.getLength(); k++) {
-		    		Element tmp3 = (Element)enumeration.item(k);
-					codelistvalueVO.setOwnerCodeListID(codelistVO.getCodeListID());
-		    		codelistvalueVO.setValue(tmp3.getAttribute("value"));
-		    		codelistvalueVO.setName(codelistvalueVO.getValue());
-		    		codelistvalueVO.setUsedIndicator(true);
-		    		codelistvalueVO.setLockedIndicator(false);
-		    		codelistvalueVO.setExtensionIndicator(false);
-		    		
-		    		Node name_node = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:enumeration[@value = '" + tmp3.getAttribute("value") + "']//xsd:documentation");	
-	    			if(name_node != null) {
-    			    	Element name_element = (Element)name_node;
-    			    	codelistvalueVO.setDefinition(name_element.getTextContent());
-    			    	codelistvalueVO.setDefinitionSource(name_element.getAttribute("source"));
-		    		}
-	    			else {
-	    				codelistvalueVO.setDefinition(null);
-	    				codelistvalueVO.setDefinitionSource(null);
-	    			}
-	    			dao.insertObject(codelistvalueVO);
-		    	}
-			}
-		}
-	}
+                {"CodeList_CurrencyCode_ISO_7_04", "5"},
+                {"CodeList_LanguageCode_ISO_7_04", "5"},
+                {"CodeList_TimeZoneCode_1", "5"},
 
-	
-	public void run() throws Exception {
-		System.out.println("### 1.4 Start");	
-		
-		DBAgent tx = new DBAgent();
-		conn = tx.open();
+                {"CodeList_UnitCode_UNECE_7_04", "6"}
+        };
 
-		String tt[][] = {{"CodeLists_1","314"}, {"CodeList_ConditionTypeCode_1","314"}, {"CodeList_ConstraintTypeCode_1","314"}, 
-				{"CodeList_DateFormatCode_1","314"}, {"CodeList_DateTimeFormatCode_1","314"}, {"CodeList_TimeFormatCode_1","314"},
-				{"CodeList_CharacterSetCode_IANA_20070514", "379"}, {"CodeList_MIMEMediaTypeCode_IANA_7_04","379"}, 
-				{"CodeList_CurrencyCode_ISO_7_04","5"}, {"CodeList_LanguageCode_ISO_7_04", "5"}, {"CodeList_TimeZoneCode_1", "5"},
-				{"CodeList_UnitCode_UNECE_7_04", "6"}};
-		for(int i = 0; i< tt.length; i++) {
-			System.out.println(tt[i][0]+"  ing..");
-			String filename = tt[i][0] + ".xsd";
-			//codeList(filename, Integer.parseInt(tt[i][1]));
-			codeListRevised(filename, Integer.parseInt(tt[i][1]));
-			codeListValue(filename);
-		}
-		
-		tx.close();
-		conn.close();
-		System.out.println("### 1.4 End");		
-	}
+        List<CodeList> codeLists = new ArrayList();
+        for (int i = 0; i < tt.length; i++) {
+            String fileName = tt[i][0];
+            int agencyId = Integer.parseInt(tt[i][1]);
 
-	public static void main (String args[]) throws Exception {
-		Utility.dbSetup();
-		P_1_4_PopulateCodeList codelist = new P_1_4_PopulateCodeList();
-		codelist.run();
+            System.out.println("## Importing Code List from " + fileName + "..");
+            String filename = fileName + ".xsd";
+            codeLists.addAll(codeList(filename, agencyId));
+        }
+        codeListRepository.save(codeLists);
 
-	}
+        for (int i = 0; i < tt.length; i++) {
+            String fileName = tt[i][0];
+            int agencyId = Integer.parseInt(tt[i][1]);
+
+            System.out.println("## Updating Code List referring " + fileName + "..");
+
+            String filename = fileName + ".xsd";
+            updateBasedCodeListID(filename, agencyId);
+        }
+
+        for (int i = 0; i < tt.length; i++) {
+            String fileName = tt[i][0];
+            int agencyId = Integer.parseInt(tt[i][1]);
+
+            System.out.println("## Impoting Code List Value from " + fileName + "..");
+
+            String filename = fileName + ".xsd";
+            codeListValue(filename);
+        }
+
+        System.out.println("### 1.4 End");
+    }
+
+    private List<CodeList> codeList(String fileinput, int agencyId) throws Exception {
+        List<CodeList> codeLists = new ArrayList();
+        String path1 = SRTConstants.filepath("CodeList") + fileinput;
+        XPathHandler xh = new XPathHandler(path1);
+
+        NodeList result = xh.getNodeList("//xsd:simpleType");
+
+        int userId = getUserID("oagis");
+
+        for (int i = 0; i < result.getLength(); i++) {
+            Element element = (Element) result.item(i);
+            String name = element.getAttribute("name");
+            if (name.endsWith("CodeContentType")) {
+                CodeList codeList = new CodeList();
+                codeList.setGuid(element.getAttribute("id"));
+
+                //added by TKim according to design Doc v2.4
+                if (name.startsWith("oacl")) {
+                    String xyz = name.substring(0, name.lastIndexOf("CodeContentType"));
+                    //System.out.print("  "+name + " with ");
+                    Node enumTypeNode = xh.getNode("//xsd:simpleType[@name='" + xyz + "CodeEnumerationType']/@id");
+                    String enumerationTypeGUID = null;
+                    if (enumTypeNode != null) {
+                        enumerationTypeGUID = enumTypeNode.getTextContent();
+                    }
+                    codeList.setEnumTypeGuid(enumerationTypeGUID);
+                } else {
+                    codeList.setEnumTypeGuid(null);
+                }
+
+                codeList.setName(name.substring(0, name.lastIndexOf("ContentType")));
+                codeList.setListId(element.getAttribute("id"));
+                codeList.setAgencyId(getAgencyID(agencyId));
+
+                if (codeList.getName().startsWith("oacl")) {
+                    codeList.setVersionId("1");
+                } else if (codeList.getName().equals("clm6Recommendation205_MeasurementUnitCommonCode")) {
+                    codeList.setVersionId("5");
+                } else {
+                    codeList.setVersionId(extractVersionId(name));
+                }
+
+                Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + name + "']/xsd:annotation/xsd:documentation");
+                if (definition_node != null) {
+                    Element definition_element2 = (Element) definition_node;
+                    codeList.setDefinition(definition_element2.getTextContent());
+                    codeList.setDefinitionSource(definition_element2.getAttribute("source"));
+                } else {
+                    codeList.setDefinition(null);
+                    codeList.setDefinitionSource(null);
+                }
+                codeList.setExtensibleIndicator(true);  //logic changed. extensible indicator is always TRUE.
+
+                codeList.setCreatedBy(userId);
+                codeList.setLastUpdatedBy(userId);
+                codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
+                codeList.setModule(extractModuleName(path1));
+                codeLists.add(codeList);
+            } else if (!name.endsWith("EnumerationType"))
+                System.out.println("Check !!  " + name);
+        }
+
+        return codeLists;
+    }
+
+    private String extractVersionId(String name) {
+        for (int j = 0; j < name.length(); j++) {
+            if (name.charAt(j) > 47 && name.charAt(j) < 58) {
+                for (int k = j + 1; k < name.length(); k++) {
+                    if (name.charAt(k) == '_') {
+                        String versionId = name.substring(j, k);
+                        for (int l = versionId.length() - 1; l >= 0; l--) {
+                            if (!(versionId.charAt(l) > 47 && versionId.charAt(l) < 58)) {
+                                versionId = versionId.substring(l + 1);
+                                break;
+                            }
+                        }
+                        return versionId;
+                    }
+                }
+                break;
+            }
+        }
+        return null;
+    }
+
+    private String extractModuleName(String filePath) {
+        int idx = filePath.indexOf("Model");
+        return FilenameUtils.separatorsToWindows(filePath.substring(idx));
+    }
+
+    private int getAgencyID(int value) {
+        return agencyIdListValueRepository.findOneByValue(String.valueOf(value)).getAgencyIdListValueId();
+    }
+
+    private int getUserID(String userName) {
+        return userRepository.findAppUserIdByLoginId(userName);
+    }
+
+    private void updateBasedCodeListID(String fileinput, int agencyId) throws Exception {
+        String path1 = SRTConstants.filepath("CodeList") + fileinput;
+        XPathHandler xh = new XPathHandler(path1);
+
+        NodeList result = xh.getNodeList("//xsd:simpleType");
+
+        for (int i = 0; i < result.getLength(); i++) {
+            Element tmp = (Element) result.item(i);
+            if (tmp.getAttribute("name").endsWith("CodeContentType")) {
+                //added by T.Kim according to design doc v2.4
+                //based_code_list_id
+                String xyz = tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("CodeContentType"));
+                Node unionNode = xh.getNode("//xsd:simpleType[@name='" + xyz + "CodeContentType']//xsd:union/@memberTypes");
+
+                if (unionNode != null) {
+                    String unionMemberStr = null;
+                    unionMemberStr = unionNode.getTextContent();
+                    unionMemberStr = unionMemberStr.replace("xsd:token", "");
+                    unionMemberStr = unionMemberStr.trim();
+                    String checkEnumType = xyz + "CodeEnumerationType";
+
+                    if (!unionMemberStr.equals(checkEnumType)) { //find base code list!
+                        unionMemberStr = unionMemberStr.replace("ContentType", "");
+
+                        CodeList baseCodelistVO = codeListRepository.findByNameContaining(unionMemberStr).get(0);
+
+                        String guid = tmp.getAttribute("id");
+                        CodeList codelistVO = codeListRepository.findOneByGuid(guid);
+
+                        if (baseCodelistVO != null && codelistVO != null) {
+                            codelistVO.setBasedCodeListId(baseCodelistVO.getCodeListId());
+                            codeListRepository.save(codelistVO);
+                            System.out.println(" Update Based Code List ID: " + tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
+                        } else {
+                            System.out.println(" Update Based Code List ID Is Failed! Check CodeListID: " + tmp.getAttribute("name"));
+                            return;
+                        }
+                    }
+                }
+            } else if (!tmp.getAttribute("name").endsWith("EnumerationType"))
+                System.out.println("Check !!  " + tmp.getAttribute("name"));
+        }
+
+    }
+
+    private void codeListValue(String fileinput) throws Exception {
+        String path1 = SRTConstants.filepath("CodeList") + fileinput;
+        XPathHandler xh = new XPathHandler(path1);
+
+        NodeList result = xh.getNodeList("//xsd:simpleType");
+        NodeList enumeration = null;
+
+        for (int i = 0; i < result.getLength(); i++) {
+            Element element = (Element) result.item(i);
+
+            enumeration = null;
+
+            if (element.getAttribute("name").endsWith("CodeContentType")) {
+                String guid = element.getAttribute("id");
+                CodeList codeList = codeListRepository.findOneByGuid(guid);
+
+                if (codeList.getEnumTypeGuid() != null) {
+                    //Get code_list_value from enumerationType
+                    enumeration = xh.getNodeList("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration");
+                    if (enumeration.getLength() < 1) {
+                        System.out.println("   EnumerationType " + codeList.getEnumTypeGuid() + " has no enumerations");
+                    } else {
+                        System.out.println("   Start import from EnumerationType: " + codeList.getEnumTypeGuid());
+                    }
+                } else {//if enum_type_guid is null
+                    if (codeList.getBasedCodeListId() > 0) {
+                        //Inherit from based code list
+                        List<CodeListValue> codeListValuesFromBase = codeListValueRepository.findByCodeListId(codeList.getBasedCodeListId());
+
+                        if (codeListValuesFromBase.size() > 0) {
+                            System.out.println("   Start inherit from BasedCodeList: " + codeList.getName());
+                            for (int j = 0; j < codeListValuesFromBase.size(); j++) {
+                                CodeListValue codeListValue = codeListValuesFromBase.get(j);
+                                codeListValue.setCodeListId(codeList.getCodeListId());
+                                codeListValueRepository.save(codeListValue);
+                            }
+                        }
+                    } else {//if based code list is null
+                        //Get the values from local xsd:enumeration
+                        enumeration = xh.getNodeList("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration");
+                        if (enumeration.getLength() < 1) {
+                            System.out.println("   " + codeList.getEnumTypeGuid() + " has no enumerations");
+                        } else {
+                            System.out.println("   Start import from LocalEnumeration: ");
+                        }
+                    }
+                }
+
+                if (enumeration != null) {
+                    for (int j = 0; j < enumeration.getLength(); j++) {
+                        Element aEnum = (Element) enumeration.item(j);
+                        CodeListValue codeListValue = new CodeListValue();
+                        codeListValue.setCodeListId(codeList.getCodeListId());
+                        codeListValue.setValue(aEnum.getAttribute("value"));
+                        codeListValue.setName(aEnum.getAttribute("value"));
+                        codeListValue.setUsedIndicator(true);
+                        codeListValue.setLockedIndicator(false);
+                        codeListValue.setExtensionIndicator(false);
+
+                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
+                        if (definitionNode == null) {
+                            definitionNode = xh.getNode("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
+                        }
+                        if (definitionNode != null) {
+                            Element definition = (Element) definitionNode;
+                            codeListValue.setDefinition(definition.getTextContent().trim());
+                            codeListValue.setDefinitionSource(definition.getAttribute("source"));
+                        } else {
+                            codeListValue.setDefinition(null);
+                            codeListValue.setDefinitionSource(null);
+                        }
+                        codeListValueRepository.save(codeListValue);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String args[]) throws Exception {
+        try (AbstractApplicationContext ctx = (AbstractApplicationContext)
+                SpringApplication.run(Application.class, args);) {
+            P_1_4_PopulateCodeList populateCodeList = ctx.getBean(P_1_4_PopulateCodeList.class);
+            populateCodeList.run(ctx);
+        }
+    }
 }

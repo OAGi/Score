@@ -1,12 +1,30 @@
 package org.oagi.srt.repository.entity;
 
-public class User {
+import javax.persistence.*;
+import java.io.Serializable;
 
+@Entity
+@Table(name = "app_user")
+public class User implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "APP_USER_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "APP_USER_ID_SEQ", sequenceName = "APP_USER_ID_SEQ", allocationSize = 1)
     private int appUserId;
+
+    @Column(nullable = false)
     private String loginId;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column
     private String name;
+
+    @Column
     private String organization;
+
+    @Column(nullable = false)
     private boolean oagisDeveloperIndicator;
 
     public int getAppUserId() {
@@ -55,5 +73,17 @@ public class User {
 
     public void setOagisDeveloperIndicator(boolean oagisDeveloperIndicator) {
         this.oagisDeveloperIndicator = oagisDeveloperIndicator;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "appUserId=" + appUserId +
+                ", loginId='" + loginId + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", organization='" + organization + '\'' +
+                ", oagisDeveloperIndicator=" + oagisDeveloperIndicator +
+                '}';
     }
 }

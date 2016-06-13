@@ -1,29 +1,90 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class AssociationCoreComponent extends CoreComponent {
+@Entity
+@Table(name = "ascc")
+public class AssociationCoreComponent extends CoreComponent implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "ASCC_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ASCC_ID_SEQ", sequenceName = "ASCC_ID_SEQ", allocationSize = 1)
     private int asccId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int cardinalityMin;
+
+    @Column(nullable = false)
     private int cardinalityMax;
+
+    @Column(nullable = false)
     private int seqKey;
+
+    @Column(nullable = false)
     private int fromAccId;
+
+    @Column(nullable = false)
     private int toAsccpId;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column
     private String definition;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int state;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentAsccId;
+
+    @Column
+    private Integer revisionAction;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentAsccId;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAsccId() {
         return asccId;
@@ -46,6 +107,9 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public void setCardinalityMin(int cardinalityMin) {
+        if (cardinalityMin < 0) {
+            throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
+        }
         this.cardinalityMin = cardinalityMin;
     }
 
@@ -54,6 +118,9 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public void setCardinalityMax(int cardinalityMax) {
+        if (cardinalityMax < -1) {
+            throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
+        }
         this.cardinalityMax = cardinalityMax;
     }
 
@@ -70,7 +137,9 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public void setFromAccId(int fromAccId) {
-        this.fromAccId = fromAccId;
+        if (fromAccId > 0) {
+            this.fromAccId = fromAccId;
+        }
     }
 
     public int getToAsccpId() {
@@ -78,7 +147,9 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public void setToAsccpId(int toAsccpId) {
-        this.toAsccpId = toAsccpId;
+        if (toAsccpId > 0) {
+            this.toAsccpId = toAsccpId;
+        }
     }
 
     public String getDen() {
@@ -170,7 +241,7 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public int getRevisionAction() {
-        return revisionAction;
+        return (revisionAction == null) ? 0 : revisionAction;
     }
 
     public void setRevisionAction(int revisionAction) {
@@ -178,7 +249,7 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -186,10 +257,37 @@ public class AssociationCoreComponent extends CoreComponent {
     }
 
     public int getCurrentAsccId() {
-        return currentAsccId;
+        return (currentAsccId == null) ? 0 : currentAsccId;
     }
 
     public void setCurrentAsccId(int currentAsccId) {
         this.currentAsccId = currentAsccId;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationCoreComponent{" +
+                "asccId=" + asccId +
+                ", guid='" + guid + '\'' +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", seqKey=" + seqKey +
+                ", fromAccId=" + fromAccId +
+                ", toAsccpId=" + toAsccpId +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", deprecated=" + deprecated +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentAsccId=" + currentAsccId +
+                '}';
     }
 }

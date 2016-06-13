@@ -51,10 +51,10 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         }
         return null;
     }
-    
+
     public static void xmltest_exp(String xsdfilename, String xmlfilename, String rootElementname, String prefix) throws Exception, FileNotFoundException {
-    	String oagis = "http://www.openapplications.org/oagis/10";
-    	XSModel xsModel = new XSParser().parse(SRTConstants.TEST_BOD_FILE_PATH+xsdfilename+".xsd");
+        String oagis = "http://www.openapplications.org/oagis/10";
+        XSModel xsModel = new XSParser().parse(SRTConstants.TEST_BOD_FILE_PATH+xsdfilename+".xsd");
         XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
         XSInstance xsInstance = new XSInstance();
         QName rootElement = new QName(oagis, rootElementname, prefix);
@@ -67,18 +67,18 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         xsInstance.generateDefaultAttributes = true;
         xsInstance.generateOptionalAttributes = false;
         //xsInstance.sampleValueGenerator = new XmlTest();
-        
+
         xsInstance.showContentModel = false;
         String schemalocation = oagis + " "+ xsdfilename + ".xsd";
         xsInstance.generate(xsModel, rootElement, sampleXML, schemalocation, null);
-        
+
         System.out.println(xmlfilename+".xsd from "+ xsdfilename+".xsd is generated...");
     }
-    
+
     public static void xmltest_exp_replace_any(String xsdfilename, String xmlfilename, String rootElementname, String prefix) throws Exception, FileNotFoundException {
-    	String oagis = "http://www.openapplications.org/oagis/10";
-    	String newxsdfilename = replace_any(xsdfilename);
-    	XSModel xsModel = new XSParser().parse(SRTConstants.TEST_BOD_FILE_PATH+newxsdfilename+".xsd");
+        String oagis = "http://www.openapplications.org/oagis/10";
+        String newxsdfilename = replace_any(xsdfilename);
+        XSModel xsModel = new XSParser().parse(SRTConstants.TEST_BOD_FILE_PATH+newxsdfilename+".xsd");
         XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
         XSInstance xsInstance = new XSInstance();
         QName rootElement = new QName(oagis, rootElementname, prefix);
@@ -94,32 +94,32 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         String schemalocation = oagis + " "+ newxsdfilename + ".xsd";
         System.out.println("### Start to generate an instance of " + xsdfilename);
         xsInstance.generate(xsModel, rootElement, sampleXML, schemalocation, null);
-       
+
         System.out.println("### Finish generating an instance of " + xsdfilename);
     }
-    
+
     public static String replace_any(String xsdfilename) throws Exception {
-    	DocumentBuilderFactory f = DocumentBuilderFactory.newInstance(); 
-    	DocumentBuilder db = f.newDocumentBuilder();
-    	File XSD = new File(SRTConstants.TEST_BOD_FILE_PATH+xsdfilename+".xsd");
+        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = f.newDocumentBuilder();
+        File XSD = new File(SRTConstants.TEST_BOD_FILE_PATH+xsdfilename+".xsd");
         Document doc = db.parse(XSD);
         NodeList any = doc.getElementsByTagName("xsd:any");
         NodeList replaced = doc.getElementsByTagName("xsd:element");
         Node replacedNode = replaced.item(0);
         Element aa = doc.createElement("xsd:element");
         aa.setAttribute("id", Utility.generateGUID());
-        aa.setAttribute("name", ((Element)replacedNode).getAttribute("name")); 
-        
+        aa.setAttribute("name", ((Element)replacedNode).getAttribute("name"));
+
         for(int i = any.getLength()-1; i >= 0 ; i--){
-        	Node bb = any.item(i);
-        	//bb.getParentNode().removeChild(any.item(i));
-        	bb.getParentNode().replaceChild(aa, any.item(i));
+            Node bb = any.item(i);
+            //bb.getParentNode().removeChild(any.item(i));
+            bb.getParentNode().replaceChild(aa, any.item(i));
         }
-        
+
         NodeList includenodelist = doc.getElementsByTagName("xsd:include");
         if(includenodelist.getLength() > 0){
-        	Node include = includenodelist.item(0);
-        	((Element)include).setAttribute("schemaLocation", SRTConstants.COMPONENTS_XSD_FILE_PATH);
+            Node include = includenodelist.item(0);
+            ((Element)include).setAttribute("schemaLocation", SRTConstants.COMPONENTS_XSD_FILE_PATH);
         }
 //        NodeList union = doc.getElementsByTagName("xsd:union");
 //        for(int i = union.getLength()-1; i >= 0 ; i--){
@@ -133,28 +133,28 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
 //        	}
 //        	((Element)bb).setAttribute("memberTypes", split);
 //        }
-        
+
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer t = tf.newTransformer();
         t.setOutputProperty(OutputKeys.INDENT, "yes");
-        
+
         DOMSource source = new DOMSource(doc);
         String newxsdfilname = xsdfilename+"_replace_any";
         StreamResult result = new StreamResult(SRTConstants.TEST_BOD_FILE_PATH+newxsdfilname+".xsd");
         t.transform(source, result);
         return newxsdfilname;
     }
-    
-    
+
+
     public static void main(String[] args) throws Exception{
 //    	remove_any("AcknowledgeField");
-    	String xsdfilename = "AcknowledgeField_created";
-    	String xmlfilename= "AcknowledgeField_test";
-    	String rootElementname = "AcknowledgeField";
-    	String prefix = "xs";
-    	String oagis = "http://www.openapplications.org/oagis/10";
-    	XSModel xsModel = new XSParser().parse(SRTConstants.TEST_XML_FILE_PATH+xsdfilename+".xsd");
-    	XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
+        String xsdfilename = "AcknowledgeField_created";
+        String xmlfilename= "AcknowledgeField_test";
+        String rootElementname = "AcknowledgeField";
+        String prefix = "xs";
+        String oagis = "http://www.openapplications.org/oagis/10";
+        XSModel xsModel = new XSParser().parse(SRTConstants.TEST_XML_FILE_PATH+xsdfilename+".xsd");
+        XMLDocument sampleXML = new XMLDocument(new StreamResult(new FileOutputStream(SRTConstants.TEST_XML_FILE_PATH+xmlfilename+".xml")), false, 4, null);
         XSInstance xsInstance = new XSInstance();
         QName rootElement = new QName(oagis, rootElementname, prefix);
         xsInstance.minimumElementsGenerated = 1;
@@ -166,11 +166,11 @@ public class XmlTest implements XSInstance.SampleValueGenerator{
         xsInstance.generateDefaultAttributes = true;
         xsInstance.generateOptionalAttributes = true;
         //xsInstance.sampleValueGenerator = new XmlTest();
-        
+
         xsInstance.showContentModel = false;
         String schemalocation = oagis + " "+ xsdfilename + ".xsd";
         xsInstance.generate(xsModel, rootElement, sampleXML, schemalocation, null);
-        
+
         System.out.println(xmlfilename+".xsd from "+ xsdfilename+".xsd is generated...");
     }
 }

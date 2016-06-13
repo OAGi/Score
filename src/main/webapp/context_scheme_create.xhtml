@@ -38,6 +38,12 @@
 					<p:message for="desc" />
 					<h:outputText value="#{contextSchemeHandler.description}" />
 					
+					<h:outputLabel for="SchemeId" rows="10" value="Scheme Id (or short name):" style="font-weight:bold" />
+					<p:inputText id="SchemeId" value="#{contextSchemeHandler.schemeId}"
+						required="true" label="Scheme Id (or short name)" />
+					<p:message for="SchemeId" />
+					<h:outputText value="#{contextSchemeHandler.schemeId}" />
+					
 					<h:outputLabel for="SchemeAgencyId" rows="10" value="Scheme Agency Id:" style="font-weight:bold" />
 					<p:inputText id="SchemeAgencyId" value="#{contextSchemeHandler.schemeAgencyID}"
 						required="true" label="SchemeAgencyId" />

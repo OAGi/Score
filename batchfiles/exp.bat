@@ -1,0 +1,1 @@
+java -jar exp.jar %1

@@ -1,30 +1,91 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class AssociationCoreComponentProperty {
+@Entity
+@Table(name = "asccp")
+public class AssociationCoreComponentProperty implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "ASCCP_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ASCCP_ID_SEQ", sequenceName = "ASCCP_ID_SEQ", allocationSize = 1)
     private int asccpId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private String propertyTerm;
+
+    @Lob
+    @Column(nullable = false)
     private String definition;
+
+    @Column(nullable = false)
     private int roleOfAccId;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column(nullable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int state;
+
+    @Column(nullable = false)
     private String module;
+
+    @Column(nullable = false)
     private int namespaceId;
+
+    @Column(nullable = false)
     private boolean reusableIndicator;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentAsccpId;
+
+    @Column
+    private Integer revisionAction;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentAsccpId;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAsccpId() {
         return asccpId;
@@ -171,7 +232,7 @@ public class AssociationCoreComponentProperty {
     }
 
     public int getRevisionAction() {
-        return revisionAction;
+        return (revisionAction == null) ? 0 : revisionAction;
     }
 
     public void setRevisionAction(int revisionAction) {
@@ -179,7 +240,7 @@ public class AssociationCoreComponentProperty {
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -187,10 +248,37 @@ public class AssociationCoreComponentProperty {
     }
 
     public int getCurrentAsccpId() {
-        return currentAsccpId;
+        return (currentAsccpId == null) ? 0 : currentAsccpId;
     }
 
     public void setCurrentAsccpId(int currentAsccpId) {
         this.currentAsccpId = currentAsccpId;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationCoreComponentProperty{" +
+                "asccpId=" + asccpId +
+                ", guid='" + guid + '\'' +
+                ", propertyTerm='" + propertyTerm + '\'' +
+                ", definition='" + definition + '\'' +
+                ", roleOfAccId=" + roleOfAccId +
+                ", den='" + den + '\'' +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", module='" + module + '\'' +
+                ", namespaceId=" + namespaceId +
+                ", reusableIndicator=" + reusableIndicator +
+                ", deprecated=" + deprecated +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentAsccpId=" + currentAsccpId +
+                '}';
     }
 }

@@ -1,31 +1,93 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class AggregateCoreComponent {
+@Entity
+@Table(name = "acc")
+public class AggregateCoreComponent implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "ACC_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ACC_ID_SEQ", sequenceName = "ACC_ID_SEQ", allocationSize = 1)
     private int accId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private String objectClassTerm;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column
     private String definition;
-    private int basedAccId;
+
+    @Column
+    private Integer basedAccId;
+
+    @Column
     private String objectClassQualifier;
+
+    @Column
     private int oagisComponentType;
+
+    @Column
     private String module;
-    private int namespaceId;
+
+    @Column
+    private Integer namespaceId;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int state;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentAccId;
+
+    @Column
+    private Integer revisionAction;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentAccId;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAccId() {
         return accId;
@@ -68,11 +130,13 @@ public class AggregateCoreComponent {
     }
 
     public int getBasedAccId() {
-        return basedAccId;
+        return (basedAccId == null) ? 0 : basedAccId;
     }
 
     public void setBasedAccId(int basedAccId) {
-        this.basedAccId = basedAccId;
+        if (basedAccId > 0) {
+            this.basedAccId = basedAccId;
+        }
     }
 
     public String getObjectClassQualifier() {
@@ -100,7 +164,7 @@ public class AggregateCoreComponent {
     }
 
     public int getNamespaceId() {
-        return namespaceId;
+        return (namespaceId == null) ? 0 : namespaceId;
     }
 
     public void setNamespaceId(int namespaceId) {
@@ -172,7 +236,7 @@ public class AggregateCoreComponent {
     }
 
     public int getRevisionAction() {
-        return revisionAction;
+        return (revisionAction == null) ? 0 : revisionAction;
     }
 
     public void setRevisionAction(int revisionAction) {
@@ -180,7 +244,7 @@ public class AggregateCoreComponent {
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -188,7 +252,7 @@ public class AggregateCoreComponent {
     }
 
     public int getCurrentAccId() {
-        return currentAccId;
+        return (currentAccId == null) ? 0 : currentAccId;
     }
 
     public void setCurrentAccId(int currentAccId) {
@@ -201,5 +265,33 @@ public class AggregateCoreComponent {
 
     public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
+    }
+
+    @Override
+    public String toString() {
+        return "AggregateCoreComponent{" +
+                "accId=" + accId +
+                ", guid='" + guid + '\'' +
+                ", objectClassTerm='" + objectClassTerm + '\'' +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", basedAccId=" + basedAccId +
+                ", objectClassQualifier='" + objectClassQualifier + '\'' +
+                ", oagisComponentType=" + oagisComponentType +
+                ", module='" + module + '\'' +
+                ", namespaceId=" + namespaceId +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentAccId=" + currentAccId +
+                ", deprecated=" + deprecated +
+                '}';
     }
 }

@@ -1,29 +1,90 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasicCoreComponentProperty {
+@Entity
+@Table(name = "bccp")
+public class BasicCoreComponentProperty implements Serializable {
+
+    @Id
+    @GeneratedValue(generator = "BCCP_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "BCCP_ID_SEQ", sequenceName = "BCCP_ID_SEQ", allocationSize = 1)
     private int bccpId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private String propertyTerm;
+
+    @Column(nullable = false)
     private String representationTerm;
+
+    @Column(nullable = false)
     private int bdtId;
+
+    @Column(nullable = false)
     private String den;
+
+    @Column
     private String definition;
+
+    @Column
     private String module;
-    private int namespaceId;
+
+    @Column
+    private Integer namespaceId;
+
+    @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int ownerUserId;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @Column(nullable = false)
     private int state;
+
+    @Column(nullable = false)
     private int revisionNum;
+
+    @Column(nullable = false)
     private int revisionTrackingNum;
-    private int revisionAction;
-    private int releaseId;
-    private int currentBccpId;
+
+    @Column
+    private int revisionAction = 1;
+
+    @Column
+    private Integer releaseId;
+
+    @Column
+    private Integer currentBccpId;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getBccpId() {
         return bccpId;
@@ -90,7 +151,7 @@ public class BasicCoreComponentProperty {
     }
 
     public int getNamespaceId() {
-        return namespaceId;
+        return (namespaceId == null) ? 0 : namespaceId;
     }
 
     public void setNamespaceId(int namespaceId) {
@@ -178,7 +239,7 @@ public class BasicCoreComponentProperty {
     }
 
     public int getReleaseId() {
-        return releaseId;
+        return (releaseId == null) ? 0 : releaseId;
     }
 
     public void setReleaseId(int releaseId) {
@@ -186,10 +247,37 @@ public class BasicCoreComponentProperty {
     }
 
     public int getCurrentBccpId() {
-        return currentBccpId;
+        return (currentBccpId == null) ? 0 : currentBccpId;
     }
 
     public void setCurrentBccpId(int currentBccpId) {
         this.currentBccpId = currentBccpId;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicCoreComponentProperty{" +
+                "bccpId=" + bccpId +
+                ", guid='" + guid + '\'' +
+                ", propertyTerm='" + propertyTerm + '\'' +
+                ", representationTerm='" + representationTerm + '\'' +
+                ", bdtId=" + bdtId +
+                ", den='" + den + '\'' +
+                ", definition='" + definition + '\'' +
+                ", module='" + module + '\'' +
+                ", namespaceId=" + namespaceId +
+                ", deprecated=" + deprecated +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
+                ", revisionNum=" + revisionNum +
+                ", revisionTrackingNum=" + revisionTrackingNum +
+                ", revisionAction=" + revisionAction +
+                ", releaseId=" + releaseId +
+                ", currentBccpId=" + currentBccpId +
+                '}';
     }
 }

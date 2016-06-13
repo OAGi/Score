@@ -4,7 +4,6 @@ import org.oagi.srt.generate.standalone.StandaloneXMLSchema;
 import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
@@ -14,10 +13,10 @@ import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -37,17 +36,19 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private static final long serialVersionUID = 4424008438705914095L;
 
 	@Autowired
-	private RepositoryFactory repositoryFactory;
-	private AggregateBusinessInformationEntityRepository abieRepository;
-	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+	private ApplicationContext applicationContext;
+
+	@Autowired
 	private AssociationCoreComponentPropertyRepository asccpRepository;
 
-	@PostConstruct
-	public void init() {
-		abieRepository = repositoryFactory.aggregateBusinessInformationEntityRepository();
-		asbiepRepository = repositoryFactory.associationBusinessInformationEntityPropertyRepository();
-		asccpRepository = repositoryFactory.associationCoreComponentPropertyRepository();
-	}
+	@Autowired
+	private AggregateBusinessInformationEntityRepository abieRepository;
+
+	@Autowired
+	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+
+	@Autowired
+	private StandaloneXMLSchema standaloneXMLSchema;
 
 	private ABIEView selectedABIEView;
 	private List<ABIEView> abieViewList = new ArrayList<ABIEView>();
@@ -108,7 +109,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			AssociationBusinessInformationEntityProperty asbiepVO =
 					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
 			AssociationCoreComponentProperty asccpVO =
-					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
+					asccpRepository.findOne(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().contains(query)) {
 				results.add(asccpVO.getPropertyTerm());
@@ -124,10 +125,10 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			AssociationBusinessInformationEntityProperty asbiepVO =
 					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
 			AssociationCoreComponentProperty asccpVO =
-					asccpRepository.findOneByAsccpId(asbiepVO.getBasedAsccpId());
+					asccpRepository.findOne(asbiepVO.getBasedAsccpId());
 
 			if (asccpVO.getPropertyTerm().equals(abieName)) {
-				ABIEView av = new ABIEView(asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
+				ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
 				av.setAsccp(asccpVO);
 				av.setAbie(abieVO);
 				av.setAsbiep(asbiepVO);
@@ -161,18 +162,14 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 		this.abieName = abieName;
 	}
 
-	public void generate() {
-		StandaloneXMLSchema schema = new StandaloneXMLSchema();
+	public void generate() throws Exception {
 		ArrayList<Integer> al = new ArrayList<Integer>();
 		for (ABIEView av : abieViewList) {
 			al.add(av.getAbie().getAbieId());
 		}
-		try {
-			filePath = schema.generateXMLSchema(al, true);
-			System.out.println("### " + filePath);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		filePath = standaloneXMLSchema.generateXMLSchema(al, true);
+		System.out.println("### " + filePath);
 	}
 	
 	private StreamedContent file;

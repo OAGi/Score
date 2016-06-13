@@ -1,14 +1,9 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntityProperty;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BasicBusinessInformationEntityPropertyRepository {
+public interface BasicBusinessInformationEntityPropertyRepository
+        extends JpaRepository<BasicBusinessInformationEntityProperty, Integer> {
 
-    public int findGreatestId();
-
-    public BasicBusinessInformationEntityProperty findOneByBbiepId(int bbiepId);
-
-    public void save(BasicBusinessInformationEntityProperty basicBusinessInformationEntityProperty);
-
-    public void update(BasicBusinessInformationEntityProperty basicBusinessInformationEntityProperty);
 }

@@ -4,7 +4,6 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.RepositoryFactory;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.primefaces.context.RequestContext;
@@ -20,10 +19,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -33,7 +29,10 @@ import java.util.stream.Collectors;
 public class CodeListHandler extends UIHandler {
 
     @Autowired
-    private RepositoryFactory repositoryFactory;
+    private CodeListRepository codeListRepository;
+
+    @Autowired
+    private CodeListValueRepository codeListValueRepository;
 
     private List<CodeList> codeLists = Collections.emptyList();
     private List<CodeListValue> codeListValues = Collections.emptyList();
@@ -56,8 +55,7 @@ public class CodeListHandler extends UIHandler {
 
     @PostConstruct
     public void init() {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        codeLists = codeListRepository.findAll();
+        codeLists = codeListRepository.findAllOrderByCreationTimestampDesc();
     }
 
     public List<CodeListValue> getSelectedCodeListValue() {
@@ -145,8 +143,7 @@ public class CodeListHandler extends UIHandler {
     public void onBasedCodeChosen(SelectEvent event) {
         CodeListHandler ch = (CodeListHandler) event.getObject();
         if (ch.getSelected() != null) {
-            selected = (CodeList) ch.getSelected();
-            CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
+            selected = ch.getSelected();
             codeListValues = codeListValueRepository.findByCodeListId(selected.getCodeListId());
 
             for (CodeListValue codeListValue : codeListValues) {
@@ -163,8 +160,6 @@ public class CodeListHandler extends UIHandler {
 
     public void onEdit(CodeList obj) {
         codeList = obj;
-
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         codeListValues = codeListValueRepository.findByCodeListId(codeList.getCodeListId());
     }
 
@@ -172,8 +167,6 @@ public class CodeListHandler extends UIHandler {
     public void onDiscard(CodeList obj) {
         codeList = obj;
         codeList.setState(SRTConstants.CODE_LIST_STATE_DISCARDED);
-
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeListRepository.updateStateByCodeListId(codeList.getState(), codeList.getCodeListId());
     }
 
@@ -181,20 +174,16 @@ public class CodeListHandler extends UIHandler {
     public void onDelete(CodeList obj) {
         codeList = obj;
         codeList.setState(SRTConstants.CODE_LIST_STATE_DELETED);
-
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeListRepository.updateStateByCodeListId(codeList.getState(), codeList.getCodeListId());
     }
 
     public List<String> completeInput(String query) {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeLists = codeListRepository.findByNameContaining(query);
 
         return codeLists.stream().map(codeList -> codeList.getName()).collect(Collectors.toList());
     }
 
     public void search() {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeLists =
                 codeListRepository.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(getBasedCodeListName());
         if (codeLists.isEmpty()) {
@@ -204,8 +193,8 @@ public class CodeListHandler extends UIHandler {
     }
 
     public void searchDerived(String id) {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        codeLists = codeListRepository.findByCodeListId(Integer.parseInt(id));
+        CodeList codeList = codeListRepository.findOne(Integer.parseInt(id));
+        codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
         if (codeLists.isEmpty()) {
             FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists.", "[" + getBasedCodeListName() + "] No such Code List exists.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -218,7 +207,6 @@ public class CodeListHandler extends UIHandler {
         FacesMessage msg = new FacesMessage(selected.getName(), String.valueOf(selected.getCodeListId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         codeListValues = codeListValueRepository.findByCodeListId(selected.getCodeListId());
     }
 
@@ -243,17 +231,15 @@ public class CodeListHandler extends UIHandler {
         codeList.setCreatedBy(userId);
         codeList.setLastUpdatedBy(userId);
 
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeListRepository.save(codeList);
 
         int codeListId = codeList.getCodeListId();
 
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         for (CodeListValue codeListValue : codeListValues) {
             setIndicators(codeListValue);
             codeListValue.setCodeListId(codeListId);
-            codeListValueRepository.save(codeListValue);
         }
+        codeListValueRepository.save(codeListValues);
     }
 
     private void setIndicators(CodeListValue codeListValue) {
@@ -283,10 +269,8 @@ public class CodeListHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void updateSave() {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
-        codeListRepository.update(codeList);
+        codeListRepository.save(codeList);
 
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         for (CodeListValue codeListValue : codeListValues) {
             setIndicators(codeListValue);
             codeListValue.setCodeListId(codeList.getCodeListId());
@@ -299,10 +283,8 @@ public class CodeListHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void updatePublish() {
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeListRepository.updateStateByCodeListId(SRTConstants.CODE_LIST_STATE_PUBLISHED, codeList.getCodeListId());
 
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         for (CodeListValue codeListValue : codeListValues) {
             setIndicators(codeListValue);
             codeListValue.setCodeListId(codeList.getCodeListId());
@@ -324,17 +306,15 @@ public class CodeListHandler extends UIHandler {
         codeList.setCreatedBy(userId);
         codeList.setLastUpdatedBy(userId);
 
-        CodeListRepository codeListRepository = repositoryFactory.codeListRepository();
         codeListRepository.save(codeList);
 
         int codeListId = codeList.getCodeListId();
 
-        CodeListValueRepository codeListValueRepository = repositoryFactory.codeListValueRepository();
         for (CodeListValue codeListValue : codeListValues) {
             setIndicators(codeListValue);
             codeListValue.setCodeListId(codeListId);
-            codeListValueRepository.save(codeListValue);
         }
+        codeListValueRepository.save(codeListValues);
     }
 
     public void cancel() {

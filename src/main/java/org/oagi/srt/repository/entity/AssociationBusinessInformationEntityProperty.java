@@ -1,20 +1,60 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class AssociationBusinessInformationEntityProperty {
+@Entity
+@Table(name = "asbiep")
+public class AssociationBusinessInformationEntityProperty implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "ASBIEP_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ASBIEP_ID_SEQ", sequenceName = "ASBIEP_ID_SEQ", allocationSize = 1)
     private int asbiepId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private int basedAsccpId;
+
+    @Column(nullable = false)
     private int roleOfAbieId;
+
+    @Column
     private String definition;
+
+    @Column
     private String remark;
+
+    @Column
     private String bizTerm;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getAsbiepId() {
         return asbiepId;
@@ -102,5 +142,22 @@ public class AssociationBusinessInformationEntityProperty {
 
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "AssociationBusinessInformationEntityProperty{" +
+                "asbiepId=" + asbiepId +
+                ", guid='" + guid + '\'' +
+                ", basedAsccpId=" + basedAsccpId +
+                ", roleOfAbieId=" + roleOfAbieId +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", bizTerm='" + bizTerm + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
     }
 }

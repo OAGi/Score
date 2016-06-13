@@ -1,21 +1,63 @@
 package org.oagi.srt.repository.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class ContextScheme {
+@Entity
+@Table(name = "classification_ctx_scheme")
+public class ContextScheme implements Serializable {
 
+    @Id
+    @GeneratedValue(generator = "CTX_SCHEME_ID_SEQ", strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CTX_SCHEME_ID_SEQ", sequenceName = "CTX_SCHEME_ID_SEQ", allocationSize = 1)
     private int classificationCtxSchemeId;
+
+    @Column(nullable = false)
     private String guid;
+
+    @Column(nullable = false)
     private String schemeId;
+
+    @Column
     private String schemeName;
+
+    @Column
     private String description;
+
+    @Column(nullable = false)
     private String schemeAgencyId;
+
+    @Column(nullable = false)
     private String schemeVersionId;
+
+    @Column(nullable = false)
     private int ctxCategoryId;
+
+    @Column(nullable = false, updatable = false)
     private int createdBy;
+
+    @Column(nullable = false)
     private int lastUpdatedBy;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
+
+    @PrePersist
+    public void prePersist() {
+        creationTimestamp = new Date();
+        lastUpdateTimestamp = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdateTimestamp = new Date();
+    }
 
     public int getClassificationCtxSchemeId() {
         return classificationCtxSchemeId;
@@ -111,5 +153,23 @@ public class ContextScheme {
 
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "ContextScheme{" +
+                "classificationCtxSchemeId=" + classificationCtxSchemeId +
+                ", guid='" + guid + '\'' +
+                ", schemeId='" + schemeId + '\'' +
+                ", schemeName='" + schemeName + '\'' +
+                ", description='" + description + '\'' +
+                ", schemeAgencyId='" + schemeAgencyId + '\'' +
+                ", schemeVersionId='" + schemeVersionId + '\'' +
+                ", ctxCategoryId=" + ctxCategoryId +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
     }
 }
