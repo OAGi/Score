@@ -207,6 +207,7 @@ public class Utility {
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
         result = result.replace("ID", "Identifier");
+        result = result.replace("  ", " ");
         return result;
     }
 
