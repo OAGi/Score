@@ -1014,7 +1014,7 @@ CREATE TABLE `code_list` (
   `enum_type_guid` varchar(41) CHARACTER SET utf8 DEFAULT NULL,
   `name` varchar(100) CHARACTER SET utf8,
   `list_id` varchar(100) CHARACTER SET utf8 NOT NULL COMMENT 'External identifier.',
-  `agency_id` int(11) unsigned NOT NULL,
+  `agency_id` int(11) unsigned NULL,
   `version_id` varchar(10) CHARACTER SET utf8 NOT NULL,
   `definition` text CHARACTER SET utf8,
   `remark` varchar(225) DEFAULT NULL COMMENT 'This column allows the user to codify context specific usage of the BIE. It is different from the Definition column in that the Definition column is a descriptive text while this one is machine understandable. So the data type of this column is more like code.',

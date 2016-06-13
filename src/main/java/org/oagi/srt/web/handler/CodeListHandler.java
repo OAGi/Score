@@ -2,6 +2,7 @@ package org.oagi.srt.web.handler;
 
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.entity.CodeList;
@@ -34,8 +35,8 @@ public class CodeListHandler extends UIHandler {
     @Autowired
     private CodeListValueRepository codeListValueRepository;
 
-    private List<CodeList> codeLists = Collections.emptyList();
-    private List<CodeListValue> codeListValues = Collections.emptyList();
+    private List<CodeList> codeLists = new ArrayList();
+    private List<CodeListValue> codeListValues = new ArrayList();
 
     private CodeList codeList = new CodeList();
     private CodeListValue codeListValueVO = new CodeListValue();
@@ -55,6 +56,7 @@ public class CodeListHandler extends UIHandler {
 
     @PostConstruct
     public void init() {
+        super.init();
         codeLists = codeListRepository.findAllOrderByCreationTimestampDesc();
     }
 
@@ -224,8 +226,6 @@ public class CodeListHandler extends UIHandler {
         codeList.setEnumTypeGuid(Utility.generateGUID());
         if (selected != null) {
             codeList.setBasedCodeListId(selected.getCodeListId());
-        } else {
-            codeList.setBasedCodeListId(-1);
         }
         codeList.setState(SRTConstants.CODE_LIST_STATE_EDITING);
         codeList.setCreatedBy(userId);
@@ -298,10 +298,9 @@ public class CodeListHandler extends UIHandler {
         codeList.setExtensibleIndicator(extensible);
         codeList.setGuid(Utility.generateGUID());
         codeList.setEnumTypeGuid(Utility.generateGUID());
-        if (selected != null)
+        if (selected != null) {
             codeList.setBasedCodeListId(selected.getCodeListId());
-        else
-            codeList.setBasedCodeListId(-1);
+        }
         codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
         codeList.setCreatedBy(userId);
         codeList.setLastUpdatedBy(userId);

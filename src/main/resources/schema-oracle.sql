@@ -567,7 +567,7 @@ CREATE TABLE CODE_LIST (
   ENUM_TYPE_GUID        VARCHAR2(41)  NULL,
   NAME                  VARCHAR2(100) NULL,
   LIST_ID               VARCHAR2(100) NOT NULL,
-  AGENCY_ID             NUMBER(10)    NOT NULL,
+  AGENCY_ID             NUMBER(10)    NULL,
   VERSION_ID            VARCHAR2(10)  NOT NULL,
   DEFINITION            CLOB          NULL,
   REMARK                VARCHAR2(225) NULL,

@@ -39,8 +39,8 @@ public class CodeList implements Serializable {
     @Column(nullable = false)
     private String listId;
 
-    @Column(nullable = false)
-    private int agencyId;
+    @Column
+    private Integer agencyId;
 
     @Column(nullable = false)
     private String versionId;
@@ -142,11 +142,13 @@ public class CodeList implements Serializable {
     }
 
     public int getAgencyId() {
-        return agencyId;
+        return (agencyId == null) ? 0 : agencyId;
     }
 
     public void setAgencyId(int agencyId) {
-        this.agencyId = agencyId;
+        if (agencyId > 0) {
+            this.agencyId = agencyId;
+        }
     }
 
     public String getVersionId() {

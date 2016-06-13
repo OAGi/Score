@@ -17,6 +17,9 @@ public class UIHandler {
 	@PostConstruct
 	public void init() {
 		userId = userRepository.findAppUserIdByLoginId("oagis");
+		if (userId == 0) {
+			throw new IllegalStateException();
+		}
 	}
 
 	public void closeDialog() {
