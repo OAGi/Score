@@ -26,9 +26,11 @@
 	<xsd:simpleType name="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeContentType" id="oagis-id-efcfccd8fff24243a86b8f0d432db37a">
 		<xsd:restriction base="xsd:normalizedString"/>
 	</xsd:simpleType>
+	<!--
 	<xsd:complexType name="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeType" id="oagis-id-bae741df93d44eecb45c45476dcb0637">
 		<xsd:simpleContent>
 			<xsd:extension base="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeContentType"/>
 		</xsd:simpleContent>
 	</xsd:complexType>
+-->
 </xsd:schema>

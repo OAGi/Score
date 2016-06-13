@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2014 rel. 2 (x64) (http://www.altova.com) by Taehun (NIST) -->
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
 <!--
 
    Schema agency: 	Open Applications Group 
@@ -3642,7 +3642,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		<xsd:sequence>
 			<xsd:element ref="ID" id="oagis-id-6dc6f29ea63f415aa75a19472aec64c0" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="schemeID" type="xsd:normalizedString" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">
+		<xsd:attribute name="schemeID" type="NormalizedStringType" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3658,7 +3658,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">
+		<xsd:attribute name="schemeVersionID" type="NormalizedStringType" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3674,7 +3674,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="schemeAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">
+		<xsd:attribute name="schemeAgencyID" type="AgencyIDContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
