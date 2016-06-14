@@ -102,21 +102,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
     }
     
     public List<String> completeInput(String query) {
-		List<String> results = new ArrayList<String>();
-
-		List<AggregateBusinessInformationEntity> list_01 = abieRepository.findByTopLevel(true);
-		for (AggregateBusinessInformationEntity abieVO : list_01) {
-			AssociationBusinessInformationEntityProperty asbiepVO =
-					asbiepRepository.findOneByRoleOfAbieId(abieVO.getAbieId());
-			AssociationCoreComponentProperty asccpVO =
-					asccpRepository.findOne(asbiepVO.getBasedAsccpId());
-
-			if (asccpVO.getPropertyTerm().contains(query)) {
-				results.add(asccpVO.getPropertyTerm());
-			}
-		}
-
-		return results;
+		return asccpRepository.findPropertyTermByAbieIsTopLevelAndPropertyTermContains(true, query);
 	}
 	
 	public void search() {
