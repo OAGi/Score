@@ -82,12 +82,41 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
     private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);
 
+    private Map<String, Document> documentMap = new HashMap();
+
+    private Document loadDocument(String uri) {
+        String module = Utility.extractModuleName(uri);
+
+        Document xmlDocument;
+        if (!documentMap.containsKey(module)) {
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            builderFactory.setNamespaceAware(true);
+            try {
+                DocumentBuilder builder = builderFactory.newDocumentBuilder();
+                try (InputStream inputStream = new URI(uri).toURL().openStream()) {
+                    xmlDocument = builder.parse(inputStream);
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            documentMap.put(module, xmlDocument);
+        } else {
+            xmlDocument = documentMap.get(module);
+        }
+
+        return xmlDocument;
+    }
+
+    private XPath xPath;
+
     @PostConstruct
     public void init() throws Exception {
         userId = userRepository.findAppUserIdByLoginId("oagis");
         releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
-        namespaceId =
-                namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
+        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
+
+        xPath = XPathFactory.newInstance().newXPath();
+        xPath.setNamespaceContext(new OAGiNamespaceContext());
     }
 
     public static void main(String[] args) throws Exception {
@@ -104,6 +133,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         System.out.println("### 1.8 Start");
 
         populate();
+        populateUnused();
 
         System.out.println("### 1.8 End");
     }
@@ -148,6 +178,110 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
     }
 
+    private void populateUnused() throws Exception {
+        Collection<File> targetFiles = Arrays.asList(
+                new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/BODs"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Nouns"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Common/Components/Components.xsd"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Common/Components/Meta.xsd"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Extension/Extensions.xsd"));
+        for (File file : targetFiles) {
+            populateUnusedACC(file);
+        }
+        for (File file : targetFiles) {
+            populateUnusedASCCP(file);
+        }
+    }
+
+    private void populateUnusedACC(File file) throws Exception {
+        if (file == null) {
+            return;
+        }
+        if (file.getName().endsWith("IST.xsd")) {
+            return;
+        }
+
+        if (file.isDirectory()) {
+            for (File child : getBODs(file)) {
+                populateUnusedACC(child);
+            }
+        } else {
+            Document document = loadDocument(file.toURI().toString());
+            NodeList complexTypes = (NodeList) xPath.evaluate("//xsd:complexType", document, XPathConstants.NODESET);
+            for (int i = 0, len = complexTypes.getLength(); i < len; ++i) {
+                Element complexType = (Element) complexTypes.item(i);
+                double cnt = (Double) xPath.evaluate("count(./sequence) or count(./xsd:complexContent)",
+                        complexType, XPathConstants.NUMBER);
+                if (cnt != 1) {
+                    continue;
+                }
+                String guid = complexType.getAttribute("id");
+                if (accRepository.existsByGuid(guid)) {
+                    continue;
+                }
+
+                String name = complexType.getAttribute("name");
+                String module = Utility.extractModuleName(file.getAbsolutePath());
+                logger.info("Found unused ACC name " + name + ", GUID " + guid + " from " + module);
+
+                Context context = new Context(file);
+
+                XSComplexType xsComplexType = context.xsSchemaSet.getComplexType(SRTConstants.OAGI_NS, name);
+                TypeDecl typeDecl = new TypeDecl(context, xsComplexType, complexType);
+                createACC(typeDecl);
+            }
+        }
+    }
+
+    private void populateUnusedASCCP(File file) throws Exception {
+        if (file == null) {
+            return;
+        }
+        if (file.getName().endsWith("IST.xsd")) {
+            return;
+        }
+
+        if (file.isDirectory()) {
+            for (File child : getBODs(file)) {
+                populateUnusedASCCP(child);
+            }
+        } else {
+            Document document = loadDocument(file.toURI().toString());
+            NodeList elements = (NodeList) xPath.evaluate("//xsd:element", document, XPathConstants.NODESET);
+            for (int i = 0, len = elements.getLength(); i < len; ++i) {
+                Element element = (Element) elements.item(i);
+                String guid = element.getAttribute("id");
+                if (StringUtils.isEmpty(guid)) {
+                    continue;
+                }
+                if (asccpRepository.existsByGuid(guid)) {
+                    continue;
+                }
+                String name = element.getAttribute("name");
+                if (StringUtils.isEmpty(name)) {
+                    continue;
+                }
+
+                String module = Utility.extractModuleName(file.getAbsolutePath());
+                Context context = new Context(file);
+
+                XSElementDecl xsElementDecl = context.xsSchemaSet.getElementDecl(SRTConstants.OAGI_NS, name);
+                ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
+                if (!elementDecl.canBeAscc()) {
+                    continue;
+                }
+                logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
+
+                double refCnt = (Double) xPath.evaluate("count(./@ref)", element, XPathConstants.NUMBER);
+                boolean reusableIndicator = (refCnt == 0) ? false : true;
+
+                createASCCP(elementDecl, reusableIndicator);
+            }
+        }
+    }
+
     private File[] getBODs(File f) {
         return f.listFiles((dir, name) -> {
             return name.matches(".*.xsd");
@@ -156,9 +290,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
     private class Context {
         private XSSchemaSet xsSchemaSet;
-        private XPath xPath;
-        private ElementDecl rootElementDecl;
-        private Map<String, Document> documentMap = new HashMap();
+        private File file;
 
         public Context(File file) throws Exception {
             XSOMParser xsomParser = new XSOMParser(SAXParserFactory.newInstance());
@@ -166,9 +298,18 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
             xsSchemaSet = xsomParser.getResult();
 
-            xPath = XPathFactory.newInstance().newXPath();
-            xPath.setNamespaceContext(new OAGiNamespaceContext());
+            this.file = file;
+        }
 
+        private Document loadDocument(Locator locator) {
+            if (locator == null) {
+                return null;
+            }
+            String systemId = locator.getSystemId();
+            return P_1_8_1_PopulateAccAsccpBccAscc.this.loadDocument(systemId);
+        }
+
+        public ElementDecl getRootElementDecl() throws Exception {
             String fileName = file.getName();
             String rootElementName = fileName.substring(0, fileName.indexOf(".xsd"));
             XSElementDecl xsElementDecl =
@@ -178,37 +319,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             Element element = (Element)
                     xPath.evaluate("//xsd:element[@name='" + rootElementName + "']", document, XPathConstants.NODE);
 
-            rootElementDecl = new ElementDecl(this, xsElementDecl, element);
-        }
-
-        private Document loadDocument(Locator locator) {
-            if (locator == null) {
-                return null;
-            }
-            String systemId = locator.getSystemId();
-
-            Document xmlDocument;
-            if (!documentMap.containsKey(systemId)) {
-                DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-                builderFactory.setNamespaceAware(true);
-                try {
-                    DocumentBuilder builder = builderFactory.newDocumentBuilder();
-                    try (InputStream inputStream = new URI(systemId).toURL().openStream()) {
-                        xmlDocument = builder.parse(inputStream);
-                    }
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-                documentMap.put(systemId, xmlDocument);
-            } else {
-                xmlDocument = documentMap.get(systemId);
-            }
-
-            return xmlDocument;
-        }
-
-        public ElementDecl getRootElementDecl() {
-            return rootElementDecl;
+            return new ElementDecl(this, xsElementDecl, element);
         }
 
         public String evaluate(String expression, Object item) {
