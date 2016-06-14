@@ -103,6 +103,9 @@ public class TopLevelABIEHandler implements Serializable {
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
 
     @Autowired
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     private int abieCount = 0;
@@ -590,7 +593,12 @@ public class TopLevelABIEHandler implements Serializable {
         private Map<Integer, AggregateCoreComponent> aggregateCoreComponentMap;
         private Map<Integer, AssociationCoreComponentProperty> associationCoreComponentPropertyMap;
         private Map<Integer, BasicCoreComponentProperty> basicCoreComponentPropertyMap;
-        private Map<Integer, BusinessDataTypePrimitiveRestriction> businessDataTypePrimitiveRestrictionMap;
+
+        private Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriDefaultMap;
+        private Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriCodeListMap;
+
+        private Map<Integer, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriDefaultMap;
+        private Map<Integer, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriCodeListMap;
 
         private int userId;
 
@@ -619,9 +627,24 @@ public class TopLevelABIEHandler implements Serializable {
             basicCoreComponentPropertyMap = bccpRepository.findAll().stream()
                     .filter(bccp -> bccp.getRevisionNum() == 0)
                     .collect(Collectors.toMap(bccp -> bccp.getBccpId(), Function.identity()));
-            businessDataTypePrimitiveRestrictionMap = bdtPriRestriRepository.findAll().stream()
+
+            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
+            bdtPriRestriDefaultMap = bdtPriRestriList.stream()
                     .filter(bdtPriRestri -> bdtPriRestri.isDefault())
                     .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
+            bdtPriRestriCodeListMap = bdtPriRestriList.stream()
+                    .filter(bdtPriRestri -> bdtPriRestri.getCodeListId() > 0)
+                    .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
+
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = bdtScPriRestriRepository.findAll();
+            bdtScPriRestriDefaultMap = bdtScPriRestriList.stream()
+                    .filter(bdtScPriRestri -> bdtScPriRestri.isDefault())
+                    .collect(Collectors.toMap(bdtScPriRestri -> bdtScPriRestri.getBdtScId(), Function.identity()));
+            bdtScPriRestriCodeListMap = bdtScPriRestriList.stream()
+                    .filter(bdtScPriRestri -> bdtScPriRestri.getCodeListId() > 0)
+                    .collect(Collectors.toMap(bdtScPriRestri -> bdtScPriRestri.getBdtScId(), Function.identity()));
+
+
         }
 
         public int getUserId() {
@@ -664,8 +687,23 @@ public class TopLevelABIEHandler implements Serializable {
             return basicCoreComponentPropertyMap.get(toBccpId);
         }
 
-        public int getBdtPrimitiveRestrictionId(int bdtId) {
-            return businessDataTypePrimitiveRestrictionMap.get(bdtId).getBdtPriRestriId();
+        public int getDefaultBdtPriRestriId(int bdtId) {
+            return bdtPriRestriDefaultMap.get(bdtId).getBdtPriRestriId();
+        }
+
+        public int getCodeListIdOfBdtPriRestriId(int bdtId) {
+            BusinessDataTypePrimitiveRestriction e = bdtPriRestriCodeListMap.get(bdtId);
+            return (e != null) ? e.getCodeListId() : 0;
+        }
+
+        public int getDefaultBdtScPriRestriId(int bdtScId) {
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriDefaultMap.get(bdtScId);
+            return (e != null) ? e.getBdtScPriRestriId() : 0;
+        }
+
+        public int getCodeListIdOfBdtScPriRestriId(int bdtScId) {
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriCodeListMap.get(bdtScId);
+            return (e != null) ? e.getCodeListId() : 0;
         }
 
         public List<DataTypeSupplementaryComponent> findByOwnerDtId(int ownerDtId) {
@@ -788,10 +826,11 @@ public class TopLevelABIEHandler implements Serializable {
 
             BasicCoreComponentProperty bccp = createBIEContext.getBCCP(bcc.getToBccpId());
             int bdtId = bccp.getBdtId();
-            int bdtPrimitiveRestrictionId = createBIEContext.getBdtPrimitiveRestrictionId(bdtId);
+            int bdtPrimitiveRestrictionId = createBIEContext.getDefaultBdtPriRestriId(bdtId);
+            int codeListId = createBIEContext.getCodeListIdOfBdtPriRestriId(bdtId);
 
             createBBIEP(createBIEContext.getUserId(), bccp);
-            createBBIE(createBIEContext.getUserId(), bdtPrimitiveRestrictionId);
+            createBBIE(createBIEContext.getUserId(), bdtPrimitiveRestrictionId, codeListId);
             createBBIESC(createBIEContext, bdtId);
         }
 
@@ -804,7 +843,7 @@ public class TopLevelABIEHandler implements Serializable {
             bbiep.setDefinition(bccp.getDefinition());
         }
 
-        private void createBBIE(int userId, int bdtPrimitiveRestrictionId) {
+        private void createBBIE(int userId, int bdtPrimitiveRestrictionId, int codeListId) {
             bbie = new BasicBusinessInformationEntity();
             bbie.setGuid(Utility.generateGUID());
             bbie.setBasedBccId(bcc.getBccId());
@@ -814,6 +853,9 @@ public class TopLevelABIEHandler implements Serializable {
             bbie.setCardinalityMax(bcc.getCardinalityMax());
             bbie.setCardinalityMin(bcc.getCardinalityMin());
             bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
+            if (codeListId > 0) {
+                bbie.setCodeListId(codeListId);
+            }
             bbie.setCreatedBy(userId);
             bbie.setLastUpdatedBy(userId);
             bbie.setSeqKey(seqKey);
@@ -827,7 +869,16 @@ public class TopLevelABIEHandler implements Serializable {
                         BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                                 new BasicBusinessInformationEntitySupplementaryComponent();
                         // bbieSc.setBbieId(bbieId);
-                        bbieSc.setDtScId(dtSc.getDtScId());
+                        int bdtScId = dtSc.getDtScId();
+                        bbieSc.setDtScId(bdtScId);
+                        int bdtScPriRestriId = createBIEContext.getDefaultBdtScPriRestriId(bdtScId);
+                        if (bdtScPriRestriId > 0) {
+                            bbieSc.setDtScPriRestriId(bdtScPriRestriId);
+                        }
+                        int codeListId = createBIEContext.getCodeListIdOfBdtScPriRestriId(bdtScId);
+                        if (codeListId > 0) {
+                            bbieSc.setCodeListId(codeListId);
+                        }
                         bbieSc.setMaxCardinality(dtSc.getMaxCardinality());
                         bbieSc.setMinCardinality(dtSc.getMinCardinality());
                         bbieSc.setDefinition(dtSc.getDefinition());
@@ -1319,8 +1370,14 @@ public class TopLevelABIEHandler implements Serializable {
     private BasicBusinessInformationEntity copyBBIE(int userId, BasicBusinessInformationEntity obbieVO, int abie, int bbiep) {
         BasicBusinessInformationEntity nbbieVO = new BasicBusinessInformationEntity();
         nbbieVO.setBasedBccId(obbieVO.getBasedBccId());
-        nbbieVO.setBdtPriRestriId(obbieVO.getBdtPriRestriId());
-        nbbieVO.setCodeListId(obbieVO.getCodeListId());
+        int bdtPriRestriId = obbieVO.getBdtPriRestriId();
+        if (bdtPriRestriId > 0) {
+            nbbieVO.setBdtPriRestriId(bdtPriRestriId);
+        }
+        int codeListId = obbieVO.getCodeListId();
+        if (codeListId > 0) {
+            nbbieVO.setCodeListId(codeListId);
+        }
         nbbieVO.setCardinalityMax(obbieVO.getCardinalityMax());
         nbbieVO.setCardinalityMin(obbieVO.getCardinalityMin());
         nbbieVO.setDefaultValue(obbieVO.getDefaultValue());
