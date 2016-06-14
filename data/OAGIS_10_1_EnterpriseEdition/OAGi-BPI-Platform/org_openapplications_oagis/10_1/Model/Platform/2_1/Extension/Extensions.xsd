@@ -78,7 +78,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!---->
-	<xsd:element name="AccountingPeriodExtension" id="oagis-id-0fc1e28f43304f519c02e8ddb589dfc5"/>
+	<xsd:element name="AccountingPeriodExtension" type="AccountingPeriodExtensionType" id="oagis-id-0fc1e28f43304f519c02e8ddb589dfc5"/>
 	<xsd:complexType name="AccountingPeriodExtensionType" id="oagis-id-afc9c470011e4299840f91c030434d74">
 		<xsd:complexContent>
 			<xsd:extension base="AllExtensionType">
