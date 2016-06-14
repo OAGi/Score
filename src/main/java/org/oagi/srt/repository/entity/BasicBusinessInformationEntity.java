@@ -154,7 +154,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         return (bdtPriRestriId == null) ? 0 : bdtPriRestriId;
     }
 
-    public void setBdtPriRestriId(int bdtPriRestriId) {
+    public void setBdtPriRestriId(Integer bdtPriRestriId) {
         this.bdtPriRestriId = bdtPriRestriId;
     }
 
@@ -162,7 +162,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         return (codeListId == null) ? 0 : codeListId;
     }
 
-    public void setCodeListId(int codeListId) {
+    public void setCodeListId(Integer codeListId) {
         this.codeListId = codeListId;
     }
 

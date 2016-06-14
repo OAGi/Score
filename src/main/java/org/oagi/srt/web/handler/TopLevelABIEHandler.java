@@ -1845,11 +1845,11 @@ public class TopLevelABIEHandler implements Serializable {
 
         if (aABIEView.getRestrictionType().equalsIgnoreCase("Primitive")) {
             bbieVO.setBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
-            bbieVO.setCodeListId(0);
+            bbieVO.setCodeListId(null);
         } else if (aABIEView.getRestrictionType().equalsIgnoreCase("Code")) {
             if (codeList != null) {
                 bbieVO.setCodeListId(codeList.getCodeListId());
-                bbieVO.setBdtPriRestriId(0);
+                bbieVO.setBdtPriRestriId(null);
             }
         }
 
