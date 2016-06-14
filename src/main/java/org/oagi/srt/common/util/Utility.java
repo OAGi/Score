@@ -451,7 +451,8 @@ public class Utility {
     }
 
     public static String extractModuleName(String path) {
-        return FilenameUtils.separatorsToWindows(path.substring(path.indexOf("Model")));
+        int idx = path.indexOf("Model");
+        return (idx != -1) ? FilenameUtils.separatorsToWindows(path.substring(idx)) : path;
     }
 
     public static void main(String args[]) {
