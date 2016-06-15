@@ -794,7 +794,7 @@ public class StandaloneXMLSchema {
         if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
             aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
         else if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("Id"));
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("ID"));
         else
             aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
         //aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm())));

@@ -520,7 +520,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         String name = targetDecl.getName();
-        String propertyTerm = Utility.spaceSeparator(name.replaceAll("ID", "Identifier"));
+        String propertyTerm = Utility.spaceSeparator(name);
 
         TypeDecl typeDecl = targetDecl.getTypeDecl();
         String typeGuid = typeDecl.getId();

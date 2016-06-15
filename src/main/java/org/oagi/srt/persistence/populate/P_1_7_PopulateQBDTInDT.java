@@ -654,7 +654,7 @@ public class P_1_7_PopulateQBDTInDT {
         BasicCoreComponentProperty bccp = new BasicCoreComponentProperty();
         bccp.setGuid(guid);
 
-        String propertyTerm = Utility.spaceSeparator(name.replaceAll("ID", "Identifier"));
+        String propertyTerm = Utility.spaceSeparator(name);
         bccp.setPropertyTerm(propertyTerm);
         bccp.setRepresentationTerm(dataType.getDataTypeTerm());
         bccp.setBdtId(dataType.getDtId());

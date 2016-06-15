@@ -20,18 +20,6 @@ public class Utility {
         return den;
     }
 
-    public static String parseUppercase(String str) {
-        int index = 0;
-        str = str.replaceAll("ID", "Identifier");
-        for (int i = str.length() - 1; i > -1; i--) {
-            if (Character.isUpperCase(str.charAt(i)) && i != 0) {
-                index = i;
-                break;
-            }
-        }
-        return str.substring(0, index).toLowerCase();
-    }
-
     public static String first(String den) {
         den = den.substring(0, den.indexOf(".")).replace("_", " ");
         return den;
@@ -206,13 +194,15 @@ public class Utility {
         String result = sb.toString();
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
-        result = result.replace("ID", "Identifier");
         result = result.replace("  ", " ");
+        
+        result = IDtoIdentifier(result);
+
         return result;
     }
 
     public static String spaceSeparatorBeforeStr(String str, String beforeStr) {
-        int pos = str.indexOf(beforeStr);
+        int pos = str.lastIndexOf(beforeStr);
         if (pos != -1) {
             str = str.substring(0, pos);
         }
@@ -236,9 +226,23 @@ public class Utility {
         String result = sb.toString();
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
-        result = result.replace("ID", "Identifier");
+        result = result.replace("  ", " ");
+        result = IDtoIdentifier(result);
         result = result.trim();
         return result;
+    }
+    
+    public static String IDtoIdentifier(String space_separated_str){
+    	
+    	String[] delim = space_separated_str.split(" ");
+    	String ret = "";
+    	for(int i= 0; i<delim.length; i++){
+    		if(delim[i].equals("ID")){
+    			delim[i] = "Identifier";
+    		}
+    		ret = ret+" "+delim[i];
+    	}
+    	return ret;
     }
 
     public static String denWithoutUUID(String den) {
@@ -406,8 +410,19 @@ public class Utility {
                 word = word.substring(0, 1);
             if (word.startsWith(" "))
                 word = word.substring(0, 1);
-            if (word.equalsIgnoreCase("identifier"))
-                ret.append("ID");
+            if (word.toLowerCase().contains("identifier")){
+            	int posStart=-1;
+            	int posEnd = -1;
+            	
+            	posStart = word.toLowerCase().indexOf("identifier");
+            	posEnd = posStart+"identifier".length();
+                
+                String str1 = word.substring(0,posStart);
+                String str2 = word.substring(posEnd);
+                
+                ret.append(str1+"ID"+str2);
+                
+            }
             else if (!word.isEmpty()) {
                 ret.append(word.substring(0, 1).toUpperCase());
                 ret.append(word.substring(1));
@@ -429,8 +444,19 @@ public class Utility {
                 word = word.substring(0, 1);
             if (word.startsWith(" "))
                 word = word.substring(0, 1);
-            if (word.equalsIgnoreCase("identifier"))
-                ret.append("ID");
+            if (word.toLowerCase().contains("identifier")){
+            	int posStart=-1;
+            	int posEnd = -1;
+            	
+            	posStart = word.toLowerCase().indexOf("identifier");
+            	posEnd = posStart+"identifier".length();
+                
+                String str1 = word.substring(0,posStart);
+                String str2 = word.substring(posEnd);
+                
+                ret.append(str1+"ID"+str2);
+                
+            }
             else {
                 if (!word.isEmpty() && cnt != 0) {
                     ret.append(word.substring(0, 1).toUpperCase());
