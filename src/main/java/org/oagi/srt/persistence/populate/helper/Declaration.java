@@ -24,6 +24,7 @@ public interface Declaration {
 
     public boolean canBeAcc();
     public boolean canBeAscc();
+    public boolean canBeAsccp();
 
     public Collection<Declaration> getParticles(ParticleAction particleAction);
     public Collection<AttrDecl> getAttributes();

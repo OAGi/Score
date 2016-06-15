@@ -2,6 +2,7 @@ package org.oagi.srt.persistence.populate.helper;
 
 import com.sun.xml.internal.xsom.XSDeclaration;
 import com.sun.xml.internal.xsom.XSTerm;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 import java.util.Collection;
@@ -24,7 +25,12 @@ public class GroupDecl extends AbstractDeclaration {
 
     @Override
     public boolean canBeAscc() {
-        return getRefDecl() != null;
+        return canBeAcc();
+    }
+
+    @Override
+    public boolean canBeAsccp() {
+        return !StringUtils.isEmpty(getName());
     }
 
     @Override

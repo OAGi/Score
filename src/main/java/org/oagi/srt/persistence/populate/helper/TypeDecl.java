@@ -52,6 +52,11 @@ public class TypeDecl extends AbstractDeclaration {
         return (isComplexType() && !hasSimpleContent());
     }
 
+    @Override
+    public boolean canBeAsccp() {
+        return canBeAscc();
+    }
+
     public TypeDecl getBaseTypeDecl() {
         XSType baseType = this.xsType.getBaseType();
         if (baseType == null) {

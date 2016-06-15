@@ -2,6 +2,7 @@ package org.oagi.srt.persistence.populate;
 
 import com.sun.xml.internal.xsom.XSComplexType;
 import com.sun.xml.internal.xsom.XSElementDecl;
+import com.sun.xml.internal.xsom.XSModelGroupDecl;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
@@ -84,6 +85,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.8 Start");
 
@@ -93,8 +95,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         System.out.println("### 1.8 End");
     }
 
-    @Transactional(rollbackFor = Throwable.class)
-    public void populate() throws Exception {
+    private void populate() throws Exception {
         populate1();
         populate2();
     }
@@ -134,16 +135,14 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
     }
 
-    @Transactional(rollbackFor = Throwable.class)
-    public void populateUnused() throws Exception {
+    private void populateUnused() throws Exception {
         Collection<File> targetFiles = Arrays.asList(
                 new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
                 new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
                 new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/BODs"),
                 new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Common/Components/Components.xsd"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Common/Components/Meta.xsd"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Extension/Extensions.xsd"));
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Common/Components"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Extension"));
         for (File file : targetFiles) {
             populateUnusedACC(file);
         }
@@ -169,7 +168,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             NodeList complexTypes = (NodeList) Context.xPath.evaluate("//xsd:complexType", document, XPathConstants.NODESET);
             for (int i = 0, len = complexTypes.getLength(); i < len; ++i) {
                 Element complexType = (Element) complexTypes.item(i);
-                double cnt = (Double) Context.xPath.evaluate("count(./sequence) or count(./xsd:complexContent)",
+                double cnt = (Double) Context.xPath.evaluate("count(./xsd:sequence) or count(./xsd:complexContent)",
                         complexType, XPathConstants.NUMBER);
                 if (cnt != 1) {
                     continue;
@@ -226,7 +225,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
                 XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, name);
                 ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
-                if (!elementDecl.canBeAscc()) {
+                if (!elementDecl.canBeAsccp()) {
                     continue;
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
@@ -236,6 +235,38 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
                 createASCCP(elementDecl, reusableIndicator);
             }
+
+            NodeList groups = (NodeList) Context.xPath.evaluate("//xsd:group", document, XPathConstants.NODESET);
+            for (int i = 0, len = groups.getLength(); i < len; ++i) {
+                Element group = (Element) groups.item(i);
+                String guid = group.getAttribute("id");
+                if (StringUtils.isEmpty(guid)) {
+                    continue;
+                }
+                if (asccpRepository.existsByGuid(guid)) {
+                    continue;
+                }
+                String name = group.getAttribute("name");
+                if (StringUtils.isEmpty(name)) {
+                    continue;
+                }
+
+                String module = Utility.extractModuleName(file.getAbsolutePath());
+                Context context = new Context(file);
+
+                XSModelGroupDecl xsModelGroupDecl = context.getModelGroupDecl(SRTConstants.OAGI_NS, name);
+                GroupDecl groupDecl = new GroupDecl(context, xsModelGroupDecl, group);
+                if (!groupDecl.canBeAsccp()) {
+                    continue;
+                }
+                logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
+
+                double refCnt = (Double) Context.xPath.evaluate("count(./@ref)", group, XPathConstants.NUMBER);
+                boolean reusableIndicator = (refCnt == 0) ? false : true;
+
+                createASCCP(groupDecl, reusableIndicator);
+            }
+
         }
     }
 
