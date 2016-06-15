@@ -25,7 +25,7 @@ public class GroupDecl extends AbstractDeclaration {
 
     @Override
     public boolean canBeAscc() {
-        return canBeAcc();
+        return getRefDecl() != null;
     }
 
     @Override
