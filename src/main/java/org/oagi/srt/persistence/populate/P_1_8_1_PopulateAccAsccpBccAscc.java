@@ -128,7 +128,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
     }
 
-    @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### 1.8 Start");
 
@@ -138,6 +137,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         System.out.println("### 1.8 End");
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public void populate() throws Exception {
         populate1();
         populate2();
@@ -178,7 +178,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
     }
 
-    private void populateUnused() throws Exception {
+    @Transactional(rollbackFor = Throwable.class)
+    public void populateUnused() throws Exception {
         Collection<File> targetFiles = Arrays.asList(
                 new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
                 new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
