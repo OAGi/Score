@@ -174,6 +174,11 @@ public abstract class AbstractDeclaration implements Declaration {
     }
 
     @Override
+    public boolean canBeAsccp() {
+        return false;
+    }
+
+    @Override
     public Collection<Declaration> getParticles(ParticleAction particleAction) {
         return Collections.emptyList();
     }
