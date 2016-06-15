@@ -231,18 +231,17 @@ public class Utility {
         result = result.trim();
         return result;
     }
-    
-    public static String IDtoIdentifier(String space_separated_str){
-    	
-    	String[] delim = space_separated_str.split(" ");
-    	String ret = "";
-    	for(int i= 0; i<delim.length; i++){
-    		if(delim[i].equals("ID")){
-    			delim[i] = "Identifier";
-    		}
-    		ret = ret+" "+delim[i];
-    	}
-    	return ret;
+
+    public static String IDtoIdentifier(String space_separated_str) {
+        String[] delim = space_separated_str.split(" ");
+        String ret = "";
+        for (int i = 0; i < delim.length; i++) {
+            if (delim[i].equals("ID")) {
+                delim[i] = "Identifier";
+            }
+            ret = ret + " " + delim[i];
+        }
+        return ret.trim();
     }
 
     public static String denWithoutUUID(String den) {
