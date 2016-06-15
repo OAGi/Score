@@ -1,14 +1,17 @@
 package org.oagi.srt.persistence.populate;
 
+import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSSchema;
 import com.sun.xml.internal.xsom.XSType;
 import com.sun.xml.internal.xsom.parser.SchemaDocument;
 import com.sun.xml.internal.xsom.parser.XSOMParser;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
+import org.oagi.srt.persistence.populate.helper.Context;
+import org.oagi.srt.persistence.populate.helper.ElementDecl;
+import org.oagi.srt.persistence.populate.helper.TypeDecl;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +28,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.Locator;
 
 import javax.annotation.PostConstruct;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-import java.io.InputStream;
-import java.net.URI;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -165,11 +163,6 @@ public class P_1_7_PopulateQBDTInDT {
             xsomParser.parse(systemId);
         }
 
-        Map<String, Document> documentMap = new HashMap();
-
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        xPath.setNamespaceContext(new OAGiNamespaceContext());
-
         for (SchemaDocument schemaDocument : xsomParser.getDocuments()) {
             XSSchema xsSchema = schemaDocument.getSchema();
             Iterator<XSType> xsTypeIterator = xsSchema.iterateTypes();
@@ -185,21 +178,9 @@ public class P_1_7_PopulateQBDTInDT {
                     return;
                 }
                 String systemId = locator.getSystemId();
+                Document xmlDocument = Context.loadDocument(systemId);
 
-                Document xmlDocument;
-                if (!documentMap.containsKey(systemId)) {
-                    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-                    builderFactory.setNamespaceAware(true);
-                    DocumentBuilder builder = builderFactory.newDocumentBuilder();
-                    try (InputStream inputStream = new URI(systemId).toURL().openStream()) {
-                        xmlDocument = builder.parse(inputStream);
-                    }
-                    documentMap.put(systemId, xmlDocument);
-                } else {
-                    xmlDocument = documentMap.get(systemId);
-                }
-
-                XPathExpression xPathExpression = xPath.compile("//*[@name='" + typeName + "']");
+                XPathExpression xPathExpression = Context.xPath.compile("//*[@name='" + typeName + "']");
                 Node node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
                 if (node == null) {
                     return;
@@ -211,12 +192,12 @@ public class P_1_7_PopulateQBDTInDT {
 
                 String dtGuid = idAttribute.getNodeValue();
 
-                Node definitionNode = (Node) xPath.compile(
+                Node definitionNode = (Node) Context.xPath.compile(
                         "./xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]")
                         .evaluate(node, XPathConstants.NODE);
                 String definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
                 if (definition == null) {
-                    definitionNode = (Node) xPath.compile("./xsd:annotation/xsd:documentation")
+                    definitionNode = (Node) Context.xPath.compile("./xsd:annotation/xsd:documentation")
                             .evaluate(node, XPathConstants.NODE);
                     definition = (definitionNode != null) ? definitionNode.getTextContent() : null;
                 }
@@ -224,7 +205,7 @@ public class P_1_7_PopulateQBDTInDT {
                     definition = null;
                 }
 
-                Node baseTypeNode = (Node) xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
+                Node baseTypeNode = (Node) Context.xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
                 String baseTypeName = ((baseTypeNode != null) ? baseTypeNode.getAttributes().getNamedItem("base").getNodeValue() : null);
 
                 String module = Utility.extractModuleName(systemId);
@@ -247,9 +228,27 @@ public class P_1_7_PopulateQBDTInDT {
         insertCodeContentTypeDT();
         insertIDContentTypeDT();
 
-        insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd, 0);
-        insertDTAndBCCP(elementsFromMetaXSD, meta_xsd, 1); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
-        insertDTAndBCCP(elementsFromComponentsXSD, component_xsd, 2);
+        List<File> files = new ArrayList();
+        files.addAll(Arrays.asList(
+                new File(SRTConstants.FIELDS_XSD_FILE_PATH),
+                new File(SRTConstants.META_XSD_FILE_PATH),
+                new File(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH),
+                new File(SRTConstants.COMPONENTS_XSD_FILE_PATH)));
+        for (File directory : Arrays.asList(
+                new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/BODs"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Nouns"))) {
+            files.addAll(Arrays.asList(directory.listFiles((dir, name) -> name.endsWith(".xsd") && !name.endsWith("IST.xsd"))));
+        }
+
+        for (File file : files) {
+            insertDTAndBCCP(file);
+        }
+
+//        insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd);
+//        insertDTAndBCCP(elementsFromMetaXSD, meta_xsd); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
+//        insertDTAndBCCP(elementsFromComponentsXSD, component_xsd);
 
         insertDTwithoutElement();
     }
@@ -283,7 +282,69 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler, int xsdType) throws Exception {
+    private void insertDTAndBCCP(File file) throws Exception {
+        Context context = new Context(file);
+        XPathHandler xHandler = new XPathHandler(file);
+        NodeList elements = xHandler.getNodeList("/xsd:schema/xsd:element");
+        for (int i = 0, len = elements.getLength(); i < len; ++i) {
+            Element element = (Element) elements.item(i);
+            String bccp = element.getAttribute("name");
+            if (StringUtils.isEmpty(bccp)) {
+                continue;
+            }
+            String guid = element.getAttribute("id");
+            if (StringUtils.isEmpty(guid)) {
+                continue;
+            }
+
+            XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, bccp);
+            if (xsElementDecl == null) {
+                throw new IllegalStateException("Could not find " + bccp + ", GUID " + guid + " BCCP");
+            }
+            ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
+            TypeDecl typeDecl = elementDecl.getTypeDecl();
+            boolean canBccp = typeDecl.isSimpleType() || typeDecl.isComplexType() && typeDecl.hasSimpleContent();
+            if (canBccp) {
+                String typeName = typeDecl.getName();
+
+                DataTypeInfoHolder dataTypeInfoHolder = dtiHolderMap.get(typeName);
+                if (dataTypeInfoHolder == null) {
+                    throw new IllegalStateException("Unknown QBDT: " + typeName);
+                }
+
+                DataType dataType = dataTypeRepository.findOneByGuid(dataTypeInfoHolder.getGuid());
+                if (dataType == null) {
+                    /*
+                     * @TODO
+                     * Section 3.1.1.13 Import BCCPs
+                     *
+                     * Assuming the target xsd:element is a BCCP,
+                     * the xsd:element/@type shall be a BDT that has already been imported.
+                     * If it cannot be found the system should throw an error that
+                     * indicates something is wrong either in the import logic or its implementation.
+                     */
+                    // add new QBDT
+                    XPathHandler typeXPathHandler = new XPathHandler(typeDecl.getModuleAsFile());
+                    dataType = addToDT(dataTypeInfoHolder, typeName, typeXPathHandler);
+                    if (dataType == null) {
+                        throw new IllegalStateException("Could add DataType for BCCP type '" + typeName + "', GUID " + typeDecl.getId());
+                    }
+
+                    // add DT_SC
+                    addToDTSC(typeXPathHandler, typeName, dataType);
+                }
+
+                Node documentationFromXSD = xHandler.getNode(element, ".//xsd:documentation | .//*[local-name()=\"ccts_Definition\"]");
+                String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
+
+                String module = elementDecl.getModule();
+                // add BCCP
+                addToBCCP(guid, bccp, dataType, definition, module);
+            }
+        }
+    }
+
+    private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler) throws Exception {
         for (int i = 0; i < elementsFromXSD.getLength(); i++) {//ElementsFromXSD don't have CodeContentType, IDContentType
             Element element = (Element) elementsFromXSD.item(i);
             String bccp = element.getAttribute("name");
@@ -311,7 +372,7 @@ public class P_1_7_PopulateQBDTInDT {
             String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
 
             // add BCCP
-            addToBCCP(guid, bccp, dataType, definition);
+            addToBCCP(guid, bccp, dataType, definition, null);
         }
     }
 
@@ -472,13 +533,14 @@ public class P_1_7_PopulateQBDTInDT {
         if (base.endsWith("CodeContentType")) {
             baseDataType = getDataTypeWithDen("Code. Type");
         } else {
-            
-        	Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='"+type+"']/xsd:simpleContent");
-        	if(simpleContentNode==null){
-        		return null;
-        	}
-        	
-        	String baseDen = Utility.typeToDen(base);
+            if (xHandler != null) {
+                Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='" + type + "']/xsd:simpleContent");
+                if (simpleContentNode == null) {
+                    return null;
+                }
+            }
+
+            String baseDen = Utility.typeToDen(base);
             baseDataType = getDataTypeWithDen(baseDen);
 
             // QBDT is based on another QBDT
@@ -584,7 +646,11 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private void addToBCCP(String guid, String name, DataType dataType, String definition) throws Exception {
+    private void addToBCCP(String guid, String name, DataType dataType, String definition, String module) throws Exception {
+        if (bccpRepository.existsByGuid(guid)) {
+            return;
+        }
+
         BasicCoreComponentProperty bccp = new BasicCoreComponentProperty();
         bccp.setGuid(guid);
 
@@ -598,6 +664,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setCreatedBy(userId);
         bccp.setLastUpdatedBy(userId);
         bccp.setOwnerUserId(userId);
+        bccp.setModule(module);
         bccpRepository.save(bccp);
     }
 

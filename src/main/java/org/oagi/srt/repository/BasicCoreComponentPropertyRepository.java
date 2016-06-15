@@ -12,6 +12,9 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
     @Query("select b from BasicCoreComponentProperty b where b.guid = ?1")
     public BasicCoreComponentProperty findOneByGuid(String guid);
 
+    @Query("select case when count(b) > 0 then true else false end from BasicCoreComponentProperty b where b.guid = ?1")
+    public boolean existsByGuid(String guid);
+
     @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.guid = ?1")
     public BasicCoreComponentProperty findBccpIdAndDenByGuid(String guid);
 }

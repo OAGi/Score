@@ -1,11 +1,11 @@
 package org.oagi.srt.persistence.populate;
 
-import com.sun.xml.internal.xsom.*;
-import com.sun.xml.internal.xsom.parser.XSOMParser;
+import com.sun.xml.internal.xsom.XSComplexType;
+import com.sun.xml.internal.xsom.XSElementDecl;
 import org.oagi.srt.Application;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.persistence.populate.helper.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
@@ -19,29 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Locator;
 
 import javax.annotation.PostConstruct;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 @Component
 public class P_1_8_1_PopulateAccAsccpBccAscc {
@@ -82,41 +68,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
     private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);
 
-    private Map<String, Document> documentMap = new HashMap();
-
-    private Document loadDocument(String uri) {
-        String module = Utility.extractModuleName(uri);
-
-        Document xmlDocument;
-        if (!documentMap.containsKey(module)) {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
-            try {
-                DocumentBuilder builder = builderFactory.newDocumentBuilder();
-                try (InputStream inputStream = new URI(uri).toURL().openStream()) {
-                    xmlDocument = builder.parse(inputStream);
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-            documentMap.put(module, xmlDocument);
-        } else {
-            xmlDocument = documentMap.get(module);
-        }
-
-        return xmlDocument;
-    }
-
-    private XPath xPath;
-
     @PostConstruct
     public void init() throws Exception {
         userId = userRepository.findAppUserIdByLoginId("oagis");
         releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
         namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
-
-        xPath = XPathFactory.newInstance().newXPath();
-        xPath.setNamespaceContext(new OAGiNamespaceContext());
     }
 
     public static void main(String[] args) throws Exception {
@@ -209,11 +165,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 populateUnusedACC(child);
             }
         } else {
-            Document document = loadDocument(file.toURI().toString());
-            NodeList complexTypes = (NodeList) xPath.evaluate("//xsd:complexType", document, XPathConstants.NODESET);
+            Document document = Context.loadDocument(file.toURI().toString());
+            NodeList complexTypes = (NodeList) Context.xPath.evaluate("//xsd:complexType", document, XPathConstants.NODESET);
             for (int i = 0, len = complexTypes.getLength(); i < len; ++i) {
                 Element complexType = (Element) complexTypes.item(i);
-                double cnt = (Double) xPath.evaluate("count(./sequence) or count(./xsd:complexContent)",
+                double cnt = (Double) Context.xPath.evaluate("count(./sequence) or count(./xsd:complexContent)",
                         complexType, XPathConstants.NUMBER);
                 if (cnt != 1) {
                     continue;
@@ -229,7 +185,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
                 Context context = new Context(file);
 
-                XSComplexType xsComplexType = context.xsSchemaSet.getComplexType(SRTConstants.OAGI_NS, name);
+                XSComplexType xsComplexType = context.getComplexType(SRTConstants.OAGI_NS, name);
                 TypeDecl typeDecl = new TypeDecl(context, xsComplexType, complexType);
                 createACC(typeDecl);
             }
@@ -249,8 +205,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 populateUnusedASCCP(child);
             }
         } else {
-            Document document = loadDocument(file.toURI().toString());
-            NodeList elements = (NodeList) xPath.evaluate("//xsd:element", document, XPathConstants.NODESET);
+            Document document = Context.loadDocument(file.toURI().toString());
+            NodeList elements = (NodeList) Context.xPath.evaluate("//xsd:element", document, XPathConstants.NODESET);
             for (int i = 0, len = elements.getLength(); i < len; ++i) {
                 Element element = (Element) elements.item(i);
                 String guid = element.getAttribute("id");
@@ -268,14 +224,14 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 String module = Utility.extractModuleName(file.getAbsolutePath());
                 Context context = new Context(file);
 
-                XSElementDecl xsElementDecl = context.xsSchemaSet.getElementDecl(SRTConstants.OAGI_NS, name);
+                XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, name);
                 ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
                 if (!elementDecl.canBeAscc()) {
                     continue;
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                double refCnt = (Double) xPath.evaluate("count(./@ref)", element, XPathConstants.NUMBER);
+                double refCnt = (Double) Context.xPath.evaluate("count(./@ref)", element, XPathConstants.NUMBER);
                 boolean reusableIndicator = (refCnt == 0) ? false : true;
 
                 createASCCP(elementDecl, reusableIndicator);
@@ -287,596 +243,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return f.listFiles((dir, name) -> {
             return name.matches(".*.xsd");
         });
-    }
-
-    private class Context {
-        private XSSchemaSet xsSchemaSet;
-        private File file;
-
-        public Context(File file) throws Exception {
-            XSOMParser xsomParser = new XSOMParser(SAXParserFactory.newInstance());
-            xsomParser.parse(file);
-
-            xsSchemaSet = xsomParser.getResult();
-
-            this.file = file;
-        }
-
-        private Document loadDocument(Locator locator) {
-            if (locator == null) {
-                return null;
-            }
-            String systemId = locator.getSystemId();
-            return P_1_8_1_PopulateAccAsccpBccAscc.this.loadDocument(systemId);
-        }
-
-        public ElementDecl getRootElementDecl() throws Exception {
-            String fileName = file.getName();
-            String rootElementName = fileName.substring(0, fileName.indexOf(".xsd"));
-            XSElementDecl xsElementDecl =
-                    xsSchemaSet.getElementDecl(SRTConstants.OAGI_NS, rootElementName);
-
-            Document document = loadDocument(xsElementDecl.getLocator());
-            Element element = (Element)
-                    xPath.evaluate("//xsd:element[@name='" + rootElementName + "']", document, XPathConstants.NODE);
-
-            return new ElementDecl(this, xsElementDecl, element);
-        }
-
-        public String evaluate(String expression, Object item) {
-            try {
-                return xPath.evaluate(expression, item);
-            } catch (XPathExpressionException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        public Element evaluateElement(String expression, Node item) {
-            try {
-                return (Element) xPath.evaluate(expression, item, XPathConstants.NODE);
-            } catch (XPathExpressionException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        public Element evaluateElement(String expression, XSComponent xsComponent) {
-            Document document = loadDocument(xsComponent.getLocator());
-            return evaluateElement(expression, document);
-        }
-
-        public NodeList evaluateNodeList(String expression, Node item) {
-            try {
-                return (NodeList) xPath.evaluate(expression, item, XPathConstants.NODESET);
-            } catch (XPathExpressionException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-    }
-
-    private interface Declaration {
-        public String getName();
-        public String getId();
-        public String getDefinition();
-        public String getModule();
-        public int getMinOccur();
-        public int getMaxOccur();
-
-        public boolean isGroup();
-
-        public boolean hasRefDecl();
-        public void setRefDecl(Declaration reference);
-        public Declaration getRefDecl();
-
-        public boolean hasTypeDecl();
-        public void setTypeDecl(TypeDecl reference);
-        public TypeDecl getTypeDecl();
-
-        public boolean canBeAcc();
-        public boolean canBeAscc();
-
-        public Collection<Declaration> getParticles();
-        public Collection<AttrDecl> getAttributes();
-    }
-
-    private abstract class AbstractDeclaration implements Declaration {
-        protected Context context;
-        protected XSDeclaration xsDeclaration;
-        private Element element;
-
-        private Declaration reference;
-        private TypeDecl type;
-        private Transformer transformer;
-        private final int INDENT_AMOUNT = 2;
-
-        public AbstractDeclaration(Context context, XSDeclaration xsDeclaration, Element element) {
-            if (context == null) {
-                throw new IllegalArgumentException("'context' paremeter must not be null.");
-            }
-            if (xsDeclaration == null) {
-                throw new IllegalArgumentException("'xsDeclaration' paremeter must not be null.");
-            }
-            if (element == null) {
-                throw new IllegalArgumentException("'element' paremeter must not be null.");
-            }
-
-            this.context = context;
-            this.xsDeclaration = xsDeclaration;
-            this.element = element;
-
-            TransformerFactory transFactory = TransformerFactory.newInstance();
-            try {
-                transformer = transFactory.newTransformer();
-            } catch (TransformerConfigurationException e) {
-                throw new IllegalStateException(e);
-            }
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(INDENT_AMOUNT));
-        }
-
-        @Override
-        public boolean hasRefDecl() {
-            return (reference != null);
-        }
-
-        @Override
-        public Declaration getRefDecl() {
-            return reference;
-        }
-
-        @Override
-        public void setRefDecl(Declaration reference) {
-            this.reference = reference;
-        }
-
-        @Override
-        public boolean hasTypeDecl() {
-            return (type != null);
-        }
-
-        @Override
-        public TypeDecl getTypeDecl() {
-            return type;
-        }
-
-        @Override
-        public void setTypeDecl(TypeDecl type) {
-            this.type = type;
-        }
-
-        public String getId() {
-            return this.element.getAttribute("id");
-        }
-
-        public String getName() {
-            return this.xsDeclaration.getName();
-        }
-
-        public String getDefinition() {
-            Element element = context.evaluateElement(
-                    "./xsd:annotation/xsd:documentation", this.element);
-            if (element != null) {
-                NodeList nodeList = context.evaluateNodeList("//text()[normalize-space()='']", element);
-                for (int i = 0; i < nodeList.getLength(); ++i) {
-                    Node node = nodeList.item(i);
-                    node.getParentNode().removeChild(node);
-                }
-
-                try {
-                    StringWriter buffer = new StringWriter();
-                    transformer.transform(new DOMSource(element), new StreamResult(buffer));
-                    String definition = buffer.toString();
-                    definition = arrangeIndent(removeOAGiNamepsace(removeDocumentationNode(definition)));
-                    return (!StringUtils.isEmpty(definition)) ? definition.trim() : null;
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-            return null;
-        }
-
-        private String removeDocumentationNode(String s) {
-            if (StringUtils.isEmpty(s)) {
-                return null;
-            }
-            int sIdx = s.indexOf('>');
-            int eIdx = s.lastIndexOf("</xsd:documentation>");
-            if (eIdx == -1) {
-                return null;
-            }
-            return s.substring(sIdx + 1, eIdx);
-        }
-
-        private String removeOAGiNamepsace(String s) {
-            if (StringUtils.isEmpty(s)) {
-                return null;
-            }
-            return s.replaceAll(" xmlns=\"" + SRTConstants.OAGI_NS + "\">", ">");
-        }
-
-        private String arrangeIndent(String s) {
-            if (StringUtils.isEmpty(s)) {
-                return null;
-            }
-            String regex = "";
-            for (int i = 0; i < INDENT_AMOUNT; ++i) {
-                regex += " ";
-            }
-            return s.replaceAll(regex + "<", "<");
-        }
-
-        public int getMinOccur() {
-            String minOccurs = element.getAttribute("minOccurs");
-            return (!StringUtils.isEmpty(minOccurs)) ?
-                    Integer.valueOf(minOccurs) : 1;
-        }
-
-        public int getMaxOccur() {
-            String maxOccurs = element.getAttribute("maxOccurs");
-            return (!StringUtils.isEmpty(maxOccurs)) ?
-                    ("unbounded".equals(maxOccurs)) ? -1 : Integer.valueOf(maxOccurs) : 1;
-        }
-
-        @Override
-        public boolean isGroup() {
-            return false;
-        }
-
-        @Override
-        public boolean canBeAcc() {
-            return false;
-        }
-
-        @Override
-        public boolean canBeAscc() {
-            return false;
-        }
-
-        @Override
-        public Collection<Declaration> getParticles() {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public Collection<AttrDecl> getAttributes() {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public String getModule() {
-            String systemId = xsDeclaration.getLocator().getSystemId();
-            return Utility.extractModuleName(systemId);
-        }
-
-        protected Collection<XSDeclaration> asXSDeclarations(XSTerm xsTerm) {
-            if (xsTerm == null) {
-                return Collections.emptyList();
-            }
-            if (xsTerm.isModelGroup()) {
-                List<XSDeclaration> xsParticles = new ArrayList();
-                for (XSParticle child : xsTerm.asModelGroup().getChildren()) {
-                    xsParticles.addAll(asXSDeclarations(child.getTerm()));
-                }
-                return xsParticles;
-            } else if (xsTerm.isElementDecl()) {
-                return Arrays.asList(xsTerm.asElementDecl());
-            } else if (xsTerm.isModelGroupDecl()) {
-                return Arrays.asList(xsTerm.asModelGroupDecl());
-            } else {
-                return Collections.emptyList();
-            }
-        }
-
-        protected Collection<Declaration> getParticles(XSTerm xsTerm) {
-            Collection<XSDeclaration> xsDeclarations = asXSDeclarations(xsTerm);
-            if (xsDeclarations.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            List<Declaration> particles = new ArrayList();
-            for (XSDeclaration xsDeclaration : xsDeclarations) {
-                boolean isGroup = (xsDeclaration instanceof XSModelGroupDecl);
-                String elementName = xsDeclaration.getName();
-                Declaration particle = null;
-                String expression;
-                if (isGroup) {
-                    expression = ".//xsd:group[@ref='" + elementName + "']";
-                    Element particleElement = context.evaluateElement(expression, this.element);
-                    if (particleElement != null) {
-                        particle = new GroupDecl(context, xsDeclaration, particleElement);
-                    }
-                } else {
-                    expression = ".//xsd:element[@ref='" + elementName + "']";
-                    Element particleElement = context.evaluateElement(expression, this.element);
-                    if (particleElement != null) {
-                        particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
-                    }
-                }
-
-                boolean isLocalElement = (particle == null);
-                if (isLocalElement) {
-                    if (isGroup) {
-                        particle = new GroupDecl(context, xsDeclaration, this.element);
-                    } else {
-                        expression = ".//xsd:element[@name='" + elementName + "']";
-                        Element particleElement = context.evaluateElement(expression, this.element);
-                        particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
-                    }
-
-                    createASCCP(particle, false);
-                }
-
-                if (!isLocalElement) {
-                    Declaration reference;
-                    if (isGroup) {
-                        expression = "//xsd:group[@name='" + elementName + "']";
-                        XSDeclaration xsReference =
-                                context.xsSchemaSet.getModelGroupDecl(SRTConstants.OAGI_NS, elementName);
-                        if (xsReference == null) {
-                            throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
-                        }
-                        Element referenceElement = context.evaluateElement(expression, xsReference);
-                        reference = new GroupDecl(context, xsReference, referenceElement);
-                    } else {
-                        expression = "//xsd:element[@name='" + elementName + "']";
-                        XSDeclaration xsReference =
-                                context.xsSchemaSet.getElementDecl(SRTConstants.OAGI_NS, elementName);
-                        if (xsReference == null) {
-                            throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
-                        }
-                        Element referenceElement = context.evaluateElement(expression, xsReference);
-                        reference = new ElementDecl(context, (XSElementDecl) xsReference, referenceElement);
-                    }
-
-                    particle.setRefDecl(reference);
-                }
-
-                particles.add(particle);
-            }
-            return particles;
-        }
-    }
-
-    private class ElementDecl extends AbstractDeclaration {
-
-        public ElementDecl(Context context, XSElementDecl xsElementDecl, Element element) {
-            super(context, xsElementDecl, element);
-            setTypeDecl(xsElementDecl);
-        }
-
-        private void setTypeDecl(XSElementDecl xsElementDecl) {
-            XSType xsType = xsElementDecl.getType();
-            String typeName = xsType.getName();
-            String expression = null;
-            if (typeName.endsWith("Group")) {
-                expression = "//xsd:group[@name='" + xsType.getName() + "']";
-            } else if (xsType.isComplexType()) {
-                expression = "//xsd:complexType[@name='" + xsType.getName() + "']";
-            } else if (xsType.isSimpleType()) {
-                expression = "//xsd:simpleType[@name='" + xsType.getName() + "']";
-            } else {
-                return;
-            }
-
-            Element element = context.evaluateElement(expression, xsType);
-            if (element == null) {
-                return;
-            }
-
-            TypeDecl typeDecl = new TypeDecl(context, xsType, element);
-            setTypeDecl(typeDecl);
-        }
-
-        @Override
-        public boolean canBeAcc() {
-            return getTypeDecl().canBeAcc();
-        }
-
-        @Override
-        public boolean canBeAscc() {
-            return getTypeDecl().canBeAscc();
-        }
-    }
-
-    private class GroupDecl extends AbstractDeclaration {
-
-        public GroupDecl(Context context, XSDeclaration declaration, Element element) {
-            super(context, declaration, element);
-        }
-
-        @Override
-        public boolean isGroup() {
-            return true;
-        }
-
-        @Override
-        public boolean canBeAcc() {
-            return getRefDecl() == null;
-        }
-
-        @Override
-        public boolean canBeAscc() {
-            return getRefDecl() != null;
-        }
-
-        @Override
-        public Collection<Declaration> getParticles() {
-            return getParticles(((XSTerm) xsDeclaration).asModelGroupDecl().getModelGroup());
-        }
-    }
-
-    public class TypeDecl extends AbstractDeclaration {
-        private XSType xsType;
-        private Element element;
-
-        public TypeDecl(Context context, XSType xsType, Element element) {
-            super(context, xsType, element);
-            this.xsType = xsType;
-            this.element = element;
-        }
-
-        public boolean isAbstract() {
-            if (xsType.isComplexType()) {
-                return xsType.asComplexType().isAbstract();
-            }
-            return false;
-        }
-
-        public boolean isComplexType() {
-            return xsType.isComplexType();
-        }
-
-        public boolean hasSimpleContent() {
-            return Integer.valueOf(context.evaluate("count(.//xsd:simpleContent)", this.element)) > 0;
-        }
-
-        public boolean isGroupElement() {
-            return element.getNodeName().equals("group") && !StringUtils.isEmpty(element.getAttribute("name"));
-        }
-
-        @Override
-        public boolean canBeAcc() {
-            return (isComplexType() && !hasSimpleContent()) || isGroupElement();
-        }
-
-        @Override
-        public boolean canBeAscc() {
-            return (isComplexType() && !hasSimpleContent());
-        }
-
-        public TypeDecl getBaseTypeDecl() {
-            XSType baseType = this.xsType.getBaseType();
-            if (baseType == null) {
-                return null;
-            }
-
-            String baseTypeName = baseType.getName();
-            if ("anyType".equals(baseTypeName)) {
-                return null;
-            }
-
-            String expression;
-            if (baseType.isComplexType()) {
-                expression = "//xsd:complexType[@name='" + baseTypeName + "']";
-            } else if (baseType.isSimpleType()) {
-                expression = "//xsd:simpleType[@name='" + baseTypeName + "']";
-            } else {
-                return null;
-            }
-            Element element = context.evaluateElement(expression, baseType);
-            if (element == null) {
-                return null;
-            }
-            return new TypeDecl(context, baseType, element);
-        }
-
-        public Collection<Declaration> getParticles() {
-            XSParticle xsParticle;
-            if (xsType.isComplexType()) {
-                XSContentType xsContentType = xsType.asComplexType().getExplicitContent();
-                if (xsContentType == null) {
-                    xsContentType = xsType.asComplexType().getContentType();
-                }
-                xsParticle = xsContentType.asParticle();
-            } else if (xsType.isSimpleType()) {
-                xsParticle = xsType.asSimpleType().asParticle();
-            } else {
-                throw new IllegalStateException();
-            }
-
-            if (xsParticle == null) {
-                return Collections.emptyList();
-            }
-            XSTerm xsTerm = xsParticle.getTerm();
-            return getParticles(xsTerm);
-        }
-
-        public Collection<AttrDecl> getAttributes() {
-            if (xsType.isComplexType()) {
-                Collection<? extends XSAttributeUse> declaredAttributeUses =
-                        xsType.asComplexType().getDeclaredAttributeUses();
-                if (declaredAttributeUses.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                List<AttrDecl> attrDecls = new ArrayList();
-                for (XSAttributeUse xsAttributeUse : declaredAttributeUses) {
-                    XSAttributeDecl xsAttributeDecl = xsAttributeUse.getDecl();
-                    String expression = "./xsd:attribute[@name='" + xsAttributeUse.getDecl().getName() + "']";
-                    Element element = context.evaluateElement(expression, this.element);
-                    if (element == null) {
-                        continue;
-                    }
-                    attrDecls.add(new AttrDecl(context, xsAttributeDecl, element));
-                }
-
-                return attrDecls;
-            } else {
-                return Collections.emptyList();
-            }
-        }
-    }
-
-    private class AttrDecl extends AbstractDeclaration {
-        private XSAttributeDecl xsAttributeDecl;
-        private String use;
-
-        public AttrDecl(Context context, XSAttributeDecl xsAttributeDecl, Element element) {
-            super(context, xsAttributeDecl, element);
-
-            this.xsAttributeDecl = xsAttributeDecl;
-            this.use = element.getAttribute("use");
-        }
-
-        @Override
-        public int getMinOccur() {
-            if (isOptional()) {
-                return 0;
-            }
-            if (isRequired()) {
-                return 1;
-            }
-            if (isProhibited()) {
-                return 0;
-            }
-            return 1;
-        }
-
-        @Override
-        public int getMaxOccur() {
-            if (isOptional()) {
-                return 1;
-            }
-            if (isRequired()) {
-                return 1;
-            }
-            if (isProhibited()) {
-                return 0;
-            }
-            return 1;
-        }
-
-        public String getUse() {
-            return use;
-        }
-
-        public boolean isRequired() {
-            return "required".equals(use);
-        }
-
-        public boolean isOptional() {
-            return "optional".equals(use);
-        }
-
-        public boolean isProhibited() {
-            return "prohibited".equals(use);
-        }
-
-        public TypeDecl getTypeDecl() {
-            XSSimpleType xsType = xsAttributeDecl.getType();
-            return new TypeDecl(context, xsType,
-                    context.evaluateElement("//xsd:simpleType[@name='" + xsType.getName() + "']", xsType));
-        }
     }
 
     private AssociationCoreComponentProperty createASCCP(Declaration declaration) {
@@ -948,7 +314,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         AggregateCoreComponent acc = createACC(declaration);
         int sequenceKey = 1;
-        Collection<Declaration> particles = declaration.getParticles();
+        Collection<Declaration> particles = declaration.getParticles(particle -> createASCCP(particle, false));
         for (Declaration asccOrBccElement : particles) {
             String guid = asccOrBccElement.getId();
             Declaration refDecl = asccOrBccElement.getRefDecl();
@@ -978,7 +344,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         for (AttrDecl bccpAttr : declaration.getAttributes()) {
-            BasicCoreComponentProperty bccp = getOrCreateBCCP(bccpAttr);
+            BasicCoreComponentProperty bccp = getOrCreateBCCP(bccpAttr, true);
             createBCC(acc, bccp, bccpAttr, 0);
         }
 
@@ -1092,7 +458,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
                               Declaration declaration, int sequenceKey, int entityType) {
-        BasicCoreComponentProperty bccp = getOrCreateBCCP(declaration);
+        BasicCoreComponentProperty bccp = getBCCP(declaration);
         return createBCC(fromAcc, bccp, declaration, sequenceKey, entityType);
     }
 
@@ -1143,14 +509,18 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return true;
     }
 
-    private BasicCoreComponentProperty getOrCreateBCCP(Declaration declaration) {
+    private BasicCoreComponentProperty getBCCP(Declaration declaration) {
+        return getOrCreateBCCP(declaration, false);
+    }
+
+    private BasicCoreComponentProperty getOrCreateBCCP(Declaration declaration, boolean createIfAbsent) {
         Declaration targetDecl = declaration.getRefDecl();
         if (targetDecl == null) {
             targetDecl = declaration;
         }
 
         String name = targetDecl.getName();
-        String propertyTerm = Utility.spaceSeparator(name).replace("ID", "Identifier");
+        String propertyTerm = Utility.spaceSeparator(name.replaceAll("ID", "Identifier"));
 
         TypeDecl typeDecl = targetDecl.getTypeDecl();
         String typeGuid = typeDecl.getId();
@@ -1178,24 +548,29 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             return bccp;
         }
 
-        String representationTerm = dt.getDataTypeTerm();
-        String den = Utility.firstToUpperCase(propertyTerm) + ". " + representationTerm;
+        if (createIfAbsent) {
+            String representationTerm = dt.getDataTypeTerm();
+            String den = Utility.firstToUpperCase(propertyTerm) + ". " + representationTerm;
 
-        bccp = new BasicCoreComponentProperty();
-        String bccpGuid = Utility.generateGUID();
-        bccp.setGuid(bccpGuid);
-        bccp.setPropertyTerm(propertyTerm);
-        bccp.setBdtId(bdtId);
-        bccp.setRepresentationTerm(representationTerm);
-        bccp.setDen(den);
-        bccp.setState(3);
-        bccp.setCreatedBy(userId);
-        bccp.setLastUpdatedBy(userId);
-        bccp.setOwnerUserId(userId);
-        bccp.setDeprecated(false);
-        bccp.setReleaseId(releaseId);
-        bccpRepository.saveAndFlush(bccp);
-        return bccp;
+            bccp = new BasicCoreComponentProperty();
+            String bccpGuid = Utility.generateGUID();
+            bccp.setGuid(bccpGuid);
+            bccp.setPropertyTerm(propertyTerm);
+            bccp.setBdtId(bdtId);
+            bccp.setRepresentationTerm(representationTerm);
+            bccp.setDen(den);
+            bccp.setState(3);
+            bccp.setCreatedBy(userId);
+            bccp.setLastUpdatedBy(userId);
+            bccp.setOwnerUserId(userId);
+            bccp.setDeprecated(false);
+            bccp.setReleaseId(releaseId);
+            bccp.setModule(declaration.getModule());
+            bccpRepository.saveAndFlush(bccp);
+            return bccp;
+        } else {
+            throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
+        }
     }
 
 }

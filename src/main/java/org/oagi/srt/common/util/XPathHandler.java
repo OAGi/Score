@@ -1,39 +1,33 @@
 package org.oagi.srt.common.util;
 
+import org.oagi.srt.persistence.populate.helper.Context;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
-import java.io.FileInputStream;
-import java.io.IOException;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.File;
 
 public class XPathHandler {
 
     private Document xmlDocument;
-    private DocumentBuilder builder;
-    private XPath xPath;
 
-    public XPathHandler(String filePath) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        builderFactory.setNamespaceAware(true);
+    public XPathHandler(String filePath) throws Exception {
+        this(new File(filePath));
+    }
 
-        builder = builderFactory.newDocumentBuilder();
-        xmlDocument = builder.parse(new FileInputStream(filePath));
-        xPath = XPathFactory.newInstance().newXPath();
-        xPath.setNamespaceContext(new OAGiNamespaceContext());
+    public XPathHandler(File file) throws Exception {
+        xmlDocument = Context.loadDocument(file.toURI().toString());
     }
 
     public XPathExpression compile(String expression) throws XPathExpressionException {
-        return xPath.compile(expression);
+        return Context.xPath.compile(expression);
     }
 
     public NodeList getNodeList(String xPathExpression) throws XPathExpressionException {
-        return (NodeList) xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODESET);
+        return (NodeList) Context.xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODESET);
     }
 
     public Node getNode(String xPathExpression) throws XPathExpressionException {
@@ -41,7 +35,7 @@ public class XPathHandler {
     }
 
     public Node getNode(Object item, String xPathExpression) throws XPathExpressionException {
-        return getNode(xPath.compile(xPathExpression), item);
+        return getNode(Context.xPath.compile(xPathExpression), item);
     }
 
     public Node getNode(XPathExpression expression, Object item) throws XPathExpressionException {
