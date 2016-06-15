@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 @Component
 public class PopulateBlobContents {
@@ -37,20 +39,30 @@ public class PopulateBlobContents {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws IOException {
-        populate("Model/Platform/2_1/Common/DataTypes");
-        populate("Model/Platform/2_1/Common/ISO20022");
-        populate("Model/Platform/2_1/OAGi-Platform.xsd");
-    }
-
-    private void populate(String path) throws IOException {
         Release release = releaseRepository.findOneByReleaseNum("10.1");
-        doPopulate(new File(baseDataDirectory, path).getAbsoluteFile(), release);
+
+        Collection<File> files = Arrays.asList(
+                new File(baseDataDirectory, "Model/Platform/2_1/Common/DataTypes"),
+                new File(baseDataDirectory, "Model/Platform/2_1/Common/ISO20022"),
+                new File(baseDataDirectory, "Model/Platform/2_1/OAGi-Platform.xsd"));
+
+        for (File file : files) {
+            populate(file, release);
+        }
+        for (File file : new File(baseDataDirectory, "Model/BODs")
+                .listFiles((dir, name) -> name.endsWith("IST.xsd"))) {
+            populate(file, release);
+        }
+        for (File file : new File(baseDataDirectory, "Model/Nouns")
+                .listFiles((dir, name) -> name.endsWith("IST.xsd"))) {
+            populate(file, release);
+        }
     }
 
-    private void doPopulate(File file, Release release) throws IOException {
+    private void populate(File file, Release release) throws IOException {
         if (file.isDirectory()) {
             for (File child : file.listFiles()) {
-                doPopulate(child, release);
+                populate(child, release);
             }
         } else {
             if (!isXMLSchemaFile(file)) {
