@@ -155,21 +155,6 @@
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>in.jlibs</groupId>
-			<artifactId>jlibs-core</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>in.jlibs</groupId>
-			<artifactId>jlibs-xml</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>in.jlibs</groupId>
-			<artifactId>jlibs-xsd</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
@@ -183,22 +168,6 @@
 			<artifactId>primefaces</artifactId>
 			<version>5.3</version>
 		</dependency>
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>serializer</artifactId>
-			<version>2.7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.11.0</version>
-		</dependency>
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xml-apis</artifactId>
-			<version>1.4.01</version>
-		</dependency>
-
 		<dependency>
 			<groupId>com.codepoetics</groupId>
 			<artifactId>protonpack</artifactId>
