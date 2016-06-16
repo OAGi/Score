@@ -242,7 +242,8 @@
 							<p:layout style="min-width:800px; min-height:700px;">
 								<p:layoutUnit position="west" resizable="true" size="400" minSize="400" maxSize="400">
 									<p:treeTable id="treeTable" value="#{topLevelABIEHandler.root}" var="aBIEView" selection="#{topLevelABIEHandler.selectedTreeNode}" selectionMode="single" dynamic="true">
-										<p:ajax event="select" listener="#{topLevelABIEHandler.expand()}" update=":form:treeTable :form:details" />
+										<p:ajax event="select" listener="#{topLevelABIEHandler.expand}" update=":form:treeTable :form:details" />
+										<p:ajax event="collapse" listener="#{topLevelABIEHandler.collapse}" update=":form:treeTable :form:details" />
 										<f:facet name="header">
 											#{topLevelABIEHandler.selected.module}
 										</f:facet>

@@ -6,10 +6,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.web.handler.BusinessContextHandler.BusinessContextValues;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FlowEvent;
-import org.primefaces.event.ItemSelectEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.UnselectEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.chart.Axis;
@@ -1716,7 +1713,7 @@ public class TopLevelABIEHandler implements Serializable {
 
     private HashSet<Integer> openedNodes = new HashSet<Integer>();
 
-    public void expand() {
+    public void expand(NodeSelectEvent event) {
         ABIEView abieView = (ABIEView) selectedTreeNode.getData();
         if (!openedNodes.contains(abieView.getId())) {
             openedNodes.add(abieView.getId());
@@ -1737,6 +1734,24 @@ public class TopLevelABIEHandler implements Serializable {
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
             CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId()) : null;
             codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
+        }
+    }
+
+    public void collapse(NodeCollapseEvent event) {
+        TreeNode targetTreeNode = event.getTreeNode();
+        if ("root".equals(targetTreeNode.getParent().getRowKey())) {
+            return;
+        }
+
+        collapseNode(targetTreeNode);
+        targetTreeNode.getChildren().clear();
+    }
+
+    private void collapseNode(TreeNode treeNode) {
+        ABIEView abieView = (ABIEView) treeNode.getData();
+        openedNodes.remove(abieView.getId());
+        for (TreeNode child : treeNode.getChildren()) {
+            collapseNode(child);
         }
     }
 
