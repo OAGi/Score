@@ -789,20 +789,30 @@ public class StandaloneXMLSchema {
             aNode.setAttributeNode(fixed_att);
         }
         // Generate a DOM Attribute node
+        /*
+         * Section 3.8.1.22 GenerateSCs #2
+         */
         Attr aNameNode = aNode.getOwnerDocument().createAttribute("name");
-        DataTypeSupplementaryComponent aDTSC = dtScRepository.findOne(aBBIESC.getDtScId());
-        if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Text"))
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
-        else if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("ID"));
-        else
-            //aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
-        	aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm())+Utility.toCamelCase(aDTSC.getRepresentationTerm()));
+
+        DataTypeSupplementaryComponent dtSc = dtScRepository.findOne(aBBIESC.getDtScId());
+        String representationTerm = dtSc.getRepresentationTerm();
+        String propertyTerm = dtSc.getPropertyTerm();
+        if ("Text".equals(representationTerm) ||
+            "Indicator".equals(representationTerm) && "Preferred".equals(propertyTerm)) {
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm));
+        } else if ("Identifier".equals(representationTerm)) {
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm).concat("ID"));
+        } else {
+            aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm) + Utility.toCamelCase(representationTerm));
+        }
+
         aNode.setAttributeNode(aNameNode);
-        if (aBBIESC.getMinCardinality() >= 1)
+        if (aBBIESC.getMinCardinality() >= 1) {
             aNode.setAttribute("use", "required");
-        else
+        } else {
             aNode.setAttribute("use", "optional");
+        }
+
         Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation");
         Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
