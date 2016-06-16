@@ -26,7 +26,7 @@ public class AttrDecl extends AbstractDeclaration {
         if (isProhibited()) {
             return 0;
         }
-        return 1;
+        return 0;
     }
 
     @Override
