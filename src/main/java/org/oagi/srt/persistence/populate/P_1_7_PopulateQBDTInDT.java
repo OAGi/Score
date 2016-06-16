@@ -778,28 +778,30 @@ public class P_1_7_PopulateQBDTInDT {
                     String representationTerm = dtSc.getRepresentationTerm();
                     DataType dtVO = getDataTypeWithRepresentationTerm(representationTerm);
 
-                    CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAllowedVO = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
-                    cdtSCAllowedVO.setCdtScId(dtSc.getDtScId());
-                    List<CoreDataTypeAllowedPrimitive> cdtallowedprimitivelist = getCDTAllowedPrimitiveIDs(dtVO.getDtId());
-                    for (CoreDataTypeAllowedPrimitive svo : cdtallowedprimitivelist) {
-                        cdtSCAllowedVO.setCdtPriId(svo.getCdtPriId());
-                        cdtSCAllowedVO.setDefault(svo.isDefault());
-                        cdtScAwdPriRepository.save(cdtSCAllowedVO);
+
+                    List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = getCdtAwdPriList(dtVO.getDtId());
+                    for (CoreDataTypeAllowedPrimitive svo : cdtAwdPriList) {
+                        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri =
+                                new CoreDataTypeSupplementaryComponentAllowedPrimitive();
+                        cdtScAwdPri.setCdtScId(dtSc.getDtScId());
+                        cdtScAwdPri.setCdtPriId(svo.getCdtPriId());
+                        cdtScAwdPri.setDefault(svo.isDefault());
+                        cdtScAwdPriRepository.save(cdtScAwdPri);
 
                         // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
-                        int cdtSCAllowedPrimitiveId =
+                        int cdtScAwdPriId =
                                 cdtScAwdPriRepository
-                                        .findOneByCdtScIdAndCdtPriId(cdtSCAllowedVO.getCdtScId(), cdtSCAllowedVO.getCdtPriId())
+                                        .findOneByCdtScIdAndCdtPriId(cdtScAwdPri.getCdtScId(), cdtScAwdPri.getCdtPriId())
                                         .getCdtScAwdPriId();
 
-                        List<String> xsdbs = Types.getCorrespondingXSDBuiltType(getPrimitiveName(cdtSCAllowedVO.getCdtPriId()));
-                        for (String xbt : xsdbs) {
-                            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap mapVO =
+                        List<String> xbtList = Types.getCorrespondingXSDBuiltType(getPrimitiveName(cdtScAwdPri.getCdtPriId()));
+                        for (String xbt : xbtList) {
+                            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
                                     new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
-                            mapVO.setCdtScAwdPri(cdtSCAllowedPrimitiveId);
+                            cdtScAwdPriXpsTypeMap.setCdtScAwdPri(cdtScAwdPriId);
                             int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
-                            mapVO.setXbtId(xdtBuiltTypeId);
-                            cdtScAwdPriXpsTypeMapRepository.save(mapVO);
+                            cdtScAwdPriXpsTypeMap.setXbtId(xdtBuiltTypeId);
+                            cdtScAwdPriXpsTypeMapRepository.save(cdtScAwdPriXpsTypeMap);
                         }
                     }
 
@@ -865,7 +867,7 @@ public class P_1_7_PopulateQBDTInDT {
         return cdtPriRepository.findOneByName(name).getCdtPriId();
     }
 
-    public List<CoreDataTypeAllowedPrimitive> getCDTAllowedPrimitiveIDs(int cdt_id) throws Exception {
+    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(int cdt_id) throws Exception {
         return cdtAwdPriRepository.findByCdtId(cdt_id);
     }
 
