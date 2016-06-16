@@ -796,8 +796,8 @@ public class StandaloneXMLSchema {
         else if (aDTSC.getRepresentationTerm().equalsIgnoreCase("Identifier"))
             aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat("ID"));
         else
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
-        //aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()).concat(Utility.toCamelCase(aDTSC.getRepresentationTerm())));
+            //aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm()));
+        	aNameNode.setNodeValue(Utility.toLowerCamelCase(aDTSC.getPropertyTerm().concat(aDTSC.getRepresentationTerm())));
         aNode.setAttributeNode(aNameNode);
         if (aBBIESC.getMinCardinality() >= 1)
             aNode.setAttribute("use", "required");
