@@ -9,6 +9,8 @@ import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.entity.DataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -32,6 +34,8 @@ import java.util.List;
  */
 @Component
 public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private UserRepository userRepository;
@@ -86,7 +90,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             dataType.setRevisionTrackingNum(0);
             dataType.setDeprecated(false);
             dataType.setModule(module);
-            System.out.println("Populating additional BDTs from meta whose name is " + name);
+            logger.debug("Populating additional BDTs from meta whose name is " + name);
             dataTypeRepository.saveAndFlush(dataType);
 
             // BDT_Primitive_Restriction
@@ -108,7 +112,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             bdtPriRestri.setBdtId(bdtId);
             bdtPriRestri.setCdtAwdPriXpsTypeMapId(aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
             bdtPriRestri.setDefault(aBusinessDataTypePrimitiveRestriction.isDefault());
-            System.out.println("Populating BDT Primitive Restriction for bdt id = " + bdtId + " cdt primitive expression type map = " + bdtPriRestri.getCdtAwdPriXpsTypeMapId() + " is_default = " + bdtPriRestri.isDefault());
+            logger.debug("Populating BDT Primitive Restriction for bdt id = " + bdtId + " cdt primitive expression type map = " + bdtPriRestri.getCdtAwdPriXpsTypeMapId() + " is_default = " + bdtPriRestri.isDefault());
 
             result.add(bdtPriRestri);
         }
@@ -118,7 +122,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.6. Start");
+        logger.debug("### 1.6. Start");
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
@@ -130,7 +134,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
         P_1_5_6_PopulateBDTSCPrimitiveRestriction bdtscpri = applicationContext.getBean(P_1_5_6_PopulateBDTSCPrimitiveRestriction.class);
         bdtscpri.populateBDTSCPrimitiveRestriction(businessDataType_xsd, meta_xsd, false);
 
-        System.out.println("### 1.6. End");
+        logger.debug("### 1.6. End");
     }
 
     public static void main(String args[]) throws Exception {

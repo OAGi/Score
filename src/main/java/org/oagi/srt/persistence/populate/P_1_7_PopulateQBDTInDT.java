@@ -14,6 +14,8 @@ import org.oagi.srt.persistence.populate.helper.ElementDecl;
 import org.oagi.srt.persistence.populate.helper.TypeDecl;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +42,8 @@ import java.util.*;
  */
 @Component
 public class P_1_7_PopulateQBDTInDT {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private UserRepository userRepository;
@@ -1024,11 +1028,11 @@ public class P_1_7_PopulateQBDTInDT {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.7 Start");
+        logger.debug("### 1.7 Start");
 
         populate();
 
-        System.out.println("### 1.7 End");
+        logger.debug("### 1.7 End");
     }
 
     public static void main(String[] args) throws Exception {

@@ -10,6 +10,8 @@ import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +32,8 @@ import java.util.List;
 @Component
 public class P_1_4_PopulateCodeList {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private UserRepository userRepository;
 
@@ -44,7 +48,7 @@ public class P_1_4_PopulateCodeList {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.4 Start");
+        logger.debug("### 1.4 Start");
 
         String tt[][] = {               
                 {"CodeList_ConditionTypeCode_1", "314"},
@@ -69,7 +73,7 @@ public class P_1_4_PopulateCodeList {
             String fileName = tt[i][0];
             int agencyId = Integer.parseInt(tt[i][1]);
 
-            System.out.println("## Importing Code List from " + fileName + "..");
+            logger.debug("## Importing Code List from " + fileName + "..");
             String filename = fileName + ".xsd";
             codeLists.addAll(codeList(filename, agencyId));
         }
@@ -79,7 +83,7 @@ public class P_1_4_PopulateCodeList {
             String fileName = tt[i][0];
             int agencyId = Integer.parseInt(tt[i][1]);
 
-            System.out.println("## Updating Code List referring " + fileName + "..");
+            logger.debug("## Updating Code List referring " + fileName + "..");
 
             String filename = fileName + ".xsd";
             updateBasedCodeListID(filename, agencyId);
@@ -89,13 +93,13 @@ public class P_1_4_PopulateCodeList {
             String fileName = tt[i][0];
             int agencyId = Integer.parseInt(tt[i][1]);
 
-            System.out.println("## Impoting Code List Value from " + fileName + "..");
+            logger.debug("## Impoting Code List Value from " + fileName + "..");
 
             String filename = fileName + ".xsd";
             codeListValue(filename);
         }
 
-        System.out.println("### 1.4 End");
+        logger.debug("### 1.4 End");
     }
 
     private List<CodeList> codeList(String fileinput, int agencyId) throws Exception {
@@ -157,7 +161,7 @@ public class P_1_4_PopulateCodeList {
                 codeList.setModule(Utility.extractModuleName(path1));
                 codeLists.add(codeList);
             } else if (!name.endsWith("EnumerationType"))
-                System.out.println("Check !!  " + name);
+                logger.debug("Check !!  " + name);
         }
 
         return codeLists;
@@ -224,15 +228,15 @@ public class P_1_4_PopulateCodeList {
                         if (baseCodelistVO != null && codelistVO != null) {
                             codelistVO.setBasedCodeListId(baseCodelistVO.getCodeListId());
                             codeListRepository.save(codelistVO);
-                            System.out.println(" Update Based Code List ID: " + tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
+                            logger.debug(" Update Based Code List ID: " + tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
                         } else {
-                            System.out.println(" Update Based Code List ID Is Failed! Check CodeListID: " + tmp.getAttribute("name"));
+                            logger.debug(" Update Based Code List ID Is Failed! Check CodeListID: " + tmp.getAttribute("name"));
                             return;
                         }
                     }
                 }
             } else if (!tmp.getAttribute("name").endsWith("EnumerationType"))
-                System.out.println("Check !!  " + tmp.getAttribute("name"));
+                logger.debug("Check !!  " + tmp.getAttribute("name"));
         }
 
     }
@@ -257,9 +261,9 @@ public class P_1_4_PopulateCodeList {
                     //Get code_list_value from enumerationType
                     enumeration = xh.getNodeList("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration");
                     if (enumeration.getLength() < 1) {
-                        System.out.println("   EnumerationType for " + codeList.getName() + " has no enumerations");
+                        logger.debug("   EnumerationType for " + codeList.getName() + " has no enumerations");
                     } else {
-                        System.out.println("   Start import from EnumerationType to: " + codeList.getName());
+                        logger.debug("   Start import from EnumerationType to: " + codeList.getName());
                     }
                 } else {//if enum_type_guid is null
                     if (codeList.getBasedCodeListId() > 0) {
@@ -267,7 +271,7 @@ public class P_1_4_PopulateCodeList {
                         List<CodeListValue> codeListValuesFromBase = codeListValueRepository.findByCodeListId(codeList.getBasedCodeListId());
 
                         if (codeListValuesFromBase.size() > 0) {
-                            System.out.println("   Start inherit from BasedCodeList to : " + codeList.getName());
+                            logger.debug("   Start inherit from BasedCodeList to : " + codeList.getName());
                             for (int j = 0; j < codeListValuesFromBase.size(); j++) {
                                 CodeListValue codeListValue = new CodeListValue();
                                 CodeListValue codeListValueFromBase = codeListValuesFromBase.get(j);
@@ -286,9 +290,9 @@ public class P_1_4_PopulateCodeList {
                         //Get the values from local xsd:enumeration
                         enumeration = xh.getNodeList("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration");
                         if (enumeration.getLength() < 1) {
-                            System.out.println("   " + codeList.getName() + " has no local enumerations");
+                            logger.debug("   " + codeList.getName() + " has no local enumerations");
                         } else {
-                            System.out.println("   Start import from LocalEnumeration: ");
+                            logger.debug("   Start import from LocalEnumeration: ");
                         }
                     }
                 }
@@ -321,7 +325,7 @@ public class P_1_4_PopulateCodeList {
                         count++;
                     }
                     if(count>0){
-                    	System.out.println("         "+count+" enumerations are imported!");
+                    	logger.debug("         "+count+" enumerations are imported!");
                     }
                 }
             }

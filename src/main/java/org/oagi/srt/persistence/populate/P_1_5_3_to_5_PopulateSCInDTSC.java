@@ -58,7 +58,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
             // default BDT
             if (dt2.getType() == 0) {
-                System.out.println("Popuating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
+                logger.debug("Popuating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
                 List<DataTypeSupplementaryComponent> cdtSCList = dtScRepository.findByOwnerDtId(dt2.getDtId());
 
                 NodeList attributeNodeList = xh2.getNodeList("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -124,7 +124,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         String baseStr = basePropertyTerm + " " + baseRepresentationTerm;
                         String thisStr = Utility.spaceSeparator(attribute_name);
 
-                        System.out.println(baseStr + " vs " + thisStr);
+                        logger.debug(baseStr + " vs " + thisStr);
                         if (baseStr.equals(thisStr)) {
                             baseInd = j;
                             vo.setPropertyTerm(baseCDTSC.getPropertyTerm());
@@ -136,7 +136,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     }
                     if (baseInd > -1) {
                         cdtSCList.remove(baseInd);
-                        System.out.println("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This sc has corresponding base!");
+                        logger.debug("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This sc has corresponding base!");
                         dtScRepository.save(vo);
                     } else {
                         String propertyTerm = "";
@@ -160,7 +160,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         vo.setPropertyTerm(propertyTerm);
                         vo.setRepresentationTerm(representationTerm);
                         vo.setDefinition(definition);
-                        System.out.println("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by default BDT is new from Attribute!");
+                        logger.debug("~~~ " + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by default BDT is new from Attribute!");
                         dtScRepository.save(vo);
                     }
                 }
@@ -183,7 +183,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     vo.setMinCardinality(0);
                     vo.setMaxCardinality(0);
                     vo.setBasedDtScId(baseCDTSC.getDtScId());
-                    System.out.println("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
+                    logger.debug("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
                     dtScRepository.save(vo);
                 }
             }
@@ -197,7 +197,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
             // default BDT
             if (dt2.getType() == 0) {
-                System.out.println("Validating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
+                logger.debug("Validating SCs for default BDT with type = " + Utility.denToTypeName(dt.getDen()));
                 //Inherit from based CDT
                 ArrayList<String> fromXSDwAttrs = new ArrayList<String>();
                 ArrayList<String> fromDBwAttrs = new ArrayList<String>();
@@ -276,7 +276,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         DataTypeSupplementaryComponent adtsc = dtScRepository.findOneByGuid(attrNode.getAttribute("id"));
 
                         if (adtsc == null) {
-                            System.out.println("@@@@ DTSC from Attributes is not imported! Check DTSC (guid=" + attrNode.getAttribute("id") + ")");
+                            logger.debug("@@@@ DTSC from Attributes is not imported! Check DTSC (guid=" + attrNode.getAttribute("id") + ")");
                         } else {
                             fromDBStr = fromDBStr + adtsc.getGuid();
                             fromDBStr = fromDBStr + adtsc.getPropertyTerm();
@@ -287,9 +287,9 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         }
 
                         if (!fromDBStr.equals(aStrFromXSDwAttr)) {
-                            System.out.println("@@@@ DTSC from Attributes has different values! Check DTSC (guid=" + attrNode.getAttribute("id") + ")");
-                            System.out.println("     FromXSD: " + aStrFromXSDwAttr);
-                            System.out.println("      FromDB: " + fromDBStr);
+                            logger.debug("@@@@ DTSC from Attributes has different values! Check DTSC (guid=" + attrNode.getAttribute("id") + ")");
+                            logger.debug("     FromXSD: " + aStrFromXSDwAttr);
+                            logger.debug("      FromDB: " + fromDBStr);
                         }
                     }
                 }
@@ -347,13 +347,13 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                             }
                         }
                     }
-                    System.out.println("");
+                    logger.debug("");
 
                 }
 
                 for (int i = CDTSCs.size() - 1; i > -1; i--) {
                     DataTypeSupplementaryComponent cdtsc = (DataTypeSupplementaryComponent) CDTSCs.get(i);
-                    System.out.println("@@@@ " + cdtsc.getPropertyTerm() + " " + cdtsc.getRepresentationTerm() + " is not imported! Check Default BDT: " + dt.getGuid());
+                    logger.debug("@@@@ " + cdtsc.getPropertyTerm() + " " + cdtsc.getRepresentationTerm() + " is not imported! Check Default BDT: " + dt.getGuid());
                 }
             }
         }
@@ -376,7 +376,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             if (dt2.getType() != 0) {
                 //inheritance
                 String denType = Utility.DenToName(dt.getDen());
-                System.out.println("Popuating SCs for unqualified bdt with type = " + denType);
+                logger.debug("Popuating SCs for unqualified bdt with type = " + denType);
                 Node extensionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");
                 if (extensionNode == null)
                     extensionNode = xh2.getNode("//xsd:simpleType[@name = '" + denType + "']/xsd:restriction");
@@ -436,7 +436,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         String baseStr = basePropertyTerm + " " + baseRepresentationTerm;
                         String thisStr = Utility.spaceSeparator(attribute_name);
 
-                        System.out.println(baseStr + " vs " + thisStr);
+                        logger.debug(baseStr + " vs " + thisStr);
                         if (baseStr.equals(thisStr)) {
                             baseInd = j;
                             vo.setPropertyTerm(baseDefaultBDTSC.getPropertyTerm());
@@ -449,7 +449,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                     if (baseInd > -1) {
                         baseDefaultDTSCs.remove(baseInd);
-                        System.out.println("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT has corresponding base!");
+                        logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT has corresponding base!");
                         dtScRepository.save(vo);
                     } else {
 
@@ -474,7 +474,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         vo.setPropertyTerm(propertyTerm);
                         vo.setRepresentationTerm(representationTerm);
                         vo.setDefinition(definition);
-                        System.out.println("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
+                        logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is new from Attribute!");
 
                         dtScRepository.save(vo);
 
@@ -513,9 +513,9 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
                                     System.out.print("   ~~~" + insertedSC.getPropertyTerm() + " " + insertedSC.getRepresentationTerm() + " is " + tmpPri.getName());
                                     if (cdtSCAP.isDefault()) {
-                                        System.out.println(" and it's Default!");
+                                        logger.debug(" and it's Default!");
                                     } else {
-                                        System.out.println("");
+                                        logger.debug("");
                                     }
 
                                     cdtScAwdPriRepository.save(cdtSCAP);
@@ -556,7 +556,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     vo.setMinCardinality(baseDefaultBDTSC.getMinCardinality());
                     vo.setMaxCardinality(baseDefaultBDTSC.getMaxCardinality());
                     vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
-                    System.out.println("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
+                    logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
                     dtScRepository.save(vo);
                 }
             }
@@ -580,7 +580,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             // unqualified BDT
             if (dt2.getType() != 0) {
                 String denType = Utility.DenToName(dt.getDen());
-                System.out.println("Validating SCs for unqualified bdt with type = " + denType);
+                logger.debug("Validating SCs for unqualified bdt with type = " + denType);
                 Node extensionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");
                 if (extensionNode == null)
                     extensionNode = xh2.getNode("//xsd:simpleType[@name = '" + denType + "']/xsd:restriction");
@@ -659,7 +659,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     DataTypeSupplementaryComponent dtsc = dtScRepository.findOneByGuid(attribute_id);
 
                     if (dtsc == null) {
-                        System.out.println("@@@@ The Attribute is not imported! Check DT: " + dt.getGuid());
+                        logger.debug("@@@@ The Attribute is not imported! Check DT: " + dt.getGuid());
                     } else {
                         fromDB = fromDB + dtsc.getGuid();
                         fromDB = fromDB + dtsc.getPropertyTerm();
@@ -669,9 +669,9 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         fromDB = fromDB + dtsc.getMaxCardinality();
 
                         if (!fromXSD.equals(fromDB)) {
-                            System.out.println("@@@@ DTSC from Attributes has different values! Check DTSC (guid=" + dtsc.getGuid() + ")");
-                            System.out.println("     FromXSD: " + fromXSD);
-                            System.out.println("      FromDB: " + fromDB);
+                            logger.debug("@@@@ DTSC from Attributes has different values! Check DTSC (guid=" + dtsc.getGuid() + ")");
+                            logger.debug("     FromXSD: " + fromXSD);
+                            logger.debug("      FromDB: " + fromDB);
                         }
                     }
 
@@ -711,16 +711,16 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
 //								System.out.print("   ~~~"+insertedSC.getPropertyTerm()+" "+insertedSC.getRepresentationTerm()+" is "+tmpPri.getName());
 //								if(cdtSCAP.getisDefault()){
-//									System.out.println(" and it's Default!");
+//									logger.debug(" and it's Default!");
 //								}
 //								else{
-//									System.out.println("");
+//									logger.debug("");
 //								}
 
                                 //cdtScAwdPriRepository.insertObject(cdtSCAP);
 
 
-                                System.out.println("        ** Pri:" + tmpPri.getName() + " Default:" + cdtSCAP.isDefault());
+                                logger.debug("        ** Pri:" + tmpPri.getName() + " Default:" + cdtSCAP.isDefault());
 
                                 CoreDataTypeSupplementaryComponentAllowedPrimitive insertedCDTSCAP =
                                         cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAP.getCdtScId(), cdtSCAP.getCdtPriId());
@@ -735,7 +735,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     XSDBuiltInType xbt = xbtRepository.findOne(tmp.getXbtId());
 
                                     //cdtScAwdPriXpsTypeMapRepository.insertObject(tmp);
-                                    System.out.println("          ** XBT:" + xbt.getBuiltInType());
+                                    logger.debug("          ** XBT:" + xbt.getBuiltInType());
 
                                 }
                             }
@@ -796,11 +796,11 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                             }
                         }
                     }
-                    System.out.println("");
+                    logger.debug("");
                 }
                 for (int i = baseDefaultDTSCs.size() - 1; i > -1; i--) {
                     DataTypeSupplementaryComponent bdtsc = baseDefaultDTSCs.get(i);
-                    System.out.println("@@@@ " + bdtsc.getPropertyTerm() + " " + bdtsc.getRepresentationTerm() + " is not inherited! Check Unqualified BDT: " + dt.getGuid());
+                    logger.debug("@@@@ " + bdtsc.getPropertyTerm() + " " + bdtsc.getRepresentationTerm() + " is not inherited! Check Unqualified BDT: " + dt.getGuid());
                 }
             }
         }
@@ -815,23 +815,23 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.5.3-5 Start");
+        logger.debug("### 1.5.3-5 Start");
 
         populateDTSC();
 
-        System.out.println("### 1.5.3-5 End");
+        logger.debug("### 1.5.3-5 End");
 
     }
 
     public void validate() throws Exception {
-        System.out.println("### 1.5.3-5 Start Validation");
+        logger.debug("### 1.5.3-5 Start Validation");
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         validatePopulateDTSCforDefaultBDT(businessDataType_xsd, fields_xsd);
         validatePopulateDTSCforUnqualifiedBDT(businessDataType_xsd, fields_xsd, true);
 
-        System.out.println("### 1.5.3-5 Validation End");
+        logger.debug("### 1.5.3-5 Validation End");
 
     }
 

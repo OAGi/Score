@@ -6,6 +6,8 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -27,6 +29,8 @@ import java.util.List;
  */
 @Component
 public class P_1_5_1_to_2_PopulateBDTsInDT {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private UserRepository userRepository;
@@ -59,7 +63,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.5.1-2 Start");
+        logger.debug("### 1.5.1-2 Start");
 
         File f = new File(SRTConstants.NOUNS_FILE_PATH);
 
@@ -74,7 +78,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         importCodeContentType();
         importIDContentType();
 
-        System.out.println("### 1.5.1-2 End");
+        logger.debug("### 1.5.1-2 End");
     }
 
     private int getUserID(String userName) {
@@ -82,7 +86,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void importDataTypeList(String dataType) throws Exception {
-        System.out.println("Importing " + dataType + " now");
+        logger.debug("Importing " + dataType + " now");
         String typeName;
         String xsdTypeName;
         String dataTypeTerm = "";
@@ -103,7 +107,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         }
         Element typeNameElement = (Element) typeNameNode;
         typeName = typeNameElement.getAttribute("base");
-        System.out.println("!! typeName = " + typeName);
+        logger.debug("!! typeName = " + typeName);
         Node aNodeTN = fields_xsd.getNode("//xsd:" + type + "Type[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;
 
@@ -118,13 +122,13 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dataTypeTermNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
         }
         Element dataTypeTermElement = (Element) dataTypeTermNode;
-        System.out.println("### " + dataTypeTermElement.getTextContent());
+        logger.debug("### " + dataTypeTermElement.getTextContent());
         try {
             dataTypeTerm = dataTypeTermElement.getTextContent().substring(0, dataTypeTermElement.getTextContent().indexOf(". Type"));
             if (dataTypeTerm == "")
-                System.out.println("Error getting the data type term for the unqualified BDT: " + dataType);
+                logger.debug("Error getting the data type term for the unqualified BDT: " + dataType);
         } catch (Exception e) {
-            System.out.println("Error getting the data type term for the unqualified BDT: " + dataType + " Stacktrace:" + e.getMessage());
+            logger.debug("Error getting the data type term for the unqualified BDT: " + dataType + " Stacktrace:" + e.getMessage());
         }
 
         //Definitions
@@ -175,12 +179,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         }
 
         if (defaultId == -1 || defaultId == 0)
-            System.out.println("Error getting the default BDT primitive restriction for the default BDT: " + typeName);
-        System.out.println("data type term = " + dataTypeTerm);
+            logger.debug("Error getting the default BDT primitive restriction for the default BDT: " + typeName);
+        logger.debug("data type term = " + dataTypeTerm);
 
         DataType dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definition,
                 ccDefinition, aElementBDT.getAttribute("id"), module);
-        System.out.println("Inserting bdt primitive restriction for default bdt");
+        logger.debug("Inserting bdt primitive restriction for default bdt");
         insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
 
         //Unqualified Type Name
@@ -190,7 +194,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         String unQualifiedDataTypeTerm = dataTypeTerm;
         DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm,
                 aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"), module);
-        System.out.println("Inserting bdt primitive restriction for unqualfieid bdt");
+        logger.debug("Inserting bdt primitive restriction for unqualfieid bdt");
         insertBDTPrimitiveRestriction(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
     }
 
@@ -199,7 +203,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         int basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
-            System.out.println("Inserting default bdt whose name is " + typeName);
+            logger.debug("Inserting default bdt whose name is " + typeName);
 
             dtVO = new DataType();
 
@@ -251,7 +255,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                     if (defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId())
                         isDefault = true;
                     aBDT_Primitive_RestrictionVO.setDefault(isDefault);
-                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type in DefaultBDT" +
+                    logger.debug("Inserting allowed primitive expression type map with XSD built-in type in DefaultBDT" +
                             getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = " + isDefault);
                     bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
                 }
@@ -264,7 +268,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         		aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
         		aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
         		aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
-        		System.out.println("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
+        		logger.debug("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
                 bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
         	}
         }
@@ -371,17 +375,17 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         DataType dVO1 = new DataType();
 
         if (check_BDT(aElementBDT.getAttribute("id"))) {
-            System.out.println("Default BDT is already existing");
+            logger.debug("Default BDT is already existing");
             dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
         } else {
             dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(),
                     (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"), module);
-            System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
+            logger.debug("Inserting bdt primitive restriction for exceptional default bdt");
             insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
         }
 
         if (check_BDT(aElementBDT.getAttribute("id")))
-            System.out.println("Unqualified BDT is already existing");
+            logger.debug("Unqualified BDT is already existing");
         else {
             //Unqualified Type Name
             String unQualifiedTypeName = dataType;
@@ -390,7 +394,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             String unQualifiedDataTypeTerm = dataTypeTerm;
             DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm,
                     aElementBDT.getAttribute("id"), aElementBDT.getAttribute("id"), module);
-            System.out.println("Inserting bdt primitive restriction for exceptional unqualified bdt");
+            logger.debug("Inserting bdt primitive restriction for exceptional unqualified bdt");
             insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
         }
     }
@@ -427,7 +431,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 continue;
 
             Node typeNameNode = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']/xsd:restriction");
-            System.out.println("Importing " + dataType + " now in the exception ");
+            logger.debug("Importing " + dataType + " now in the exception ");
             Element typeNameElement = (Element) typeNameNode;
             typeName = typeNameElement.getAttribute("base");
 
@@ -486,17 +490,17 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             DataType dVO1 = new DataType();
 
             if (check_BDT(aElementBDT.getAttribute("id"))) {
-                System.out.println("Default BDT is already existing");
+                logger.debug("Default BDT is already existing");
                 dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
             } else {
                 dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(),
                         (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"), module);
-                System.out.println("Inserting bdt primitive restriction for exceptional default bdt");
+                logger.debug("Inserting bdt primitive restriction for exceptional default bdt");
                 insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
             }
 
             if (check_BDT(aElementTN.getAttribute("id")))
-                System.out.println("Unqualified BDT is already existing");
+                logger.debug("Unqualified BDT is already existing");
             else {
                 //Unqualified Type Name
                 String unQualifiedTypeName = dataType;
@@ -505,7 +509,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
                 String unQualifiedDataTypeTerm = dataTypeTerm;
                 DataType dVO2 = insertUnqualified_BDTStatement(unQualifiedTypeName, unQualifiedDataTypeTerm,
                         aElementTN.getAttribute("id"), aElementBDT.getAttribute("id"), module);
-                System.out.println("Inserting bdt primitive restriction for exceptional unqualified bdt");
+                logger.debug("Inserting bdt primitive restriction for exceptional unqualified bdt");
                 insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO2.getDtId(), defaultId);
             }
         }
@@ -538,7 +542,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 	                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
 	                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
 	                    aBDT_Primitive_RestrictionVO.setDefault(true);
-	                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
+	                    logger.debug("Inserting allowed primitive expression type map with XSD built-in type " +
 	                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = true");
 	                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
 	                } 
@@ -548,7 +552,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 	                    aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
 	                    aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
 	                    aBDT_Primitive_RestrictionVO.setDefault(false);
-	                    System.out.println("Inserting allowed primitive expression type map with XSD built-in type " +
+	                    logger.debug("Inserting allowed primitive expression type map with XSD built-in type " +
 	                            getXsdBuiltinType(aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) + ": default = false");
 	                    bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
 	                }
@@ -564,7 +568,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         		aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
         		aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
         		aBDT_Primitive_RestrictionVO.setDefault(defaultBDTPri.get(i).isDefault());
-        		System.out.println("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
+        		logger.debug("Inherit allowed primitive expression type map with XSD built-in type in unqualified BDT");
                 bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
         	}
         }

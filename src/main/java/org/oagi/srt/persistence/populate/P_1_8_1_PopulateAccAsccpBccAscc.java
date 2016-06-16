@@ -86,12 +86,12 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.8 Start");
+        logger.debug("### 1.8 Start");
 
         populate();
         populateUnused();
 
-        System.out.println("### 1.8 End");
+        logger.debug("### 1.8 End");
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -111,7 +111,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         for (File file : files) {
             if (file.getName().equals("AcknowledgeInvoice.xsd")) {
-                System.out.println(file.getName() + " processing...");
+                logger.debug(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }
         }
@@ -129,7 +129,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         for (File file : files) {
             if (!file.getName().equals("AcknowledgeInvoice.xsd") &&
                 !file.getName().endsWith("IST.xsd")) {
-                System.out.println(file.getName() + " processing...");
+                logger.debug(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }
         }

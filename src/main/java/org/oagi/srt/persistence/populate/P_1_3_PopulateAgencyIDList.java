@@ -7,6 +7,8 @@ import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +32,8 @@ import java.util.List;
 @Component
 public class P_1_3_PopulateAgencyIDList {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
@@ -38,11 +42,11 @@ public class P_1_3_PopulateAgencyIDList {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        System.out.println("### 1.3 Start");
+        logger.debug("### 1.3 Start");
         Collection<AgencyIdList> agencyIdLists = agencyIDList();
         Collection<AgencyIdListValue> agencyIdListValues = agencyIDListValue(agencyIdLists);
         updateAgencyIDList(agencyIdLists, agencyIdListValues);
-        System.out.println("### 1.3 End");
+        logger.debug("### 1.3 End");
     }
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {
