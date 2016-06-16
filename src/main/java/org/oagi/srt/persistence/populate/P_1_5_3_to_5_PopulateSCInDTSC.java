@@ -6,6 +6,8 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -25,6 +27,8 @@ import java.util.List;
  */
 @Component
 public class P_1_5_3_to_5_PopulateSCInDTSC {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private DataTypeRepository dataTypeRepository;
