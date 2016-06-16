@@ -814,62 +814,68 @@ public class StandaloneXMLSchema {
     }
 
     public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
-        DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
-
-        CodeList aCL = codeListRepository.findOne(gBBIESC.getCodeListId());
-        if (aCL == null) {
-            aCL = new CodeList();
+        CodeList codeList = codeListRepository.findOne(gBBIESC.getCodeListId());
+        if (codeList != null) {
+            return codeList;
         }
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
+
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
                 bdtScPriRestriRepository.findOne(gBBIESC.getDtScPriRestriId());
-        if (aBDTSCPrimitiveRestriction == null) {
-            aBDTSCPrimitiveRestriction = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-        }
-
-        if (aCL.getCodeListId() != 0) {
-
-        } else if (aBDTSCPrimitiveRestriction.getBdtScPriRestriId() != 0) {
-            aCL = codeListRepository.findOne(aBDTSCPrimitiveRestriction.getCodeListId());
-        } else if (aCL.getCodeListId() == 0 && aBDTSCPrimitiveRestriction.getBdtScPriRestriId() == 0) {
+        if (bdtScPriRestri != null) {
+            return codeListRepository.findOne(bdtScPriRestri.getCodeListId());
+        } else {
+            DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
                     bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
-            aCL = codeListRepository.findOne(bBDTSCPrimitiveRestriction.getCodeListId());
+            if (bBDTSCPrimitiveRestriction != null) {
+                codeList = codeListRepository.findOne(bBDTSCPrimitiveRestriction.getCodeListId());
+            }
         }
-        return aCL;
+
+        return codeList;
     }
 
     public AgencyIdList getAgencyIdList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) throws Exception {
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
+        AgencyIdList agencyIdList = agencyIdListRepository.findOne(gBBIESC.getAgencyIdListId());
+        if (agencyIdList != null) {
+            return agencyIdList;
+        }
+
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
                 bdtScPriRestriRepository.findOne(gBBIESC.getDtScPriRestriId());
-        DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
-
-        AgencyIdList aAL = agencyIdListRepository.findOne(gBBIESC.getAgencyIdListId());
-        if (aAL == null) {
-            aAL = agencyIdListRepository.findOne(aBDTSCPrimitiveRestriction.getAgencyIdListId());
+        if (bdtScPriRestri != null) {
+            agencyIdList = agencyIdListRepository.findOne(bdtScPriRestri.getAgencyIdListId());
         }
 
-        if (aAL == null) {
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
-                    bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
-            aAL = agencyIdListRepository.findOne(bBDTSCPrimitiveRestriction.getAgencyIdListId());
+        if (agencyIdList == null) {
+            DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
+            bdtScPriRestri = bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+            if (bdtScPriRestri != null) {
+                agencyIdList = agencyIdListRepository.findOne(bdtScPriRestri.getAgencyIdListId());
+            }
         }
-        return aAL;
+        return agencyIdList;
     }
 
     public Element setBBIESCType(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
         DataTypeSupplementaryComponent gDTSC = dtScRepository.findOne(gBBIESC.getDtScId());
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
-                bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
-                cdtScAwdPriXpsTypeMapRepository.findOne(bBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
-        XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
-        if (aXSDBuiltInType.getBuiltInType() != null) {
-            Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
-            aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
-            gNode.setAttributeNode(aTypeNode);
+        if (gDTSC != null) {
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                    bdtScPriRestriRepository.findOneByBdtScIdAndDefault(gDTSC.getDtScId(), true);
+            if (bdtScPriRestri != null) {
+                CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                        cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId());
+                if (cdtScAwdPriXpsTypeMap != null) {
+                    XSDBuiltInType xbt = xbtRepository.findOne(cdtScAwdPriXpsTypeMap.getXbtId());
+                    if (xbt != null && xbt.getBuiltInType() != null) {
+                        Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
+                        aTypeNode.setNodeValue(xbt.getBuiltInType());
+                        gNode.setAttributeNode(aTypeNode);
+                    }
+                }
+            }
         }
         return gNode;
-
     }
 
     public Element setBBIESCType2(BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) throws Exception {
