@@ -88,9 +88,6 @@ public class P_1_7_PopulateQBDTInDT {
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     private XPathHandler fields_xsd;
-    private XPathHandler meta_xsd;
-    private XPathHandler businessDataType_xsd;
-    private XPathHandler component_xsd;
 
     private class DataTypeInfoHolder {
         private String typeName;
@@ -152,9 +149,6 @@ public class P_1_7_PopulateQBDTInDT {
     @PostConstruct
     public void init() throws Exception {
         fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-        businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        component_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
     }
@@ -220,10 +214,6 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void populate() throws Exception {
-        NodeList elementsFromFieldsXSD = fields_xsd.getNodeList("/xsd:schema/xsd:element");
-        NodeList elementsFromMetaXSD = meta_xsd.getNodeList("/xsd:schema/xsd:element");
-        NodeList elementsFromComponentsXSD = component_xsd.getNodeList("/xsd:schema/xsd:element");
-
         prepareForBCCP(SRTConstants.FIELDS_XSD_FILE_PATH,
                 SRTConstants.META_XSD_FILE_PATH,
                 SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
@@ -249,10 +239,6 @@ public class P_1_7_PopulateQBDTInDT {
         for (File file : files) {
             insertDTAndBCCP(file);
         }
-
-//        insertDTAndBCCP(elementsFromFieldsXSD, fields_xsd);
-//        insertDTAndBCCP(elementsFromMetaXSD, meta_xsd); // found that no QBDT from Meta.xsd, maybe because already imported in additional BDT
-//        insertDTAndBCCP(elementsFromComponentsXSD, component_xsd);
 
         insertDTwithoutElement();
     }
