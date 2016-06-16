@@ -115,7 +115,7 @@ public class TypeDecl extends AbstractDeclaration {
             List<AttrDecl> attrDecls = new ArrayList();
             for (XSAttributeUse xsAttributeUse : declaredAttributeUses) {
                 XSAttributeDecl xsAttributeDecl = xsAttributeUse.getDecl();
-                String expression = "./xsd:attribute[@name='" + xsAttributeUse.getDecl().getName() + "']";
+                String expression = ".//xsd:attribute[@name='" + xsAttributeUse.getDecl().getName() + "']";
                 Element element = context.evaluateElement(expression, this.element);
                 if (element == null) {
                     continue;
