@@ -429,7 +429,7 @@ public class P_1_7_PopulateQBDTInDT {
                             bdtScPriRestri.setDefault(false);
 
                     } else if (type.equalsIgnoreCase("NormalizedStringType")) {
-                        if (svo.getCdtPriId() == getCdtPriId("String") && vo.getXbtId() == getXbtId("xsd:string"))
+                        if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
                             bdtScPriRestri.setDefault(true);
                         else
                             bdtScPriRestri.setDefault(false);
