@@ -798,7 +798,8 @@ public class StandaloneXMLSchema {
         String representationTerm = dtSc.getRepresentationTerm();
         String propertyTerm = dtSc.getPropertyTerm();
         if ("Text".equals(representationTerm) ||
-            "Indicator".equals(representationTerm) && "Preferred".equals(propertyTerm)) {
+            "Indicator".equals(representationTerm) && "Preferred".equals(propertyTerm)||
+            propertyTerm.contains(representationTerm)) {
             aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm));
         } else if ("Identifier".equals(representationTerm)) {
             aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm).concat("ID"));
