@@ -1420,11 +1420,11 @@ public class TopLevelABIEHandler implements Serializable {
 
         av.setBbiesc(nbbiescVO);
         String sc_name = "";
-        if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Text")
-        || dtscvo.getPropertyTerm().contains(dtscvo.getRepresentationTerm()))
+        if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Text") ||
+            dtscvo.getPropertyTerm().contains(dtscvo.getRepresentationTerm())) {
             sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm());
-        else {
-        	sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm()).concat(dtscvo.getRepresentationTerm());	
+        } else {
+            sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm()).concat(dtscvo.getRepresentationTerm());
         }
         av.setName(sc_name);
 
@@ -1702,11 +1702,12 @@ public class TopLevelABIEHandler implements Serializable {
             av_01.setBbiesc(bbiescVO);
 
             String sc_name = "";
-            if (dtscVO.getRepresentationTerm().equalsIgnoreCase("Text")
-            ||  dtscVO.getPropertyTerm().contains(dtscVO.getRepresentationTerm()))
+            if (dtscVO.getRepresentationTerm().equalsIgnoreCase("Text") ||
+                dtscVO.getPropertyTerm().contains(dtscVO.getRepresentationTerm())) {
                 sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm());
-            else
+            } else {
                 sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm().concat(dtscVO.getRepresentationTerm()));
+            }
             av_01.setName(sc_name);
 
             av_01.setColor("orange");
