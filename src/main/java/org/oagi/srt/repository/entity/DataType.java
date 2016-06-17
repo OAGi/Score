@@ -1,5 +1,6 @@
 package org.oagi.srt.repository.entity;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -225,7 +226,9 @@ public class DataType implements Serializable {
     }
 
     public void setRevisionDoc(String revisionDoc) {
-        this.revisionDoc = revisionDoc;
+        if (!StringUtils.isEmpty(revisionDoc)) {
+            this.revisionDoc = revisionDoc;
+        }
     }
 
     public String getModule() {

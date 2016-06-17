@@ -53,6 +53,12 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     @Autowired
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
+    @Autowired
+    private ReleaseRepository releaseRepository;
+
+    private int userId;
+    private int releaseId;
+
     public static void main(String[] args) throws Exception {
         try (AbstractApplicationContext ctx = (AbstractApplicationContext)
                 SpringApplication.run(Application.class, args);) {
@@ -65,7 +71,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.debug("### 1.5.1-2 Start");
 
-        File f = new File(SRTConstants.NOUNS_FILE_PATH);
+        userId = userRepository.findAppUserIdByLoginId("oagis");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
 
         for (int i = 0; i < Types.dataTypeList.length; i++) {
             importDataTypeList(Types.dataTypeList[i]);
@@ -79,10 +86,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         importIDContentType();
 
         logger.debug("### 1.5.1-2 End");
-    }
-
-    private int getUserID(String userName) {
-        return userRepository.findAppUserIdByLoginId(userName);
     }
 
     private void importDataTypeList(String dataType) throws Exception {
@@ -218,9 +221,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setDefinition(definition);
             dtVO.setContentComponentDefinition(ccDefinition);
             dtVO.setState(3);
-
-            int userId = getUserID("oagis");
-
             dtVO.setCreatedBy(userId);
             dtVO.setLastUpdatedBy(userId);
             dtVO.setOwnerUserId(userId);
@@ -228,6 +228,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setRevisionNum(0);
             dtVO.setRevisionTrackingNum(0);
             dtVO.setDeprecated(false);
+            dtVO.setReleaseId(releaseId);
             dtVO.setModule(module);
 
             dtVO = dataTypeRepository.saveAndFlush(dtVO);
@@ -296,9 +297,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setDen(Utility.typeToDen(typeName));
             dtVO.setContentComponentDen(Utility.typeToContent(typeName));
             dtVO.setState(3);
-
-            int userId = getUserID("oagis");
-
             dtVO.setCreatedBy(userId);
             dtVO.setLastUpdatedBy(userId);
             dtVO.setOwnerUserId(userId);
@@ -306,6 +304,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
             dtVO.setRevisionNum(0);
             dtVO.setRevisionTrackingNum(0);
             dtVO.setDeprecated(false);
+            dtVO.setReleaseId(releaseId);
             dtVO.setModule(module);
             dtVO = dataTypeRepository.saveAndFlush(dtVO);
         }

@@ -56,13 +56,13 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
 
-    public int getAgencyListID() throws Exception {
-        AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
-        return agencyIdList.getAgencyIdListId();
-    }
+    private int agencyIdListId;
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
+        AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
+        agencyIdListId = agencyIdList.getAgencyIdListId();
+
         XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xh2 = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         logger.debug("### 1.5.6 Start");
@@ -240,7 +240,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     bVO.setDefault(false);
 
                     if (ele.getAttribute("name").contains("AgencyID")) {
-                        bVO.setAgencyIdListId(getAgencyListID());
+                        bVO.setAgencyIdListId(agencyIdListId);
                         logger.debug("     $$$$$ Populating bdt sc primitive restriction for bdt sc = " + aDataTypeSupplementaryComponent.getPropertyTerm() + aDataTypeSupplementaryComponent.getRepresentationTerm() + " owner dt den = " + getDen(aDataTypeSupplementaryComponent.getOwnerDtId()) + " agency id list id = " + bVO.getAgencyIdListId() + " is default = " + bVO.isDefault());
                     } else {
                         bVO.setCodeListId(codeListId);

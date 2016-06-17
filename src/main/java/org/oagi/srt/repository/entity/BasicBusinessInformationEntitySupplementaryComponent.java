@@ -1,5 +1,6 @@
 package org.oagi.srt.repository.entity;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -160,7 +161,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (!StringUtils.isEmpty(definition)) {
+            this.definition = definition;
+        }
     }
 
     public String getRemark() {

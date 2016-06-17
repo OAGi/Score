@@ -87,6 +87,12 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
+    @Autowired
+    private ReleaseRepository releaseRepository;
+
+    @Autowired
+    private NamespaceRepository namespaceRepository;
+
     private XPathHandler fields_xsd;
 
     private class DataTypeInfoHolder {
@@ -144,6 +150,9 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private int userId;
+    private int releaseId;
+    private int namespaceId;
+
     private Map<String, DataTypeInfoHolder> dtiHolderMap;
 
     @PostConstruct
@@ -151,6 +160,8 @@ public class P_1_7_PopulateQBDTInDT {
         fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
+        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
     }
 
     private void prepareForBCCP(String... systemIds) throws Exception {
@@ -572,6 +583,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setRevisionNum(0);
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
+        dataType.setReleaseId(releaseId);
         dataType.setModule(dataTypeInfoHolder.getModule());
         dataTypeRepository.saveAndFlush(dataType);
 
@@ -654,7 +666,10 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setCreatedBy(userId);
         bccp.setLastUpdatedBy(userId);
         bccp.setOwnerUserId(userId);
+        bccp.setDeprecated(false);
+        bccp.setReleaseId(releaseId);
         bccp.setModule(module);
+        bccp.setNamespaceId(namespaceId);
         bccpRepository.save(bccp);
     }
 
@@ -943,11 +958,11 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private DataType addToDTForContentType(DataTypeInfoHolder dataTypeInfoHolder, XPathHandler xHandler) throws Exception {
-        DataType dtVO = new DataType();
+        DataType dataType = new DataType();
         String guid = dataTypeInfoHolder.getGuid();
-        dtVO.setGuid(guid);
-        dtVO.setType(1);
-        dtVO.setVersionNum("1.0");
+        dataType.setGuid(guid);
+        dataType.setType(1);
+        dataType.setVersionNum("1.0");
 
         String base = dataTypeInfoHolder.getBaseTypeName();
 
@@ -959,8 +974,8 @@ public class P_1_7_PopulateQBDTInDT {
             base = "IDContentType";
         }
 
-        dtVO.setBasedDtId(dVO.getDtId());
-        dtVO.setDataTypeTerm(dVO.getDataTypeTerm());
+        dataType.setBasedDtId(dVO.getDtId());
+        dataType.setDataTypeTerm(dVO.getDataTypeTerm());
 
         String type = dataTypeInfoHolder.getTypeName();
         String qualifier = Utility.qualifier(type, dVO);
@@ -968,27 +983,27 @@ public class P_1_7_PopulateQBDTInDT {
             throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den: " + dVO.getDen());
         }
 
-        dtVO.setQualifier(qualifier);
+        dataType.setQualifier(qualifier);
         String den = Utility.denWithQualifier(qualifier, dVO.getDen());
-        dtVO.setDen(den);
-        dtVO.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
+        dataType.setDen(den);
+        dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
         String definition = dataTypeInfoHolder.getDefinition();
-        dtVO.setDefinition(definition);
-        dtVO.setState(3);
-        dtVO.setCreatedBy(userId);
-        dtVO.setLastUpdatedBy(userId);
-        dtVO.setOwnerUserId(userId);
-        dtVO.setRevisionNum(0);
-        dtVO.setRevisionTrackingNum(0);
-        dtVO.setDeprecated(false);
-        dtVO.setModule(dataTypeInfoHolder.getModule());
-        dataTypeRepository.save(dtVO);
+        dataType.setDefinition(definition);
+        dataType.setState(3);
+        dataType.setCreatedBy(userId);
+        dataType.setLastUpdatedBy(userId);
+        dataType.setOwnerUserId(userId);
+        dataType.setRevisionNum(0);
+        dataType.setRevisionTrackingNum(0);
+        dataType.setDeprecated(false);
+        dataType.setReleaseId(releaseId);
+        dataType.setModule(dataTypeInfoHolder.getModule());
+        dataType = dataTypeRepository.saveAndFlush(dataType);
 
-        DataType res = dataTypeRepository.findOneByGuid(guid);
         // add to BDTPrimitiveRestriction
-        insertBDTPrimitiveRestriction(res, base);
+        insertBDTPrimitiveRestriction(dataType, base);
 
-        return res;
+        return dataType;
     }
 
     private void addToDTSCForContentType(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {

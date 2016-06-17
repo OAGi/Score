@@ -597,6 +597,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setOwnerUserId(userId);
             bccp.setDeprecated(false);
             bccp.setReleaseId(releaseId);
+            bccp.setNamespaceId(namespaceId);
             bccp.setModule(declaration.getModule());
             bccpRepository.saveAndFlush(bccp);
             return bccp;
