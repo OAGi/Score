@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeItemMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ItemMaster.xsd"/>
+	<xsd:element name="ChangeItemMaster" type="ChangeItemMasterType" id="oagis-id-8bfdce2284cb4be0afb1242098f4f79a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeItemMaster is to supply Item information for goods or services to another business application module.  This BOD may also be initiated by the sending system upon some event occurring.
+
+This BOD is not for Changehronizing ITEM quantities at each inventory location.   The ChangeInventoryBalance Business Object Document is used for this purpose.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate item information. 
+
+This BOD can be used to Changehronize items used in finished goods, raw materials, work-in-Change or components in a bill of materials.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeItemMasterType" id="oagis-id-aa72e0776e24479d85b63cfaefa6b088">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeItemMasterDataAreaType" id="oagis-id-408916cd8c074f409856f4e185163003">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeItemMaster. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (ItemMaster).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeItemMasterDataAreaType" id="oagis-id-1e9bcb60986747b3b2aea2eb5c77130e">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-f304c7dcbd534b8595d394eb71a1f50c"/>
+			<xsd:element ref="ItemMaster" maxOccurs="unbounded" id="oagis-id-39e405e20f074487b1afeb27e90b1d01"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

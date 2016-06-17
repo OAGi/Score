@@ -1,0 +1,2088 @@
+<GetDebitTransferIST releaseID="string" versionID="string" systemEnvironmentCode="Production" languageCode="en-US" xmlns="http://www.openapplications.org/oagis/10" xmlurn="urn:iso:std:iso:20022:tech:xsd:pain.008.001.03">
+  <ApplicationArea>
+    
+    <Sender typeCode="token" partyRoleCode="token">
+      
+      <LogicalID schemeID="string" schemeVersionID="string" schemeAgencyID="304">string</LogicalID>
+      
+      <ComponentID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</ComponentID>
+      
+      <TaskID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</TaskID>
+      
+      <ReferenceID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</ReferenceID>
+      
+      <ConfirmationCodes>
+        
+        <ProcessingConfirmationCode listID="string" listAgencyID="token" listVersionID="string">string</ProcessingConfirmationCode>
+        
+        <ConfirmationCode>OnError</ConfirmationCode>
+      </ConfirmationCodes>
+      
+      <AuthorizationID schemeID="string" schemeVersionID="string" schemeAgencyID="37">string</AuthorizationID>
+    </Sender>
+    
+    <Receiver typeCode="token" partyRoleCode="token">
+      
+      <LogicalID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</LogicalID>
+      
+      <ComponentID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</ComponentID>
+      
+      <ID schemeID="string" schemeVersionID="string" schemeAgencyID="96" typeCode="token">string</ID>
+    </Receiver>
+    <CreationDateTime>token</CreationDateTime>
+    
+    <Signature qualifyingAgencyId="string">
+      
+      <AnyElement/>
+    </Signature>
+    
+    <ScenarioID schemeID="string" schemeVersionID="string" schemeAgencyID="186">string</ScenarioID>
+    
+    <CorrelationID schemeID="string" schemeVersionID="string" schemeAgencyID="345">string</CorrelationID>
+    
+    <BODID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</BODID>
+    
+    <Extension typeCode="token" actionCode="Rejected" sequenceNumber="100">
+      
+      <AnyExtension>
+        
+        <AnyElement/>
+      </AnyExtension>
+      
+      <Amount currencyCode="token" typeCode="token">1000.00</Amount>
+      
+      <Code listID="string" listAgencyID="token" listVersionID="string" typeCode="token">string</Code>
+      
+      <DateTime typeCode="token">token</DateTime>
+      
+      <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+      
+      <Indicator typeCode="token">true</Indicator>
+      
+      <Measure unitCode="string" typeCode="token">1000.00</Measure>
+      
+      <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+      
+      <Number typeCode="token">1000.00</Number>
+      
+      <Quantity unitCode="token" typeCode="token">1000.00</Quantity>
+      
+      <Text languageCode="string" typeCode="token">string</Text>
+      
+      <Time typeCode="token">04:15:53-04:00</Time>
+      
+      <ValueText formatCode="token" typeCode="token">string</ValueText>
+    </Extension>
+  </ApplicationArea>
+  <DataArea>
+    <Get uniqueIndicator="false" maxItems="201" recordSetSaveIndicator="false" recordSetStartNumber="201" recordSetReferenceID="string">
+      <!--1 or more repetitio-->
+      <Expression expressionLanguage="token">token</Expression>
+    </Get>
+    <!--1 or more repetitio-->
+    <DebitTransferIST>
+      <urn:GrpHdr>
+        <urn:MsgId>string</urn:MsgId>
+        <urn:CreDtTm>2006-11-29T12:20:00</urn:CreDtTm>
+        <!--0 to 2 repetitio-->
+        <urn:Authstn>
+          <!--You have a CHOICE of the next 2 items at this level-->
+          <urn:Cd>ILEV</urn:Cd>
+          <urn:Prtry>string</urn:Prtry>
+        </urn:Authstn>
+        <urn:NbOfTxs>string</urn:NbOfTxs>
+        
+        <urn:CtrlSum>1000.00000000000000000</urn:CtrlSum>
+        <urn:InitgPty>
+          
+          <urn:Nm>string</urn:Nm>
+          
+          <urn:PstlAdr>
+            
+            <urn:AdrTp>BIZZ</urn:AdrTp>
+            
+            <urn:Dept>string</urn:Dept>
+            
+            <urn:SubDept>string</urn:SubDept>
+            
+            <urn:StrtNm>string</urn:StrtNm>
+            
+            <urn:BldgNb>string</urn:BldgNb>
+            
+            <urn:PstCd>string</urn:PstCd>
+            
+            <urn:TwnNm>string</urn:TwnNm>
+            
+            <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+            
+            <urn:Ctry>string</urn:Ctry>
+            <!--0 to 7 repetitio-->
+            <urn:AdrLine>string</urn:AdrLine>
+          </urn:PstlAdr>
+          
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:OrgId>
+              
+              <urn:AnyBIC>string</urn:AnyBIC>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:OrgId>
+            <urn:PrvtId>
+              
+              <urn:DtAndPlcOfBirth>
+                <urn:BirthDt>2015-06-17-04:00</urn:BirthDt>
+                
+                <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                <urn:CityOfBirth>string</urn:CityOfBirth>
+                <urn:CtryOfBirth>string</urn:CtryOfBirth>
+              </urn:DtAndPlcOfBirth>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:PrvtId>
+          </urn:Id>
+          
+          <urn:CtryOfRes>string</urn:CtryOfRes>
+          
+          <urn:CtctDtls>
+            
+            <urn:NmPrfx>MISS</urn:NmPrfx>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PhneNb>string</urn:PhneNb>
+            
+            <urn:MobNb>string</urn:MobNb>
+            
+            <urn:FaxNb>string</urn:FaxNb>
+            
+            <urn:EmailAdr>string</urn:EmailAdr>
+            
+            <urn:Othr>string</urn:Othr>
+          </urn:CtctDtls>
+        </urn:InitgPty>
+        
+        <urn:FwdgAgt>
+          <urn:FinInstnId>
+            
+            <urn:BICFI>string</urn:BICFI>
+            
+            <urn:ClrSysMmbId>
+              
+              <urn:ClrSysId>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>strin</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:ClrSysId>
+              <urn:MmbId>string</urn:MmbId>
+            </urn:ClrSysMmbId>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>HOME</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+            
+            <urn:Othr>
+              <urn:Id>string</urn:Id>
+              
+              <urn:SchmeNm>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>stri</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:SchmeNm>
+              
+              <urn:Issr>string</urn:Issr>
+            </urn:Othr>
+          </urn:FinInstnId>
+          
+          <urn:BrnchId>
+            
+            <urn:Id>string</urn:Id>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>PBOX</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+          </urn:BrnchId>
+        </urn:FwdgAgt>
+      </urn:GrpHdr>
+      <!--1 or more repetitio-->
+      <urn:PmtInf>
+        <urn:PmtInfId>string</urn:PmtInfId>
+        <urn:PmtMtd>DD</urn:PmtMtd>
+        
+        <urn:BtchBookg>true</urn:BtchBookg>
+        
+        <urn:NbOfTxs>string</urn:NbOfTxs>
+        
+        <urn:CtrlSum>1000.00000000000000000</urn:CtrlSum>
+        
+        <urn:PmtTpInf>
+          
+          <urn:InstrPrty>NORM</urn:InstrPrty>
+          
+          <urn:SvcLvl>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>stri</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:SvcLvl>
+          
+          <urn:LclInstrm>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>string</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:LclInstrm>
+          
+          <urn:SeqTp>FRST</urn:SeqTp>
+          
+          <urn:CtgyPurp>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>stri</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:CtgyPurp>
+        </urn:PmtTpInf>
+        <urn:ReqdColltnDt>2000-07-28-04:00</urn:ReqdColltnDt>
+        <urn:Cdtr>
+          
+          <urn:Nm>string</urn:Nm>
+          
+          <urn:PstlAdr>
+            
+            <urn:AdrTp>MLTO</urn:AdrTp>
+            
+            <urn:Dept>string</urn:Dept>
+            
+            <urn:SubDept>string</urn:SubDept>
+            
+            <urn:StrtNm>string</urn:StrtNm>
+            
+            <urn:BldgNb>string</urn:BldgNb>
+            
+            <urn:PstCd>string</urn:PstCd>
+            
+            <urn:TwnNm>string</urn:TwnNm>
+            
+            <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+            
+            <urn:Ctry>string</urn:Ctry>
+            <!--0 to 7 repetitio-->
+            <urn:AdrLine>string</urn:AdrLine>
+          </urn:PstlAdr>
+          
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:OrgId>
+              
+              <urn:AnyBIC>string</urn:AnyBIC>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:OrgId>
+            <urn:PrvtId>
+              
+              <urn:DtAndPlcOfBirth>
+                <urn:BirthDt>2016-09-11</urn:BirthDt>
+                
+                <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                <urn:CityOfBirth>string</urn:CityOfBirth>
+                <urn:CtryOfBirth>string</urn:CtryOfBirth>
+              </urn:DtAndPlcOfBirth>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:PrvtId>
+          </urn:Id>
+          
+          <urn:CtryOfRes>string</urn:CtryOfRes>
+          
+          <urn:CtctDtls>
+            
+            <urn:NmPrfx>MISS</urn:NmPrfx>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PhneNb>string</urn:PhneNb>
+            
+            <urn:MobNb>string</urn:MobNb>
+            
+            <urn:FaxNb>string</urn:FaxNb>
+            
+            <urn:EmailAdr>string</urn:EmailAdr>
+            
+            <urn:Othr>string</urn:Othr>
+          </urn:CtctDtls>
+        </urn:Cdtr>
+        <urn:CdtrAcct>
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:IBAN>string</urn:IBAN>
+            <urn:Othr>
+              <urn:Id>string</urn:Id>
+              
+              <urn:SchmeNm>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>stri</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:SchmeNm>
+              
+              <urn:Issr>string</urn:Issr>
+            </urn:Othr>
+          </urn:Id>
+          
+          <urn:Tp>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>stri</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:Tp>
+          
+          <urn:Ccy>string</urn:Ccy>
+          
+          <urn:Nm>string</urn:Nm>
+        </urn:CdtrAcct>
+        <urn:CdtrAgt>
+          <urn:FinInstnId>
+            
+            <urn:BICFI>string</urn:BICFI>
+            
+            <urn:ClrSysMmbId>
+              
+              <urn:ClrSysId>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>strin</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:ClrSysId>
+              <urn:MmbId>string</urn:MmbId>
+            </urn:ClrSysMmbId>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>PBOX</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+            
+            <urn:Othr>
+              <urn:Id>string</urn:Id>
+              
+              <urn:SchmeNm>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>stri</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:SchmeNm>
+              
+              <urn:Issr>string</urn:Issr>
+            </urn:Othr>
+          </urn:FinInstnId>
+          
+          <urn:BrnchId>
+            
+            <urn:Id>string</urn:Id>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>HOME</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+          </urn:BrnchId>
+        </urn:CdtrAgt>
+        
+        <urn:CdtrAgtAcct>
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:IBAN>string</urn:IBAN>
+            <urn:Othr>
+              <urn:Id>string</urn:Id>
+              
+              <urn:SchmeNm>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>stri</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:SchmeNm>
+              
+              <urn:Issr>string</urn:Issr>
+            </urn:Othr>
+          </urn:Id>
+          
+          <urn:Tp>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>stri</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:Tp>
+          
+          <urn:Ccy>string</urn:Ccy>
+          
+          <urn:Nm>string</urn:Nm>
+        </urn:CdtrAgtAcct>
+        
+        <urn:UltmtCdtr>
+          
+          <urn:Nm>string</urn:Nm>
+          
+          <urn:PstlAdr>
+            
+            <urn:AdrTp>PBOX</urn:AdrTp>
+            
+            <urn:Dept>string</urn:Dept>
+            
+            <urn:SubDept>string</urn:SubDept>
+            
+            <urn:StrtNm>string</urn:StrtNm>
+            
+            <urn:BldgNb>string</urn:BldgNb>
+            
+            <urn:PstCd>string</urn:PstCd>
+            
+            <urn:TwnNm>string</urn:TwnNm>
+            
+            <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+            
+            <urn:Ctry>string</urn:Ctry>
+            <!--0 to 7 repetitio-->
+            <urn:AdrLine>string</urn:AdrLine>
+          </urn:PstlAdr>
+          
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:OrgId>
+              
+              <urn:AnyBIC>string</urn:AnyBIC>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:OrgId>
+            <urn:PrvtId>
+              
+              <urn:DtAndPlcOfBirth>
+                <urn:BirthDt>2004-12-05-05:00</urn:BirthDt>
+                
+                <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                <urn:CityOfBirth>string</urn:CityOfBirth>
+                <urn:CtryOfBirth>string</urn:CtryOfBirth>
+              </urn:DtAndPlcOfBirth>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:PrvtId>
+          </urn:Id>
+          
+          <urn:CtryOfRes>string</urn:CtryOfRes>
+          
+          <urn:CtctDtls>
+            
+            <urn:NmPrfx>DOCT</urn:NmPrfx>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PhneNb>string</urn:PhneNb>
+            
+            <urn:MobNb>string</urn:MobNb>
+            
+            <urn:FaxNb>string</urn:FaxNb>
+            
+            <urn:EmailAdr>string</urn:EmailAdr>
+            
+            <urn:Othr>string</urn:Othr>
+          </urn:CtctDtls>
+        </urn:UltmtCdtr>
+        
+        <urn:ChrgBr>DEBT</urn:ChrgBr>
+        
+        <urn:ChrgsAcct>
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:IBAN>string</urn:IBAN>
+            <urn:Othr>
+              <urn:Id>string</urn:Id>
+              
+              <urn:SchmeNm>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>stri</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:SchmeNm>
+              
+              <urn:Issr>string</urn:Issr>
+            </urn:Othr>
+          </urn:Id>
+          
+          <urn:Tp>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>stri</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:Tp>
+          
+          <urn:Ccy>string</urn:Ccy>
+          
+          <urn:Nm>string</urn:Nm>
+        </urn:ChrgsAcct>
+        
+        <urn:ChrgsAcctAgt>
+          <urn:FinInstnId>
+            
+            <urn:BICFI>string</urn:BICFI>
+            
+            <urn:ClrSysMmbId>
+              
+              <urn:ClrSysId>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>strin</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:ClrSysId>
+              <urn:MmbId>string</urn:MmbId>
+            </urn:ClrSysMmbId>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>BIZZ</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+            
+            <urn:Othr>
+              <urn:Id>string</urn:Id>
+              
+              <urn:SchmeNm>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:Cd>stri</urn:Cd>
+                <urn:Prtry>string</urn:Prtry>
+              </urn:SchmeNm>
+              
+              <urn:Issr>string</urn:Issr>
+            </urn:Othr>
+          </urn:FinInstnId>
+          
+          <urn:BrnchId>
+            
+            <urn:Id>string</urn:Id>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>MLTO</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+          </urn:BrnchId>
+        </urn:ChrgsAcctAgt>
+        
+        <urn:CdtrSchmeId>
+          
+          <urn:Nm>string</urn:Nm>
+          
+          <urn:PstlAdr>
+            
+            <urn:AdrTp>ADDR</urn:AdrTp>
+            
+            <urn:Dept>string</urn:Dept>
+            
+            <urn:SubDept>string</urn:SubDept>
+            
+            <urn:StrtNm>string</urn:StrtNm>
+            
+            <urn:BldgNb>string</urn:BldgNb>
+            
+            <urn:PstCd>string</urn:PstCd>
+            
+            <urn:TwnNm>string</urn:TwnNm>
+            
+            <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+            
+            <urn:Ctry>string</urn:Ctry>
+            <!--0 to 7 repetitio-->
+            <urn:AdrLine>string</urn:AdrLine>
+          </urn:PstlAdr>
+          
+          <urn:Id>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:OrgId>
+              
+              <urn:AnyBIC>string</urn:AnyBIC>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:OrgId>
+            <urn:PrvtId>
+              
+              <urn:DtAndPlcOfBirth>
+                <urn:BirthDt>2014-12-08</urn:BirthDt>
+                
+                <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                <urn:CityOfBirth>string</urn:CityOfBirth>
+                <urn:CtryOfBirth>string</urn:CtryOfBirth>
+              </urn:DtAndPlcOfBirth>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:PrvtId>
+          </urn:Id>
+          
+          <urn:CtryOfRes>string</urn:CtryOfRes>
+          
+          <urn:CtctDtls>
+            
+            <urn:NmPrfx>MIST</urn:NmPrfx>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PhneNb>string</urn:PhneNb>
+            
+            <urn:MobNb>string</urn:MobNb>
+            
+            <urn:FaxNb>string</urn:FaxNb>
+            
+            <urn:EmailAdr>string</urn:EmailAdr>
+            
+            <urn:Othr>string</urn:Othr>
+          </urn:CtctDtls>
+        </urn:CdtrSchmeId>
+        <!--1 or more repetitio-->
+        <urn:DrctDbtTxInf>
+          <urn:PmtId>
+            
+            <urn:InstrId>string</urn:InstrId>
+            <urn:EndToEndId>string</urn:EndToEndId>
+          </urn:PmtId>
+          
+          <urn:PmtTpInf>
+            
+            <urn:InstrPrty>NORM</urn:InstrPrty>
+            
+            <urn:SvcLvl>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:Cd>stri</urn:Cd>
+              <urn:Prtry>string</urn:Prtry>
+            </urn:SvcLvl>
+            
+            <urn:LclInstrm>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:Cd>string</urn:Cd>
+              <urn:Prtry>string</urn:Prtry>
+            </urn:LclInstrm>
+            
+            <urn:SeqTp>RCUR</urn:SeqTp>
+            
+            <urn:CtgyPurp>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:Cd>stri</urn:Cd>
+              <urn:Prtry>string</urn:Prtry>
+            </urn:CtgyPurp>
+          </urn:PmtTpInf>
+          <urn:InstdAmt Ccy="string">1000.00000000000000</urn:InstdAmt>
+          
+          <urn:ChrgBr>SLEV</urn:ChrgBr>
+          
+          <urn:DrctDbtTx>
+            
+            <urn:MndtRltdInf>
+              
+              <urn:MndtId>string</urn:MndtId>
+              
+              <urn:DtOfSgntr>2002-11-05</urn:DtOfSgntr>
+              
+              <urn:AmdmntInd>true</urn:AmdmntInd>
+              
+              <urn:AmdmntInfDtls>
+                
+                <urn:OrgnlMndtId>string</urn:OrgnlMndtId>
+                
+                <urn:OrgnlCdtrSchmeId>
+                  
+                  <urn:Nm>string</urn:Nm>
+                  
+                  <urn:PstlAdr>
+                    
+                    <urn:AdrTp>PBOX</urn:AdrTp>
+                    
+                    <urn:Dept>string</urn:Dept>
+                    
+                    <urn:SubDept>string</urn:SubDept>
+                    
+                    <urn:StrtNm>string</urn:StrtNm>
+                    
+                    <urn:BldgNb>string</urn:BldgNb>
+                    
+                    <urn:PstCd>string</urn:PstCd>
+                    
+                    <urn:TwnNm>string</urn:TwnNm>
+                    
+                    <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                    
+                    <urn:Ctry>string</urn:Ctry>
+                    <!--0 to 7 repetitio-->
+                    <urn:AdrLine>string</urn:AdrLine>
+                  </urn:PstlAdr>
+                  
+                  <urn:Id>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:OrgId>
+                      
+                      <urn:AnyBIC>string</urn:AnyBIC>
+                      
+                      <urn:Othr>
+                        <urn:Id>string</urn:Id>
+                        
+                        <urn:SchmeNm>
+                          <!--You have a CHOICE of the next 2 items at this level-->
+                          <urn:Cd>stri</urn:Cd>
+                          <urn:Prtry>string</urn:Prtry>
+                        </urn:SchmeNm>
+                        
+                        <urn:Issr>string</urn:Issr>
+                      </urn:Othr>
+                    </urn:OrgId>
+                    <urn:PrvtId>
+                      
+                      <urn:DtAndPlcOfBirth>
+                        <urn:BirthDt>2017-10-14</urn:BirthDt>
+                        
+                        <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                        <urn:CityOfBirth>string</urn:CityOfBirth>
+                        <urn:CtryOfBirth>string</urn:CtryOfBirth>
+                      </urn:DtAndPlcOfBirth>
+                      
+                      <urn:Othr>
+                        <urn:Id>string</urn:Id>
+                        
+                        <urn:SchmeNm>
+                          <!--You have a CHOICE of the next 2 items at this level-->
+                          <urn:Cd>stri</urn:Cd>
+                          <urn:Prtry>string</urn:Prtry>
+                        </urn:SchmeNm>
+                        
+                        <urn:Issr>string</urn:Issr>
+                      </urn:Othr>
+                    </urn:PrvtId>
+                  </urn:Id>
+                  
+                  <urn:CtryOfRes>string</urn:CtryOfRes>
+                  
+                  <urn:CtctDtls>
+                    
+                    <urn:NmPrfx>MADM</urn:NmPrfx>
+                    
+                    <urn:Nm>string</urn:Nm>
+                    
+                    <urn:PhneNb>string</urn:PhneNb>
+                    
+                    <urn:MobNb>string</urn:MobNb>
+                    
+                    <urn:FaxNb>string</urn:FaxNb>
+                    
+                    <urn:EmailAdr>string</urn:EmailAdr>
+                    
+                    <urn:Othr>string</urn:Othr>
+                  </urn:CtctDtls>
+                </urn:OrgnlCdtrSchmeId>
+                
+                <urn:OrgnlCdtrAgt>
+                  <urn:FinInstnId>
+                    
+                    <urn:BICFI>string</urn:BICFI>
+                    
+                    <urn:ClrSysMmbId>
+                      
+                      <urn:ClrSysId>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>strin</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:ClrSysId>
+                      <urn:MmbId>string</urn:MmbId>
+                    </urn:ClrSysMmbId>
+                    
+                    <urn:Nm>string</urn:Nm>
+                    
+                    <urn:PstlAdr>
+                      
+                      <urn:AdrTp>DLVY</urn:AdrTp>
+                      
+                      <urn:Dept>string</urn:Dept>
+                      
+                      <urn:SubDept>string</urn:SubDept>
+                      
+                      <urn:StrtNm>string</urn:StrtNm>
+                      
+                      <urn:BldgNb>string</urn:BldgNb>
+                      
+                      <urn:PstCd>string</urn:PstCd>
+                      
+                      <urn:TwnNm>string</urn:TwnNm>
+                      
+                      <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                      
+                      <urn:Ctry>string</urn:Ctry>
+                      <!--0 to 7 repetitio-->
+                      <urn:AdrLine>string</urn:AdrLine>
+                    </urn:PstlAdr>
+                    
+                    <urn:Othr>
+                      <urn:Id>string</urn:Id>
+                      
+                      <urn:SchmeNm>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>stri</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:SchmeNm>
+                      
+                      <urn:Issr>string</urn:Issr>
+                    </urn:Othr>
+                  </urn:FinInstnId>
+                  
+                  <urn:BrnchId>
+                    
+                    <urn:Id>string</urn:Id>
+                    
+                    <urn:Nm>string</urn:Nm>
+                    
+                    <urn:PstlAdr>
+                      
+                      <urn:AdrTp>ADDR</urn:AdrTp>
+                      
+                      <urn:Dept>string</urn:Dept>
+                      
+                      <urn:SubDept>string</urn:SubDept>
+                      
+                      <urn:StrtNm>string</urn:StrtNm>
+                      
+                      <urn:BldgNb>string</urn:BldgNb>
+                      
+                      <urn:PstCd>string</urn:PstCd>
+                      
+                      <urn:TwnNm>string</urn:TwnNm>
+                      
+                      <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                      
+                      <urn:Ctry>string</urn:Ctry>
+                      <!--0 to 7 repetitio-->
+                      <urn:AdrLine>string</urn:AdrLine>
+                    </urn:PstlAdr>
+                  </urn:BrnchId>
+                </urn:OrgnlCdtrAgt>
+                
+                <urn:OrgnlCdtrAgtAcct>
+                  <urn:Id>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:IBAN>string</urn:IBAN>
+                    <urn:Othr>
+                      <urn:Id>string</urn:Id>
+                      
+                      <urn:SchmeNm>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>stri</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:SchmeNm>
+                      
+                      <urn:Issr>string</urn:Issr>
+                    </urn:Othr>
+                  </urn:Id>
+                  
+                  <urn:Tp>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:Tp>
+                  
+                  <urn:Ccy>string</urn:Ccy>
+                  
+                  <urn:Nm>string</urn:Nm>
+                </urn:OrgnlCdtrAgtAcct>
+                
+                <urn:OrgnlDbtr>
+                  
+                  <urn:Nm>string</urn:Nm>
+                  
+                  <urn:PstlAdr>
+                    
+                    <urn:AdrTp>BIZZ</urn:AdrTp>
+                    
+                    <urn:Dept>string</urn:Dept>
+                    
+                    <urn:SubDept>string</urn:SubDept>
+                    
+                    <urn:StrtNm>string</urn:StrtNm>
+                    
+                    <urn:BldgNb>string</urn:BldgNb>
+                    
+                    <urn:PstCd>string</urn:PstCd>
+                    
+                    <urn:TwnNm>string</urn:TwnNm>
+                    
+                    <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                    
+                    <urn:Ctry>string</urn:Ctry>
+                    <!--0 to 7 repetitio-->
+                    <urn:AdrLine>string</urn:AdrLine>
+                  </urn:PstlAdr>
+                  
+                  <urn:Id>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:OrgId>
+                      
+                      <urn:AnyBIC>string</urn:AnyBIC>
+                      
+                      <urn:Othr>
+                        <urn:Id>string</urn:Id>
+                        
+                        <urn:SchmeNm>
+                          <!--You have a CHOICE of the next 2 items at this level-->
+                          <urn:Cd>stri</urn:Cd>
+                          <urn:Prtry>string</urn:Prtry>
+                        </urn:SchmeNm>
+                        
+                        <urn:Issr>string</urn:Issr>
+                      </urn:Othr>
+                    </urn:OrgId>
+                    <urn:PrvtId>
+                      
+                      <urn:DtAndPlcOfBirth>
+                        <urn:BirthDt>2019-05-03</urn:BirthDt>
+                        
+                        <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                        <urn:CityOfBirth>string</urn:CityOfBirth>
+                        <urn:CtryOfBirth>string</urn:CtryOfBirth>
+                      </urn:DtAndPlcOfBirth>
+                      
+                      <urn:Othr>
+                        <urn:Id>string</urn:Id>
+                        
+                        <urn:SchmeNm>
+                          <!--You have a CHOICE of the next 2 items at this level-->
+                          <urn:Cd>stri</urn:Cd>
+                          <urn:Prtry>string</urn:Prtry>
+                        </urn:SchmeNm>
+                        
+                        <urn:Issr>string</urn:Issr>
+                      </urn:Othr>
+                    </urn:PrvtId>
+                  </urn:Id>
+                  
+                  <urn:CtryOfRes>string</urn:CtryOfRes>
+                  
+                  <urn:CtctDtls>
+                    
+                    <urn:NmPrfx>MISS</urn:NmPrfx>
+                    
+                    <urn:Nm>string</urn:Nm>
+                    
+                    <urn:PhneNb>string</urn:PhneNb>
+                    
+                    <urn:MobNb>string</urn:MobNb>
+                    
+                    <urn:FaxNb>string</urn:FaxNb>
+                    
+                    <urn:EmailAdr>string</urn:EmailAdr>
+                    
+                    <urn:Othr>string</urn:Othr>
+                  </urn:CtctDtls>
+                </urn:OrgnlDbtr>
+                
+                <urn:OrgnlDbtrAcct>
+                  <urn:Id>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:IBAN>string</urn:IBAN>
+                    <urn:Othr>
+                      <urn:Id>string</urn:Id>
+                      
+                      <urn:SchmeNm>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>stri</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:SchmeNm>
+                      
+                      <urn:Issr>string</urn:Issr>
+                    </urn:Othr>
+                  </urn:Id>
+                  
+                  <urn:Tp>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:Tp>
+                  
+                  <urn:Ccy>string</urn:Ccy>
+                  
+                  <urn:Nm>string</urn:Nm>
+                </urn:OrgnlDbtrAcct>
+                
+                <urn:OrgnlDbtrAgt>
+                  <urn:FinInstnId>
+                    
+                    <urn:BICFI>string</urn:BICFI>
+                    
+                    <urn:ClrSysMmbId>
+                      
+                      <urn:ClrSysId>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>strin</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:ClrSysId>
+                      <urn:MmbId>string</urn:MmbId>
+                    </urn:ClrSysMmbId>
+                    
+                    <urn:Nm>string</urn:Nm>
+                    
+                    <urn:PstlAdr>
+                      
+                      <urn:AdrTp>ADDR</urn:AdrTp>
+                      
+                      <urn:Dept>string</urn:Dept>
+                      
+                      <urn:SubDept>string</urn:SubDept>
+                      
+                      <urn:StrtNm>string</urn:StrtNm>
+                      
+                      <urn:BldgNb>string</urn:BldgNb>
+                      
+                      <urn:PstCd>string</urn:PstCd>
+                      
+                      <urn:TwnNm>string</urn:TwnNm>
+                      
+                      <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                      
+                      <urn:Ctry>string</urn:Ctry>
+                      <!--0 to 7 repetitio-->
+                      <urn:AdrLine>string</urn:AdrLine>
+                    </urn:PstlAdr>
+                    
+                    <urn:Othr>
+                      <urn:Id>string</urn:Id>
+                      
+                      <urn:SchmeNm>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>stri</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:SchmeNm>
+                      
+                      <urn:Issr>string</urn:Issr>
+                    </urn:Othr>
+                  </urn:FinInstnId>
+                  
+                  <urn:BrnchId>
+                    
+                    <urn:Id>string</urn:Id>
+                    
+                    <urn:Nm>string</urn:Nm>
+                    
+                    <urn:PstlAdr>
+                      
+                      <urn:AdrTp>BIZZ</urn:AdrTp>
+                      
+                      <urn:Dept>string</urn:Dept>
+                      
+                      <urn:SubDept>string</urn:SubDept>
+                      
+                      <urn:StrtNm>string</urn:StrtNm>
+                      
+                      <urn:BldgNb>string</urn:BldgNb>
+                      
+                      <urn:PstCd>string</urn:PstCd>
+                      
+                      <urn:TwnNm>string</urn:TwnNm>
+                      
+                      <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                      
+                      <urn:Ctry>string</urn:Ctry>
+                      <!--0 to 7 repetitio-->
+                      <urn:AdrLine>string</urn:AdrLine>
+                    </urn:PstlAdr>
+                  </urn:BrnchId>
+                </urn:OrgnlDbtrAgt>
+                
+                <urn:OrgnlDbtrAgtAcct>
+                  <urn:Id>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:IBAN>string</urn:IBAN>
+                    <urn:Othr>
+                      <urn:Id>string</urn:Id>
+                      
+                      <urn:SchmeNm>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <urn:Cd>stri</urn:Cd>
+                        <urn:Prtry>string</urn:Prtry>
+                      </urn:SchmeNm>
+                      
+                      <urn:Issr>string</urn:Issr>
+                    </urn:Othr>
+                  </urn:Id>
+                  
+                  <urn:Tp>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:Tp>
+                  
+                  <urn:Ccy>string</urn:Ccy>
+                  
+                  <urn:Nm>string</urn:Nm>
+                </urn:OrgnlDbtrAgtAcct>
+                
+                <urn:OrgnlFnlColltnDt>2014-07-20-04:00</urn:OrgnlFnlColltnDt>
+                
+                <urn:OrgnlFrqcy>FRTN</urn:OrgnlFrqcy>
+              </urn:AmdmntInfDtls>
+              
+              <urn:ElctrncSgntr>string</urn:ElctrncSgntr>
+              
+              <urn:FrstColltnDt>2001-11-25-05:00</urn:FrstColltnDt>
+              
+              <urn:FnlColltnDt>2010-01-19</urn:FnlColltnDt>
+              
+              <urn:Frqcy>MNTH</urn:Frqcy>
+            </urn:MndtRltdInf>
+            
+            <urn:CdtrSchmeId>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:PstlAdr>
+                
+                <urn:AdrTp>ADDR</urn:AdrTp>
+                
+                <urn:Dept>string</urn:Dept>
+                
+                <urn:SubDept>string</urn:SubDept>
+                
+                <urn:StrtNm>string</urn:StrtNm>
+                
+                <urn:BldgNb>string</urn:BldgNb>
+                
+                <urn:PstCd>string</urn:PstCd>
+                
+                <urn:TwnNm>string</urn:TwnNm>
+                
+                <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                
+                <urn:Ctry>string</urn:Ctry>
+                <!--0 to 7 repetitio-->
+                <urn:AdrLine>string</urn:AdrLine>
+              </urn:PstlAdr>
+              
+              <urn:Id>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <urn:OrgId>
+                  
+                  <urn:AnyBIC>string</urn:AnyBIC>
+                  
+                  <urn:Othr>
+                    <urn:Id>string</urn:Id>
+                    
+                    <urn:SchmeNm>
+                      <!--You have a CHOICE of the next 2 items at this level-->
+                      <urn:Cd>stri</urn:Cd>
+                      <urn:Prtry>string</urn:Prtry>
+                    </urn:SchmeNm>
+                    
+                    <urn:Issr>string</urn:Issr>
+                  </urn:Othr>
+                </urn:OrgId>
+                <urn:PrvtId>
+                  
+                  <urn:DtAndPlcOfBirth>
+                    <urn:BirthDt>2014-10-15</urn:BirthDt>
+                    
+                    <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                    <urn:CityOfBirth>string</urn:CityOfBirth>
+                    <urn:CtryOfBirth>string</urn:CtryOfBirth>
+                  </urn:DtAndPlcOfBirth>
+                  
+                  <urn:Othr>
+                    <urn:Id>string</urn:Id>
+                    
+                    <urn:SchmeNm>
+                      <!--You have a CHOICE of the next 2 items at this level-->
+                      <urn:Cd>stri</urn:Cd>
+                      <urn:Prtry>string</urn:Prtry>
+                    </urn:SchmeNm>
+                    
+                    <urn:Issr>string</urn:Issr>
+                  </urn:Othr>
+                </urn:PrvtId>
+              </urn:Id>
+              
+              <urn:CtryOfRes>string</urn:CtryOfRes>
+              
+              <urn:CtctDtls>
+                
+                <urn:NmPrfx>MIST</urn:NmPrfx>
+                
+                <urn:Nm>string</urn:Nm>
+                
+                <urn:PhneNb>string</urn:PhneNb>
+                
+                <urn:MobNb>string</urn:MobNb>
+                
+                <urn:FaxNb>string</urn:FaxNb>
+                
+                <urn:EmailAdr>string</urn:EmailAdr>
+                
+                <urn:Othr>string</urn:Othr>
+              </urn:CtctDtls>
+            </urn:CdtrSchmeId>
+            
+            <urn:PreNtfctnId>string</urn:PreNtfctnId>
+            
+            <urn:PreNtfctnDt>2003-06-25</urn:PreNtfctnDt>
+          </urn:DrctDbtTx>
+          
+          <urn:UltmtCdtr>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>PBOX</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+            
+            <urn:Id>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:OrgId>
+                
+                <urn:AnyBIC>string</urn:AnyBIC>
+                
+                <urn:Othr>
+                  <urn:Id>string</urn:Id>
+                  
+                  <urn:SchmeNm>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:SchmeNm>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Othr>
+              </urn:OrgId>
+              <urn:PrvtId>
+                
+                <urn:DtAndPlcOfBirth>
+                  <urn:BirthDt>2011-05-05</urn:BirthDt>
+                  
+                  <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                  <urn:CityOfBirth>string</urn:CityOfBirth>
+                  <urn:CtryOfBirth>string</urn:CtryOfBirth>
+                </urn:DtAndPlcOfBirth>
+                
+                <urn:Othr>
+                  <urn:Id>string</urn:Id>
+                  
+                  <urn:SchmeNm>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:SchmeNm>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Othr>
+              </urn:PrvtId>
+            </urn:Id>
+            
+            <urn:CtryOfRes>string</urn:CtryOfRes>
+            
+            <urn:CtctDtls>
+              
+              <urn:NmPrfx>MADM</urn:NmPrfx>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:PhneNb>string</urn:PhneNb>
+              
+              <urn:MobNb>string</urn:MobNb>
+              
+              <urn:FaxNb>string</urn:FaxNb>
+              
+              <urn:EmailAdr>string</urn:EmailAdr>
+              
+              <urn:Othr>string</urn:Othr>
+            </urn:CtctDtls>
+          </urn:UltmtCdtr>
+          <urn:DbtrAgt>
+            <urn:FinInstnId>
+              
+              <urn:BICFI>string</urn:BICFI>
+              
+              <urn:ClrSysMmbId>
+                
+                <urn:ClrSysId>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>strin</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:ClrSysId>
+                <urn:MmbId>string</urn:MmbId>
+              </urn:ClrSysMmbId>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:PstlAdr>
+                
+                <urn:AdrTp>MLTO</urn:AdrTp>
+                
+                <urn:Dept>string</urn:Dept>
+                
+                <urn:SubDept>string</urn:SubDept>
+                
+                <urn:StrtNm>string</urn:StrtNm>
+                
+                <urn:BldgNb>string</urn:BldgNb>
+                
+                <urn:PstCd>string</urn:PstCd>
+                
+                <urn:TwnNm>string</urn:TwnNm>
+                
+                <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                
+                <urn:Ctry>string</urn:Ctry>
+                <!--0 to 7 repetitio-->
+                <urn:AdrLine>string</urn:AdrLine>
+              </urn:PstlAdr>
+              
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:FinInstnId>
+            
+            <urn:BrnchId>
+              
+              <urn:Id>string</urn:Id>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:PstlAdr>
+                
+                <urn:AdrTp>DLVY</urn:AdrTp>
+                
+                <urn:Dept>string</urn:Dept>
+                
+                <urn:SubDept>string</urn:SubDept>
+                
+                <urn:StrtNm>string</urn:StrtNm>
+                
+                <urn:BldgNb>string</urn:BldgNb>
+                
+                <urn:PstCd>string</urn:PstCd>
+                
+                <urn:TwnNm>string</urn:TwnNm>
+                
+                <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                
+                <urn:Ctry>string</urn:Ctry>
+                <!--0 to 7 repetitio-->
+                <urn:AdrLine>string</urn:AdrLine>
+              </urn:PstlAdr>
+            </urn:BrnchId>
+          </urn:DbtrAgt>
+          
+          <urn:DbtrAgtAcct>
+            <urn:Id>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:IBAN>string</urn:IBAN>
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:Id>
+            
+            <urn:Tp>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:Cd>stri</urn:Cd>
+              <urn:Prtry>string</urn:Prtry>
+            </urn:Tp>
+            
+            <urn:Ccy>string</urn:Ccy>
+            
+            <urn:Nm>string</urn:Nm>
+          </urn:DbtrAgtAcct>
+          <urn:Dbtr>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>DLVY</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+            
+            <urn:Id>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:OrgId>
+                
+                <urn:AnyBIC>string</urn:AnyBIC>
+                
+                <urn:Othr>
+                  <urn:Id>string</urn:Id>
+                  
+                  <urn:SchmeNm>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:SchmeNm>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Othr>
+              </urn:OrgId>
+              <urn:PrvtId>
+                
+                <urn:DtAndPlcOfBirth>
+                  <urn:BirthDt>2009-06-09</urn:BirthDt>
+                  
+                  <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                  <urn:CityOfBirth>string</urn:CityOfBirth>
+                  <urn:CtryOfBirth>string</urn:CtryOfBirth>
+                </urn:DtAndPlcOfBirth>
+                
+                <urn:Othr>
+                  <urn:Id>string</urn:Id>
+                  
+                  <urn:SchmeNm>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:SchmeNm>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Othr>
+              </urn:PrvtId>
+            </urn:Id>
+            
+            <urn:CtryOfRes>string</urn:CtryOfRes>
+            
+            <urn:CtctDtls>
+              
+              <urn:NmPrfx>DOCT</urn:NmPrfx>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:PhneNb>string</urn:PhneNb>
+              
+              <urn:MobNb>string</urn:MobNb>
+              
+              <urn:FaxNb>string</urn:FaxNb>
+              
+              <urn:EmailAdr>string</urn:EmailAdr>
+              
+              <urn:Othr>string</urn:Othr>
+            </urn:CtctDtls>
+          </urn:Dbtr>
+          <urn:DbtrAcct>
+            <urn:Id>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:IBAN>string</urn:IBAN>
+              <urn:Othr>
+                <urn:Id>string</urn:Id>
+                
+                <urn:SchmeNm>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <urn:Cd>stri</urn:Cd>
+                  <urn:Prtry>string</urn:Prtry>
+                </urn:SchmeNm>
+                
+                <urn:Issr>string</urn:Issr>
+              </urn:Othr>
+            </urn:Id>
+            
+            <urn:Tp>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:Cd>stri</urn:Cd>
+              <urn:Prtry>string</urn:Prtry>
+            </urn:Tp>
+            
+            <urn:Ccy>string</urn:Ccy>
+            
+            <urn:Nm>string</urn:Nm>
+          </urn:DbtrAcct>
+          
+          <urn:UltmtDbtr>
+            
+            <urn:Nm>string</urn:Nm>
+            
+            <urn:PstlAdr>
+              
+              <urn:AdrTp>HOME</urn:AdrTp>
+              
+              <urn:Dept>string</urn:Dept>
+              
+              <urn:SubDept>string</urn:SubDept>
+              
+              <urn:StrtNm>string</urn:StrtNm>
+              
+              <urn:BldgNb>string</urn:BldgNb>
+              
+              <urn:PstCd>string</urn:PstCd>
+              
+              <urn:TwnNm>string</urn:TwnNm>
+              
+              <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+              
+              <urn:Ctry>string</urn:Ctry>
+              <!--0 to 7 repetitio-->
+              <urn:AdrLine>string</urn:AdrLine>
+            </urn:PstlAdr>
+            
+            <urn:Id>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <urn:OrgId>
+                
+                <urn:AnyBIC>string</urn:AnyBIC>
+                
+                <urn:Othr>
+                  <urn:Id>string</urn:Id>
+                  
+                  <urn:SchmeNm>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:SchmeNm>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Othr>
+              </urn:OrgId>
+              <urn:PrvtId>
+                
+                <urn:DtAndPlcOfBirth>
+                  <urn:BirthDt>2016-02-26</urn:BirthDt>
+                  
+                  <urn:PrvcOfBirth>string</urn:PrvcOfBirth>
+                  <urn:CityOfBirth>string</urn:CityOfBirth>
+                  <urn:CtryOfBirth>string</urn:CtryOfBirth>
+                </urn:DtAndPlcOfBirth>
+                
+                <urn:Othr>
+                  <urn:Id>string</urn:Id>
+                  
+                  <urn:SchmeNm>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:SchmeNm>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Othr>
+              </urn:PrvtId>
+            </urn:Id>
+            
+            <urn:CtryOfRes>string</urn:CtryOfRes>
+            
+            <urn:CtctDtls>
+              
+              <urn:NmPrfx>MADM</urn:NmPrfx>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:PhneNb>string</urn:PhneNb>
+              
+              <urn:MobNb>string</urn:MobNb>
+              
+              <urn:FaxNb>string</urn:FaxNb>
+              
+              <urn:EmailAdr>string</urn:EmailAdr>
+              
+              <urn:Othr>string</urn:Othr>
+            </urn:CtctDtls>
+          </urn:UltmtDbtr>
+          
+          <urn:InstrForCdtrAgt>string</urn:InstrForCdtrAgt>
+          
+          <urn:Purp>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <urn:Cd>stri</urn:Cd>
+            <urn:Prtry>string</urn:Prtry>
+          </urn:Purp>
+          <!--0 to 10 repetitio-->
+          <urn:RgltryRptg>
+            
+            <urn:DbtCdtRptgInd>DEBT</urn:DbtCdtRptgInd>
+            
+            <urn:Authrty>
+              
+              <urn:Nm>string</urn:Nm>
+              
+              <urn:Ctry>string</urn:Ctry>
+            </urn:Authrty>
+            
+            <urn:Dtls>
+              
+              <urn:Tp>string</urn:Tp>
+              
+              <urn:Dt>2019-03-26</urn:Dt>
+              
+              <urn:Ctry>string</urn:Ctry>
+              
+              <urn:Cd>string</urn:Cd>
+              
+              <urn:Amt Ccy="string">1000.00000000000000</urn:Amt>
+              
+              <urn:Inf>string</urn:Inf>
+            </urn:Dtls>
+          </urn:RgltryRptg>
+          
+          <urn:Tax>
+            
+            <urn:Cdtr>
+              
+              <urn:TaxId>string</urn:TaxId>
+              
+              <urn:RegnId>string</urn:RegnId>
+              
+              <urn:TaxTp>string</urn:TaxTp>
+            </urn:Cdtr>
+            
+            <urn:Dbtr>
+              
+              <urn:TaxId>string</urn:TaxId>
+              
+              <urn:RegnId>string</urn:RegnId>
+              
+              <urn:TaxTp>string</urn:TaxTp>
+              
+              <urn:Authstn>
+                
+                <urn:Titl>string</urn:Titl>
+                
+                <urn:Nm>string</urn:Nm>
+              </urn:Authstn>
+            </urn:Dbtr>
+            
+            <urn:AdmstnZn>string</urn:AdmstnZn>
+            
+            <urn:RefNb>string</urn:RefNb>
+            
+            <urn:Mtd>string</urn:Mtd>
+            
+            <urn:TtlTaxblBaseAmt Ccy="string">1000.00000000000000</urn:TtlTaxblBaseAmt>
+            
+            <urn:TtlTaxAmt Ccy="string">1000.00000000000000</urn:TtlTaxAmt>
+            
+            <urn:Dt>2010-06-26-04:00</urn:Dt>
+            
+            <urn:SeqNb>1000</urn:SeqNb>
+            
+            <urn:Rcrd>
+              
+              <urn:Tp>string</urn:Tp>
+              
+              <urn:Ctgy>string</urn:Ctgy>
+              
+              <urn:CtgyDtls>string</urn:CtgyDtls>
+              
+              <urn:DbtrSts>string</urn:DbtrSts>
+              
+              <urn:CertId>string</urn:CertId>
+              
+              <urn:FrmsCd>string</urn:FrmsCd>
+              
+              <urn:Prd>
+                
+                <urn:Yr>2016-10-17-04:00</urn:Yr>
+                
+                <urn:Tp>QTR4</urn:Tp>
+                
+                <urn:FrToDt>
+                  <urn:FrDt>2016-09-16-04:00</urn:FrDt>
+                  <urn:ToDt>2011-06-29</urn:ToDt>
+                </urn:FrToDt>
+              </urn:Prd>
+              
+              <urn:TaxAmt>
+                
+                <urn:Rate>1000.0000000000</urn:Rate>
+                
+                <urn:TaxblBaseAmt Ccy="string">1000.00000000000000</urn:TaxblBaseAmt>
+                
+                <urn:TtlAmt Ccy="string">1000.00000000000000</urn:TtlAmt>
+                
+                <urn:Dtls>
+                  
+                  <urn:Prd>
+                    
+                    <urn:Yr>2010-05-01-04:00</urn:Yr>
+                    
+                    <urn:Tp>MM02</urn:Tp>
+                    
+                    <urn:FrToDt>
+                      <urn:FrDt>2003-04-20-04:00</urn:FrDt>
+                      <urn:ToDt>2003-03-28-05:00</urn:ToDt>
+                    </urn:FrToDt>
+                  </urn:Prd>
+                  <urn:Amt Ccy="string">1000.00000000000000</urn:Amt>
+                </urn:Dtls>
+              </urn:TaxAmt>
+              
+              <urn:AddtlInf>string</urn:AddtlInf>
+            </urn:Rcrd>
+          </urn:Tax>
+          <!--0 to 10 repetitio-->
+          <urn:RltdRmtInf>
+            
+            <urn:RmtId>string</urn:RmtId>
+            
+            <urn:RmtLctnMtd>EMAL</urn:RmtLctnMtd>
+            
+            <urn:RmtLctnElctrncAdr>string</urn:RmtLctnElctrncAdr>
+            
+            <urn:RmtLctnPstlAdr>
+              <urn:Nm>string</urn:Nm>
+              <urn:Adr>
+                
+                <urn:AdrTp>BIZZ</urn:AdrTp>
+                
+                <urn:Dept>string</urn:Dept>
+                
+                <urn:SubDept>string</urn:SubDept>
+                
+                <urn:StrtNm>string</urn:StrtNm>
+                
+                <urn:BldgNb>string</urn:BldgNb>
+                
+                <urn:PstCd>string</urn:PstCd>
+                
+                <urn:TwnNm>string</urn:TwnNm>
+                
+                <urn:CtrySubDvsn>string</urn:CtrySubDvsn>
+                
+                <urn:Ctry>string</urn:Ctry>
+                <!--0 to 7 repetitio-->
+                <urn:AdrLine>string</urn:AdrLine>
+              </urn:Adr>
+            </urn:RmtLctnPstlAdr>
+          </urn:RltdRmtInf>
+          
+          <urn:RmtInf>
+            
+            <urn:Ustrd>string</urn:Ustrd>
+            
+            <urn:Strd>
+              
+              <urn:RfrdDocInf>
+                
+                <urn:Tp>
+                  <urn:CdOrPrtry>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>SBIN</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:CdOrPrtry>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Tp>
+                
+                <urn:Nb>string</urn:Nb>
+                
+                <urn:RltdDt>2007-10-06</urn:RltdDt>
+              </urn:RfrdDocInf>
+              
+              <urn:RfrdDocAmt>
+                
+                <urn:DuePyblAmt Ccy="string">1000.00000000000000</urn:DuePyblAmt>
+                
+                <urn:DscntApldAmt>
+                  
+                  <urn:Tp>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:Tp>
+                  <urn:Amt Ccy="string">1000.00000000000000</urn:Amt>
+                </urn:DscntApldAmt>
+                
+                <urn:CdtNoteAmt Ccy="string">1000.00000000000000</urn:CdtNoteAmt>
+                
+                <urn:TaxAmt>
+                  
+                  <urn:Tp>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>stri</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:Tp>
+                  <urn:Amt Ccy="string">1000.00000000000000</urn:Amt>
+                </urn:TaxAmt>
+                
+                <urn:AdjstmntAmtAndRsn>
+                  <urn:Amt Ccy="string">1000.00000000000000</urn:Amt>
+                  
+                  <urn:CdtDbtInd>CRDT</urn:CdtDbtInd>
+                  
+                  <urn:Rsn>stri</urn:Rsn>
+                  
+                  <urn:AddtlInf>string</urn:AddtlInf>
+                </urn:AdjstmntAmtAndRsn>
+                
+                <urn:RmtdAmt Ccy="string">1000.00000000000000</urn:RmtdAmt>
+              </urn:RfrdDocAmt>
+              
+              <urn:CdtrRefInf>
+                
+                <urn:Tp>
+                  <urn:CdOrPrtry>
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <urn:Cd>PUOR</urn:Cd>
+                    <urn:Prtry>string</urn:Prtry>
+                  </urn:CdOrPrtry>
+                  
+                  <urn:Issr>string</urn:Issr>
+                </urn:Tp>
+                
+                <urn:Ref>string</urn:Ref>
+              </urn:CdtrRefInf>
+              
+              <urn:Invcr>
+                
+                <urn:Nm>string</urn:Nm>
+                
+                <urn:PstlAdr>
+                  
+                  <urn:AdrTp>BIZZ</urn:AdrTp>
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  <!--0 to 7 repetitio-->
+                </urn:PstlAdr>
+                
+                
+                
+              </urn:Invcr>
+              
+              <!--0 to 3 repetitio-->
+            </urn:Strd>
+          </urn:RmtInf>
+        </urn:DrctDbtTxInf>
+      </urn:PmtInf>
+      
+    </DebitTransferIST>
+  </DataArea>
+</GetDebitTransferIST>

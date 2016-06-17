@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/CurrencyExchangeRate.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+        <xsd:annotation>
+                <xsd:documentation source="http://www.openapplications.org/oagis/10">This is a placeholder for the ExchangeRate noun. </xsd:documentation>
+        </xsd:annotation>
+        <xsd:annotation>
+                <xsd:documentation source="http://www.openapplications.org/oagis/10">Since it's really a Component that sometimes doubles as a Noun, its definition is in Components.</xsd:documentation>
+        </xsd:annotation>
+</xsd:schema>

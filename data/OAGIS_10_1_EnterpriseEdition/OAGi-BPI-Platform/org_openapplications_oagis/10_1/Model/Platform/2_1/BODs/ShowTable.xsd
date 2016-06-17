@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowTable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Table.xsd"/>
+	<xsd:element name="ShowTable" type="ShowTableType" id="oagis-id-757e8910cd0942878fe2107c57888cd8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowTable is to communicate to a business application module or system the sending systems representation of Table information.  This request may be used as a response to a GetTable request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowTableType" id="oagis-id-f50b710b95544465b950759f34ca9add">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowTableDataAreaType" id="oagis-id-06a0feefb3ad4fa0baa966d69a049efd">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowTable. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (Table).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowTableDataAreaType" id="oagis-id-512916602199413c8405227105473616">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-9ff76779c93846eea014b21218ad0152"/>
+			<xsd:element ref="Table" maxOccurs="unbounded" id="oagis-id-4cb30f4ef8544a25aa51ec19a2657c3b"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseSalesLead.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SalesLead.xsd"/>
+	<xsd:element name="SyncResponseSalesLead" type="SyncResponseSalesLeadType" id="oagis-id-42610b5ea7c74ceea7b088531b1590cf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseSalesLead is to enable an application to provide SalesLead information from one business application to another business application. The SyncResponseSalesLead  is the response to the Change provides a response to the request to change the original Process.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseSalesLeadType" id="oagis-id-8f6388de56c54963a42d50b94ed2e533">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseSalesLeadDataAreaType" id="oagis-id-ce517688728a4e51acfe199e30e68f65">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponsePurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseSalesLeadDataAreaType" id="oagis-id-0ffb852796d94471bef5b735ace2ee47">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-90863adf2a564a919f2ce9bba2204870"/>
+			<xsd:element ref="SalesLead" maxOccurs="unbounded" id="oagis-id-694a1311db8442889c5ca378017004b8"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

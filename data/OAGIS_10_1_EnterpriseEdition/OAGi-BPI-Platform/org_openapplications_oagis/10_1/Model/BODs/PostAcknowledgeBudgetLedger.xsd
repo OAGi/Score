@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this downPostAcknowledge package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/PostAcknowledgeBudgetLedger.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/BudgetLedger.xsd"/>
+	<xsd:element name="PostAcknowledgeBudgetLedger" type="PostAcknowledgeBudgetLedgerType" id="oagis-id-7a16ef68d93d451885411c52f4ff66f2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PostAcknowledgeBudgetLedger is to transmit budget amounts from all possible source applications throughout an enterprise to a general ledger or budget application.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PostAcknowledgeBudgetLedgerType" id="oagis-id-f43f1689bd074aa8a04468fb08edcb70">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="PostAcknowledgeBudgetLedgerDataAreaType" id="oagis-id-b5b30016269548e681ec14257aaab092">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case PostAcknowledgeBudgetLedger. The information consists of a Verb and one or more Nouns. The verb (PostAcknowledge) indicates the action to be performed on the Noun (BudgetLedger).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PostAcknowledgeBudgetLedgerDataAreaType" id="oagis-id-2fa0033bfa8b4e509ab2931e1608ec29">
+		<xsd:sequence>
+			<xsd:element ref="PostAcknowledge" id="oagis-id-9396a9dce31844c8939e0ff5ccf7348d"/>
+			<xsd:element ref="BudgetLedger" maxOccurs="unbounded" id="oagis-id-0072804ce53846329974b2b2d8eab8f8"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Invoice.xsd"/>
+        <xsd:element name="SyncInvoice" type="SyncInvoiceType" id="oagis-id-cc8078793720434e91f1e42763493d73">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncInvoice is to transmit an invoice from a supplier to a customer. This information is passed in order to keep the customer updated on the number of Invoices they have.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncInvoiceType" id="oagis-id-74c424ec0b954550ac7e4ef9c9cdac08">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncInvoiceDataAreaType" id="oagis-id-b6bd9d8fb6114d308f66593f862c8d9e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncInvoice. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (Invoice).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncInvoiceDataAreaType" id="oagis-id-0936edf5f45f44c1b4198458fe1599b5">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-13caab001ec8464ebbc776373e311b4f"/>
+                        <xsd:element ref="Invoice" maxOccurs="unbounded" id="oagis-id-9a38e90e19024e18b48d301fb458039e"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

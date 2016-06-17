@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelWarehouseShippingAdvice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarehouseShippingAdvice.xsd"/>
+	<xsd:element name="CancelWarehouseShippingAdvice" type="CancelWarehouseShippingAdviceType" id="oagis-id-e81b95c82fba407f8ee06738eddf62cc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Cancel WarehouseShippingAdvice is to communicate from one business application to one or more other business applications that a previous WarehouseShippingAdvice.
+
+Processing Note:  This cancel must refer to the original document.  To cancel the entire order, include only the WarehouseShippingAdvice Header information for the instance of the WarehouseShippingAdvice you wish to cancel. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelWarehouseShippingAdviceType" id="oagis-id-a21ad3ba1cfa4f49b748768f233ab8f7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelWarehouseShippingAdviceDataAreaType" id="oagis-id-b47f4dcaf8254a4a99c93e60b7e22b0d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelWarehouseShippingAdvice. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (WarehouseShippingAdvice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelWarehouseShippingAdviceDataAreaType" id="oagis-id-1aa0b49cf0c14e1f95d91539f8d64bc4">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-6afa2f0ebba647a8b46294cb1c2e2674"/>
+			<xsd:element ref="WarehouseShippingAdvice" maxOccurs="unbounded" id="oagis-id-ca41232f63ca4d05884076d552cd190b"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

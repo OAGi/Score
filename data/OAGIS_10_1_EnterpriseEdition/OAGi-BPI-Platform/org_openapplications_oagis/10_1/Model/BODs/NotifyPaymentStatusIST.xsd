@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/NotifyPaymentStatusIST.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ist="urn:iso:std:iso:20022:tech:xsd:pain.002.001.05" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PaymentStatusIST.xsd"/>
+	<xsd:element name="NotifyPaymentStatusIST" type="NotifyPaymentStatusISTType" id="oagis-id-ab449a9063be442a9e05b28146656c34">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyPaymentStatusIST is to enable an application to request specific PaymentStatusIST information to be Notifyed by another business application module.
+
+This typically a transaction that occurs between a company and a Bank in order to remit PaymentStatusIST to company that has provided goods or services.  
+
+The response to the NotifyPaymentStatusIST is the AcknowledgePaymentStatusIST.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyPaymentStatusISTType" id="oagis-id-01b0927c55fb4f6b9a9a50d6d7621a78">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyPaymentStatusISTDataAreaType" id="oagis-id-042b221894b846fcb70ec2c7a3056012">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyPaymentStatusIST. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (PaymentStatusIST).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyPaymentStatusISTDataAreaType" id="oagis-id-74256f85128a400e81763c089b8ad7db">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-76d2fbb119774f5eba5285c29e3915f0"/>
+			<xsd:element ref="PaymentStatusIST" maxOccurs="unbounded" id="oagis-id-ca4b199f339940a6971aafa3a4e1c813"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Context Category">
+					<p:menuitem value="Create" url="business_context_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="List" url="business_context_list.xhtml" icon="ui-icon-search" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:panel header="Create Business Context">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" cellpadding="5">
+					<p:row>
+        				<p:column style="width:200px"> 
+							<h:outputLabel value="Name: " style="font-weight:bold" />
+						</p:column> 
+						<p:column style="width:600px"> 
+							<p:inputText id="name" value="#{businessContextHandler.name}"
+								label="Name" />
+						</p:column> 
+					</p:row>
+					<p:row>
+						<p:column> 
+							<h:outputLabel for="desc" value="Business Context Value "
+								style="font-weight:bold" />
+						</p:column>
+						<p:column>
+							<p:commandButton value="Add" icon="ui-icon-extlink" actionListener="#{businessContextHandler.chooseCV}">
+						        <p:ajax event="dialogReturn" listener="#{businessContextHandler.onCCChosen}" update=":form:tbl" />
+						    </p:commandButton>
+						</p:column> 
+					</p:row>		
+					<p:row>
+						<p:column colspan="2"> 					
+							<p:dataTable id="tbl" var="businessContextValues" value="#{businessContextHandler.bcValues}"
+								style="width:600px; margin-bottom:20px">
+								
+								<p:column style="width:200px">
+									<f:facet name="header">
+										<h:outputText value="Context Category" />
+									</f:facet>
+									<h:outputText value="#{businessContextValues.ccVO.name}" />
+								</p:column>
+				
+								<p:column style="width:200px">
+									<f:facet name="header">
+										<h:outputText value="Context Scheme Name" />
+									</f:facet>
+									<h:outputText value="#{businessContextValues.csVO.schemeName}" />
+								</p:column>
+				
+								<p:column style="width:200px">
+									<f:facet name="header">
+										<h:outputText value="Context Scheme Value" />
+									</f:facet>
+									<h:outputText value="#{businessContextValues.csValues}" />
+								</p:column>
+							</p:dataTable>
+						</p:column>
+					</p:row>
+					<p:row>
+        				<p:column>
+							<p:commandButton value="Create" update="grid" icon="ui-icon-check"
+							validateClient="true" style="margin-right:10px" actionListener="#{businessContextHandler.createBusinessContext}" action="business_context_list.xhtml?faces-redirect=true" />
+						</p:column> 
+						<p:column> 
+							<p:button href="business_context_create.xhtml" value="Cancel" icon="ui-icon-check"/>
+						</p:column>
+					</p:row>
+				</h:panelGrid>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

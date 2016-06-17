@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeAcknowledgeDebitTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/DebitTransfer.xsd"/>
+	<xsd:element name="ChangeAcknowledgeDebitTransfer" type="ChangeAcknowledgeDebitTransferType" id="oagis-id-e7c39416eaef4232a6f8ad6813492090">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeDebitTransfer is to enable an application to request specific DebitTransfer information from another business application module.  The response to the ChangeAcknowledgeDebitTransfer is the ChangeAcknowledgeDebitTransfer.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeDebitTransferType" id="oagis-id-5694b62619394b7bbbc7d44bcf46a054">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeDebitTransferDataAreaType" id="oagis-id-cbd85ff7cdeb43d28db59fff43aac4a5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeDebitTransfer. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (DebitTransfer).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeDebitTransferDataAreaType" id="oagis-id-6159d61a0f064584aeb0254a093309b9">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-d0a03eef7bda422cb7eb531ec0bc05d7"/>
+			<xsd:element ref="DebitTransfer" maxOccurs="unbounded" id="oagis-id-19f681571aa74259ad6670f545aede29"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

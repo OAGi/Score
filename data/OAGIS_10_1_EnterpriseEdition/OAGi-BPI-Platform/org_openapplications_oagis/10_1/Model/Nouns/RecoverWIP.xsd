@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/RecoverWIP.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="RecoverWIP" type="RecoverWIPType" id="oagis-id-1734f7cb4dce405ca5c572633e8f0fd2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">RecoverWIP is used to notify a Manufacturing Application of the creation of usable production materials from material previously considered unsuitable for production use. This is most often likely to represent a return to production of scrap material.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RecoverWIPHeader" type="WIPDistributedEventHeaderType" id="oagis-id-da381826fbac497a93d9f5349ddfd185">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information describing the recovered production order in the WIP Recovery/Bonus event.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RecoverWIPLine" type="RecoverWIPLineType" id="oagis-id-29ecf54cf1c94ed4b2ecbef916f6127b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Information describing the specific WIP Recovery/Bonus transaction to be processed.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RecoverWIPType" id="oagis-id-48ec92994e764666bde8803b3333935f">
+		<xsd:sequence>
+			<xsd:element ref="RecoverWIPHeader" id="oagis-id-612f94f7c986472ba9a5a65a49daf035" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information describing the recovered production order in the WIP Recovery/Bonus event.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="RecoverWIPLine" id="oagis-id-516931b21dfe407eb6a06e7d6fa3c32f" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Information describing the specific WIP Recovery/Bonus transaction to be processed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-5f5880e5c4834a5f889cda3545f76651"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-7389af513b6c4b3387a0b05c9d9a9d7d"/>
+	</xsd:complexType>
+	<xsd:complexType name="RecoverWIPLineBaseType" id="oagis-id-09b3df98cbe74c61ac596bcba8623efd">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" id="oagis-id-33b3b95ca7cc4053b20e99335231c7cd" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ItemQuantity" id="oagis-id-3eeed55be98e48c0af943b5ad7d7c7c8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SiteLocation" id="oagis-id-0e629eb8dfdc45f49a15a73b35680d40" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Site Location that the associated entity occurs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="OperationReference" id="oagis-id-a40e7ced6f224ac6863bec37cfdf14ff" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to an associated work-in-process operation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-803ce012c73045b68afd7a1d7633678d" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RecoverWIPLineType" id="oagis-id-ee9ccde2f02e47359d590974104341c1">
+		<xsd:complexContent>
+			<xsd:extension base="RecoverWIPLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RecoverWIPLineExtensionType" id="oagis-id-f58a28366e4748599ef79885fb1ed3ca" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

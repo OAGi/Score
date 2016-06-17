@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/CancelCarrierRoute.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CarrierRoute.xsd"/>
+	<xsd:element name="CancelCarrierRoute" type="CancelCarrierRouteType" id="oagis-id-29b8bec1b67d4f18b3874fdb4f7b88cc">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelCarrierRoute is to enable an application to request specific Carrier Route information from another business application module.  The response to the CancelCarrierRoute is the ShowCarrierRoute.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelCarrierRouteType" id="oagis-id-a154af64c6414803871a2e4c137a2530">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelCarrierRouteDataAreaType" id="oagis-id-566f51af7ca74a6a989884ce2a0c6971">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelCarrierRoute. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (CarrierRoute).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelCarrierRouteDataAreaType" id="oagis-id-5127a169c46c440681929f01a969041e">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-674f435bfb4d4f1aba15aa5634d3e9f2"/>
+			<xsd:element ref="CarrierRoute" maxOccurs="unbounded" id="oagis-id-946978dcdb234370aa9f84ebd643fc58"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

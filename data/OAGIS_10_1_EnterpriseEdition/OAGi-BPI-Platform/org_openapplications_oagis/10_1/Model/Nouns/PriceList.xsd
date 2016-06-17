@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/PriceList.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
+	<xsd:element name="PriceList" type="PriceListType" id="oagis-id-d5671bc79cee47838fc4de71c8571a9d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Defines a list of items with their base price, price breaks, discounts and qualifiers. For each item, price breaks can be defined, above which certain discounts or overriding prices might apply. Price breaks can be defined in volume or in dollar amount. Price list qualifiers specify for which catalog, customer and/or effective dates this price list applies.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PriceListHeader" type="PriceListHeaderType" id="oagis-id-7c435526ef0e41b886c281dc99f3a379">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides the common information for the PriceList</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PriceListLine" type="PriceListLineType" id="oagis-id-f62b5908f3e04795af845d4e73722a5d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the pricing for an individual Catalog Item</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PriceListQualifier" type="PriceListQualifierType" id="oagis-id-95b1c4fa96b44add977db31b5be495cf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This qualifies the intended audience or group of users of a Price List  Qualifications for a given price list include, (but are not limited to):
+· Suppliers, Customers or Manufacturers
+· Specific Customer Site
+· Suppliers, Customers or Manufacturers
+· Catalogs</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PriceListType" id="oagis-id-eaca2d24ba6540ebb01a2fcc3c2c46e9">
+		<xsd:sequence>
+			<xsd:element ref="PriceListHeader" id="oagis-id-01fc199b9d51411a8f70db313c668e2a" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Provides the common information for the PriceList</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PriceListLine" id="oagis-id-d85897509e124dfaa09cb555877bf462" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the pricing for an individual Catalog Item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-4f533fce1e8d408e860aa938b327903a"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-4ec437302ffe425689f93754c8220d43"/>
+	</xsd:complexType>
+	<xsd:complexType name="PriceListHeaderBaseType" id="oagis-id-0df5ec0f320d4657b2489bef62b8a07c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Price list may be issued by either a company within your Enterprise, a division or by any entity that is  represented by the SupplierParty.
+
+The SupplierParty in the context of the Catalog is the Party the supplies the Catalog and also the PriceList. The PublisherPary is provided for the case in which the SupplierParty uses a third Party to publish the Catalog and PriceList.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="CurrencyCode" id="oagis-id-b78f2f25ccfe4beaa0b96092a96b93f3" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Specifies the currency code of the object in which it is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-3284e49ccb5746e9947e421db20f4fb4" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PublisherParty" id="oagis-id-7ac67e5db9984616b49026e8de44ffc9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the publisher organization/entity of the Catalog or transaction in which it is associated for the associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CustomerParty" id="oagis-id-b8490110275b461b9fbac7a2e0ec4614" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the organization that is the end customer of the goods or services being provided in the associated transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-240d27806adf4505814872b081cc61f9" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PriceBreak" id="oagis-id-0f2beaa2ff8f4d088ce390f8fdb6d747" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This defines the prices and modifiers to the price for buying a given quantity or value of an item or item category on a price list line. For Price List Lines that specify Items the price breaks can be specified in terms of quantity or amount. For Price list lines that specify commodity, price breaks can only be specified in terms of currency amount</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PriceListQualifier" id="oagis-id-c05e88c6c20b4f8fb9333535ea905366" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">This qualifies the intended audience or group of users of a Price List  Qualifications for a given price list include, (but are not limited to):
+· Suppliers, Customers or Manufacturers
+· Specific Customer Site
+· Suppliers, Customers or Manufacturers
+· Catalogs</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PriceListHeaderType" id="oagis-id-98927cfc5cb74a749e44c13defc938b9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Price list may be issued by either a company within your Enterprise, a division or by any entity that is  represented by the SupplierParty.
+
+The SupplierParty in the context of the Catalog is the Party the supplies the Catalog and also the PriceList. The PublisherPary is provided for the case in which the SupplierParty uses a third Party to publish the Catalog and PriceList.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="PriceListHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PriceListHeaderExtensionType" id="oagis-id-c5a90263fadc458ca3b373bdcb58ee61" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PriceListLineBaseType" id="oagis-id-46aa6990d7014d86b9d120da55ce1d1b">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Item" id="oagis-id-46e78730e0f645f79e4207ef3d990966" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-4245ae166f1545189fee6dc25290dfc1" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="CommodityClassification" id="oagis-id-8eb542cc0ab4425a8e9b463028b08fc0" minOccurs="0"/>
+					<xsd:element ref="UnitPrice" id="oagis-id-7b14adbb061b439ab031a6704413751e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Unit price of the item for the number of items in the unitCode specified in the PerQuantity elements.
+
+In most cases the unitCode of the PerQuantity is the same as the unitCode of the Quantity element above.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PriceBreak" id="oagis-id-f871cc149bce40159204f339d745aefa" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This defines the prices and modifiers to the price for buying a given quantity or value of an item or item category on a price list line. For Price List Lines that specify Items the price breaks can be specified in terms of quantity or amount. For Price list lines that specify commodity, price breaks can only be specified in terms of currency amount</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PriceListLineType" id="oagis-id-a83a74094c1f4b358d5c77e9aece1063">
+		<xsd:complexContent>
+			<xsd:extension base="PriceListLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PriceListLineExtensionType" id="oagis-id-ab3840ab97434c7cb35f9e1ba4d70c1e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PriceListQualifierBaseType" id="oagis-id-dfc9ea2f959548f9859ff06b26a628ec">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="CatalogReference" id="oagis-id-a7ee0dd1b0a94794a6217fc96376a2ed" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a catalogue.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="CustomerParty" id="oagis-id-dc13e4963a774a359e15a35ca8cf117c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the organization that is the end customer of the goods or services being provided in the associated transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-3e7bf7408d4d4b52ac7b93ddc9277988" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-0fef8d50679946de92f503884068edfc" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="ActualResourceGroup" id="oagis-id-261e5b52806548039ac2877520d131e9"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PriceListQualifierType" id="oagis-id-d8505a4ff1fb481e9d8404c305dfba70">
+		<xsd:complexContent>
+			<xsd:extension base="PriceListQualifierBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PriceListQualifierExtensionType" id="oagis-id-6947b37b76e147868ba1b997044c0990" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

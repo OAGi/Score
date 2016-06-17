@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Business Context Value</title>
+                <style type="text/css">
+            .ui-widget {
+                font-size: 90%;
+            }
+        </style>
+    </h:head>
+     
+    <h:body>
+        <h:form id="form">
+       		<p:outputPanel id="addSVid">
+       			<h:panelGrid id="grid7" cellpadding="5">
+					<p:row>
+        				<p:column style="width:400px"> 
+							<h:outputLabel value="Add new Scheme Value" style="font-weight:bold; color:red" />
+						</p:column> 
+					</p:row>
+				</h:panelGrid>
+				<p:separator />
+				<h:panelGrid columns="2" cellpadding="5">
+					<h:outputText value="Value: " style="font-weight:bold; color:blue" />
+					<p:inputText id="value" value="#{contextSchemeHandler.value}" label="Name" />
+					
+					<h:outputText value="Meaning: " style="font-weight:bold; color:blue" />
+					<p:inputText id="meaning" value="#{contextSchemeHandler.meaning}" label="Meaning" style="width: 400px !important;"/>
+
+				</h:panelGrid>
+				<p:separator />
+		        <h:panelGrid id="grid8" cellpadding="5">
+		        </h:panelGrid>
+		        <h:panelGrid id="grid9" columns="2" cellpadding="5">
+		        	<p:commandButton ajax="true" icon="ui-icon-search" value="Add" actionListener="#{contextSchemeHandler.addCSV}" />
+		        </h:panelGrid>
+			</p:outputPanel>
+        </h:form>
+    </h:body>
+     
+</html>

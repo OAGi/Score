@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/SyncResponseInventoryCount.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InventoryCount.xsd"/>
+	<xsd:element name="SyncResponseInventoryCount" type="SyncResponseInventoryCountType" id="oagis-id-558f9a7241fb4f18a220426031aa3726">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeInventoryCount is to enable the communication of a Change in the InventoryCount data that exists on separate Inventory databases.
+
+This data is not the master data that describes the attributes of the item such as dimensions, weight, or unit of measure.  
+
+This is data that describes the ITEM as it exists at a specific location. It is</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseInventoryCountType" id="oagis-id-2d55763ea71b48d5b562d0a7770be597">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseInventoryCountDataAreaType" id="oagis-id-65e2e53d9eae405084185317536e3755">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseInventoryCount. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (InventoryCount).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseInventoryCountDataAreaType" id="oagis-id-c1d8c2e087c34dacb05b44da1e6be763">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-7caaca8935bd452d8a007c3097a9ccc0"/>
+			<xsd:element ref="InventoryCount" maxOccurs="unbounded" id="oagis-id-3f52affc278b401abdef3a13a9fa9844"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

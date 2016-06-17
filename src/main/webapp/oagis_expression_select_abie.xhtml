@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Business Context Value</title>
+                <style type="text/css">
+            .ui-widget {
+                font-size: 90%;
+            }
+        </style>
+    </h:head>
+     
+    <h:body>
+        <h:form id="form">
+        	<p:growl id="messages1" />
+			<p:panel header="Search and Select Top-level ABIE">
+				<p:messages autoUpdate="true" />
+
+				<h:panelGrid id="grid" columns="5" cellpadding="5">
+					<h:outputLabel for="ccName" value="Name:" style="font-weight:bold" />
+					<p:autoComplete id="ccName" value="#{profileBODHandler.abieName}" completeMethod="#{profileBODHandler.completeInput}" />
+					<p:commandButton value="Search" ajax="true" actionListener="#{profileBODHandler.search}" update="tbl" icon="ui-icon-search" />
+				</h:panelGrid>
+	            <p:dataTable id="tbl" var="abieView" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="10" style="width:565px; margin-bottom:20px"
+	            	value="#{profileBODHandler.abieViewListForSelection}" selection="#{profileBODHandler.selected}" rowKey="#{abieView.id}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{profileBODHandler.onRowSelect}" />
+        			<p:ajax event="rowUnselect" listener="#{profileBODHandler.onRowUnselect}" />
+	                <p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{abieView.name}" />
+					</p:column>
+	
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="State" />
+						</f:facet>
+						<h:outputText value="#{(abieView.abie.state eq '2') ? 'Editing' : 'Published'}" />
+					</p:column>
+	
+					<p:column style="width:200px">
+						<f:facet name="header">
+							<h:outputText value="Creation Timestamp" />
+						</f:facet>
+						<h:outputText value="#{abieView.abie.creationTimestamp}" />
+					</p:column>
+	            </p:dataTable>
+	            <p:commandButton ajax="true" icon="ui-icon-search" value="Select" actionListener="#{profileBODHandler.closeDialog}" />
+	        </p:panel>
+        </h:form>
+    </h:body>
+     
+</html>

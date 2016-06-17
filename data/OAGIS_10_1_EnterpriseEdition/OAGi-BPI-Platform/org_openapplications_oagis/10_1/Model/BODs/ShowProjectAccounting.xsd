@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ShowProjectAccounting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProjectAccounting.xsd"/>
+        <xsd:element name="ShowProjectAccounting" type="ShowProjectAccountingType" id="oagis-id-947520b6a8b049e3ae76d7613535e18e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowProjectAccounting is to supply ProjectAccounting information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowProjectAccountingType" id="oagis-id-1f4fa2cd8b5b4c768a73b87c03551253">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowProjectAccountingDataAreaType" id="oagis-id-54aa2734c24c4818877472cfc4e9c43a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowProjectAccounting. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (ProjectAccounting).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowProjectAccountingDataAreaType" id="oagis-id-6b9085ce20394c86922c1ba97dd8b7c4">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-b2f7b4379845409abe1ff60b2890efac"/>
+                        <xsd:element ref="ProjectAccounting" maxOccurs="unbounded" id="oagis-id-baa32967d5b84138b1d6cbd8357786ea"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

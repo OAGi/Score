@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeProductAvailability.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductAvailability.xsd"/>
+	<xsd:element name="ChangeProductAvailability" type="ChangeProductAvailabilityType" id="oagis-id-d18a7dabdd264a5da724e796dd25a376">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeProductAvailability is to enable an application or component to request the reservations for products from  another business application or component.
+
+The response to the ChangeProductAvailability is the ListProductAvailability. The ChangeProductAvailability also enables the retrieval of information across several documents by using selection fields.    This type of functionality is limited to the capabilities of the responding application and needs to be determined during the implementation project.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeProductAvailabilityType" id="oagis-id-db6fa2fc9ac341aab62b8580ca92e35b">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeProductAvailabilityDataAreaType" id="oagis-id-e95a17a18f8d4c43a8d94041a88a1b7f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeProductAvailability. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (ProductAvailability ).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeProductAvailabilityDataAreaType" id="oagis-id-bbe9fb8483c449a28742da51b2416fe9">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-2b0bec442c09425db32d95f53e879c3b"/>
+			<xsd:element ref="ProductAvailability" maxOccurs="unbounded" id="oagis-id-4133d563fd2e487c86d8d0c80fc4b796"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

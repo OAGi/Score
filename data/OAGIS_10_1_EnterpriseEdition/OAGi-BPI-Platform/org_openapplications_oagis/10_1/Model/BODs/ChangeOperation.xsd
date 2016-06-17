@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_1  
+   Date:               27 Jun 2014
+   Copyright 1997-2014, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2014). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/BODs/ChangeOperation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Operation.xsd"/>
+	<xsd:element name="ChangeOperation" type="ChangeOperationType" id="oagis-id-2ac41d55b9094bf6b4d37a0b9991d60d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeOperation is to enable an application to provide online shopping Operations from another business application module.  The ChangeOperation is provided in a a publishe/subscribe or broadcast buiness exchange where an application other than the owner or the master of the given information provides it to the business applications that owns the data in order to have it Change or perform a function with the information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeOperationType" id="oagis-id-bd76f08526c84075877034f6409ded4f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeOperationDataAreaType" id="oagis-id-77ed8ec6cf8447c7921ffe59c1fb9dbd">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeOperation. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (Operation).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeOperationDataAreaType" id="oagis-id-9bc652be78b6479a9b5f42996a9a9b59">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-3176b8d856674d81808181583377f366"/>
+			<xsd:element ref="Operation" maxOccurs="unbounded" id="oagis-id-18a08ec29b814421b3c82565e8515874"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
