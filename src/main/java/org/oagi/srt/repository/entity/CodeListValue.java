@@ -145,6 +145,44 @@ public class CodeListValue implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CodeListValue that = (CodeListValue) o;
+
+        if (codeListValueId != that.codeListValueId) return false;
+        if (codeListId != that.codeListId) return false;
+        if (usedIndicator != that.usedIndicator) return false;
+        if (lockedIndicator != that.lockedIndicator) return false;
+        if (extensionIndicator != that.extensionIndicator) return false;
+        if (disabled != that.disabled) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (definitionSource != null ? !definitionSource.equals(that.definitionSource) : that.definitionSource != null)
+            return false;
+        return color != null ? color.equals(that.color) : that.color == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = codeListValueId;
+        result = 31 * result + codeListId;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
+        result = 31 * result + (usedIndicator ? 1 : 0);
+        result = 31 * result + (lockedIndicator ? 1 : 0);
+        result = 31 * result + (extensionIndicator ? 1 : 0);
+        result = 31 * result + (color != null ? color.hashCode() : 0);
+        result = 31 * result + (disabled ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "CodeListValue{" +
                 "codeListValueId=" + codeListValueId +

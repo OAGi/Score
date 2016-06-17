@@ -114,6 +114,36 @@ public class BusinessContext implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BusinessContext that = (BusinessContext) o;
+
+        if (bizCtxId != that.bizCtxId) return false;
+        if (createdBy != that.createdBy) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bizCtxId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BusinessContext{" +
                 "bizCtxId=" + bizCtxId +

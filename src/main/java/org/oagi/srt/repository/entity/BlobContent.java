@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 @Entity
 @Table(name = "blob_content")
@@ -82,6 +83,29 @@ public class BlobContent implements Serializable {
 
     public void setModule(String module) {
         this.module = module;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BlobContent that = (BlobContent) o;
+
+        if (blobContentId != that.blobContentId) return false;
+        if (releaseId != that.releaseId) return false;
+        if (!Arrays.equals(content, that.content)) return false;
+        return module != null ? module.equals(that.module) : that.module == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = blobContentId;
+        result = 31 * result + Arrays.hashCode(content);
+        result = 31 * result + releaseId;
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        return result;
     }
 
     @Override

@@ -56,6 +56,27 @@ public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializab
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap that = (CoreDataTypeAllowedPrimitiveExpressionTypeMap) o;
+
+        if (cdtAwdPriXpsTypeMapId != that.cdtAwdPriXpsTypeMapId) return false;
+        if (cdtAwdPriId != that.cdtAwdPriId) return false;
+        return xbtId == that.xbtId;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cdtAwdPriXpsTypeMapId;
+        result = 31 * result + cdtAwdPriId;
+        result = 31 * result + xbtId;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "CoreDataTypeAllowedPrimitiveExpressionTypeMap{" +
                 "cdtAwdPriXpsTypeMapId=" + cdtAwdPriXpsTypeMapId +

@@ -112,6 +112,37 @@ public class AgencyIdList implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AgencyIdList that = (AgencyIdList) o;
+
+        if (agencyIdListId != that.agencyIdListId) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (enumTypeGuid != null ? !enumTypeGuid.equals(that.enumTypeGuid) : that.enumTypeGuid != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (listId != null ? !listId.equals(that.listId) : that.listId != null) return false;
+        if (agencyId != null ? !agencyId.equals(that.agencyId) : that.agencyId != null) return false;
+        if (versionId != null ? !versionId.equals(that.versionId) : that.versionId != null) return false;
+        return definition != null ? definition.equals(that.definition) : that.definition == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = agencyIdListId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (enumTypeGuid != null ? enumTypeGuid.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (listId != null ? listId.hashCode() : 0);
+        result = 31 * result + (agencyId != null ? agencyId.hashCode() : 0);
+        result = 31 * result + (versionId != null ? versionId.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "AgencyIdList{" +
                 "agencyIdListId=" + agencyIdListId +

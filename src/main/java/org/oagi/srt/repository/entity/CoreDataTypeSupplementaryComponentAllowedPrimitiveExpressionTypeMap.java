@@ -56,6 +56,27 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap that = (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap) o;
+
+        if (cdtScAwdPriXpsTypeMapId != that.cdtScAwdPriXpsTypeMapId) return false;
+        if (cdtScAwdPri != that.cdtScAwdPri) return false;
+        return xbtId == that.xbtId;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cdtScAwdPriXpsTypeMapId;
+        result = 31 * result + cdtScAwdPri;
+        result = 31 * result + xbtId;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap{" +
                 "cdtScAwdPriXpsTypeMapId=" + cdtScAwdPriXpsTypeMapId +

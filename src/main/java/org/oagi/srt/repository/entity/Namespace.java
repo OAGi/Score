@@ -145,4 +145,57 @@ public class Namespace implements Serializable {
     public void setLastUpdateTimestamp(Date lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Namespace namespace = (Namespace) o;
+
+        if (namespaceId != namespace.namespaceId) return false;
+        if (stdNmsp != namespace.stdNmsp) return false;
+        if (createdBy != namespace.createdBy) return false;
+        if (ownerUserId != namespace.ownerUserId) return false;
+        if (lastUpdatedBy != namespace.lastUpdatedBy) return false;
+        if (uri != null ? !uri.equals(namespace.uri) : namespace.uri != null) return false;
+        if (prefix != null ? !prefix.equals(namespace.prefix) : namespace.prefix != null) return false;
+        if (description != null ? !description.equals(namespace.description) : namespace.description != null)
+            return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(namespace.creationTimestamp) : namespace.creationTimestamp != null)
+            return false;
+        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(namespace.lastUpdateTimestamp) : namespace.lastUpdateTimestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = namespaceId;
+        result = 31 * result + (uri != null ? uri.hashCode() : 0);
+        result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (stdNmsp ? 1 : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + ownerUserId;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Namespace{" +
+                "namespaceId=" + namespaceId +
+                ", uri='" + uri + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", description='" + description + '\'' +
+                ", stdNmsp=" + stdNmsp +
+                ", createdBy=" + createdBy +
+                ", ownerUserId=" + ownerUserId +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                '}';
+    }
 }

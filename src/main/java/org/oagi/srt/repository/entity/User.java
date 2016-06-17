@@ -89,6 +89,33 @@ public class User implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (appUserId != user.appUserId) return false;
+        if (oagisDeveloperIndicator != user.oagisDeveloperIndicator) return false;
+        if (loginId != null ? !loginId.equals(user.loginId) : user.loginId != null) return false;
+        if (password != null ? !password.equals(user.password) : user.password != null) return false;
+        if (name != null ? !name.equals(user.name) : user.name != null) return false;
+        return organization != null ? organization.equals(user.organization) : user.organization == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = appUserId;
+        result = 31 * result + (loginId != null ? loginId.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (organization != null ? organization.hashCode() : 0);
+        result = 31 * result + (oagisDeveloperIndicator ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "User{" +
                 "appUserId=" + appUserId +

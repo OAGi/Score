@@ -235,6 +235,57 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AggregateBusinessInformationEntity that = (AggregateBusinessInformationEntity) o;
+
+        if (abieId != that.abieId) return false;
+        if (basedAccId != that.basedAccId) return false;
+        if (topLevel != that.topLevel) return false;
+        if (bizCtxId != that.bizCtxId) return false;
+        if (createdBy != that.createdBy) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (state != that.state) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (bizCtxName != null ? !bizCtxName.equals(that.bizCtxName) : that.bizCtxName != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
+            return false;
+        if (clientId != null ? !clientId.equals(that.clientId) : that.clientId != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        if (status != null ? !status.equals(that.status) : that.status != null) return false;
+        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
+        return bizTerm != null ? bizTerm.equals(that.bizTerm) : that.bizTerm == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = abieId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + basedAccId;
+        result = 31 * result + (topLevel ? 1 : 0);
+        result = 31 * result + bizCtxId;
+        result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + state;
+        result = 31 * result + (clientId != null ? clientId.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "AggregateBusinessInformationEntity{" +
                 "abieId=" + abieId +

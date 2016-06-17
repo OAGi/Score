@@ -67,6 +67,29 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitive implements Seria
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CoreDataTypeSupplementaryComponentAllowedPrimitive that = (CoreDataTypeSupplementaryComponentAllowedPrimitive) o;
+
+        if (cdtScAwdPriId != that.cdtScAwdPriId) return false;
+        if (cdtScId != that.cdtScId) return false;
+        if (cdtPriId != that.cdtPriId) return false;
+        return isDefault == that.isDefault;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cdtScAwdPriId;
+        result = 31 * result + cdtScId;
+        result = 31 * result + cdtPriId;
+        result = 31 * result + (isDefault ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "CoreDataTypeSupplementaryComponentAllowedPrimitive{" +
                 "cdtScAwdPriId=" + cdtScAwdPriId +

@@ -188,6 +188,51 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BasicBusinessInformationEntitySupplementaryComponent that = (BasicBusinessInformationEntitySupplementaryComponent) o;
+
+        if (bbieScId != that.bbieScId) return false;
+        if (bbieId != that.bbieId) return false;
+        if (dtScId != that.dtScId) return false;
+        if (minCardinality != that.minCardinality) return false;
+        if (maxCardinality != that.maxCardinality) return false;
+        if (used != that.used) return false;
+        if (dtScPriRestriId != null ? !dtScPriRestriId.equals(that.dtScPriRestriId) : that.dtScPriRestriId != null)
+            return false;
+        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
+        if (agencyIdListId != null ? !agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId != null)
+            return false;
+        if (defaultValue != null ? !defaultValue.equals(that.defaultValue) : that.defaultValue != null) return false;
+        if (fixedValue != null ? !fixedValue.equals(that.fixedValue) : that.fixedValue != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
+        return bizTerm != null ? bizTerm.equals(that.bizTerm) : that.bizTerm == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bbieScId;
+        result = 31 * result + bbieId;
+        result = 31 * result + dtScId;
+        result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        result = 31 * result + minCardinality;
+        result = 31 * result + maxCardinality;
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
+        result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
+        result = 31 * result + (used ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BasicBusinessInformationEntitySupplementaryComponent{" +
                 "bbieScId=" + bbieScId +

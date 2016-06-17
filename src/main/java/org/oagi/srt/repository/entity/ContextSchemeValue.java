@@ -79,6 +79,31 @@ public class ContextSchemeValue implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContextSchemeValue that = (ContextSchemeValue) o;
+
+        if (ctxSchemeValueId != that.ctxSchemeValueId) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (meaning != null ? !meaning.equals(that.meaning) : that.meaning != null) return false;
+        return ownerCtxSchemeId != null ? ownerCtxSchemeId.equals(that.ownerCtxSchemeId) : that.ownerCtxSchemeId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ctxSchemeValueId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (meaning != null ? meaning.hashCode() : 0);
+        result = 31 * result + (ownerCtxSchemeId != null ? ownerCtxSchemeId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "ContextSchemeValue{" +
                 "ctxSchemeValueId=" + ctxSchemeValueId +

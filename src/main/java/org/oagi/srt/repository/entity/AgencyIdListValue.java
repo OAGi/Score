@@ -79,6 +79,31 @@ public class AgencyIdListValue implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AgencyIdListValue that = (AgencyIdListValue) o;
+
+        if (agencyIdListValueId != that.agencyIdListValueId) return false;
+        if (ownerListId != that.ownerListId) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return definition != null ? definition.equals(that.definition) : that.definition == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = agencyIdListValueId;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + ownerListId;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "AgencyIdListValue{" +
                 "agencyIdListValueId=" + agencyIdListValueId +

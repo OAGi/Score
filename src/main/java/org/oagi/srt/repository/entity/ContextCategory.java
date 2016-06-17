@@ -68,6 +68,29 @@ public class ContextCategory implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContextCategory that = (ContextCategory) o;
+
+        if (ctxCategoryId != that.ctxCategoryId) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return description != null ? description.equals(that.description) : that.description == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ctxCategoryId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "ContextCategory{" +
                 "ctxCategoryId=" + ctxCategoryId +

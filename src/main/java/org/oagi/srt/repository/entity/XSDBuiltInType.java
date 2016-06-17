@@ -67,6 +67,29 @@ public class XSDBuiltInType implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        XSDBuiltInType that = (XSDBuiltInType) o;
+
+        if (xbtId != that.xbtId) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (builtInType != null ? !builtInType.equals(that.builtInType) : that.builtInType != null) return false;
+        return subtypeOfXbtId != null ? subtypeOfXbtId.equals(that.subtypeOfXbtId) : that.subtypeOfXbtId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = xbtId;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (builtInType != null ? builtInType.hashCode() : 0);
+        result = 31 * result + (subtypeOfXbtId != null ? subtypeOfXbtId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "XSDBuiltInType{" +
                 "xbtId=" + xbtId +

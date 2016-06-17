@@ -95,6 +95,34 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction that = (BusinessDataTypeSupplementaryComponentPrimitiveRestriction) o;
+
+        if (bdtScPriRestriId != that.bdtScPriRestriId) return false;
+        if (bdtScId != that.bdtScId) return false;
+        if (isDefault != that.isDefault) return false;
+        if (cdtScAwdPriXpsTypeMapId != null ? !cdtScAwdPriXpsTypeMapId.equals(that.cdtScAwdPriXpsTypeMapId) : that.cdtScAwdPriXpsTypeMapId != null)
+            return false;
+        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
+        return agencyIdListId != null ? agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bdtScPriRestriId;
+        result = 31 * result + bdtScId;
+        result = 31 * result + (cdtScAwdPriXpsTypeMapId != null ? cdtScAwdPriXpsTypeMapId.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (isDefault ? 1 : 0);
+        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BusinessDataTypeSupplementaryComponentPrimitiveRestriction{" +
                 "bdtScPriRestriId=" + bdtScPriRestriId +

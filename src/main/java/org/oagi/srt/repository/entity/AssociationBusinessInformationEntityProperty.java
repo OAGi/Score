@@ -169,6 +169,44 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AssociationBusinessInformationEntityProperty that = (AssociationBusinessInformationEntityProperty) o;
+
+        if (asbiepId != that.asbiepId) return false;
+        if (basedAsccpId != that.basedAsccpId) return false;
+        if (roleOfAbieId != that.roleOfAbieId) return false;
+        if (createdBy != that.createdBy) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
+        if (bizTerm != null ? !bizTerm.equals(that.bizTerm) : that.bizTerm != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = asbiepId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + basedAsccpId;
+        result = 31 * result + roleOfAbieId;
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "AssociationBusinessInformationEntityProperty{" +
                 "asbiepId=" + asbiepId +

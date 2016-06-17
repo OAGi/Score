@@ -285,6 +285,65 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BasicBusinessInformationEntity that = (BasicBusinessInformationEntity) o;
+
+        if (bbieId != that.bbieId) return false;
+        if (basedBccId != that.basedBccId) return false;
+        if (fromAbieId != that.fromAbieId) return false;
+        if (toBbiepId != that.toBbiepId) return false;
+        if (cardinalityMin != that.cardinalityMin) return false;
+        if (cardinalityMax != that.cardinalityMax) return false;
+        if (nillable != that.nillable) return false;
+        if (nill != that.nill) return false;
+        if (createdBy != that.createdBy) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (seqKey != that.seqKey) return false;
+        if (used != that.used) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (bdtPriRestriId != null ? !bdtPriRestriId.equals(that.bdtPriRestriId) : that.bdtPriRestriId != null)
+            return false;
+        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
+        if (defaultValue != null ? !defaultValue.equals(that.defaultValue) : that.defaultValue != null) return false;
+        if (fixedValue != null ? !fixedValue.equals(that.fixedValue) : that.fixedValue != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bbieId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + basedBccId;
+        result = 31 * result + fromAbieId;
+        result = 31 * result + toBbiepId;
+        result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + cardinalityMin;
+        result = 31 * result + cardinalityMax;
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
+        result = 31 * result + (nillable ? 1 : 0);
+        result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
+        result = 31 * result + (nill ? 1 : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + seqKey;
+        result = 31 * result + (used ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BasicBusinessInformationEntity{" +
                 "bbieId=" + bbieId +

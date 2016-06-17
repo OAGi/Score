@@ -123,6 +123,40 @@ public class DataTypeSupplementaryComponent implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DataTypeSupplementaryComponent that = (DataTypeSupplementaryComponent) o;
+
+        if (dtScId != that.dtScId) return false;
+        if (ownerDtId != that.ownerDtId) return false;
+        if (minCardinality != that.minCardinality) return false;
+        if (maxCardinality != that.maxCardinality) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
+        if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
+            return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        return basedDtScId != null ? basedDtScId.equals(that.basedDtScId) : that.basedDtScId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = dtScId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
+        result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + ownerDtId;
+        result = 31 * result + minCardinality;
+        result = 31 * result + maxCardinality;
+        result = 31 * result + (basedDtScId != null ? basedDtScId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DataTypeSupplementaryComponent{" +
                 "dtScId=" + dtScId +

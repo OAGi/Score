@@ -68,6 +68,29 @@ public class Release implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Release release = (Release) o;
+
+        if (releaseId != release.releaseId) return false;
+        if (namespaceId != release.namespaceId) return false;
+        if (releaseNum != null ? !releaseNum.equals(release.releaseNum) : release.releaseNum != null) return false;
+        return releaseNote != null ? releaseNote.equals(release.releaseNote) : release.releaseNote == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = releaseId;
+        result = 31 * result + (releaseNum != null ? releaseNum.hashCode() : 0);
+        result = 31 * result + (releaseNote != null ? releaseNote.hashCode() : 0);
+        result = 31 * result + namespaceId;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Release{" +
                 "releaseId=" + releaseId +

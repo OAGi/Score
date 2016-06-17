@@ -56,6 +56,27 @@ public class BusinessContextValue implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BusinessContextValue that = (BusinessContextValue) o;
+
+        if (bizCtxValueId != that.bizCtxValueId) return false;
+        if (bizCtxId != that.bizCtxId) return false;
+        return ctxSchemeValueId == that.ctxSchemeValueId;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bizCtxValueId;
+        result = 31 * result + bizCtxId;
+        result = 31 * result + ctxSchemeValueId;
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BusinessContextValue{" +
                 "bizCtxValueId=" + bizCtxValueId +

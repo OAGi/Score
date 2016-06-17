@@ -289,6 +289,68 @@ public class CodeList implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CodeList codeList = (CodeList) o;
+
+        if (codeListId != codeList.codeListId) return false;
+        if (extensibleIndicator != codeList.extensibleIndicator) return false;
+        if (createdBy != codeList.createdBy) return false;
+        if (lastUpdatedBy != codeList.lastUpdatedBy) return false;
+        if (editDisabled != codeList.editDisabled) return false;
+        if (deleteDisabled != codeList.deleteDisabled) return false;
+        if (discardDisabled != codeList.discardDisabled) return false;
+        if (guid != null ? !guid.equals(codeList.guid) : codeList.guid != null) return false;
+        if (enumTypeGuid != null ? !enumTypeGuid.equals(codeList.enumTypeGuid) : codeList.enumTypeGuid != null)
+            return false;
+        if (name != null ? !name.equals(codeList.name) : codeList.name != null) return false;
+        if (listId != null ? !listId.equals(codeList.listId) : codeList.listId != null) return false;
+        if (agencyId != null ? !agencyId.equals(codeList.agencyId) : codeList.agencyId != null) return false;
+        if (versionId != null ? !versionId.equals(codeList.versionId) : codeList.versionId != null) return false;
+        if (definition != null ? !definition.equals(codeList.definition) : codeList.definition != null) return false;
+        if (remark != null ? !remark.equals(codeList.remark) : codeList.remark != null) return false;
+        if (definitionSource != null ? !definitionSource.equals(codeList.definitionSource) : codeList.definitionSource != null)
+            return false;
+        if (basedCodeListId != null ? !basedCodeListId.equals(codeList.basedCodeListId) : codeList.basedCodeListId != null)
+            return false;
+        if (module != null ? !module.equals(codeList.module) : codeList.module != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(codeList.creationTimestamp) : codeList.creationTimestamp != null)
+            return false;
+        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(codeList.lastUpdateTimestamp) : codeList.lastUpdateTimestamp != null)
+            return false;
+        return state != null ? state.equals(codeList.state) : codeList.state == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = codeListId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (enumTypeGuid != null ? enumTypeGuid.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (listId != null ? listId.hashCode() : 0);
+        result = 31 * result + (agencyId != null ? agencyId.hashCode() : 0);
+        result = 31 * result + (versionId != null ? versionId.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (definitionSource != null ? definitionSource.hashCode() : 0);
+        result = 31 * result + (basedCodeListId != null ? basedCodeListId.hashCode() : 0);
+        result = 31 * result + (extensibleIndicator ? 1 : 0);
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (editDisabled ? 1 : 0);
+        result = 31 * result + (deleteDisabled ? 1 : 0);
+        result = 31 * result + (discardDisabled ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "CodeList{" +
                 "codeListId=" + codeListId +

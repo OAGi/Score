@@ -169,6 +169,48 @@ public class ContextScheme implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContextScheme that = (ContextScheme) o;
+
+        if (classificationCtxSchemeId != that.classificationCtxSchemeId) return false;
+        if (ctxCategoryId != that.ctxCategoryId) return false;
+        if (createdBy != that.createdBy) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (schemeId != null ? !schemeId.equals(that.schemeId) : that.schemeId != null) return false;
+        if (schemeName != null ? !schemeName.equals(that.schemeName) : that.schemeName != null) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (schemeAgencyId != null ? !schemeAgencyId.equals(that.schemeAgencyId) : that.schemeAgencyId != null)
+            return false;
+        if (schemeVersionId != null ? !schemeVersionId.equals(that.schemeVersionId) : that.schemeVersionId != null)
+            return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = classificationCtxSchemeId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (schemeId != null ? schemeId.hashCode() : 0);
+        result = 31 * result + (schemeName != null ? schemeName.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (schemeAgencyId != null ? schemeAgencyId.hashCode() : 0);
+        result = 31 * result + (schemeVersionId != null ? schemeVersionId.hashCode() : 0);
+        result = 31 * result + ctxCategoryId;
+        result = 31 * result + createdBy;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "ContextScheme{" +
                 "classificationCtxSchemeId=" + classificationCtxSchemeId +

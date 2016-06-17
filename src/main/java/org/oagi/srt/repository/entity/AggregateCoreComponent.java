@@ -309,6 +309,72 @@ public class AggregateCoreComponent implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AggregateCoreComponent that = (AggregateCoreComponent) o;
+
+        if (accId != that.accId) return false;
+        if (oagisComponentType != that.oagisComponentType) return false;
+        if (createdBy != that.createdBy) return false;
+        if (ownerUserId != that.ownerUserId) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (state != that.state) return false;
+        if (revisionNum != that.revisionNum) return false;
+        if (revisionTrackingNum != that.revisionTrackingNum) return false;
+        if (deprecated != that.deprecated) return false;
+        if (isAbstract != that.isAbstract) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (objectClassTerm != null ? !objectClassTerm.equals(that.objectClassTerm) : that.objectClassTerm != null)
+            return false;
+        if (den != null ? !den.equals(that.den) : that.den != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (basedAccId != null ? !basedAccId.equals(that.basedAccId) : that.basedAccId != null) return false;
+        if (objectClassQualifier != null ? !objectClassQualifier.equals(that.objectClassQualifier) : that.objectClassQualifier != null)
+            return false;
+        if (module != null ? !module.equals(that.module) : that.module != null) return false;
+        if (namespaceId != null ? !namespaceId.equals(that.namespaceId) : that.namespaceId != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
+            return false;
+        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
+            return false;
+        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
+        return currentAccId != null ? currentAccId.equals(that.currentAccId) : that.currentAccId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = accId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (objectClassTerm != null ? objectClassTerm.hashCode() : 0);
+        result = 31 * result + (den != null ? den.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
+        result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
+        result = 31 * result + oagisComponentType;
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + ownerUserId;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + state;
+        result = 31 * result + revisionNum;
+        result = 31 * result + revisionTrackingNum;
+        result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
+        result = 31 * result + (currentAccId != null ? currentAccId.hashCode() : 0);
+        result = 31 * result + (deprecated ? 1 : 0);
+        result = 31 * result + (isAbstract ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "AggregateCoreComponent{" +
                 "accId=" + accId +

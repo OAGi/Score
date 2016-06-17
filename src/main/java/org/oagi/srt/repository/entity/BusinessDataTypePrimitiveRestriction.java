@@ -101,6 +101,34 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BusinessDataTypePrimitiveRestriction that = (BusinessDataTypePrimitiveRestriction) o;
+
+        if (bdtPriRestriId != that.bdtPriRestriId) return false;
+        if (bdtId != that.bdtId) return false;
+        if (isDefault != that.isDefault) return false;
+        if (cdtAwdPriXpsTypeMapId != null ? !cdtAwdPriXpsTypeMapId.equals(that.cdtAwdPriXpsTypeMapId) : that.cdtAwdPriXpsTypeMapId != null)
+            return false;
+        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
+        return agencyIdListId != null ? agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bdtPriRestriId;
+        result = 31 * result + bdtId;
+        result = 31 * result + (cdtAwdPriXpsTypeMapId != null ? cdtAwdPriXpsTypeMapId.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (isDefault ? 1 : 0);
+        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BusinessDataTypePrimitiveRestriction{" +
                 "bdtPriRestriId=" + bdtPriRestriId +

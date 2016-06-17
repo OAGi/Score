@@ -158,6 +158,42 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BasicBusinessInformationEntityProperty that = (BasicBusinessInformationEntityProperty) o;
+
+        if (bbiepId != that.bbiepId) return false;
+        if (basedBccpId != that.basedBccpId) return false;
+        if (createdBy != that.createdBy) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
+        if (bizTerm != null ? !bizTerm.equals(that.bizTerm) : that.bizTerm != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bbiepId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + basedBccpId;
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BasicBusinessInformationEntityProperty{" +
                 "bbiepId=" + bbiepId +

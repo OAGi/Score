@@ -293,6 +293,68 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BasicCoreComponent that = (BasicCoreComponent) o;
+
+        if (bccId != that.bccId) return false;
+        if (cardinalityMin != that.cardinalityMin) return false;
+        if (cardinalityMax != that.cardinalityMax) return false;
+        if (toBccpId != that.toBccpId) return false;
+        if (fromAccId != that.fromAccId) return false;
+        if (seqKey != that.seqKey) return false;
+        if (entityType != that.entityType) return false;
+        if (createdBy != that.createdBy) return false;
+        if (ownerUserId != that.ownerUserId) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (state != that.state) return false;
+        if (revisionNum != that.revisionNum) return false;
+        if (revisionTrackingNum != that.revisionTrackingNum) return false;
+        if (deprecated != that.deprecated) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
+        if (den != null ? !den.equals(that.den) : that.den != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
+            return false;
+        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
+            return false;
+        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
+            return false;
+        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
+        return currentBccId != null ? currentBccId.equals(that.currentBccId) : that.currentBccId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bccId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + cardinalityMin;
+        result = 31 * result + cardinalityMax;
+        result = 31 * result + toBccpId;
+        result = 31 * result + fromAccId;
+        result = 31 * result + seqKey;
+        result = 31 * result + entityType;
+        result = 31 * result + (den != null ? den.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + createdBy;
+        result = 31 * result + ownerUserId;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + state;
+        result = 31 * result + revisionNum;
+        result = 31 * result + revisionTrackingNum;
+        result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
+        result = 31 * result + (currentBccId != null ? currentBccId.hashCode() : 0);
+        result = 31 * result + (deprecated ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "BasicCoreComponent{" +
                 "bccId=" + bccId +
