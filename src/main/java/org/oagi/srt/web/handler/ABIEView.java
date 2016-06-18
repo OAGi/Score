@@ -34,6 +34,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     private AssociationCoreComponent ascc;
     private AssociationCoreComponentProperty asccp;
     private AggregateCoreComponent acc;
+    private BusinessObjectDocument bod;
     private AggregateBusinessInformationEntity abie;
     private AssociationBusinessInformationEntityProperty asbiep;
     private AssociationBusinessInformationEntity asbie;
@@ -168,6 +169,14 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
 
     public void setAcc(AggregateCoreComponent acc) {
         this.acc = acc;
+    }
+
+    public BusinessObjectDocument getBod() {
+        return bod;
+    }
+
+    public void setBod(BusinessObjectDocument bod) {
+        this.bod = bod;
     }
 
     public AggregateBusinessInformationEntity getAbie() {

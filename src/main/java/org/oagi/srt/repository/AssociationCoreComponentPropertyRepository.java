@@ -35,10 +35,12 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
 
     @Query("select distinct asccp.propertyTerm from " +
             "AggregateBusinessInformationEntity abie, " +
+            "BusinessObjectDocument bod," +
             "AssociationBusinessInformationEntityProperty asbiep, " +
             "AssociationCoreComponentProperty asccp where " +
-            "abie.abieId = asbiep.roleOfAbieId and abie.topLevel = ?1 and " +
+            "bod.topLevelAbieId = abie.abieId and " +
+            "abie.abieId = asbiep.roleOfAbieId and " +
             "asbiep.basedAsccpId = asccp.asccpId and " +
-            "asccp.propertyTerm like %?2%")
-    public List<String> findPropertyTermByAbieIsTopLevelAndPropertyTermContains(boolean topLevel, String propertyTerm);
+            "asccp.propertyTerm like %?1%")
+    public List<String> findPropertyTermByropertyTermContains(String propertyTerm);
 }

@@ -13,6 +13,6 @@ public interface BasicBusinessInformationEntitySupplementaryComponentRepository
     @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(int bbieId);
 
-    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1 and b.used = ?2")
-    public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieIdAndUsed(int bbieId, boolean used);
+    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bodId = ?1 and b.used = true")
+    public List<BasicBusinessInformationEntitySupplementaryComponent> findByBodIdAndUsedIsTrue(int bodId);
 }

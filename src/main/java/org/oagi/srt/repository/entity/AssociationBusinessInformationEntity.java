@@ -74,6 +74,9 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
+    @Column(nullable = false)
+    private int bodId;
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();
@@ -229,6 +232,14 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.used = used;
     }
 
+    public int getBodId() {
+        return bodId;
+    }
+
+    public void setBodId(int bodId) {
+        this.bodId = bodId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -247,6 +258,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
         if (seqKey != that.seqKey) return false;
         if (used != that.used) return false;
+        if (bodId != that.bodId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
         if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
@@ -274,6 +286,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + seqKey;
         result = 31 * result + (used ? 1 : 0);
+        result = 31 * result + bodId;
         return result;
     }
 
@@ -296,6 +309,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", seqKey=" + seqKey +
                 ", used=" + used +
+                ", bodId=" + bodId +
                 '}';
     }
 }

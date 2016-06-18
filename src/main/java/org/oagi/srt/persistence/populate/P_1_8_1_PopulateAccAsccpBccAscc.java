@@ -89,7 +89,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         logger.debug("### 1.8 Start");
 
         populate();
-        populateUnused();
+        //populateUnused();
 
         logger.debug("### 1.8 End");
     }
@@ -97,7 +97,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     @Transactional(rollbackFor = Throwable.class)
     public void populate() throws Exception {
         populate1();
-        populate2();
+        //populate2();
     }
 
     private void populate1() throws Exception {
@@ -110,7 +110,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         for (File file : files) {
-            if (file.getName().equals("AcknowledgeInvoice.xsd")) {
+            if (file.getName().equals("ProcessPurchaseOrder.xsd")) {
                 logger.debug(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }

@@ -89,6 +89,9 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
+    @Column(nullable = false)
+    private int bodId;
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();
@@ -284,6 +287,14 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.used = used;
     }
 
+    public int getBodId() {
+        return bodId;
+    }
+
+    public void setBodId(int bodId) {
+        this.bodId = bodId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -303,6 +314,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
         if (seqKey != that.seqKey) return false;
         if (used != that.used) return false;
+        if (bodId != that.bodId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (bdtPriRestriId != null ? !bdtPriRestriId.equals(that.bdtPriRestriId) : that.bdtPriRestriId != null)
             return false;
@@ -340,6 +352,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + seqKey;
         result = 31 * result + (used ? 1 : 0);
+        result = 31 * result + bodId;
         return result;
     }
 
@@ -367,6 +380,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", seqKey=" + seqKey +
                 ", used=" + used +
+                ", bodId=" + bodId +
                 '}';
     }
 }

@@ -95,6 +95,9 @@ public class StandaloneXMLSchema {
     @Autowired
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
 
+    @Autowired
+    private BusinessObjectDocumentRepository bodRepository;
+
     public String writeXSDFile(Document doc, String filename) throws TransformerException {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
@@ -1004,7 +1007,7 @@ public class StandaloneXMLSchema {
         private List<String> storedCC = new ArrayList();
         private List<String> guidArrayList = new ArrayList();
 
-        public GenerationContext() {
+        public GenerationContext(BusinessObjectDocument bod) {
             List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
             findBdtPriRestriByBdtIdAndDefaultIsTrueMap = bdtPriRestriList.stream()
                     .filter(e -> e.isDefault())
@@ -1076,26 +1079,30 @@ public class StandaloneXMLSchema {
             findAgencyIdListValueByOwnerListIdMap = agencyIdListValues.stream()
                     .collect(Collectors.groupingBy(e -> e.getOwnerListId()));
 
-            List<AggregateBusinessInformationEntity> abieList = abieRepository.findAll();
+            List<AggregateBusinessInformationEntity> abieList = abieRepository.findByBodId(bod.getBodId());
             findAbieMap = abieList.stream()
                     .collect(Collectors.toMap(e -> e.getAbieId(), Function.identity()));
 
-            List<BasicBusinessInformationEntity> bbieList = bbieRepository.findAll();
+            List<BasicBusinessInformationEntity> bbieList =
+                    bbieRepository.findByBodIdAndUsedIsTrue(bod.getBodId());
             findBbieByFromAbieIdAndUsedIsTrueMap = bbieList.stream()
                     .filter(e -> e.isUsed())
                     .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
 
-            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = bbieScRepository.findAll();
+            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList =
+                    bbieScRepository.findByBodIdAndUsedIsTrue(bod.getBodId());
             findBbieScByBbieIdAndUsedIsTrueMap = bbieScList.stream()
                     .filter(e -> e.isUsed())
                     .collect(Collectors.groupingBy(e -> e.getBbieId()));
 
-            List<AssociationBusinessInformationEntity> asbieList = asbieRepository.findAll();
+            List<AssociationBusinessInformationEntity> asbieList =
+                    asbieRepository.findByBodIdAndUsedIsTrue(bod.getBodId());
             findAsbieByFromAbieIdAndUsedIsTrueMap = asbieList.stream()
                     .filter(e -> e.isUsed())
                     .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
 
-            List<AssociationBusinessInformationEntityProperty> asbiepList = asbiepRepository.findAll();
+            List<AssociationBusinessInformationEntityProperty> asbiepList =
+                    asbiepRepository.findByBodId(bod.getBodId());
             findASBIEPMap = asbiepList.stream()
                     .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
             findAsbiepByRoleOfAbieIdMap = asbiepList.stream()
@@ -1440,34 +1447,36 @@ public class StandaloneXMLSchema {
         }
     }
 
-    public String generateXMLSchema(List<Integer> abie_ids, boolean schema_package_flag) throws Exception {
-        GenerationContext generationContext = new GenerationContext();
+    public String generateXMLSchema(List<Integer> bodIds, boolean schema_package_flag) throws Exception {
+        String filepath = null;
+        for (int bodId : bodIds) {
+            BusinessObjectDocument bod = bodRepository.findOne(bodId);
+            GenerationContext generationContext = new GenerationContext(bod);
+            AggregateBusinessInformationEntity abie =
+                    generationContext.findAbie(bod.getTopLevelAbieId());
 
-        List<AggregateBusinessInformationEntity> gABIE = receiveABIE(generationContext, abie_ids);
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.newDocument();
 
-        Element schemaNode = generateSchema(doc);
-        String filepath = null, filename = null;
-        if (schema_package_flag == true) {
-            for (AggregateBusinessInformationEntity abie : gABIE) {
+            Element schemaNode = generateSchema(doc);
+            String filename = null;
+            if (schema_package_flag == true) {
                 AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
                 System.out.println("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + asbiep.getAsbiepId());
                 doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
                 AssociationCoreComponentProperty asccpvo = generationContext.findASCCP(asbiep.getBasedAsccpId());
                 filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
-            }
-            filepath = writeXSDFile(doc, filename + "_standalone");
-        } else {
-            for (AggregateBusinessInformationEntity aAggregateBusinessInformationEntity : gABIE) {
-                AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(aAggregateBusinessInformationEntity.getAbieId());
+                filepath = writeXSDFile(doc, filename + "_standalone");
+            } else {
+                AssociationBusinessInformationEntityProperty asbiep =
+                        generationContext.receiveASBIEP(abie.getAbieId());
                 doc = docBuilder.newDocument();
                 schemaNode = generateSchema(doc);
                 doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
-                writeXSDFile(doc, "Package/" + aAggregateBusinessInformationEntity.getGuid());
+                writeXSDFile(doc, "Package/" + abie.getGuid());
+                filepath = Zip.compression(Utility.generateGUID());
             }
-            filepath = Zip.compression(Utility.generateGUID());
         }
 
         return filepath;

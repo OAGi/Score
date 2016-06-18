@@ -14,13 +14,13 @@ public class AggregateBusinessInformationEntityRepositoryImpl
 
     private final String SAVE_BULK_STATEMENT_FOR_MYSQL =
             "insert into `abie` " +
-                    "(`based_acc_id`, `biz_ctx_id`, `biz_term`, `client_id`," +
+                    "(`based_acc_id`, `biz_term`, `client_id`," +
                     " `created_by`, `creation_timestamp`, `definition`, `guid`," +
                     " `last_update_timestamp`, `last_updated_by`, `remark`," +
-                    " `state`, `status`, `is_top_level`, `version`) values ";
+                    " `status`, `version`) values ";
 
     private final String SAVE_BULK_STATEMENT_SUFFIX_FOR_MYSQL =
-            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private final String FIND_ID_BY_GUID_STATEMENT_FOR_MYSQL =
             "select `abie_id`, `guid` from `abie` where `guid` IN (";
@@ -39,7 +39,6 @@ public class AggregateBusinessInformationEntityRepositoryImpl
     protected void prepare(Dialect dialect, AggregateBusinessInformationEntity entity, List<Object> args) {
         entity.prePersist();
         args.add(entity.getBasedAccId());
-        args.add(entity.getBizCtxId());
         args.add(entity.getBizTerm());
         args.add(entity.getClientId() == 0 ? null : entity.getClientId());
         args.add(entity.getCreatedBy());
@@ -49,9 +48,7 @@ public class AggregateBusinessInformationEntityRepositoryImpl
         args.add(entity.getLastUpdateTimestamp());
         args.add(entity.getLastUpdatedBy());
         args.add(entity.getRemark());
-        args.add(entity.getState());
         args.add(entity.getStatus());
-        args.add(entity.isTopLevel());
         args.add(entity.getVersion());
     }
 

@@ -4,10 +4,15 @@ import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProper
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface AssociationBusinessInformationEntityPropertyRepository
         extends JpaRepository<AssociationBusinessInformationEntityProperty, Integer>,
         BulkInsertRepository<AssociationBusinessInformationEntityProperty> {
 
     @Query("select a from AssociationBusinessInformationEntityProperty a where a.roleOfAbieId = ?1")
     public AssociationBusinessInformationEntityProperty findOneByRoleOfAbieId(int roleOfAbieId);
+
+    @Query("select a from AssociationBusinessInformationEntityProperty a where a.bodId = ?1")
+    public List<AssociationBusinessInformationEntityProperty> findByBodId(int bodId);
 }

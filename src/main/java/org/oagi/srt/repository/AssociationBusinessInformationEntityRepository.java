@@ -13,6 +13,6 @@ public interface AssociationBusinessInformationEntityRepository
     @Query("select a from AssociationBusinessInformationEntity a where a.fromAbieId = ?1")
     public List<AssociationBusinessInformationEntity> findByFromAbieId(int fromAbieId);
 
-    @Query("select a from AssociationBusinessInformationEntity a where a.fromAbieId = ?1 and a.used = ?2")
-    public List<AssociationBusinessInformationEntity> findByFromAbieIdAndUsed(int fromAbieId, boolean used);
+    @Query("select a from AssociationBusinessInformationEntity a where a.bodId = ?1 and a.used = true")
+    public List<AssociationBusinessInformationEntity> findByBodIdAndUsedIsTrue(int bodId);
 }

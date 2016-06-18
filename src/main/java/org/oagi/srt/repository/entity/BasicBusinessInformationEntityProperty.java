@@ -56,6 +56,9 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
+    @Column(nullable = false)
+    private int bodId;
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();
@@ -157,6 +160,14 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
+    public int getBodId() {
+        return bodId;
+    }
+
+    public void setBodId(int bodId) {
+        this.bodId = bodId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -168,6 +179,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
         if (basedBccpId != that.basedBccpId) return false;
         if (createdBy != that.createdBy) return false;
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
+        if (bodId != that.bodId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
         if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
@@ -190,6 +202,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
         result = 31 * result + lastUpdatedBy;
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + bodId;
         return result;
     }
 
@@ -206,6 +219,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", bodId=" + bodId +
                 '}';
     }
 }
