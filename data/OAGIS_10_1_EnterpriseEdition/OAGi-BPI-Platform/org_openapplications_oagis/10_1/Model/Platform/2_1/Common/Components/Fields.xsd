@@ -3713,7 +3713,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="SequencedTextType" id="oagis-id-51e010d7a1e24ebe89fcf58989fefd1b">
-		<xsd:complexContent>
+		<xsd:simpleContent>
 			<xsd:extension base="TextType">
 				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-39a5a53826024a65a2291f50d9feecd3">
 					<xsd:annotation>
@@ -3721,7 +3721,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
-		</xsd:complexContent>
+		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="TypedSequencedTextType" id="oagis-id-c2bef83fa023429f96c2383d4304c7b2">
 		<xsd:complexContent>
