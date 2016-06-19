@@ -753,7 +753,7 @@ public class P_1_7_PopulateQBDTInDT {
                     representation_term = "Name";
                 } else {
                     String attrType = attrElement.getAttribute("type");
-                    if (attrType.equals("StringType") || attrType.equals("NormalizedStringType"))
+                    if (attrType.equals("StringType") || attrType.equals("NormalizedStringType") || attrType.equals("TokenType"))
                         representation_term = "Text";
                     else if (attrType.equals("IndicatorType"))
                         representation_term = "Indicator";
@@ -792,7 +792,9 @@ public class P_1_7_PopulateQBDTInDT {
                     // populate CDT_SC_Allowed_Primitives
                     String representationTerm = dtSc.getRepresentationTerm();
                     DataType dtVO = getDataTypeWithRepresentationTerm(representationTerm);
-
+                    if (dtVO == null) {
+                        throw new IllegalStateException();
+                    }
 
                     List<CoreDataTypeAllowedPrimitive> cdtAwdPriList = getCdtAwdPriList(dtVO.getDtId());
                     for (CoreDataTypeAllowedPrimitive svo : cdtAwdPriList) {
