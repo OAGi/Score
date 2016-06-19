@@ -3724,11 +3724,11 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="TypedSequencedTextType" id="oagis-id-c2bef83fa023429f96c2383d4304c7b2">
-		<xsd:complexContent>
+		<xsd:simpleContent>
 			<xsd:extension base="SequencedTextType">
 				<xsd:attribute name="type" type="TokenType" id="oagis-id-4228f5e4d6294040a8d813736f872bae"/>
 			</xsd:extension>
-		</xsd:complexContent>
+		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="TelephoneValueType" id="oagis-id-30c24b6c473f48e396ad7b0845cf95d2">
 		<xsd:simpleContent>
