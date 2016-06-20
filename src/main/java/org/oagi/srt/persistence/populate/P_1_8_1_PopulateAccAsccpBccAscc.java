@@ -110,7 +110,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         for (File file : files) {
-            if (file.getName().equals("ProcessPurchaseOrder.xsd")) {
+            if (file.getName().equals("AcknowledgeInvoice.xsd")) {
                 logger.debug(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }
