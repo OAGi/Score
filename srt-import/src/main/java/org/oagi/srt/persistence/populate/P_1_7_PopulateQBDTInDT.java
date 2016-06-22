@@ -1028,11 +1028,11 @@ public class P_1_7_PopulateQBDTInDT {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.7 Start");
+        logger.info("### 1.7 Start");
 
         populate();
 
-        logger.debug("### 1.7 End");
+        logger.info("### 1.7 End");
     }
 
     public static void main(String[] args) throws Exception {

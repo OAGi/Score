@@ -47,7 +47,7 @@ public class P_1_4_PopulateCodeList {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.4 Start");
+        logger.info("### 1.4 Start");
 
         String tt[][] = {               
                 {"CodeList_ConditionTypeCode_1", "314"},
@@ -98,7 +98,7 @@ public class P_1_4_PopulateCodeList {
             codeListValue(filename);
         }
 
-        logger.debug("### 1.4 End");
+        logger.info("### 1.4 End");
     }
 
     private List<CodeList> codeList(String fileinput, int agencyId) throws Exception {

@@ -818,23 +818,23 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.5.3-5 Start");
+        logger.info("### 1.5.3-5 Start");
 
         populateDTSC();
 
-        logger.debug("### 1.5.3-5 End");
+        logger.info("### 1.5.3-5 End");
 
     }
 
     public void validate() throws Exception {
-        logger.debug("### 1.5.3-5 Start Validation");
+        logger.info("### 1.5.3-5 Start Validation");
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         validatePopulateDTSCforDefaultBDT(businessDataType_xsd, fields_xsd);
         validatePopulateDTSCforUnqualifiedBDT(businessDataType_xsd, fields_xsd, true);
 
-        logger.debug("### 1.5.3-5 Validation End");
+        logger.info("### 1.5.3-5 Validation End");
 
     }
 

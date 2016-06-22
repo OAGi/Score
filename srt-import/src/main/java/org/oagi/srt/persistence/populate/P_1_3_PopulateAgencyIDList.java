@@ -41,11 +41,11 @@ public class P_1_3_PopulateAgencyIDList {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.3 Start");
+        logger.info("### 1.3 Start");
         Collection<AgencyIdList> agencyIdLists = agencyIDList();
         agencyIDListValue(agencyIdLists);
         updateAgencyIDList();
-        logger.debug("### 1.3 End");
+        logger.info("### 1.3 End");
     }
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {

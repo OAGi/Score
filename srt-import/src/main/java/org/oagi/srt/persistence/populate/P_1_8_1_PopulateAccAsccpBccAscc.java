@@ -76,7 +76,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.8 Start");
+        logger.info("### 1.8 Start");
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
         releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
@@ -85,7 +85,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         populate();
         populateUnused();
 
-        logger.debug("### 1.8 End");
+        logger.info("### 1.8 End");
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -105,7 +105,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         for (File file : files) {
             if (file.getName().equals("AcknowledgeInvoice.xsd")) {
-                logger.debug(file.getName() + " processing...");
+                logger.info(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }
         }
@@ -123,7 +123,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         for (File file : files) {
             if (!file.getName().equals("AcknowledgeInvoice.xsd") &&
                 !file.getName().endsWith("IST.xsd")) {
-                logger.debug(file.getName() + " processing...");
+                logger.info(file.getName() + " processing...");
                 createASCCP(new Context(file).getRootElementDecl());
             }
         }

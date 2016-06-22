@@ -66,7 +66,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.5.1-2 Start");
+        logger.info("### 1.5.1-2 Start");
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
         releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
@@ -82,7 +82,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         importCodeContentType();
         importIDContentType();
 
-        logger.debug("### 1.5.1-2 End");
+        logger.info("### 1.5.1-2 End");
     }
 
     private void importDataTypeList(String dataType) throws Exception {

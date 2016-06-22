@@ -127,7 +127,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
-        logger.debug("### 1.6. Start");
+        logger.info("### 1.6. Start");
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
         releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
@@ -142,7 +142,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
         P_1_5_6_PopulateBDTSCPrimitiveRestriction bdtscpri = applicationContext.getBean(P_1_5_6_PopulateBDTSCPrimitiveRestriction.class);
         bdtscpri.populateBDTSCPrimitiveRestriction(businessDataType_xsd, meta_xsd, false);
 
-        logger.debug("### 1.6. End");
+        logger.info("### 1.6. End");
     }
 
     public static void main(String args[]) throws Exception {

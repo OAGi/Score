@@ -64,9 +64,9 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
         XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xh2 = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        logger.debug("### 1.5.6 Start");
+        logger.info("### 1.5.6 Start");
         populateBDTSCPrimitiveRestriction(xh, xh2, true);
-        logger.debug("### 1.5.6 End");
+        logger.info("### 1.5.6 End");
     }
 
     public void populateBDTSCPrimitiveRestriction(XPathHandler xh, XPathHandler xh2, boolean is_fields_xsd) throws Exception {
