@@ -25,26 +25,26 @@ public class AgencyIdList implements Serializable {
     )
     private int agencyIdListId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String enumTypeGuid;
 
-    @Column
+    @Column(length = 100)
     private String name;
 
-    @Column
+    @Column(length = 10)
     private String listId;
 
     @Column
     private Integer agencyId = null;
 
-    @Column
+    @Column(length = 10)
     private String versionId;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     public int getAgencyIdListId() {

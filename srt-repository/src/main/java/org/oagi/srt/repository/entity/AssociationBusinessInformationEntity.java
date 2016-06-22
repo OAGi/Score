@@ -26,7 +26,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     )
     private int asbieId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
@@ -39,7 +39,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     private int basedAscc;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(nullable = false)
@@ -51,7 +51,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
 
-    @Column
+    @Column(length = 225)
     private String remark;
 
     @Column(nullable = false, updatable = false)

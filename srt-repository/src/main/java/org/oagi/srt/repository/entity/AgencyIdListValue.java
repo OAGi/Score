@@ -25,14 +25,14 @@ public class AgencyIdListValue implements Serializable {
     )
     private int agencyIdListValueId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 150)
     private String value;
 
-    @Column
+    @Column(length = 150)
     private String name;
 
     @Lob
-    @Column(length = 1024 * 1024)
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(nullable = false)

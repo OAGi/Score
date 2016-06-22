@@ -25,11 +25,11 @@ public class Release implements Serializable {
     )
     private int releaseId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String releaseNum;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String releaseNote;
 
     @Column(nullable = false)

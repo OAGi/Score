@@ -54,13 +54,13 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     private String fixedValue;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
-    @Column
+    @Column(length = 225)
     private String remark;
 
-    @Column
+    @Column(length = 225)
     private String bizTerm;
 
     @Column(name = "is_used", nullable = false)

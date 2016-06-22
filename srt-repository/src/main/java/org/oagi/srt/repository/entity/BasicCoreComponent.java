@@ -27,7 +27,7 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     )
     private int bccId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
@@ -52,7 +52,7 @@ public class BasicCoreComponent extends CoreComponent implements Serializable {
     private String den;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(nullable = false, updatable = false)

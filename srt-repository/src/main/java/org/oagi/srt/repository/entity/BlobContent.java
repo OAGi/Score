@@ -36,7 +36,7 @@ public class BlobContent implements Serializable {
     @Column(nullable = false)
     private int releaseId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String module;
 
     public BlobContent() {

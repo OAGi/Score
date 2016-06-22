@@ -26,7 +26,7 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     )
     private int asccId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
@@ -44,11 +44,11 @@ public class AssociationCoreComponent extends CoreComponent implements Serializa
     @Column(nullable = false)
     private int toAsccpId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String den;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(name = "is_deprecated", nullable = false)

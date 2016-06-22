@@ -27,23 +27,23 @@ public class AssociationCoreComponentProperty implements Serializable {
     )
     private int asccpId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
     private String propertyTerm;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(nullable = false)
     private int roleOfAccId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String den;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private int createdBy;
 
     @Column(nullable = false)
@@ -63,7 +63,7 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column(nullable = false)
     private int state;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String module;
 
     @Column(nullable = false)

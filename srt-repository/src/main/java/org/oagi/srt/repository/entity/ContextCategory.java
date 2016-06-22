@@ -25,14 +25,14 @@ public class ContextCategory implements Serializable {
     )
     private int ctxCategoryId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column
+    @Column(length = 45)
     private String name;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String description;
 
     public int getCtxCategoryId() {

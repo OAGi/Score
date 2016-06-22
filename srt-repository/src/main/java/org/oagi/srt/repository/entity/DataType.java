@@ -27,46 +27,46 @@ public class DataType implements Serializable {
     )
     private int dtId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
     private int type;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String versionNum;
 
     @Column
     private Integer previousVersionDtId;
 
-    @Column
+    @Column(length = 45)
     private String dataTypeTerm;
 
-    @Column
+    @Column(length = 100)
     private String qualifier;
 
     @Column
     private Integer basedDtId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String den;
 
-    @Column
+    @Column(length = 200)
     private String contentComponentDen;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String contentComponentDefinition;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String revisionDoc;
 
-    @Column
+    @Column(length = 100)
     private String module;
 
     @Column

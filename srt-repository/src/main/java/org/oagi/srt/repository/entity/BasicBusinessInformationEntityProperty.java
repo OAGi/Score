@@ -26,23 +26,23 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     )
     private int bbiepId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
     private int basedBccpId;
 
     @Lob
-    @Column(nullable = false)
+    @Column(length = 10 * 1024)
     private String definition;
 
-    @Column(nullable = false)
+    @Column(length = 225)
     private String remark;
 
-    @Column(nullable = false)
+    @Column(length = 225)
     private String bizTerm;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private int createdBy;
 
     @Column(nullable = false)

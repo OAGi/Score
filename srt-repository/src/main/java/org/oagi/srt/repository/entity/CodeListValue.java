@@ -28,14 +28,14 @@ public class CodeListValue implements Serializable {
     @Column
     private int codeListId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String value;
 
-    @Column
+    @Column(length = 100)
     private String name;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column

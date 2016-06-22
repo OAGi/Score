@@ -25,17 +25,17 @@ public class DataTypeSupplementaryComponent implements Serializable {
     )
     private int dtScId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column
+    @Column(length = 60)
     private String propertyTerm;
 
-    @Column
+    @Column(length = 20)
     private String representationTerm;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(nullable = false)

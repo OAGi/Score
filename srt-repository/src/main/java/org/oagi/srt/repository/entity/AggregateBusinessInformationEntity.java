@@ -26,7 +26,7 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     )
     private int abieId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
@@ -36,7 +36,7 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     private String bizCtxName;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
     @Column(nullable = false, updatable = false)
@@ -56,16 +56,16 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     @Column
     private Integer clientId;
 
-    @Column
+    @Column(length = 45)
     private String version;
 
-    @Column
+    @Column(length = 45)
     private String status;
 
-    @Column
+    @Column(length = 225)
     private String remark;
 
-    @Column
+    @Column(length = 225)
     private String bizTerm;
 
     @Column(nullable = false)

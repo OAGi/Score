@@ -26,7 +26,7 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     )
     private int asbiepId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
@@ -36,13 +36,13 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     private int roleOfAbieId;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
-    @Column
+    @Column(length = 225)
     private String remark;
 
-    @Column
+    @Column(length = 225)
     private String bizTerm;
 
     @Column(nullable = false, updatable = false)

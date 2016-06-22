@@ -26,22 +26,23 @@ public class ContextScheme implements Serializable {
     )
     private int classificationCtxSchemeId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String schemeId;
 
     @Column
     private String schemeName;
 
-    @Column
+    @Lob
+    @Column(length = 10 * 1024)
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String schemeAgencyId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String schemeVersionId;
 
     @Column(nullable = false)

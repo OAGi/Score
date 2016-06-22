@@ -25,10 +25,10 @@ public class XSDBuiltInType implements Serializable {
     )
     private int xbtId;
 
-    @Column
+    @Column(length = 45)
     private String name;
 
-    @Column(name = "builtin_type")
+    @Column(name = "builtin_type", length = 45)
     private String builtInType;
 
     @Column

@@ -25,16 +25,16 @@ public class User implements Serializable {
     )
     private int appUserId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String loginId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String password;
 
-    @Column
+    @Column(length = 100)
     private String name;
 
-    @Column
+    @Column(length = 100)
     private String organization;
 
     @Column(nullable = false)

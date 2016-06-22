@@ -26,13 +26,13 @@ public class Namespace implements Serializable {
     )
     private int namespaceId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String uri;
 
-    @Column
+    @Column(length = 45)
     private String prefix;
 
-    @Column
+    @Column(length = 200)
     private String description;
 
     @Column(name = "is_std_nmsp", nullable = false)

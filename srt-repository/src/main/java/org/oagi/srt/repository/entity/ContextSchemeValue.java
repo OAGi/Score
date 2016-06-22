@@ -25,14 +25,14 @@ public class ContextSchemeValue implements Serializable {
     )
     private int ctxSchemeValueId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String value;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String meaning;
 
     @Column

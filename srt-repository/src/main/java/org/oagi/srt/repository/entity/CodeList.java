@@ -27,29 +27,29 @@ public class CodeList implements Serializable {
     )
     private int codeListId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column
     private String enumTypeGuid;
 
-    @Column
+    @Column(length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String listId;
 
     @Column
     private Integer agencyId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String versionId;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
-    @Column
+    @Column(length = 225)
     private String remark;
 
     @Column
@@ -61,7 +61,7 @@ public class CodeList implements Serializable {
     @Column(nullable = false)
     private boolean extensibleIndicator;
 
-    @Column
+    @Column(length = 100)
     private String module;
 
     @Column(nullable = false, updatable = false)
@@ -78,7 +78,7 @@ public class CodeList implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String state;
 
     @Transient

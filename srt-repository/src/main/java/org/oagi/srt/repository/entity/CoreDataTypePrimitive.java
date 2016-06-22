@@ -25,7 +25,7 @@ public class CoreDataTypePrimitive implements Serializable {
     )
     private int cdtPriId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String name;
 
     public int getCdtPriId() {

@@ -26,26 +26,26 @@ public class BasicCoreComponentProperty implements Serializable {
     )
     private int bccpId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 60)
     private String propertyTerm;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String representationTerm;
 
     @Column(nullable = false)
     private int bdtId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String den;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
-    @Column
+    @Column(length = 100)
     private String module;
 
     @Column

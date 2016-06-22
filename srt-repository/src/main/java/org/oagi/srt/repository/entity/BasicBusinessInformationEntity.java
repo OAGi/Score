@@ -26,7 +26,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     )
     private int bbieId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
@@ -63,10 +63,10 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     private boolean nill;
 
     @Lob
-    @Column
+    @Column(length = 10 * 1024)
     private String definition;
 
-    @Column
+    @Column(length = 225)
     private String remark;
 
     @Column(nullable = false, updatable = false)

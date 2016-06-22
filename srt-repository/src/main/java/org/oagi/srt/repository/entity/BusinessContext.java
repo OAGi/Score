@@ -26,10 +26,10 @@ public class BusinessContext implements Serializable {
     )
     private int bizCtxId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column
+    @Column(length = 100)
     private String name;
 
     @Column(nullable = false, updatable = false)
