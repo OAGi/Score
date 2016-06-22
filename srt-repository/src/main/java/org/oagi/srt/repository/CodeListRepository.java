@@ -8,9 +8,6 @@ import java.util.List;
 
 public interface CodeListRepository extends JpaRepository<CodeList, Integer> {
 
-    @Query("select c from CodeList c order by c.creationTimestamp desc")
-    public List<CodeList> findAllOrderByCreationTimestampDesc();
-
     public List<CodeList> findByNameContaining(String name);
 
     @Query("select c from CodeList c where c.name like %?1% and c.state = 'Published' and c.extensibleIndicator = 1")

@@ -11,6 +11,13 @@ import java.util.Date;
 @Table(name = "code_list")
 public class CodeList implements Serializable {
 
+    public enum State {
+        Editing,
+        Published,
+        Discarded,
+        Deleted
+    }
+
     public static final String SEQUENCE_NAME = "CODE_LIST_ID_SEQ";
 
     @Id
@@ -79,7 +86,8 @@ public class CodeList implements Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false, length = 10)
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private State state;
 
     @Transient
     private boolean editDisabled;
@@ -239,20 +247,20 @@ public class CodeList implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public String getState() {
+    public State getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(State state) {
         this.state = state;
 
         switch (state) {
-            case SRTConstants.CODE_LIST_STATE_EDITING:
+            case Editing:
                 setEditDisabled(false);
                 setDiscardDisabled(false);
                 setDeleteDisabled(true);
                 break;
-            case SRTConstants.CODE_LIST_STATE_PUBLISHED:
+            case Published:
                 setEditDisabled(true);
                 setDiscardDisabled(true);
                 setDeleteDisabled(false);

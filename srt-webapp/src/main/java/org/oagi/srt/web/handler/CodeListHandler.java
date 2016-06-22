@@ -1,17 +1,14 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.repository.AgencyIdListRepository;
-import org.oagi.srt.repository.CodeListRepository;
-import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
+import org.oagi.srt.service.CodeListService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +17,10 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @Scope("view")
@@ -30,10 +29,7 @@ import java.util.stream.Collectors;
 public class CodeListHandler extends UIHandler {
 
     @Autowired
-    private CodeListRepository codeListRepository;
-
-    @Autowired
-    private CodeListValueRepository codeListValueRepository;
+    private CodeListService codeListService;
 
     private List<CodeList> codeLists = new ArrayList();
     private List<CodeListValue> codeListValues = new ArrayList();
@@ -57,7 +53,7 @@ public class CodeListHandler extends UIHandler {
     @PostConstruct
     public void init() {
         super.init();
-        codeLists = codeListRepository.findAllOrderByCreationTimestampDesc();
+        codeLists = codeListService.findAll(Sort.Direction.DESC, "creationTimestamp");
     }
 
     public List<CodeListValue> getSelectedCodeListValue() {
@@ -146,7 +142,7 @@ public class CodeListHandler extends UIHandler {
         CodeListHandler ch = (CodeListHandler) event.getObject();
         if (ch.getSelected() != null) {
             selected = ch.getSelected();
-            codeListValues = codeListValueRepository.findByCodeListId(selected.getCodeListId());
+            codeListValues = codeListService.findByCodeList(selected);
 
             for (CodeListValue codeListValue : codeListValues) {
                 if (codeListValue.isUsedIndicator() && !codeListValue.isLockedIndicator())
@@ -162,43 +158,30 @@ public class CodeListHandler extends UIHandler {
 
     public void onEdit(CodeList obj) {
         codeList = obj;
-        codeListValues = codeListValueRepository.findByCodeListId(codeList.getCodeListId());
+        codeListValues = codeListService.findByCodeList(codeList);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void onDiscard(CodeList obj) {
         codeList = obj;
-        codeList.setState(SRTConstants.CODE_LIST_STATE_DISCARDED);
-        codeListRepository.updateStateByCodeListId(codeList.getState(), codeList.getCodeListId());
+        codeListService.updateState(codeList, CodeList.State.Discarded);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void onDelete(CodeList obj) {
         codeList = obj;
-        codeList.setState(SRTConstants.CODE_LIST_STATE_DELETED);
-        codeListRepository.updateStateByCodeListId(codeList.getState(), codeList.getCodeListId());
+        codeListService.updateState(codeList, CodeList.State.Deleted);
     }
 
     public List<String> completeInput(String query) {
-        codeLists = codeListRepository.findByNameContaining(query);
-
-        return codeLists.stream().map(codeList -> codeList.getName()).collect(Collectors.toList());
+        return codeListService.findDistinctNameByNameContaining(query);
     }
 
     public void search() {
         codeLists =
-                codeListRepository.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(getBasedCodeListName());
+                codeListService.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(getBasedCodeListName());
         if (codeLists.isEmpty()) {
             FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists or not yet published or not extensible", "[" + getBasedCodeListName() + "] No such Code List exists or not yet published or not extensible");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-        }
-    }
-
-    public void searchDerived(String id) {
-        CodeList codeList = codeListRepository.findOne(Integer.parseInt(id));
-        codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
-        if (codeLists.isEmpty()) {
-            FacesMessage msg = new FacesMessage("[" + getBasedCodeListName() + "] No such Code List exists.", "[" + getBasedCodeListName() + "] No such Code List exists.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
     }
@@ -209,7 +192,7 @@ public class CodeListHandler extends UIHandler {
         FacesMessage msg = new FacesMessage(selected.getName(), String.valueOf(selected.getCodeListId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
-        codeListValues = codeListValueRepository.findByCodeListId(selected.getCodeListId());
+        codeListValues = codeListService.findByCodeList(selected);
     }
 
     public void onRowUnselect(UnselectEvent event) {
@@ -221,61 +204,62 @@ public class CodeListHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void save() {
-        codeList.setExtensibleIndicator(extensible);
-        codeList.setGuid(Utility.generateGUID());
-        codeList.setEnumTypeGuid(Utility.generateGUID());
-        if (selected != null) {
-            codeList.setBasedCodeListId(selected.getCodeListId());
-        }
-        codeList.setState(SRTConstants.CODE_LIST_STATE_EDITING);
-        codeList.setCreatedBy(userId);
-        codeList.setLastUpdatedBy(userId);
-
-        codeListRepository.save(codeList);
-
-        int codeListId = codeList.getCodeListId();
+        codeList =
+                codeListService.newCodeListBuilder(codeList)
+                        .userId(userId)
+                        .extensibleIndicator(extensible)
+                        .basedCodeList(selected)
+                        .build();
 
         for (CodeListValue codeListValue : codeListValues) {
-            setIndicators(codeListValue);
-            codeListValue.setCodeListId(codeListId);
+            setIndicators(codeListValue)
+                    .codeList(codeList)
+                    .build();
         }
-        codeListValueRepository.save(codeListValues);
     }
 
-    private void setIndicators(CodeListValue codeListValue) {
+    private CodeListService.CodeListValueBuilder setIndicators(CodeListValue codeListValue) {
+        CodeListService.CodeListValueBuilder codeListValueBuilder =
+                codeListService.newCodeListValueBuilder(codeListValue);
+
         switch (codeListValue.getColor()) {
             case "blue":
-                codeListValue.setUsedIndicator(true);
-                codeListValue.setLockedIndicator(false);
-                codeListValue.setExtensionIndicator(false);
+                codeListValueBuilder
+                        .usedIndicator(true)
+                        .lockedIndicator(false)
+                        .extensionIndicator(false);
                 break;
             case "red":
-                codeListValue.setUsedIndicator(false);
-                codeListValue.setLockedIndicator(true);
-                codeListValue.setExtensionIndicator(false);
+                codeListValueBuilder
+                        .usedIndicator(false)
+                        .lockedIndicator(true)
+                        .extensionIndicator(false);
                 break;
             case "orange":
-                codeListValue.setUsedIndicator(false);
-                codeListValue.setLockedIndicator(false);
-                codeListValue.setExtensionIndicator(false);
+                codeListValueBuilder
+                        .usedIndicator(false)
+                        .lockedIndicator(false)
+                        .extensionIndicator(false);
                 break;
             case "green":
-                codeListValue.setUsedIndicator(true);
-                codeListValue.setLockedIndicator(false);
-                codeListValue.setExtensionIndicator(true);
+                codeListValueBuilder
+                        .usedIndicator(true)
+                        .lockedIndicator(false)
+                        .extensionIndicator(true);
                 break;
         }
+
+        return codeListValueBuilder;
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void updateSave() {
-        codeListRepository.save(codeList);
+        codeListService.update(codeList);
 
         for (CodeListValue codeListValue : codeListValues) {
-            setIndicators(codeListValue);
-            codeListValue.setCodeListId(codeList.getCodeListId());
-            codeListValueRepository.updateCodeListIdByCodeListValueId(
-                    codeListValue.getCodeListId(), codeListValue.getCodeListValueId());
+            setIndicators(codeListValue)
+                    .codeList(codeList)
+                    .build();
         }
 
         selected = codeList;
@@ -283,37 +267,24 @@ public class CodeListHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void updatePublish() {
-        codeListRepository.updateStateByCodeListId(SRTConstants.CODE_LIST_STATE_PUBLISHED, codeList.getCodeListId());
+        codeListService.updateState(codeList, CodeList.State.Published);
 
         for (CodeListValue codeListValue : codeListValues) {
-            setIndicators(codeListValue);
-            codeListValue.setCodeListId(codeList.getCodeListId());
-            codeListValueRepository.updateCodeListIdByCodeListValueId(
-                    codeListValue.getCodeListId(), codeListValue.getCodeListValueId());
+            setIndicators(codeListValue)
+                    .codeList(codeList)
+                    .build();
         }
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void publish() {
-        codeList.setExtensibleIndicator(extensible);
-        codeList.setGuid(Utility.generateGUID());
-        codeList.setEnumTypeGuid(Utility.generateGUID());
-        if (selected != null) {
-            codeList.setBasedCodeListId(selected.getCodeListId());
-        }
-        codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-        codeList.setCreatedBy(userId);
-        codeList.setLastUpdatedBy(userId);
-
-        codeListRepository.save(codeList);
-
-        int codeListId = codeList.getCodeListId();
-
-        for (CodeListValue codeListValue : codeListValues) {
-            setIndicators(codeListValue);
-            codeListValue.setCodeListId(codeListId);
-        }
-        codeListValueRepository.save(codeListValues);
+        codeList =
+                codeListService.newCodeListBuilder(codeList)
+                        .userId(userId)
+                        .extensibleIndicator(extensible)
+                        .state(CodeList.State.Published)
+                        .basedCodeList(selected)
+                        .build();
     }
 
     public void cancel() {
