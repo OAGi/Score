@@ -29,9 +29,9 @@ public class SRTConstants {
 	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
 	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 
-	public static final String BOD_FILE_PATH = "../data/xsd";
+	public static final String BOD_FILE_PATH = "./data/xsd";
 
-	public static final String MODEL_FOLDER_PATH = "../data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model";
+	public static final String MODEL_FOLDER_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model";
 	public static final String BOD_FILE_PATH_01 = MODEL_FOLDER_PATH + "/Platform/2_1/BODs/";
 	public static final String BOD_FILE_PATH_02 = MODEL_FOLDER_PATH + "/BODs/";
 
@@ -44,10 +44,10 @@ public class SRTConstants {
 	public static final String NOUNS_FILE_PATH = MODEL_FOLDER_PATH + "/Nouns/";
 	public static final String XBT_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
 	public static final String CODE_LIST_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/CodeLists/";
-	public static final String TEST_BOD_FILE_PATH = "../data/xsd";
-	public static final String TEST_XML_FILE_PATH = "../data/xsd";
+	public static final String TEST_BOD_FILE_PATH = "./data/xsd";
+	public static final String TEST_XML_FILE_PATH = "./data/xsd";
 
-	public static final String BASE_DATA_PATH = "../data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1";
+	public static final String BASE_DATA_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1";
 
 	public static String filepath(String list) {
 		String prefix_filepath = MODEL_FOLDER_PATH;

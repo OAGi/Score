@@ -8,8 +8,6 @@ import com.sun.xml.internal.xsom.parser.XSOMParser;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.RepositoryConfig;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.persistence.populate.helper.ElementDecl;
 import org.oagi.srt.persistence.populate.helper.TypeDecl;
@@ -18,8 +16,9 @@ import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -29,7 +28,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Locator;
 
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -1038,8 +1036,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public static void main(String[] args) throws Exception {
-        try (AnnotationConfigApplicationContext ctx =
-                     new AnnotationConfigApplicationContext(RepositoryConfig.class, ImportConfig.class)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_7_PopulateQBDTInDT populateQBDTInDT = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
             populateQBDTInDT.run(ctx);
         }

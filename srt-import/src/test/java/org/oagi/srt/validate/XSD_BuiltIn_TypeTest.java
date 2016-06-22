@@ -3,27 +3,20 @@ package org.oagi.srt.validate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.TestRepositoryConfig;
-import org.oagi.srt.validate.data.TableData;
+import org.oagi.srt.persistence.populate.ImportApplication;
 import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.oagi.srt.repository.entity.XSDBuiltInType;
+import org.oagi.srt.validate.data.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Yunsu Lee
  * @version 1.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-        TestRepositoryConfig.class,
-        ImportConfig.class
-})
+@SpringApplicationConfiguration(ImportApplication.class)
 public class XSD_BuiltIn_TypeTest {
 
     @Autowired

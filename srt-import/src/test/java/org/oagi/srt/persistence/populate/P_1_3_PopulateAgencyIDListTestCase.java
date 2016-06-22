@@ -3,29 +3,22 @@ package org.oagi.srt.persistence.populate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.TestRepositoryConfig;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-        TestRepositoryConfig.class,
-        ImportConfig.class
-})
+@SpringApplicationConfiguration(ImportApplication.class)
 public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired

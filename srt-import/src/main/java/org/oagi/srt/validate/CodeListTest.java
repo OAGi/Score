@@ -2,15 +2,15 @@ package org.oagi.srt.validate;
 
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.RepositoryConfig;
+import org.oagi.srt.persistence.populate.ImportApplication;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -138,8 +138,7 @@ public class CodeListTest {
     }
 
     public static void main(String[] args) throws Exception {
-        try (AnnotationConfigApplicationContext ctx =
-                     new AnnotationConfigApplicationContext(RepositoryConfig.class, ImportConfig.class)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             CodeListTest codeListTest = ctx.getBean(CodeListTest.class);
             codeListTest.run(ctx);
         }

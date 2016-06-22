@@ -1,0 +1,166 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;">
+    <!ENTITY bull "&#8226;">
+    <!ENTITY copy "&#169;">
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<f:facet name="first">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport"
+			content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+
+	</f:facet>
+	<link rel="shortcut icon" type="image/png" href="images/oagi.png" />
+	<title>OAGi Semantic Refinement Project</title>
+	<h:outputStylesheet name="css/sr.css" />
+
+	<ui:insert name="head" />
+
+	<style type="text/css">
+.ui-layout-north {
+	z-index: 20 !important;
+	overflow: visible !important;;
+}
+
+.ui-layout-north .ui-layout-unit-content {
+	overflow: visible !important;
+}
+
+ul.ui-menu-child {
+    white-space: nowrap;
+    width: auto !important;
+}
+
+</style>
+</h:head>
+
+<h:body>
+	<p:layout fullPage="true">
+		<p:layoutUnit position="north" size="50" style="border:0; margin:0; padding:0;">
+			<p:layout>
+				<p:layoutUnit position="west" size="200" resizable="false" closable="false" style="border:0; margin:0; padding:0;text-align:center">
+					<h:outputLink value="index.xhtml">
+ 						<p:graphicImage name="images/oagi.png" width="200" height="50" style="border:0; margin:10; padding:10; !important"/>
+ 					</h:outputLink>
+				</p:layoutUnit>
+				<p:layoutUnit position="center" style="border:0; margin:0; padding:0;">
+					<!-- Header Menu-->
+					<h:form>
+						<p:growl id="messages" />
+						<p:menubar>
+						
+							<p:submenu label="#{str['BIEs']}" icon="ui-icon-document">
+								<p:menuitem value="#{str['Create_top-level_ABIE']}" url="/top_level_abie_create.xhtml" />
+								<p:separator />
+								<p:menuitem value="Profile BOD List" url="/top_level_abie_list.xhtml" />
+								<p:separator />
+								<p:menuitem value="#{str['Copy_top-level_ABIE']}" url="/top_level_abie_copy.xhtml" />
+							</p:submenu>
+							
+							<p:submenu label="Profile OAGIS" icon="ui-icon-disk">
+								<p:menuitem value="Generate OAGIS expression" url="/oagis_expression_generate.xhtml" />
+							</p:submenu>
+
+							<p:submenu label="Business Context" icon="ui-icon-star">
+								<p:menuitem value="Create business context" url="/business_context_create.xhtml" />
+								<p:separator />
+								<p:menuitem value="Business context list" url="/business_context_list.xhtml" />
+							</p:submenu>
+
+							<p:submenu label="Context Category" icon="ui-icon-calculator">
+								<p:menuitem value="Context category List" url="/context_category_list.xhtml" />
+								<p:separator />
+								<p:menuitem value="Create context category" url="/context_category_create.xhtml" />
+								<p:separator />
+								<p:menuitem value="Search context category" url="/context_category_search.xhtml" />
+							</p:submenu>
+ 
+							<p:submenu label="Context Scheme" icon="ui-icon-suitcase">
+								<p:menuitem value="Create new context scheme" url="/context_scheme_create.xhtml" />
+								<p:separator />
+								<p:menuitem value="Context scheme list" url="/context_scheme_list.xhtml" />
+							</p:submenu>
+							
+							<p:submenu label="Code List" icon="ui-icon-flag">
+								<p:menuitem value="View Code List" url="/code_lists.xhtml" />
+								<p:separator />
+								<p:menuitem value="Create Code List w/o base" url="/code_list_create_wo_base.xhtml" />
+								<p:separator />
+								<p:menuitem value="Create Code List from another" url="/code_list_create_from_another.xhtml" />
+							</p:submenu>
+							
+							<p:submenu label="Help" icon="ui-icon-help">
+								<p:menuitem value="Ask to Serm" url="#" />
+								<p:separator />
+								<p:menuitem value="Ask to Mike" url="#" />
+								<p:separator />
+								<p:menuitem value="Don't ask to Yunsu" url="#" />
+							</p:submenu>
+							
+							<p:submenu label="Admin" icon="ui-icon-person">
+								<p:menuitem value="Config Menu String" url="menu_string_configuration.xhtml" />
+								<p:separator />
+								<p:menuitem value="User List" url="#" />
+								<p:separator />
+								<p:menuitem value="Anything else?" url="#" />
+							</p:submenu>
+
+
+							<f:facet name="options">
+								<h:selectOneMenu value="User-EN" onchange="submit()"
+									valueChangeListener="#{termType.countryUserTypeCodeChanged}">
+					   				<f:selectItems value="#{termType.userTypesInMap}" /> 
+					   			</h:selectOneMenu>
+							</f:facet>
+						</p:menubar>
+					</h:form>
+				</p:layoutUnit>
+			</p:layout>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west" size="200" header="Left"
+			resizable="false" closable="false" collapsible="true" effect="drop">
+			<ui:insert name="side_menu" />
+		</p:layoutUnit>
+
+<!-- 		<p:layoutUnit position="east" size="200" header="Right"
+			resizable="false" closable="false" collapsible="true" effect="drop">
+			<p:graphicImage name="images/#{str['pic']}.jpg" width="150" height="150" style="border:0; margin:0; padding:0;"/> <br/>
+			<h:outputText value="What can I help you?" />
+		</p:layoutUnit> -->
+
+		<p:layoutUnit position="center">
+			<ui:insert name="content" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="south" size="50" resizable="true"
+			closable="true" collapsible="true">
+			<span class="fontSize14 blue"><a
+				href="http://www.oagi.org">Open Application Group</a> &copy; 2015, Some rights reserved.</span>
+			<span class="floatRight fontSize14 blue">
+				<p:clock />
+			</span>
+		</p:layoutUnit>
+
+	</p:layout>
+	<!-- 
+     <ui:insert name="status">
+        <p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
+            <f:facet name="start">
+                <p:graphicImage name="images/loader.gif" />
+            </f:facet>
+
+            <f:facet name="success">
+                <h:outputText value="" />
+            </f:facet>
+        </p:ajaxStatus>
+    </ui:insert>
+     -->
+</h:body>
+</html>

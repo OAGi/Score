@@ -3,14 +3,14 @@ package org.oagi.srt.validate;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.RepositoryConfig;
+import org.oagi.srt.persistence.populate.ImportApplication;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -1616,8 +1616,7 @@ public class DataTypeTest {
     }
 
     public static void main(String[] args) throws Exception {
-        try (AnnotationConfigApplicationContext ctx =
-                     new AnnotationConfigApplicationContext(RepositoryConfig.class, ImportConfig.class)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             DataTypeTest dataTypeTest = ctx.getBean(DataTypeTest.class);
             dataTypeTest.run(ctx);
         }

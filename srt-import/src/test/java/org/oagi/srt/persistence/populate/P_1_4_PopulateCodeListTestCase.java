@@ -3,8 +3,6 @@ package org.oagi.srt.persistence.populate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.TestRepositoryConfig;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
@@ -12,8 +10,8 @@ import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,10 +26,7 @@ import java.util.stream.StreamSupport;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-        TestRepositoryConfig.class,
-        ImportConfig.class
-})
+@SpringApplicationConfiguration(ImportApplication.class)
 public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired

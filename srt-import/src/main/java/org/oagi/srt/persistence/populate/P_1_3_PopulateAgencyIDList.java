@@ -2,8 +2,6 @@ package org.oagi.srt.persistence.populate;
 
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.RepositoryConfig;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
@@ -11,8 +9,9 @@ import org.oagi.srt.repository.entity.AgencyIdListValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
@@ -123,8 +122,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     public static void main(String args[]) throws Exception {
-        try (AnnotationConfigApplicationContext ctx =
-                     new AnnotationConfigApplicationContext(RepositoryConfig.class, ImportConfig.class)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_3_PopulateAgencyIDList populateAgencyIDList = ctx.getBean(P_1_3_PopulateAgencyIDList.class);
             populateAgencyIDList.run(ctx);
         }

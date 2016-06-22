@@ -5,16 +5,15 @@ import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSModelGroupDecl;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.RepositoryConfig;
 import org.oagi.srt.persistence.populate.helper.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -69,8 +68,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);
 
     public static void main(String[] args) throws Exception {
-        try (AnnotationConfigApplicationContext ctx =
-                     new AnnotationConfigApplicationContext(RepositoryConfig.class, ImportConfig.class)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_8_1_PopulateAccAsccpBccAscc populateAccAsccpBccAscc =
                     ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
             populateAccAsccpBccAscc.run(ctx);

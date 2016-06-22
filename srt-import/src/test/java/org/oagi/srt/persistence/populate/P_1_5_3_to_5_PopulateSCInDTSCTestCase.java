@@ -3,12 +3,10 @@ package org.oagi.srt.persistence.populate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.TestRepositoryConfig;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -24,10 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static org.oagi.srt.persistence.populate.P_1_5_1_to_2_PopulateBDTsInDTTestCase.EXPECTED_GUID_OF_BDT_LIST;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-        TestRepositoryConfig.class,
-        ImportConfig.class
-})
+@SpringApplicationConfiguration(ImportApplication.class)
 public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired

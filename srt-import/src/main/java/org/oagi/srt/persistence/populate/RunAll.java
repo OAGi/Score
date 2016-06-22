@@ -1,14 +1,12 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.config.ImportConfig;
-import org.oagi.srt.config.RepositoryConfig;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class RunAll {
 
     public static void main(String args[]) throws Exception {
-        try (AnnotationConfigApplicationContext ctx =
-                     new AnnotationConfigApplicationContext(RepositoryConfig.class, ImportConfig.class)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
 
             P_1_3_PopulateAgencyIDList p1 = ctx.getBean(P_1_3_PopulateAgencyIDList.class);
             p1.run(ctx);
