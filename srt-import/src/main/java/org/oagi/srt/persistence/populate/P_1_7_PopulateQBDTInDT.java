@@ -559,7 +559,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setBasedDtId(baseDataType.getDtId());
         dataType.setDataTypeTerm(baseDataType.getDataTypeTerm());
 
-        String qualifier = Utility.qualifier(type, baseDataType);
+        String qualifier = Utility.qualifier(type, baseDataType.getDen(), baseDataType.getDataTypeTerm());
         if (StringUtils.isEmpty(qualifier)) {
             throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den:" + baseDataType.getDen());
         }
@@ -975,7 +975,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setDataTypeTerm(dVO.getDataTypeTerm());
 
         String type = dataTypeInfoHolder.getTypeName();
-        String qualifier = Utility.qualifier(type, dVO);
+        String qualifier = Utility.qualifier(type, dVO.getDen(), dVO.getDataTypeTerm());
         if (StringUtils.isEmpty(qualifier)) {
             throw new IllegalStateException("!!Null Qualifier Detected During Import QBDT " + type + " based on Den: " + dVO.getDen());
         }

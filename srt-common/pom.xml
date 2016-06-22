@@ -4,21 +4,30 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.oagi</groupId>
-	<artifactId>srt</artifactId>
+	<artifactId>srt-common</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<modules>
-		<module>srt-common</module>
-		<module>srt-repository</module>
-		<module>srt-import</module>
-		<module>srt-webapp</module>
-	</modules>
+	<packaging>jar</packaging>
 
-	<name>oagi-srt</name>
+	<name>oagi-srt-common</name>
 	<url>https://github.com/OAGi/OAGi-Semantic-Refinement-and-Tooling</url>
 	<description>OAGi Semantic Refinement and Tooling</description>
 
+	<parent>
+		<groupId>org.oagi</groupId>
+		<artifactId>srt</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
 	<properties>
-		<java.version>1.8</java.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+	</dependencies>
 </project>
