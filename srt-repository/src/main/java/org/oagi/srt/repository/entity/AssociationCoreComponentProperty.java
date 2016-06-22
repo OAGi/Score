@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,7 +34,7 @@ public class AssociationCoreComponentProperty implements Serializable {
     private String propertyTerm;
 
     @Lob
-    @Column(nullable = false)
+    @Column
     private String definition;
 
     @Column(nullable = false)
@@ -142,7 +143,9 @@ public class AssociationCoreComponentProperty implements Serializable {
     }
 
     public void setDefinition(String definition) {
-        this.definition = definition;
+        if (!StringUtils.isEmpty(definition)) {
+            this.definition = definition;
+        }
     }
 
     public int getRoleOfAccId() {

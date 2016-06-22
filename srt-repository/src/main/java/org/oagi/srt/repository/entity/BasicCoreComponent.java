@@ -1,7 +1,7 @@
 package org.oagi.srt.repository.entity;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;

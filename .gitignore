@@ -1,7 +1,8 @@
 .idea/*
 *.iml
 *.class
-target/*
+target
+target/**
 build/*
 bin/*
 tmp/*
