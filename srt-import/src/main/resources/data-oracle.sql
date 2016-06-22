@@ -8,7 +8,7 @@ COMMIT;
 -- 3.1.1.3	Populate the namespace table
 INSERT INTO NAMESPACE (NAMESPACE_ID, URI, PREFIX, DESCRIPTION, 
                        IS_STD_NMSP, OWNER_USER_ID, CREATED_BY, LAST_UPDATED_BY, 
-                       CREATION_TIMESTAMP, LAST_UPDATED_TIMESTAMP)
+                       CREATION_TIMESTAMP, LAST_UPDATE_TIMESTAMP)
   SELECT
     NAMESPACE_ID_SEQ.NEXTVAL, 'http://www.openapplications.org/oagis/10', '', 'OAGIS release 10 namespace',
     APP_USER_ID, APP_USER_ID, APP_USER_ID, APP_USER_ID,

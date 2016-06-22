@@ -15,7 +15,7 @@ VALUES
 UPDATE `APP_USER_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `app_user`);
 
 -- 3.1.1.3	Populate the namespace table
-INSERT INTO `namespace` (`namespace_id`, `uri`, `prefix`, `description`, `is_std_nmsp`, `owner_user_id`, `created_by`, `last_updated_by`, `creation_timestamp`, `last_updated_timestamp`)
+INSERT INTO `namespace` (`namespace_id`, `uri`, `prefix`, `description`, `is_std_nmsp`, `owner_user_id`, `created_by`, `last_updated_by`, `creation_timestamp`, `last_update_timestamp`)
 VALUES
   (1, 'http://www.openapplications.org/oagis/10', '', 'OAGIS release 10 namespace', 1, 1, 1, 1, '2014-06-27 00:00:00', '2014-06-27 00:00:00');
 

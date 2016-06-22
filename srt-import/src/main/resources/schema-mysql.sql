@@ -1275,7 +1275,7 @@ CREATE TABLE `namespace` (
   `created_by` int(11) unsigned NOT NULL COMMENT 'The user who created the namespace.',
   `last_updated_by` int(11) unsigned NOT NULL COMMENT 'The use who last updated the record.',
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The time when the record was first created.',
-  `last_updated_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The time the record was last updated.',
+  `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The time the record was last updated.',
   PRIMARY KEY (`namespace_id`),
   KEY `namespace_owner_user_id_fk` (`owner_user_id`),
   KEY `namespace_created_by_fk` (`created_by`),
