@@ -1,0 +1,54 @@
+# AOP
+spring:
+  aop:
+    proxy-target-class: true
+
+  datasource:
+    continue-on-error: true
+    initialize: false
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+  batch:
+    initializer:
+      enabled: false
+
+# Development environment
+---
+spring:
+  profiles: development
+
+# DataSource
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://docker:3306/oagsrt_revision?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true
+    username: root
+    password: qwer1234
+    platform: mysql
+
+  jpa:
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+
+logging:
+  level:
+    org.oagi.srt: DEBUG
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+# Staging environment
+---
+spring:
+  profiles: staging
+
+# DataSource
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521/OAGISRTDB
+    username: oagi
+    password: oagi
+    platform: oracle
