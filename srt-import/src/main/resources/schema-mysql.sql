@@ -197,7 +197,7 @@ DROP TABLE IF EXISTS `app_user`;
 CREATE TABLE `app_user` (
   `app_user_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `login_id` varchar(45) NOT NULL,
-  `password` varchar(45) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `name` varchar(100),
   `organization` varchar(100),
   `oagis_developer_indicator` tinyint(1) NOT NULL COMMENT 'This indicates whether the user can edit OAGIS Model content. Content created by the OAGIS developer is also considered OAGIS Model content.',
