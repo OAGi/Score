@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- ==================================================================== --><!-- ===== XML Schema Builtin Type Extension XML Schema File 								    ===== --><!-- ==================================================================== --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================== -->
+<!-- ===== XML Schema Builtin Type Extension XML Schema File 								    ===== -->
+<!-- ==================================================================== -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:  OAGIS 10.1 Platform 2_1 
@@ -18,7 +22,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/DataTypes/XMLSchemaBuiltinType_1.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- ================================================================== -->
 	<!-- =====  Type Definitions                                                                                    ===== -->
 	<!-- =================================================================== -->
