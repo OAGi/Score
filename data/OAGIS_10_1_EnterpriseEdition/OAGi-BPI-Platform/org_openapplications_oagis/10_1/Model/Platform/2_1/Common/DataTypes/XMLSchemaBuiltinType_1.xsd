@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- ==================================================================== --><!-- ===== XML Schema Builtin Type Extension XML Schema File 								    ===== --><!-- ==================================================================== --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================== -->
+<!-- ===== XML Schema Builtin Type Extension XML Schema File 								    ===== -->
+<!-- ==================================================================== -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:  OAGIS 10.1 Platform 2_1 
@@ -18,10 +22,21 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/DataTypes/XMLSchemaBuiltinType_1.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- ================================================================== -->
 	<!-- =====  Type Definitions                                                                                    ===== -->
 	<!-- =================================================================== -->
+	<!-- ===== Type Definitions Boolean                                                                        ===== -->
+	<xsd:simpleType name="xbt_BooleanTrueFalseType" id="oagis-id-76437f4a5e99418a8c8e2257f7d7f2e1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Boolean with 'true' or 'false' literals only.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:boolean">
+			<xsd:pattern value="false"/>
+			<xsd:pattern value="true"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
 	<!-- ===== Type Definitions Duration                                                                        ===== -->
 	<!-- =================================================================== -->
 	<xsd:simpleType name="xbt_WeekDurationType" id="oagis-id-5e9e51b71a664530bbb87ad2d55e4125">
@@ -43,8 +58,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DD</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="xsd:date">
-		</xsd:restriction>
+		<xsd:restriction base="xsd:date"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="xbt_DayOfWeekType" id="oagis-id-0bdc5988f4904c10b969fe376c09b4ee">
 		<xsd:annotation>
@@ -84,29 +98,25 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="xsd:token">
-		</xsd:restriction>
+		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="xbt_WeekDayType" id="oagis-id-60b5d214096a4aa5a203a9d42c2c2660">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-D</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="xsd:token">
-		</xsd:restriction>
+		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="xbt_YearDayType" id="oagis-id-27ece956cc9a437e90204888a279dbba">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDD</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="xsd:token">
-		</xsd:restriction>
+		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="xbt_YearMonthType" id="oagis-id-89128ab3d09647f3b40b8c22a127daff">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="xsd:gYearMonth">
-		</xsd:restriction>
+		<xsd:restriction base="xsd:gYearMonth"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="xbt_YearType" id="oagis-id-bc04da1aa2534ce687c7618ac682f3ac">
 		<xsd:annotation>
