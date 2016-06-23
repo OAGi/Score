@@ -26,7 +26,7 @@
 				<p:treeTable id="treeTable" value="#{topLevelABIEHandler.root}" var="aBIEView" selection="#{topLevelABIEHandler.selectedTreeNode}" selectionMode="single" dynamic="true">
 					<p:ajax event="select" listener="#{topLevelABIEHandler.showDetails()}" update=":form:details" />
 					<f:facet name="header">
-						#{topLevelABIEHandler.selected.module}
+						#{topLevelABIEHandler.selected.module.module}
 					</f:facet>
 					<p:column headerText="BIEs">
 						<h:outputText value="#{aBIEView.name}" style="color:#{aBIEView.color};"/>

@@ -3,12 +3,10 @@ package org.oagi.srt.persistence.populate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.repository.AgencyIdListValueRepository;
-import org.oagi.srt.repository.CodeListRepository;
-import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.UserRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
+import org.oagi.srt.repository.entity.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +38,9 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
 
     @Autowired
     private CodeListValueRepository codeListValueRepository;
+
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     @Autowired
     private P_1_3_PopulateAgencyIDList populateAgencyIDList;
@@ -614,19 +615,20 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
         actualCodeListMap.values().forEach(codeList -> {
             String guid = codeList.getGuid();
             assertTrue(expectedCodeListMap.containsKey(guid));
+            assertNotNull(codeList.getModule());
 
+            Module module = codeList.getModule();
             ExpectedCodeList expectedCodeList = expectedCodeListMap.get(guid);
             assertEquals(expectedCodeList.getName(), codeList.getName());
-            assertEquals(expectedCodeList.getModule(), codeList.getModule());
+            assertEquals(expectedCodeList.getModule(), module.getModule());
             assertEquals(expectedCodeList.getEnumTypeGuid(), codeList.getEnumTypeGuid());
             if (expectedCodeList.getBaseCodeListGuid() != null) {
                 assertTrue(actualCodeListMap.containsKey(expectedCodeList.getBaseCodeListGuid()));
             }
             assertEquals(expectedCodeList.getVersionId(), Integer.parseInt(codeList.getVersionId()));
 
-            assertNotNull(codeList.getModule());
-            String module = codeList.getModule();
-            String filename = module.substring(module.lastIndexOf('\\') + 1, module.length());
+            String moduleStr = module.getModule();
+            String filename = moduleStr.substring(moduleStr.lastIndexOf('\\') + 1, moduleStr.length());
             switch (filename) {
                 case "CodeLists_1.xsd":
                 case "CodeList_ConditionTypeCode_1.xsd":

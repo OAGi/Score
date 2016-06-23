@@ -54,6 +54,9 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     @Autowired
     private ReleaseRepository releaseRepository;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     private int userId;
     private int releaseId;
 
@@ -97,7 +100,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
-        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
 
         //Type Name
         Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + dataType + "']/xsd:simpleContent/xsd:extension");
@@ -199,7 +202,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition,
-                                               String ccDefinition, String id, String module) throws Exception {
+                                               String ccDefinition, String id, Module module) throws Exception {
         int basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
@@ -278,7 +281,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm,
-                                                   String id, String defaultGUID, String module) throws Exception {
+                                                   String id, String defaultGUID, Module module) throws Exception {
         int basedDTID = dataTypeRepository.findOneByGuid(defaultGUID).getDtId();
 
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
@@ -321,7 +324,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
-        String module = Utility.extractModuleName(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH));
 
         typeName = dataType;
         String type = "simple";
@@ -406,7 +409,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
-        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
 
         //Type Name
         NodeList simpleTypeNodeList = fields_xsd.getNodeList("//xsd:simpleType");
@@ -585,7 +588,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
-        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
 
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;
@@ -639,8 +642,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
 
-        String module = Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH);
-
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
 
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;

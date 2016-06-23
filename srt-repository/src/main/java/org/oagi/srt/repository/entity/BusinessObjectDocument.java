@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.SRTConstants;
 
 import javax.persistence.*;
 import java.io.Serializable;

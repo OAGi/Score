@@ -3,12 +3,10 @@ package org.oagi.srt.persistence.populate;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.repository.AgencyIdListValueRepository;
-import org.oagi.srt.repository.CodeListRepository;
-import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.UserRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
+import org.oagi.srt.repository.entity.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,9 @@ public class P_1_4_PopulateCodeList {
 
     @Autowired
     private CodeListValueRepository codeListValueRepository;
+
+    @Autowired
+    private ModuleRepository moduleRepository;
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
@@ -103,7 +105,7 @@ public class P_1_4_PopulateCodeList {
 
     private List<CodeList> codeList(String fileinput, int agencyId) throws Exception {
         List<CodeList> codeLists = new ArrayList();
-        String path1 = SRTConstants.filepath("CodeList") + fileinput;
+        String path1 = new File(SRTConstants.filepath("CodeList") + fileinput).getCanonicalPath();
         XPathHandler xh = new XPathHandler(path1);
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
@@ -156,8 +158,10 @@ public class P_1_4_PopulateCodeList {
 
                 codeList.setCreatedBy(userId);
                 codeList.setLastUpdatedBy(userId);
-                codeList.setState(SRTConstants.CODE_LIST_STATE_PUBLISHED);
-                codeList.setModule(Utility.extractModuleName(path1));
+                codeList.setState(CodeList.State.Published);
+                String moduleName = Utility.extractModuleName(path1);
+                Module module = moduleRepository.findByModule(moduleName);
+                codeList.setModule(module);
                 codeLists.add(codeList);
             } else if (!name.endsWith("EnumerationType"))
                 logger.debug("Check !!  " + name);

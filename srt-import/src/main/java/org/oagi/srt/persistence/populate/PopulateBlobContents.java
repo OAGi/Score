@@ -1,9 +1,13 @@
 package org.oagi.srt.persistence.populate;
 
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BlobContentRepository;
+import org.oagi.srt.repository.ModuleDepRepository;
+import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.BlobContent;
+import org.oagi.srt.repository.entity.Module;
 import org.oagi.srt.repository.entity.Release;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -26,6 +30,10 @@ public class PopulateBlobContents {
 
     @Autowired
     private BlobContentRepository blobContentRepository;
+
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     private File baseDataDirectory;
 
     @PostConstruct
@@ -70,6 +78,9 @@ public class PopulateBlobContents {
             }
 
             BlobContent blobContent = new BlobContent(file);
+            String moduleName = Utility.extractModuleName(file.getCanonicalPath());
+            Module module = moduleRepository.findByModule(moduleName);
+            blobContent.setModule(module);
             blobContent.setReleaseId(release.getReleaseId());
             blobContentRepository.save(blobContent);
         }

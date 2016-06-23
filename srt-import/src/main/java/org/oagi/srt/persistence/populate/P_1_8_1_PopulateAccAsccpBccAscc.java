@@ -60,6 +60,9 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     @Autowired
     private NamespaceRepository namespaceRepository;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     private int userId;
     private int releaseId;
     private int namespaceId;
@@ -106,7 +109,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         for (File file : files) {
             if (file.getName().equals("AcknowledgeInvoice.xsd")) {
                 logger.info(file.getName() + " processing...");
-                createASCCP(new Context(file).getRootElementDecl());
+                createASCCP(new Context(file, moduleRepository).getRootElementDecl());
             }
         }
     }
@@ -124,7 +127,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             if (!file.getName().equals("AcknowledgeInvoice.xsd") &&
                 !file.getName().endsWith("IST.xsd")) {
                 logger.info(file.getName() + " processing...");
-                createASCCP(new Context(file).getRootElementDecl());
+                createASCCP(new Context(file, moduleRepository).getRootElementDecl());
             }
         }
     }
@@ -177,7 +180,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 String module = Utility.extractModuleName(file.getAbsolutePath());
                 logger.info("Found unused ACC name " + name + ", GUID " + guid + " from " + module);
 
-                Context context = new Context(file);
+                Context context = new Context(file, moduleRepository);
 
                 XSComplexType xsComplexType = context.getComplexType(SRTConstants.OAGI_NS, name);
                 TypeDecl typeDecl = new TypeDecl(context, xsComplexType, complexType);
@@ -216,7 +219,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
 
                 String module = Utility.extractModuleName(file.getAbsolutePath());
-                Context context = new Context(file);
+                Context context = new Context(file, moduleRepository);
 
                 XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, name);
                 ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
@@ -247,7 +250,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
 
                 String module = Utility.extractModuleName(file.getAbsolutePath());
-                Context context = new Context(file);
+                Context context = new Context(file, moduleRepository);
 
                 XSModelGroupDecl xsModelGroupDecl = context.getModelGroupDecl(SRTConstants.OAGI_NS, name);
                 GroupDecl groupDecl = new GroupDecl(context, xsModelGroupDecl, group);
@@ -282,7 +285,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private AssociationCoreComponentProperty createASCCP(Declaration declaration, AggregateCoreComponent acc, boolean reusableIndicator) {
         String asccpGuid = declaration.getId();
         String definition = declaration.getDefinition();
-        String module = declaration.getModule();
+        Module module = declaration.getModule();
         String propertyTerm = Utility.spaceSeparator(declaration.getName());
         if (acc == null) {
             if (declaration.isGroup()) {
@@ -396,7 +399,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
 
         String definition = declaration.getDefinition();
-        String module = declaration.getModule();
+        Module module = declaration.getModule();
 
         AggregateCoreComponent acc = new AggregateCoreComponent();
         String typeGuid = declaration.getId();
@@ -592,7 +595,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setDeprecated(false);
             bccp.setReleaseId(releaseId);
             bccp.setNamespaceId(namespaceId);
-            bccp.setModule(declaration.getModule());
+            Module module = declaration.getModule();
+            bccp.setModule(module);
             bccpRepository.saveAndFlush(bccp);
             return bccp;
         } else {

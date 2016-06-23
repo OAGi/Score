@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.oagi.srt.common.SRTConstants;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -68,8 +67,9 @@ public class CodeList implements Serializable {
     @Column(nullable = false)
     private boolean extensibleIndicator;
 
-    @Column(length = 100)
-    private String module;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id")
+    private Module module;
 
     @Column(nullable = false, updatable = false)
     private int createdBy;
@@ -207,11 +207,11 @@ public class CodeList implements Serializable {
         this.extensibleIndicator = extensibleIndicator;
     }
 
-    public String getModule() {
+    public Module getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(Module module) {
         this.module = module;
     }
 
@@ -328,7 +328,7 @@ public class CodeList implements Serializable {
             return false;
         if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(codeList.lastUpdateTimestamp) : codeList.lastUpdateTimestamp != null)
             return false;
-        return state != null ? state.equals(codeList.state) : codeList.state == null;
+        return state == codeList.state;
 
     }
 
@@ -373,12 +373,12 @@ public class CodeList implements Serializable {
                 ", definitionSource='" + definitionSource + '\'' +
                 ", basedCodeListId=" + basedCodeListId +
                 ", extensibleIndicator=" + extensibleIndicator +
-                ", module='" + module + '\'' +
+                ", module=" + module +
                 ", createdBy=" + createdBy +
                 ", creationTimestamp=" + creationTimestamp +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
-                ", state='" + state + '\'' +
+                ", state=" + state +
                 ", editDisabled=" + editDisabled +
                 ", deleteDisabled=" + deleteDisabled +
                 ", discardDisabled=" + discardDisabled +

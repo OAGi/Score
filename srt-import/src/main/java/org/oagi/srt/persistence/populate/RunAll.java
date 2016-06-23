@@ -8,6 +8,12 @@ public class RunAll {
     public static void main(String args[]) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
 
+            PopulateModules populateModules = ctx.getBean(PopulateModules.class);
+            populateModules.run(ctx);
+
+            PopulateBlobContents populateBlobContents = ctx.getBean(PopulateBlobContents.class);
+            populateBlobContents.run(ctx);
+
             P_1_3_PopulateAgencyIDList p1 = ctx.getBean(P_1_3_PopulateAgencyIDList.class);
             p1.run(ctx);
 
@@ -31,9 +37,6 @@ public class RunAll {
 
             P_1_8_1_PopulateAccAsccpBccAscc p14 = ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
             p14.run(ctx);
-
-            PopulateBlobContents populateBlobContents = ctx.getBean(PopulateBlobContents.class);
-            populateBlobContents.run(ctx);
         }
     }
 }

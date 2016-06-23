@@ -91,6 +91,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private NamespaceRepository namespaceRepository;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     private XPathHandler fields_xsd;
 
     private class DataTypeInfoHolder {
@@ -100,10 +103,10 @@ public class P_1_7_PopulateQBDTInDT {
         private String baseTypeName;
         private Element typeElement;
         private String uri;
-        private String module;
+        private Module module;
 
         public DataTypeInfoHolder(String typeName, String guid, String definition,
-                                  String baseTypeName, Element typeElement, String uri, String module) {
+                                  String baseTypeName, Element typeElement, String uri, Module module) {
             this.typeName = typeName;
             this.guid = guid;
             this.definition = definition;
@@ -129,7 +132,7 @@ public class P_1_7_PopulateQBDTInDT {
             return baseTypeName;
         }
 
-        public String getModule() {
+        public Module getModule() {
             return module;
         }
 
@@ -206,7 +209,7 @@ public class P_1_7_PopulateQBDTInDT {
                 Node baseTypeNode = (Node) Context.xPath.compile(".//*[@base]").evaluate(node, XPathConstants.NODE);
                 String baseTypeName = ((baseTypeNode != null) ? baseTypeNode.getAttributes().getNamedItem("base").getNodeValue() : null);
 
-                String module = Utility.extractModuleName(systemId);
+                Module module = moduleRepository.findByModule(Utility.extractModuleName(systemId));
                 DataTypeInfoHolder dtiHolder = new DataTypeInfoHolder(typeName, dtGuid, definition, baseTypeName, (Element) node, systemId, module);
                 dtiHolderMap.put(typeName, dtiHolder);
             }
@@ -279,7 +282,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void insertDTAndBCCP(File file) throws Exception {
-        Context context = new Context(file);
+        Context context = new Context(file, moduleRepository);
         XPathHandler xHandler = new XPathHandler(file);
         NodeList elements = xHandler.getNodeList("/xsd:schema/xsd:element");
         for (int i = 0, len = elements.getLength(); i < len; ++i) {
@@ -333,7 +336,7 @@ public class P_1_7_PopulateQBDTInDT {
                 Node documentationFromXSD = xHandler.getNode(element, ".//xsd:documentation | .//*[local-name()=\"ccts_Definition\"]");
                 String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
 
-                String module = elementDecl.getModule();
+                Module module = elementDecl.getModule();
                 // add BCCP
                 addToBCCP(guid, bccp, dataType, definition, module);
             }
@@ -579,7 +582,8 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
         dataType.setReleaseId(releaseId);
-        dataType.setModule(dataTypeInfoHolder.getModule());
+        Module module = dataTypeInfoHolder.getModule();
+        dataType.setModule(module);
         dataTypeRepository.saveAndFlush(dataType);
 
         // add to BDTPrimitiveRestriction
@@ -643,7 +647,7 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private void addToBCCP(String guid, String name, DataType dataType, String definition, String module) throws Exception {
+    private void addToBCCP(String guid, String name, DataType dataType, String definition, Module module) throws Exception {
         if (bccpRepository.existsByGuid(guid)) {
             return;
         }
@@ -994,7 +998,8 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
         dataType.setReleaseId(releaseId);
-        dataType.setModule(dataTypeInfoHolder.getModule());
+        Module module = dataTypeInfoHolder.getModule();
+        dataType.setModule(module);
         dataType = dataTypeRepository.saveAndFlush(dataType);
 
         // add to BDTPrimitiveRestriction

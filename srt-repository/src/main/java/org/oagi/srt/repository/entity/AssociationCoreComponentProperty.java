@@ -63,8 +63,9 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column(nullable = false)
     private int state;
 
-    @Column(nullable = false, length = 100)
-    private String module;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id", nullable = false)
+    private Module module;
 
     @Column(nullable = false)
     private int namespaceId;
@@ -212,11 +213,11 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.state = state;
     }
 
-    public String getModule() {
+    public Module getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(Module module) {
         this.module = module;
     }
 
@@ -359,7 +360,7 @@ public class AssociationCoreComponentProperty implements Serializable {
                 ", creationTimestamp=" + creationTimestamp +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", state=" + state +
-                ", module='" + module + '\'' +
+                ", module=" + module +
                 ", namespaceId=" + namespaceId +
                 ", reusableIndicator=" + reusableIndicator +
                 ", deprecated=" + deprecated +

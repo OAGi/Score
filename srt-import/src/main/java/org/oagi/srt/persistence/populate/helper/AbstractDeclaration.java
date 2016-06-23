@@ -3,6 +3,7 @@ package org.oagi.srt.persistence.populate.helper;
 import com.sun.xml.internal.xsom.*;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.entity.Module;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -189,9 +190,9 @@ public abstract class AbstractDeclaration implements Declaration {
     }
 
     @Override
-    public String getModule() {
+    public Module getModule() {
         String systemId = xsDeclaration.getLocator().getSystemId();
-        return Utility.extractModuleName(systemId);
+        return context.findByModule(Utility.extractModuleName(systemId));
     }
 
     @Override

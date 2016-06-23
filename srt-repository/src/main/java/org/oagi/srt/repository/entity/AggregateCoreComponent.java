@@ -48,8 +48,9 @@ public class AggregateCoreComponent implements Serializable {
     @Column
     private int oagisComponentType;
 
-    @Column(length = 100)
-    private String module;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id")
+    private Module module;
 
     @Column
     private Integer namespaceId;
@@ -188,11 +189,11 @@ public class AggregateCoreComponent implements Serializable {
         this.oagisComponentType = oagisComponentType;
     }
 
-    public String getModule() {
+    public Module getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(Module module) {
         this.module = module;
     }
 
@@ -385,7 +386,7 @@ public class AggregateCoreComponent implements Serializable {
                 ", basedAccId=" + basedAccId +
                 ", objectClassQualifier='" + objectClassQualifier + '\'' +
                 ", oagisComponentType=" + oagisComponentType +
-                ", module='" + module + '\'' +
+                ", module=" + module +
                 ", namespaceId=" + namespaceId +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +

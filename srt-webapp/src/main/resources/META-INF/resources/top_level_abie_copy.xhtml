@@ -116,7 +116,7 @@
 											listener="#{topLevelABIEHandler.showDetails()}"
 											update=":main:details" />
 										<f:facet name="header">
-					            #{topLevelABIEHandler.selected.module}
+					            #{topLevelABIEHandler.selected.module.module}
 					        </f:facet>
 										<p:column headerText="BIEs">
 											<h:outputText value="#{aBIEView.name}"

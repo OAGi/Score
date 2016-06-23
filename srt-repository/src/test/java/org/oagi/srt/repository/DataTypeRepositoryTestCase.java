@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.config.TestRepositoryConfig;
 import org.oagi.srt.repository.entity.DataType;
+import org.oagi.srt.repository.entity.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -36,7 +37,13 @@ public class DataTypeRepositoryTestCase extends AbstractTransactionalJUnit4Sprin
         expectedDataType.setGuid(UUID.randomUUID().toString());
         expectedDataType.setVersionNum("1.0");
         expectedDataType.setDen("Test. Type");
-        expectedDataType.setModule("Model\\Platform\\2_1\\ReadMe.txt");
+
+        Module module = new Module();
+        module.setModuleId(1);
+        module.setModule("Model\\BODs\\AcknowledgeAllocateResource.xsd");
+        module.setNamespaceId(1);
+        module.setReleaseId(1);
+        expectedDataType.setModule(module);
 
         dataTypeRepository.save(expectedDataType);
 

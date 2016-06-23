@@ -6,6 +6,8 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.populate.P_1_8_1_PopulateAccAsccpBccAscc;
+import org.oagi.srt.repository.ModuleRepository;
+import org.oagi.srt.repository.entity.Module;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,14 +64,16 @@ public class Context {
 
     private XSSchemaSet xsSchemaSet;
     private File file;
+    private ModuleRepository moduleRepository;
 
-    public Context(File file) throws Exception {
+    public Context(File file, ModuleRepository moduleRepository) throws Exception {
         XSOMParser xsomParser = new XSOMParser(SAXParserFactory.newInstance());
         xsomParser.parse(file);
 
         xsSchemaSet = xsomParser.getResult();
 
         this.file = file;
+        this.moduleRepository = moduleRepository;
     }
 
     private Document loadDocument(Locator locator) {
@@ -136,5 +140,9 @@ public class Context {
 
     public Iterator<XSElementDecl> iterateElementDecls() {
         return xsSchemaSet.iterateElementDecls();
+    }
+
+    public Module findByModule(String module) {
+        return moduleRepository.findByModule(module);
     }
 }

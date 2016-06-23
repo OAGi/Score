@@ -45,8 +45,9 @@ public class BasicCoreComponentProperty implements Serializable {
     @Column(length = 10 * 1024)
     private String definition;
 
-    @Column(length = 100)
-    private String module;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id")
+    private Module module;
 
     @Column
     private Integer namespaceId;
@@ -169,11 +170,11 @@ public class BasicCoreComponentProperty implements Serializable {
         this.definition = definition;
     }
 
-    public String getModule() {
+    public Module getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(Module module) {
         this.module = module;
     }
 
@@ -351,7 +352,7 @@ public class BasicCoreComponentProperty implements Serializable {
                 ", bdtId=" + bdtId +
                 ", den='" + den + '\'' +
                 ", definition='" + definition + '\'' +
-                ", module='" + module + '\'' +
+                ", module=" + module +
                 ", namespaceId=" + namespaceId +
                 ", deprecated=" + deprecated +
                 ", createdBy=" + createdBy +

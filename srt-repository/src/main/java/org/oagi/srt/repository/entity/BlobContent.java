@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -36,21 +35,15 @@ public class BlobContent implements Serializable {
     @Column(nullable = false)
     private int releaseId;
 
-    @Column(nullable = false, length = 100)
-    private String module;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id", nullable = false)
+    private Module module;
 
     public BlobContent() {
     }
 
     public BlobContent(File file) throws IOException {
-        setModule(extractModuleFromFile(file));
         setContent(FileUtils.readFileToByteArray(file));
-    }
-
-    private String extractModuleFromFile(File file) {
-        String path = file.getAbsolutePath();
-        path = path.substring(path.indexOf("Model"));
-        return FilenameUtils.separatorsToWindows(path);
     }
 
     public int getBlobContentId() {
@@ -77,11 +70,11 @@ public class BlobContent implements Serializable {
         this.releaseId = releaseId;
     }
 
-    public String getModule() {
+    public Module getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(Module module) {
         this.module = module;
     }
 
@@ -112,9 +105,9 @@ public class BlobContent implements Serializable {
     public String toString() {
         return "BlobContent{" +
                 "blobContentId=" + blobContentId +
-                ", content=" + ((content != null) ? "<byte[] " + content.length + ">" : null) +
+                ", content=" + Arrays.toString(content) +
                 ", releaseId=" + releaseId +
-                ", module='" + module + '\'' +
+                ", module=" + module +
                 '}';
     }
 }

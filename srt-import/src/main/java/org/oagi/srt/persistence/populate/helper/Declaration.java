@@ -1,5 +1,7 @@
 package org.oagi.srt.persistence.populate.helper;
 
+import org.oagi.srt.repository.entity.Module;
+
 import java.io.File;
 import java.util.Collection;
 
@@ -7,7 +9,7 @@ public interface Declaration {
     public String getName();
     public String getId();
     public String getDefinition();
-    public String getModule();
+    public Module getModule();
     public File getModuleAsFile();
     public int getMinOccur();
     public int getMaxOccur();

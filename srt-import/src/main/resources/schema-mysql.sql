@@ -7,6 +7,56 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
+# Dump of table module
+# ------------------------------------------------------------
+DROP TABLE IF EXISTS `module`;
+
+CREATE TABLE `module` (
+  `module_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `module` varchar(100) NOT NULL COMMENT 'This semantically the same as the module columns in CC tables.',
+  `release_id` int(11) unsigned NOT NULL,
+  `namespace_id` int(11) unsigned NOT NULL COMMENT 'Note that a release record has a namespace associated. The namespace_id if specified override the release''s namespace.',
+  PRIMARY KEY (`module_id`),
+  KEY `module_release_id_fk` (`release_id`),
+  KEY `module_namespace_id_fk` (`namespace_id`),
+  CONSTRAINT `module_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
+  CONSTRAINT `module_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`)
+) ENGINE = InnoDB;
+
+DROP TABLE IF EXISTS `MODULE_ID_SEQ`;
+
+CREATE TABLE `MODULE_ID_SEQ` (
+  `next_val` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `MODULE_ID_SEQ` (`next_val`) VALUES (1);
+
+
+# Dump of table module_dep
+# ------------------------------------------------------------
+DROP TABLE IF EXISTS `module_dep`;
+
+CREATE TABLE `module_dep` (
+  `module_dep_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `dependency_type` int(11) unsigned NOT NULL COMMENT 'This is a code list. The value tells the expression generator what to do based on this dependency. 0 = xsd:include, 1 = xsd:import. There could be other values supporting other expressions/syntaxes.',
+  `depending_module_id` int(11) unsigned NOT NULL,
+  `depended_module_id` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`module_dep_id`),
+  KEY `module_dep_depending_module_id_fk` (`depending_module_id`),
+  KEY `module_dep_depended_module_id_fk` (`depended_module_id`),
+  CONSTRAINT `module_dep_depending_module_id_fk` FOREIGN KEY (`depending_module_id`) REFERENCES `module` (`module_id`),
+  CONSTRAINT `module_dep_depended_module_id_fk` FOREIGN KEY (`depended_module_id`) REFERENCES `module` (`module_id`)
+) ENGINE = InnoDB;
+
+DROP TABLE IF EXISTS `MODULE_DEP_ID_SEQ`;
+
+CREATE TABLE `MODULE_DEP_ID_SEQ` (
+  `next_val` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `MODULE_DEP_ID_SEQ` (`next_val`) VALUES (1);
+
+
 # Dump of table bod
 # ------------------------------------------------------------
 DROP TABLE IF EXISTS `bod`;
@@ -89,7 +139,7 @@ CREATE TABLE `acc` (
   `based_acc_id` int(11) unsigned DEFAULT NULL COMMENT 'Based_ACC_ID is a foreign key to the ACC table itself. It represents the ACC that is qualified by this ACC. In general CCS sense, a qualification can by a content extension or restriction, but the current scope supports only extension.\n\nFor history records of an ACC, this column always points to the current record of an ACC.',
   `object_class_qualifier` varchar(100),
   `oagis_component_type` int(11) DEFAULT NULL COMMENT 'The value can be 0 = Base, 1 = Semantics, 2 = Extension, 3 = Semantic Group, 4 = User Extension Group. Generally, Bsae is assigned when the Object_Class_Term contains "Base" at the end. Extension is assigned with the Object_Class_Term contains "Extension" at the end. Semantic Group is assigned when an ACC is imported from an XSD Group. Other cases are assigned Semantics.',
-  `module` varchar(100) COMMENT 'This column stores the name of the physical schema module the ACC belongs to. Right now the schema file name is assigned. In the future, this needs to be updated to a file path from the base of the release directory.',
+  `module_id` int(11) unsigned COMMENT 'This column stores the name of the physical schema module the ACC belongs to. Right now the schema file name is assigned. In the future, this needs to be updated to a file path from the base of the release directory.',
   `namespace_id` int(11) unsigned DEFAULT NULL COMMENT 'Foreign key to the Namespace table. This is the namespace to which the entity belongs. This namespace column is only used in the case the component is a user''s component.',
   `created_by` int(11) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the entity.\n\nThis column never change between the history and the current record. The history record should have the same value as that of its current record.',
   `owner_user_id` int(11) unsigned NOT NULL COMMENT 'This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn''t rollback the ownership. ',
@@ -107,6 +157,7 @@ CREATE TABLE `acc` (
   PRIMARY KEY (`acc_id`),
   UNIQUE KEY `acc_uk1` (`guid`),
   KEY `acc_based_acc_id_fk` (`based_acc_id`),
+  KEY `acc_module_id_fk` (`module_id`),
   KEY `acc_namespace_id_fk` (`namespace_id`),
   KEY `acc_created_by_fk` (`created_by`),
   KEY `acc_owner_user_id_fk` (`owner_user_id`),
@@ -114,6 +165,7 @@ CREATE TABLE `acc` (
   KEY `acc_release_id_fk` (`release_id`),
   KEY `acc_current_acc_id_fk` (`current_acc_id`),
   CONSTRAINT `acc_based_acc_id_fk` FOREIGN KEY (`based_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `acc_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `acc_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `acc_current_acc_id_fk` FOREIGN KEY (`current_acc_id`) REFERENCES `acc` (`acc_id`),
   CONSTRAINT `acc_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
@@ -379,7 +431,7 @@ CREATE TABLE `asccp` (
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the revision of the ASCCP was created. \n\nThis never change for a revision.',
   `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The timestamp when the record was last updated.\n\nThe value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the revision has occurred.',
   `state` int(11) NOT NULL COMMENT '1 = Editing, 2 = Candidate, 3 = Published. This the revision life cycle state of the ACC.\n\nState change can''t be undone. But the history record can still keep the records of when the state was changed.',
-  `module` text COMMENT 'This column stores the name of the physical schema module the ASCCP belongs to. Right now the schema file name is assigned. In the future, this needs to be updated to a file path from the base of the release directory.',
+  `module_id` int(11) unsigned COMMENT 'This column stores the name of the physical schema module the ASCCP belongs to. Right now the schema file name is assigned. In the future, this needs to be updated to a file path from the base of the release directory.',
   `namespace_id` int(11) unsigned DEFAULT NULL COMMENT 'Foreign key to the Namespace table. This is the namespace, to which the entity belongs.',
   `reusable_indicator` tinyint(1) DEFAULT '1',
   `is_deprecated` tinyint(1) NOT NULL COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).',
@@ -394,12 +446,14 @@ CREATE TABLE `asccp` (
   KEY `asccp_created_by_fk` (`created_by`),
   KEY `asccp_owner_user_id_fk` (`owner_user_id`),
   KEY `asccp_last_updated_by_fk` (`last_updated_by`),
+  KEY `asccp_module_id_fk` (`module_id`),
   KEY `asccp_namespace_id_fk` (`namespace_id`),
   KEY `asccp_released_id_fk` (`release_id`),
   KEY `asccp_current_asccp_id_fk` (`current_asccp_id`),
   CONSTRAINT `asccp_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `asccp_current_asccp_id_fk` FOREIGN KEY (`current_asccp_id`) REFERENCES `asccp` (`asccp_id`),
   CONSTRAINT `asccp_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `asccp_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `asccp_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
   CONSTRAINT `asccp_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `asccp_released_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
@@ -628,7 +682,7 @@ CREATE TABLE `bccp` (
   `bdt_id` int(11) unsigned NOT NULL COMMENT 'Only DT_ID which DT_Type is BDT can be used.',
   `den` varchar(200) NOT NULL,
   `definition` text,
-  `module` text COMMENT 'This column stores the name of the physical schema module the ASCCP belongs to. Right now the schema file name is assigned. In the future, this needs to be updated to a file path from the base of the release directory.',
+  `module_id` int(11) unsigned COMMENT 'This column stores the name of the physical schema module the ASCCP belongs to. Right now the schema file name is assigned. In the future, this needs to be updated to a file path from the base of the release directory.',
   `namespace_id` int(11) unsigned DEFAULT NULL COMMENT 'Foreign key to the Namespace table. This is the namespace, to which the entity belongs.',
   `is_deprecated` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).',
   `created_by` int(11) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the entity.\n\nThis column never change between the history and the current record. The history record should have the same value as that of its current record.',
@@ -646,6 +700,7 @@ CREATE TABLE `bccp` (
   UNIQUE KEY `bccp_sc_uk1` (`guid`),
   UNIQUE KEY `bccp_sc_uk2` (`property_term`, `bdt_id`),
   KEY `bccp_bdt_id_fk` (`bdt_id`),
+  KEY `bccp_module_id_fk` (`module_id`),
   KEY `bccp_namespace_id_fk` (`namespace_id`),
   KEY `bccp_created_by_fk` (`created_by`),
   KEY `bccp_owner_user_id_fk` (`owner_user_id`),
@@ -656,6 +711,7 @@ CREATE TABLE `bccp` (
   CONSTRAINT `bccp_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `bccp_current_bccp_id_fk` FOREIGN KEY (`current_bccp_id`) REFERENCES `bccp` (`bccp_id`),
   CONSTRAINT `bccp_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
+  CONSTRAINT `bccp_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `bccp_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`),
   CONSTRAINT `bccp_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `bccp_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
@@ -836,10 +892,12 @@ CREATE TABLE `blob_content` (
   `blob_content_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary key.',
   `content` mediumblob NOT NULL COMMENT 'The Blob content of the schema file.',
   `release_id` int(11) unsigned NOT NULL COMMENT 'The release to which this file belongs/published.',
-  `module` varchar(100) NOT NULL COMMENT 'The is the subdirectory and filename of the blob. The format is Windows file path. The starting directory shall be the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be ''Model\\filename.xsd''. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be ''Model\\Platform\\2_1\\Common\\Components\\filename.xsd''.',
+  `module_id` int(11) unsigned NOT NULL COMMENT 'The is the subdirectory and filename of the blob. The format is Windows file path. The starting directory shall be the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be ''Model\\filename.xsd''. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be ''Model\\Platform\\2_1\\Common\\Components\\filename.xsd''.',
   PRIMARY KEY (`blob_content_id`),
   KEY `blob_content_release_id_fk` (`release_id`),
-  CONSTRAINT `blob_content_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
+  KEY `blob_module_id_fk` (`module_id`),
+  CONSTRAINT `blob_content_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`),
+  CONSTRAINT `blob_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table stores schemas in Blob.';
 
 DROP TABLE IF EXISTS `BLOB_CONTENT_ID_SEQ`;
@@ -1057,7 +1115,7 @@ CREATE TABLE `code_list` (
   `definition_source` varchar(100) CHARACTER SET utf8,
   `based_code_list_id` int(11) unsigned DEFAULT NULL COMMENT 'This indicates that this code list is based on another code list - restriction and extension are allowed.',
   `extensible_indicator` tinyint(1) NOT NULL,
-  `module` varchar(100) COMMENT 'The is the subdirectory and filename of the blob. The format is Windows file path. The starting directory shall be the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be ''Model\\filename.xsd''. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be ''Model\\Platform\\2_1\\Common\\Components\\filename.xsd''.',
+  `module_id` int(11) unsigned COMMENT 'The is the subdirectory and filename of the blob. The format is Windows file path. The starting directory shall be the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be ''Model\\filename.xsd''. If the file is under, say, Model\\Platform\\2_1\\Common\\Components directory, then the value of this column shall be ''Model\\Platform\\2_1\\Common\\Components\\filename.xsd''.',
   `created_by` int(11) unsigned NOT NULL,
   `last_updated_by` int(11) unsigned NOT NULL,
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1068,10 +1126,12 @@ CREATE TABLE `code_list` (
   UNIQUE KEY `code_list_uk2` (`enum_type_guid`),
   KEY `code_list_agency_id_fk` (`agency_id`),
   KEY `code_list_based_cl_id_fk` (`based_code_list_id`),
+  KEY `code_module_id_fk` (`module_id`),
   KEY `code_list_created_by_fk` (`created_by`),
   KEY `code_list_last_updated_by_fk` (`last_updated_by`),
   CONSTRAINT `code_list_agency_id_fk` FOREIGN KEY (`agency_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`),
   CONSTRAINT `code_list_based_cl_id_fk` FOREIGN KEY (`based_code_list_id`) REFERENCES `code_list` (`code_list_id`),
+  CONSTRAINT `code_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `code_list_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `code_list_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='When a code list is derived, the whole set of code values belonging to that code list will be copied.';
@@ -1186,7 +1246,7 @@ CREATE TABLE `dt` (
   `definition` text CHARACTER SET utf8,
   `content_component_definition` text CHARACTER SET utf8,
   `revision_doc` text CHARACTER SET utf8 COMMENT 'This is for documenting about the revision.',
-  `module` varchar(100) COMMENT 'physical file where the DT shall belong to when generating it.',
+  `module_id` int(11) unsigned COMMENT 'physical file where the DT shall belong to when generating it.',
   `state` int(11) DEFAULT NULL COMMENT '1 = Editing, 2 = Candidate, 3 = Published. This the revision life cycle state of the entity.\n\nState change can''t be undone. But the history record can still keep the records of when the state was changed.',
   `created_by` int(11) unsigned NOT NULL,
   `owner_user_id` int(11) unsigned NOT NULL COMMENT 'This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.\n\nThe ownership can change throughout the history, but undoing shouldn''t rollback the ownership. ',
@@ -1203,12 +1263,14 @@ CREATE TABLE `dt` (
   UNIQUE KEY `DT_UK1` (`guid`),
   KEY `dt_previous_version_dt_id_fk` (`previous_version_dt_id`),
   KEY `dt_based_dt_id_fk` (`based_dt_id`),
+  KEY `dt_module_id_fk` (`module_id`),
   KEY `dt_created_by_fk` (`created_by`),
   KEY `dt_owner_user_id_fk` (`owner_user_id`),
   KEY `dt_last_updated_by_fk` (`last_updated_by`),
   KEY `dt_release_id_fk` (`release_id`),
   KEY `dt_current_bdt_id_fk` (`current_bdt_id`),
   CONSTRAINT `dt_based_dt_id_fk` FOREIGN KEY (`based_dt_id`) REFERENCES `dt` (`dt_id`),
+  CONSTRAINT `dt_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`),
   CONSTRAINT `dt_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `dt_current_bdt_id_fk` FOREIGN KEY (`current_bdt_id`) REFERENCES `dt` (`dt_id`),
   CONSTRAINT `dt_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),

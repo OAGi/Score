@@ -66,8 +66,9 @@ public class DataType implements Serializable {
     @Column(length = 10 * 1024)
     private String revisionDoc;
 
-    @Column(length = 100)
-    private String module;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "module_id")
+    private Module module;
 
     @Column
     private int state;
@@ -231,11 +232,11 @@ public class DataType implements Serializable {
         }
     }
 
-    public String getModule() {
+    public Module getModule() {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule(Module module) {
         this.module = module;
     }
 
@@ -336,6 +337,81 @@ public class DataType implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DataType dataType = (DataType) o;
+
+        if (dtId != dataType.dtId) return false;
+        if (type != dataType.type) return false;
+        if (state != dataType.state) return false;
+        if (createdBy != dataType.createdBy) return false;
+        if (ownerUserId != dataType.ownerUserId) return false;
+        if (lastUpdatedBy != dataType.lastUpdatedBy) return false;
+        if (revisionNum != dataType.revisionNum) return false;
+        if (revisionTrackingNum != dataType.revisionTrackingNum) return false;
+        if (deprecated != dataType.deprecated) return false;
+        if (guid != null ? !guid.equals(dataType.guid) : dataType.guid != null) return false;
+        if (versionNum != null ? !versionNum.equals(dataType.versionNum) : dataType.versionNum != null) return false;
+        if (previousVersionDtId != null ? !previousVersionDtId.equals(dataType.previousVersionDtId) : dataType.previousVersionDtId != null)
+            return false;
+        if (dataTypeTerm != null ? !dataTypeTerm.equals(dataType.dataTypeTerm) : dataType.dataTypeTerm != null)
+            return false;
+        if (qualifier != null ? !qualifier.equals(dataType.qualifier) : dataType.qualifier != null) return false;
+        if (basedDtId != null ? !basedDtId.equals(dataType.basedDtId) : dataType.basedDtId != null) return false;
+        if (den != null ? !den.equals(dataType.den) : dataType.den != null) return false;
+        if (contentComponentDen != null ? !contentComponentDen.equals(dataType.contentComponentDen) : dataType.contentComponentDen != null)
+            return false;
+        if (definition != null ? !definition.equals(dataType.definition) : dataType.definition != null) return false;
+        if (contentComponentDefinition != null ? !contentComponentDefinition.equals(dataType.contentComponentDefinition) : dataType.contentComponentDefinition != null)
+            return false;
+        if (revisionDoc != null ? !revisionDoc.equals(dataType.revisionDoc) : dataType.revisionDoc != null)
+            return false;
+        if (module != null ? !module.equals(dataType.module) : dataType.module != null) return false;
+        if (creationTimestamp != null ? !creationTimestamp.equals(dataType.creationTimestamp) : dataType.creationTimestamp != null)
+            return false;
+        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(dataType.lastUpdateTimestamp) : dataType.lastUpdateTimestamp != null)
+            return false;
+        if (revisionAction != null ? !revisionAction.equals(dataType.revisionAction) : dataType.revisionAction != null)
+            return false;
+        if (releaseId != null ? !releaseId.equals(dataType.releaseId) : dataType.releaseId != null) return false;
+        return currentBdtId != null ? currentBdtId.equals(dataType.currentBdtId) : dataType.currentBdtId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = dtId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + type;
+        result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
+        result = 31 * result + (previousVersionDtId != null ? previousVersionDtId.hashCode() : 0);
+        result = 31 * result + (dataTypeTerm != null ? dataTypeTerm.hashCode() : 0);
+        result = 31 * result + (qualifier != null ? qualifier.hashCode() : 0);
+        result = 31 * result + (basedDtId != null ? basedDtId.hashCode() : 0);
+        result = 31 * result + (den != null ? den.hashCode() : 0);
+        result = 31 * result + (contentComponentDen != null ? contentComponentDen.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
+        result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + state;
+        result = 31 * result + createdBy;
+        result = 31 * result + ownerUserId;
+        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + revisionNum;
+        result = 31 * result + revisionTrackingNum;
+        result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
+        result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
+        result = 31 * result + (currentBdtId != null ? currentBdtId.hashCode() : 0);
+        result = 31 * result + (deprecated ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DataType{" +
                 "dtId=" + dtId +
@@ -351,6 +427,7 @@ public class DataType implements Serializable {
                 ", definition='" + definition + '\'' +
                 ", contentComponentDefinition='" + contentComponentDefinition + '\'' +
                 ", revisionDoc='" + revisionDoc + '\'' +
+                ", module=" + module +
                 ", state=" + state +
                 ", createdBy=" + createdBy +
                 ", ownerUserId=" + ownerUserId +
