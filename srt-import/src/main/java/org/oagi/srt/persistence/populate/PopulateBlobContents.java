@@ -37,8 +37,8 @@ public class PopulateBlobContents {
     private File baseDataDirectory;
 
     @PostConstruct
-    public void init() {
-        baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH).getAbsoluteFile();
+    public void init() throws IOException {
+        baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH).getCanonicalFile();
         if (!baseDataDirectory.exists()) {
             throw new IllegalStateException("Couldn't find data directory: " + baseDataDirectory +
                     ". Please check your environments.");

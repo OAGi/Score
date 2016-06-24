@@ -33,11 +33,6 @@ public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUn
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Before
-    public void setUp() throws Exception {
-        populateAgencyIDList.run(applicationContext);
-    }
-
     @Test
     public void test_PopulateAgencyIdListTable() {
         assertEquals(1, agencyIdListRepository.count());

@@ -51,7 +51,7 @@ public class P_1_4_PopulateCodeList {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.4 Start");
 
-        String tt[][] = {               
+        String tt[][] = {
                 {"CodeList_ConditionTypeCode_1", "314"},
                 {"CodeList_ConstraintTypeCode_1", "314"},
                 {"CodeList_DateFormatCode_1", "314"},
@@ -109,12 +109,12 @@ public class P_1_4_PopulateCodeList {
         XPathHandler xh = new XPathHandler(path1);
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
-
         int userId = getUserID("oagis");
 
         for (int i = 0; i < result.getLength(); i++) {
             Element element = (Element) result.item(i);
             String name = element.getAttribute("name");
+
             if (name.endsWith("CodeContentType")) {
                 CodeList codeList = new CodeList();
                 codeList.setGuid(element.getAttribute("id"));
@@ -122,15 +122,11 @@ public class P_1_4_PopulateCodeList {
                 //added by TKim according to design Doc v2.4
                 if (name.startsWith("oacl")) {
                     String xyz = name.substring(0, name.lastIndexOf("CodeContentType"));
-                    //System.out.print("  "+name + " with ");
                     Node enumTypeNode = xh.getNode("//xsd:simpleType[@name='" + xyz + "CodeEnumerationType']/@id");
-                    String enumerationTypeGUID = null;
                     if (enumTypeNode != null) {
-                        enumerationTypeGUID = enumTypeNode.getTextContent();
+                        String enumerationTypeGUID = enumTypeNode.getTextContent();
+                        codeList.setEnumTypeGuid(enumerationTypeGUID);
                     }
-                    codeList.setEnumTypeGuid(enumerationTypeGUID);
-                } else {
-                    codeList.setEnumTypeGuid(null);
                 }
 
                 codeList.setName(name.substring(0, name.lastIndexOf("ContentType")));
@@ -145,14 +141,10 @@ public class P_1_4_PopulateCodeList {
                     codeList.setVersionId(extractVersionId(name));
                 }
 
-                Node definition_node = xh.getNode("//xsd:simpleType[@name = '" + name + "']/xsd:annotation/xsd:documentation");
-                if (definition_node != null) {
-                    Element definition_element2 = (Element) definition_node;
-                    codeList.setDefinition(definition_element2.getTextContent());
-                    codeList.setDefinitionSource(definition_element2.getAttribute("source"));
-                } else {
-                    codeList.setDefinition(null);
-                    codeList.setDefinitionSource(null);
+                Element definitionNode = (Element) xh.getNode("//xsd:simpleType[@name = '" + name + "']/xsd:annotation/xsd:documentation");
+                if (definitionNode != null) {
+                    codeList.setDefinition(definitionNode.getTextContent());
+                    codeList.setDefinitionSource(definitionNode.getAttribute("source"));
                 }
                 codeList.setExtensibleIndicator(true);  //logic changed. extensible indicator is always TRUE.
 
@@ -163,8 +155,9 @@ public class P_1_4_PopulateCodeList {
                 Module module = moduleRepository.findByModule(moduleName);
                 codeList.setModule(module);
                 codeLists.add(codeList);
-            } else if (!name.endsWith("EnumerationType"))
-                logger.debug("Check !!  " + name);
+            } else if (!name.endsWith("EnumerationType")) {
+                logger.warn("Check !!  " + name);
+            }
         }
 
         return codeLists;
@@ -206,15 +199,16 @@ public class P_1_4_PopulateCodeList {
         NodeList result = xh.getNodeList("//xsd:simpleType");
 
         for (int i = 0; i < result.getLength(); i++) {
-            Element tmp = (Element) result.item(i);
-            if (tmp.getAttribute("name").endsWith("CodeContentType")) {
+            Element element = (Element) result.item(i);
+            String elementName = element.getAttribute("name");
+            if (elementName.endsWith("CodeContentType")) {
                 //added by T.Kim according to design doc v2.4
                 //based_code_list_id
-                String xyz = tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("CodeContentType"));
+                String xyz = elementName.substring(0, elementName.lastIndexOf("CodeContentType"));
                 Node unionNode = xh.getNode("//xsd:simpleType[@name='" + xyz + "CodeContentType']//xsd:union/@memberTypes");
 
                 if (unionNode != null) {
-                    String unionMemberStr = null;
+                    String unionMemberStr;
                     unionMemberStr = unionNode.getTextContent();
                     unionMemberStr = unionMemberStr.replace("xsd:token", "");
                     unionMemberStr = unionMemberStr.trim();
@@ -225,21 +219,21 @@ public class P_1_4_PopulateCodeList {
 
                         CodeList baseCodelistVO = codeListRepository.findByNameContaining(unionMemberStr).get(0);
 
-                        String guid = tmp.getAttribute("id");
+                        String guid = element.getAttribute("id");
                         CodeList codelistVO = codeListRepository.findOneByGuid(guid);
 
                         if (baseCodelistVO != null && codelistVO != null) {
                             codelistVO.setBasedCodeListId(baseCodelistVO.getCodeListId());
                             codeListRepository.save(codelistVO);
-                            logger.debug(" Update Based Code List ID: " + tmp.getAttribute("name").substring(0, tmp.getAttribute("name").lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
+                            logger.debug(" Update Based Code List ID: " + elementName.substring(0, elementName.lastIndexOf("ContentType")) + " is based on " + baseCodelistVO.getName());
                         } else {
-                            logger.debug(" Update Based Code List ID Is Failed! Check CodeListID: " + tmp.getAttribute("name"));
+                            logger.warn(" Update Based Code List ID Is Failed! Check CodeListID: " + elementName);
                             return;
                         }
                     }
                 }
-            } else if (!tmp.getAttribute("name").endsWith("EnumerationType"))
-                logger.debug("Check !!  " + tmp.getAttribute("name"));
+            } else if (!elementName.endsWith("EnumerationType"))
+                logger.warn("Check !!  " + elementName);
         }
 
     }
@@ -249,14 +243,14 @@ public class P_1_4_PopulateCodeList {
         XPathHandler xh = new XPathHandler(path1);
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
-        NodeList enumeration = null;
 
         for (int i = 0; i < result.getLength(); i++) {
             Element element = (Element) result.item(i);
+            String elementName = element.getAttribute("name");
 
-            enumeration = null;
+            NodeList enumeration = null;
 
-            if (element.getAttribute("name").endsWith("CodeContentType")) {
+            if (elementName.endsWith("CodeContentType")) {
                 String guid = element.getAttribute("id");
                 CodeList codeList = codeListRepository.findOneByGuid(guid);
 
@@ -291,7 +285,7 @@ public class P_1_4_PopulateCodeList {
                         }
                     } else {//if based code list is null
                         //Get the values from local xsd:enumeration
-                        enumeration = xh.getNodeList("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration");
+                        enumeration = xh.getNodeList("//xsd:simpleType[@name='" + elementName + "']//xsd:enumeration");
                         if (enumeration.getLength() < 1) {
                             logger.debug("   " + codeList.getName() + " has no local enumerations");
                         } else {
@@ -300,8 +294,8 @@ public class P_1_4_PopulateCodeList {
                     }
                 }
 
-                if (enumeration != null && enumeration.getLength()>0) {
-                	int count=0;
+                if (enumeration != null && enumeration.getLength() > 0) {
+                    int count = 0;
                     for (int j = 0; j < enumeration.getLength(); j++) {
                         Element aEnum = (Element) enumeration.item(j);
                         CodeListValue codeListValue = new CodeListValue();
@@ -312,7 +306,7 @@ public class P_1_4_PopulateCodeList {
                         codeListValue.setLockedIndicator(false);
                         codeListValue.setExtensionIndicator(false);
 
-                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + element.getAttribute("name") + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
+                        Node definitionNode = xh.getNode("//xsd:simpleType[@name='" + elementName + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
                         if (definitionNode == null) {
                             definitionNode = xh.getNode("//xsd:simpleType[@id='" + codeList.getEnumTypeGuid() + "']//xsd:enumeration[@value='" + codeListValue.getValue() + "']//xsd:documentation");
                         }
@@ -320,15 +314,13 @@ public class P_1_4_PopulateCodeList {
                             Element definition = (Element) definitionNode;
                             codeListValue.setDefinition(definition.getTextContent().trim());
                             codeListValue.setDefinitionSource(definition.getAttribute("source"));
-                        } else {
-                            codeListValue.setDefinition(null);
-                            codeListValue.setDefinitionSource(null);
                         }
+
                         codeListValueRepository.save(codeListValue);
                         count++;
                     }
-                    if(count>0){
-                    	logger.debug("         "+count+" enumerations are imported!");
+                    if (count > 0) {
+                        logger.info("\t\t" + count + " enumerations are imported!");
                     }
                 }
             }

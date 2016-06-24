@@ -574,7 +574,6 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
     }
 
     private void importCodeContentType() throws Exception {
-
         String dataType = "CodeContentType";
 
         String typeName;

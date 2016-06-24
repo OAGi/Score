@@ -53,8 +53,8 @@ public class PopulateModules {
     private XPath xPath;
 
     @PostConstruct
-    public void init() {
-        baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH, "Model").getAbsoluteFile();
+    public void init() throws IOException {
+        baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH, "Model").getCanonicalFile();
         if (!baseDataDirectory.exists()) {
             throw new IllegalStateException("Couldn't find data directory: " + baseDataDirectory +
                     ". Please check your environments.");

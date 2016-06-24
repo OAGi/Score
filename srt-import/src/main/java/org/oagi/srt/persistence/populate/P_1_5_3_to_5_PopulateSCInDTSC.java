@@ -514,7 +514,6 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     	cdtSCAP.setDefault(cdtAP.isDefault());
                                     }
 
-                                    System.out.print("   ~~~" + insertedSC.getPropertyTerm() + " " + insertedSC.getRepresentationTerm() + " is " + tmpPri.getName());
                                     if (cdtSCAP.isDefault()) {
                                         logger.debug(" and it's Default!");
                                     } else {
