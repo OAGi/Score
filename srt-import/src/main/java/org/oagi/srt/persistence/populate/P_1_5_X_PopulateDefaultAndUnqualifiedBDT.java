@@ -1101,7 +1101,7 @@ public class P_1_5_X_PopulateDefaultAndUnqualifiedBDT {
     public int getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
         if(dtsc.getBasedDtScId()>0) {
             DataTypeSupplementaryComponent baseDTSC = dtScRepository.findOne(dtsc.getBasedDtScId());
-            getCDTSCAncestor(baseDTSC);
+            return getCDTSCAncestor(baseDTSC);
         }
         return dtsc.getDtScId();
     }

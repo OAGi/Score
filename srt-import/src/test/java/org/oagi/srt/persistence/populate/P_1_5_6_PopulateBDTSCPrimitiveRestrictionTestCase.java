@@ -67,7 +67,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
     public void testPopulateDefaultBDTSCPrimitive() {
 
         Map<String, ExpectedBDTSCPrimitive> expectedBDTSCPrimitive = new HashMap();
-        expectedBDTSCPrimitive.put("Amount_0723C8. Type^Currency^Code", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 2));
+        expectedBDTSCPrimitive.put("Amount_0723C8. Type^Currency^Code", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "oacl_CurrencyCode", "", 0));
         expectedBDTSCPrimitive.put("Binary Object_4277E5. Type^MIME^Code", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "clmIANAMIMEMediaType20090304_MIMEMediaTypeCode", "", 0));
         expectedBDTSCPrimitive.put("Binary Object_4277E5. Type^Character Set^Code", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "clmIANACharacterSetCode20070514_CharacterSetCode", "", 0));
         expectedBDTSCPrimitive.put("Binary Object_4277E5. Type^Filename^Name", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
@@ -84,7 +84,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
         expectedBDTSCPrimitive.put("Code_1DEB05. Type^List Agency^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "", "Agency Identification", 0));
         expectedBDTSCPrimitive.put("Code_1DEB05. Type^List Version^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Date Time_AD9DD9. Type^Time Zone^Code", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 2));
-        expectedBDTSCPrimitive.put("Date Time_AD9DD9. Type^Daylight Saving^Indicator", new ExpectedBDTSCPrimitive(Arrays.asList("Boolean^xsd:boolean"), "", "", 0));
+        expectedBDTSCPrimitive.put("Date Time_AD9DD9. Type^Daylight Saving^Indicator", new ExpectedBDTSCPrimitive(Arrays.asList("Boolean^xbt boolean true or false"), "", "", 0));
         expectedBDTSCPrimitive.put("Identifier_D995CD. Type^Scheme^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Identifier_D995CD. Type^Scheme Version^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Identifier_D995CD. Type^Scheme Agency^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "", "Agency Identification", 0));
@@ -101,7 +101,8 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
         expectedBDTSCPrimitive.put("Code_1E7368. Type^List^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Code_1E7368. Type^List Agency^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Code_1E7368. Type^List Version^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
-        expectedBDTSCPrimitive.put("Amount. Type^Currency^Code", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 2));
+
+        expectedBDTSCPrimitive.put("Amount. Type^Currency^Code", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "oacl_CurrencyCode", "", 0));
         expectedBDTSCPrimitive.put("Binary Object. Type^MIME^Code", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "clmIANAMIMEMediaType20090304_MIMEMediaTypeCode", "", 0));
         expectedBDTSCPrimitive.put("Binary Object. Type^Character Set^Code", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "clmIANACharacterSetCode20070514_CharacterSetCode", "", 0));
         expectedBDTSCPrimitive.put("Binary Object. Type^Filename^Name", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
@@ -118,7 +119,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
         expectedBDTSCPrimitive.put("Code. Type^List Agency^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "", "Agency Identification", 0));
         expectedBDTSCPrimitive.put("Code. Type^List Version^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Date Time. Type^Time Zone^Code", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 2));
-        expectedBDTSCPrimitive.put("Date Time. Type^Daylight Saving^Indicator", new ExpectedBDTSCPrimitive(Arrays.asList("Boolean^xsd:boolean"), "", "", 0));
+        expectedBDTSCPrimitive.put("Date Time. Type^Daylight Saving^Indicator", new ExpectedBDTSCPrimitive(Arrays.asList("Boolean^xbt boolean true or false"), "", "", 0));
         expectedBDTSCPrimitive.put("Identifier. Type^Scheme^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Identifier. Type^Scheme Version^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("NormalizedString^xsd:normalizedString", "String^xsd:string", "Token^xsd:token"), "", "", 0));
         expectedBDTSCPrimitive.put("Identifier. Type^Scheme Agency^Identifier", new ExpectedBDTSCPrimitive(Arrays.asList("Token^xsd:token"), "", "Agency Identification", 0));
