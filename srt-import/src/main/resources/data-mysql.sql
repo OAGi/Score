@@ -54,7 +54,8 @@ VALUES
   (21, 'non negative integer', 'xsd:nonNegativeInteger', 20),
   (22, 'positive integer', 'xsd:positiveInteger', 21),
   (23, 'double', 'xsd:double', 2),
-  (24, 'any uri', 'xsd:anyURI', 2);
+  (24, 'any uri', 'xsd:anyURI', 2),
+  (25, 'xbt_BooleanTrueFalseType', 'xbt boolean true or false', 15);
 
 UPDATE `XBT_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `xbt`);
 
@@ -208,7 +209,7 @@ VALUES
   (34, 13, 13),
   (35, 14, 12),
   (36, 15, 14),
-  (37, 16, 15),
+  (37, 16, 25),
   (38, 17, 19),
   (39, 18, 23),
   (40, 18, 18),
@@ -457,7 +458,7 @@ VALUES
   (22, 22, 13),
   (23, 23, 12),
   (24, 24, 14),
-  (25, 25, 15),
+  (25, 25, 25),
   (26, 26, 13),
   (27, 27, 12),
   (28, 28, 14),

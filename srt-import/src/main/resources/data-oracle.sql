@@ -171,6 +171,12 @@ INSERT INTO XBT (XBT_ID, NAME, BUILTIN_TYPE, SUBTYPE_OF_XBT_ID)
   FROM XBT
   WHERE NAME = 'any simple type';
 
+INSERT INTO XBT (XBT_ID, NAME, BUILTIN_TYPE, SUBTYPE_OF_XBT_ID)
+  SELECT
+    XBT_ID_SEQ.NEXTVAL, 'xbt_BooleanTrueFalseType', 'xbt boolean true or false', XBT_ID
+  FROM XBT
+  WHERE NAME = 'boolean';
+
 COMMIT;
 
 
@@ -1157,7 +1163,7 @@ INSERT INTO CDT_AWD_PRI_XPS_TYPE_MAP (CDT_AWD_PRI_XPS_TYPE_MAP_ID, CDT_AWD_PRI_I
                                                  (SELECT DT_ID FROM DT WHERE DATA_TYPE_TERM = 'Indicator' AND TYPE = 0)
                                                  AND
                                                  (CDT_PRI_ID = (SELECT CDT_PRI_ID FROM CDT_PRI WHERE NAME = 'Boolean'))),
-   (SELECT XBT_ID FROM XBT WHERE BUILTIN_TYPE = 'xsd:boolean'));
+   (SELECT XBT_ID FROM XBT WHERE BUILTIN_TYPE = 'xbt boolean true or false'));
 
 INSERT INTO CDT_AWD_PRI_XPS_TYPE_MAP (CDT_AWD_PRI_XPS_TYPE_MAP_ID, CDT_AWD_PRI_ID, XBT_ID) VALUES
   (CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ.NEXTVAL,
@@ -3363,7 +3369,7 @@ INSERT INTO CDT_SC_AWD_PRI_XPS_TYPE_MAP (CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID, CDT_SC_
                         WHERE NAME = 'Boolean')),
    (SELECT XBT_ID
     FROM XBT
-    WHERE NAME = 'boolean'));
+    WHERE NAME = 'xbt_BooleanTrueFalseType'));
 
 INSERT INTO CDT_SC_AWD_PRI_XPS_TYPE_MAP (CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID, CDT_SC_AWD_PRI, XBT_ID) VALUES
   (CDT_SC_AW_PR_XPS_TYP_MP_ID_SEQ.NEXTVAL,
