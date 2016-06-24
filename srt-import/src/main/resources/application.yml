@@ -3,7 +3,14 @@ spring:
   aop:
     proxy-target-class: true
 
+# DataSource
   datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.99.100:3306/oagsrt?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true
+    username: root
+    password: qwer1234
+    platform: mysql
+
     continue-on-error: true
     initialize: false
 
@@ -11,28 +18,13 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
 
   batch:
     initializer:
       enabled: false
-
-# Development environment
----
-spring:
-  profiles: development
-
-# DataSource
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://docker:3306/oagsrt_revision?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true
-    username: root
-    password: qwer1234
-    platform: mysql
-
-  jpa:
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
 
 logging:
   level:
