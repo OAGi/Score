@@ -55,7 +55,7 @@ VALUES
   (22, 'positive integer', 'xsd:positiveInteger', 21),
   (23, 'double', 'xsd:double', 2),
   (24, 'any uri', 'xsd:anyURI', 2),
-  (25, 'xbt_BooleanTrueFalseType', 'xbt boolean true or false', 15);
+  (25, 'xbt boolean true or false', 'xbt_BooleanTrueFalseType', 15);
 
 UPDATE `XBT_ID_SEQ` SET `next_val` = (SELECT count(*) + 1 FROM `xbt`);
 
