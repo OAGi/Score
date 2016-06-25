@@ -1,5 +1,8 @@
 package org.oagi.srt.common;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * @version 1.0
  * @author Yunsu Lee
@@ -29,25 +32,35 @@ public class SRTConstants {
 	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
 	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 
-	public static final String BOD_FILE_PATH = "./data/xsd";
+	public static final String DATA_PATH;
+	static {
+		File dataPath = new File("data");
+		if (!dataPath.exists()) {
+			dataPath = new File("..", "data");
+			if (!dataPath.exists()) {
+				throw new IllegalStateException("Could not find 'data' directory. Check your environments.");
+			}
+		}
+		try {
+			DATA_PATH = dataPath.getCanonicalPath();
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
-	public static final String MODEL_FOLDER_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model";
+	public static final String BOD_FILE_PATH = new File(DATA_PATH, "xsd").getPath();
+
+	public static final String MODEL_FOLDER_PATH = new File(DATA_PATH, "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model").getPath();
 	public static final String BOD_FILE_PATH_01 = MODEL_FOLDER_PATH + "/Platform/2_1/BODs/";
 	public static final String BOD_FILE_PATH_02 = MODEL_FOLDER_PATH + "/BODs/";
 
 	public static final String FIELDS_XSD_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/Components/Fields.xsd";
-	public static final String FILEDS_EXTENDED_XSD_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/Components/Fields_modified_extended.xsd";
 	public static final String META_XSD_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/Components/Meta.xsd";
-	public static final String META_EXTENDED_XSD_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/Components/Meta_extended.xsd";
 	public static final String BUSINESS_DATA_TYPE_XSD_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/DataTypes/BusinessDataType_1.xsd";
 	public static final String COMPONENTS_XSD_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/Components/Components.xsd";
-	public static final String NOUNS_FILE_PATH = MODEL_FOLDER_PATH + "/Nouns/";
 	public static final String XBT_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/DataTypes/XMLSchemaBuiltinType_1.xsd";
-	public static final String CODE_LIST_FILE_PATH = MODEL_FOLDER_PATH + "/Platform/2_1/Common/CodeLists/";
-	public static final String TEST_BOD_FILE_PATH = "./data/xsd";
-	public static final String TEST_XML_FILE_PATH = "./data/xsd";
 
-	public static final String BASE_DATA_PATH = "./data/OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1";
+	public static final String BASE_DATA_PATH = new File(DATA_PATH, "OAGIS_10_1_EnterpriseEdition/OAGi-BPI-Platform/org_openapplications_oagis/10_1").getPath();
 
 	public static String filepath(String list) {
 		String prefix_filepath = MODEL_FOLDER_PATH;

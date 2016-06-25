@@ -10,4 +10,7 @@ public interface CoreDataTypeAllowedPrimitiveRepository extends JpaRepository<Co
 
     @Query("select c from CoreDataTypeAllowedPrimitive c where c.cdtId = ?1")
     public List<CoreDataTypeAllowedPrimitive> findByCdtId(int cdtId);
+
+    @Query("select c from CoreDataTypeAllowedPrimitive c where c.cdtId = ?1 and c.cdtPriId = ?2")
+    public CoreDataTypeAllowedPrimitive findOneByCdtIdAndCdtPriId(int cdtId, int cdtPriId);
 }

@@ -24,6 +24,11 @@ public interface DataTypeSupplementaryComponentRepository extends JpaRepository<
     @Query("select d from DataTypeSupplementaryComponent d where d.guid = ?1 and d.ownerDtId = ?2")
     public DataTypeSupplementaryComponent findOneByGuidAndOwnerDtId(String guid, int ownerDtId);
 
+    @Query("select d from DataTypeSupplementaryComponent d, DataType dt where d.ownerDtId = dt.dtId and dt.dataTypeTerm = ?1 and d.propertyTerm = ?2")
+    public DataTypeSupplementaryComponent findOneByOwnerDataTypeTermAndPropertyTerm(
+            String ownerDataTypeTerm, String propertyTerm
+    );
+
     @Query("select d from DataTypeSupplementaryComponent d where d.ownerDtId = ?1 and d.propertyTerm = ?2 and d.representationTerm = ?3")
     public DataTypeSupplementaryComponent findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(
             int ownerDtId, String propertyTerm, String representationTerm

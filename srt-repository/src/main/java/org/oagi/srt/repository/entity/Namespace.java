@@ -57,8 +57,12 @@ public class Namespace implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
+        if (creationTimestamp == null) {
+            creationTimestamp = new Date();
+        }
+        if (lastUpdateTimestamp == null) {
+            lastUpdateTimestamp = new Date();
+        }
     }
 
     @PreUpdate
