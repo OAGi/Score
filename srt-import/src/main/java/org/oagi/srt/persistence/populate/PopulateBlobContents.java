@@ -3,7 +3,6 @@ package org.oagi.srt.persistence.populate;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BlobContentRepository;
-import org.oagi.srt.repository.ModuleDepRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.BlobContent;

@@ -3,13 +3,17 @@ package org.oagi.srt.persistence.populate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.config.TestRepositoryConfig;
+import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.CodeListRepository;
+import org.oagi.srt.repository.CodeListValueRepository;
+import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.entity.Module;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -24,7 +28,7 @@ import java.util.stream.StreamSupport;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(ImportApplication.class)
+@ContextConfiguration(classes = TestRepositoryConfig.class)
 public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired
@@ -40,7 +44,10 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
     private CodeListValueRepository codeListValueRepository;
 
     @Autowired
-    private ModuleRepository moduleRepository;
+    private PopulateModules populateModules;
+
+    @Autowired
+    private P_1_1_PopulateCommonData populateCommonData;
 
     @Autowired
     private P_1_3_PopulateAgencyIDList populateAgencyIDList;
@@ -53,6 +60,8 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
 
     @Before
     public void setUp() throws Exception {
+        populateCommonData.run(applicationContext);
+        populateModules.run(applicationContext);
         populateAgencyIDList.run(applicationContext);
         populateCodeList.run(applicationContext);
     }
@@ -662,7 +671,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
             assertTrue(codeList.isExtensibleIndicator());
             assertEquals(userRepository.findAppUserIdByLoginId("oagis"), codeList.getCreatedBy());
             assertEquals(userRepository.findAppUserIdByLoginId("oagis"), codeList.getLastUpdatedBy());
-            assertEquals("Published", codeList.getState());
+            assertEquals(CodeList.State.Published, codeList.getState());
         });
     }
 
@@ -1121,7 +1130,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedCodeListValue(null, "-mm:ss", "oagis-id-98f48609a5154608bd5673aea57784da"),
                 new ExpectedCodeListValue(null, "-mm", "oagis-id-98f48609a5154608bd5673aea57784da"),
                 new ExpectedCodeListValue(null, "--ss", "oagis-id-98f48609a5154608bd5673aea57784da"),
-                
+
                 new ExpectedCodeListValue(null, "YYYY-MM-DD", "oagis-id-46fc137ae5b44dde9ab25724a2abec86"),
                 new ExpectedCodeListValue(null, "YYYY-MM", "oagis-id-46fc137ae5b44dde9ab25724a2abec86"),
                 new ExpectedCodeListValue(null, "YYYY", "oagis-id-46fc137ae5b44dde9ab25724a2abec86"),
@@ -1590,31 +1599,30 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
             CodeListValue codeListValue =
                     codeListValueRepository.findOneByCodeListIdAndValue(codeList.getCodeListId(), expectedCodeListValue.getValue());
             assertNotNull("It must be exist. Code List ID: " + codeList.getCodeListId() +
-                    " and Code List Value: " + expectedCodeListValue.getValue(),
+                            " and Code List Value: " + expectedCodeListValue.getValue(),
                     codeListValue);
         });
-        
+
         List<CodeList> allCodeList = codeListRepository.findAll();
-        
-        for(int i=0; i<allCodeList.size(); i++){
-        	CodeList aCodeList = allCodeList.get(i);
-        	if(aCodeList.getBasedCodeListId()>0){
+
+        for (int i = 0; i < allCodeList.size(); i++) {
+            CodeList aCodeList = allCodeList.get(i);
+            if (aCodeList.getBasedCodeListId() > 0) {
                 List<CodeListValue> baseCodeListValues = codeListValueRepository.findByCodeListId(aCodeList.getBasedCodeListId());
                 List<CodeListValue> thisCodeListValues = codeListValueRepository.findByCodeListId(aCodeList.getCodeListId());
-                
-                assertEquals(baseCodeListValues.size(), thisCodeListValues.size());
-                for(int j=0; j<baseCodeListValues.size(); j++){
-                	CodeListValue aBaseCodeListValue = baseCodeListValues.get(j);
-                	CodeListValue aCodeListValue = thisCodeListValues.get(j);
-                	
-                	assertEquals(aBaseCodeListValue.getDefinition(), aCodeListValue.getDefinition());
-                	assertEquals(aBaseCodeListValue.getDefinitionSource(), aCodeListValue.getDefinitionSource());
-                	assertEquals(aBaseCodeListValue.getName(), aCodeListValue.getName());
-                	assertEquals(aBaseCodeListValue.getValue(), aCodeListValue.getValue());
 
+                assertEquals(baseCodeListValues.size(), thisCodeListValues.size());
+                for (int j = 0; j < baseCodeListValues.size(); j++) {
+                    CodeListValue aBaseCodeListValue = baseCodeListValues.get(j);
+                    CodeListValue aCodeListValue = thisCodeListValues.get(j);
+
+                    assertEquals(aBaseCodeListValue.getDefinition(), aCodeListValue.getDefinition());
+                    assertEquals(aBaseCodeListValue.getDefinitionSource(), aCodeListValue.getDefinitionSource());
+                    assertEquals(aBaseCodeListValue.getName(), aCodeListValue.getName());
+                    assertEquals(aBaseCodeListValue.getValue(), aCodeListValue.getValue());
                 }
-        	}
+            }
         }
-        
+
     }
 }
