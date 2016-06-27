@@ -1,9 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.config.TestRepositoryConfig;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
@@ -12,8 +10,7 @@ import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.entity.Module;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,7 +25,7 @@ import java.util.stream.StreamSupport;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestRepositoryConfig.class)
+@SpringApplicationConfiguration(ImportApplication.class)
 public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired
@@ -42,29 +39,6 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
 
     @Autowired
     private CodeListValueRepository codeListValueRepository;
-
-    @Autowired
-    private PopulateModules populateModules;
-
-    @Autowired
-    private P_1_1_PopulateCommonData populateCommonData;
-
-    @Autowired
-    private P_1_3_PopulateAgencyIDList populateAgencyIDList;
-
-    @Autowired
-    private P_1_4_PopulateCodeList populateCodeList;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Before
-    public void setUp() throws Exception {
-        populateCommonData.run(applicationContext);
-        populateModules.run(applicationContext);
-        populateAgencyIDList.run(applicationContext);
-        populateCodeList.run(applicationContext);
-    }
 
     private class ExpectedCodeList {
         private String module;
