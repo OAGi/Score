@@ -3318,13 +3318,13 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="NameType_02FC2Z">
-<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-84fa20db74b942449e1885cff79b24df"> -->
-					<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-84fa20db74b942449e1885cff79b24df">
+				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-84fa20db74b942449e1885cff79b24df">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
+			<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-84fa20db74b942449e1885cff79b24df"> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:simpleType name="NumberType" id="oagis-id-06083bfba01d4213a852830000e939b9">
@@ -3362,131 +3362,131 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:complexType name="OpenAmountType" id="oagis-id-4b47b06600344fdb95bbe52f664c5a20">
 		<xsd:simpleContent>
 			<xsd:extension base="AmountType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-63d46f46e4fa46ec8cc269212d7cfa77"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-63d46f46e4fa46ec8cc269212d7cfa77"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-63d46f46e4fa46ec8cc269212d7cfa77"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenBinaryObjectType" id="oagis-id-994553f41e0e48158d0a2516bc935511">
 		<xsd:simpleContent>
 			<xsd:extension base="BinaryObjectType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b4436f4498bd47b188330661b29d596d"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-b4436f4498bd47b188330661b29d596d"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b4436f4498bd47b188330661b29d596d"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenCodeType" id="oagis-id-506251b85278490a98d998763406f0b9">
 		<xsd:simpleContent>
 			<xsd:extension base="CodeType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-563f7c1348ca48328faf286aaa19473b"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-563f7c1348ca48328faf286aaa19473b"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-563f7c1348ca48328faf286aaa19473b"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenDateType" id="oagis-id-b033251fb58848eebffbabdd778aa940">
 		<xsd:simpleContent>
 			<xsd:extension base="DateType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-64b1ef4ceab44c06a3816c19a28b5fec"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-64b1ef4ceab44c06a3816c19a28b5fec"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-64b1ef4ceab44c06a3816c19a28b5fec"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenDateTimeType" id="oagis-id-38a0fb8fb7514a29b0597837faf2518d">
 		<xsd:simpleContent>
 			<xsd:extension base="DateTimeType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-543b69ea686e44f4a470a332e18b1d91"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-543b69ea686e44f4a470a332e18b1d91"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-543b69ea686e44f4a470a332e18b1d91"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenDurationType" id="oagis-id-f8166dd9674d4855a3b2da5001049590">
 		<xsd:simpleContent>
 			<xsd:extension base="DurationType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-8d7acef53cda44a2874809fc08d2018b"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-8d7acef53cda44a2874809fc08d2018b"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-8d7acef53cda44a2874809fc08d2018b"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenIDType" id="oagis-id-1af3c0f64e8f4852b1303a583171b609">
 		<xsd:simpleContent>
 			<xsd:extension base="IDType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c66d3280c8f5457096df33b593dcbddf"/> -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-c66d3280c8f5457096df33b593dcbddf"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c66d3280c8f5457096df33b593dcbddf"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenIndicatorType" id="oagis-id-1443878322254f0da4f0bf36a3d468ab">
 		<xsd:simpleContent>
 			<xsd:extension base="IndicatorType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-48dc2d60ac4d4235bf9a1f6706a81e3b"/> -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-48dc2d60ac4d4235bf9a1f6706a81e3b"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-48dc2d60ac4d4235bf9a1f6706a81e3b"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenMeasureType" id="oagis-id-87bd59221bbc47938599363bbba6142a">
 		<xsd:simpleContent>
 			<xsd:extension base="MeasureType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-98d2757026ec48daacb73f7589300fa3"/> -->
-				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-98d2757026ec48daacb73f7589300fa3"/>				
+				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-98d2757026ec48daacb73f7589300fa3"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-98d2757026ec48daacb73f7589300fa3"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenNameType" id="oagis-id-3cd82d4229984113976240713ed38906">
 		<xsd:simpleContent>
 			<xsd:extension base="NameType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-82d03758dfd844bea1676759edf0d653"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-82d03758dfd844bea1676759edf0d653"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-82d03758dfd844bea1676759edf0d653"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenNumberType" id="oagis-id-dfabe79fde714c1daf6547d6e533a6ee">
 		<xsd:simpleContent>
 			<xsd:extension base="NumberType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-81c76ad6b7914fbf980e0149c0b0cbb7"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-81c76ad6b7914fbf980e0149c0b0cbb7"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-81c76ad6b7914fbf980e0149c0b0cbb7"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenPercentType" id="oagis-id-46626125da114dfabbfbb11800d1bc52">
 		<xsd:simpleContent>
 			<xsd:extension base="PercentType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b00b3ba702944e048bf72e3edfc85c9b"/> -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-b00b3ba702944e048bf72e3edfc85c9b"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-b00b3ba702944e048bf72e3edfc85c9b"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenQuantityType" id="oagis-id-0b2f056d45304fe997e6b8df8d8ad33e">
 		<xsd:simpleContent>
 			<xsd:extension base="QuantityType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-3afffa0da54c450f84aadbd33c0beac0"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-3afffa0da54c450f84aadbd33c0beac0"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-3afffa0da54c450f84aadbd33c0beac0"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenTextType" id="oagis-id-5840f7a57dd949ababcd1eb394b2840c">
 		<xsd:simpleContent>
 			<xsd:extension base="TextType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2780e69800934662a4782be31c2bacf6"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-2780e69800934662a4782be31c2bacf6"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2780e69800934662a4782be31c2bacf6"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenTimeType" id="oagis-id-fd79b936c42944f0818865b89e092257">
 		<xsd:simpleContent>
 			<xsd:extension base="TimeType">
-<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-fe67f89596b34ea387d6d97167e31778"/> -->
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-fe67f89596b34ea387d6d97167e31778"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-fe67f89596b34ea387d6d97167e31778"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="OpenFieldValueType" id="oagis-id-a443aea7aa634ae8aa57bfad38762ef1">
 		<xsd:simpleContent>
 			<xsd:extension base="ValueType">
-<!--				<xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-9034f3521cc84e0e93b4b10e54bb46a3"/>
-				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c736ced2c5d24d85a2fb47f608a85a95"/>  -->
 				<xsd:attribute name="formatCode" type="xsd:token" id="oagis-id-9034f3521cc84e0e93b4b10e54bb46a3"/>
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-c736ced2c5d24d85a2fb47f608a85a95"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-9034f3521cc84e0e93b4b10e54bb46a3"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-c736ced2c5d24d85a2fb47f608a85a95"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!--=======================-->
@@ -3495,23 +3495,23 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:complexType name="ScoreValueType" id="oagis-id-f4c5cb13024345408522ce0757ce2f5c">
 		<xsd:simpleContent>
 			<xsd:extension base="ValueType">
-<!--				<xsd:attribute name="code" type="CodeContentType" id="oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4"/>  
-				<xsd:attribute name="interval" type="StringType" id="oagis-id-0710e25ea5cb4c118538c9dd002ce2f0"/>
-				<xsd:attribute name="minimum" type="StringType" id="oagis-id-6f2da2a259f44984b0a479fe8eb0379e"/>
-				<xsd:attribute name="maximum" type="StringType" id="oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9"/>  -->
 				<xsd:attribute name="code" type="xsd:token" id="oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4"/>
 				<xsd:attribute name="interval" type="xsd:string" id="oagis-id-0710e25ea5cb4c118538c9dd002ce2f0"/>
 				<xsd:attribute name="minimum" type="xsd:string" id="oagis-id-6f2da2a259f44984b0a479fe8eb0379e"/>
 				<xsd:attribute name="maximum" type="xsd:string" id="oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="code" type="CodeContentType" id="oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4"/>  
+				<xsd:attribute name="interval" type="StringType" id="oagis-id-0710e25ea5cb4c118538c9dd002ce2f0"/>
+				<xsd:attribute name="minimum" type="StringType" id="oagis-id-6f2da2a259f44984b0a479fe8eb0379e"/>
+				<xsd:attribute name="maximum" type="StringType" id="oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="RecordFieldValueType" id="oagis-id-de22296a3390465eb652dc43a7676bc0">
 		<xsd:simpleContent>
 			<xsd:extension base="ValueType">
-<!--				<xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-9034f3521cc84e0e93b4b10e54aa46a3"/>  -->
 				<xsd:attribute name="formatCode" type="xsd:token" id="oagis-id-9034f3521cc84e0e93b4b10e54aa46a3"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="formatCode" type="CodeType_1E7368" id="oagis-id-9034f3521cc84e0e93b4b10e54aa46a3"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:simpleType name="DayDateType" id="oagis-id-5a2ed18041c04f3e995c773480b0076d">
@@ -3531,9 +3531,9 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="TextType">
-<!--				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749ac95a7f28"/> -->
 				<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-7c3c291f53984e90bed1749ac95a7f28"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749ac95a7f28"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="NoteType" id="oagis-id-8d9b4b5c8b284fd0b59b246262bcafa2">
@@ -3542,15 +3542,15 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="TextType">
-<!--				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749bc10a7f28"/>
-				<xsd:attribute name="author" type="StringType" use="optional" id="oagis-id-08c23257569347caa798f07620e38923"/>
-				<xsd:attribute name="entryDateTime" type="DateTimeType" use="optional" id="oagis-id-8b0a10d59d3647d89e0819516c1aeaca"/>
-				<xsd:attribute name="status" type="StringType" use="optional" id="oagis-id-893aac10c6724803ad4e1496ce5d0027"/>  -->
 				<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-7c3c291f53984e90bed1749bc10a7f28"/>
 				<xsd:attribute name="author" type="xsd:string" use="optional" id="oagis-id-08c23257569347caa798f07620e38923"/>
 				<xsd:attribute name="entryDateTime" type="xsd:token" use="optional" id="oagis-id-8b0a10d59d3647d89e0819516c1aeaca"/>
 				<xsd:attribute name="status" type="xsd:string" use="optional" id="oagis-id-893aac10c6724803ad4e1496ce5d0027"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749bc10a7f28"/>
+				<xsd:attribute name="author" type="StringType" use="optional" id="oagis-id-08c23257569347caa798f07620e38923"/>
+				<xsd:attribute name="entryDateTime" type="DateTimeType" use="optional" id="oagis-id-8b0a10d59d3647d89e0819516c1aeaca"/>
+				<xsd:attribute name="status" type="StringType" use="optional" id="oagis-id-893aac10c6724803ad4e1496ce5d0027"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="TemperatureMeasureType" id="oagis-id-4a641b3b6a074d5b909b425aeec9caaa">
@@ -3602,18 +3602,6 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="StringType">
-<!--				<xsd:attribute name="name" type="NormalizedStringType" use="required" id="oagis-id-8b03854b876742dc9c1d1bedddf2755d">
-					<xsd:annotation>
-						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the name of the tag for the information being passed.</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="typeCode" type="NormalizedStringType" use="optional" id="oagis-id-086abcbc69a34794ad2520eb28080afc">
-					<xsd:annotation>
-						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the type of the information being passed in the NameValue.</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="unitCode" type="UnitCodeContentType" use="optional" id="oagis-id-ed2af44734be48f6be9936110eae4641"/>
-				<xsd:attribute name="unitCodeListVersionID" type="NormalizedStringType" use="optional" id="oagis-id-d455ed06eb7a40d1ae1d3408cd3ea1c3"/> -->
 				<xsd:attribute name="name" type="xsd:normalizedString" use="required" id="oagis-id-8b03854b876742dc9c1d1bedddf2755d">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the name of the tag for the information being passed.</xsd:documentation>
@@ -3625,8 +3613,20 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="unitCode" type="oacl_UnitCodeContentType" use="optional" id="oagis-id-ed2af44734be48f6be9936110eae4641"/>
-				<xsd:attribute name="unitCodeListVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-d455ed06eb7a40d1ae1d3408cd3ea1c3"/>		
+				<xsd:attribute name="unitCodeListVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-d455ed06eb7a40d1ae1d3408cd3ea1c3"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="name" type="NormalizedStringType" use="required" id="oagis-id-8b03854b876742dc9c1d1bedddf2755d">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the name of the tag for the information being passed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="typeCode" type="NormalizedStringType" use="optional" id="oagis-id-086abcbc69a34794ad2520eb28080afc">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the type of the information being passed in the NameValue.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="unitCode" type="UnitCodeContentType" use="optional" id="oagis-id-ed2af44734be48f6be9936110eae4641"/>
+				<xsd:attribute name="unitCodeListVersionID" type="NormalizedStringType" use="optional" id="oagis-id-d455ed06eb7a40d1ae1d3408cd3ea1c3"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:element name="RecordFieldValue" type="RecordFieldValueType" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
@@ -3657,9 +3657,9 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:complexType name="PreferredNameType" id="oagis-id-55e3dee204b449fab4dac08c5893c031">
 		<xsd:simpleContent>
 			<xsd:extension base="NameType">
-<!--				<xsd:attribute name="preferred" type="IndicatorType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>  -->
-				<xsd:attribute name="preferred" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
+				<xsd:attribute name="preferredIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="preferred" type="IndicatorType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:element name="SalutationPreferredName" type="PreferredNameType" id="oagis-id-1fbae1f17a16483cbef250158ff3812c">
@@ -3670,13 +3670,13 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:complexType name="SequencedCodeType" id="oagis-id-dac3c62369c54a5e8b996496f0438c64">
 		<xsd:simpleContent>
 			<xsd:extension base="CodeType">
-<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-f14c6ce3eae34517acb446241a38c629">  -->
 				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-f14c6ce3eae34517acb446241a38c629">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
+			<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-f14c6ce3eae34517acb446241a38c629">  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:element name="CompositeID" type="CompositeIDType" id="oagis-id-891549473a7e4cc68e037e0641e14aa3"/>
@@ -3684,7 +3684,6 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		<xsd:sequence>
 			<xsd:element ref="ID" id="oagis-id-6dc6f29ea63f415aa75a19472aec64c0" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-<!--		<xsd:attribute name="schemeID" type="NormalizedStringType" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">  -->
 		<xsd:attribute name="schemeID" type="xsd:normalizedString" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
@@ -3701,8 +3700,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-<!--		<xsd:attribute name="schemeVersionID" type="NormalizedStringType" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">  -->
-			<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">
+		<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3718,8 +3716,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-<!--		<xsd:attribute name="schemeAgencyID" type="AgencyIDContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">  -->
-		<xsd:attribute name="schemeAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">		
+		<xsd:attribute name="schemeAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3739,56 +3736,53 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-<!--		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-798d6f25298540be8bb621ec3edaf008"/>-->
 		<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-798d6f25298540be8bb621ec3edaf008"/>
-<!--		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-8a43ad61a0b24022ba802025eb852075"> -->
 		<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-8a43ad61a0b24022ba802025eb852075">
 			<xsd:annotation>
 				<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<!--		<xsd:attribute name="schemeID" type="NormalizedStringType" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">  -->
+		<!--		<xsd:attribute name="schemeVersionID" type="NormalizedStringType" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">  -->
+		<!--		<xsd:attribute name="schemeAgencyID" type="AgencyIDContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">  -->
+		<!--		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-798d6f25298540be8bb621ec3edaf008"/>-->
+		<!--		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-8a43ad61a0b24022ba802025eb852075"> -->
 	</xsd:complexType>
 	<xsd:complexType name="SequencedIDType" id="oagis-id-0624ca38925d43929a6f7d8b7b7e0882">
 		<xsd:simpleContent>
 			<xsd:extension base="IDType">
-<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-93d92483194641a3ac48a997ec4dbe5d">  -->
-				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-93d92483194641a3ac48a997ec4dbe5d">				
+				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-93d92483194641a3ac48a997ec4dbe5d">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
+			<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-93d92483194641a3ac48a997ec4dbe5d">  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="SequencedTextType" id="oagis-id-51e010d7a1e24ebe89fcf58989fefd1b">
 		<xsd:simpleContent>
 			<xsd:extension base="TextType">
-<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-39a5a53826024a65a2291f50d9feecd3">  -->
-				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-39a5a53826024a65a2291f50d9feecd3">				
+				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-39a5a53826024a65a2291f50d9feecd3">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
+			<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-39a5a53826024a65a2291f50d9feecd3">  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="TypedSequencedTextType" id="oagis-id-c2bef83fa023429f96c2383d4304c7b2">
 		<xsd:simpleContent>
 			<xsd:extension base="SequencedTextType">
-<!--				<xsd:attribute name="type" type="TokenType" id="oagis-id-4228f5e4d6294040a8d813736f872bae"/> -->
-				<xsd:attribute name="type" type="xsd:string" id="oagis-id-4228f5e4d6294040a8d813736f872bae"/>				
+				<xsd:attribute name="type" type="xsd:string" id="oagis-id-4228f5e4d6294040a8d813736f872bae"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="type" type="TokenType" id="oagis-id-4228f5e4d6294040a8d813736f872bae"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="TelephoneValueType" id="oagis-id-30c24b6c473f48e396ad7b0845cf95d2">
 		<xsd:simpleContent>
 			<xsd:extension base="ValueType_D19E7B">
-<!--				<xsd:attribute name="numberFormatValue" type="ValueType_E7171E" use="optional" id="oagis-id-c13ef1ab9da949329b0b19895179bbd8"/>
-				<xsd:attribute name="accessCode" type="CodeType_1E7368" use="optional" id="oagis-id-81f8b8994157436689db9229650af6c3"/>
-				<xsd:attribute name="countryCode" type="CodeType_1E7368" use="optional" id="oagis-id-da20be8066e1484da8ed8519b1457ba8"/>
-				<xsd:attribute name="areaCode" type="CodeType_1E7368" use="optional" id="oagis-id-fda27cba60354fe1b3ec82438aebb73f"/>
-				<xsd:attribute name="exchangeValue" type="ValueType_E7171E" use="optional" id="oagis-id-121bc81df6df4642b1390485dc65656e"/>
-				<xsd:attribute name="extensionValue" type="ValueType_E7171E" use="optional" id="oagis-id-5a36cbe4e69a4c869e2425f1331c1d76"/> -->
 				<xsd:attribute name="numberFormatValue" type="xsd:normalizedString" use="optional" id="oagis-id-c13ef1ab9da949329b0b19895179bbd8"/>
 				<xsd:attribute name="accessCode" type="xsd:token" use="optional" id="oagis-id-81f8b8994157436689db9229650af6c3"/>
 				<xsd:attribute name="countryCode" type="xsd:token" use="optional" id="oagis-id-da20be8066e1484da8ed8519b1457ba8"/>
@@ -3796,22 +3790,28 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<xsd:attribute name="exchangeValue" type="xsd:normalizedString" use="optional" id="oagis-id-121bc81df6df4642b1390485dc65656e"/>
 				<xsd:attribute name="extensionValue" type="xsd:normalizedString" use="optional" id="oagis-id-5a36cbe4e69a4c869e2425f1331c1d76"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="numberFormatValue" type="ValueType_E7171E" use="optional" id="oagis-id-c13ef1ab9da949329b0b19895179bbd8"/>
+				<xsd:attribute name="accessCode" type="CodeType_1E7368" use="optional" id="oagis-id-81f8b8994157436689db9229650af6c3"/>
+				<xsd:attribute name="countryCode" type="CodeType_1E7368" use="optional" id="oagis-id-da20be8066e1484da8ed8519b1457ba8"/>
+				<xsd:attribute name="areaCode" type="CodeType_1E7368" use="optional" id="oagis-id-fda27cba60354fe1b3ec82438aebb73f"/>
+				<xsd:attribute name="exchangeValue" type="ValueType_E7171E" use="optional" id="oagis-id-121bc81df6df4642b1390485dc65656e"/>
+				<xsd:attribute name="extensionValue" type="ValueType_E7171E" use="optional" id="oagis-id-5a36cbe4e69a4c869e2425f1331c1d76"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="LicenseIndicatorType" id="oagis-id-de63b187aff44fedb887d12a9035309a">
 		<xsd:simpleContent>
 			<xsd:extension base="IndicatorType">
-<!--				<xsd:attribute name="name" type="LicenseTypeCodeContentType" use="required" id="oagis-id-db502068711649c385a0bd1f41d3a63d"/>  -->
-			<xsd:attribute name="name" type="oacl_LicenseTypeCodeContentType" use="required" id="oagis-id-db502068711649c385a0bd1f41d3a63d"/>
+				<xsd:attribute name="name" type="oacl_LicenseTypeCodeContentType" use="required" id="oagis-id-db502068711649c385a0bd1f41d3a63d"/>
 			</xsd:extension>
+			<!--				<xsd:attribute name="name" type="LicenseTypeCodeContentType" use="required" id="oagis-id-db502068711649c385a0bd1f41d3a63d"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="HarmonizedTariffScheduleCodeType" id="oagis-id-3de49c6b04d2483d94e47b46e246aa4f">
 		<xsd:simpleContent>
 			<xsd:extension base="CodeType">
-			<!-- <xsd:attribute name="countryCode" type="NormalizedStringType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/> -->
-			<xsd:attribute name="countryCode" type="oacl_CountryCodeContentType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/>
+				<xsd:attribute name="countryCode" type="oacl_CountryCodeContentType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/>
 			</xsd:extension>
+			<!-- <xsd:attribute name="countryCode" type="NormalizedStringType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!--=======================-->

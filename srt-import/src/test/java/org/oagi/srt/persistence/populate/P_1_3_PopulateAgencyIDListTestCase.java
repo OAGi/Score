@@ -85,7 +85,7 @@ public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUn
         expectedAgencyIdListValues.put("13", new ExpectedAgencyIdListValue("ICAO (International Civil Aviation Organization)", "International Civil Aviation Organization."));
         expectedAgencyIdListValues.put("14", new ExpectedAgencyIdListValue("ICS (International Chamber of Shipping)", "International Chamber of Shipping."));
         expectedAgencyIdListValues.put("15", new ExpectedAgencyIdListValue("RINET (Reinsurance and Insurance Network)", "Reinsurance and Insurance Network."));
-        expectedAgencyIdListValues.put("16", new ExpectedAgencyIdListValue("US, D&B (Dun & Bradstreet Corporation)", "Identifies the Dun & Bradstreet Corporation, United States."));
+        expectedAgencyIdListValues.put("16", new ExpectedAgencyIdListValue("US, D&B (Dun&Bradstreet Corporation)", "Identifies the Dun&Bradstreet Corporation, United States."));
         expectedAgencyIdListValues.put("17", new ExpectedAgencyIdListValue("S.W.I.F.T.", "Society for Worldwide Interbank Financial Telecommunications s.c."));
         expectedAgencyIdListValues.put("18", new ExpectedAgencyIdListValue("Conventions on SAD and transit (EC and EFTA)", "SAD = Single Administrative Document."));
         expectedAgencyIdListValues.put("19", new ExpectedAgencyIdListValue("FRRC (Federal Reserve Routing Code)", "Federal Reserve Routing Code."));

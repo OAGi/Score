@@ -752,9 +752,9 @@ public class P_1_7_PopulateQBDTInDT {
                     representation_term = "Name";
                 } else {
                     String attrType = attrElement.getAttribute("type");
-                    if (attrType.equals("StringType") || attrType.equals("NormalizedStringType") || attrType.equals("TokenType"))
+                    if (attrType.equals("xsd:string") || attrType.equals("xsd:normalizedString") || attrType.equals("xsd:token"))
                         representation_term = "Text";
-                    else if (attrType.equals("IndicatorType"))
+                    else if (attrType.equals("xbt_BooleanTrueFalseType"))
                         representation_term = "Indicator";
                 }
 
@@ -784,6 +784,8 @@ public class P_1_7_PopulateQBDTInDT {
 //				since the attr name is the same, it just update the guid
 //				in this case, the target dtsc is new? or not?
 
+
+                System.out.println(attrName+" "+representation_term);
                 DataTypeSupplementaryComponent duplicate = checkDuplicate(dtSc);
                 if (duplicate == null) {
                     dtScRepository.saveAndFlush(dtSc);

@@ -58,6 +58,9 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReleaseRepository releaseRepository;
+
     private DataType defaultTextBDT;
 
     private List<String> targetGuids;
@@ -196,7 +199,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
             assertEquals(0, actualDataType.getRevisionNum());
             assertEquals(0, actualDataType.getRevisionTrackingNum());
             assertEquals(0, actualDataType.getRevisionAction());
-            assertEquals(0, actualDataType.getReleaseId());
+            assertEquals(releaseRepository.findReleaseIdByReleaseNum("10.1"), actualDataType.getReleaseId());
             assertEquals(0, actualDataType.getCurrentBdtId());
             assertEquals(false, actualDataType.isDeprecated());
         });

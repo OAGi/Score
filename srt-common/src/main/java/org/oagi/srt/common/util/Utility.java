@@ -318,6 +318,12 @@ public class Utility {
             } else {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, "Type");
             }
+
+            String baseType = baseDen.replace(" ","").replace("_","").replace(".","");
+            if(type.contains(baseType)){
+                qualifier = Utility.spaceSeparatorBeforeStr(type, baseType);
+            }
+
         } else if (baseDen.equals("Code Content. Type")) {
             qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeContentType");
         } else if (baseDen.endsWith("Code Content. Type")) {

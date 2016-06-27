@@ -79,7 +79,7 @@
 						</ccts_ContentComponentValueDomain>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:attribute name="currencyCode" type="CodeType_1E7368" use="optional" id="oagis-id-0dd62519460d4a91bfdbc1f7778befac">
+				<xsd:attribute name="currencyCode" type="oacl_CurrencyCodeContentType" use="optional" id="oagis-id-0dd62519460d4a91bfdbc1f7778befac">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3850,7 +3850,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-91f69292cc854d3dbdca58d770769652">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-91f69292cc854d3dbdca58d770769652">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3929,7 +3929,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-c3c84f2a7fb840f2bbdd127b25ac3c10">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-c3c84f2a7fb840f2bbdd127b25ac3c10">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4008,7 +4008,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-b06e62989a014ee8842e0a854df761c2">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-b06e62989a014ee8842e0a854df761c2">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4087,7 +4087,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-b36f901b62d64cc89067d1035bb22925">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-b36f901b62d64cc89067d1035bb22925">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4166,7 +4166,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-963db3cf96dd40ed861b41d727c77fc8">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-963db3cf96dd40ed861b41d727c77fc8">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4245,7 +4245,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-1cd21c91cb554bcfa6de061ee1aeeac3">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-1cd21c91cb554bcfa6de061ee1aeeac3">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4324,7 +4324,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-52d3a6de83ed4d968d373b651e47a5d3">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-52d3a6de83ed4d968d373b651e47a5d3">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4403,7 +4403,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-b505139ef62f45da892c332bfa3a714d">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-b505139ef62f45da892c332bfa3a714d">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4482,7 +4482,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-fda35e6a1f184825b1008972b7a58866">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-fda35e6a1f184825b1008972b7a58866">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4561,7 +4561,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-8776e4e64d434294abffc8b3790697af">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-8776e4e64d434294abffc8b3790697af">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4640,7 +4640,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-e3975d30b9054a2098933ce437e55e8f">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-e3975d30b9054a2098933ce437e55e8f">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4719,7 +4719,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-ba3c9db0a7d742c78e4b44cb83a1a86b">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-ba3c9db0a7d742c78e4b44cb83a1a86b">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4798,7 +4798,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-e6059102ae2b46568b7d9c48d1c6ed11">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-e6059102ae2b46568b7d9c48d1c6ed11">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4877,7 +4877,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-3047fbc3f75b4ddda94f620bf38cbf38">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-3047fbc3f75b4ddda94f620bf38cbf38">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -4956,7 +4956,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-a05ff45a0b03454f82ca564600480604">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-a05ff45a0b03454f82ca564600480604">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5035,7 +5035,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-cb21820ce796429d83baf8a625816978">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-cb21820ce796429d83baf8a625816978">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5114,7 +5114,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-6f1b59b45b004bb19ba14c16e7375053">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-6f1b59b45b004bb19ba14c16e7375053">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5193,7 +5193,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-8c85e265eff94cb7b225fb1c16bd1f92">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-8c85e265eff94cb7b225fb1c16bd1f92">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5272,7 +5272,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-d07913ee1df0464b964213249f687b43">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-d07913ee1df0464b964213249f687b43">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5351,7 +5351,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-7a5ecac8930c433790acbddc5d32d766">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-7a5ecac8930c433790acbddc5d32d766">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5430,7 +5430,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-7f1b76e4ebd84d0fac6541db0e9f1827">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-7f1b76e4ebd84d0fac6541db0e9f1827">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5509,7 +5509,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-6a63c539402647379099822cf6fd0703">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-6a63c539402647379099822cf6fd0703">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5588,7 +5588,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-4c915f717b9c4d519de21630a96a7c75">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-4c915f717b9c4d519de21630a96a7c75">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5667,7 +5667,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-fef3431078604f588a5a3048ad7eabb6">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-fef3431078604f588a5a3048ad7eabb6">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5746,7 +5746,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-dbc61907614943f2bc836979fad29ef9">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-dbc61907614943f2bc836979fad29ef9">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5825,7 +5825,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-927b716947284417b6a012bb655c3253">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-927b716947284417b6a012bb655c3253">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5904,7 +5904,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-64b4be31c288420595fb443f4c98f0ed">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-64b4be31c288420595fb443f4c98f0ed">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -5983,7 +5983,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-f6b8358933774253a55a21c678dc3c24">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-f6b8358933774253a55a21c678dc3c24">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6062,7 +6062,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-f8fa98deb95d4f549dec1a6513938c52">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-f8fa98deb95d4f549dec1a6513938c52">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6141,7 +6141,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-349ba9d0b7b2472b9ed84b1aec2020a2">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-349ba9d0b7b2472b9ed84b1aec2020a2">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6220,7 +6220,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-afc7172646a8484caa164112440b8508">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-afc7172646a8484caa164112440b8508">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6299,7 +6299,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-6400f85a95a946cf99f1730a4ebc677a">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-6400f85a95a946cf99f1730a4ebc677a">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6414,7 +6414,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-2356baa82e8147538697fae698a4d2aa">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-2356baa82e8147538697fae698a4d2aa">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7136,7 +7136,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-8a40cb3fc7724977a3c1791266c13075">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-8a40cb3fc7724977a3c1791266c13075">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7215,7 +7215,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-ecc2063ddb734be396bf31043c44452b">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-ecc2063ddb734be396bf31043c44452b">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7294,7 +7294,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-475a94c7c14e4f3e86c8e5aa7071b268">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-475a94c7c14e4f3e86c8e5aa7071b268">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7373,7 +7373,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-9f4851e5f70943d29d4e413bcdf03119">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9f4851e5f70943d29d4e413bcdf03119">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7452,7 +7452,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-043a0d4a2b7244e89f712d92599a6568">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-043a0d4a2b7244e89f712d92599a6568">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7531,7 +7531,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-a662a72881244177beb24cd521d1571f">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-a662a72881244177beb24cd521d1571f">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7610,7 +7610,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-87326f73383c4447b3286acc929b726a">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-87326f73383c4447b3286acc929b726a">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7689,7 +7689,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-f7aa34779a3740d1afa0c844424aa469">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-f7aa34779a3740d1afa0c844424aa469">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7768,7 +7768,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-92954cd66c0a45eba4966fde6faced4c">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-92954cd66c0a45eba4966fde6faced4c">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7847,7 +7847,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-14737d9358d34a2aa8e14d2195131e6b">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-14737d9358d34a2aa8e14d2195131e6b">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -7926,7 +7926,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-5c9b3f982012447da1b000e2fbb2c315">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-5c9b3f982012447da1b000e2fbb2c315">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8005,7 +8005,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-f182b831e0f44c1bbe3ea5345e9a5ac0">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-f182b831e0f44c1bbe3ea5345e9a5ac0">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8084,7 +8084,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-59787b8aa9c34368b97965dc9d7c2e27">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-59787b8aa9c34368b97965dc9d7c2e27">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8163,7 +8163,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-388dca86dc70421192ed78d84c2ae767">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-388dca86dc70421192ed78d84c2ae767">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8242,7 +8242,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-35bf7d7ed4184ed4af536c7349087491">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-35bf7d7ed4184ed4af536c7349087491">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8321,7 +8321,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-a6bfb89de74546d79e12ed0d006966a3">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-a6bfb89de74546d79e12ed0d006966a3">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8400,7 +8400,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-116378cde2814894883f2809cf4c4e6d">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-116378cde2814894883f2809cf4c4e6d">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8479,7 +8479,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-5d0bc80ad2214d74896ca10252eb792b">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-5d0bc80ad2214d74896ca10252eb792b">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8558,7 +8558,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-657e93ed84b046ed8feb91fd28442e08">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-657e93ed84b046ed8feb91fd28442e08">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8637,7 +8637,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-ab7ef47fa9f94f56a69b2b50e6ae6c82">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-ab7ef47fa9f94f56a69b2b50e6ae6c82">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8716,7 +8716,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-04ebe34c9301418ab15efd53d16d7f3d">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-04ebe34c9301418ab15efd53d16d7f3d">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8795,7 +8795,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-3c4792fd52cc4a92b3810755b6ef4958">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-3c4792fd52cc4a92b3810755b6ef4958">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8874,7 +8874,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-6f196fba89574d66adbc59adcf7f311a">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-6f196fba89574d66adbc59adcf7f311a">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -8953,7 +8953,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-9a4734293df24d60893ca3b6d44880f0">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9a4734293df24d60893ca3b6d44880f0">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -9068,7 +9068,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="daylightSavingIndicator" type="IndicatorType_CVW231" use="optional" id="oagis-id-09d94676f88c4f358e8d2771e9d45619">
+				<xsd:attribute name="daylightSavingIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-09d94676f88c4f358e8d2771e9d45619">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -12280,7 +12280,6 @@
 				<ccts_DataTypeTermName>Indicator</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<!-- <xsd:restriction base="xsd:boolean"> -->
 		<xsd:restriction base="xbt_BooleanTrueFalseType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
@@ -12291,11 +12290,12 @@
 					</ccts_ContentComponentValueDomain>
 				</xsd:documentation>
 			</xsd:annotation>
-	<!--		
+			<!--		
 			<xsd:pattern value="false"/>
 			<xsd:pattern value="true"/>
 	-->
 		</xsd:restriction>
+		<!-- <xsd:restriction base="xsd:boolean"> -->
 	</xsd:simpleType>
 	<!-- =================================================================== -->
 	<!-- ===== Measure Types                                                                                                  ===== -->
@@ -12321,7 +12321,7 @@
 						</ccts_ContentComponentValueDomain>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:attribute name="unitCode" type="CodeType_1E7368" use="optional" id="oagis-id-e3abbe93e0c148d5a86141c7dbe41974">
+				<xsd:attribute name="unitCode" type="oacl_UnitCodeContentType" use="optional" id="oagis-id-e3abbe93e0c148d5a86141c7dbe41974">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -13178,7 +13178,7 @@
 						</ccts_ContentComponentValueDomain>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:attribute name="unitCode" type="CodeType_1E7368" use="optional" id="oagis-id-9b0fbfcf9ac244b29dc8c7281607dc90">
+				<xsd:attribute name="unitCode" type="oacl_UnitCodeContentType" use="optional" id="oagis-id-9b0fbfcf9ac244b29dc8c7281607dc90">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>

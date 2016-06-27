@@ -26,23 +26,17 @@ public class RunAll {
             P_1_4_PopulateCodeList p4 = ctx.getBean(P_1_4_PopulateCodeList.class);
             p4.run(ctx);
 
-            P_1_5_1_to_2_PopulateBDTsInDT p5 = ctx.getBean(P_1_5_1_to_2_PopulateBDTsInDT.class);
+            P_1_5_PopulateDefaultAndUnqualifiedBDT p5 = ctx.getBean(P_1_5_PopulateDefaultAndUnqualifiedBDT.class);
             p5.run(ctx);
 
-            P_1_5_3_to_5_PopulateSCInDTSC p6 = ctx.getBean(P_1_5_3_to_5_PopulateSCInDTSC.class);
+            P_1_6_PopulateDTFromMeta p6 = ctx.getBean(P_1_6_PopulateDTFromMeta.class);
             p6.run(ctx);
 
-            P_1_5_6_PopulateBDTSCPrimitiveRestriction p7 = ctx.getBean(P_1_5_6_PopulateBDTSCPrimitiveRestriction.class);
+            P_1_7_PopulateQBDTInDT p7 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
             p7.run(ctx);
 
-            P_1_6_1_to_2_PopulateDTFromMetaXSD p8 = ctx.getBean(P_1_6_1_to_2_PopulateDTFromMetaXSD.class);
+            P_1_8_1_PopulateAccAsccpBccAscc p8 = ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
             p8.run(ctx);
-
-            P_1_7_PopulateQBDTInDT p9 = ctx.getBean(P_1_7_PopulateQBDTInDT.class);
-            p9.run(ctx);
-
-            P_1_8_1_PopulateAccAsccpBccAscc p10 = ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
-            p10.run(ctx);
         }
     }
 }
