@@ -1005,21 +1005,19 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         }
     }
 
-    public void populateBDTSCPrimitiveRestrictionWithAttribute(Element attrElement, DataTypeSupplementaryComponent dtsc, XPathHandler xh, XPathHandler xh2) {
-
-        String type = attrElement.getAttribute("type");
+    public void populateBDTSCPrimitiveRestrictionWithAttribute(DataTypeSupplementaryComponent dtSc, String type) {
         CodeList isCodeList = codeListRepository.findOneByName(type.replace("CodeContentType", "Code"));
 
         if (isCodeList != null) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtSCPri.setBdtScId(dtsc.getDtScId());
+            bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(false);
             bdtSCPri.setCodeListId(isCodeList.getCodeListId());
             bdtScPriRestriRepository.save(bdtSCPri);
 
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtSCPri.setBdtScId(dtsc.getDtScId());
-            int mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtsc);
+            bdtSCPri.setBdtScId(dtSc.getDtScId());
+            int mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
@@ -1028,26 +1026,26 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
 
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtSCPri.setBdtScId(dtsc.getDtScId());
+            bdtSCPri.setBdtScId(dtSc.getDtScId());
             bdtSCPri.setDefault(false);
             bdtSCPri.setAgencyIdListId(agencyIdList.getAgencyIdListId());
             bdtScPriRestriRepository.save(bdtSCPri);
 
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtSCPri.setBdtScId(dtsc.getDtScId());
-            int mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtsc);
+            bdtSCPri.setBdtScId(dtSc.getDtScId());
+            int mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
         } else {
-            List<CoreDataTypeSupplementaryComponentAllowedPrimitive> al3 = cdtScAwdPriRepository.findByCdtScId(getCDTSCAncestor(dtsc));
+            List<CoreDataTypeSupplementaryComponentAllowedPrimitive> al3 = cdtScAwdPriRepository.findByCdtScId(getCDTSCAncestor(dtSc));
 
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive aCDTSCAllowedPrimitiveVO : al3) {//Loop retrieved cdt_sc_awd_pri\
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> al4 =
                         cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(aCDTSCAllowedPrimitiveVO.getCdtScAwdPriId());
                 for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExVO : al4) {
                     BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                    bVO.setBdtScId(dtsc.getDtScId());
+                    bVO.setBdtScId(dtSc.getDtScId());
 
                     bVO.setCdtScAwdPriXpsTypeMapId(aCDTSCAllowedPrimitiveExVO.getCdtScAwdPriXpsTypeMapId());
                     XSDBuiltInType xbtVO = xbtRepository.findOne(aCDTSCAllowedPrimitiveExVO.getXbtId());
@@ -1061,6 +1059,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 }
             }
         }
+    }
+
+    public void populateBDTSCPrimitiveRestrictionWithAttribute(Element attrElement, DataTypeSupplementaryComponent dtSc, XPathHandler xh, XPathHandler xh2) {
+        String type = attrElement.getAttribute("type");
+        populateBDTSCPrimitiveRestrictionWithAttribute(dtSc, type);
     }
 
     public void inheritCDTSCAllowedPrimitiveRestriction(DataTypeSupplementaryComponent dtSc) {

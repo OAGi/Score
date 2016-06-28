@@ -94,6 +94,9 @@ public class P_1_7_PopulateQBDTInDT {
     @Autowired
     private ModuleRepository moduleRepository;
 
+    @Autowired
+    private P_1_5_PopulateDefaultAndUnqualifiedBDT populateDefaultAndUnqualifiedBDT;
+
     private XPathHandler fields_xsd;
 
     private class DataTypeInfoHolder {
@@ -407,108 +410,7 @@ public class P_1_7_PopulateQBDTInDT {
             }
 
         } else { // else if (new SC)
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri;
-
-            List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtScAwdPriList = getCdtSCAllowedPrimitiveID(dtscVO.getDtScId());
-            for (CoreDataTypeSupplementaryComponentAllowedPrimitive svo : cdtScAwdPriList) {
-                List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> maps = getCdtSCAPMap(svo.getCdtScAwdPriId());
-                for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap vo : maps) {
-                    bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                    bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
-                    bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(vo.getCdtScAwdPriXpsTypeMapId());
-
-                    if (type.equalsIgnoreCase("NumberType_B98233")) {
-                        if (svo.getCdtPriId() == getCdtPriId("Decimal") && vo.getXbtId() == getXbtId("xsd:decimal"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.equalsIgnoreCase("CodeType_1E7368") ||
-                            type.equalsIgnoreCase("CodeContentType") ||
-                            name.equalsIgnoreCase("countryCode")) {
-                        if (svo.getCdtPriId() == getCdtPriId("Token") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.equalsIgnoreCase("StringType")) {
-                        if (svo.getCdtPriId() == getCdtPriId("String") && vo.getXbtId() == getXbtId("xsd:string"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.equalsIgnoreCase("NormalizedStringType")) {
-                        if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (name.equalsIgnoreCase("listID") ||
-                            name.equalsIgnoreCase("listVersionID") ||
-                            name.equalsIgnoreCase("unitCodeListVersionID")) {
-                        if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.equalsIgnoreCase("DateTimeType")) {
-                        if (svo.getCdtPriId() == getCdtPriId("TimePoint") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.equalsIgnoreCase("IndicatorType")) {
-                        if (svo.getCdtPriId() == getCdtPriId("Boolean") && vo.getXbtId() == getXbtId("xsd:boolean"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.equalsIgnoreCase("ValueType_E7171E")) {
-                        if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (name.equalsIgnoreCase("name")) {
-                        if (svo.getCdtPriId() == getCdtPriId("NormalizedString") && vo.getXbtId() == getXbtId("xsd:normalizedString"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (type.contains("CodeContentType")) {
-                        if (svo.getCdtPriId() == getCdtPriId("Token") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-
-                    } else if (name.equalsIgnoreCase("listAgencyID")) {
-                        if (svo.getCdtPriId() == getCdtPriId("Token") && vo.getXbtId() == getXbtId("xsd:token"))
-                            bdtScPriRestri.setDefault(true);
-                        else
-                            bdtScPriRestri.setDefault(false);
-                    }
-
-                    bdtScPriRestriListForSaving.add(bdtScPriRestri);
-                }
-            }
-
-            if (type.contains("CodeContentType")) {
-                // add code_list id for this case
-                bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
-                bdtScPriRestri.setCodeListId(getCodeListId(type.substring(0, type.indexOf("CodeContentType"))));
-                bdtScPriRestri.setDefault(false);
-                bdtScPriRestriListForSaving.add(bdtScPriRestri);
-            }
-
-            if (name.equalsIgnoreCase("listAgencyID")) {
-                // add agency_id_list id for this case
-                bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                bdtScPriRestri.setBdtScId(dtscVO.getDtScId());
-                bdtScPriRestri.setAgencyIdListId(getAgencyListID());
-                bdtScPriRestri.setDefault(false);
-                bdtScPriRestriListForSaving.add(bdtScPriRestri);
-            }
+            populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtscVO, type);
         }
 
         if (!bdtScPriRestriListForSaving.isEmpty()) {
@@ -784,8 +686,7 @@ public class P_1_7_PopulateQBDTInDT {
 //				since the attr name is the same, it just update the guid
 //				in this case, the target dtsc is new? or not?
 
-
-                System.out.println(attrName + " " + representation_term);
+                logger.trace(attrName + " " + representation_term);
                 DataTypeSupplementaryComponent duplicate = checkDuplicate(dtSc);
                 if (duplicate == null) {
                     dtScRepository.saveAndFlush(dtSc);
