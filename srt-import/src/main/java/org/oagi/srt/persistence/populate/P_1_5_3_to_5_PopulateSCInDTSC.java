@@ -378,7 +378,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             // unqualified BDT
             if (dt2.getType() != 0) {
                 //inheritance
-                String denType = Utility.DenToName(dt.getDen());
+                String denType = Utility.denToName(dt.getDen());
                 logger.debug("Popuating SCs for unqualified bdt with type = " + denType);
                 Node extensionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");
                 if (extensionNode == null)
@@ -581,7 +581,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
             DataType dt2 = dataTypeRepository.findOne(dt.getBasedDtId());
             // unqualified BDT
             if (dt2.getType() != 0) {
-                String denType = Utility.DenToName(dt.getDen());
+                String denType = Utility.denToName(dt.getDen());
                 logger.debug("Validating SCs for unqualified bdt with type = " + denType);
                 Node extensionNode = xh2.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");
                 if (extensionNode == null)
