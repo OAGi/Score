@@ -785,7 +785,7 @@ public class P_1_7_PopulateQBDTInDT {
 //				in this case, the target dtsc is new? or not?
 
 
-                System.out.println(attrName+" "+representation_term);
+                System.out.println(attrName + " " + representation_term);
                 DataTypeSupplementaryComponent duplicate = checkDuplicate(dtSc);
                 if (duplicate == null) {
                     dtScRepository.saveAndFlush(dtSc);
