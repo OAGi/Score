@@ -8,9 +8,7 @@ import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.export.model.SchemaCodeList;
-import org.oagi.srt.export.model.SchemaModule;
-import org.oagi.srt.export.model.SchemaModuleVisitor;
+import org.oagi.srt.export.model.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -118,6 +116,48 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         rootElement.addContent(codeListElement);
     }
 
+    @Override
+    public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception {
+        Element simpleTypeElement = new Element("simpleType", XSD_NS);
+        String name = bdtSimpleType.getName();
+        simpleTypeElement.setAttribute("name", name);
+        simpleTypeElement.setAttribute("id", bdtSimpleType.getGuid());
+
+        Element restrictionElement = new Element("restriction", XSD_NS);
+        simpleTypeElement.addContent(restrictionElement);
+
+        if ( (name.endsWith("CodeContentType") && !name.equals("CodeContentType")) ||
+             (name.endsWith("IDContentType") && !name.equals("IDContentType")) ) {
+            String baseName;
+            if ((name.endsWith("CodeContentType"))) {
+                baseName = bdtSimpleType.getCodeListName();
+            } else {
+                baseName = bdtSimpleType.getAgencyIdName();
+            }
+
+            restrictionElement.setAttribute("base", baseName + "ContentType");
+        } else {
+            restrictionElement.setAttribute("base", bdtSimpleType.getBaseDTName());
+        }
+
+        rootElement.addContent(simpleTypeElement);
+    }
+
+    @Override
+    public void visitBDTSimpleContent(BDTSimpleContent bdtSimpleContent) throws Exception {
+        Element complexTypeElement = new Element("complexType", XSD_NS);
+        complexTypeElement.setAttribute("name", bdtSimpleContent.getName());
+        complexTypeElement.setAttribute("id", bdtSimpleContent.getGuid());
+
+        Element simpleContentElement = new Element("simpleContent", XSD_NS);
+        complexTypeElement.addContent(simpleContentElement);
+
+        Element extensionElement = new Element("extension", XSD_NS);
+        simpleContentElement.addContent(extensionElement);
+
+        rootElement.addContent(complexTypeElement);
+    }
+
     private void addRestriction(Element codeListElement, Collection<String> values) {
         Element restrictionElement = new Element("restriction", XSD_NS);
         restrictionElement.setAttribute("base", "xsd:token");
@@ -142,11 +182,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void endSchemaModule(SchemaModule schemaModule) throws Exception {
-        System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
+        if (this.moduleFile.getName().endsWith("Fields.xsd")) {
+            System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
 
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        outputter.output(this.document, System.out);
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            outputter.output(this.document, System.out);
 
-        System.out.println();
+            System.out.println();
+        }
     }
 }

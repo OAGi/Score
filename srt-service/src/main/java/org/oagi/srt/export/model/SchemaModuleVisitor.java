@@ -12,5 +12,9 @@ public interface SchemaModuleVisitor {
 
     public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception;
 
+    public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception;
+
+    public void visitBDTSimpleContent(BDTSimpleContent bdtSimpleContent) throws Exception;
+
     public void endSchemaModule(SchemaModule schemaModule) throws Exception;
 }

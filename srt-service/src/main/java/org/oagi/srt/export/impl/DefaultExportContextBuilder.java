@@ -3,19 +3,13 @@ package org.oagi.srt.export.impl;
 import org.oagi.srt.ServiceApplication;
 import org.oagi.srt.export.ExportContext;
 import org.oagi.srt.export.ExportContextBuilder;
-import org.oagi.srt.export.model.SchemaCodeList;
-import org.oagi.srt.export.model.SchemaModule;
-import org.oagi.srt.repository.CodeListRepository;
-import org.oagi.srt.repository.CodeListValueRepository;
-import org.oagi.srt.repository.ModuleDepRepository;
-import org.oagi.srt.repository.ModuleRepository;
-import org.oagi.srt.repository.entity.CodeList;
-import org.oagi.srt.repository.entity.CodeListValue;
-import org.oagi.srt.repository.entity.Module;
-import org.oagi.srt.repository.entity.ModuleDep;
+import org.oagi.srt.export.model.*;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -39,6 +33,21 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     @Autowired
     private CodeListValueRepository codeListValueRepository;
 
+    @Autowired
+    private BlobContentRepository blobContentRepository;
+
+    @Autowired
+    private DataTypeRepository dtRepository;
+
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
+
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
+    private AgencyIdListRepository agencyIdListRepository;
+
     @Override
     public ExportContext build() {
         DefaultExportContext context = new DefaultExportContext();
@@ -49,6 +58,8 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
         createSchemaModules(context, moduleMap);
         createCodeLists(moduleMap);
+        BdtsBlob bdtsBlob = loadBtdsBlob();
+        createBDT(bdtsBlob, moduleMap);
 
         return context;
     }
@@ -99,6 +110,39 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                 SchemaCodeList baseSchemaCodeList = schemaCodeListMap.get(codeList.getBasedCodeListId());
                 schemaCodeList.setBaseCodeList(baseSchemaCodeList);
             }
+        }
+    }
+
+    private BdtsBlob loadBtdsBlob() {
+        BlobContent blobContent = blobContentRepository.findByModuleEndsWith("BusinessDataType_1.xsd");
+        if (blobContent == null) {
+            throw new IllegalStateException();
+        }
+
+        return new BdtsBlob(blobContent.getContent());
+    }
+
+    private void createBDT(BdtsBlob bdtsBlob, Map<Integer, SchemaModule> moduleMap) {
+        List<DataType> bdtList = dtRepository.findAll(new Sort(Sort.Direction.ASC, "module")).stream()
+                .filter(e -> e.getType() == 1).collect(Collectors.toList());
+        for (DataType bdt : bdtList) {
+            if (bdt.getBasedDtId() == 0) {
+                throw new IllegalStateException();
+            }
+            DataType baseDataType = dtRepository.findOne(bdt.getBasedDtId());
+
+            SchemaModule schemaModule = moduleMap.get(bdt.getModule().getModuleId());
+            List<DataTypeSupplementaryComponent> dtScList = dtScRepository.findByOwnerDtId(bdt.getDtId()).stream()
+                    .filter(e -> e.getMaxCardinality() > 0).collect(Collectors.toList());
+
+            BDTSimple bdtSimple;
+            if (dtScList.isEmpty()) {
+                bdtSimple = new BDTSimpleType(bdt, baseDataType,
+                        bdtPriRestriRepository, codeListRepository, agencyIdListRepository);
+            } else {
+                bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList);
+            }
+            schemaModule.addBDTSimple(bdtSimple);
         }
     }
 

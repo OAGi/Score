@@ -17,6 +17,7 @@ public class SchemaModule {
     private int dependedModuleSize = 0;
 
     private List<SchemaCodeList> schemaCodeLists = new ArrayList();
+    private List<BDTSimple> bdtSimples = new ArrayList();
 
     public SchemaModule(Module module) {
         this.module = module;
@@ -51,10 +52,22 @@ public class SchemaModule {
             schemaModuleVisitor.visitCodeList(codeList);
         }
 
+        for (BDTSimple bdtSimple : bdtSimples) {
+            if (bdtSimple instanceof BDTSimpleType) {
+                schemaModuleVisitor.visitBDTSimpleType((BDTSimpleType) bdtSimple);
+            } else if (bdtSimple instanceof BDTSimpleContent) {
+                schemaModuleVisitor.visitBDTSimpleContent((BDTSimpleContent) bdtSimple);
+            }
+        }
+
         schemaModuleVisitor.endSchemaModule(this);
     }
 
     public void addCodeList(SchemaCodeList schemaCodeList) {
         this.schemaCodeLists.add(schemaCodeList);
+    }
+
+    public void addBDTSimple(BDTSimple bdtSimple) {
+        this.bdtSimples.add(bdtSimple);
     }
 }

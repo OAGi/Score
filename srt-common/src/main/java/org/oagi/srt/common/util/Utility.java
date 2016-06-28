@@ -52,7 +52,6 @@ public class Utility {
     }
 
     public static String denToTypeName(String den) {
-
         int pos = den.indexOf("_");
         den = den.replace("Identifier", "ID");
 
@@ -65,7 +64,6 @@ public class Utility {
             den = den.replace(".", "");
             return den;
         }
-
     }
 
     public static String denToUnqualified(String den) {
