@@ -6,7 +6,6 @@ import org.oagi.srt.repository.CoreDataTypeAllowedPrimitiveExpressionTypeMapRepo
 import org.oagi.srt.repository.XSDBuiltInTypeRepository;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
+
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(SCOPE_PROTOTYPE)
 public class ABIEView implements Serializable, Comparable<ABIEView> {
 
     @Autowired
