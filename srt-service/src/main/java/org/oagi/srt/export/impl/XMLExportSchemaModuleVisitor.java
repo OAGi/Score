@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 
 public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
@@ -85,31 +86,48 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             Element codeListElement = new Element("simpleType", XSD_NS);
             codeListElement.setAttribute("name", name + "EnumerationType");
             codeListElement.setAttribute("id", schemaCodeList.getEnumTypeGuid());
-            Element restrictionElement = new Element("restriction", XSD_NS);
-            restrictionElement.setAttribute("base", "xsd:token");
-            codeListElement.addContent(restrictionElement);
 
-            for (String value : schemaCodeList.getValues()) {
-                Element enumerationElement = new Element("enumeration", XSD_NS);
-                enumerationElement.setAttribute("value", value);
-                restrictionElement.addContent(enumerationElement);
-            }
+            addRestriction(codeListElement, schemaCodeList.getValues());
             rootElement.addContent(codeListElement);
         }
 
         Element codeListElement = new Element("simpleType", XSD_NS);
         codeListElement.setAttribute("name", name + "ContentType");
         codeListElement.setAttribute("id", schemaCodeList.getGuid());
-        Element unionElement = new Element("union", XSD_NS);
-        SchemaCodeList baseCodeList = schemaCodeList.getBaseCodeList();
-        if (baseCodeList == null) {
-            unionElement.setAttribute("memberTypes", name + "EnumerationType" + " xsd:token");
+
+        if (name.startsWith("clm")) {
+            Collection<String> values = schemaCodeList.getValues();
+            if (values.isEmpty()) {
+                Element restrictionElement = new Element("restriction", XSD_NS);
+                restrictionElement.setAttribute("base", "xsd:normalizedString");
+                codeListElement.addContent(restrictionElement);
+            } else {
+                addRestriction(codeListElement, values);
+            }
         } else {
-            unionElement.setAttribute("memberTypes", baseCodeList.getName() + "ContentType" + " xsd:token");
+            Element unionElement = new Element("union", XSD_NS);
+            SchemaCodeList baseCodeList = schemaCodeList.getBaseCodeList();
+            if (baseCodeList == null) {
+                unionElement.setAttribute("memberTypes", name + "EnumerationType" + " xsd:token");
+            } else {
+                unionElement.setAttribute("memberTypes", baseCodeList.getName() + "ContentType" + " xsd:token");
+            }
+            codeListElement.addContent(unionElement);
         }
-        codeListElement.addContent(unionElement);
 
         rootElement.addContent(codeListElement);
+    }
+
+    private void addRestriction(Element codeListElement, Collection<String> values) {
+        Element restrictionElement = new Element("restriction", XSD_NS);
+        restrictionElement.setAttribute("base", "xsd:token");
+        codeListElement.addContent(restrictionElement);
+
+        for (String value : values) {
+            Element enumerationElement = new Element("enumeration", XSD_NS);
+            enumerationElement.setAttribute("value", value);
+            restrictionElement.addContent(enumerationElement);
+        }
     }
 
     private String getRelativeSchemaLocation(SchemaModule schemaModule) throws IOException {
