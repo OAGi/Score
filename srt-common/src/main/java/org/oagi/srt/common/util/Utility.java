@@ -4,6 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class Utility {
 
@@ -39,10 +40,26 @@ public class Utility {
         return den;
     }
 
+    /**
+     * @deprecated
+     * @see #denToName(String)
+     */
     public static String DenToName(String den) {
         den = den.substring(0, den.indexOf(". Type")).replaceAll(" ", "") + "Type";
         den = den.replace("Identifier", "ID");
         return den;
+    }
+
+    public static String denToName(String den) {
+        String name;
+        if (Pattern.matches("[\\w ]+_[A-Z0-9]{6}. Type", den)) {
+            name = den.substring(0, den.lastIndexOf(". Type"));
+            int idx = name.lastIndexOf('_');
+            name = name.substring(0, idx) + "Type" + name.substring(idx);
+        } else {
+            name = den.replaceAll("[.] ", "");
+        }
+        return name.replaceAll(" ", "").replace("Identifier", "ID").replaceAll("_CodeType", "CodeType");
     }
 
     public static String createDenFormat(String str) {

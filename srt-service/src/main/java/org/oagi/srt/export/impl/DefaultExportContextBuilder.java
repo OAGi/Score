@@ -42,12 +42,6 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
-    @Autowired
-    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
-
-    @Autowired
-    private AgencyIdListRepository agencyIdListRepository;
-
     @Override
     public ExportContext build() {
         DefaultExportContext context = new DefaultExportContext();
@@ -126,6 +120,10 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         List<DataType> bdtList = dtRepository.findAll(new Sort(Sort.Direction.ASC, "module")).stream()
                 .filter(e -> e.getType() == 1).collect(Collectors.toList());
         for (DataType bdt : bdtList) {
+            if (bdtsBlob.exists(bdt.getGuid())) {
+                continue;
+            }
+
             if (bdt.getBasedDtId() == 0) {
                 throw new IllegalStateException();
             }
@@ -137,10 +135,12 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
             BDTSimple bdtSimple;
             if (dtScList.isEmpty()) {
-                bdtSimple = new BDTSimpleType(bdt, baseDataType,
-                        bdtPriRestriRepository, codeListRepository, agencyIdListRepository);
+                bdtSimple = new BDTSimpleType(bdt, baseDataType);
             } else {
-                bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList);
+                List<DataTypeSupplementaryComponent> baseDtScList =
+                        dtScRepository.findByOwnerDtId(baseDataType.getDtId()).stream()
+                                .filter(e -> e.getMaxCardinality() > 0).collect(Collectors.toList());
+                bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList, baseDtScList);
             }
             schemaModule.addBDTSimple(bdtSimple);
         }
@@ -150,8 +150,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ServiceApplication.class, args)) {
             ExportContextBuilder exportContextBuilder = ctx.getBean(ExportContextBuilder.class);
             ExportContext exportContext = exportContextBuilder.build();
+
             for (SchemaModule schemaModule : exportContext.getSchemaModules()) {
-                schemaModule.visit(new XMLExportSchemaModuleVisitor(new File("./data")));
+                XMLExportSchemaModuleVisitor visitor = ctx.getBean(XMLExportSchemaModuleVisitor.class);
+                visitor.setBaseDirectory(new File("./data"));
+                schemaModule.visit(visitor);
             }
         }
     }

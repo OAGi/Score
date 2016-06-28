@@ -14,14 +14,24 @@ public class BDTSimpleContent implements BDTSimple {
 
     private List<DataTypeSupplementaryComponent> dtScList;
 
-    public BDTSimpleContent(DataType dataType, DataType baseDataType, List<DataTypeSupplementaryComponent> dtScList) {
+    private List<DataTypeSupplementaryComponent> baseDtScList;
+
+    public BDTSimpleContent(DataType dataType, DataType baseDataType,
+                            List<DataTypeSupplementaryComponent> dtScList,
+                            List<DataTypeSupplementaryComponent> baseDtScList) {
         this.dataType = dataType;
         this.baseDataType = baseDataType;
         this.dtScList = dtScList;
+        this.baseDtScList = baseDtScList;
+    }
+
+    @Override
+    public int getBdtId() {
+        return dataType.getDtId();
     }
 
     public String getName() {
-        return denToName(dataType.getDen());
+        return Utility.denToName(dataType.getDen());
     }
 
     public String getGuid() {
@@ -29,14 +39,14 @@ public class BDTSimpleContent implements BDTSimple {
     }
 
     public String getBaseDTName() {
-        return denToName(baseDataType.getDen());
+        return Utility.denToName(baseDataType.getDen());
     }
 
-    private String denToName(String den) {
-        String name = Utility.denToTypeName(den);
-        if (name.contains("Type_ ")) {
-            name = name.replace("Type_ ", "") + "Type";
-        }
-        return name.replaceAll(" ", "").replaceAll("_", "");
+    public List<DataTypeSupplementaryComponent> getDtScList() {
+        return dtScList;
+    }
+
+    public List<DataTypeSupplementaryComponent> getBaseDtScList() {
+        return baseDtScList;
     }
 }

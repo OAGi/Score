@@ -1,5 +1,6 @@
 package org.oagi.srt.export.impl;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -9,19 +10,30 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.export.model.*;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
+
+@Scope(SCOPE_PROTOTYPE)
+@Component
 public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
-    private final File baseDir;
+    private File baseDir;
 
     private Document document;
     private Element rootElement;
@@ -29,8 +41,26 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
-    public XMLExportSchemaModuleVisitor(File baseDir) throws IOException {
-        this.baseDir = baseDir.getCanonicalFile();
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
+
+    @Autowired
+    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
+    @Autowired
+    private CodeListRepository codeListRepository;
+
+    @Autowired
+    private AgencyIdListRepository agencyIdListRepository;
+
+    public void setBaseDirectory(File baseDirectory) throws IOException {
+        this.baseDir = baseDirectory.getCanonicalFile();
     }
 
     @Override
@@ -130,9 +160,9 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
              (name.endsWith("IDContentType") && !name.equals("IDContentType")) ) {
             String baseName;
             if ((name.endsWith("CodeContentType"))) {
-                baseName = bdtSimpleType.getCodeListName();
+                baseName = getCodeListName(bdtSimpleType);
             } else {
-                baseName = bdtSimpleType.getAgencyIdName();
+                baseName = getAgencyIdName(bdtSimpleType);
             }
 
             restrictionElement.setAttribute("base", baseName + "ContentType");
@@ -141,6 +171,33 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         }
 
         rootElement.addContent(simpleTypeElement);
+    }
+
+    private String getCodeListName(BDTSimpleType bdtSimpleType) {
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                bdtPriRestriRepository.findByBdtId(bdtSimpleType.getBdtId()).stream()
+                        .filter(e -> e.getCodeListId() > 0).collect(Collectors.toList());
+        if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        CodeList codeList = codeListRepository.findOne(bdtPriRestriList.get(0).getCodeListId());
+        return codeList.getName();
+    }
+
+    public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                bdtPriRestriRepository.findByBdtId(bdtSimpleType.getBdtId()).stream()
+                        .filter(e -> e.getAgencyIdListId() > 0).collect(Collectors.toList());
+        if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
+            throw new IllegalStateException();
+        }
+
+        AgencyIdList agencyIdList = agencyIdListRepository.findOne(bdtPriRestriList.get(0).getAgencyIdListId());
+        if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
+            return "clm63055D08B_AgencyIdentification";
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -153,9 +210,121 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         complexTypeElement.addContent(simpleContentElement);
 
         Element extensionElement = new Element("extension", XSD_NS);
+
+        String baseName = bdtSimpleContent.getBaseDTName();
+        String name = bdtSimpleContent.getName();
+
+        if ("CodeType".equals(baseName) && !"OpenCodeType".equals(name)) {
+            extensionElement.setAttribute("base", name + "ContentType");
+        } else {
+            extensionElement.setAttribute("base", baseName);
+        }
+
+        List<DataTypeSupplementaryComponent> dtScList;
+        if (baseName.endsWith("CodeContentType")) {
+            dtScList = bdtSimpleContent.getDtScList();
+        } else {
+            dtScList = new ArrayList();
+            List<String> baseDtScGuidList = bdtSimpleContent.getBaseDtScList().stream()
+                    .map(e -> e.getGuid()).collect(Collectors.toList());
+            for (DataTypeSupplementaryComponent dtSc : bdtSimpleContent.getDtScList()) {
+                if (!baseDtScGuidList.contains(dtSc.getGuid())) {
+                    dtScList.add(dtSc);
+                }
+            }
+        }
+
+        for (DataTypeSupplementaryComponent dtSc : dtScList) {
+            Element attributeElement = new Element("attribute", XSD_NS);
+
+            String attrName = getName(dtSc);
+            attributeElement.setAttribute("name", attrName);
+
+            String typeName = getTypeName(dtSc);
+            attributeElement.setAttribute("type", typeName);
+
+            int useInt = dtSc.getMinCardinality() * 2 + dtSc.getMaxCardinality();
+            switch (useInt) {
+                case 0:
+                    attributeElement.setAttribute("use", "prohibited");
+                    break;
+                case 3:
+                    attributeElement.setAttribute("use", "required");
+                    break;
+                case 2:
+                    throw new IllegalStateException();
+            }
+
+            attributeElement.setAttribute("id", dtSc.getGuid());
+
+            extensionElement.addContent(attributeElement);
+        }
+
         simpleContentElement.addContent(extensionElement);
 
         rootElement.addContent(complexTypeElement);
+    }
+
+    private String getName(DataTypeSupplementaryComponent dtSc) {
+        String propertyTerm = dtSc.getPropertyTerm();
+        if ("MIME".equals(propertyTerm)) {
+            propertyTerm = propertyTerm.toLowerCase();
+        }
+        String representationTerm = dtSc.getRepresentationTerm();
+        if (propertyTerm.equals(representationTerm)) {
+            representationTerm = "";
+        }
+
+        String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm;
+        return attrName.replaceAll(" ", "");
+    }
+
+    private String getTypeName(DataTypeSupplementaryComponent dtSc) {
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
+                bdtScPriRestriRepository.findByBdtScId(dtSc.getDtScId());
+
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> codeListBdtScPriRestri =
+                bdtScPriRestriList.stream()
+                        .filter(e -> e.getCodeListId() > 0)
+                        .collect(Collectors.toList());
+        if (codeListBdtScPriRestri.size() > 1) {
+            throw new IllegalStateException();
+        }
+
+        if (codeListBdtScPriRestri.isEmpty()) {
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> agencyIdBdtScPriRestri =
+                    bdtScPriRestriList.stream()
+                            .filter(e -> e.getAgencyIdListId() > 0)
+                            .collect(Collectors.toList());
+            if (agencyIdBdtScPriRestri.size() > 1) {
+                throw new IllegalStateException();
+            }
+
+            if (agencyIdBdtScPriRestri.isEmpty()) {
+                List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> defaultBdtScPriRestri =
+                        bdtScPriRestriList.stream()
+                                .filter(e -> e.isDefault())
+                                .collect(Collectors.toList());
+                if (defaultBdtScPriRestri.isEmpty() || defaultBdtScPriRestri.size() > 1) {
+                    throw new IllegalStateException();
+                }
+
+                CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                        cdtScAwdPriXpsTypeMapRepository.findOne(defaultBdtScPriRestri.get(0).getCdtScAwdPriXpsTypeMapId());
+                XSDBuiltInType xbt = xbtRepository.findOne(cdtScAwdPriXpsTypeMap.getXbtId());
+                return xbt.getBuiltInType();
+            } else {
+                AgencyIdList agencyIdList = agencyIdListRepository.findOne(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
+                if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
+                    return "clm63055D08B_AgencyIdentificationContentType";
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
+        } else {
+            CodeList codeList = codeListRepository.findOne(codeListBdtScPriRestri.get(0).getCodeListId());
+            return codeList.getName() + "ContentType";
+        }
     }
 
     private void addRestriction(Element codeListElement, Collection<String> values) {
@@ -182,13 +351,12 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void endSchemaModule(SchemaModule schemaModule) throws Exception {
-        if (this.moduleFile.getName().endsWith("Fields.xsd")) {
-            System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
+        FileUtils.forceMkdir(this.moduleFile.getParentFile());
 
-            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-            outputter.output(this.document, System.out);
-
-            System.out.println();
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(this.moduleFile))) {
+            outputter.output(this.document, outputStream);
+            outputStream.flush();
         }
     }
 }
