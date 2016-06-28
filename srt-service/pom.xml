@@ -63,6 +63,13 @@
 			<version>1.1.1</version>
 		</dependency>
 
+		<!-- Exporting -->
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc6</artifactId>

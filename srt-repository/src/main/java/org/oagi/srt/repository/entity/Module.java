@@ -28,11 +28,13 @@ public class Module implements Serializable {
     @Column(length = 100, nullable = false)
     private String module;
 
-    @Column(nullable = false)
-    private int releaseId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "release_id", nullable = false)
+    private Release release;
 
-    @Column(nullable = false)
-    private int namespaceId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "namespace_id", nullable = false)
+    private Namespace namespace;
 
     public int getModuleId() {
         return moduleId;
@@ -50,20 +52,20 @@ public class Module implements Serializable {
         this.module = module;
     }
 
-    public int getReleaseId() {
-        return releaseId;
+    public Release getRelease() {
+        return release;
     }
 
-    public void setReleaseId(int releaseId) {
-        this.releaseId = releaseId;
+    public void setRelease(Release release) {
+        this.release = release;
     }
 
-    public int getNamespaceId() {
-        return namespaceId;
+    public Namespace getNamespace() {
+        return namespace;
     }
 
-    public void setNamespaceId(int namespaceId) {
-        this.namespaceId = namespaceId;
+    public void setNamespace(Namespace namespace) {
+        this.namespace = namespace;
     }
 
     @Override
@@ -74,9 +76,9 @@ public class Module implements Serializable {
         Module module1 = (Module) o;
 
         if (moduleId != module1.moduleId) return false;
-        if (releaseId != module1.releaseId) return false;
-        if (namespaceId != module1.namespaceId) return false;
-        return module != null ? module.equals(module1.module) : module1.module == null;
+        if (module != null ? !module.equals(module1.module) : module1.module != null) return false;
+        if (release != null ? !release.equals(module1.release) : module1.release != null) return false;
+        return namespace != null ? namespace.equals(module1.namespace) : module1.namespace == null;
 
     }
 
@@ -84,8 +86,8 @@ public class Module implements Serializable {
     public int hashCode() {
         int result = moduleId;
         result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + releaseId;
-        result = 31 * result + namespaceId;
+        result = 31 * result + (release != null ? release.hashCode() : 0);
+        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         return result;
     }
 
@@ -94,8 +96,8 @@ public class Module implements Serializable {
         return "Module{" +
                 "moduleId=" + moduleId +
                 ", module='" + module + '\'' +
-                ", releaseId=" + releaseId +
-                ", namespaceId=" + namespaceId +
+                ", release=" + release +
+                ", namespace=" + namespace +
                 '}';
     }
 }

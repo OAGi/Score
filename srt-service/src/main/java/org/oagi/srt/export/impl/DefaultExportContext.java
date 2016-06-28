@@ -3,20 +3,20 @@ package org.oagi.srt.export.impl;
 import org.oagi.srt.export.ExportContext;
 import org.oagi.srt.export.model.SchemaModule;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class DefaultExportContext implements ExportContext {
 
-    private List<SchemaModule> schemaModules = new ArrayList();
+    private Map<String, SchemaModule> schemaModules = new HashMap();
 
     public void addSchemaModule(SchemaModule schemaModule) {
-        schemaModules.add(schemaModule);
+        if (!schemaModules.containsKey(schemaModule.getPath())) {
+            schemaModules.put(schemaModule.getPath(), schemaModule);
+        }
     }
 
     @Override
-    public List<SchemaModule> getSchemaModules() {
-        return Collections.unmodifiableList(schemaModules);
+    public Collection<SchemaModule> getSchemaModules() {
+        return Collections.unmodifiableCollection(schemaModules.values());
     }
 }

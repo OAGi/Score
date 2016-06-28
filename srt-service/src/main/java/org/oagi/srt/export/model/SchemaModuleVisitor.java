@@ -10,5 +10,7 @@ public interface SchemaModuleVisitor {
 
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception;
 
+    public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception;
+
     public void endSchemaModule(SchemaModule schemaModule) throws Exception;
 }

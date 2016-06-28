@@ -1,21 +1,20 @@
 package org.oagi.srt.export.impl;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.input.DOMBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.export.model.SchemaCodeList;
 import org.oagi.srt.export.model.SchemaModule;
 import org.oagi.srt.export.model.SchemaModuleVisitor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,9 +28,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     private Element rootElement;
     private File moduleFile;
 
+    private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
+
     public XMLExportSchemaModuleVisitor(File baseDir) throws IOException {
         this.baseDir = baseDir.getCanonicalFile();
-        FileUtils.forceMkdir(baseDir);
     }
 
     @Override
@@ -39,44 +39,77 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
 
-        DocumentBuilder documentBuilder = null;
+        DocumentBuilder documentBuilder;
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException(e);
         }
-        document = documentBuilder.newDocument();
+        org.w3c.dom.Document document = documentBuilder.newDocument();
 
-        Element schemaNode = document.createElementNS(SRTConstants.NS_XSD, "xsd:schema");
-        schemaNode.setAttribute("xmlns:xsd", SRTConstants.NS_XSD);
-        schemaNode.setAttribute("xmlns", SRTConstants.OAGI_NS);
-        schemaNode.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
-        schemaNode.setAttribute("targetNamespace", SRTConstants.OAGI_NS);
-        schemaNode.setAttribute("elementFormDefault", "qualified");
-        schemaNode.setAttribute("attributeFormDefault", "unqualified");
+        DOMBuilder jdomBuilder = new DOMBuilder();
+        this.document = jdomBuilder.build(document);
 
-        document.appendChild(schemaNode);
-        rootElement = schemaNode;
+        Element schemaElement = new Element("schema", XSD_NS);
+        schemaElement.addNamespaceDeclaration(Namespace.getNamespace("", SRTConstants.OAGI_NS));
+        schemaElement.setAttribute("targetNamespace", SRTConstants.OAGI_NS);
+        schemaElement.setAttribute("elementFormDefault", "qualified");
+        schemaElement.setAttribute("attributeFormDefault", "unqualified");
+
+        this.document.addContent(schemaElement);
+        this.rootElement = schemaElement;
 
         moduleFile = new File(baseDir, schemaModule.getPath()).getCanonicalFile();
-        FileUtils.forceMkdir(moduleFile.getParentFile());
     }
-
 
     @Override
     public void visitIncludeModule(SchemaModule includeSchemaModule) throws Exception {
-        Element includeElement = document.createElement("xsd:include");
+        Element includeElement = new Element("include", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(includeSchemaModule);
         includeElement.setAttribute("schemaLocation", schemaLocation);
-        rootElement.appendChild(includeElement);
+        rootElement.addContent(includeElement);
     }
 
     @Override
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception {
-        Element importElement = document.createElement("xsd:import");
+        Element importElement = new Element("import", XSD_NS);
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
-        rootElement.appendChild(importElement);
+        rootElement.addContent(importElement);
+    }
+
+    @Override
+    public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception {
+        String name = schemaCodeList.getName();
+        if (schemaCodeList.getEnumTypeGuid() != null) {
+            Element codeListElement = new Element("simpleType", XSD_NS);
+            codeListElement.setAttribute("name", name + "EnumerationType");
+            codeListElement.setAttribute("id", schemaCodeList.getEnumTypeGuid());
+            Element restrictionElement = new Element("restriction", XSD_NS);
+            restrictionElement.setAttribute("base", "xsd:token");
+            codeListElement.addContent(restrictionElement);
+
+            for (String value : schemaCodeList.getValues()) {
+                Element enumerationElement = new Element("enumeration", XSD_NS);
+                enumerationElement.setAttribute("value", value);
+                restrictionElement.addContent(enumerationElement);
+            }
+            rootElement.addContent(codeListElement);
+        }
+
+        Element codeListElement = new Element("simpleType", XSD_NS);
+        codeListElement.setAttribute("name", name + "ContentType");
+        codeListElement.setAttribute("id", schemaCodeList.getGuid());
+        Element unionElement = new Element("union", XSD_NS);
+        SchemaCodeList baseCodeList = schemaCodeList.getBaseCodeList();
+        if (baseCodeList == null) {
+            unionElement.setAttribute("memberTypes", name + "EnumerationType" + " xsd:token");
+        } else {
+            unionElement.setAttribute("memberTypes", baseCodeList.getName() + "ContentType" + " xsd:token");
+        }
+        codeListElement.addContent(unionElement);
+
+        rootElement.addContent(codeListElement);
     }
 
     private String getRelativeSchemaLocation(SchemaModule schemaModule) throws IOException {
@@ -91,16 +124,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void endSchemaModule(SchemaModule schemaModule) throws Exception {
-        System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
+        if (this.moduleFile.getName().contains("CodeLists")) {
+            System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
 
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        DOMSource source = new DOMSource(document);
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            outputter.output(this.document, System.out);
 
-        StreamResult result = new StreamResult(System.out);
-        transformer.transform(source, result);
-
-        System.out.println();
+            System.out.println();
+        }
     }
 }

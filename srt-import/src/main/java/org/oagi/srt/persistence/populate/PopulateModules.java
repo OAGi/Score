@@ -9,6 +9,8 @@ import org.oagi.srt.repository.NamespaceRepository;
 import org.oagi.srt.repository.ReleaseRepository;
 import org.oagi.srt.repository.entity.Module;
 import org.oagi.srt.repository.entity.ModuleDep;
+import org.oagi.srt.repository.entity.Namespace;
+import org.oagi.srt.repository.entity.Release;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +26,7 @@ import org.w3c.dom.NodeList;
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
 
@@ -48,9 +48,8 @@ public class PopulateModules {
     private NamespaceRepository namespaceRepository;
 
     private File baseDataDirectory;
-    private int releaseId;
-    private int namespaceId;
-    private XPath xPath;
+    private Release release;
+    private Namespace namespace;
 
     @PostConstruct
     public void init() throws IOException {
@@ -65,9 +64,8 @@ public class PopulateModules {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### Module population Start");
 
-        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
-        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
-        xPath = XPathFactory.newInstance().newXPath();
+        release = releaseRepository.findOneByReleaseNum("10.1");
+        namespace = namespaceRepository.findByUri("http://www.openapplications.org/oagis/10");
 
         populateModule(baseDataDirectory);
         populateModuleDep(baseDataDirectory);
@@ -89,8 +87,8 @@ public class PopulateModules {
             if (!moduleRepository.existsByModule(moduleName)) {
                 Module module = new Module();
                 module.setModule(moduleName);
-                module.setReleaseId(releaseId);
-                module.setNamespaceId(namespaceId);
+                module.setRelease(release);
+                module.setNamespace(namespace);
 
                 moduleRepository.save(module);
             }

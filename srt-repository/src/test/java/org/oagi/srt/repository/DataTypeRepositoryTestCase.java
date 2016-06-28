@@ -5,6 +5,8 @@ import org.junit.runner.RunWith;
 import org.oagi.srt.config.TestRepositoryConfig;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.entity.Module;
+import org.oagi.srt.repository.entity.Namespace;
+import org.oagi.srt.repository.entity.Release;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -41,8 +43,8 @@ public class DataTypeRepositoryTestCase extends AbstractTransactionalJUnit4Sprin
         Module module = new Module();
         module.setModuleId(1);
         module.setModule("Model\\BODs\\AcknowledgeAllocateResource.xsd");
-        module.setNamespaceId(1);
-        module.setReleaseId(1);
+        module.setNamespace(new Namespace());
+        module.setRelease(new Release());
         expectedDataType.setModule(module);
 
         dataTypeRepository.save(expectedDataType);

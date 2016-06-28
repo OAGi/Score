@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface NamespaceRepository extends JpaRepository<Namespace, Integer> {
 
+    @Query("select n from Namespace n where n.uri = ?1")
+    public Namespace findByUri(String uri);
+
     @Query("select n.namespaceId from Namespace n where n.uri = ?1")
     public int findNamespaceIdByUri(String uri);
 
