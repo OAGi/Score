@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ImportApplication.class)
+@Transactional(readOnly = true)
 public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Autowired
@@ -85,7 +87,7 @@ public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUn
         expectedAgencyIdListValues.put("13", new ExpectedAgencyIdListValue("ICAO (International Civil Aviation Organization)", "International Civil Aviation Organization."));
         expectedAgencyIdListValues.put("14", new ExpectedAgencyIdListValue("ICS (International Chamber of Shipping)", "International Chamber of Shipping."));
         expectedAgencyIdListValues.put("15", new ExpectedAgencyIdListValue("RINET (Reinsurance and Insurance Network)", "Reinsurance and Insurance Network."));
-        expectedAgencyIdListValues.put("16", new ExpectedAgencyIdListValue("US, D&B (Dun&Bradstreet Corporation)", "Identifies the Dun&Bradstreet Corporation, United States."));
+        expectedAgencyIdListValues.put("16", new ExpectedAgencyIdListValue("US, D&B (Dun & Bradstreet Corporation)", "Identifies the Dun & Bradstreet Corporation, United States."));
         expectedAgencyIdListValues.put("17", new ExpectedAgencyIdListValue("S.W.I.F.T.", "Society for Worldwide Interbank Financial Telecommunications s.c."));
         expectedAgencyIdListValues.put("18", new ExpectedAgencyIdListValue("Conventions on SAD and transit (EC and EFTA)", "SAD = Single Administrative Document."));
         expectedAgencyIdListValues.put("19", new ExpectedAgencyIdListValue("FRRC (Federal Reserve Routing Code)", "Federal Reserve Routing Code."));
