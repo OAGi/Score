@@ -124,13 +124,11 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void endSchemaModule(SchemaModule schemaModule) throws Exception {
-        if (this.moduleFile.getName().contains("CodeLists")) {
-            System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
+        System.out.println("<" + this.moduleFile.getCanonicalPath() + ">");
 
-            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-            outputter.output(this.document, System.out);
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        outputter.output(this.document, System.out);
 
-            System.out.println();
-        }
+        System.out.println();
     }
 }
