@@ -1,4 +1,5 @@
 package org.oagi.srt.persistence.populate;
+
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
@@ -22,7 +23,6 @@ import java.util.List;
  * Created by tnk11 on 6/24/2016.
  */
 @Component
-
 public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -32,7 +32,6 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     @Autowired
     private DataTypeRepository dataTypeRepository;
-
 
     @Autowired
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
@@ -75,7 +74,6 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     private int userId;
     private int releaseId;
-
 
     public static void main(String[] args) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
@@ -260,7 +258,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtId);
         DataType bdt = dataTypeRepository.findOne(bdtID);
 
-        if(bdt.getBasedDtId()==cdtId) {//if default BDT
+        if (bdt.getBasedDtId() == cdtId) {//if default BDT
             for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
 
                 List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> al4 =
@@ -280,10 +278,9 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                     bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
                 }
             }
-        }
-        else {
+        } else {
             List<BusinessDataTypePrimitiveRestriction> defaultBDTPri = bdtPriRestriRepository.findByBdtId(bdt.getBasedDtId());
-            for(int i=0; i<defaultBDTPri.size(); i++){
+            for (int i = 0; i < defaultBDTPri.size(); i++) {
                 BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
                 aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
                 aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
@@ -542,14 +539,14 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
 
         DataType bdt = dataTypeRepository.findOne(bdtID);
-        if(bdt.getBasedDtId()==cdtID){
+        if (bdt.getBasedDtId() == cdtID) {
             boolean isTimePoint = false;
-            if(bdt.getDen().equals(Utility.typeToDen("DateType_DB95C8")) 		//DayDateType
-                    || bdt.getDen().equals(Utility.typeToDen("DateType_0C267D"))		//MonthDateType
-                    || bdt.getDen().equals(Utility.typeToDen("DateType_5B057B"))		//MonthDayDateType
-                    || bdt.getDen().equals(Utility.typeToDen("DateType_57D5E1"))		//YearDateType
-                    || bdt.getDen().equals(Utility.typeToDen("DateType_BBCC14"))){		//YearMonthDateType
-                isTimePoint=true;
+            if (bdt.getDen().equals(Utility.typeToDen("DateType_DB95C8"))        //DayDateType
+                    || bdt.getDen().equals(Utility.typeToDen("DateType_0C267D"))        //MonthDateType
+                    || bdt.getDen().equals(Utility.typeToDen("DateType_5B057B"))        //MonthDayDateType
+                    || bdt.getDen().equals(Utility.typeToDen("DateType_57D5E1"))        //YearDateType
+                    || bdt.getDen().equals(Utility.typeToDen("DateType_BBCC14"))) {        //YearMonthDateType
+                isTimePoint = true;
             }
 
             for (CoreDataTypeAllowedPrimitive aCDTAllowedPrimitiveVO : al3) {
@@ -570,7 +567,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                         bdtPriRestriRepository.save(aBDT_Primitive_RestrictionVO);
                     }
 
-                    if(isTimePoint && idOfXsdToken==aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()){
+                    if (isTimePoint && idOfXsdToken == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) {
                         BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
                         aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
                         aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(aCDTAllowedPrimitiveExpressionTypeMapVO.getCdtAwdPriXpsTypeMapId());
@@ -583,10 +580,9 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                     //TODO: logic for default BDTs which don't have base type and only have union
                 }
             }
-        }
-        else {
+        } else {
             List<BusinessDataTypePrimitiveRestriction> defaultBDTPri = bdtPriRestriRepository.findByBdtId(bdt.getBasedDtId());
-            for(int i=0; i<defaultBDTPri.size(); i++){
+            for (int i = 0; i < defaultBDTPri.size(); i++) {
                 BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
                 aBDT_Primitive_RestrictionVO.setBdtId(bdtID);
                 aBDT_Primitive_RestrictionVO.setCdtAwdPriXpsTypeMapId(defaultBDTPri.get(i).getCdtAwdPriXpsTypeMapId());
@@ -714,7 +710,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         List<DataTypeSupplementaryComponent> cdtSCList = dtScRepository.findByOwnerDtId(baseCDT.getDtId());
 
         NodeList attributeNodeList = xh2.getNodeList("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
-        if (attributeNodeList == null || attributeNodeList.getLength() < 1 && xh!=null) {
+        if (attributeNodeList == null || attributeNodeList.getLength() < 1 && xh != null) {
             attributeNodeList = xh.getNodeList("//xsd:complexType[@name = '" + Utility.denToTypeName(dt.getDen()) + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
         }
         for (int i = 0; i < attributeNodeList.getLength(); i++) {
@@ -750,7 +746,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             int baseInd = -1;
             for (int j = 0; j < cdtSCList.size(); j++) {
 
-                DataTypeSupplementaryComponent baseCDTSC = (DataTypeSupplementaryComponent) cdtSCList.get(j);
+                DataTypeSupplementaryComponent baseCDTSC = cdtSCList.get(j);
                 String basePropertyTerm = baseCDTSC.getPropertyTerm();
                 String baseRepresentationTerm = baseCDTSC.getRepresentationTerm();
                 String baseStr = basePropertyTerm + " " + baseRepresentationTerm;
@@ -804,24 +800,24 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         //Inherit From the remain SCs based on CDT because they don't have corresponding attributes
         //Just copy and get the values from remain cdtSCList
         for (int i = 0; i < cdtSCList.size(); i++) {
-            DataTypeSupplementaryComponent baseCDTSC = (DataTypeSupplementaryComponent) cdtSCList.get(i);
-            DataTypeSupplementaryComponent vo = new DataTypeSupplementaryComponent();
+            DataTypeSupplementaryComponent baseCDTSC = cdtSCList.get(i);
+            DataTypeSupplementaryComponent dtSc = new DataTypeSupplementaryComponent();
 
-            vo.setOwnerDtId(dt.getDtId());
-            vo.setGuid(Utility.generateGUID());
-            vo.setPropertyTerm(baseCDTSC.getPropertyTerm());
-            vo.setRepresentationTerm(baseCDTSC.getRepresentationTerm());
-            vo.setDefinition(baseCDTSC.getDefinition());
+            dtSc.setOwnerDtId(dt.getDtId());
+            dtSc.setGuid(Utility.generateGUID());
+            dtSc.setPropertyTerm(baseCDTSC.getPropertyTerm());
+            dtSc.setRepresentationTerm(baseCDTSC.getRepresentationTerm());
+            dtSc.setDefinition(baseCDTSC.getDefinition());
 
             //we already know it doesn't have attributes
             //so according to design doc,
             //min_cardinality = 0, max_cardinality = 0
-            vo.setMinCardinality(0);
-            vo.setMaxCardinality(0);
-            vo.setBasedDtScId(baseCDTSC.getDtScId());
+            dtSc.setMinCardinality(0);
+            dtSc.setMaxCardinality(0);
+            dtSc.setBasedDtScId(baseCDTSC.getDtScId());
             logger.debug("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
-            dtScRepository.save(vo);
-            inheritCDTSCAllowedPrimitiveRestriction(vo, xh, xh2);
+            dtScRepository.save(dtSc);
+            inheritCDTSCAllowedPrimitiveRestriction(dtSc);
         }
     }
 
@@ -834,10 +830,10 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         if (extensionNode == null) {
             extensionNode = xh2.getNode("//xsd:simpleType[@name = '" + denType + "']/xsd:restriction");
         }
-        if (extensionNode == null){
+        if (extensionNode == null) {
             extensionNode = xh.getNode("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension");
         }
-        if(extensionNode == null){
+        if (extensionNode == null) {
             extensionNode = xh.getNode("//xsd:simpleType[@name = '" + denType + "']/xsd:restriction");
         }
 
@@ -856,7 +852,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
         //adding additional SCs for attributes
         NodeList attributeList = xh2.getNodeList("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
-        if (attributeList == null || attributeList.getLength()<1 && xh!=null) {
+        if (attributeList == null || attributeList.getLength() < 1 && xh != null) {
             attributeList = xh.getNodeList("//xsd:complexType[@name = '" + denType + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
         }
         int min_cardinality = 0;
@@ -1005,16 +1001,16 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
             logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
             dtScRepository.save(vo);
-            inheritBDTSCPrimitiveRestriction(vo,xh,xh2);
+            inheritBDTSCPrimitiveRestriction(vo, xh, xh2);
         }
     }
 
     public void populateBDTSCPrimitiveRestrictionWithAttribute(Element attrElement, DataTypeSupplementaryComponent dtsc, XPathHandler xh, XPathHandler xh2) {
 
         String type = attrElement.getAttribute("type");
-        CodeList isCodeList = codeListRepository.findOneByName(type.replace("CodeContentType","Code"));
+        CodeList isCodeList = codeListRepository.findOneByName(type.replace("CodeContentType", "Code"));
 
-        if(isCodeList!=null) {
+        if (isCodeList != null) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtsc.getDtScId());
             bdtSCPri.setDefault(false);
@@ -1028,8 +1024,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
 
-        }
-        else if(type.equals("clm63055D08B_AgencyIdentificationContentType")){
+        } else if (type.equals("clm63055D08B_AgencyIdentificationContentType")) {
             AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
 
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -1044,8 +1039,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
-        }
-        else {
+        } else {
             List<CoreDataTypeSupplementaryComponentAllowedPrimitive> al3 = cdtScAwdPriRepository.findByCdtScId(getCDTSCAncestor(dtsc));
 
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive aCDTSCAllowedPrimitiveVO : al3) {//Loop retrieved cdt_sc_awd_pri\
@@ -1058,10 +1052,9 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                     bVO.setCdtScAwdPriXpsTypeMapId(aCDTSCAllowedPrimitiveExVO.getCdtScAwdPriXpsTypeMapId());
                     XSDBuiltInType xbtVO = xbtRepository.findOne(aCDTSCAllowedPrimitiveExVO.getXbtId());
 
-                    if(type.equals(xbtVO.getBuiltInType())) {
+                    if (type.equals(xbtVO.getBuiltInType())) {
                         bVO.setDefault(true);
-                    }
-                    else {
+                    } else {
                         bVO.setDefault(false);
                     }
                     bdtScPriRestriRepository.save(bVO);
@@ -1070,28 +1063,27 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         }
     }
 
-    public void inheritCDTSCAllowedPrimitiveRestriction(DataTypeSupplementaryComponent dtsc, XPathHandler xh, XPathHandler xh2) {
+    public void inheritCDTSCAllowedPrimitiveRestriction(DataTypeSupplementaryComponent dtSc) {
 
-        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> baseCDTSCPriList = cdtScAwdPriRepository.findByCdtScId(dtsc.getBasedDtScId());
-        boolean isDefaultCDTPri= false;
-        for(int i=0; i<baseCDTSCPriList.size(); i++) {
-            if(baseCDTSCPriList.get(i).isDefault()){
-                isDefaultCDTPri=true;
+        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> baseCDTSCPriList = cdtScAwdPriRepository.findByCdtScId(dtSc.getBasedDtScId());
+        boolean isDefaultCDTPri;
+        for (int i = 0; i < baseCDTSCPriList.size(); i++) {
+            if (baseCDTSCPriList.get(i).isDefault()) {
+                isDefaultCDTPri = true;
+            } else {
+                isDefaultCDTPri = false;
             }
-            else {
-                isDefaultCDTPri=false;
-            }
+
             List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtScAwdPriXpsTypeMapList = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(baseCDTSCPriList.get(i).getCdtScAwdPriId());
-            for(int j=0; j<cdtScAwdPriXpsTypeMapList.size(); j++){
+            for (int j = 0; j < cdtScAwdPriXpsTypeMapList.size(); j++) {
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction inputBDTSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-                inputBDTSCPri.setBdtScId(dtsc.getDtScId());
+                inputBDTSCPri.setBdtScId(dtSc.getDtScId());
                 inputBDTSCPri.setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapList.get(j).getCdtScAwdPriXpsTypeMapId());
                 inputBDTSCPri.setCodeListId(0);
                 inputBDTSCPri.setAgencyIdListId(0);
-                if(isDefaultCDTPri && j==0){
+                if (isDefaultCDTPri && j == 0) {
                     inputBDTSCPri.setDefault(true);
-                }
-                else {
+                } else {
                     inputBDTSCPri.setDefault(false);
                 }
                 bdtScPriRestriRepository.save(inputBDTSCPri);
@@ -1101,9 +1093,10 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     public void inheritBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtsc, XPathHandler xh, XPathHandler xh2) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> baseBDTSCPriList = bdtScPriRestriRepository.findByBdtScId(dtsc.getBasedDtScId());
-        for(int i=0; i<baseBDTSCPriList.size(); i++) {
+        for (int i = 0; i < baseBDTSCPriList.size(); i++) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction baseBDTSCPri = baseBDTSCPriList.get(i);
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction inputBDTSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction inputBDTSCPri =
+                    new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
 
             inputBDTSCPri.setBdtScId(dtsc.getDtScId());
             inputBDTSCPri.setDefault(baseBDTSCPri.isDefault());
@@ -1115,19 +1108,22 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
     }
 
 
-    public int getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId(String CDTPrimitiveName, String BuiltInType, DataTypeSupplementaryComponent dtsc) {
+    public int getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId(
+            String cdtPrimitiveName, String builtInType, DataTypeSupplementaryComponent dtsc) {
 
-        CoreDataTypePrimitive cdtPri = cdtPriRepository.findOneByName(CDTPrimitiveName);
-        int cdtSCId=getCDTSCAncestor(dtsc);
-        XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(BuiltInType);
-        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPri.getCdtPriId());
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap map = cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(cdtSCAwdPri.getCdtScAwdPriId(), xbt.getXbtId());
+        CoreDataTypePrimitive cdtPri = cdtPriRepository.findOneByName(cdtPrimitiveName);
+        int cdtSCId = getCDTSCAncestor(dtsc);
+        XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(builtInType);
+        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri =
+                cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPri.getCdtPriId());
+        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap map =
+                cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(cdtSCAwdPri.getCdtScAwdPriId(), xbt.getXbtId());
 
         return map.getCdtScAwdPriXpsTypeMapId();
     }
 
     public int getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
-        if(dtsc.getBasedDtScId()>0) {
+        if (dtsc.getBasedDtScId() > 0) {
             DataTypeSupplementaryComponent baseDTSC = dtScRepository.findOne(dtsc.getBasedDtScId());
             return getCDTSCAncestor(baseDTSC);
         }
