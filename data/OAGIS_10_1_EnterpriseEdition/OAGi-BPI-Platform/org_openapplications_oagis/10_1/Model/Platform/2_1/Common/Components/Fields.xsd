@@ -3684,7 +3684,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		<xsd:sequence>
 			<xsd:element ref="ID" id="oagis-id-6dc6f29ea63f415aa75a19472aec64c0" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="schemeID" type="xsd:normalizedString" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">
+		<xsd:attribute name="schemeID" type="NormalizedStringType" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3700,7 +3700,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">
+		<xsd:attribute name="schemeVersionID" type="NormalizedStringType" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3716,7 +3716,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="schemeAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">
+		<xsd:attribute name="schemeAgencyID" type="AgencyIDContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -3736,17 +3736,12 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-798d6f25298540be8bb621ec3edaf008"/>
-		<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-8a43ad61a0b24022ba802025eb852075">
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-798d6f25298540be8bb621ec3edaf008"/>
+		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-8a43ad61a0b24022ba802025eb852075">
 			<xsd:annotation>
 				<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<!--		<xsd:attribute name="schemeID" type="NormalizedStringType" use="optional" id="oagis-id-d91f2b8007ac4a90a6bb76803e173688">  -->
-		<!--		<xsd:attribute name="schemeVersionID" type="NormalizedStringType" use="optional" id="oagis-id-247f477be27a40ab978ddc11554d2c9f">  -->
-		<!--		<xsd:attribute name="schemeAgencyID" type="AgencyIDContentType" use="optional" id="oagis-id-d44d6f8b63744a038f5417eae27e787b">  -->
-		<!--		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-798d6f25298540be8bb621ec3edaf008"/>-->
-		<!--		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-8a43ad61a0b24022ba802025eb852075"> -->
 	</xsd:complexType>
 	<xsd:complexType name="SequencedIDType" id="oagis-id-0624ca38925d43929a6f7d8b7b7e0882">
 		<xsd:simpleContent>
