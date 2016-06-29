@@ -2,8 +2,10 @@ package org.oagi.srt.web.handler;
 
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -106,6 +108,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Autowired
     private BusinessObjectDocumentRepository bodRepository;
+
+    @Autowired
+    private CoreComponentService coreComponentService;
 
     private int abieCount = 0;
     private int bbiescCount = 0;
@@ -464,108 +469,18 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private List<CoreComponent> queryNestedChildAssoc(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
-        List<BasicCoreComponent> bcc_tmp_assoc = createBIEContext.getBCC(aggregateCoreComponent.getAccId());
-        List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(aggregateCoreComponent.getAccId());
-
-        int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
-        List<CoreComponent> tmp_assoc = new ArrayList(size);
-        tmp_assoc.addAll(bcc_tmp_assoc);
-        tmp_assoc.addAll(ascc_tmp_assoc);
-
-        ArrayList<CoreComponent> assoc = new ArrayList(size);
-        CoreComponent a = new CoreComponent();
-        for (int i = 0; i < size; i++)
-            assoc.add(a);
-
-        int attribute_cnt = 0;
-        for (BasicCoreComponent basicCoreComponent : bcc_tmp_assoc) {
-            if (basicCoreComponent.getSeqKey() == 0) {
-                assoc.set(attribute_cnt, basicCoreComponent);
-                attribute_cnt++;
-            }
-        }
-
-        for (CoreComponent coreComponent : tmp_assoc) {
-            if (coreComponent instanceof BasicCoreComponent) {
-                BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
-                if (basicCoreComponent.getSeqKey() > 0) {
-                    assoc.set(basicCoreComponent.getSeqKey() - 1 + attribute_cnt, basicCoreComponent);
-                }
-            } else {
-                AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
-                assoc.set(associationCoreComponent.getSeqKey() - 1 + attribute_cnt, associationCoreComponent);
-            }
-        }
-
-        assoc.trimToSize();
-
+        List<CoreComponent> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, createBIEContext);
         return getAssocList(createBIEContext, assoc);
     }
 
     private List<CoreComponent> queryNestedChildAssoc_wo_attribute(CreateBIEContext createBIEContext, AggregateCoreComponent aggregateCoreComponent) {
-        List<BasicCoreComponent> bcc_tmp_assoc = getBCCwoAttribute(createBIEContext, aggregateCoreComponent.getAccId());
-        List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(aggregateCoreComponent.getAccId());
-        int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
-        List<CoreComponent> tmp_assoc = new ArrayList(size);
-        tmp_assoc.addAll(bcc_tmp_assoc);
-        tmp_assoc.addAll(ascc_tmp_assoc);
-
-        ArrayList<CoreComponent> assoc = new ArrayList(size);
-        CoreComponent a = new CoreComponent();
-        for (int i = 0; i < size; i++)
-            assoc.add(a);
-
-        for (CoreComponent coreComponent : tmp_assoc) {
-            if (coreComponent instanceof BasicCoreComponent) {
-                BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
-                assoc.set(basicCoreComponent.getSeqKey() - 1, basicCoreComponent);
-            } else {
-                AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
-                assoc.set(associationCoreComponent.getSeqKey() - 1, associationCoreComponent);
-            }
-        }
-
-        assoc.trimToSize();
-
+        List<CoreComponent> assoc = coreComponentService.getCoreComponentsWithoutAttributes(aggregateCoreComponent, createBIEContext);
         return getAssocList(createBIEContext, assoc);
     }
 
     private List<CoreComponent> queryChildAssoc(CreateBIEContext createBIEContext,
                                                 AggregateCoreComponent acc) {
-        List<BasicCoreComponent> bcc_tmp_assoc = createBIEContext.getBCC(acc.getAccId());
-        List<AssociationCoreComponent> ascc_tmp_assoc = createBIEContext.getASCC(acc.getAccId());
-        int size = bcc_tmp_assoc.size() + ascc_tmp_assoc.size();
-        List<CoreComponent> tmp_assoc = new ArrayList(size);
-        tmp_assoc.addAll(bcc_tmp_assoc);
-        tmp_assoc.addAll(ascc_tmp_assoc);
-
-        ArrayList<CoreComponent> assoc = new ArrayList(size);
-        CoreComponent a = new CoreComponent();
-        for (int i = 0; i < size; i++)
-            assoc.add(a);
-
-        int attribute_cnt = 0;
-        for (BasicCoreComponent basicCoreComponent : bcc_tmp_assoc) {
-            if (basicCoreComponent.getSeqKey() == 0) {
-                assoc.set(attribute_cnt, basicCoreComponent);
-                attribute_cnt++;
-            }
-        }
-
-        for (CoreComponent coreComponent : tmp_assoc) {
-            if (coreComponent instanceof BasicCoreComponent) {
-                BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
-                if (basicCoreComponent.getSeqKey() > 0) {
-                    assoc.set(basicCoreComponent.getSeqKey() - 1 + attribute_cnt, basicCoreComponent);
-                }
-            } else {
-                AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
-                assoc.set(associationCoreComponent.getSeqKey() - 1 + attribute_cnt, associationCoreComponent);
-            }
-        }
-
-        assoc.trimToSize();
-
+        List<CoreComponent> assoc = coreComponentService.getCoreComponents(acc, createBIEContext);
         return assoc;
     }
 
@@ -606,7 +521,7 @@ public class TopLevelABIEHandler implements Serializable {
         return check;
     }
 
-    private class CreateBIEContext {
+    private class CreateBIEContext implements CoreComponentProvider {
         private ABIETaskHolder abieTaskHolder;
         private BBIETreeTaskHolder bbieTreeTaskHolder;
         private ASBIETreeTaskHolder asbieTreeTaskHolder;
@@ -696,13 +611,22 @@ public class TopLevelABIEHandler implements Serializable {
             asbieTreeTaskHolder.createASBIETree(this, asccVO, abie, seqKey);
         }
 
-        public List<BasicCoreComponent> getBCC(int fromAccId) {
+        @Override
+        public List<BasicCoreComponent> getBCCs(int fromAccId) {
             return basicCoreComponents.stream()
                     .filter(bcc -> bcc.getFromAccId() == fromAccId)
                     .collect(Collectors.toList());
         }
 
-        private List<AssociationCoreComponent> getASCC(int fromAccId) {
+        @Override
+        public List<BasicCoreComponent> getBCCsWithoutAttributes(int accId) {
+            return getBCCs(accId).stream()
+                    .filter(e -> e.getSeqKey() != 0)
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public List<AssociationCoreComponent> getASCCs(int fromAccId) {
             return associationCoreComponents.stream()
                     .filter(acc -> acc.getFromAccId() == fromAccId)
                     .collect(Collectors.toList());
@@ -1127,7 +1051,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     private List<BasicCoreComponent> getBCCwoAttribute(CreateBIEContext createBIEContext, int accId) {
-        return createBIEContext.getBCC(accId).stream()
+        return createBIEContext.getBCCs(accId).stream()
                 .filter(basicCoreComponent -> basicCoreComponent.getSeqKey() > 0)
                 .collect(Collectors.toList());
     }
