@@ -6,6 +6,7 @@ import org.oagi.srt.export.ExportContextBuilder;
 import org.oagi.srt.export.model.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,9 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -48,6 +47,18 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     @Autowired
     private BasicCoreComponentRepository bccRepository;
 
+    @Autowired
+    private AggregateCoreComponentRepository accRepository;
+
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
+
+    @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
+
+    @Autowired
+    private CoreComponentService coreComponentService;
+
     @Override
     public ExportContext build() {
         DefaultExportContext context = new DefaultExportContext();
@@ -61,6 +72,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         BdtsBlob bdtsBlob = loadBtdsBlob();
         createBDT(bdtsBlob, moduleMap);
         createBCCP(moduleMap);
+        createACC(moduleMap);
 
         return context;
     }
@@ -165,6 +177,34 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
             SchemaModule schemaModule = moduleMap.get(bccp.getModule().getModuleId());
             schemaModule.addBCCP(new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen()));
+        }
+    }
+
+    private void createACC(Map<Integer, SchemaModule> moduleMap) {
+        for (AggregateCoreComponent acc :
+                accRepository.findAll(new Sort(Sort.Direction.ASC, "module"))) {
+
+            SchemaModule schemaModule = moduleMap.get(acc.getModule().getModuleId());
+            schemaModule.addACC(newACC(acc));
+        }
+    }
+
+    private ACC newACC(AggregateCoreComponent acc) {
+        switch (acc.getOagisComponentType()) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                if (acc.getBasedAccId() > 0) {
+                    AggregateCoreComponent basedAcc = accRepository.findOne(acc.getBasedAccId());
+                    return new ACCComplexType(acc, newACC(basedAcc));
+                } else {
+                    return new ACCComplexType(acc);
+                }
+            case 4: // @TODO: Not yet handled
+                return new ACCGroup(acc);
+            default:
+                throw new IllegalStateException();
         }
     }
 

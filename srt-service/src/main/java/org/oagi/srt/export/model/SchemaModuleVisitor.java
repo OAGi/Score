@@ -18,5 +18,9 @@ public interface SchemaModuleVisitor {
 
     public void visitBCCP(BCCP bccp) throws Exception;
 
+    public void visitACCComplexType(ACCComplexType accComplexType) throws Exception;
+
+    public void visitACCGroup(ACCGroup accGroup) throws Exception;
+
     public void endSchemaModule(SchemaModule schemaModule) throws Exception;
 }

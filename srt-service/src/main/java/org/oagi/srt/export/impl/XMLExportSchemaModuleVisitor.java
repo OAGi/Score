@@ -8,9 +8,11 @@ import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.export.model.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -58,6 +60,18 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
+
+    @Autowired
+    private CoreComponentService coreComponentService;
+
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
+
+    @Autowired
+    private DataTypeRepository dtRepository;
+
+    @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
 
     public void setBaseDirectory(File baseDirectory) throws IOException {
         this.baseDir = baseDirectory.getCanonicalFile();
@@ -244,15 +258,9 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             attributeElement.setAttribute("type", typeName);
 
             int useInt = dtSc.getMinCardinality() * 2 + dtSc.getMaxCardinality();
-            switch (useInt) {
-                case 0:
-                    attributeElement.setAttribute("use", "prohibited");
-                    break;
-                case 3:
-                    attributeElement.setAttribute("use", "required");
-                    break;
-                case 2:
-                    throw new IllegalStateException();
+            String useVal = getUseAttributeValue(useInt);
+            if (useVal != null) {
+                attributeElement.setAttribute("use", useVal);
             }
 
             attributeElement.setAttribute("id", dtSc.getGuid());
@@ -273,6 +281,82 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         element.setAttribute("id", bccp.getGuid());
 
         rootElement.addContent(element);
+    }
+
+    @Override
+    public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
+        Element complexTypeElement = new Element("complexType", XSD_NS);
+        complexTypeElement.setAttribute("name", accComplexType.getName());
+        if (accComplexType.isAbstract()) {
+            complexTypeElement.setAttribute("abstract", "true");
+        }
+        complexTypeElement.setAttribute("id", accComplexType.getGuid());
+
+        Element sequenceElement = new Element("sequence", XSD_NS);
+        ACC basedACC = accComplexType.getBasedACC();
+        if (basedACC != null) {
+            Element complexContentElement = new Element("complexContent", XSD_NS);
+            complexTypeElement.addContent(complexContentElement);
+
+            Element extensionElement = new Element("extension", XSD_NS);
+            extensionElement.setAttribute("type", basedACC.getName() + "Type");
+            complexContentElement.addContent(extensionElement);
+
+            extensionElement.addContent(sequenceElement);
+        } else {
+            complexTypeElement.addContent(sequenceElement);
+        }
+
+        List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
+        for (CoreComponent coreComponent : coreComponents) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+                DataType bdt = dtRepository.findOne(bccp.getBdtId());
+
+                if (bcc.getSeqKey() == 0) {
+                    Element attributeElement = new Element("attribute", XSD_NS);
+
+                    attributeElement.setAttribute("name", Utility.toLowerCamelCase(bccp.getPropertyTerm()));
+                    attributeElement.setAttribute("type", Utility.denToName(bdt.getDen()));
+
+                    int useInt = bcc.getCardinalityMin() * 2 + bcc.getCardinalityMax();
+                    String useVal = getUseAttributeValue(useInt);
+                    if (useVal != null) {
+                        attributeElement.setAttribute("use", useVal);
+                    }
+
+                    attributeElement.setAttribute("id", bcc.getGuid());
+
+                    sequenceElement.addContent(attributeElement);
+                } else {
+
+                }
+            } else if (coreComponent instanceof AssociationCoreComponent) {
+                AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+
+            }
+        }
+
+        rootElement.addContent(complexTypeElement);
+    }
+
+    private String getUseAttributeValue(int useInt) {
+        switch (useInt) {
+            case 0:
+                return "prohibited";
+            case 3:
+                return "required";
+            case 2:
+                throw new IllegalStateException();
+        }
+        return null;
+    }
+
+    @Override
+    public void visitACCGroup(ACCGroup accGroup) throws Exception {
+
     }
 
     private String getTypeName(BDTSC dtSc) {

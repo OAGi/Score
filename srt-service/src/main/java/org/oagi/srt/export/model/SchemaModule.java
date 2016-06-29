@@ -21,6 +21,8 @@ public class SchemaModule {
 
     private List<BCCP> bccpList = new ArrayList();
 
+    private List<ACC> accList = new ArrayList();
+
     public SchemaModule(Module module) {
         this.module = module;
     }
@@ -47,6 +49,10 @@ public class SchemaModule {
 
     public void addBCCP(BCCP bccp) {
         this.bccpList.add(bccp);
+    }
+
+    public void addACC(ACC acc) {
+        this.accList.add(acc);
     }
 
     public void visit(SchemaModuleVisitor schemaModuleVisitor) throws Exception {
@@ -76,6 +82,14 @@ public class SchemaModule {
 
         for (BCCP bccp : bccpList) {
             schemaModuleVisitor.visitBCCP(bccp);
+        }
+
+        for (ACC acc : accList) {
+            if (acc instanceof ACCComplexType) {
+                schemaModuleVisitor.visitACCComplexType((ACCComplexType) acc);
+            } else if (acc instanceof ACCGroup) {
+                schemaModuleVisitor.visitACCGroup((ACCGroup) acc);
+            }
         }
 
         schemaModuleVisitor.endSchemaModule(this);
