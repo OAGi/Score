@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "ascc")
-public class AssociationCoreComponent extends CoreComponent implements Serializable {
+public class AssociationCoreComponent implements CoreComponent, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
 

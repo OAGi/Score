@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bcc")
-public class BasicCoreComponent extends CoreComponent implements Serializable {
+public class BasicCoreComponent implements CoreComponent, Serializable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 

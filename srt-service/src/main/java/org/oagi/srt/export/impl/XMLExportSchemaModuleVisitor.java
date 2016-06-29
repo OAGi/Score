@@ -1,5 +1,6 @@
 package org.oagi.srt.export.impl;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -20,8 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -72,6 +72,9 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
+
+    @Autowired
+    private AggregateCoreComponentRepository accRepository;
 
     public void setBaseDirectory(File baseDirectory) throws IOException {
         this.baseDir = baseDirectory.getCanonicalFile();
@@ -285,8 +288,17 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
-        Element complexTypeElement = new Element("complexType", XSD_NS);
-        complexTypeElement.setAttribute("name", accComplexType.getName());
+        asccpRepository.findOneByGuid(accComplexType.getGuid());
+
+        Element complexTypeElement;
+        if (isGroup(accComplexType)) {
+            complexTypeElement = new Element("group", XSD_NS);
+            complexTypeElement.setAttribute("name", accComplexType.getName());
+        } else {
+            complexTypeElement = new Element("complexType", XSD_NS);
+            complexTypeElement.setAttribute("name", accComplexType.getName() + "Type");
+        }
+
         if (accComplexType.isAbstract()) {
             complexTypeElement.setAttribute("abstract", "true");
         }
@@ -308,6 +320,52 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         }
 
         List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
+        // for ASCC or BCC (Sequence Key != 0)
+        for (CoreComponent coreComponent : coreComponents) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+
+                if (bcc.getSeqKey() > 0) {
+                    Element element = new Element("element", XSD_NS);
+
+                    element.setAttribute("ref", Utility.toCamelCase(bccp.getPropertyTerm()));
+                    element.setAttribute("id", bcc.getGuid());
+                    setCardinalities(element, bcc);
+
+                    sequenceElement.addContent(element);
+                }
+            } else if (coreComponent instanceof AssociationCoreComponent) {
+                AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
+                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+
+                if (isGroup(asccp)) {
+                    Element groupElement = new Element("group", XSD_NS);
+
+                    groupElement.setAttribute("ref", Utility.toCamelCase(asccp.getPropertyTerm()));
+                    groupElement.setAttribute("id", ascc.getGuid());
+                    setCardinalities(groupElement, ascc);
+
+                    sequenceElement.addContent(groupElement);
+                } else {
+                    Element element = new Element("element", XSD_NS);
+
+                    if (asccp.isReusableIndicator()) {
+                        element.setAttribute("ref", Utility.toCamelCase(asccp.getPropertyTerm()));
+                    } else {
+                        element.setAttribute("name", Utility.toCamelCase(asccp.getPropertyTerm()));
+                        element.setAttribute("type", getTypeName(asccp));
+                    }
+
+                    element.setAttribute("id", ascc.getGuid());
+                    setCardinalities(element, ascc);
+
+                    sequenceElement.addContent(element);
+                }
+            }
+        }
+
+        // for BCCP (Sequence Key == 0)
         for (CoreComponent coreComponent : coreComponents) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
@@ -329,17 +387,30 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     attributeElement.setAttribute("id", bcc.getGuid());
 
                     sequenceElement.addContent(attributeElement);
-                } else {
-
                 }
-            } else if (coreComponent instanceof AssociationCoreComponent) {
-                AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
-
             }
         }
 
         rootElement.addContent(complexTypeElement);
+    }
+
+    private void setCardinalities(Element element, CoreComponent ascc) {
+        element.setAttribute("minOccurs", Integer.toString(ascc.getCardinalityMin()));
+        switch (ascc.getCardinalityMax()) {
+            case -1:
+                element.setAttribute("maxOccurs", "unbounded");
+                break;
+            default:
+                element.setAttribute("maxOccurs", Integer.toString(ascc.getCardinalityMax()));
+                break;
+        }
+    }
+
+    private String getTypeName(AssociationCoreComponentProperty asccp) {
+        String den = asccp.getDen();
+        String propertyTerm = asccp.getPropertyTerm();
+
+        return Utility.toCamelCase(den.substring((propertyTerm + ". ").length())) + "Type";
     }
 
     private String getUseAttributeValue(int useInt) {
@@ -352,6 +423,16 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                 throw new IllegalStateException();
         }
         return null;
+    }
+
+    private boolean isGroup(ACCComplexType accComplexType) {
+        AssociationCoreComponentProperty asccp = asccpRepository.findOneByGuid(accComplexType.getGuid());
+        return (asccp != null) && asccp.getRoleOfAccId() == accComplexType.getRawId();
+    }
+
+    private boolean isGroup(AssociationCoreComponentProperty asccp) {
+        AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+        return (acc != null) && acc.getGuid().equals(asccp.getGuid());
     }
 
     @Override
@@ -435,19 +516,12 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             return;
         }
 
-        System.out.println("<< " + this.moduleFile + " >>");
+        FileUtils.forceMkdir(this.moduleFile.getParentFile());
 
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        outputter.output(this.document, System.out);
-
-        System.out.println();
-
-//        FileUtils.forceMkdir(this.moduleFile.getParentFile());
-//
-//        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-//        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(this.moduleFile))) {
-//            outputter.output(this.document, outputStream);
-//            outputStream.flush();
-//        }
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(this.moduleFile))) {
+            outputter.output(this.document, outputStream);
+            outputStream.flush();
+        }
     }
 }
