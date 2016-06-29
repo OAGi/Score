@@ -309,6 +309,17 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                             .filter(e -> e.isDefault())
                             .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                             .sum());
+
+            actualBdtScPriRestriList.stream()
+                    .collect(Collectors.groupingBy(
+                            BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId))
+                    .forEach(((bdtScId, bdtScPriRestriList) -> {
+                        assertEquals("The summation of 'is_default' value is always be 1. bdt_sc_id: " + bdtScId,
+                                1,
+                                bdtScPriRestriList.stream()
+                                        .mapToInt(e -> e.isDefault() ? 1 : 0)
+                                        .sum());
+                    }));
         });
     }
 
