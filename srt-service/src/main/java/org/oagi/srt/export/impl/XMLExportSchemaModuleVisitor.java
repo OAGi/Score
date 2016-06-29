@@ -320,28 +320,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         }
 
         List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
+        // for ASCC or BCC (Sequence Key != 0)
         for (CoreComponent coreComponent : coreComponents) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
                 BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
-                DataType bdt = dtRepository.findOne(bccp.getBdtId());
 
-                if (bcc.getSeqKey() == 0) {
-                    Element attributeElement = new Element("attribute", XSD_NS);
-
-                    attributeElement.setAttribute("name", Utility.toLowerCamelCase(bccp.getPropertyTerm()));
-                    attributeElement.setAttribute("type", Utility.denToName(bdt.getDen()));
-
-                    int useInt = bcc.getCardinalityMin() * 2 + bcc.getCardinalityMax();
-                    String useVal = getUseAttributeValue(useInt);
-                    if (useVal != null) {
-                        attributeElement.setAttribute("use", useVal);
-                    }
-
-                    attributeElement.setAttribute("id", bcc.getGuid());
-
-                    sequenceElement.addContent(attributeElement);
-                } else {
+                if (bcc.getSeqKey() > 0) {
                     Element element = new Element("element", XSD_NS);
 
                     element.setAttribute("ref", Utility.toCamelCase(bccp.getPropertyTerm()));
@@ -376,6 +361,32 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     setCardinalities(element, ascc);
 
                     sequenceElement.addContent(element);
+                }
+            }
+        }
+
+        // for BCCP (Sequence Key == 0)
+        for (CoreComponent coreComponent : coreComponents) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
+                BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+                DataType bdt = dtRepository.findOne(bccp.getBdtId());
+
+                if (bcc.getSeqKey() == 0) {
+                    Element attributeElement = new Element("attribute", XSD_NS);
+
+                    attributeElement.setAttribute("name", Utility.toLowerCamelCase(bccp.getPropertyTerm()));
+                    attributeElement.setAttribute("type", Utility.denToName(bdt.getDen()));
+
+                    int useInt = bcc.getCardinalityMin() * 2 + bcc.getCardinalityMax();
+                    String useVal = getUseAttributeValue(useInt);
+                    if (useVal != null) {
+                        attributeElement.setAttribute("use", useVal);
+                    }
+
+                    attributeElement.setAttribute("id", bcc.getGuid());
+
+                    sequenceElement.addContent(attributeElement);
                 }
             }
         }
