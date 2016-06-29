@@ -16,5 +16,7 @@ public interface SchemaModuleVisitor {
 
     public void visitBDTSimpleContent(BDTSimpleContent bdtSimpleContent) throws Exception;
 
+    public void visitBCCP(BCCP bccp) throws Exception;
+
     public void endSchemaModule(SchemaModule schemaModule) throws Exception;
 }

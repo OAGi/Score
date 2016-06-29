@@ -1,6 +1,5 @@
 package org.oagi.srt.export.impl;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -19,7 +18,8 @@ import org.springframework.stereotype.Component;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -220,24 +220,24 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             extensionElement.setAttribute("base", baseName);
         }
 
-        List<DataTypeSupplementaryComponent> dtScList;
+        List<BDTSC> dtScList;
         if (baseName.endsWith("CodeContentType")) {
             dtScList = bdtSimpleContent.getDtScList();
         } else {
             dtScList = new ArrayList();
             List<String> baseDtScGuidList = bdtSimpleContent.getBaseDtScList().stream()
                     .map(e -> e.getGuid()).collect(Collectors.toList());
-            for (DataTypeSupplementaryComponent dtSc : bdtSimpleContent.getDtScList()) {
+            for (BDTSC dtSc : bdtSimpleContent.getDtScList()) {
                 if (!baseDtScGuidList.contains(dtSc.getGuid())) {
                     dtScList.add(dtSc);
                 }
             }
         }
 
-        for (DataTypeSupplementaryComponent dtSc : dtScList) {
+        for (BDTSC dtSc : dtScList) {
             Element attributeElement = new Element("attribute", XSD_NS);
 
-            String attrName = getName(dtSc);
+            String attrName = dtSc.getName();
             attributeElement.setAttribute("name", attrName);
 
             String typeName = getTypeName(dtSc);
@@ -265,21 +265,17 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         rootElement.addContent(complexTypeElement);
     }
 
-    private String getName(DataTypeSupplementaryComponent dtSc) {
-        String propertyTerm = dtSc.getPropertyTerm();
-        if ("MIME".equals(propertyTerm)) {
-            propertyTerm = propertyTerm.toLowerCase();
-        }
-        String representationTerm = dtSc.getRepresentationTerm();
-        if (propertyTerm.equals(representationTerm)) {
-            representationTerm = "";
-        }
+    @Override
+    public void visitBCCP(BCCP bccp) throws Exception {
+        Element element = new Element("element", XSD_NS);
+        element.setAttribute("name", bccp.getName());
+        element.setAttribute("type", bccp.getTypeName());
+        element.setAttribute("id", bccp.getGuid());
 
-        String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm;
-        return attrName.replaceAll(" ", "");
+        rootElement.addContent(element);
     }
 
-    private String getTypeName(DataTypeSupplementaryComponent dtSc) {
+    private String getTypeName(BDTSC dtSc) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
                 bdtScPriRestriRepository.findByBdtScId(dtSc.getDtScId());
 
@@ -351,12 +347,23 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void endSchemaModule(SchemaModule schemaModule) throws Exception {
-        FileUtils.forceMkdir(this.moduleFile.getParentFile());
+        if (this.rootElement.getContent().isEmpty()) {
+            return;
+        }
+
+        System.out.println("<< " + this.moduleFile + " >>");
 
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(this.moduleFile))) {
-            outputter.output(this.document, outputStream);
-            outputStream.flush();
-        }
+        outputter.output(this.document, System.out);
+
+        System.out.println();
+
+//        FileUtils.forceMkdir(this.moduleFile.getParentFile());
+//
+//        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+//        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(this.moduleFile))) {
+//            outputter.output(this.document, outputStream);
+//            outputStream.flush();
+//        }
     }
 }

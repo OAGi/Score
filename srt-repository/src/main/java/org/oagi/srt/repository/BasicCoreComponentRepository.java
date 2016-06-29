@@ -11,6 +11,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1")
     public List<BasicCoreComponent> findByFromAccId(int fromAccId);
 
+    @Query("select b from BasicCoreComponent b where b.toBccpId = ?1 and b.entityType = ?2")
+    public List<BasicCoreComponent> findByToBccpIdAndEntityType(int toBccpId, int entityType);
+
     @Query("select b from BasicCoreComponent b where b.den like ?1%")
     public List<BasicCoreComponent> findByDenStartsWith(String den);
 

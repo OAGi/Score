@@ -19,6 +19,8 @@ public class SchemaModule {
     private List<SchemaCodeList> schemaCodeLists = new ArrayList();
     private List<BDTSimple> bdtSimples = new ArrayList();
 
+    private List<BCCP> bccpList = new ArrayList();
+
     public SchemaModule(Module module) {
         this.module = module;
     }
@@ -33,6 +35,18 @@ public class SchemaModule {
 
     public void addImport(SchemaModule schemaModule) {
         importModules.put(dependedModuleSize++, schemaModule);
+    }
+
+    public void addCodeList(SchemaCodeList schemaCodeList) {
+        this.schemaCodeLists.add(schemaCodeList);
+    }
+
+    public void addBDTSimple(BDTSimple bdtSimple) {
+        this.bdtSimples.add(bdtSimple);
+    }
+
+    public void addBCCP(BCCP bccp) {
+        this.bccpList.add(bccp);
     }
 
     public void visit(SchemaModuleVisitor schemaModuleVisitor) throws Exception {
@@ -60,14 +74,10 @@ public class SchemaModule {
             }
         }
 
+        for (BCCP bccp : bccpList) {
+            schemaModuleVisitor.visitBCCP(bccp);
+        }
+
         schemaModuleVisitor.endSchemaModule(this);
-    }
-
-    public void addCodeList(SchemaCodeList schemaCodeList) {
-        this.schemaCodeLists.add(schemaCodeList);
-    }
-
-    public void addBDTSimple(BDTSimple bdtSimple) {
-        this.bdtSimples.add(bdtSimple);
     }
 }

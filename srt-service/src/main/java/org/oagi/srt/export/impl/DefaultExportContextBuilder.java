@@ -42,6 +42,12 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
 
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
+
+    @Autowired
+    private BasicCoreComponentRepository bccRepository;
+
     @Override
     public ExportContext build() {
         DefaultExportContext context = new DefaultExportContext();
@@ -54,6 +60,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         createCodeLists(moduleMap);
         BdtsBlob bdtsBlob = loadBtdsBlob();
         createBDT(bdtsBlob, moduleMap);
+        createBCCP(moduleMap);
 
         return context;
     }
@@ -143,6 +150,21 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                 bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList, baseDtScList);
             }
             schemaModule.addBDTSimple(bdtSimple);
+        }
+    }
+
+    private void createBCCP(Map<Integer, SchemaModule> moduleMap) {
+        for (BasicCoreComponentProperty bccp :
+                bccpRepository.findAll(new Sort(Sort.Direction.ASC, "module"))) {
+
+            List<BasicCoreComponent> bccList = bccRepository.findByToBccpIdAndEntityType(bccp.getBccpId(), 1);
+            if (bccList.isEmpty()) {
+                continue;
+            }
+            DataType bdt = dtRepository.findOne(bccp.getBdtId());
+
+            SchemaModule schemaModule = moduleMap.get(bccp.getModule().getModuleId());
+            schemaModule.addBCCP(new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen()));
         }
     }
 

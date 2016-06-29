@@ -59,7 +59,11 @@ public class Utility {
         } else {
             name = den.replaceAll("[.] ", "");
         }
-        return name.replaceAll(" ", "").replace("Identifier", "ID").replaceAll("_CodeType", "CodeType");
+        return name
+                .replaceAll("_ ", "")
+                .replaceAll(" ", "")
+                .replace("Identifier", "ID")
+                .replaceAll("_CodeType", "CodeType");
     }
 
     public static String createDenFormat(String str) {
