@@ -123,7 +123,7 @@ public class Types {
 		}
 		
 		if(cdtPrimitive.equalsIgnoreCase("Boolean")) {
-			res.add("xsd:boolean");
+			res.add("xbt_BooleanTrueFalseType");
 			return res;
 		}
 		

@@ -4843,7 +4843,7 @@ supplementary information.</ccts_Definition>
 						</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-d68e1a8121944c03a721773885265c71"/>
+				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-d68e1a8121944c03a721773885265c71"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
