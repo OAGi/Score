@@ -289,9 +289,9 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         String propertyTerm = Utility.spaceSeparator(declaration.getName());
         if (acc == null) {
             if (declaration.isGroup()) {
-                acc = getOrCreateACC(declaration);
+                acc = createACC(declaration);
             } else {
-                acc = getOrCreateACC(declaration.getTypeDecl());
+                acc = createACC(declaration.getTypeDecl());
             }
         }
         if (acc == null) {
@@ -330,7 +330,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return asccp;
     }
 
-    private AggregateCoreComponent getOrCreateACC(Declaration declaration) {
+    private AggregateCoreComponent createACC(Declaration declaration) {
         if (declaration == null || !declaration.canBeAcc()) {
             return null;
         }
@@ -341,7 +341,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             return aggregateCoreComponent;
         }
 
-        AggregateCoreComponent acc = createACC(declaration);
+        AggregateCoreComponent acc = doCreateACC(declaration);
         int sequenceKey = 1;
         Collection<Declaration> particles = declaration.getParticles(particle -> createASCCP(particle, false));
         for (Declaration asccOrBccElement : particles) {
@@ -380,7 +380,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return acc;
     }
 
-    private AggregateCoreComponent createACC(Declaration declaration) {
+    private AggregateCoreComponent doCreateACC(Declaration declaration) {
         String name = declaration.getName();
         int idx = name.lastIndexOf("Type");
         String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
@@ -417,7 +417,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         AggregateCoreComponent basedAcc = null;
         if (declaration instanceof TypeDecl) {
             TypeDecl baseTypeDecl = ((TypeDecl) declaration).getBaseTypeDecl();
-            basedAcc = getOrCreateACC(baseTypeDecl);
+            basedAcc = createACC(baseTypeDecl);
         }
         if (basedAcc != null) {
             acc.setBasedAccId(basedAcc.getAccId());
