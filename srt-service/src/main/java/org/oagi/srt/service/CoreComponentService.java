@@ -8,9 +8,7 @@ import org.oagi.srt.repository.entity.CoreComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CoreComponentService {
@@ -64,10 +62,7 @@ public class CoreComponentService {
         tmp_assoc.addAll(bccList);
         tmp_assoc.addAll(asccList);
 
-        ArrayList<CoreComponent> coreComponents = new ArrayList(size);
-        CoreComponent a = new CoreComponent();
-        for (int i = 0; i < size; i++)
-            coreComponents.add(a);
+        List<CoreComponent> coreComponents = Arrays.asList(new CoreComponent[size]);
 
         int attribute_cnt = 0;
         for (BasicCoreComponent basicCoreComponent : bccList) {
@@ -88,8 +83,6 @@ public class CoreComponentService {
                 coreComponents.set(associationCoreComponent.getSeqKey() - 1 + attribute_cnt, associationCoreComponent);
             }
         }
-
-        coreComponents.trimToSize();
 
         return coreComponents;
     }

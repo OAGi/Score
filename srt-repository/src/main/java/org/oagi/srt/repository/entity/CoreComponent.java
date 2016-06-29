@@ -3,5 +3,9 @@ package org.oagi.srt.repository.entity;
 /*
  * Marker interface
  */
-public class CoreComponent {
+public interface CoreComponent {
+
+    public int getCardinalityMin();
+
+    public int getCardinalityMax();
 }
