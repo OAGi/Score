@@ -232,20 +232,21 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         String name = bdtSimpleContent.getName();
 
         if ("CodeType".equals(baseName) && !"OpenCodeType".equals(name)) {
-            extensionElement.setAttribute("base", name + "ContentType");
-        } else {
-            extensionElement.setAttribute("base", baseName);
+            baseName = name + "ContentType";
         }
+        // b/c of 'CodeType'
+        if (baseName.endsWith("CodeTypeContentType")) {
+            baseName = baseName.replaceAll("CodeTypeContentType", "CodeContentType");
+        }
+        extensionElement.setAttribute("base", baseName);
 
         List<BDTSC> dtScList;
         if (baseName.endsWith("CodeContentType")) {
             dtScList = bdtSimpleContent.getDtScList();
         } else {
             dtScList = new ArrayList();
-            List<String> baseDtScGuidList = bdtSimpleContent.getBaseDtScList().stream()
-                    .map(e -> e.getGuid()).collect(Collectors.toList());
             for (BDTSC dtSc : bdtSimpleContent.getDtScList()) {
-                if (!baseDtScGuidList.contains(dtSc.getGuid())) {
+                if (!dtSc.hasBasedBDTSC()) {
                     dtScList.add(dtSc);
                 }
             }

@@ -33,7 +33,8 @@ public class BDTSimpleContent implements BDTSimple {
                         dtSc.getGuid(),
                         getName(dtSc),
                         dtSc.getMinCardinality(),
-                        dtSc.getMaxCardinality()))
+                        dtSc.getMaxCardinality(),
+                        (dtSc.getBasedDtScId() > 0) ? true : false))
                 .collect(Collectors.toList());
     }
 
