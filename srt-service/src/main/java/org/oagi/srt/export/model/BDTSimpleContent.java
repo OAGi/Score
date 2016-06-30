@@ -1,6 +1,7 @@
 package org.oagi.srt.export.model;
 
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
@@ -15,41 +16,21 @@ public class BDTSimpleContent implements BDTSimple {
 
     private List<BDTSC> dtScList;
 
-    private List<BDTSC> baseDtScList;
+    private ImportedDataProvider importedDataProvider;
 
     public BDTSimpleContent(DataType dataType, DataType baseDataType,
                             List<DataTypeSupplementaryComponent> dtScList,
-                            List<DataTypeSupplementaryComponent> baseDtScList) {
+                            ImportedDataProvider importedDataProvider) {
+        this.importedDataProvider = importedDataProvider;
         this.dataType = dataType;
         this.baseDataType = baseDataType;
         this.dtScList = map(dtScList);
-        this.baseDtScList = map(baseDtScList);
     }
 
     private List<BDTSC> map(List<DataTypeSupplementaryComponent> dtScList) {
         return dtScList.stream()
-                .map(dtSc -> new BDTSC(
-                        dtSc.getDtScId(),
-                        dtSc.getGuid(),
-                        getName(dtSc),
-                        dtSc.getMinCardinality(),
-                        dtSc.getMaxCardinality(),
-                        (dtSc.getBasedDtScId() > 0) ? true : false))
+                .map(dtSc -> new BDTSC(dtSc, importedDataProvider))
                 .collect(Collectors.toList());
-    }
-
-    private String getName(DataTypeSupplementaryComponent dtSc) {
-        String propertyTerm = dtSc.getPropertyTerm();
-        if ("MIME".equals(propertyTerm)) {
-            propertyTerm = propertyTerm.toLowerCase();
-        }
-        String representationTerm = dtSc.getRepresentationTerm();
-        if (propertyTerm.equals(representationTerm)) {
-            representationTerm = "";
-        }
-
-        String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm;
-        return attrName.replaceAll(" ", "");
     }
 
     @Override
@@ -71,9 +52,5 @@ public class BDTSimpleContent implements BDTSimple {
 
     public List<BDTSC> getDtScList() {
         return dtScList;
-    }
-
-    public List<BDTSC> getBaseDtScList() {
-        return baseDtScList;
     }
 }

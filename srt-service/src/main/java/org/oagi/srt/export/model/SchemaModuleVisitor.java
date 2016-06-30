@@ -1,7 +1,5 @@
 package org.oagi.srt.export.model;
 
-import org.oagi.srt.export.model.SchemaModule;
-
 public interface SchemaModuleVisitor {
 
     public void startSchemaModule(SchemaModule schemaModule) throws Exception;
@@ -21,6 +19,10 @@ public interface SchemaModuleVisitor {
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception;
 
     public void visitACCGroup(ACCGroup accGroup) throws Exception;
+
+    public void visitASCCPComplexType(ASCCPComplexType asccpComplexType) throws Exception;
+
+    public void visitASCCPGroup(ASCCPGroup asccpGroup) throws Exception;
 
     public void endSchemaModule(SchemaModule schemaModule) throws Exception;
 }

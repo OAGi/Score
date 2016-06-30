@@ -1,50 +1,99 @@
 package org.oagi.srt.export.model;
 
-public class BDTSC {
+import org.oagi.srt.provider.ImportedDataProvider;
+import org.oagi.srt.repository.entity.*;
 
-    private int dtScId;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    private String guid;
+public class BDTSC implements Component {
 
-    private String name;
+    private DataTypeSupplementaryComponent dtSc;
 
-    private int minCardinality;
+    private ImportedDataProvider importedDataProvider;
 
-    private int maxCardinality;
-
-    private boolean hasBasedBDTSC;
-
-    public BDTSC(int dtScId, String guid, String name,
-                 int minCardinality, int maxCardinality, boolean hasBasedBDTSC) {
-        this.dtScId = dtScId;
-        this.guid = guid;
-        this.name = name;
-        this.minCardinality = minCardinality;
-        this.maxCardinality = maxCardinality;
-        this.hasBasedBDTSC = hasBasedBDTSC;
-    }
-
-    public int getDtScId() {
-        return dtScId;
-    }
-
-    public String getGuid() {
-        return guid;
+    public BDTSC(DataTypeSupplementaryComponent dtSc,
+                 ImportedDataProvider importedDataProvider) {
+        this.importedDataProvider = importedDataProvider;
+        this.dtSc = dtSc;
     }
 
     public String getName() {
-        return name;
+        String propertyTerm = dtSc.getPropertyTerm();
+        if ("MIME".equals(propertyTerm)) {
+            propertyTerm = propertyTerm.toLowerCase();
+        }
+        String representationTerm = dtSc.getRepresentationTerm();
+        if (propertyTerm.equals(representationTerm)) {
+            representationTerm = "";
+        }
+
+        String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm;
+        return attrName.replaceAll(" ", "");
+    }
+
+    public String getGuid() {
+        return dtSc.getGuid();
+    }
+
+    @Override
+    public String getTypeName() {
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
+                importedDataProvider.findBdtScPriRestriListByDtScId(dtSc.getDtScId());
+
+        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> codeListBdtScPriRestri =
+                bdtScPriRestriList.stream()
+                        .filter(e -> e.getCodeListId() > 0)
+                        .collect(Collectors.toList());
+        if (codeListBdtScPriRestri.size() > 1) {
+            throw new IllegalStateException();
+        }
+
+        if (codeListBdtScPriRestri.isEmpty()) {
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> agencyIdBdtScPriRestri =
+                    bdtScPriRestriList.stream()
+                            .filter(e -> e.getAgencyIdListId() > 0)
+                            .collect(Collectors.toList());
+            if (agencyIdBdtScPriRestri.size() > 1) {
+                throw new IllegalStateException();
+            }
+
+            if (agencyIdBdtScPriRestri.isEmpty()) {
+                List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> defaultBdtScPriRestri =
+                        bdtScPriRestriList.stream()
+                                .filter(e -> e.isDefault())
+                                .collect(Collectors.toList());
+                if (defaultBdtScPriRestri.isEmpty() || defaultBdtScPriRestri.size() > 1) {
+                    throw new IllegalStateException();
+                }
+
+                CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                        importedDataProvider.findCdtScAwdPriXpsTypeMap(defaultBdtScPriRestri.get(0).getCdtScAwdPriXpsTypeMapId());
+                XSDBuiltInType xbt = importedDataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+                return xbt.getBuiltInType();
+            } else {
+                AgencyIdList agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
+                if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
+                    return "clm63055D08B_AgencyIdentificationContentType";
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
+        } else {
+            CodeList codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());
+            return codeList.getName() + "ContentType";
+        }
     }
 
     public int getMinCardinality() {
-        return minCardinality;
+        return dtSc.getMinCardinality();
     }
 
     public int getMaxCardinality() {
-        return maxCardinality;
+        return dtSc.getMaxCardinality();
     }
 
     public boolean hasBasedBDTSC() {
-        return hasBasedBDTSC;
+        return (dtSc.getBasedDtScId() > 0);
     }
 }

@@ -11,7 +11,7 @@ import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.export.model.*;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,37 +44,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
     @Autowired
-    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
-
-    @Autowired
-    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
-
-    @Autowired
-    private CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository cdtScAwdPriXpsTypeMapRepository;
-
-    @Autowired
-    private XSDBuiltInTypeRepository xbtRepository;
-
-    @Autowired
-    private CodeListRepository codeListRepository;
-
-    @Autowired
-    private AgencyIdListRepository agencyIdListRepository;
-
-    @Autowired
     private CoreComponentService coreComponentService;
 
     @Autowired
-    private BasicCoreComponentPropertyRepository bccpRepository;
-
-    @Autowired
-    private DataTypeRepository dtRepository;
-
-    @Autowired
-    private AssociationCoreComponentPropertyRepository asccpRepository;
-
-    @Autowired
-    private AggregateCoreComponentRepository accRepository;
+    private ImportedDataProvider importedDataProvider;
 
     public void setBaseDirectory(File baseDirectory) throws IOException {
         this.baseDir = baseDirectory.getCanonicalFile();
@@ -192,24 +165,24 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     private String getCodeListName(BDTSimpleType bdtSimpleType) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
-                bdtPriRestriRepository.findByBdtId(bdtSimpleType.getBdtId()).stream()
+                importedDataProvider.findBdtPriRestriListByDtId(bdtSimpleType.getBdtId()).stream()
                         .filter(e -> e.getCodeListId() > 0).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
-        CodeList codeList = codeListRepository.findOne(bdtPriRestriList.get(0).getCodeListId());
+        CodeList codeList = importedDataProvider.findCodeList(bdtPriRestriList.get(0).getCodeListId());
         return codeList.getName();
     }
 
     public String getAgencyIdName(BDTSimpleType bdtSimpleType) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
-                bdtPriRestriRepository.findByBdtId(bdtSimpleType.getBdtId()).stream()
+                importedDataProvider.findBdtPriRestriListByDtId(bdtSimpleType.getBdtId()).stream()
                         .filter(e -> e.getAgencyIdListId() > 0).collect(Collectors.toList());
         if (bdtPriRestriList.isEmpty() || bdtPriRestriList.size() > 1) {
             throw new IllegalStateException();
         }
 
-        AgencyIdList agencyIdList = agencyIdListRepository.findOne(bdtPriRestriList.get(0).getAgencyIdListId());
+        AgencyIdList agencyIdList = importedDataProvider.findAgencyIdList(bdtPriRestriList.get(0).getAgencyIdListId());
         if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
             return "clm63055D08B_AgencyIdentification";
         } else {
@@ -258,7 +231,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             String attrName = dtSc.getName();
             attributeElement.setAttribute("name", attrName);
 
-            String typeName = getTypeName(dtSc);
+            String typeName = dtSc.getTypeName();
             attributeElement.setAttribute("type", typeName);
 
             int useInt = dtSc.getMinCardinality() * 2 + dtSc.getMaxCardinality();
@@ -279,20 +252,25 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitBCCP(BCCP bccp) throws Exception {
+        addSimpleElement(bccp);
+    }
+
+    private Element addSimpleElement(org.oagi.srt.export.model.Component component) {
         Element element = new Element("element", XSD_NS);
-        element.setAttribute("name", bccp.getName());
-        element.setAttribute("type", bccp.getTypeName());
-        element.setAttribute("id", bccp.getGuid());
+
+        element.setAttribute("name", component.getName());
+        element.setAttribute("type", component.getTypeName());
+        element.setAttribute("id", component.getGuid());
 
         rootElement.addContent(element);
+
+        return element;
     }
 
     @Override
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
-        asccpRepository.findOneByGuid(accComplexType.getGuid());
-
         Element complexTypeElement;
-        if (isGroup(accComplexType)) {
+        if (accComplexType.isGroup()) {
             complexTypeElement = new Element("group", XSD_NS);
             complexTypeElement.setAttribute("name", accComplexType.getName());
         } else {
@@ -312,7 +290,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             complexTypeElement.addContent(complexContentElement);
 
             Element extensionElement = new Element("extension", XSD_NS);
-            extensionElement.setAttribute("type", basedACC.getName() + "Type");
+            extensionElement.setAttribute("type", basedACC.getTypeName());
             complexContentElement.addContent(extensionElement);
 
             extensionElement.addContent(sequenceElement);
@@ -325,7 +303,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         for (CoreComponent coreComponent : coreComponents) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+                BasicCoreComponentProperty bccp = importedDataProvider.findBCCP(bcc.getToBccpId());
 
                 if (bcc.getSeqKey() > 0) {
                     Element element = new Element("element", XSD_NS);
@@ -338,12 +316,12 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                 }
             } else if (coreComponent instanceof AssociationCoreComponent) {
                 AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
-                AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+                ASCCP asccp = ASCCP.newInstance(importedDataProvider.findASCCP(ascc.getToAsccpId()), importedDataProvider);
 
-                if (isGroup(asccp)) {
+                if (asccp.isGroup()) {
                     Element groupElement = new Element("group", XSD_NS);
 
-                    groupElement.setAttribute("ref", Utility.toCamelCase(asccp.getPropertyTerm()));
+                    groupElement.setAttribute("ref", asccp.getName());
                     groupElement.setAttribute("id", ascc.getGuid());
                     setCardinalities(groupElement, ascc);
 
@@ -352,10 +330,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     Element element = new Element("element", XSD_NS);
 
                     if (asccp.isReusableIndicator()) {
-                        element.setAttribute("ref", Utility.toCamelCase(asccp.getPropertyTerm()));
+                        element.setAttribute("ref", asccp.getName());
                     } else {
-                        element.setAttribute("name", Utility.toCamelCase(asccp.getPropertyTerm()));
-                        element.setAttribute("type", getTypeName(asccp));
+                        element.setAttribute("name", asccp.getName());
+                        element.setAttribute("type", asccp.getTypeName());
                     }
 
                     element.setAttribute("id", ascc.getGuid());
@@ -370,8 +348,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         for (CoreComponent coreComponent : coreComponents) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
-                BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
-                DataType bdt = dtRepository.findOne(bccp.getBdtId());
+                BasicCoreComponentProperty bccp = importedDataProvider.findBCCP(bcc.getToBccpId());
+                DataType bdt = importedDataProvider.findDT(bccp.getBdtId());
 
                 if (bcc.getSeqKey() == 0) {
                     Element attributeElement = new Element("attribute", XSD_NS);
@@ -407,13 +385,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         }
     }
 
-    private String getTypeName(AssociationCoreComponentProperty asccp) {
-        String den = asccp.getDen();
-        String propertyTerm = asccp.getPropertyTerm();
-
-        return Utility.toCamelCase(den.substring((propertyTerm + ". ").length())) + "Type";
-    }
-
     private String getUseAttributeValue(int useInt) {
         switch (useInt) {
             case 0:
@@ -426,67 +397,19 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         return null;
     }
 
-    private boolean isGroup(ACCComplexType accComplexType) {
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByGuid(accComplexType.getGuid());
-        return (asccp != null) && asccp.getRoleOfAccId() == accComplexType.getRawId();
-    }
-
-    private boolean isGroup(AssociationCoreComponentProperty asccp) {
-        AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
-        return (acc != null) && acc.getGuid().equals(asccp.getGuid());
+    @Override
+    public void visitACCGroup(ACCGroup accGroup) throws Exception {
+        // not implemented yet
     }
 
     @Override
-    public void visitACCGroup(ACCGroup accGroup) throws Exception {
-
+    public void visitASCCPComplexType(ASCCPComplexType asccpComplexType) throws Exception {
+        addSimpleElement(asccpComplexType);
     }
 
-    private String getTypeName(BDTSC dtSc) {
-        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
-                bdtScPriRestriRepository.findByBdtScId(dtSc.getDtScId());
-
-        List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> codeListBdtScPriRestri =
-                bdtScPriRestriList.stream()
-                        .filter(e -> e.getCodeListId() > 0)
-                        .collect(Collectors.toList());
-        if (codeListBdtScPriRestri.size() > 1) {
-            throw new IllegalStateException();
-        }
-
-        if (codeListBdtScPriRestri.isEmpty()) {
-            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> agencyIdBdtScPriRestri =
-                    bdtScPriRestriList.stream()
-                            .filter(e -> e.getAgencyIdListId() > 0)
-                            .collect(Collectors.toList());
-            if (agencyIdBdtScPriRestri.size() > 1) {
-                throw new IllegalStateException();
-            }
-
-            if (agencyIdBdtScPriRestri.isEmpty()) {
-                List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> defaultBdtScPriRestri =
-                        bdtScPriRestriList.stream()
-                                .filter(e -> e.isDefault())
-                                .collect(Collectors.toList());
-                if (defaultBdtScPriRestri.isEmpty() || defaultBdtScPriRestri.size() > 1) {
-                    throw new IllegalStateException();
-                }
-
-                CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
-                        cdtScAwdPriXpsTypeMapRepository.findOne(defaultBdtScPriRestri.get(0).getCdtScAwdPriXpsTypeMapId());
-                XSDBuiltInType xbt = xbtRepository.findOne(cdtScAwdPriXpsTypeMap.getXbtId());
-                return xbt.getBuiltInType();
-            } else {
-                AgencyIdList agencyIdList = agencyIdListRepository.findOne(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
-                if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
-                    return "clm63055D08B_AgencyIdentificationContentType";
-                } else {
-                    throw new IllegalStateException();
-                }
-            }
-        } else {
-            CodeList codeList = codeListRepository.findOne(codeListBdtScPriRestri.get(0).getCodeListId());
-            return codeList.getName() + "ContentType";
-        }
+    @Override
+    public void visitASCCPGroup(ASCCPGroup asccpGroup) throws Exception {
+        // not implemented yet
     }
 
     private void addRestriction(Element codeListElement, Collection<String> values) {

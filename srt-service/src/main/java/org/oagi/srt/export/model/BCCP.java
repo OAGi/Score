@@ -2,7 +2,7 @@ package org.oagi.srt.export.model;
 
 import org.oagi.srt.common.util.Utility;
 
-public class BCCP {
+public class BCCP implements Component {
 
     private String guid;
     private String propertyTerm;

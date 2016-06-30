@@ -4,17 +4,21 @@ import org.oagi.srt.ServiceApplication;
 import org.oagi.srt.export.ExportContext;
 import org.oagi.srt.export.ExportContextBuilder;
 import org.oagi.srt.export.model.*;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.provider.ImportedDataProvider;
+import org.oagi.srt.repository.BlobContentRepository;
+import org.oagi.srt.repository.ModuleDepRepository;
+import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.domain.Sort;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,37 +31,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     private ModuleDepRepository moduleDepRepository;
 
     @Autowired
-    private CodeListRepository codeListRepository;
-
-    @Autowired
-    private CodeListValueRepository codeListValueRepository;
-
-    @Autowired
     private BlobContentRepository blobContentRepository;
 
     @Autowired
-    private DataTypeRepository dtRepository;
-
-    @Autowired
-    private DataTypeSupplementaryComponentRepository dtScRepository;
-
-    @Autowired
-    private BasicCoreComponentPropertyRepository bccpRepository;
-
-    @Autowired
-    private BasicCoreComponentRepository bccRepository;
-
-    @Autowired
-    private AggregateCoreComponentRepository accRepository;
-
-    @Autowired
-    private AssociationCoreComponentRepository asccRepository;
-
-    @Autowired
-    private AssociationCoreComponentPropertyRepository asccpRepository;
-
-    @Autowired
-    private CoreComponentService coreComponentService;
+    @Lazy
+    private ImportedDataProvider importedDataProvider;
 
     @Override
     public ExportContext build() {
@@ -73,11 +51,16 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         createBDT(bdtsBlob, moduleMap);
         createBCCP(moduleMap);
         createACC(moduleMap);
+        createASCCP(moduleMap);
 
         return context;
     }
 
     private void createSchemaModules(DefaultExportContext context, Map<Integer, SchemaModule> moduleMap) {
+        for (SchemaModule schemaModule : moduleMap.values()) {
+            context.addSchemaModule(schemaModule);
+        }
+
         for (ModuleDep moduleDep : moduleDepRepository.findAll()) {
             Module dependingModule = moduleDep.getDependingModule();
             Module dependedModule = moduleDep.getDependedModule();
@@ -93,13 +76,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                     dependedModuleSchema.addImport(dependingModuleSchema);
                     break;
             }
-
-            context.addSchemaModule(dependingModuleSchema);
         }
     }
 
     private void createCodeLists(Map<Integer, SchemaModule> moduleMap) {
-        List<CodeList> codeLists = codeListRepository.findAll();
+        List<CodeList> codeLists = importedDataProvider.findCodeList();
         Map<Integer, SchemaCodeList> schemaCodeListMap = new HashMap();
         for (CodeList codeList : codeLists) {
             SchemaCodeList schemaCodeList = new SchemaCodeList();
@@ -107,7 +88,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
             schemaCodeList.setName(codeList.getName());
             schemaCodeList.setEnumTypeGuid(codeList.getEnumTypeGuid());
 
-            for (CodeListValue codeListValue : codeListValueRepository.findByCodeListId(codeList.getCodeListId())) {
+            for (CodeListValue codeListValue : importedDataProvider.findCodeListValueByCodeListId(codeList.getCodeListId())) {
                 schemaCodeList.addValue(codeListValue.getValue());
             }
 
@@ -136,7 +117,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     }
 
     private void createBDT(BdtsBlob bdtsBlob, Map<Integer, SchemaModule> moduleMap) {
-        List<DataType> bdtList = dtRepository.findAll(new Sort(Sort.Direction.ASC, "module")).stream()
+        List<DataType> bdtList = importedDataProvider.findDT().stream()
                 .filter(e -> e.getType() == 1).collect(Collectors.toList());
         for (DataType bdt : bdtList) {
             if (bdtsBlob.exists(bdt.getGuid())) {
@@ -146,34 +127,31 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
             if (bdt.getBasedDtId() == 0) {
                 throw new IllegalStateException();
             }
-            DataType baseDataType = dtRepository.findOne(bdt.getBasedDtId());
+            DataType baseDataType = importedDataProvider.findDT(bdt.getBasedDtId());
 
             SchemaModule schemaModule = moduleMap.get(bdt.getModule().getModuleId());
-            List<DataTypeSupplementaryComponent> dtScList = dtScRepository.findByOwnerDtId(bdt.getDtId()).stream()
-                    .filter(e -> e.getMaxCardinality() > 0).collect(Collectors.toList());
+            List<DataTypeSupplementaryComponent> dtScList =
+                    importedDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
+                            .filter(e -> e.getMaxCardinality() > 0).collect(Collectors.toList());
 
             BDTSimple bdtSimple;
             if (dtScList.isEmpty()) {
                 bdtSimple = new BDTSimpleType(bdt, baseDataType);
             } else {
-                List<DataTypeSupplementaryComponent> baseDtScList =
-                        dtScRepository.findByOwnerDtId(baseDataType.getDtId()).stream()
-                                .filter(e -> e.getMaxCardinality() > 0).collect(Collectors.toList());
-                bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList, baseDtScList);
+                bdtSimple = new BDTSimpleContent(bdt, baseDataType, dtScList, importedDataProvider);
             }
             schemaModule.addBDTSimple(bdtSimple);
         }
     }
 
     private void createBCCP(Map<Integer, SchemaModule> moduleMap) {
-        for (BasicCoreComponentProperty bccp :
-                bccpRepository.findAll(new Sort(Sort.Direction.ASC, "module"))) {
+        for (BasicCoreComponentProperty bccp : importedDataProvider.findBCCP()) {
 
-            List<BasicCoreComponent> bccList = bccRepository.findByToBccpIdAndEntityType(bccp.getBccpId(), 1);
+            List<BasicCoreComponent> bccList = importedDataProvider.findBCCByToBccpIdAndEntityTypeIs1(bccp.getBccpId());
             if (bccList.isEmpty()) {
                 continue;
             }
-            DataType bdt = dtRepository.findOne(bccp.getBdtId());
+            DataType bdt = importedDataProvider.findDT(bccp.getBdtId());
 
             SchemaModule schemaModule = moduleMap.get(bccp.getModule().getModuleId());
             schemaModule.addBCCP(new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen()));
@@ -181,30 +159,20 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     }
 
     private void createACC(Map<Integer, SchemaModule> moduleMap) {
-        for (AggregateCoreComponent acc :
-                accRepository.findAll(new Sort(Sort.Direction.ASC, "module"))) {
+        for (AggregateCoreComponent acc : importedDataProvider.findACC()) {
 
             SchemaModule schemaModule = moduleMap.get(acc.getModule().getModuleId());
-            schemaModule.addACC(newACC(acc));
+            schemaModule.addACC(ACC.newInstance(acc, importedDataProvider));
         }
     }
 
-    private ACC newACC(AggregateCoreComponent acc) {
-        switch (acc.getOagisComponentType()) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                if (acc.getBasedAccId() > 0) {
-                    AggregateCoreComponent basedAcc = accRepository.findOne(acc.getBasedAccId());
-                    return new ACCComplexType(acc, newACC(basedAcc));
-                } else {
-                    return new ACCComplexType(acc);
-                }
-            case 4: // @TODO: Not yet handled
-                return new ACCGroup(acc);
-            default:
-                throw new IllegalStateException();
+    private void createASCCP(Map<Integer, SchemaModule> moduleMap) {
+        for (AssociationCoreComponentProperty asccp :
+                importedDataProvider.findASCCP().stream()
+                        .filter(e -> e.isReusableIndicator()).collect(Collectors.toList())) {
+
+            SchemaModule schemaModule = moduleMap.get(asccp.getModule().getModuleId());
+            schemaModule.addASCCP(ASCCP.newInstance(asccp, importedDataProvider));
         }
     }
 

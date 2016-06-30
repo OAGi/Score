@@ -1,18 +1,12 @@
 package org.oagi.srt.export.model;
 
+import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 
-public class ACCGroup implements ACC {
+public class ACCGroup extends ACC {
 
-    private AggregateCoreComponent acc;
-
-    public ACCGroup(AggregateCoreComponent acc) {
-        this.acc = acc;
-    }
-
-    public String getName() {
-        return acc.getObjectClassTerm()
-                .replaceAll(" ", "")
-                .replace("Identifier", "ID");
+    ACCGroup(AggregateCoreComponent acc, ACC basedAcc,
+             ImportedDataProvider importedDataProvider) {
+        super(acc, basedAcc, importedDataProvider);
     }
 }
