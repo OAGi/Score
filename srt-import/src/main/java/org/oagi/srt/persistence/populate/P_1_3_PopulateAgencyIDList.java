@@ -4,8 +4,10 @@ import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
+import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
 import org.oagi.srt.repository.entity.AgencyIdListValue;
+import org.oagi.srt.repository.entity.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,9 @@ public class P_1_3_PopulateAgencyIDList {
     @Autowired
     private AgencyIdListValueRepository agencyIdListValueRepository;
 
+    @Autowired
+    private ModuleRepository moduleRepository;
+
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.3 Start");
@@ -49,7 +54,13 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {
-        String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
+        String filename = "IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
+        Module module = moduleRepository.findByModuleContaining(filename);
+        if (module == null) {
+            throw new IllegalStateException("Can't find " + filename + " module. We need to import `module` first perfectly.");
+        }
+
+        String path1 = SRTConstants.filepath("AgencyID") + filename;
         XPathHandler xh = new XPathHandler(path1);
 
         AgencyIdList agencyIdList = new AgencyIdList();
@@ -69,6 +80,7 @@ public class P_1_3_PopulateAgencyIDList {
         agencyIdList.setName("Agency Identification");
         agencyIdList.setListId("3055");
         agencyIdList.setVersionId("D08B");
+        agencyIdList.setModule(module);
         agencyIdList.setDefinition("Schema agency:  UN/CEFACT\n" +
                 "Schema version: 4.5\n" +
                 "Schema date:    02 February 2014\n" +

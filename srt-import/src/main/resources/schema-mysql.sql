@@ -197,12 +197,15 @@ CREATE TABLE `agency_id_list` (
   `list_id` varchar(10) CHARACTER SET utf8,
   `agency_id` int(11) unsigned DEFAULT NULL,
   `version_id` varchar(10) CHARACTER SET utf8,
+  `module_id` int(11) unsigned NOT NULL,
   `definition` text CHARACTER SET utf8,
   PRIMARY KEY (`agency_id_list_id`),
   UNIQUE KEY `agency_id_list_uk1` (`guid`),
   UNIQUE KEY `agency_id_list_uk2` (`enum_type_guid`),
   KEY `agency_id_list_agency_id_fk` (`agency_id`),
-  CONSTRAINT `agency_id_list_agency_id_fk` FOREIGN KEY (`agency_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`)
+  KEY `agency_id_list_module_id_fk` (`module_id`),
+  CONSTRAINT `agency_id_list_agency_id_fk` FOREIGN KEY (`agency_id`) REFERENCES `agency_id_list_value` (`agency_id_list_value_id`),
+  CONSTRAINT `agency_id_list_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `AGENCY_ID_LIST_ID_SEQ`;
