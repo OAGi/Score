@@ -743,6 +743,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 assertTrue("The following dt_sc has no default in bdt_sc_pri_restri: " + actualDtSc,
                         actualDefaultMapId != 0);
                 assertTrue("The following dt_sc has 2 or more default in bdt_sc_pri_restri: " + actualDtSc,
+                        actualDefaultCount == 1);
 
                 if (expectedQBDTScPri.codeListId + expectedQBDTScPri.agencyIdListId > 0) {
                     expectedMapIdSum = getMapIdSum(actualDtSc, expectedQBDTScPri.attributeType, true);
