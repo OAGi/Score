@@ -431,6 +431,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitASCCPComplexType(ASCCPComplexType asccpComplexType) throws Exception {
+        /*
+         * <xsd:group> element doesn't need to be created here.
+         * it already created on #visitACCComplexType(ACCComplexType)
+         */
+        if (asccpComplexType.isGroup()) {
+            return;
+        }
         addSimpleElement(asccpComplexType);
     }
 
