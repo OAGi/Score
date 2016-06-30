@@ -310,7 +310,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             complexTypeElement.addContent(complexContentElement);
 
             Element extensionElement = new Element("extension", XSD_NS);
-            extensionElement.setAttribute("type", basedACC.getTypeName());
+            extensionElement.setAttribute("base", basedACC.getTypeName());
             complexContentElement.addContent(extensionElement);
 
             extensionElement.addContent(sequenceElement);
@@ -385,7 +385,15 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
                     attributeElement.setAttribute("id", bcc.getGuid());
 
-                    sequenceElement.addContent(attributeElement);
+                    if(basedACC!=null) {
+                        Element complexContentElement = complexTypeElement.getChild("complexContent", XSD_NS);
+                        Element extensionElement = complexContentElement.getChild("extension", XSD_NS);
+
+                        extensionElement.addContent(attributeElement);
+                    }
+                    else {
+                        complexTypeElement.addContent(attributeElement);
+                    }
                 }
             }
         }
