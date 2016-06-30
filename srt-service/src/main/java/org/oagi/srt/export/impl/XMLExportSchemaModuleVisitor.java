@@ -17,6 +17,7 @@ import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,19 +56,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void startSchemaModule(SchemaModule schemaModule) throws Exception {
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-
-        DocumentBuilder documentBuilder;
-        try {
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException(e);
-        }
-        org.w3c.dom.Document document = documentBuilder.newDocument();
-
-        DOMBuilder jdomBuilder = new DOMBuilder();
-        this.document = jdomBuilder.build(document);
+        this.document = createDocument();
 
         Element schemaElement = new Element("schema", XSD_NS);
         schemaElement.addNamespaceDeclaration(Namespace.getNamespace("", SRTConstants.OAGI_NS));
@@ -79,6 +68,37 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         this.rootElement = schemaElement;
 
         moduleFile = new File(baseDir, schemaModule.getPath()).getCanonicalFile();
+    }
+
+    private Document createDocument() {
+        return createDocument(null);
+    }
+
+    private Document createDocument(byte[] content) {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+
+        DocumentBuilder documentBuilder;
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException(e);
+        }
+        org.w3c.dom.Document document;
+        if (content == null) {
+            document = documentBuilder.newDocument();
+        } else {
+            try (InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(content))) {
+                document = documentBuilder.parse(inputStream);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("I/O error", e);
+            } catch (SAXException e) {
+                throw new IllegalArgumentException("Invalid XML content", e);
+            }
+        }
+
+        DOMBuilder jdomBuilder = new DOMBuilder();
+        return jdomBuilder.build(document);
     }
 
     @Override
@@ -410,6 +430,12 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     @Override
     public void visitASCCPGroup(ASCCPGroup asccpGroup) throws Exception {
         // not implemented yet
+    }
+
+    @Override
+    public void visitBlobContent(byte[] content) throws Exception {
+        this.document = createDocument(content);
+        this.rootElement = this.document.getRootElement();
     }
 
     private void addRestriction(Element codeListElement, Collection<String> values) {

@@ -52,6 +52,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         createBCCP(moduleMap);
         createACC(moduleMap);
         createASCCP(moduleMap);
+        createBlobContents(moduleMap);
 
         return context;
     }
@@ -173,6 +174,14 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
             SchemaModule schemaModule = moduleMap.get(asccp.getModule().getModuleId());
             schemaModule.addASCCP(ASCCP.newInstance(asccp, importedDataProvider));
+        }
+    }
+
+    private void createBlobContents(Map<Integer, SchemaModule> moduleMap) {
+        for (BlobContent blobContent : blobContentRepository.findAll()) {
+
+            SchemaModule schemaModule = moduleMap.get(blobContent.getModule().getModuleId());
+            schemaModule.setContent(blobContent.getContent());
         }
     }
 

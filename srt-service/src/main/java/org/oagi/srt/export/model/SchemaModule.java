@@ -23,6 +23,8 @@ public class SchemaModule {
     private List<ACC> accList = new ArrayList();
     private List<ASCCP> asccpList = new ArrayList();
 
+    private byte[] content;
+
     public SchemaModule(Module module) {
         this.module = module;
     }
@@ -59,49 +61,57 @@ public class SchemaModule {
         this.asccpList.add(asccp);
     }
 
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
     public void visit(SchemaModuleVisitor schemaModuleVisitor) throws Exception {
         schemaModuleVisitor.startSchemaModule(this);
 
-        for (int i = 0; i < dependedModuleSize; ++i) {
-            if (includeModules.containsKey(i)) {
-                SchemaModule includeSchemaModule = includeModules.get(i);
-                schemaModuleVisitor.visitIncludeModule(includeSchemaModule);
-            } else {
-                SchemaModule importSchemaModule = importModules.get(i);
-                schemaModuleVisitor.visitImportModule(importSchemaModule);
+        if (content == null) {
+            for (int i = 0; i < dependedModuleSize; ++i) {
+                if (includeModules.containsKey(i)) {
+                    SchemaModule includeSchemaModule = includeModules.get(i);
+                    schemaModuleVisitor.visitIncludeModule(includeSchemaModule);
+                } else {
+                    SchemaModule importSchemaModule = importModules.get(i);
+                    schemaModuleVisitor.visitImportModule(importSchemaModule);
+                }
             }
-        }
 
-        for (SchemaCodeList codeList : schemaCodeLists) {
-            schemaModuleVisitor.visitCodeList(codeList);
-        }
-
-        for (BDTSimple bdtSimple : bdtSimples) {
-            if (bdtSimple instanceof BDTSimpleType) {
-                schemaModuleVisitor.visitBDTSimpleType((BDTSimpleType) bdtSimple);
-            } else if (bdtSimple instanceof BDTSimpleContent) {
-                schemaModuleVisitor.visitBDTSimpleContent((BDTSimpleContent) bdtSimple);
+            for (SchemaCodeList codeList : schemaCodeLists) {
+                schemaModuleVisitor.visitCodeList(codeList);
             }
-        }
 
-        for (BCCP bccp : bccpList) {
-            schemaModuleVisitor.visitBCCP(bccp);
-        }
-
-        for (ACC acc : accList) {
-            if (acc instanceof ACCComplexType) {
-                schemaModuleVisitor.visitACCComplexType((ACCComplexType) acc);
-            } else if (acc instanceof ACCGroup) {
-                schemaModuleVisitor.visitACCGroup((ACCGroup) acc);
+            for (BDTSimple bdtSimple : bdtSimples) {
+                if (bdtSimple instanceof BDTSimpleType) {
+                    schemaModuleVisitor.visitBDTSimpleType((BDTSimpleType) bdtSimple);
+                } else if (bdtSimple instanceof BDTSimpleContent) {
+                    schemaModuleVisitor.visitBDTSimpleContent((BDTSimpleContent) bdtSimple);
+                }
             }
-        }
 
-        for (ASCCP asccp : asccpList) {
-            if (asccp instanceof ASCCPComplexType) {
-                schemaModuleVisitor.visitASCCPComplexType((ASCCPComplexType) asccp);
-            } else if (asccp instanceof ASCCPGroup) {
-                schemaModuleVisitor.visitASCCPGroup((ASCCPGroup) asccp);
+            for (BCCP bccp : bccpList) {
+                schemaModuleVisitor.visitBCCP(bccp);
             }
+
+            for (ACC acc : accList) {
+                if (acc instanceof ACCComplexType) {
+                    schemaModuleVisitor.visitACCComplexType((ACCComplexType) acc);
+                } else if (acc instanceof ACCGroup) {
+                    schemaModuleVisitor.visitACCGroup((ACCGroup) acc);
+                }
+            }
+
+            for (ASCCP asccp : asccpList) {
+                if (asccp instanceof ASCCPComplexType) {
+                    schemaModuleVisitor.visitASCCPComplexType((ASCCPComplexType) asccp);
+                } else if (asccp instanceof ASCCPGroup) {
+                    schemaModuleVisitor.visitASCCPGroup((ASCCPGroup) asccp);
+                }
+            }
+        } else {
+            schemaModuleVisitor.visitBlobContent(content);
         }
 
         schemaModuleVisitor.endSchemaModule(this);

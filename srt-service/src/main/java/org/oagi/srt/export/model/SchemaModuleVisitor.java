@@ -24,5 +24,7 @@ public interface SchemaModuleVisitor {
 
     public void visitASCCPGroup(ASCCPGroup asccpGroup) throws Exception;
 
+    public void visitBlobContent(byte[] content) throws Exception;
+
     public void endSchemaModule(SchemaModule schemaModule) throws Exception;
 }
