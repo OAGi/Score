@@ -28,8 +28,14 @@ public class BDTSC implements Component {
             representationTerm = "";
         }
 
-        String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm;
-        return attrName.replaceAll(" ", "");
+        if(propertyTerm.contains(representationTerm)){
+            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1);
+            return attrName.replaceAll(" ", "");
+        }
+        else {
+            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm.replace("Identifier", "ID");
+            return attrName.replaceAll(" ", "");
+        }
     }
 
     public String getGuid() {
