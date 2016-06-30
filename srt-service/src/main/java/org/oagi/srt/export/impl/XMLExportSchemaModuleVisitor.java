@@ -468,7 +468,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
         FileUtils.forceMkdir(this.moduleFile.getParentFile());
 
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(this.moduleFile))) {
             outputter.output(this.document, outputStream);
             outputStream.flush();
