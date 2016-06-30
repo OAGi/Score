@@ -68,7 +68,7 @@ public class P_1_3_PopulateAgencyIDList {
 
         agencyIdList.setName("Agency Identification");
         agencyIdList.setListId("3055");
-        agencyIdList.setVersionId("D13A");
+        agencyIdList.setVersionId("D08B");
         agencyIdList.setDefinition("Schema agency:  UN/CEFACT\n" +
                 "Schema version: 4.5\n" +
                 "Schema date:    02 February 2014\n" +

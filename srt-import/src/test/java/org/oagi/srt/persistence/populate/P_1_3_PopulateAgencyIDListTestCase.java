@@ -39,7 +39,7 @@ public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUn
         assertEquals(agencyIdListValueRepository.findOneByValue("6").getAgencyIdListValueId(), agencyIdList.getAgencyId());
         assertEquals("Agency Identification", agencyIdList.getName());
         assertEquals("3055", agencyIdList.getListId());
-        assertEquals("D13A", agencyIdList.getVersionId());
+        assertEquals("D08B", agencyIdList.getVersionId());
         assertEquals("Schema agency:  UN/CEFACT\n" +
                 "Schema version: 4.5\n" +
                 "Schema date:    02 February 2014\n" +
