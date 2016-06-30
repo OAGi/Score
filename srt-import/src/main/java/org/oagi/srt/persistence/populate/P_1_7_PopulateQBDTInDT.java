@@ -184,10 +184,14 @@ public class P_1_7_PopulateQBDTInDT {
                 String systemId = locator.getSystemId();
                 Document xmlDocument = Context.loadDocument(systemId);
 
-                XPathExpression xPathExpression = Context.xPath.compile("//*[@name='" + typeName + "']");
+                XPathExpression xPathExpression = Context.xPath.compile("//xsd:complexType[@name='" + typeName + "']");
                 Node node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
                 if (node == null) {
-                    return;
+                    xPathExpression = Context.xPath.compile("//xsd:simpleType[@name='" + typeName + "']");
+                    node = (Node) xPathExpression.evaluate(xmlDocument, XPathConstants.NODE);
+                    if(node == null) {
+                        return;
+                    }
                 }
                 Node idAttribute = node.getAttributes().getNamedItem("id");
                 if (idAttribute == null) {
