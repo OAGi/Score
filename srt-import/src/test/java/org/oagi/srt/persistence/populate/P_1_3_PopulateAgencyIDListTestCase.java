@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
 import org.oagi.srt.repository.entity.AgencyIdList;
+import org.oagi.srt.repository.entity.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ImportApplication.class)
@@ -37,7 +39,12 @@ public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUn
         assertNotNull(agencyIdList);
         assertEquals("oagis-id-68a3c03a4ea84562bd783fe2dc8f5487", agencyIdList.getEnumTypeGuid());
         assertEquals(agencyIdListValueRepository.findOneByValue("6").getAgencyIdListValueId(), agencyIdList.getAgencyId());
-        assertEquals("Agency Identification", agencyIdList.getName());
+        assertEquals("clm63055D08B_AgencyIdentification", agencyIdList.getName());
+        Module module = agencyIdList.getModule();
+        assertNotNull(module);
+        String modulePath = module.getModule();
+        String moduleFilename = modulePath.substring(modulePath.lastIndexOf('\\') + 1, modulePath.length());
+        assertEquals("IdentifierScheme_AgencyIdentification_3055_D08B.xsd", moduleFilename);
         assertEquals("3055", agencyIdList.getListId());
         assertEquals("D08B", agencyIdList.getVersionId());
         assertEquals("Schema agency:  UN/CEFACT\n" +

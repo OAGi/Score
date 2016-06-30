@@ -77,7 +77,7 @@ public class P_1_3_PopulateAgencyIDList {
             }
         }
 
-        agencyIdList.setName("Agency Identification");
+        agencyIdList.setName("clm63055D08B_AgencyIdentification");
         agencyIdList.setListId("3055");
         agencyIdList.setVersionId("D08B");
         agencyIdList.setModule(module);
