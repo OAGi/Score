@@ -385,13 +385,12 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
                     attributeElement.setAttribute("id", bcc.getGuid());
 
-                    if(basedACC!=null) {
+                    if (basedACC != null) {
                         Element complexContentElement = complexTypeElement.getChild("complexContent", XSD_NS);
                         Element extensionElement = complexContentElement.getChild("extension", XSD_NS);
 
                         extensionElement.addContent(attributeElement);
-                    }
-                    else {
+                    } else {
                         complexTypeElement.addContent(attributeElement);
                     }
                 }
@@ -432,6 +431,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitASCCPComplexType(ASCCPComplexType asccpComplexType) throws Exception {
+        /*
+         * <xsd:group> element doesn't need to be created here.
+         * it already created on #visitACCComplexType(ACCComplexType)
+         */
+        if (asccpComplexType.isGroup()) {
+            return;
+        }
         addSimpleElement(asccpComplexType);
     }
 
