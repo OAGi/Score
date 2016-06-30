@@ -461,6 +461,7 @@ public class P_1_7_PopulateQBDTInDT {
                     if (baseDataType == null) {
                         return null;
                     }
+                    addToDTSC(xHandler, base, baseDataType);
                 }
             }
         }

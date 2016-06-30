@@ -633,6 +633,9 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         });
     }
 
+
+
+
     @Test
     public void test_PopulateThe_bdt_sc_pri_restri_TableTheQualifiedCodeContentType() {
         DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, "Code Content. Type");
@@ -1006,9 +1009,56 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         }
     }
 
+    private void test_inherit_dt_sc(DataType expectedBasedDt, ExpectedOtherQBDT expectedQBDT) {
+        List<DataTypeSupplementaryComponent> expectedDtScList =
+                dtScRepository.findByOwnerDtId(expectedBasedDt.getDtId());
+
+        DataType actualDataType = dtRepository.findOneByGuid(expectedQBDT.getGuid());
+        assertNotNull(actualDataType);
+
+        List<DataTypeSupplementaryComponent> actualDtScList =
+                dtScRepository.findByOwnerDtId(actualDataType.getDtId());
+
+        List<DataTypeSupplementaryComponent> actualInheritDtScList = new ArrayList();
+        for(int i=0; i<actualDtScList.size(); i++){
+            for(int j=0; j<expectedDtScList.size(); j++){
+                if(expectedDtScList.get(j).getPropertyTerm().equals(actualDtScList.get(i).getPropertyTerm()) &&
+                   expectedDtScList.get(j).getRepresentationTerm().equals(actualDtScList.get(i).getRepresentationTerm())){
+                    actualInheritDtScList.add(actualDtScList.get(i));
+                    break;
+                }
+            }
+        }
+
+        assertEquals(expectedDtScList.size(), actualInheritDtScList.size());
+        assertEquals(expectedDtScList.stream()
+                        .mapToInt(e ->
+                                e.getPropertyTerm().hashCode() +
+                                        e.getRepresentationTerm().hashCode() +
+                                        //e.getDefinition().hashCode() +
+                                        e.getMinCardinality() +
+                                        e.getMaxCardinality() +
+                                        e.getDtScId()
+                        ).sum(),
+                actualInheritDtScList.stream()
+                        .mapToInt(e ->
+                                e.getPropertyTerm().hashCode() +
+                                        e.getRepresentationTerm().hashCode() +
+                                        //e.getDefinition().hashCode() +
+                                        e.getMinCardinality() +
+                                        e.getMaxCardinality() +
+                                        e.getBasedDtScId()
+                        ).sum());
+    }
+
+
     @Test
     public void test_PopulateSCInThe_dt_sc_Table() {
-
+        for (int i = 0; i < expectedOtherQBDTs.size(); i++) {
+            DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, expectedOtherQBDTs.get(i).getBasedDtDen());
+            assertNotNull(expectedBasedDt);
+            test_inherit_dt_sc(expectedBasedDt, expectedOtherQBDTs.get(i));
+        }
     }
 
     @Test
