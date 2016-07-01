@@ -492,8 +492,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
-                                         BasicCoreComponentProperty toBccp,
-                                         Declaration declaration, int entityType) {
+                              BasicCoreComponentProperty toBccp,
+                              Declaration declaration, int entityType) {
         return createBCC(fromAcc, toBccp, declaration, 0, entityType);
     }
 
