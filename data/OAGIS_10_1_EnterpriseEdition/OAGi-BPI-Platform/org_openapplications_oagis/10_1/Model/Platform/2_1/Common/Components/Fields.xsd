@@ -3596,7 +3596,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<!--=======================-->
 	<!--Structured DataTypes-->
 	<!--=======================-->
-	<xsd:complexType name="NameValuePairType" id="oagis-id-e298a36a331247c3a2a4a585d5754531">
+	<xsd:complexType name="NameValuePairStringType" id="oagis-id-e298a36a331247c3a2a4a585d5754531">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the tag and information of the new information to be passed.</xsd:documentation>
 		</xsd:annotation>
@@ -3630,25 +3630,25 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:element name="RecordFieldValue" type="RecordFieldValueType" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
-	<xsd:element name="AcceptableValue" type="NameValuePairType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
+	<xsd:element name="AcceptableValue" type="NameValuePairStringType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The value that would represents a satisfactory outcome </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="EnvironmentalParameterValue" type="NameValuePairType" id="oagis-id-2c9446e048e54fc8bb7ba3d84883bdcd"/>
+	<xsd:element name="EnvironmentalParameterValue" type="NameValuePairStringType" id="oagis-id-2c9446e048e54fc8bb7ba3d84883bdcd"/>
 	<xsd:element name="LeadTimeValue" type="ValueType" id="oagis-id-9839a510a09849ea8113453f97fe58e5"/>
-	<xsd:element name="NameValue" type="NameValuePairType" id="oagis-id-74bdcf5938814416af46067dba04e330">
+	<xsd:element name="NameValue" type="NameValuePairStringType" id="oagis-id-74bdcf5938814416af46067dba04e330">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the tag and information of the new information to be passed.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ResultValue" type="NameValuePairType" id="oagis-id-aba5faa65f984d82a81f74d12db45d57">
+	<xsd:element name="ResultValue" type="NameValuePairStringType" id="oagis-id-aba5faa65f984d82a81f74d12db45d57">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">NameValue pair for representing a test or analysis result</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="TestedPointValue" type="NameValuePairType" id="oagis-id-35c62681d1b34067a68b79967dedb0a4"/>
-	<xsd:element name="TestMethodValue" type="NameValuePairType" id="oagis-id-6f0b5e2b31ae4992aec2635c33a213e7">
+	<xsd:element name="TestedPointValue" type="NameValuePairStringType" id="oagis-id-35c62681d1b34067a68b79967dedb0a4"/>
+	<xsd:element name="TestMethodValue" type="NameValuePairStringType" id="oagis-id-6f0b5e2b31ae4992aec2635c33a213e7">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The actual method or process used to perform a test</xsd:documentation>
 		</xsd:annotation>
