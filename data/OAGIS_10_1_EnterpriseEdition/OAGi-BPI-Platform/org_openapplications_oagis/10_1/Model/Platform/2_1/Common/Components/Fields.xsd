@@ -3995,7 +3995,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="TransferCodeContentType" id="oagis-id-c9dbc6a3ec254540907732a5c253e25e">
 		<xsd:restriction base="oacl_TransferCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="UnitCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c1c2630">
+	<xsd:simpleType name="UOMCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c1c2630">
 		<xsd:restriction base="oacl_UnitCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="TimeZoneCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c1c2635">
@@ -7185,7 +7185,7 @@ supplementary information.</ccts_Definition>
 	</xsd:complexType>
 	<xsd:complexType name="UOMCodeType" id="oagis-id-6b7fa72803d843d8a29c567788b90745">
 		<xsd:simpleContent>
-			<xsd:extension base="UnitCodeContentType">
+			<xsd:extension base="UOMCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-3d8eec0a38b94bc69d9d40d9d224d647">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
