@@ -46,6 +46,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                 .collect(Collectors.toMap(Module::getModuleId, module -> new SchemaModule(module)));
 
         createSchemaModules(context, moduleMap);
+        createAgencyIdList(moduleMap);
         createCodeLists(moduleMap);
         BdtsBlob bdtsBlob = loadBtdsBlob();
         createBDT(bdtsBlob, moduleMap);
@@ -77,6 +78,16 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                     dependedModuleSchema.addImport(dependingModuleSchema);
                     break;
             }
+        }
+    }
+
+    private void createAgencyIdList(Map<Integer, SchemaModule> moduleMap) {
+        for (AgencyIdList agencyIdList : importedDataProvider.findAgencyIdList()) {
+            List<AgencyIdListValue> agencyIdListValues =
+                    importedDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
+
+            SchemaModule schemaModule = moduleMap.get(agencyIdList.getModule().getModuleId());
+            schemaModule.addAgencyId(new AgencyId(agencyIdList, agencyIdListValues));
         }
     }
 

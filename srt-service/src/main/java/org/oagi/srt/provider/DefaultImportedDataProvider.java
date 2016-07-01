@@ -26,6 +26,9 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
     private AgencyIdListRepository agencyIdListRepository;
 
     @Autowired
+    private AgencyIdListValueRepository agencyIdListValueRepository;
+
+    @Autowired
     private CodeListRepository codeListRepository;
 
     @Autowired
@@ -69,8 +72,12 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         long s = System.currentTimeMillis();
         Sort moduleSort = new Sort(Sort.Direction.ASC, "module");
 
-        findAgencyIdListMap = agencyIdListRepository.findAll().stream()
+        findAgencyIdListList = agencyIdListRepository.findAll(moduleSort);
+        findAgencyIdListMap = findAgencyIdListList.stream()
                 .collect(Collectors.toMap(AgencyIdList::getAgencyIdListId, Function.identity()));
+
+        findAgencyIdListValueByOwnerListIdMap = agencyIdListValueRepository.findAll().stream()
+                .collect(Collectors.groupingBy(AgencyIdListValue::getOwnerListId));
 
         findCodeListList = codeListRepository.findAll();
         findCodeListMap = findCodeListList.stream()
@@ -125,11 +132,25 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         logger.info("Ready for " + getClass().getSimpleName() + " in " + (System.currentTimeMillis() - s) / 1000d + " seconds");
     }
 
+    private List<AgencyIdList> findAgencyIdListList;
+
+    @Override
+    public List<AgencyIdList> findAgencyIdList() {
+        return Collections.unmodifiableList(findAgencyIdListList);
+    }
+
     private Map<Integer, AgencyIdList> findAgencyIdListMap;
 
     @Override
     public AgencyIdList findAgencyIdList(int agencyIdListId) {
         return findAgencyIdListMap.get(agencyIdListId);
+    }
+
+    private Map<Integer, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
+
+    @Override
+    public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(int ownerListId) {
+        return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ? findAgencyIdListValueByOwnerListIdMap.get(ownerListId) : Collections.emptyList();
     }
 
     private List<CodeList> findCodeListList;

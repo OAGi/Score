@@ -42,6 +42,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     private Element rootElement;
     private File moduleFile;
 
+    private final Namespace OAGI_NS = Namespace.getNamespace("", SRTConstants.OAGI_NS);
     private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
     @Autowired
@@ -59,7 +60,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         this.document = createDocument();
 
         Element schemaElement = new Element("schema", XSD_NS);
-        schemaElement.addNamespaceDeclaration(Namespace.getNamespace("", SRTConstants.OAGI_NS));
+        schemaElement.addNamespaceDeclaration(OAGI_NS);
         schemaElement.setAttribute("targetNamespace", SRTConstants.OAGI_NS);
         schemaElement.setAttribute("elementFormDefault", "qualified");
         schemaElement.setAttribute("attributeFormDefault", "unqualified");
@@ -115,6 +116,67 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         String schemaLocation = getRelativeSchemaLocation(importSchemaModule);
         importElement.setAttribute("schemaLocation", schemaLocation);
         rootElement.addContent(importElement);
+    }
+
+    @Override
+    public void visitAgencyId(AgencyId agencyId) throws Exception {
+        // ContentType part
+        Element simpleTypeElement = new Element("simpleType", XSD_NS);
+        rootElement.addContent(simpleTypeElement);
+
+        simpleTypeElement.setAttribute("name", agencyId.getTypeName());
+        simpleTypeElement.setAttribute("id", agencyId.getGuid());
+
+        Element unionElement = new Element("union", XSD_NS);
+        unionElement.setAttribute("memberTypes", "xsd:token " + agencyId.getName() + "ContentEnumerationType");
+        simpleTypeElement.addContent(unionElement);
+
+        // ContentEnumerationType part
+        Element enumerationTypeElement = new Element("simpleType", XSD_NS);
+        rootElement.addContent(enumerationTypeElement);
+
+        enumerationTypeElement.setAttribute("name", agencyId.getName() + "ContentEnumerationType");
+        enumerationTypeElement.setAttribute("id", agencyId.getEnumGuid());
+
+        Element restrictionElement = new Element("restriction", XSD_NS);
+        enumerationTypeElement.addContent(restrictionElement);
+
+        restrictionElement.setAttribute("base", "xsd:token");
+
+        Element minLengthElement = new Element("minLength", XSD_NS);
+        restrictionElement.addContent(minLengthElement);
+
+        minLengthElement.setAttribute("value", "" + agencyId.getMinLengthOfValues());
+
+        Element maxLengthElement = new Element("maxLength", XSD_NS);
+        restrictionElement.addContent(maxLengthElement);
+
+        maxLengthElement.setAttribute("value", "" + agencyId.getMaxLengthOfValues());
+
+        for (AgencyIdValue value : agencyId.getValues()) {
+            Element enumerationElement = new Element("enumeration", XSD_NS);
+            restrictionElement.addContent(enumerationElement);
+
+            enumerationElement.setAttribute("value", value.getValue());
+
+            Element annotationElement = new Element("annotation", XSD_NS);
+            enumerationElement.addContent(annotationElement);
+
+            Element documentationElement = new Element("documentation", XSD_NS);
+            annotationElement.addContent(documentationElement);
+
+            documentationElement.setAttribute("source", SRTConstants.OAGI_NS);
+
+            Element cctsNameElement = new Element("ccts_Name", OAGI_NS);
+            documentationElement.addContent(cctsNameElement);
+
+            cctsNameElement.setText(value.getName());
+
+            Element cctsDefinitionElement = new Element("ccts_Name", OAGI_NS);
+            documentationElement.addContent(cctsDefinitionElement);
+
+            cctsDefinitionElement.setText(value.getDefinition());
+        }
     }
 
     @Override

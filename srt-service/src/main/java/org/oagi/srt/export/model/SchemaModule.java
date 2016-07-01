@@ -16,6 +16,7 @@ public class SchemaModule {
     private Map<Integer, SchemaModule> importModules = new HashMap();
     private int dependedModuleSize = 0;
 
+    private List<AgencyId> agencyIdList = new ArrayList();
     private List<SchemaCodeList> schemaCodeLists = new ArrayList();
     private List<BDTSimple> bdtSimples = new ArrayList();
 
@@ -39,6 +40,10 @@ public class SchemaModule {
 
     public void addImport(SchemaModule schemaModule) {
         importModules.put(dependedModuleSize++, schemaModule);
+    }
+
+    public void addAgencyId(AgencyId agencyId) {
+        this.agencyIdList.add(agencyId);
     }
 
     public void addCodeList(SchemaCodeList schemaCodeList) {
@@ -77,6 +82,10 @@ public class SchemaModule {
                     SchemaModule importSchemaModule = importModules.get(i);
                     schemaModuleVisitor.visitImportModule(importSchemaModule);
                 }
+            }
+
+            for (AgencyId agencyId : agencyIdList) {
+                schemaModuleVisitor.visitAgencyId(agencyId);
             }
 
             for (SchemaCodeList codeList : schemaCodeLists) {

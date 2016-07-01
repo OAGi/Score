@@ -6,7 +6,11 @@ import java.util.List;
 
 public interface ImportedDataProvider {
 
+    public List<AgencyIdList> findAgencyIdList();
+
     public AgencyIdList findAgencyIdList(int agencyIdListId);
+
+    public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(int ownerListId);
 
     public List<CodeList> findCodeList();
 

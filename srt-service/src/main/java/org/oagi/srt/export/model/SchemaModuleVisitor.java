@@ -8,6 +8,8 @@ public interface SchemaModuleVisitor {
 
     public void visitImportModule(SchemaModule importSchemaModule) throws Exception;
 
+    public void visitAgencyId(AgencyId agencyId) throws Exception;
+
     public void visitCodeList(SchemaCodeList schemaCodeList) throws Exception;
 
     public void visitBDTSimpleType(BDTSimpleType bdtSimpleType) throws Exception;
