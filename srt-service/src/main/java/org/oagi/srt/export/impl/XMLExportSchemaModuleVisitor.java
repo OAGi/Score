@@ -362,20 +362,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         complexTypeElement.setAttribute("id", accComplexType.getGuid());
 
         Element sequenceElement = new Element("sequence", XSD_NS);
-        ACC basedACC = accComplexType.getBasedACC();
-        if (basedACC != null) {
-            Element complexContentElement = new Element("complexContent", XSD_NS);
-            complexTypeElement.addContent(complexContentElement);
-
-            Element extensionElement = new Element("extension", XSD_NS);
-            extensionElement.setAttribute("base", basedACC.getTypeName());
-            complexContentElement.addContent(extensionElement);
-
-            extensionElement.addContent(sequenceElement);
-        } else {
-            complexTypeElement.addContent(sequenceElement);
-        }
-
         List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
         // for ASCC or BCC (Sequence Key != 0)
         for (CoreComponent coreComponent : coreComponents) {
@@ -419,6 +405,24 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
                     sequenceElement.addContent(element);
                 }
+            }
+        }
+
+        ACC basedACC = accComplexType.getBasedACC();
+        if (basedACC != null) {
+            Element complexContentElement = new Element("complexContent", XSD_NS);
+            complexTypeElement.addContent(complexContentElement);
+
+            Element extensionElement = new Element("extension", XSD_NS);
+            extensionElement.setAttribute("base", basedACC.getTypeName());
+            complexContentElement.addContent(extensionElement);
+
+            if (!sequenceElement.getContent().isEmpty()) {
+                extensionElement.addContent(sequenceElement);
+            }
+        } else {
+            if (!sequenceElement.getContent().isEmpty()) {
+                complexTypeElement.addContent(sequenceElement);
             }
         }
 
