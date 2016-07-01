@@ -314,7 +314,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
                 1));
         expectedCodeLists.add(new ExpectedCodeList(
                 "Model\\Platform\\2_1\\Common\\CodeLists\\CodeLists_1.xsd",
-                "oacl_EMailFormatCode",
+                "oacl_EmailFormatCode",
                 "oagis-id-428bb44db16241faa4813f779ffff26e",
                 "oagis-id-9d182f28e99840318c9757dab3177019",
                 null,
@@ -585,9 +585,23 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
                 null,
                 "oagis-id-cbb8c3e6d3bb40428f8efd8639c8e222",
                 1));
+        expectedCodeLists.add(new ExpectedCodeList(
+                "Model\\Platform\\2_1\\Common\\CodeLists\\CodeLists_1.xsd",
+                "oacl_HarmonizedTariffScheduleCode",
+                "oagis-id-c9b40a121c11428ab0f56918757be62f",
+                "oagis-id-5cdefe010ca2496f99cd516f11aebc7a",
+                null,
+                1));
+        expectedCodeLists.add(new ExpectedCodeList(
+                "Model\\Platform\\2_1\\Common\\CodeLists\\CodeLists_1.xsd",
+                "oacl_SequencedCode",
+                "oagis-id-8570e458813c4a50b653f49e7d3df8b2",
+                "oagis-id-dc21bc6736fe49c0be43e76fa6a321bd",
+                null,
+                1));
 
-        assertEquals(71, expectedCodeLists.size());
-        assertEquals(71, codeListRepository.count());
+        assertEquals(73, expectedCodeLists.size());
+        assertEquals(73, codeListRepository.count());
 
         Map<String, ExpectedCodeList> expectedCodeListMap =
                 expectedCodeLists.stream()
