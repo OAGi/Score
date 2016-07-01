@@ -79,11 +79,7 @@ public class BDTSC implements Component {
                 return xbt.getBuiltInType();
             } else {
                 AgencyIdList agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
-                if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
-                    return "clm63055D08B_AgencyIdentificationContentType";
-                } else {
-                    throw new IllegalStateException();
-                }
+                return agencyIdList.getName();
             }
         } else {
             CodeList codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());

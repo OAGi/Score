@@ -265,11 +265,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         }
 
         AgencyIdList agencyIdList = importedDataProvider.findAgencyIdList(bdtPriRestriList.get(0).getAgencyIdListId());
-        if ("oagis-id-f1df540ef0db48318f3a423b3057955f".equals(agencyIdList.getGuid())) {
-            return "clm63055D08B_AgencyIdentification";
-        } else {
-            throw new IllegalStateException();
-        }
+        return agencyIdList.getName();
     }
 
     @Override
