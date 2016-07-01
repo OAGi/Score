@@ -388,7 +388,7 @@ Values are:
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the identifier of the country of origin of an item, service or shipment </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="CountrySubDivisionCode" type="CountrySubDivisionCodeType" nillable="true" id="oagis-id-6f544719d56343248467059480b3b497">
+	<xsd:element name="CountrySubdivisionCode" type="CountrySubdivisionCodeType" nillable="true" id="oagis-id-6f544719d56343248467059480b3b497">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the Country. These may be Districts, Regions, States, Provinces etc. A possible list of values is as specified in ISO 3166-2. The name attribute identifies the name of this e.g. District, Region etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 		</xsd:annotation>
@@ -3136,7 +3136,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the town or the city</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="CitySubDivisionName" type="OpenNameType" nillable="true" id="oagis-id-399665b5fc4643f0a48fa89926dfa8e9">
+	<xsd:element name="CitySubdivisionName" type="OpenNameType" nillable="true" id="oagis-id-399665b5fc4643f0a48fa89926dfa8e9">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the City, example a city may have many districts or Boroughs. The type attribute identifies the type of this entity e.g. City, Borough etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 		</xsd:annotation>
@@ -3596,7 +3596,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<!--=======================-->
 	<!--Structured DataTypes-->
 	<!--=======================-->
-	<xsd:complexType name="NameValuePairType" id="oagis-id-e298a36a331247c3a2a4a585d5754531">
+	<xsd:complexType name="NameValuePairStringType" id="oagis-id-e298a36a331247c3a2a4a585d5754531">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the tag and information of the new information to be passed.</xsd:documentation>
 		</xsd:annotation>
@@ -3630,25 +3630,25 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:element name="RecordFieldValue" type="RecordFieldValueType" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
-	<xsd:element name="AcceptableValue" type="NameValuePairType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
+	<xsd:element name="AcceptableValue" type="NameValuePairStringType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The value that would represents a satisfactory outcome </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="EnvironmentalParameterValue" type="NameValuePairType" id="oagis-id-2c9446e048e54fc8bb7ba3d84883bdcd"/>
+	<xsd:element name="EnvironmentalParameterValue" type="NameValuePairStringType" id="oagis-id-2c9446e048e54fc8bb7ba3d84883bdcd"/>
 	<xsd:element name="LeadTimeValue" type="ValueType" id="oagis-id-9839a510a09849ea8113453f97fe58e5"/>
-	<xsd:element name="NameValue" type="NameValuePairType" id="oagis-id-74bdcf5938814416af46067dba04e330">
+	<xsd:element name="NameValue" type="NameValuePairStringType" id="oagis-id-74bdcf5938814416af46067dba04e330">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the tag and information of the new information to be passed.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ResultValue" type="NameValuePairType" id="oagis-id-aba5faa65f984d82a81f74d12db45d57">
+	<xsd:element name="ResultValue" type="NameValuePairStringType" id="oagis-id-aba5faa65f984d82a81f74d12db45d57">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">NameValue pair for representing a test or analysis result</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="TestedPointValue" type="NameValuePairType" id="oagis-id-35c62681d1b34067a68b79967dedb0a4"/>
-	<xsd:element name="TestMethodValue" type="NameValuePairType" id="oagis-id-6f0b5e2b31ae4992aec2635c33a213e7">
+	<xsd:element name="TestedPointValue" type="NameValuePairStringType" id="oagis-id-35c62681d1b34067a68b79967dedb0a4"/>
+	<xsd:element name="TestMethodValue" type="NameValuePairStringType" id="oagis-id-6f0b5e2b31ae4992aec2635c33a213e7">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The actual method or process used to perform a test</xsd:documentation>
 		</xsd:annotation>
@@ -3657,7 +3657,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:complexType name="PreferredNameType" id="oagis-id-55e3dee204b449fab4dac08c5893c031">
 		<xsd:simpleContent>
 			<xsd:extension base="NameType">
-				<xsd:attribute name="preferred" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
+				<xsd:attribute name="preferredIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
 			</xsd:extension>
 			<!--				<xsd:attribute name="preferred" type="IndicatorType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>  -->
 		</xsd:simpleContent>
@@ -3667,18 +3667,6 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Way the person is addressed e.g. Honorable etc?</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="SequencedCodeType" id="oagis-id-dac3c62369c54a5e8b996496f0438c64">
-		<xsd:simpleContent>
-			<xsd:extension base="CodeType">
-				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-f14c6ce3eae34517acb446241a38c629">
-					<xsd:annotation>
-						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-			</xsd:extension>
-			<!--				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-f14c6ce3eae34517acb446241a38c629">  -->
-		</xsd:simpleContent>
-	</xsd:complexType>
 	<xsd:element name="CompositeID" type="CompositeIDType" id="oagis-id-891549473a7e4cc68e037e0641e14aa3"/>
 	<xsd:complexType name="CompositeIDType" id="oagis-id-63b736740d0e45b0a7078597d1a1dbe4">
 		<xsd:sequence>
@@ -3801,14 +3789,6 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<!--				<xsd:attribute name="name" type="LicenseTypeCodeContentType" use="required" id="oagis-id-db502068711649c385a0bd1f41d3a63d"/>  -->
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="HarmonizedTariffScheduleCodeType" id="oagis-id-3de49c6b04d2483d94e47b46e246aa4f">
-		<xsd:simpleContent>
-			<xsd:extension base="CodeType">
-				<xsd:attribute name="countryCode" type="oacl_CountryCodeContentType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/>
-			</xsd:extension>
-			<!-- <xsd:attribute name="countryCode" type="NormalizedStringType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/> -->
-		</xsd:simpleContent>
-	</xsd:complexType>
 	<!--=======================-->
 	<!--ID Content Types-->
 	<!--=======================-->
@@ -3884,8 +3864,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="DeliveryPointCodeContentType" id="oagis-id-e5f3ed90350e43ee8168257121535b9e">
 		<xsd:restriction base="oacl_DeliveryPointCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="EMailFormatCodeContentType" id="oagis-id-dca015ffe62946dfafa7b45cae8f8b68">
-		<xsd:restriction base="oacl_EMailFormatCodeContentType"/>
+	<xsd:simpleType name="EmailFormatCodeContentType" id="oagis-id-dca015ffe62946dfafa7b45cae8f8b68">
+		<xsd:restriction base="oacl_EmailFormatCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="EngineeringActivityCodeContentType" id="oagis-id-7f8fcf6fa5df4bc1ad4eada3f42eb43c">
 		<xsd:restriction base="oacl_EngineeringActivityCodeContentType"/>
@@ -3907,6 +3887,9 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:simpleType>
 	<xsd:simpleType name="GenderCodeContentType" id="oagis-id-f080bdebd0be449c8f0563ceb3de483c">
 		<xsd:restriction base="oacl_GenderCodeContentType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HarmonizedTariffScheduleCodeContentType" id="oagis-id-249485ae0f564188a28550804e222fa4">
+		<xsd:restriction base="oacl_HarmonizedTariffScheduleCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="IncotermsCodeContentType" id="oagis-id-a3ccabb5e06240f189d72bd1a451c09f">
 		<xsd:restriction base="oacl_IncotermsCodeContentType"/>
@@ -3983,6 +3966,9 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="SalesTaskCodeContentType" id="oagis-id-12af5c4e0b4d4a45acfa61fdf9f739ab">
 		<xsd:restriction base="oacl_SalesTaskCodeContentType"/>
 	</xsd:simpleType>
+	<xsd:simpleType name="SequencedCodeContentType" id="oagis-id-cacf6c06cb71441ea53b980abd8b46c7">
+		<xsd:restriction base="oacl_SequencedCodeContentType"/>
+	</xsd:simpleType>
 	<xsd:simpleType name="StateCodeContentType" id="oagis-id-2654ce58ee6d4da7b332a995a2cddf0d">
 		<xsd:restriction base="oacl_StateCodeContentType"/>
 	</xsd:simpleType>
@@ -3995,7 +3981,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="TransferCodeContentType" id="oagis-id-c9dbc6a3ec254540907732a5c253e25e">
 		<xsd:restriction base="oacl_TransferCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="UnitCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c1c2630">
+	<xsd:simpleType name="UOMCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c1c2630">
 		<xsd:restriction base="oacl_UnitCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="TimeZoneCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c1c2635">
@@ -4774,7 +4760,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="CountrySubDivisionCodeType" id="oagis-id-3582718b267c47c1bb66f323026b6455">
+	<xsd:complexType name="CountrySubdivisionCodeType" id="oagis-id-3582718b267c47c1bb66f323026b6455">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID/>
@@ -5190,7 +5176,7 @@ supplementary information.</ccts_Definition>
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="EMailFormatCodeContentType">
+			<xsd:extension base="EmailFormatCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-3488a0e0f0404c89869d07f8c03b2b7a">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
@@ -5668,6 +5654,64 @@ supplementary information.</ccts_Definition>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<xsd:complexType name="HarmonizedTariffScheduleCodeType" id="oagis-id-3de49c6b04d2483d94e47b46e246aa4f">
+		<xsd:simpleContent>
+			<xsd:extension base="HarmonizedTariffScheduleCodeContentType">
+				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-640e32a2301242c795736b89185d1784">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of a list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-5ac8314a950e4a8e86ff783358f6f73d">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Agency. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the agency that manages the code list</ccts_Definition>
+							<ccts_PropertyTermName>List Agency</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>True</ccts_DefaultIndicator>
+								<ccts_SchemeOrListID>3055</ccts_SchemeOrListID>
+								<ccts_SchemeOrListVersionID>D08B</ccts_SchemeOrListVersionID>
+								<ccts_SchemeOrListAgencyID>6</ccts_SchemeOrListAgencyID>
+								<ccts_SchemeOrListModificationAllowedIndicator>False</ccts_SchemeOrListModificationAllowedIndicator>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-89f0a8e3e84745baae71ecf6e9f9d555">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Version. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the version of the list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List Version</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="countryCode" type="oacl_CountryCodeContentType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
 	<xsd:complexType name="IncotermsCodeType" id="oagis-id-bdbb3ceca38b4a3b960f07ce65dbdc14">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
@@ -5793,7 +5837,7 @@ supplementary information.</ccts_Definition>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="LicenseCodeType" id="oagis-id-05347183cec64cd0a418d3ebaa440d65">
+	<xsd:complexType name="LicenseTypeCodeType" id="oagis-id-05347183cec64cd0a418d3ebaa440d65">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID>BDT000000</ccts_UniqueID>
@@ -6865,6 +6909,68 @@ supplementary information.</ccts_Definition>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<xsd:complexType name="SequencedCodeType" id="oagis-id-dac3c62369c54a5e8b996496f0438c64">
+		<xsd:simpleContent>
+			<xsd:extension base="SequencedCodeContentType">
+				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-01e03d3d96dc4b76a31e74d608e2ec99">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of a list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-c25a2ea157fd4aa297854bf3dfd89373">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Agency. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the agency that manages the code list</ccts_Definition>
+							<ccts_PropertyTermName>List Agency</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>True</ccts_DefaultIndicator>
+								<ccts_SchemeOrListID>3055</ccts_SchemeOrListID>
+								<ccts_SchemeOrListVersionID>D08B</ccts_SchemeOrListVersionID>
+								<ccts_SchemeOrListAgencyID>6</ccts_SchemeOrListAgencyID>
+								<ccts_SchemeOrListModificationAllowedIndicator>False</ccts_SchemeOrListModificationAllowedIndicator>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-1c58d4a913ee4f1fb1d87bb067b51ced">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Version. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the version of the list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List Version</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-f14c6ce3eae34517acb446241a38c629">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
 	<xsd:complexType name="StateCodeType" id="oagis-id-d1e442d072d84de89420ca400bf11533">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
@@ -7185,7 +7291,7 @@ supplementary information.</ccts_Definition>
 	</xsd:complexType>
 	<xsd:complexType name="UOMCodeType" id="oagis-id-6b7fa72803d843d8a29c567788b90745">
 		<xsd:simpleContent>
-			<xsd:extension base="UnitCodeContentType">
+			<xsd:extension base="UOMCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-3d8eec0a38b94bc69d9d40d9d224d647">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
