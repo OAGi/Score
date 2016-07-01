@@ -26,14 +26,38 @@ public class BDTSC implements Component {
         String representationTerm = dtSc.getRepresentationTerm();
         if (propertyTerm.equals(representationTerm)) {
             representationTerm = "";
+        } else {
+            /*
+             * To handle an exceptional case in Fields.xsd.
+             *
+             * <xsd:attribute name="preferred" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
+             *
+             * The above SC has the representationTerm is 'Indicator'.
+             * So if we don't follow the following rule, the name becomes 'preferredIndicator'.
+             */
+            List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList =
+                    importedDataProvider.findBdtScPriRestriListByDtScId(dtSc.getDtScId()).stream()
+                            .filter(e -> e.isDefault()).collect(Collectors.toList());
+            if (bdtScPriRestriList.isEmpty() || bdtScPriRestriList.size() > 1) {
+                throw new IllegalStateException();
+            }
+
+            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
+                    importedDataProvider.findCdtScAwdPriXpsTypeMap(
+                            bdtScPriRestriList.get(0).getCdtScAwdPriXpsTypeMapId());
+
+            XSDBuiltInType xbt = importedDataProvider.findXbt(cdtScAwdPriXpsTypeMap.getXbtId());
+            if ("xbt_BooleanTrueFalseType".equals(xbt.getBuiltInType())) {
+                representationTerm = "";
+            }
         }
 
-        if(propertyTerm.contains(representationTerm)){
+        if (propertyTerm.contains(representationTerm)) {
             String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1);
             return attrName.replaceAll(" ", "");
-        }
-        else {
-            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) + representationTerm.replace("Identifier", "ID");
+        } else {
+            String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1) +
+                    representationTerm.replace("Identifier", "ID");
             return attrName.replaceAll(" ", "");
         }
     }
