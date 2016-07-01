@@ -172,7 +172,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
             cctsNameElement.setText(value.getName());
 
-            Element cctsDefinitionElement = new Element("ccts_Name", OAGI_NS);
+            Element cctsDefinitionElement = new Element("ccts_Definition", OAGI_NS);
             documentationElement.addContent(cctsDefinitionElement);
 
             cctsDefinitionElement.setText(value.getDefinition());
