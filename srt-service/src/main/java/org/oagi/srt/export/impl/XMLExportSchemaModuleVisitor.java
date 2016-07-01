@@ -231,7 +231,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         if ( (name.endsWith("CodeContentType") && !name.equals("CodeContentType")) ||
              (name.endsWith("IDContentType") && !name.equals("IDContentType")) ) {
             String baseName;
-            if ((name.endsWith("CodeContentType"))) {
+            if (name.endsWith("CodeContentType")) {
                 baseName = getCodeListName(bdtSimpleType);
             } else {
                 baseName = getAgencyIdName(bdtSimpleType);

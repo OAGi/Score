@@ -79,7 +79,7 @@ public class BDTSC implements Component {
                 return xbt.getBuiltInType();
             } else {
                 AgencyIdList agencyIdList = importedDataProvider.findAgencyIdList(agencyIdBdtScPriRestri.get(0).getAgencyIdListId());
-                return agencyIdList.getName();
+                return agencyIdList.getName() + "ContentType";
             }
         } else {
             CodeList codeList = importedDataProvider.findCodeList(codeListBdtScPriRestri.get(0).getCodeListId());
