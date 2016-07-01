@@ -32,6 +32,8 @@ public class SRTConstants {
 	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
 	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 
+	public static final String AGENCY_ID_LIST_NAME = "clm63055D08B_AgencyIdentification";
+
 	public static final String DATA_PATH;
 	static {
 		File dataPath = new File("data");

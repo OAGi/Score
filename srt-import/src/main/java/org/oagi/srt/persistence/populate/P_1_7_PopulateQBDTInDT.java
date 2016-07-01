@@ -34,6 +34,8 @@ import javax.xml.xpath.XPathExpression;
 import java.io.File;
 import java.util.*;
 
+import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
+
 /**
  * @author Yunsu Lee
  * @version 1.0
@@ -759,7 +761,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     public int getAgencyListID() throws Exception {
-        return agencyIdListRepository.findOneByName("Agency Identification").getAgencyIdListId();
+        return agencyIdListRepository.findOneByName(AGENCY_ID_LIST_NAME).getAgencyIdListId();
     }
 
     public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid) throws Exception {

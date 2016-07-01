@@ -19,6 +19,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
+
 /**
  * Created by tnk11 on 6/24/2016.
  */
@@ -1022,8 +1024,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
 
-        } else if (type.equals("clm63055D08B_AgencyIdentificationContentType")) {
-            AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
+        } else if (type.equals(AGENCY_ID_LIST_NAME + "ContentType")) {
+            AgencyIdList agencyIdList = agencyIdListRepository.findOneByName(AGENCY_ID_LIST_NAME);
 
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtSc.getDtScId());
