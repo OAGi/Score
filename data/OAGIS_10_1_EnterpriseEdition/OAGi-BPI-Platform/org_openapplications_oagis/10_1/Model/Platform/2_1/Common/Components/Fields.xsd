@@ -3530,7 +3530,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="TextType">
+			<xsd:extension base="StringType">
 				<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-7c3c291f53984e90bed1749ac95a7f28"/>
 			</xsd:extension>
 			<!--				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749ac95a7f28"/> -->
@@ -3541,7 +3541,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A free form note. The lang attribute identifies the language that the note is in. The author identifies the author of the note. The enrtyDate indicates the date the note was entered or last modified.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="TextType">
+			<xsd:extension base="StringType">
 				<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-7c3c291f53984e90bed1749bc10a7f28"/>
 				<xsd:attribute name="author" type="xsd:string" use="optional" id="oagis-id-08c23257569347caa798f07620e38923"/>
 				<xsd:attribute name="entryDateTime" type="xsd:token" use="optional" id="oagis-id-8b0a10d59d3647d89e0819516c1aeaca"/>
