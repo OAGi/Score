@@ -24,7 +24,8 @@ public class BDTSC implements Component {
             propertyTerm = propertyTerm.toLowerCase();
         }
         String representationTerm = dtSc.getRepresentationTerm();
-        if (propertyTerm.equals(representationTerm)) {
+        if (propertyTerm.equals(representationTerm) ||
+            "Text".equals(representationTerm)) { // exceptional case. 'expressionLanguageText' must be 'expressionLanguage'.
             representationTerm = "";
         }
 
