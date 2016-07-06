@@ -388,7 +388,7 @@ Values are:
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the identifier of the country of origin of an item, service or shipment </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="CountrySubdivisionCode" type="CountrySubdivisionCodeType" nillable="true" id="oagis-id-6f544719d56343248467059480b3b497">
+	<xsd:element name="CountrySubDivisionCode" type="CountrySubDivisionCodeType" nillable="true" id="oagis-id-6f544719d56343248467059480b3b497">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the Country. These may be Districts, Regions, States, Provinces etc. A possible list of values is as specified in ISO 3166-2. The name attribute identifies the name of this e.g. District, Region etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 		</xsd:annotation>
@@ -3136,7 +3136,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the town or the city</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="CitySubdivisionName" type="OpenNameType" nillable="true" id="oagis-id-399665b5fc4643f0a48fa89926dfa8e9">
+	<xsd:element name="CitySubDivisionName" type="OpenNameType" nillable="true" id="oagis-id-399665b5fc4643f0a48fa89926dfa8e9">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the City, example a city may have many districts or Boroughs. The type attribute identifies the type of this entity e.g. City, Borough etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 		</xsd:annotation>
@@ -4760,7 +4760,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="CountrySubdivisionCodeType" id="oagis-id-3582718b267c47c1bb66f323026b6455">
+	<xsd:complexType name="CountrySubDivisionCodeType" id="oagis-id-3582718b267c47c1bb66f323026b6455">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID/>

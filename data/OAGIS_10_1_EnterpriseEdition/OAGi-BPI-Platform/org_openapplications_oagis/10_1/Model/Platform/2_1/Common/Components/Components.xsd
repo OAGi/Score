@@ -4813,12 +4813,12 @@ In the case of an Operation is the location that the Operation its resulting mat
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the town or the city</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CitySubdivisionName" id="oagis-id-09d86186a023451eb9cbcb87bd2e84f7" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="CitySubDivisionName" id="oagis-id-09d86186a023451eb9cbcb87bd2e84f7" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the City, example a city may have many districts or Boroughs. The type attribute identifies the type of this entity e.g. City, Borough etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CountrySubdivisionCode" id="oagis-id-6b4798e402af4dc691801c68995a6e44" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="CountrySubDivisionCode" id="oagis-id-6b4798e402af4dc691801c68995a6e44" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the Country. These may be Districts, Regions, States, Provinces etc. A possible list of values is as specified in ISO 3166-2. The name attribute identifies the name of this e.g. District, Region etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 						</xsd:annotation>
@@ -6995,7 +6995,7 @@ Possible values:
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">HR-XML 3.0</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CountrySubdivisionCode" id="oagis-id-1c27a2e005a94b2da717caae66c3f598" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="CountrySubDivisionCode" id="oagis-id-1c27a2e005a94b2da717caae66c3f598" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Qualifies the further division of the Country. These may be Districts, Regions, States, Provinces etc. A possible list of values is as specified in ISO 3166-2. The name attribute identifies the name of this e.g. District, Region etc, and there is a pre-defined list of types supported, with the ability to add new ones as necessary</xsd:documentation>
 						</xsd:annotation>
