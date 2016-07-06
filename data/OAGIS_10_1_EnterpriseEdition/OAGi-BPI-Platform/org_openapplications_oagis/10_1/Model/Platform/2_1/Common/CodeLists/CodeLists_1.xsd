@@ -614,6 +614,12 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_GenderCodeContentType" id="oagis-id-58bcc34f61284f4580e706506453fc3d">
 		<xsd:union memberTypes="oacl_GenderCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
+	<xsd:simpleType name="oacl_HarmonizedTariffScheduleCodeEnumerationType" id="oagis-id-5cdefe010ca2496f99cd516f11aebc7a">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_HarmonizedTariffScheduleCodeContentType" id="oagis-id-c9b40a121c11428ab0f56918757be62f">
+		<xsd:union memberTypes="oacl_HarmonizedTariffScheduleCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
 	<xsd:simpleType name="oacl_IncotermsCodeEnumerationType" id="oagis-id-610f796fb0e246809299f9c8ccd5e307">
 		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>
@@ -983,6 +989,12 @@ borne by the beneficiary customer.</xsd:documentation>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_StateCodeContentType" id="oagis-id-5d83970fc7a14264960da8e6c9fca3e4">
 		<xsd:union memberTypes="oacl_StateCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SequencedCodeEnumerationType" id="oagis-id-dc21bc6736fe49c0be43e76fa6a321bd">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_SequencedCodeContentType" id="oagis-id-8570e458813c4a50b653f49e7d3df8b2">
+		<xsd:union memberTypes="oacl_SequencedCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_SystemEnvironmentCodeEnumerationType" id="oagis-id-ecd5459a46b64a18a8e231007a66c2ef">
 		<xsd:restriction base="xsd:token">
