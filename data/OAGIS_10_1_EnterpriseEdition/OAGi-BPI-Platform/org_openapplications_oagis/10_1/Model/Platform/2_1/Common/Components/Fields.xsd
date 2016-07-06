@@ -264,8 +264,8 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The total cost of this project, as either an entered amount (no activity costing) or calculated as the sum of the activity costs.
 
-				This field is updated by the LoadProjectAccounting BOD.
-			</xsd:documentation>
+This field is updated by the LoadProjectAccounting BOD.
+							</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="TotalCreditLimitAmount" type="AmountType" nillable="true" id="oagis-id-f269cd7333cb4667a9954e98bd18a4df">
@@ -285,8 +285,7 @@
 	</xsd:element>
 	<xsd:element name="TotalTaxAmount" type="AmountType" nillable="true" id="oagis-id-4f435a4ceff8471ca24b99b8ef43200b">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Amount of money resulting from the calculation of the
-				tax.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Amount of money resulting from the calculation of the tax.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="TotalValueAmount" type="AmountType" nillable="true" id="oagis-id-ab7cbbe4584f4bcd8df85da846e72117">
@@ -327,7 +326,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">CardCode or Card Id field that can be optionally provided to use additional security features of credit card authorization. It is typically a 3 digit number located on the back of most credit cards.
 
-				For American Express, it is a 4 digit number on the front.</xsd:documentation>
+For American Express, it is a 4 digit number on the front.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CarrierEquipmentCode" type="CodeType" id="oagis-id-19b3a8fe80d1483985d8d3375b198ae6"/>
@@ -344,7 +343,7 @@
 	<xsd:element name="ChargeBearerCode" type="ChargeBearerCodeType" nillable="true" id="oagis-id-e3838696b5a34169a6428af91c003c3b">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Specifies if the creditor and/or debtor will bear the charges associated with
-				the processing of the payment transaction.</xsd:documentation>
+the processing of the payment transaction.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CheckFormsCode" type="CodeType" nillable="true" id="oagis-id-2d9979dae02e45c28cd8e5c80938c13d">
@@ -371,11 +370,11 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the methodology by which the value of an item is determined.
 
-				Values are:
-				Standard
-				Moving Average
-				LIFO - For last in first out.
-				FIFO - For first in first out.</xsd:documentation>
+Values are:
+Standard
+Moving Average
+LIFO - For last in first out.
+FIFO - For first in first out.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CountryCode" type="CountryCodeType" nillable="true" id="oagis-id-5157fcc44dc54cffa6c0bae7ba1f8912">
@@ -407,8 +406,8 @@
 	<xsd:element name="DateCode" type="CodeType" nillable="true" id="oagis-id-d61baba273ff490cb41099b6108c749e">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates whether the dates specified on the schedule are delivery based or shipment based. Valid values for this field include:
-				- Ship
-				- Deliver</xsd:documentation>
+- Ship
+- Deliver</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="DebitCreditCode" type="DebitCreditCodeType" nillable="true" id="oagis-id-d68fbdc5fbe34c22bcb4a99d1886ac45"/>
@@ -484,7 +483,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Specifies the transfer method that will be used by the first agent to transfer the funds to the creditor.
 
-				IST limits these values to CreditTransfer (TRF) and Checque (CHK).</xsd:documentation>
+IST limits these values to CreditTransfer (TRF) and Checque (CHK).</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="FixedAssetCode" type="CodeType" nillable="true" id="oagis-id-5e9419a0de51489e9997c16bc8c2785b">
@@ -499,7 +498,7 @@
 	</xsd:element>
 	<xsd:element name="FreightClassificationCode" type="CodeType" nillable="true" id="oagis-id-444802ccc2604300a8714cdb5599ff38">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This qualifies goods for purposes of freight cost calculation. An example would the qualifications used by National Motor Freight Carriers.EXAMPLES§	National Motor Freight Carriers (NMFC) Class Code – Based on an evaluation of density, stowability, ease of handling and liability, the commodities are grouped into one of 18 classes.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This qualifies goods for purposes of freight cost calculation. An example would the qualifications used by National Motor Freight Carriers.EXAMPLES: National Motor Freight Carriers (NMFC) Class Code - Based on an evaluation of density, stowability, ease of handling and liability, the commodities are grouped into one of 18 classes.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="FreightTermCode" type="FreightTermCodeType" nillable="true" id="oagis-id-ef9f6e4170a749d6b761dbc91ae9b971">
@@ -519,22 +518,22 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a contractual code used to describe the point where delivery occurs (goods ownership is transferred) in a contract of sale.  It identifies the rights and obligations of each partner  (supplier, carrier and customer) in the transaction and may specify the requirements to assume ownership (i.e. paying for the cost of the goods and/or transportation).
 
-				The United Nations Trade Facilitation Information Exchange (UN/TraFIX) has established the following codes (INCOTERMS 2010) for use in international trade. (See http://www.unece.org/cefact/recommendations/rec_index.htm).  These terms may also be found in the United States Uniform Commercial Code (UCC).
+The United Nations Trade Facilitation Information Exchange (UN/TraFIX) has established the following codes (INCOTERMS 2010) for use in international trade. (See http://www.unece.org/cefact/recommendations/rec_index.htm).  These terms may also be found in the United States Uniform Commercial Code (UCC).
 
-				EXAMPLES
-				General transport
-				EXW - Ex Works ... (named place)
-				FCA - Free Carrier ... (named place)
-				CPT - Carriage Paid ... (named place of destination)
-				CIP - Carriage and Insurance Paid To ... (named place of destination)
-				DAT - Delivered at Terminal
-				DAP - Delivered at Place ... (named place of destination)
-				DDP - Delivered Duty Paid ... (destination place)
-				Water transportation
-				FAS - Free Along Ship ... (named port of shipment)
-				FOB - Free On Board ... (named port of shipment)
-				CFR - Cost and Freight ... (named port of destination)
-				CIF - Cost, Insurance and Freight ... (named port of destination)</xsd:documentation>
+EXAMPLES
+General transport
+EXW - Ex Works ... (named place)
+FCA - Free Carrier ... (named place)
+CPT - Carriage Paid ... (named place of destination)
+CIP - Carriage and Insurance Paid To ... (named place of destination)
+DAT - Delivered at Terminal
+DAP - Delivered at Place ... (named place of destination)
+DDP - Delivered Duty Paid ... (destination place)
+Water transportation
+FAS - Free Along Ship ... (named port of shipment)
+FOB - Free On Board ... (named port of shipment)
+CFR - Cost and Freight ... (named port of destination)
+CIF - Cost, Insurance and Freight ... (named port of destination)</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="InventoryPolicyCode" type="CodeType" id="oagis-id-9750975841384470ab6e126119a7208c"/>
@@ -643,7 +642,7 @@
 	<xsd:element name="ProcessCode" type="CodeType" nillable="true" id="oagis-id-7d7e0b64ca704bf5aafa5dd33292abc5">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a process code used for grouping like operations.
-				Possible examples are:  Heat Treat, Dyeing</xsd:documentation>
+Possible examples are:  Heat Treat, Dyeing</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ProcessingConfirmationCode" type="CodeType" id="oagis-id-858edbd676c44e71bfef520337d17980"/>
@@ -663,16 +662,16 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This  determines the receipt routing of an item or part. Examples of values include:
 
-				Customer consignment
-				Inspection
-				Vendor consignment
-				Blocked
-				Bonded
-				User defined
+Customer consignment
+Inspection
+Vendor consignment
+Blocked
+Bonded
+User defined
 
-				SYNONYMS
-				Material Status
-				Material Condition Code</xsd:documentation>
+SYNONYMS
+Material Status
+Material Condition Code</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ReceivedCode" type="CodeType" nillable="true" id="oagis-id-be7a0c2384e241278657ab227705795b">
@@ -683,7 +682,7 @@
 	<xsd:element name="RemitLocationMethodCode" type="RemitLocationMethodCodeType" nillable="true" id="oagis-id-8945d209a7d44033a5fa12c77fa0b2a4">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Specifies the method to be used by the first agent to deliver the
-				remittance advice information.</xsd:documentation>
+remittance advice information.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="RegionCode" type="CodeType" nillable="true" id="oagis-id-23e5e713060f4c6588d91959d5d8fca6"/>
@@ -694,7 +693,7 @@
 	</xsd:element>
 	<xsd:element name="RequestLanguageCode" type="LanguageCodeType" nillable="true" id="oagis-id-2e0ec8c9ef174cd3939a0135584b675d">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The RequestLanguage element can be used by the requesting system to indicate the desired language of the catalog or application to which session will be initiated upon receipt of the Show URL transaction.  For instance, application A wishes to ‘punch out’ to external system B’s online Dutch-language catalog.  System B supports numerous languages, but will validate the value of the 'RequestLanguage' element and return the appropriate URL to direct application A to the Dutch site</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The RequestLanguage element can be used by the requesting system to indicate the desired language of the catalog or application to which session will be initiated upon receipt of the Show URL transaction.  For instance, application A wishes to 'punch out' to external system B's online Dutch-language catalog.  System B supports numerous languages, but will validate the value of the 'RequestLanguage' element and return the appropriate URL to direct application A to the Dutch site</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="RequestStateCode" type="CodeType" nillable="true" id="oagis-id-1eafd76a58e941dca6e5a346ce05310a"/>
@@ -707,7 +706,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies what the following resources of an operation or step are to be used for.
 
-				The following are a couple of examples: Setup, Teardown, Run</xsd:documentation>
+The following are a couple of examples: Setup, Teardown, Run</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ResponseCode" type="CodeType" nillable="true" id="oagis-id-e09fef05fbd440b9ac980b56d97c4116">
@@ -838,13 +837,13 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This describes the unit of measure that a product is shipped.  This is sometimes different from the unit of measure that is used to count a product as it is consumed, sold or accounted for.
 
-				Examples are:
+Examples are:
 
-				- Generic Quantity  (Each, Pair, Dozen, Gross, etc)
-				- Weight (Ounce, Pound, Ton, Kilogram, etc)
-				- Volume (Cup, Pint, Gallon, Liter, etc)
-				- Length (Inch, Foot, Yard, Meter, etc)
-				- Time (Second, Minute, Hour, Day, Year, etc)</xsd:documentation>
+- Generic Quantity  (Each, Pair, Dozen, Gross, etc)
+- Weight (Ounce, Pound, Ton, Kilogram, etc)
+- Volume (Cup, Pint, Gallon, Liter, etc)
+- Length (Inch, Foot, Yard, Meter, etc)
+- Time (Second, Minute, Hour, Day, Year, etc)</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="SpecialPriceAuthorizationCode" type="CodeType" nillable="true" id="oagis-id-ea8532d3ca384fbfb12e424f6b357be9">
@@ -899,11 +898,11 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the.methodology by which the value of an item is determined.
 
-				Values are:
-				Standard
-				Moving Average
-				LIFO - last in first out.
-				FIFO - first in first out</xsd:documentation>
+Values are:
+Standard
+Moving Average
+LIFO - last in first out.
+FIFO - first in first out</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CreditorTaxTypeCode" type="CodeType" nillable="true" id="oagis-id-a130ed3061464fd78aa6fbc9ae2db470">
@@ -947,7 +946,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">ScheduleType is a code or identifier that describes the specific schedule and can be used in a variety of contexts. When used in the context of employee, ScheduleType refers to the specific schedule for the employee or worker.
 
-				When used in the context of a Schedule, ScheduleType indicates whether the Schedule is a demand schedule from a customer or a supply schedule from a supplier. Valid values for this context are: “Demand”, “Supplier”</xsd:documentation>
+When used in the context of a Schedule, ScheduleType indicates whether the Schedule is a demand schedule from a customer or a supply schedule from a supplier. Valid values for this context are: “Demand”, “Supplier”</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="StepTypeCode" type="CodeType" nillable="true" id="oagis-id-989c88cd82284df8a7b06de446c24160">
@@ -1394,7 +1393,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Total amount of break time used by all Labour involved with the associated entity.
 
-				In cases where BreakTimeDuratation occurs along with BreakTimePeriod. BreakTimeDuration is being deprecated in favor of BreakTimePeriod.</xsd:documentation>
+In cases where BreakTimeDuratation occurs along with BreakTimePeriod. BreakTimeDuration is being deprecated in favor of BreakTimePeriod.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CompletedDuration" type="DurationMeasureType" nillable="true" id="oagis-id-7e86145cdb7340f083e471b2907f0634">
@@ -1512,7 +1511,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Activity that is associated to the Project in which the distribution is to be assigned..
 
-				An ActivityId cannot occur with out a ProjectId.</xsd:documentation>
+An ActivityId cannot occur with out a ProjectId.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="AgencyID" type="IDType" nillable="true" id="oagis-id-0e8f5d31b1124daba66264018e11df67"/>
@@ -1537,7 +1536,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">BillOFLadingID where used as a reference to the BillOfLading is deprecated in favor of BillOfLadingReference in 9.2 release.
 
-				Is the bill of lading identifier.</xsd:documentation>
+Is the bill of lading identifier.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CAGEID" type="IDType" nillable="true" id="oagis-id-e4276a931d5f4f558d6d158090eef10c">
@@ -1642,7 +1641,7 @@
 	<xsd:element name="EquipmentID" type="IDType" nillable="true" id="oagis-id-42b4f53e40d840e292a49cac12f63b59"/>
 	<xsd:element name="FindNumberID" type="IDType" nillable="true" id="oagis-id-7386661a4c604433b89c1772670bd246">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">FindNumber: is used as a shorthand for the ItemID (part number) in manufacturing instructions, engineering drawings and/or CAD models.  The FindNumber is the same for all instances of the Item.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">FindNumber: is used as a shorthand for the ItemID (part number) in manufacturing instructions, engineering drawings and/or CAD models. The FindNumber is the same for all instances of the Item.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="FixedAssetID" type="IDType" nillable="true" id="oagis-id-f553f21227534ed1afd9abc757726633">
@@ -1674,9 +1673,9 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
 
-				It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction.
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction.
 
-				Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
+Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="GroupID" type="IDType" nillable="true" id="oagis-id-10342d5b2ef2411b8898206f2a33f72f"/>
@@ -1684,8 +1683,7 @@
 	<xsd:element name="IBANID" type="IDType" nillable="true" id="oagis-id-a4270b088de44d1f922732e7cd5d8c6c"/>
 	<xsd:element name="ID" type="OpenIDType" nillable="true" id="oagis-id-57f1dbe323d344caa1394f49f923bb89">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Identifiers of the given instance of an entity within the scope of the integration. The schemeAgencyID attribute identifies the party that provided or knows this party by the given identifier.
-			</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Identifiers of the given instance of an entity within the scope of the integration. The schemeAgencyID attribute identifies the party that provided or knows this party by the given identifier.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="InnerPackID" type="OpenIDType" id="oagis-id-501d06b284534b3c98933c90a12634c3"/>
@@ -1830,7 +1828,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference designator on a Drawing or BluePrint where the BOM is used.
 
-				Is an identifier used to refer to an instance of the  Item (part number) in manufacturing instructions, engineering drawings and/or CAD models. ReferenceDesignator is also often known as an installation point. There will be a single distinct ReferenceDesignatorID for each instance of an Item, however multiple distinct ItemIDs could have the same ReferenceDesignatorID value within a BOM, such as for alternate parts or parts selected from a test-fit-and-select processes. </xsd:documentation>
+Is an identifier used to refer to an instance of the  Item (part number) in manufacturing instructions, engineering drawings and/or CAD models. ReferenceDesignator is also often known as an installation point. There will be a single distinct ReferenceDesignatorID for each instance of an Item, however multiple distinct ItemIDs could have the same ReferenceDesignatorID value within a BOM, such as for alternate parts or parts selected from a test-fit-and-select processes. </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ReferenceOrderNumberID" type="IDType" nillable="true" id="oagis-id-47bb8e44c1724b94b0cfbcc26e15c992">
@@ -2006,11 +2004,11 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TRACKINGID is a unique identifier for the purpose of tracking an individual package or shipment
 
-				Examples of a valid TRACKINGID include:
-				•An express parcel tracking number as typically assigned by UPS, DHL, Fedex or other similar carriers.
-				•A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.
-				•A "Pro Number" (Progressive Number), as assigned by an LTL (less-than-truckload) freight carrier.  Since the same Pro Number can be assigned to multiple shipping units within an LTL shipment, the SHIPUNITSEQ and SHIPUNITTOT field identifiers may be used to identify the individual pieces.
-				•The unique identifier of a motor freight trailer, railroad box or tank car, ocean freight container or other transportation vessel.
+Examples of a valid TRACKINGID include:
+•An express parcel tracking number as typically assigned by UPS, DHL, Fedex or other similar carriers.
+•A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.
+•A "Pro Number" (Progressive Number), as assigned by an LTL (less-than-truckload) freight carrier.  Since the same Pro Number can be assigned to multiple shipping units within an LTL shipment, the SHIPUNITSEQ and SHIPUNITTOT field identifiers may be used to identify the individual pieces.
+•The unique identifier of a motor freight trailer, railroad box or tank car, ocean freight container or other transportation vessel.
 			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
@@ -2145,7 +2143,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies within a Bill of Material structure if an OptionClass or Option conflicts with another part of the Bill of Material structure and therefore if chosen, must not be combined with any other OptionClass or Option within that branch of the Bill of Material.
 
-				In other words if a given Option is choosen another Option out of the same OptionClass can not be selected.</xsd:documentation>
+In other words if a given Option is choosen another Option out of the same OptionClass can not be selected.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ExclusiveShipmentIndicator" type="IndicatorType" nillable="true" id="oagis-id-4c26406a4ee64895906da9c7ed8b0525"/>
@@ -2182,9 +2180,9 @@
 	<xsd:element name="HideIndicator" type="IndicatorType" nillable="true" id="oagis-id-536f2f35ba2444f08d4d7ea3fa33ee38">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">
-				This field indicates whether or not this price should be
-				displayed.
-			</xsd:documentation>
+						This field indicates whether or not this price should be
+							displayed.
+					</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="HTMLPreferredIndicator" type="IndicatorType" nillable="true" id="oagis-id-bba70de2cd2d4cec89efaf1f4037ea9f">
@@ -2369,7 +2367,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the value and unit of measure in the z-axis in a thrre dimensional system.
 
-				Examples of this maybe the Altitude in the case of a map of the world, or the height or shelf in a rack system in the case of a manufacturing or warehouse facility.</xsd:documentation>
+Examples of this maybe the Altitude in the case of a map of the world, or the height or shelf in a rack system in the case of a manufacturing or warehouse facility.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="DegreeMeasure" type="MeasureType" nillable="true" id="oagis-id-cc16c313757f4c55b7528dd7500d6eec"/>
@@ -2452,7 +2450,7 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the value and unit of measure in the z-axis in a thrre dimensional system.
 
-				Examples of this maybe the Altitude in the case of a map of the world, or the height or shelf in a rack system in the case of a manufacturing or warehouse facility.</xsd:documentation>
+Examples of this maybe the Altitude in the case of a map of the world, or the height or shelf in a rack system in the case of a manufacturing or warehouse facility.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="VolumeMeasure" type="MeasureType" nillable="true" id="oagis-id-773dac34f36d4eb395f7d87a5fb9ec78">
@@ -2477,9 +2475,9 @@
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The catch weight conversion factor is a stock keeping conversion factor for inventory goods.  This is a special conversion factor for when the units of measure can not be converted using arithmetic.  This conversion factor is used with the CatchWeightQuantity.
 
-				Examples of the use of this factor include:
-				Number of Chickens to a Box
-				Number of units of a chemical in a barrel</xsd:documentation>
+Examples of the use of this factor include:
+Number of Chickens to a Box
+Number of units of a chemical in a barrel</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CopiesNumber" type="NumberType" id="oagis-id-794622bf0d5e41a9bf4ce4e4806b9d60">
@@ -2578,8 +2576,8 @@
 	<xsd:element name="DeltaPercent" type="PercentType" nillable="true" id="oagis-id-1fd135e445d3445592743a9992f0ed49">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">
-				Used to express delta between to multiple price types .
-			</xsd:documentation>
+						Used to express delta between to multiple price types .
+					</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="DiscountPercent" type="PercentType" nillable="true" id="oagis-id-9507fe1a0369466385789b234c2fe105">
@@ -2997,7 +2995,7 @@
 	<xsd:element name="Operator" type="TextType" id="oagis-id-5570f7511ade4b928129923451b74c14">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Operator element defines operator criteria for the SearchValue. For instance if the requester wishes to return a result set of all prices &gt; $600, the transaction would contain a SearchTerm data type with a SearchValue of ‘600’, an SearchValueInclusive of ‘0’ and an OPERATOR value of ‘&gt;.’
-				The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equals, Less Then or Equals, Equals</xsd:documentation>
+The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equals, Less Then or Equals, Equals</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="PlacardEndorsement" type="TextType" nillable="true" id="oagis-id-bb161e6ac9b241f7ae13ff2ce7dfea0b">
@@ -3555,9 +3553,7 @@
 	</xsd:complexType>
 	<xsd:complexType name="TemperatureMeasureType" id="oagis-id-4a641b3b6a074d5b909b425aeec9caaa">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TemperatureMeasureType is logically derived from UN/CEFACT TBG17 ABIE TemperatureType as defined in the Reusable Aggregate Business Information Entity (RUABIE) XML Schema file.
-
-			</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TemperatureMeasureType is logically derived from UN/CEFACT TBG17 ABIE TemperatureType as defined in the Reusable Aggregate Business Information Entity (RUABIE) XML Schema file.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="MeasureType"/>
@@ -4782,8 +4778,8 @@
 				<ccts_DictionaryEntryName>Country Subdivision_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
 				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange
-					independence may be used to represent or replace a definitive value or text of an attribute together with relevant
-					supplementary information.</ccts_Definition>
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
+supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Country Subdivision</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5115,8 +5111,8 @@
 				<ccts_DictionaryEntryName>Delivery Point_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
 				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange
-					independence may be used to represent or replace a definitive value or text of an attribute together with relevant
-					supplementary information.</ccts_Definition>
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
+supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Delivery Point</ccts_QualifierTerm>
 			</xsd:documentation>
@@ -5606,8 +5602,8 @@
 				<ccts_DictionaryEntryName>Gender_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
 				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange
-					independence may be used to represent or replace a definitive value or text of an attribute together with relevant
-					supplementary information.</ccts_Definition>
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
+supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Gender</ccts_QualifierTerm>
 			</xsd:documentation>
