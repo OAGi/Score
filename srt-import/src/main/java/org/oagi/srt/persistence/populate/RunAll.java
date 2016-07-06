@@ -36,7 +36,7 @@ public class RunAll {
             p7.run(ctx);
 
             P_1_8_1_PopulateAccAsccpBccAscc p8 = ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
-            p8.run(ctx);
+            //p8.run(ctx);
         }
     }
 }

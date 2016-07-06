@@ -437,34 +437,31 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setVersionNum("1.0");
 
         DataType baseDataType;
-        if (base.endsWith("CodeContentType")) {
-            baseDataType = getDataTypeWithDen("Code. Type");
-        } else {
-            if (xHandler != null) {
-                Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='" + type + "']/xsd:simpleContent");
-                if (simpleContentNode == null) {
-                    return null;
-                }
+
+        if (xHandler != null) {
+            Node simpleContentNode = xHandler.getNode("//xsd:complexType[@name='" + type + "']/xsd:simpleContent");
+            if (simpleContentNode == null) {
+                return null;
+            }
+        }
+
+        String baseDen = Utility.typeToDen(base);
+        baseDataType = getDataTypeWithDen(baseDen);
+
+        if(baseDataType == null){
+            DataTypeInfoHolder baseDataTypeInfoHolder = dtiHolderMap.get(base);
+            if (baseDataTypeInfoHolder == null) {
+                throw new IllegalStateException("Unknown QBDT: " + base);
             }
 
-            String baseDen = Utility.typeToDen(base);
-            baseDataType = getDataTypeWithDen(baseDen);
-
-            // QBDT is based on another QBDT
+            // QBDT is based on Other QBDT
+            baseDataType = getDataTypeWithGUID(baseDataTypeInfoHolder.getGuid());
             if (baseDataType == null) {
-                DataTypeInfoHolder baseDataTypeInfoHolder = dtiHolderMap.get(base);
-                if (baseDataTypeInfoHolder == null) {
-                    throw new IllegalStateException("Unknown QBDT: " + base);
-                }
-
-                baseDataType = getDataTypeWithGUID(baseDataTypeInfoHolder.getGuid());
+                baseDataType = addToDT(baseDataTypeInfoHolder, base, xHandler);
                 if (baseDataType == null) {
-                    baseDataType = addToDT(baseDataTypeInfoHolder, base, xHandler);
-                    if (baseDataType == null) {
-                        return null;
-                    }
-                    addToDTSC(xHandler, base, baseDataType);
+                    return null;
                 }
+                addToDTSC(xHandler, base, baseDataType);
             }
         }
 
@@ -507,46 +504,45 @@ public class P_1_7_PopulateQBDTInDT {
 
         String dataTypeTerm = dataType.getDataTypeTerm();
 
-//		//the previous condition below cannot classify the cases correctly.
-//		//we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
-        if (dataTypeTerm.equalsIgnoreCase("Code") &&
-                !(dataTypeTerm.equalsIgnoreCase("Code") &&
-                        base.equalsIgnoreCase("CodeType"))) {
-            //same as (DataTypeTerm = "Code") & (base != "CodeType")
+		//we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
+        if(base.endsWith("CodeContentType")){
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
-            if (base.endsWith("CodeContentType")) {
-                bdtPriRestri.setCodeListId(getCodeListId(base.substring(0, base.indexOf("CodeContentType"))));
-            } else {//MatchCodeType, ResponseCodeType
-                for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
-                    if (aBusinessDataTypePrimitiveRestriction.getCodeListId() > 0) {
-                        bdtPriRestri.setCodeListId(aBusinessDataTypePrimitiveRestriction.getCodeListId());
-                        break;
-                    }
-                }
-            }
+            int codeListId = getCodeListId(base.substring(0, base.indexOf("CodeContentType")));
+            bdtPriRestri.setCodeListId(getCodeListId(base.substring(0, base.indexOf("CodeContentType"))));
             bdtPriRestri.setDefault(false);
-            bdtPriRestriListForSaving.add(bdtPriRestri);
-        }
+            bdtPriRestriListForSaving.add(bdtPriRestri); //for CodeList
 
-        if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
+            for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
+                BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
+                inheritedBdtPriRestri.setBdtId(dataType.getDtId());
+                inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
+                inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
+                bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
+            }//For inherited
+        }
+        else if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
             bdtPriRestri.setAgencyIdListId(getAgencyListID());
             bdtPriRestri.setDefault(false);
-            bdtPriRestriListForSaving.add(bdtPriRestri);
-        }
+            bdtPriRestriListForSaving.add(bdtPriRestri); //For AgencyIdList
 
-        if (!dataTypeTerm.equalsIgnoreCase("Code") ||
-                (dataTypeTerm.equalsIgnoreCase("Code") && base.endsWith("CodeType")) ||
-                (dataTypeTerm.equalsIgnoreCase("Code") && base.endsWith("CodeContentType"))) {
-            //
-            //third or condition is not fine because we might apply this code to base = "CodeContentType" not only end-with "CodeContentType"
-            for (BusinessDataTypePrimitiveRestriction bdtPriRestri : al) {
+            for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
                 BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
                 inheritedBdtPriRestri.setBdtId(dataType.getDtId());
-                inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(bdtPriRestri.getCdtAwdPriXpsTypeMapId());
-                inheritedBdtPriRestri.setDefault(bdtPriRestri.isDefault());
+                inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
+                inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
+                bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
+            }//For inherited
+        }
+        else {
+            for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
+                BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
+                inheritedBdtPriRestri.setBdtId(dataType.getDtId());
+                inheritedBdtPriRestri.setCdtAwdPriXpsTypeMapId(baseBDTPriRestri.getCdtAwdPriXpsTypeMapId());
+                inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
+                inheritedBdtPriRestri.setCodeListId(baseBDTPriRestri.getCodeListId());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
             }
         }

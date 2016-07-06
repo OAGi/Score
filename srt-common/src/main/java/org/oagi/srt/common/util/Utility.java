@@ -314,7 +314,13 @@ public class Utility {
     public static String denWithQualifier(String qualifier, String baseDen) {
         String denWithQualifier = "";
         baseDen = Utility.denWithoutUUID(baseDen);
-        denWithQualifier = qualifier + "_ " + baseDen;
+
+        if(!baseDen.equals("Code Content. Type") && baseDen.endsWith("Code Content. Type")){
+            denWithQualifier = qualifier + "_ " + "Code. Type";
+        }
+        else {
+            denWithQualifier = qualifier + "_ " + baseDen;
+        }
 
         return denWithQualifier;
     }
@@ -346,7 +352,13 @@ public class Utility {
         } else if (baseDen.equals("Code Content. Type")) {
             qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeContentType");
         } else if (baseDen.endsWith("Code Content. Type")) {
-            qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeType");
+            int pos = type.lastIndexOf("CodeType");
+            if(pos != -1) {
+                qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeType");
+            }
+            else {
+                qualifier = Utility.spaceSeparatorBeforeStr(type, "Type");
+            }
         } else {
             String p1 = Utility.firstDenWithoutUUID(baseDen);
             p1 = Utility.toCamelCase(p1);

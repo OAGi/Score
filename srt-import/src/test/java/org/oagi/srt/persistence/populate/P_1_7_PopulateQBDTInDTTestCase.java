@@ -172,7 +172,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedContentType("Day Of Week", "oagis-id-9d2b86fa536740649a3a7bd257d71c89", "oacl_DayOfWeekCode"),
                 new ExpectedContentType("Debit Credit", "oagis-id-6073c7d7d8124c05ac5c4152e4036eea", "oacl_DebitCreditCode"),
                 new ExpectedContentType("Delivery Point", "oagis-id-e5f3ed90350e43ee8168257121535b9e", "oacl_DeliveryPointCode"),
-                new ExpectedContentType("Email Format", "oagis-id-dca015ffe62946dfafa7b45cae8f8b68", "oacl_EmailFormatCode"),
+                new ExpectedContentType("E Mail Format", "oagis-id-dca015ffe62946dfafa7b45cae8f8b68", "oacl_EMailFormatCode"),
                 new ExpectedContentType("Engineering Activity", "oagis-id-7f8fcf6fa5df4bc1ad4eada3f42eb43c", "oacl_EngineeringActivityCode"),
                 new ExpectedContentType("Engineering Work Order", "oagis-id-18e0ee3656834b78b9399b325a644a6f", "oacl_EngineeringWorkOrderCode"),
                 new ExpectedContentType("Engineering Work Request", "oagis-id-e29b443a7f8245699ab4e340e6f08d11", "oacl_EngineeringWorkRequestCode"),
@@ -208,7 +208,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedContentType("System Environment", "oagis-id-377aed87d8cf4a57895e04d302d76ce3", "oacl_SystemEnvironmentCode"),
                 new ExpectedContentType("Tax", "oagis-id-062248c9951d44bfbe3b65a69cfa26de", "oacl_TaxCode"),
                 new ExpectedContentType("Transfer", "oagis-id-c9dbc6a3ec254540907732a5c253e25e", "oacl_TransferCode"),
-                new ExpectedContentType("UOM", "oagis-id-740dd2f4526741cc9f8532181c1c2630", "oacl_UnitCode"),
+                new ExpectedContentType("Unit", "oagis-id-740dd2f4526741cc9f8532181c1c2630", "oacl_UnitCode"),
                 new ExpectedContentType("Time Zone", "oagis-id-740dd2f4526741cc9f8532181c1c2635", "oacl_TimeZoneCode")
         );
         assertEquals(58, expectedContentTypes.size());
@@ -235,7 +235,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedOtherQBDT("Description", "Text", "Text. Type", "oagis-id-9dc9109b384b43299ecc0d140817f47b"),
                 new ExpectedOtherQBDT("Note", "Text", "Text. Type", "oagis-id-8d9b4b5c8b284fd0b59b246262bcafa2"),
                 new ExpectedOtherQBDT("Temperature", "Measure", "Measure. Type", "oagis-id-4a641b3b6a074d5b909b425aeec9caaa"),
-                new ExpectedOtherQBDT("Name Value Pair", "Text", "String. Type", "oagis-id-e298a36a331247c3a2a4a585d5754531"),
+                new ExpectedOtherQBDT("Name Value Pair", "Value", "Value. Type", "oagis-id-e298a36a331247c3a2a4a585d5754531"),
                 new ExpectedOtherQBDT("Preferred", "Name", "Name. Type", "oagis-id-55e3dee204b449fab4dac08c5893c031"),
                 new ExpectedOtherQBDT("Sequenced", "Code", "Code. Type", "oagis-id-dac3c62369c54a5e8b996496f0438c64"),
                 new ExpectedOtherQBDT("Sequenced", "Identifier", "Identifier. Type", "oagis-id-0624ca38925d43929a6f7d8b7b7e0882"),
@@ -247,61 +247,61 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 new ExpectedOtherQBDT("Financial", "Code", "Match_ Code. Type", "oagis-id-31de26f234b749448cf9c474336ba55d"),
                 new ExpectedOtherQBDT("Encrypted", "Binary Object", "Binary Object. Type", "oagis-id-f28d03fa05a94dc49dad44afb81f79e0"),
                 new ExpectedOtherQBDT("Acknowledge", "Code", "Response_ Code. Type", "oagis-id-8637fad84f094b5f97a64c12c67b939c"),
-                new ExpectedOtherQBDT("Action", "Code", "Code. Type", "oagis-id-480d156c3d50459aa6689fa74d01ac89"),
-                new ExpectedOtherQBDT("Category", "Code", "Code. Type", "oagis-id-c4a4406c1cd74115a07f04b365ab9075"),
-                new ExpectedOtherQBDT("Charge Bearer", "Code", "Code. Type", "oagis-id-a8d20a9602eb4353816e12cd17ea0343"),
-                new ExpectedOtherQBDT("Charge", "Code", "Code. Type", "oagis-id-6131e6a3d8114c5ea36bd91044180bb1"),
-                new ExpectedOtherQBDT("Check Delivery Method", "Code", "Code. Type", "oagis-id-f28cea919478487cbb2f95deb3b408e2"),
-                new ExpectedOtherQBDT("Check Instruction", "Code", "Code. Type", "oagis-id-6fa8419852f6400abd5c255f55e38f40"),
-                new ExpectedOtherQBDT("Classification", "Code", "Code. Type", "oagis-id-8f4d478090a746fc9ec0573373901793"),
-                new ExpectedOtherQBDT("Confirmation", "Code", "Code. Type", "oagis-id-8311a261bc5348dda91cba90fa83429e"),
-                new ExpectedOtherQBDT("Contact Location", "Code", "Code. Type", "oagis-id-250d8771469544d88b7bb7607432da93"),
-                new ExpectedOtherQBDT("Control Assertion", "Code", "Code. Type", "oagis-id-34c5204633a54894846863a99618f567"),
-                new ExpectedOtherQBDT("Control Component", "Code", "Code. Type", "oagis-id-31e2c152a1c8458e8d0ecda03db61206"),
-                new ExpectedOtherQBDT("Control", "Code", "Code. Type", "oagis-id-4465b4b605184fcc8f46c44e5d153f37"),
-                new ExpectedOtherQBDT("Country", "Code", "Code. Type", "oagis-id-7d121d2b83504aadb363832921313340"),
-                new ExpectedOtherQBDT("Country Subdivision", "Code", "Code. Type", "oagis-id-3582718b267c47c1bb66f323026b6455"),
-                new ExpectedOtherQBDT("Credit Transfer", "Code", "Code. Type", "oagis-id-08af8861f20b499cabd7d7c55875e2b2"),
-                new ExpectedOtherQBDT("Currency", "Code", "Code. Type", "oagis-id-2800f421b6104d0bb3967395a7fca178"),
-                new ExpectedOtherQBDT("Day Of Week", "Code", "Code. Type", "oagis-id-12732d4b096d418fa817d8c75dbe920b"),
-                new ExpectedOtherQBDT("Debit Credit", "Code", "Code. Type", "oagis-id-0dde79e01ad647028e78e76337ad8796"),
-                new ExpectedOtherQBDT("Delivery Point", "Code", "Code. Type", "oagis-id-cdca0b77d32e4bab80a2a4597d66d13e"),
-                new ExpectedOtherQBDT("Email Format", "Code", "Code. Type", "oagis-id-55303803c2454c6bbc3b826f74ead936"),
-                new ExpectedOtherQBDT("Engineering Activity", "Code", "Code. Type", "oagis-id-bc15ccf8c8a24bf189e9dd3f4084947c"),
-                new ExpectedOtherQBDT("Engineering Work Order", "Code", "Code. Type", "oagis-id-355457cafb544cba89666c0b29ddd14b"),
-                new ExpectedOtherQBDT("Engineering Work Request", "Code", "Code. Type", "oagis-id-799714a12ef0445fb6058f78edf38719"),
-                new ExpectedOtherQBDT("Engineering Work Request Status", "Code", "Code. Type", "oagis-id-0c47b25537494bc196fb00db88be6eb3"),
-                new ExpectedOtherQBDT("Final Agent Instruction", "Code", "Code. Type", "oagis-id-46435e4819e1496e8b4e3b7e9427c049"),
-                new ExpectedOtherQBDT("Freight Term", "Code", "Code. Type", "oagis-id-0a6c463dae304b7e9323987c2414eda9"),
-                new ExpectedOtherQBDT("Gender", "Code", "Code. Type", "oagis-id-3357e4f03b794607ba65ac06f0a7af8f"),
-                new ExpectedOtherQBDT("Incoterms", "Code", "Code. Type", "oagis-id-bdbb3ceca38b4a3b960f07ce65dbdc14"),
-                new ExpectedOtherQBDT("Language", "Code", "Code. Type", "oagis-id-d06b74f6326d4b3796472e484c8ee114"),
-                new ExpectedOtherQBDT("License Type", "Code", "Code. Type", "oagis-id-05347183cec64cd0a418d3ebaa440d65"),
-                new ExpectedOtherQBDT("Match", "Code", "Code. Type", "oagis-id-a95a79c088ed4b7b8ebf0ed30d948f92"),
-                new ExpectedOtherQBDT("Match Document", "Code", "Code. Type", "oagis-id-a78f749cbd574e66bb7d2990c2f0f1e0"),
-                new ExpectedOtherQBDT("Marital Status", "Code", "Code. Type", "oagis-id-9b3d5038a87c4096ac38b3d8b446468e"),
-                new ExpectedOtherQBDT("MIME", "Code", "Code. Type", "oagis-id-481ad1c0f5e04ddaa1a9e6d124a81956"),
-                new ExpectedOtherQBDT("Payment Basis", "Code", "Code. Type", "oagis-id-0f3c04d8c8954282a3946a2fef821f2d"),
-                new ExpectedOtherQBDT("Payment Method", "Code", "Code. Type", "oagis-id-a6f7038124ff455187957149eb6b20db"),
-                new ExpectedOtherQBDT("Payment Purpose", "Code", "Code. Type", "oagis-id-6726fb3e210a497e8b784ae82b39a88e"),
-                new ExpectedOtherQBDT("Payment Scheme", "Code", "Code. Type", "oagis-id-375c95ec0fa74cdb98bc2523ddf86969"),
-                new ExpectedOtherQBDT("Payment Term", "Code", "Code. Type", "oagis-id-a805bb8347dc4a1da34799751d2b91c1"),
-                new ExpectedOtherQBDT("Process Category", "Code", "Code. Type", "oagis-id-653072097f904ab2a22386d5c4ad201b"),
-                new ExpectedOtherQBDT("Process Confirmation", "Code", "Code. Type", "oagis-id-87c569b9b0a541caadccf1b2514539dd"),
-                new ExpectedOtherQBDT("Reason", "Code", "Code. Type", "oagis-id-d558f96782dc4b7494790eb40bb98b2a"),
-                new ExpectedOtherQBDT("Recurrence Pattern", "Code", "Code. Type", "oagis-id-bf00248210d14830992852cd73f02061"),
-                new ExpectedOtherQBDT("Remit Location Method", "Code", "Code. Type", "oagis-id-38c236283326452c9bc2c392a1673152"),
-                new ExpectedOtherQBDT("Resource Type", "Code", "Code. Type", "oagis-id-2abdd58302114d6a84af5d24d59e0313"),
-                new ExpectedOtherQBDT("Response", "Code", "Code. Type", "oagis-id-dfb3832a38cb4ab68257c1a056de063d"),
-                new ExpectedOtherQBDT("Risk", "Code", "Code. Type", "oagis-id-284fa310cd834d9cbd7e804ac2bdc7e5"),
-                new ExpectedOtherQBDT("Sales Activity", "Code", "Code. Type", "oagis-id-8c211564adc3475b9f5bc96c3e90ab5e"),
-                new ExpectedOtherQBDT("Sales Task", "Code", "Code. Type", "oagis-id-d709b8ba02f1464ea8dfcb297cf91e4b"),
-                new ExpectedOtherQBDT("State", "Code", "Code. Type", "oagis-id-d1e442d072d84de89420ca400bf11533"),
-                new ExpectedOtherQBDT("System Environment", "Code", "Code. Type", "oagis-id-f0a7a5c206ae42b699e9de8da860cfc3"),
-                new ExpectedOtherQBDT("Tax", "Code", "Code. Type", "oagis-id-8954f848e8f448c0a72785acd5a3a805"),
-                new ExpectedOtherQBDT("Transfer", "Code", "Code. Type", "oagis-id-f1bf224d9da94fbea2d8e98af95c7a0b"),
-                new ExpectedOtherQBDT("Time Zone", "Code", "Code. Type", "oagis-id-f1bf224d9da94fbea2d8e98af95c7a19"),
-                new ExpectedOtherQBDT("UOM", "Code", "Code. Type", "oagis-id-6b7fa72803d843d8a29c567788b90745")
+                new ExpectedOtherQBDT("Action", "Code", "Action_ Code Content. Type", "oagis-id-480d156c3d50459aa6689fa74d01ac89"),
+                new ExpectedOtherQBDT("Category", "Code", "Category_ Code Content. Type", "oagis-id-c4a4406c1cd74115a07f04b365ab9075"),
+                new ExpectedOtherQBDT("Charge Bearer", "Code", "Charge Bearer_ Code Content. Type", "oagis-id-a8d20a9602eb4353816e12cd17ea0343"),
+                new ExpectedOtherQBDT("Charge", "Code", "Charge_ Code Content. Type", "oagis-id-6131e6a3d8114c5ea36bd91044180bb1"),
+                new ExpectedOtherQBDT("Check Delivery Method", "Code", "Check Delivery Method_ Code Content. Type", "oagis-id-f28cea919478487cbb2f95deb3b408e2"),
+                new ExpectedOtherQBDT("Check Instruction", "Code", "Check Instruction_ Code Content. Type", "oagis-id-6fa8419852f6400abd5c255f55e38f40"),
+                new ExpectedOtherQBDT("Classification", "Code", "Classification_ Code Content. Type", "oagis-id-8f4d478090a746fc9ec0573373901793"),
+                new ExpectedOtherQBDT("Confirmation", "Code", "Confirmation_ Code Content. Type", "oagis-id-8311a261bc5348dda91cba90fa83429e"),
+                new ExpectedOtherQBDT("Contact Location", "Code", "Contact Location_ Code Content. Type", "oagis-id-250d8771469544d88b7bb7607432da93"),
+                new ExpectedOtherQBDT("Control Assertion", "Code", "Control Assertion_ Code Content. Type", "oagis-id-34c5204633a54894846863a99618f567"),
+                new ExpectedOtherQBDT("Control Component", "Code", "Control Component_ Code Content. Type", "oagis-id-31e2c152a1c8458e8d0ecda03db61206"),
+                new ExpectedOtherQBDT("Control", "Code", "Control_ Code Content. Type", "oagis-id-4465b4b605184fcc8f46c44e5d153f37"),
+                new ExpectedOtherQBDT("Country", "Code", "Country_ Code Content. Type", "oagis-id-7d121d2b83504aadb363832921313340"),
+                new ExpectedOtherQBDT("Country Sub Division", "Code", "Country Subdivision_ Code Content. Type", "oagis-id-3582718b267c47c1bb66f323026b6455"),
+                new ExpectedOtherQBDT("Credit Transfer", "Code", "Credit Transfer_ Code Content. Type", "oagis-id-08af8861f20b499cabd7d7c55875e2b2"),
+                new ExpectedOtherQBDT("Currency", "Code", "Currency_ Code Content. Type", "oagis-id-2800f421b6104d0bb3967395a7fca178"),
+                new ExpectedOtherQBDT("Day Of Week", "Code", "Day Of Week_ Code Content. Type", "oagis-id-12732d4b096d418fa817d8c75dbe920b"),
+                new ExpectedOtherQBDT("Debit Credit", "Code", "Debit Credit_ Code Content. Type", "oagis-id-0dde79e01ad647028e78e76337ad8796"),
+                new ExpectedOtherQBDT("Delivery Point", "Code", "Delivery Point_ Code Content. Type", "oagis-id-cdca0b77d32e4bab80a2a4597d66d13e"),
+                new ExpectedOtherQBDT("Email Format", "Code", "E Mail Format_ Code Content. Type", "oagis-id-55303803c2454c6bbc3b826f74ead936"),
+                new ExpectedOtherQBDT("Engineering Activity", "Code", "Engineering Activity_ Code Content. Type", "oagis-id-bc15ccf8c8a24bf189e9dd3f4084947c"),
+                new ExpectedOtherQBDT("Engineering Work Order", "Code", "Engineering Work Order_ Code Content. Type", "oagis-id-355457cafb544cba89666c0b29ddd14b"),
+                new ExpectedOtherQBDT("Engineering Work Request", "Code", "Engineering Work Request_ Code Content. Type", "oagis-id-799714a12ef0445fb6058f78edf38719"),
+                new ExpectedOtherQBDT("Engineering Work Request Status", "Code", "Engineering Work Request Status_ Code Content. Type", "oagis-id-0c47b25537494bc196fb00db88be6eb3"),
+                new ExpectedOtherQBDT("Final Agent Instruction", "Code", "Final Agent Instruction_ Code Content. Type", "oagis-id-46435e4819e1496e8b4e3b7e9427c049"),
+                new ExpectedOtherQBDT("Freight Term", "Code", "Freight Term_ Code Content. Type", "oagis-id-0a6c463dae304b7e9323987c2414eda9"),
+                new ExpectedOtherQBDT("Gender", "Code", "Gender_ Code Content. Type", "oagis-id-3357e4f03b794607ba65ac06f0a7af8f"),
+                new ExpectedOtherQBDT("Incoterms", "Code", "Incoterms_ Code Content. Type", "oagis-id-bdbb3ceca38b4a3b960f07ce65dbdc14"),
+                new ExpectedOtherQBDT("Language", "Code", "Language_ Code Content. Type", "oagis-id-d06b74f6326d4b3796472e484c8ee114"),
+                new ExpectedOtherQBDT("License", "Code", "License Type_ Code Content. Type", "oagis-id-05347183cec64cd0a418d3ebaa440d65"),
+                new ExpectedOtherQBDT("Match", "Code", "Match_ Code Content. Type", "oagis-id-a95a79c088ed4b7b8ebf0ed30d948f92"),
+                new ExpectedOtherQBDT("Match Document", "Code", "Match Document_ Code Content. Type", "oagis-id-a78f749cbd574e66bb7d2990c2f0f1e0"),
+                new ExpectedOtherQBDT("Marital Status", "Code", "Marital Status_ Code Content. Type", "oagis-id-9b3d5038a87c4096ac38b3d8b446468e"),
+                new ExpectedOtherQBDT("MIME", "Code", "MIME_ Code Content. Type", "oagis-id-481ad1c0f5e04ddaa1a9e6d124a81956"),
+                new ExpectedOtherQBDT("Payment Basis", "Code", "Payment Basis_ Code Content. Type", "oagis-id-0f3c04d8c8954282a3946a2fef821f2d"),
+                new ExpectedOtherQBDT("Payment Method", "Code", "Payment Method_ Code Content. Type", "oagis-id-a6f7038124ff455187957149eb6b20db"),
+                new ExpectedOtherQBDT("Payment Purpose", "Code", "Payment Purpose_ Code Content. Type", "oagis-id-6726fb3e210a497e8b784ae82b39a88e"),
+                new ExpectedOtherQBDT("Payment Scheme", "Code", "Payment Scheme_ Code Content. Type", "oagis-id-375c95ec0fa74cdb98bc2523ddf86969"),
+                new ExpectedOtherQBDT("Payment Term", "Code", "Payment Term_ Code Content. Type", "oagis-id-a805bb8347dc4a1da34799751d2b91c1"),
+                new ExpectedOtherQBDT("Process Category", "Code", "Process Category_ Code Content. Type", "oagis-id-653072097f904ab2a22386d5c4ad201b"),
+                new ExpectedOtherQBDT("Process Confirmation", "Code", "Process Confirmation_ Code Content. Type", "oagis-id-87c569b9b0a541caadccf1b2514539dd"),
+                new ExpectedOtherQBDT("Reason", "Code", "Reason_ Code Content. Type", "oagis-id-d558f96782dc4b7494790eb40bb98b2a"),
+                new ExpectedOtherQBDT("Recurrence Pattern", "Code", "Recurrence Pattern_ Code Content. Type", "oagis-id-bf00248210d14830992852cd73f02061"),
+                new ExpectedOtherQBDT("Remit Location Method", "Code", "Remit Location Method_ Code Content. Type", "oagis-id-38c236283326452c9bc2c392a1673152"),
+                new ExpectedOtherQBDT("Resource Type", "Code", "Resource Type_ Code Content. Type", "oagis-id-2abdd58302114d6a84af5d24d59e0313"),
+                new ExpectedOtherQBDT("Response", "Code", "Response_ Code Content. Type", "oagis-id-dfb3832a38cb4ab68257c1a056de063d"),
+                new ExpectedOtherQBDT("Risk", "Code", "Risk_ Code Content. Type", "oagis-id-284fa310cd834d9cbd7e804ac2bdc7e5"),
+                new ExpectedOtherQBDT("Sales Activity", "Code", "Sales Activity_ Code Content. Type", "oagis-id-8c211564adc3475b9f5bc96c3e90ab5e"),
+                new ExpectedOtherQBDT("Sales Task", "Code", "Sales Task_ Code Content. Type", "oagis-id-d709b8ba02f1464ea8dfcb297cf91e4b"),
+                new ExpectedOtherQBDT("State", "Code", "State_ Code Content. Type", "oagis-id-d1e442d072d84de89420ca400bf11533"),
+                new ExpectedOtherQBDT("System Environment", "Code", "System Environment_ Code Content. Type", "oagis-id-f0a7a5c206ae42b699e9de8da860cfc3"),
+                new ExpectedOtherQBDT("Tax", "Code", "Tax_ Code Content. Type", "oagis-id-8954f848e8f448c0a72785acd5a3a805"),
+                new ExpectedOtherQBDT("Transfer", "Code", "Transfer_ Code Content. Type", "oagis-id-f1bf224d9da94fbea2d8e98af95c7a0b"),
+                new ExpectedOtherQBDT("Time Zone", "Code", "Time Zone_ Code Content. Type", "oagis-id-f1bf224d9da94fbea2d8e98af95c7a19"),
+                new ExpectedOtherQBDT("UOM", "Code", "Unit_ Code Content. Type", "oagis-id-6b7fa72803d843d8a29c567788b90745")
         );
         assertEquals(88, expectedOtherQBDTs.size());
 
@@ -984,7 +984,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
             String expectedDen = new StringBuilder(expectedOtherQBDT.getQualifier())
                     .append("_ ")
-                    .append(basedDtDen.replaceAll("_[\\w]{6}. ", ". ")) // DENxUUID
+                    .append((basedDtDen.contains("_ Code Content. Type")) ? "Code. Type" : basedDtDen.replaceAll("_[\\w]{6}. ", ". ")) // DENxUUID
                     .toString();
 
             assertEquals(expectedDen, actualDataType.getDen());
@@ -1004,7 +1004,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
     public void test_Populate_bdt_pri_restri_Table() {
         for (int i = 0; i < expectedOtherQBDTs.size(); i++) {
             DataType expectedBasedDt = dtRepository.findOneByTypeAndDen(1, expectedOtherQBDTs.get(i).getBasedDtDen());
-            assertNotNull(expectedBasedDt);
+            assertNotNull(expectedOtherQBDTs.get(i).getGuid(), expectedBasedDt);
             test_bdt_sc_pri_restri(expectedBasedDt, expectedOtherQBDTs.get(i));
         }
     }
@@ -1030,8 +1030,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
             }
         }
 
-        assertEquals(expectedDtScList.size(), actualInheritDtScList.size());
-        assertEquals(expectedDtScList.stream()
+        assertEquals(expectedQBDT.getGuid(), expectedDtScList.size(), actualInheritDtScList.size());
+        assertEquals(expectedQBDT.getGuid(), expectedDtScList.stream()
                         .mapToInt(e ->
                                 e.getPropertyTerm().hashCode() +
                                         e.getRepresentationTerm().hashCode() +
