@@ -5837,7 +5837,7 @@ supplementary information.</ccts_Definition>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="LicenseTypeCodeType" id="oagis-id-05347183cec64cd0a418d3ebaa440d65">
+	<xsd:complexType name="LicenseCodeType" id="oagis-id-05347183cec64cd0a418d3ebaa440d65">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID>BDT000000</ccts_UniqueID>
