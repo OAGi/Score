@@ -3884,8 +3884,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="DeliveryPointCodeContentType" id="oagis-id-e5f3ed90350e43ee8168257121535b9e">
 		<xsd:restriction base="oacl_DeliveryPointCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="EmailFormatCodeContentType" id="oagis-id-dca015ffe62946dfafa7b45cae8f8b68">
-		<xsd:restriction base="oacl_EmailFormatCodeContentType"/>
+	<xsd:simpleType name="EMailFormatCodeContentType" id="oagis-id-dca015ffe62946dfafa7b45cae8f8b68">
+		<xsd:restriction base="oacl_EMailFormatCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="EngineeringActivityCodeContentType" id="oagis-id-7f8fcf6fa5df4bc1ad4eada3f42eb43c">
 		<xsd:restriction base="oacl_EngineeringActivityCodeContentType"/>
@@ -5190,7 +5190,7 @@ supplementary information.</ccts_Definition>
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="EmailFormatCodeContentType">
+			<xsd:extension base="EMailFormatCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-3488a0e0f0404c89869d07f8c03b2b7a">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">

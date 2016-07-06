@@ -389,18 +389,18 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_DeliveryPointCodeContentType" id="oagis-id-da0b3fdfca0d48a0aa4017c5e71eaecf">
 		<xsd:union memberTypes="oacl_DeliveryPointCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_EmailFormatCodeEnumerationType" id="oagis-id-9d182f28e99840318c9757dab3177019">
+	<xsd:simpleType name="oacl_EMailFormatCodeEnumerationType" id="oagis-id-9d182f28e99840318c9757dab3177019">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="HTML"/>
 			<xsd:enumeration value="Rich Text"/>
 			<xsd:enumeration value="Plain Text"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_EmailFormatCodeContentType" id="oagis-id-428bb44db16241faa4813f779ffff26e">
+	<xsd:simpleType name="oacl_EMailFormatCodeContentType" id="oagis-id-428bb44db16241faa4813f779ffff26e">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the perferred format in which to send eMail.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:union memberTypes="oacl_EmailFormatCodeEnumerationType xsd:token"/>
+		<xsd:union memberTypes="oacl_EMailFormatCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_EngineeringActivityCodeEnumerationType" id="oagis-id-10eb52c5181f419ea5f52cf501d86708">
 		<xsd:restriction base="xsd:token">
