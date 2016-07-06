@@ -307,204 +307,204 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
 
         qbdtScPriRestriMap = new HashMap<>();
-        qbdtScPriRestriMap.put("oagis-id-63d46f46e4fa46ec8cc269212d7cfa77", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-b4436f4498bd47b188330661b29d596d", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-563f7c1348ca48328faf286aaa19473b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-64b1ef4ceab44c06a3816c19a28b5fec", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-543b69ea686e44f4a470a332e18b1d91", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8d7acef53cda44a2874809fc08d2018b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-c66d3280c8f5457096df33b593dcbddf", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-48dc2d60ac4d4235bf9a1f6706a81e3b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-98d2757026ec48daacb73f7589300fa3", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-82d03758dfd844bea1676759edf0d653", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-81c76ad6b7914fbf980e0149c0b0cbb7", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-b00b3ba702944e048bf72e3edfc85c9b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3afffa0da54c450f84aadbd33c0beac0", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-2780e69800934662a4782be31c2bacf6", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-fe67f89596b34ea387d6d97167e31778", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9034f3521cc84e0e93b4b10e54bb46a3", new ExpectedQBDTSCPriRestri("formatCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-c736ced2c5d24d85a2fb47f608a85a95", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4", new ExpectedQBDTSCPriRestri("code", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-0710e25ea5cb4c118538c9dd002ce2f0", new ExpectedQBDTSCPriRestri("interval", "xsd:string", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-6f2da2a259f44984b0a479fe8eb0379e", new ExpectedQBDTSCPriRestri("minimum", "xsd:string", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9", new ExpectedQBDTSCPriRestri("maximum", "xsd:string", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9034f3521cc84e0e93b4b10e54aa46a3", new ExpectedQBDTSCPriRestri("formatCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-7c3c291f53984e90bed1749ac95a7f28", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-7c3c291f53984e90bed1749bc10a7f28", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-08c23257569347caa798f07620e38923", new ExpectedQBDTSCPriRestri("author", "xsd:string", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8b0a10d59d3647d89e0819516c1aeaca", new ExpectedQBDTSCPriRestri("entryDateTime", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-893aac10c6724803ad4e1496ce5d0027", new ExpectedQBDTSCPriRestri("status", "xsd:string", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8b03854b876742dc9c1d1bedddf2755d", new ExpectedQBDTSCPriRestri("name", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-086abcbc69a34794ad2520eb28080afc", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ed2af44734be48f6be9936110eae4641", new ExpectedQBDTSCPriRestri("unitCode", "xsd:token", "oacl_UnitCode", ""));
-        qbdtScPriRestriMap.put("oagis-id-d455ed06eb7a40d1ae1d3408cd3ea1c3", new ExpectedQBDTSCPriRestri("unitCodeListVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9bb9add40b5b415c8489b08bd4484907", new ExpectedQBDTSCPriRestri("preferredIndicator", "xbt_BooleanTrueFalseType", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-f14c6ce3eae34517acb446241a38c629", new ExpectedQBDTSCPriRestri("sequenceNumber", "xsd:decimal", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-93d92483194641a3ac48a997ec4dbe5d", new ExpectedQBDTSCPriRestri("sequenceNumber", "xsd:decimal", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-39a5a53826024a65a2291f50d9feecd3", new ExpectedQBDTSCPriRestri("sequenceNumber", "xsd:decimal", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-4228f5e4d6294040a8d813736f872bae", new ExpectedQBDTSCPriRestri("type", "xsd:string", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-c13ef1ab9da949329b0b19895179bbd8", new ExpectedQBDTSCPriRestri("numberFormatValue", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-81f8b8994157436689db9229650af6c3", new ExpectedQBDTSCPriRestri("accessCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-da20be8066e1484da8ed8519b1457ba8", new ExpectedQBDTSCPriRestri("countryCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-fda27cba60354fe1b3ec82438aebb73f", new ExpectedQBDTSCPriRestri("areaCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-121bc81df6df4642b1390485dc65656e", new ExpectedQBDTSCPriRestri("exchangeValue", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-5a36cbe4e69a4c869e2425f1331c1d76", new ExpectedQBDTSCPriRestri("extensionValue", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-db502068711649c385a0bd1f41d3a63d", new ExpectedQBDTSCPriRestri("name", "xsd:token", "oacl_LicenseTypeCode", ""));
-        qbdtScPriRestriMap.put("oagis-id-aac395f92b5b44e389a6ba3a2f189dcd", new ExpectedQBDTSCPriRestri("countryCode", "xsd:token", "oacl_CountryCode", ""));
-        qbdtScPriRestriMap.put("oagis-id-3ed14d16c7334beea947a253ba4c5d31", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-a770cbdc4d8f42a38e136f91fe566873", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-fbfa9b1b4b914e009f17c4e486f5eaa6", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ad83b12bc35f45189bb13fe32fdabb57", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-fe96e5569935475285bb02ca3977f0e5", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-24db8872409f48b8b92a2cdf07f00285", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-b724266afe58480f80c9c58287cd672e", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9135ae93211a4470b4964eb19fd7dd11", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-a6db1960b3d1470783d2deb750f122c7", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-031ac869ab004b24baf568a18be2cba5", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3386e05f8b6f415b94bd10267da0da8a", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-c3a48632756946eab4151e3d51e6a62e", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-5150467da5004c4fac4dd1dae5f3559d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e218062ce1b94d5aa719352380a7d83b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-62e2f345ec4340a2b348798e90e234e8", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-913b18566a754ba9b94a050d399ea149", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9ae5cd690e24415b85211f98b5e1bc7b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-723f51b5f86b4753940f62ce46864aa5", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-01187c67b1834598b3e63b77634f8b0e", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e100b634bdf44e82adfc0551cc68a002", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-26acfd7fdbff40cb8af1062a513d4ce7", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-fe6422f9632e4e07addb64ad18f26d00", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-4c374723ecfb44b39a492504eb02e37f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-86fcddc6c6dd4389b3024e7f664512b5", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ef3ed7b7779145d8b49da60c24f5b6a0", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-04f8787edf8641b4a31cd2574fd9a6cb", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-a912b4737c6140cbab7820a8929db906", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e47690b640464528973b475a6764aee2", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-7916f409d25b40a4ac62927241f3410f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-b63575497bf14cac9a6f08158a3b800f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3737b52e961944fa9cca686229bfec86", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-fda2fa4f93c6415686f4be80cd0e7a61", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-4b132da72c244a9299d2b0de35164226", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-99e35ec4191f4f068a5de55f636beacd", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-f7cabe17f72f4cac95024974b4124046", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-d1b6cdd8c2dc48f5996c95b9b7387434", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-27d5ae9716904a6694e84200ee63d593", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-7a9c86259ac54c7686628c4d9ddf76fb", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-6a2a50be7142492f98ea30c541538eb0", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-d68e1a8121944c03a721773885265c71", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-bfa30d4b139849a190951d1dc77fbd28", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-31f5dc214d5045c0acb2a34701bf3403", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-e05522b3a3e54e54b36b11ed64f491aa", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-f851a6c9509548bf82a0a0ca5683249d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e758cce7a51d44f887ed75cb07f8a8c6", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-328f0ddd012249618611ef731906e78c", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-96a0c4ca29ca42e298ced3e209cdfa1d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-d578cb3477e945c59fa2d024855f8436", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-2ae14052b29c4b889b833dd52263e8f2", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-76087f82da27494c98586b51dbc0f847", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-11e2ef27228b423f8692c97293217575", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-6640631a9a604a819b905c33cafcdc84", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ae6668f9a1194a12bbc6fb9bcfdc90f7", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8a94f5337a4945f9a0f4f39250a6cde5", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-ffd0139554494360a14d2d6093b12a32", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3488a0e0f0404c89869d07f8c03b2b7a", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8920d2880d624fbd928edfadba377657", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-1581f204ba05401f8ccf6e561534d469", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-cfcf704340274e5889bccd30b4423451", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3815fcd73c8d4de69c4ecc21e5e9176b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-d1a7dd9d23314bc4838a421cd3591ef1", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-1479d9f3c21944beb53cd1605d5b7aec", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-83846bbbfc7244a79fc015982ce2ee59", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-b54005a1bf904cd6a2907270a9dcad8c", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ffa646bcc39842c890057effa6c5975d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3035a088949c4186804fd55e1796be08", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-12df0e4ddc4a4e489205c07aed956484", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-7cebe0943d9e4743809c6b3d0fc7f7c6", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3ab2bacf93714d35a4613710318e9f47", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-faa0f7006f724e1fa3bfe06a585891be", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ad71fcecdb934fda86cad46c436d2e2f", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-cb9166872ba54f05a50bc2a3fbb42165", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-ed584a4b4c7e4328859b8688d91f78be", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-1dae1402e2ac498ea41e20afb69f8002", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-dfeaf700ece44979b022e6ddbfe6fcdf", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-2d288e5dac3140f19ca5d4d9cea77684", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-f4e2135be85b4c5ea195ae367d3973be", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-4bfbb27a12e148a5af5d93a7371a0e8e", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-aa7e6f7aad054bdca87fd71326d3b740", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-d6eddc4772dd489f8723449474e56a4c", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-1b17f61877d6474ea6e73ab07f584b16", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-76d7253c61b34cc2ad43ead3b3f1922f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-391f8699cfce4a69b4dd276a83fb0a47", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-054beac32aed46c784752eeb81d10200", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-ead36c5f905a4ab09f5ec34a5b0c02a7", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-6050905d3ecf4308b65514f650eb2309", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-42e72842204b41bbba4ba402f548c0da", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-f708d760df624e79b201e51ba5630385", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-0c49b0be61ad4e63842c0e76425ddba0", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-61eeeb78bd8447e89d7d0a52f0501976", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-ab3c2e1abeff4872a7e60ce9ce95bde5", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-fe7175233094436586902d1790c8f601", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-2946363d2db24161b51780176ae21fd2", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-b743f9f23cb84470a8a1b6e2de5eea49", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-2e5a6564746c4acfbd768bafe0794997", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-1e5446c5e3d54f819ae59866ab836013", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-bc4443a7513b4a5e9768f085d91b0b08", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-2a0d8eac934f40eeaaaf904b9b52d1de", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3c3ce6fab37f4fdca102cb2180b944b0", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-3853abb5c9244483aab2cbc03fbaaaf8", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-286aa0554594455382547fd9e7d0572d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-f9f1566704274d309481299474d84574", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-f94898b8c49b4d62889fa99217d88413", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-c95531ac8f4d422ab7ddc8a5dfc3fbcb", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-498e3b310a304e3d9b512d72f4ec7808", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-7bf801b6b6414c5985584638c9ab984c", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-13bb99499c0c4699b97cb12bedb4ca84", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-492977f9faf54cc8880ccb51a7e8671c", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-ec04e819931c43d5b0babb7d3cb63055", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-571b366b135144b28c35f96337c715bb", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-c1ac8d32c67644dc8c924bc88efe32ff", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-2fea6aa2bcd348ed9605454c4eb5e1df", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8bd83370a6de465da589eeda41067ec7", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9a3aaf9381c84b569c5562c4b536f857", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-1ffc2c57129f4cc2b590f9af9f2f6cce", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-6b34b38215e14086b6daa9276407a646", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-0f3abdfb7a464cccb9fd3c04be53db7f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-5b32eb0f737743b1a8c11555b3f2ab22", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-2cc8bdf28e9043309536c249f2eea9fc", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-cc70c786386b4b1e97e03d497c93ffcf", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-ad77283348584b798fea28b6a1e7993f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-52b52cb89b2d493eae526a0eb8a2fbce", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-bda6a6cb91114b1eac169ad1151c9613", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-c4393a9d805140e6a2c019fd43cc13fb", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e5305a520c744ec49ebdd5e73d7cf474", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-f0da5d47af4d401ca9f1e041c16799bc", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-b1a04e2a0ccd4f368414fd06ceae9093", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-94aacd3290e54e55b32814303fde07e3", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-bc09af5c870441679eb7f0c684ce49ca", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-0bc83cc6e1c04a08bbed6308a1b8d732", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-9cf34eeb9a634fe4a0bc3f7b9714bd90", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-eaa90523e5284c40b6c61d7fd9aa4f5b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-310f0d76a3064a28a47093996604bd67", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-b60b59e3f1b04bb6b3e024f0817bf9cf", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-4f3fae47c66846c695f1501966b2d343", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-8df48352f08148cda04dd769e74f517f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8a0f01a897c34ed2929801c6b4632558", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e6048f5e8c0f4f1eb7cd0183ca19bd0c", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-664c5e29b37b401da802648e03f558cb", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-4ab1e9e4399048d08a46e57eef3ded04", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-8508fe4900ac4576b029c748d7a2a5da", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-05b1c539208a4192bef0ab97c5a09225", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e8c118d412ba440ba34179da2481b40f", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-e7f78b3e9b5b4ac7a69ddceb09ac5366", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-57d11f7f3618406ca906d79223a340d9", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-389a57988e504798a5869a92c6728273", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-d6ebc8c3016d4dc2b16658224ac088cf", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-2101e15920d842659f0696e8612eefbc", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-389a57988e504798a5869a92c6728354", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-d6ebc8c3016d4dc2b16658224ac08495", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-2101e15920d842659f0696e8612ee861", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-3d8eec0a38b94bc69d9d40d9d224d647", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", ""));
-        qbdtScPriRestriMap.put("oagis-id-ac4eed3fe8c24f469cfc1f47ca8f680f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification"));
-        qbdtScPriRestriMap.put("oagis-id-2d34df84eb69473592137596e3f611d4", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", ""));
+        qbdtScPriRestriMap.put("oagis-id-63d46f46e4fa46ec8cc269212d7cfa77", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-b4436f4498bd47b188330661b29d596d", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-563f7c1348ca48328faf286aaa19473b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-64b1ef4ceab44c06a3816c19a28b5fec", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-543b69ea686e44f4a470a332e18b1d91", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8d7acef53cda44a2874809fc08d2018b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-c66d3280c8f5457096df33b593dcbddf", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-48dc2d60ac4d4235bf9a1f6706a81e3b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-98d2757026ec48daacb73f7589300fa3", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-82d03758dfd844bea1676759edf0d653", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-81c76ad6b7914fbf980e0149c0b0cbb7", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b00b3ba702944e048bf72e3edfc85c9b", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3afffa0da54c450f84aadbd33c0beac0", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2780e69800934662a4782be31c2bacf6", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fe67f89596b34ea387d6d97167e31778", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-9034f3521cc84e0e93b4b10e54bb46a3", new ExpectedQBDTSCPriRestri("formatCode", "xsd:token", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-c736ced2c5d24d85a2fb47f608a85a95", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4", new ExpectedQBDTSCPriRestri("code", "xsd:token", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-0710e25ea5cb4c118538c9dd002ce2f0", new ExpectedQBDTSCPriRestri("interval", "xsd:string", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-6f2da2a259f44984b0a479fe8eb0379e", new ExpectedQBDTSCPriRestri("minimum", "xsd:string", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9", new ExpectedQBDTSCPriRestri("maximum", "xsd:string", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-9034f3521cc84e0e93b4b10e54aa46a3", new ExpectedQBDTSCPriRestri("formatCode", "xsd:token", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-7c3c291f53984e90bed1749ac95a7f28", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-7c3c291f53984e90bed1749bc10a7f28", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-08c23257569347caa798f07620e38923", new ExpectedQBDTSCPriRestri("author", "xsd:string", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8b0a10d59d3647d89e0819516c1aeaca", new ExpectedQBDTSCPriRestri("entryDateTime", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-893aac10c6724803ad4e1496ce5d0027", new ExpectedQBDTSCPriRestri("status", "xsd:string", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8b03854b876742dc9c1d1bedddf2755d", new ExpectedQBDTSCPriRestri("name", "xsd:normalizedString", "", "","required"));
+        qbdtScPriRestriMap.put("oagis-id-086abcbc69a34794ad2520eb28080afc", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ed2af44734be48f6be9936110eae4641", new ExpectedQBDTSCPriRestri("unitCode", "xsd:token", "oacl_UnitCode", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d455ed06eb7a40d1ae1d3408cd3ea1c3", new ExpectedQBDTSCPriRestri("unitCodeListVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-9bb9add40b5b415c8489b08bd4484907", new ExpectedQBDTSCPriRestri("preferredIndicator", "xbt_BooleanTrueFalseType", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f14c6ce3eae34517acb446241a38c629", new ExpectedQBDTSCPriRestri("sequenceNumber", "xsd:decimal", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-93d92483194641a3ac48a997ec4dbe5d", new ExpectedQBDTSCPriRestri("sequenceNumber", "xsd:decimal", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-39a5a53826024a65a2291f50d9feecd3", new ExpectedQBDTSCPriRestri("sequenceNumber", "xsd:decimal", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-4228f5e4d6294040a8d813736f872bae", new ExpectedQBDTSCPriRestri("type", "xsd:string", "", "",""));
+        qbdtScPriRestriMap.put("oagis-id-c13ef1ab9da949329b0b19895179bbd8", new ExpectedQBDTSCPriRestri("numberFormatValue", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-81f8b8994157436689db9229650af6c3", new ExpectedQBDTSCPriRestri("accessCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-da20be8066e1484da8ed8519b1457ba8", new ExpectedQBDTSCPriRestri("countryCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fda27cba60354fe1b3ec82438aebb73f", new ExpectedQBDTSCPriRestri("areaCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-121bc81df6df4642b1390485dc65656e", new ExpectedQBDTSCPriRestri("exchangeValue", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-5a36cbe4e69a4c869e2425f1331c1d76", new ExpectedQBDTSCPriRestri("extensionValue", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-db502068711649c385a0bd1f41d3a63d", new ExpectedQBDTSCPriRestri("name", "xsd:token", "oacl_LicenseTypeCode", "","required"));
+        qbdtScPriRestriMap.put("oagis-id-aac395f92b5b44e389a6ba3a2f189dcd", new ExpectedQBDTSCPriRestri("countryCode", "xsd:token", "oacl_CountryCode", "",""));
+        qbdtScPriRestriMap.put("oagis-id-3ed14d16c7334beea947a253ba4c5d31", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-a770cbdc4d8f42a38e136f91fe566873", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fbfa9b1b4b914e009f17c4e486f5eaa6", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ad83b12bc35f45189bb13fe32fdabb57", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fe96e5569935475285bb02ca3977f0e5", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-24db8872409f48b8b92a2cdf07f00285", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b724266afe58480f80c9c58287cd672e", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-9135ae93211a4470b4964eb19fd7dd11", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-a6db1960b3d1470783d2deb750f122c7", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-031ac869ab004b24baf568a18be2cba5", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3386e05f8b6f415b94bd10267da0da8a", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-c3a48632756946eab4151e3d51e6a62e", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-5150467da5004c4fac4dd1dae5f3559d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e218062ce1b94d5aa719352380a7d83b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-62e2f345ec4340a2b348798e90e234e8", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-913b18566a754ba9b94a050d399ea149", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-9ae5cd690e24415b85211f98b5e1bc7b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-723f51b5f86b4753940f62ce46864aa5", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-01187c67b1834598b3e63b77634f8b0e", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e100b634bdf44e82adfc0551cc68a002", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-26acfd7fdbff40cb8af1062a513d4ce7", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fe6422f9632e4e07addb64ad18f26d00", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-4c374723ecfb44b39a492504eb02e37f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-86fcddc6c6dd4389b3024e7f664512b5", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ef3ed7b7779145d8b49da60c24f5b6a0", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-04f8787edf8641b4a31cd2574fd9a6cb", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-a912b4737c6140cbab7820a8929db906", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e47690b640464528973b475a6764aee2", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-7916f409d25b40a4ac62927241f3410f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b63575497bf14cac9a6f08158a3b800f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3737b52e961944fa9cca686229bfec86", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fda2fa4f93c6415686f4be80cd0e7a61", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-4b132da72c244a9299d2b0de35164226", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-99e35ec4191f4f068a5de55f636beacd", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f7cabe17f72f4cac95024974b4124046", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d1b6cdd8c2dc48f5996c95b9b7387434", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-27d5ae9716904a6694e84200ee63d593", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-7a9c86259ac54c7686628c4d9ddf76fb", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-6a2a50be7142492f98ea30c541538eb0", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d68e1a8121944c03a721773885265c71", new ExpectedQBDTSCPriRestri("typeCode", "xsd:token", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-bfa30d4b139849a190951d1dc77fbd28", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-31f5dc214d5045c0acb2a34701bf3403", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e05522b3a3e54e54b36b11ed64f491aa", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f851a6c9509548bf82a0a0ca5683249d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e758cce7a51d44f887ed75cb07f8a8c6", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-328f0ddd012249618611ef731906e78c", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-96a0c4ca29ca42e298ced3e209cdfa1d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d578cb3477e945c59fa2d024855f8436", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2ae14052b29c4b889b833dd52263e8f2", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-76087f82da27494c98586b51dbc0f847", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-11e2ef27228b423f8692c97293217575", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-6640631a9a604a819b905c33cafcdc84", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ae6668f9a1194a12bbc6fb9bcfdc90f7", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8a94f5337a4945f9a0f4f39250a6cde5", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ffd0139554494360a14d2d6093b12a32", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3488a0e0f0404c89869d07f8c03b2b7a", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8920d2880d624fbd928edfadba377657", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-1581f204ba05401f8ccf6e561534d469", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-cfcf704340274e5889bccd30b4423451", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3815fcd73c8d4de69c4ecc21e5e9176b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d1a7dd9d23314bc4838a421cd3591ef1", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-1479d9f3c21944beb53cd1605d5b7aec", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-83846bbbfc7244a79fc015982ce2ee59", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b54005a1bf904cd6a2907270a9dcad8c", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ffa646bcc39842c890057effa6c5975d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3035a088949c4186804fd55e1796be08", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-12df0e4ddc4a4e489205c07aed956484", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-7cebe0943d9e4743809c6b3d0fc7f7c6", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3ab2bacf93714d35a4613710318e9f47", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-faa0f7006f724e1fa3bfe06a585891be", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ad71fcecdb934fda86cad46c436d2e2f", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-cb9166872ba54f05a50bc2a3fbb42165", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ed584a4b4c7e4328859b8688d91f78be", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-1dae1402e2ac498ea41e20afb69f8002", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-dfeaf700ece44979b022e6ddbfe6fcdf", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2d288e5dac3140f19ca5d4d9cea77684", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f4e2135be85b4c5ea195ae367d3973be", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-4bfbb27a12e148a5af5d93a7371a0e8e", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-aa7e6f7aad054bdca87fd71326d3b740", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d6eddc4772dd489f8723449474e56a4c", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-1b17f61877d6474ea6e73ab07f584b16", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-76d7253c61b34cc2ad43ead3b3f1922f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-391f8699cfce4a69b4dd276a83fb0a47", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-054beac32aed46c784752eeb81d10200", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ead36c5f905a4ab09f5ec34a5b0c02a7", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-6050905d3ecf4308b65514f650eb2309", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-42e72842204b41bbba4ba402f548c0da", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f708d760df624e79b201e51ba5630385", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-0c49b0be61ad4e63842c0e76425ddba0", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-61eeeb78bd8447e89d7d0a52f0501976", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ab3c2e1abeff4872a7e60ce9ce95bde5", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-fe7175233094436586902d1790c8f601", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2946363d2db24161b51780176ae21fd2", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b743f9f23cb84470a8a1b6e2de5eea49", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2e5a6564746c4acfbd768bafe0794997", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-1e5446c5e3d54f819ae59866ab836013", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-bc4443a7513b4a5e9768f085d91b0b08", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2a0d8eac934f40eeaaaf904b9b52d1de", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3c3ce6fab37f4fdca102cb2180b944b0", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3853abb5c9244483aab2cbc03fbaaaf8", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-286aa0554594455382547fd9e7d0572d", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f9f1566704274d309481299474d84574", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f94898b8c49b4d62889fa99217d88413", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-c95531ac8f4d422ab7ddc8a5dfc3fbcb", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-498e3b310a304e3d9b512d72f4ec7808", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-7bf801b6b6414c5985584638c9ab984c", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-13bb99499c0c4699b97cb12bedb4ca84", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-492977f9faf54cc8880ccb51a7e8671c", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ec04e819931c43d5b0babb7d3cb63055", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-571b366b135144b28c35f96337c715bb", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-c1ac8d32c67644dc8c924bc88efe32ff", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2fea6aa2bcd348ed9605454c4eb5e1df", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8bd83370a6de465da589eeda41067ec7", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-9a3aaf9381c84b569c5562c4b536f857", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-1ffc2c57129f4cc2b590f9af9f2f6cce", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-6b34b38215e14086b6daa9276407a646", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-0f3abdfb7a464cccb9fd3c04be53db7f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-5b32eb0f737743b1a8c11555b3f2ab22", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2cc8bdf28e9043309536c249f2eea9fc", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-cc70c786386b4b1e97e03d497c93ffcf", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ad77283348584b798fea28b6a1e7993f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-52b52cb89b2d493eae526a0eb8a2fbce", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-bda6a6cb91114b1eac169ad1151c9613", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-c4393a9d805140e6a2c019fd43cc13fb", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e5305a520c744ec49ebdd5e73d7cf474", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-f0da5d47af4d401ca9f1e041c16799bc", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b1a04e2a0ccd4f368414fd06ceae9093", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-94aacd3290e54e55b32814303fde07e3", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-bc09af5c870441679eb7f0c684ce49ca", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-0bc83cc6e1c04a08bbed6308a1b8d732", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-9cf34eeb9a634fe4a0bc3f7b9714bd90", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-eaa90523e5284c40b6c61d7fd9aa4f5b", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-310f0d76a3064a28a47093996604bd67", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-b60b59e3f1b04bb6b3e024f0817bf9cf", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-4f3fae47c66846c695f1501966b2d343", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8df48352f08148cda04dd769e74f517f", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8a0f01a897c34ed2929801c6b4632558", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e6048f5e8c0f4f1eb7cd0183ca19bd0c", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-664c5e29b37b401da802648e03f558cb", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-4ab1e9e4399048d08a46e57eef3ded04", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-8508fe4900ac4576b029c748d7a2a5da", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-05b1c539208a4192bef0ab97c5a09225", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e8c118d412ba440ba34179da2481b40f", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-e7f78b3e9b5b4ac7a69ddceb09ac5366", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-57d11f7f3618406ca906d79223a340d9", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-389a57988e504798a5869a92c6728273", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d6ebc8c3016d4dc2b16658224ac088cf", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2101e15920d842659f0696e8612eefbc", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-389a57988e504798a5869a92c6728354", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-d6ebc8c3016d4dc2b16658224ac08495", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2101e15920d842659f0696e8612ee861", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-3d8eec0a38b94bc69d9d40d9d224d647", new ExpectedQBDTSCPriRestri("listID", "xsd:normalizedString", "", "","optional"));
+        qbdtScPriRestriMap.put("oagis-id-ac4eed3fe8c24f469cfc1f47ca8f680f", new ExpectedQBDTSCPriRestri("listAgencyID", "xsd:token", "", "clm63055D08B_AgencyIdentification","optional"));
+        qbdtScPriRestriMap.put("oagis-id-2d34df84eb69473592137596e3f611d4", new ExpectedQBDTSCPriRestri("listVersionID", "xsd:normalizedString", "", "","optional"));
         assertEquals(198, qbdtScPriRestriMap.size());
     }
 
@@ -649,8 +649,9 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         private String attributeType;
         private int codeListId;
         private int agencyIdListId;
+        private String use;
 
-        public ExpectedQBDTSCPriRestri(String attName, String attType, String codeListName, String agencyIdListName) {
+        public ExpectedQBDTSCPriRestri(String attName, String attType, String codeListName, String agencyIdListName, String use) {
             if (!StringUtils.isEmpty(codeListName)) {
                 CodeList cdl = codeListRepository.findOneByName(codeListName);
                 codeListId = cdl.getCodeListId();
@@ -661,6 +662,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
             this.attributeName = attName;
             this.attributeType = attType;
+            this.use=use;
         }
     }
 
@@ -1036,8 +1038,6 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                                 e.getPropertyTerm().hashCode() +
                                         e.getRepresentationTerm().hashCode() +
                                         //e.getDefinition().hashCode() +
-                                        e.getMinCardinality() +
-                                        e.getMaxCardinality() +
                                         e.getDtScId()
                         ).sum(),
                 actualInheritDtScList.stream()
@@ -1045,10 +1045,40 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                                 e.getPropertyTerm().hashCode() +
                                         e.getRepresentationTerm().hashCode() +
                                         //e.getDefinition().hashCode() +
-                                        e.getMinCardinality() +
-                                        e.getMaxCardinality() +
                                         e.getBasedDtScId()
                         ).sum());
+
+        for(int i=0; i<actualInheritDtScList.size(); i++){
+            String use = null;
+            ExpectedQBDTSCPriRestri tempQBDTSCRecord = qbdtScPriRestriMap.get(actualInheritDtScList.get(i));
+            if(tempQBDTSCRecord!=null) {
+                use =tempQBDTSCRecord.use;
+            }
+            if(use==null){//Copied from base, so min/max cardinality should be same
+                DataTypeSupplementaryComponent baseDtSc = dtScRepository.findOne(actualInheritDtScList.get(i).getBasedDtScId());
+                DataType baseDT = dtRepository.getOne(baseDtSc.getOwnerDtId());
+                if(!baseDT.getDen().contains("_ Code Content. Type")){
+                    assertEquals(baseDtSc.getMinCardinality(), actualInheritDtScList.get(i).getMinCardinality());
+                    assertEquals(baseDtSc.getMaxCardinality(), actualInheritDtScList.get(i).getMaxCardinality());
+                }
+            }
+            else if (use.equalsIgnoreCase("optional")){
+                assertEquals(0, actualInheritDtScList.get(i).getMinCardinality());
+                assertEquals(1, actualInheritDtScList.get(i).getMaxCardinality());
+            }
+            else if (use.equalsIgnoreCase("required")){
+                assertEquals(1, actualInheritDtScList.get(i).getMinCardinality());
+                assertEquals(1, actualInheritDtScList.get(i).getMaxCardinality());
+            }
+            else if (use.equalsIgnoreCase("prohibited")){
+                assertEquals(0, actualInheritDtScList.get(i).getMinCardinality());
+                assertEquals(0, actualInheritDtScList.get(i).getMaxCardinality());
+            }
+            else if (use.equalsIgnoreCase("")){
+                assertEquals(0, actualInheritDtScList.get(i).getMinCardinality());
+                assertEquals(1, actualInheritDtScList.get(i).getMaxCardinality());
+            }
+        }
     }
 
 
