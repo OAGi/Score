@@ -281,14 +281,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
         String baseName = bdtSimpleContent.getBaseDTName();
         String name = bdtSimpleContent.getName();
-
-        if ("CodeType".equals(baseName) && !"OpenCodeType".equals(name)) {
-            baseName = name + "ContentType";
-        }
-        // b/c of 'CodeType'
-        if (baseName.endsWith("CodeTypeContentType")) {
-            baseName = baseName.replaceAll("CodeTypeContentType", "CodeContentType");
-        }
         extensionElement.setAttribute("base", baseName);
 
         List<BDTSC> dtScList;
