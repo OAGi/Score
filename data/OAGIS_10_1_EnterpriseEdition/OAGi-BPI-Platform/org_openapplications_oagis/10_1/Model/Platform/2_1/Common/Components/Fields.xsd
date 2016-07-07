@@ -285,8 +285,7 @@ This field is updated by the LoadProjectAccounting BOD.
 	</xsd:element>
 	<xsd:element name="TotalTaxAmount" type="AmountType" nillable="true" id="oagis-id-4f435a4ceff8471ca24b99b8ef43200b">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Amount of money resulting from the calculation of the
-tax.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Amount of money resulting from the calculation of the tax.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="TotalValueAmount" type="AmountType" nillable="true" id="oagis-id-ab7cbbe4584f4bcd8df85da846e72117">
@@ -372,10 +371,10 @@ the processing of the payment transaction.</xsd:documentation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the methodology by which the value of an item is determined.
 
 Values are:
- Standard
- Moving Average
- LIFO - For last in first out.
- FIFO - For first in first out.</xsd:documentation>
+Standard
+Moving Average
+LIFO - For last in first out.
+FIFO - For first in first out.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="CountryCode" type="CountryCodeType" nillable="true" id="oagis-id-5157fcc44dc54cffa6c0bae7ba1f8912">
@@ -449,7 +448,7 @@ Values are:
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ending production sequence number, name, or identifier given to a manufactured or assembled item for use in sequenced part requirements and shipments for a given day's requirements</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="EngineeringWorkRequestCodeType" type="EngineeringWorkRequestCodeType" id="oagis-id-b431bc4e5a684aed8933e069f5adf52e">
+	<xsd:element name="EngineeringWorkRequestCode" type="EngineeringWorkRequestCodeType" id="oagis-id-b431bc4e5a684aed8933e069f5adf52e">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">Code type specifing the type of Engineering Work Request.</xsd:documentation>
 		</xsd:annotation>
@@ -521,9 +520,9 @@ IST limits these values to CreditTransfer (TRF) and Checque (CHK).</xsd:document
 
 The United Nations Trade Facilitation Information Exchange (UN/TraFIX) has established the following codes (INCOTERMS 2010) for use in international trade. (See http://www.unece.org/cefact/recommendations/rec_index.htm).  These terms may also be found in the United States Uniform Commercial Code (UCC).
 
-EXAMPLES 
-General transport	
-EXW - Ex Works ... (named place) 
+EXAMPLES
+General transport
+EXW - Ex Works ... (named place)
 FCA - Free Carrier ... (named place)
 CPT - Carriage Paid ... (named place of destination)
 CIP - Carriage and Insurance Paid To ... (named place of destination)
@@ -798,7 +797,7 @@ The following are a couple of examples: Setup, Teardown, Run</xsd:documentation>
 	</xsd:element>
 	<xsd:element name="WageGroupCode" type="CodeType" nillable="true" id="oagis-id-e701ba2064c54301865ae0cac7e9ee66">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to clategorize an employee's wage.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is used to clategorize an employee’s wage.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="NationalityCountryCode" type="CountryCodeType" nillable="true" id="oagis-id-001672500ef9475e8cedd92ca31d8ece"/>
@@ -947,7 +946,7 @@ FIFO - first in first out</xsd:documentation>
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">ScheduleType is a code or identifier that describes the specific schedule and can be used in a variety of contexts. When used in the context of employee, ScheduleType refers to the specific schedule for the employee or worker.
 
-When used in the context of a Schedule, ScheduleType indicates whether the Schedule is a demand schedule from a customer or a supply schedule from a supplier. Valid values for this context are: 'Demand', 'Supplier'</xsd:documentation>
+When used in the context of a Schedule, ScheduleType indicates whether the Schedule is a demand schedule from a customer or a supply schedule from a supplier. Valid values for this context are: “Demand”, “Supplier”</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="StepTypeCode" type="CodeType" nillable="true" id="oagis-id-989c88cd82284df8a7b06de446c24160">
@@ -985,7 +984,7 @@ When used in the context of a Schedule, ScheduleType indicates whether the Sched
 	</xsd:element>
 	<xsd:element name="CheckMaturityDate" type="DateType" nillable="true" id="oagis-id-c8309248205e459084dbee92df7c96e9">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Date when the draft becomes payable and when debtor's account is debited.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Date when the draft becomes payable and when debtor’s account is debited.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="FromTime" type="TimeType" nillable="true" id="oagis-id-eb4be8f88450410397a08cade7702ac4"/>
@@ -1406,7 +1405,7 @@ In cases where BreakTimeDuratation occurs along with BreakTimePeriod. BreakTimeD
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Total time that the associated entity or entities was down during the associated task or operation.
 
-In cases where DownTimeDuratation occurs along with DownTimePeriod. DownTimeDuration is being deprecated in favor of DownTimePeriod.</xsd:documentation>
+				In cases where DownTimeDuratation occurs along with DownTimePeriod. DownTimeDuration is being deprecated in favor of DownTimePeriod.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="Duration" type="DurationMeasureType" nillable="true" id="oagis-id-b7c624e7fd7945db9402994817b6a0cc">
@@ -1674,7 +1673,7 @@ Is the bill of lading identifier.</xsd:documentation>
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
 
-It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction.
 
 Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
 		</xsd:annotation>
@@ -1684,8 +1683,7 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 	<xsd:element name="IBANID" type="IDType" nillable="true" id="oagis-id-a4270b088de44d1f922732e7cd5d8c6c"/>
 	<xsd:element name="ID" type="OpenIDType" nillable="true" id="oagis-id-57f1dbe323d344caa1394f49f923bb89">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Identifiers of the given instance of an entity within the scope of the integration. The schemeAgencyID attribute identifies the party that provided or knows this party by the given identifier.
-</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the Identifiers of the given instance of an entity within the scope of the integration. The schemeAgencyID attribute identifies the party that provided or knows this party by the given identifier.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="InnerPackID" type="OpenIDType" id="oagis-id-501d06b284534b3c98933c90a12634c3"/>
@@ -1830,7 +1828,7 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference designator on a Drawing or BluePrint where the BOM is used.
 
- Is an identifier used to refer to an instance of the Item (part number) in manufacturing instructions, engineering drawings and/or CAD models. ReferenceDesignator is also often known as an installation point. There will be a single distinct ReferenceDesignatorID for each instance of an Item, however multiple distinct ItemIDs could have the same ReferenceDesignatorID value within a BOM, such as for alternate parts or parts selected from a test-fit-and-select processes. </xsd:documentation>
+Is an identifier used to refer to an instance of the  Item (part number) in manufacturing instructions, engineering drawings and/or CAD models. ReferenceDesignator is also often known as an installation point. There will be a single distinct ReferenceDesignatorID for each instance of an Item, however multiple distinct ItemIDs could have the same ReferenceDesignatorID value within a BOM, such as for alternate parts or parts selected from a test-fit-and-select processes. </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ReferenceOrderNumberID" type="IDType" nillable="true" id="oagis-id-47bb8e44c1724b94b0cfbcc26e15c992">
@@ -2007,11 +2005,11 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TRACKINGID is a unique identifier for the purpose of tracking an individual package or shipment
 
 Examples of a valid TRACKINGID include:
-- An express parcel tracking number as typically assigned by UPS, DHL, Fedex or other similar carriers.
-- A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.  
-- A "Pro Number" (Progressive Number), as assigned by an LTL (less-than-truckload) freight carrier.  Since the same Pro Number can be assigned to multiple shipping units within an LTL shipment, the SHIPUNITSEQ and SHIPUNITTOT field identifiers may be used to identify the individual pieces.
-- The unique identifier of a motor freight trailer, railroad box or tank car, ocean freight container or other transportation vessel.
-</xsd:documentation>
+•An express parcel tracking number as typically assigned by UPS, DHL, Fedex or other similar carriers.
+•A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.
+•A "Pro Number" (Progressive Number), as assigned by an LTL (less-than-truckload) freight carrier.  Since the same Pro Number can be assigned to multiple shipping units within an LTL shipment, the SHIPUNITSEQ and SHIPUNITTOT field identifiers may be used to identify the individual pieces.
+•The unique identifier of a motor freight trailer, railroad box or tank car, ocean freight container or other transportation vessel.
+			</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="TransactionID" type="IDType" nillable="true" id="oagis-id-f0194e51e8c24ae6a298405c60151e70">
@@ -2138,7 +2136,7 @@ Examples of a valid TRACKINGID include:
 	<xsd:element name="EveryDayIndicator" type="IndicatorType" nillable="true" id="oagis-id-dbb288fea9514a42acc7717edfac23b7"/>
 	<xsd:element name="ExactMatchIndicator" type="IndicatorType" nillable="true" id="oagis-id-dfcc44957aa54fdfaf2c513983f10b9f">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ExactMatch element is used to define the type of search the external system should perform.  If the ExactMatch is true then the external system should (if supported) search using this criterion and return only the data that exactly matches the search criteria.  A false value would mean that the external system should use this search criterion and return a 'fuzzy' match of data that contains the search criteria but not necessarily an explicit match.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The ExactMatch element is used to define the type of search the external system should perform.  If the ExactMatch is true then the external system should (if supported) search using this criterion and return only the data that exactly matches the search criteria.  A false value would mean that the external system should use this search criterion and return a ‘fuzzy’ match of data that contains the search criteria but not necessarily an explicit match.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ExclusiveIndicator" type="IndicatorType" nillable="true" id="oagis-id-3dd07a94313145e7b704948f3d47dc13">
@@ -2182,9 +2180,9 @@ In other words if a given Option is choosen another Option out of the same Optio
 	<xsd:element name="HideIndicator" type="IndicatorType" nillable="true" id="oagis-id-536f2f35ba2444f08d4d7ea3fa33ee38">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">
-                        This field indicates whether or not this price should be
-                            displayed.
-                    </xsd:documentation>
+						This field indicates whether or not this price should be
+							displayed.
+					</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="HTMLPreferredIndicator" type="IndicatorType" nillable="true" id="oagis-id-bba70de2cd2d4cec89efaf1f4037ea9f">
@@ -2199,7 +2197,7 @@ In other words if a given Option is choosen another Option out of the same Optio
 	</xsd:element>
 	<xsd:element name="InclusiveIndicator" type="IndicatorType" nillable="true" id="oagis-id-e4c3f9ef339d4a1c9901b76dbc9551de">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The InclusiveIndicator element is used to identify whether the SearchValue should be an included or excluded component of the result set.  For example, if a user was looking for ballpoint pens, but NOT red ballpoint pens, the transaction would contain two instances of the SearchTerm data type one containing a SearchValue of 'Ballpoint' and an SearchValueInclusive of 'Inclusive' and one containing a SearchValue of 'Red' and an SearchValueInclusive of 'Exclusive'</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The InclusiveIndicator element is used to identify whether the SearchValue should be an included or excluded component of the result set.  For example, if a user was looking for ballpoint pens, but NOT red ballpoint pens, the transaction would contain two instances of the SearchTerm data type one containing a SearchValue of ‘Ballpoint’ and an SearchValueInclusive of 'Inclusive' and one containing a SearchValue of ‘Red’ and an SearchValueInclusive of 'Exclusive'</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="IncrementIndicator" type="IndicatorType" nillable="true" id="oagis-id-ed25a676d6984222ab3e0cc9ea92c71e"/>
@@ -2477,7 +2475,7 @@ Examples of this maybe the Altitude in the case of a map of the world, or the he
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The catch weight conversion factor is a stock keeping conversion factor for inventory goods.  This is a special conversion factor for when the units of measure can not be converted using arithmetic.  This conversion factor is used with the CatchWeightQuantity.
 
-Examples of the use of this factor include:	
+Examples of the use of this factor include:
 Number of Chickens to a Box
 Number of units of a chemical in a barrel</xsd:documentation>
 		</xsd:annotation>
@@ -2578,8 +2576,8 @@ Number of units of a chemical in a barrel</xsd:documentation>
 	<xsd:element name="DeltaPercent" type="PercentType" nillable="true" id="oagis-id-1fd135e445d3445592743a9992f0ed49">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">
-                        Used to express delta between to multiple price types .
-                    </xsd:documentation>
+						Used to express delta between to multiple price types .
+					</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="DiscountPercent" type="PercentType" nillable="true" id="oagis-id-9507fe1a0369466385789b234c2fe105">
@@ -2747,7 +2745,7 @@ Number of units of a chemical in a barrel</xsd:documentation>
 	<xsd:element name="OccursEveryQuantity" type="QuantityType" nillable="true" id="oagis-id-08d0604feef44d46bac249a57bd5a798"/>
 	<xsd:element name="OpenQuantity" type="QuantityType" nillable="true" id="oagis-id-bd66cb7c7759444d8fb7c22801707d58">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This segment is used to describe the quantity of item's, products or resources open to processing on a document header or line.  The open quantity may refer to the quantity's being budgeted, produced, purchased, received, sold, or used</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This segment is used to describe the quantity of item’s, products or resources open to processing on a document header or line.  The open quantity may refer to the quantity’s being budgeted, produced, purchased, received, sold, or used</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="OrderQuantity" type="QuantityType" nillable="true" id="oagis-id-feca822bb6b842db8205390266b6816d">
@@ -2937,7 +2935,7 @@ Number of units of a chemical in a barrel</xsd:documentation>
 	</xsd:element>
 	<xsd:element name="DebitPurposeReason" type="TextType" nillable="true" id="oagis-id-7a536c83b1f04ddaa560aa1cfa2a9766">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reason or nature of the debit, on the debtor's account, that must be returned in debit advices/statements to the debtor.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Reason or nature of the debit, on the debtor’s account, that must be returned in debit advices/statements to the debtor.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="DialNumber" type="TextType" nillable="true" id="oagis-id-298bf84786304c188e8e4ae3db62062e">
@@ -2982,7 +2980,7 @@ Number of units of a chemical in a barrel</xsd:documentation>
 	<xsd:element name="LineThree" type="TextType" nillable="true" id="oagis-id-618bc66d447b4c889b7a8563a5d0173e"/>
 	<xsd:element name="LineFour" type="TextType" nillable="true" id="oagis-id-e1613a4481894e8a9e91eb17ac7e361e"/>
 	<xsd:element name="LineFive" type="TextType" nillable="true" id="oagis-id-fb01acf72b74400eb28468d98d080c4b"/>
-	<xsd:element name="LotNumberSpecification" type="DescriptionType" nillable="true" id="oagis-id-35e7f85765bf4278ad6d5a96e0834e24">
+	<xsd:element name="LotNumberSpecification" type="DescriptionTextType" nillable="true" id="oagis-id-35e7f85765bf4278ad6d5a96e0834e24">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the business rules used to specify what constitutes a lot</xsd:documentation>
 		</xsd:annotation>
@@ -2996,7 +2994,7 @@ Number of units of a chemical in a barrel</xsd:documentation>
 	<xsd:element name="MethodConsequenceText" type="TextType" nillable="true" id="oagis-id-80e8d6c609fe4a2a9efcc38e3c0fe4b0"/>
 	<xsd:element name="Operator" type="TextType" id="oagis-id-5570f7511ade4b928129923451b74c14">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Operator element defines operator criteria for the SearchValue. For instance if the requester wishes to return a result set of all prices &gt; $600, the transaction would contain a SearchTerm data type with a SearchValue of '600', an SearchValueInclusive of '0' and an OPERATOR value of '&gt;.'
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The Operator element defines operator criteria for the SearchValue. For instance if the requester wishes to return a result set of all prices &gt; $600, the transaction would contain a SearchTerm data type with a SearchValue of ‘600’, an SearchValueInclusive of ‘0’ and an OPERATOR value of ‘&gt;.’
 The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equals, Less Then or Equals, Equals</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
@@ -3052,7 +3050,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:element>
 	<xsd:element name="SearchQualifier" type="TextType" id="oagis-id-94a057e1b35e41469f8917f776082fc3">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SearchQualifier element is an additional element to identify how the SearchValue should be utilized for the search in the catalog provider's system.  The SearchQualifier could be used to indicate that the SearchValue should be searched for in Item Descriptions, or categories, etc.</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The SearchQualifier element is an additional element to identify how the SearchValue should be utilized for the search in the catalog provider’s system.  The SearchQualifier could be used to indicate that the SearchValue should be searched for in Item Descriptions, or categories, etc.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="SearchValueText" type="TextType" nillable="true" id="oagis-id-e744379a258248da9cce89165bac6851">
@@ -3088,19 +3086,19 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<!--=======================-->
 	<!--Text - Description-->
 	<!--=======================-->
-	<xsd:element name="Description" type="DescriptionType" nillable="true" id="oagis-id-e21429e293de4eb09c3262c5167ec0f9"/>
-	<xsd:element name="MethodDescription" type="DescriptionType" nillable="true" id="oagis-id-70d72988dbd045cbaf229797f303fae9"/>
-	<xsd:element name="OfferDescription" type="DescriptionType" nillable="true" id="oagis-id-7d0e258be10045a78aad2805eb08634c">
+	<xsd:element name="Description" type="DescriptionTextType" nillable="true" id="oagis-id-e21429e293de4eb09c3262c5167ec0f9"/>
+	<xsd:element name="MethodDescription" type="DescriptionTextType" nillable="true" id="oagis-id-70d72988dbd045cbaf229797f303fae9"/>
+	<xsd:element name="OfferDescription" type="DescriptionTextType" nillable="true" id="oagis-id-7d0e258be10045a78aad2805eb08634c">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Description of the Marketing program offer made by manufacturer</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="SerialNumberSpecificationDescription" type="DescriptionType" nillable="true" id="oagis-id-fc674e923a8c441f81ce796d3557dd0c">
+	<xsd:element name="SerialNumberSpecificationDescription" type="DescriptionTextType" nillable="true" id="oagis-id-fc674e923a8c441f81ce796d3557dd0c">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the business rules used to specify what constitutes a serial number</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="UsageDescription" type="DescriptionType" nillable="true" id="oagis-id-1ad6152dd75243a9aedd588fd30fbbd5">
+	<xsd:element name="UsageDescription" type="DescriptionTextType" nillable="true" id="oagis-id-1ad6152dd75243a9aedd588fd30fbbd5">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Describes how an ITEM or product is consumed during the manufacturing process.</xsd:documentation>
 		</xsd:annotation>
@@ -3228,8 +3226,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Information, in free text form, which is supplied to enable the matching (reconciliation) of a payment with the items that the payment is intended to settle, such as commercial invoices in an Accounts Receivable system.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="Note" type="NoteType" nillable="true" id="oagis-id-4d76a6376d894130a8a7819af995abf3"/>
-	<xsd:element name="SpecialHandlingNote" type="NoteType" nillable="true" id="oagis-id-ec410a408efa47a5a51e8524d34e2add">
+	<xsd:element name="Note" type="NoteTextType" nillable="true" id="oagis-id-4d76a6376d894130a8a7819af995abf3"/>
+	<xsd:element name="SpecialHandlingNote" type="NoteTextType" nillable="true" id="oagis-id-ec410a408efa47a5a51e8524d34e2add">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This describes any special, physical handling needs that the freight might have. For example, the need for a lift gate</xsd:documentation>
 		</xsd:annotation>
@@ -3500,7 +3498,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<xsd:attribute name="minimum" type="xsd:string" id="oagis-id-6f2da2a259f44984b0a479fe8eb0379e"/>
 				<xsd:attribute name="maximum" type="xsd:string" id="oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9"/>
 			</xsd:extension>
-			<!--				<xsd:attribute name="code" type="CodeContentType" id="oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4"/>  
+			<!--				<xsd:attribute name="code" type="CodeContentType" id="oagis-id-0c8ef7c4cd374bffb8710c544b4f9de4"/>
 				<xsd:attribute name="interval" type="StringType" id="oagis-id-0710e25ea5cb4c118538c9dd002ce2f0"/>
 				<xsd:attribute name="minimum" type="StringType" id="oagis-id-6f2da2a259f44984b0a479fe8eb0379e"/>
 				<xsd:attribute name="maximum" type="StringType" id="oagis-id-d53cf4ec2ae44af78ef15bdf266fb6a9"/>  -->
@@ -3517,7 +3515,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="DayDateType" id="oagis-id-5a2ed18041c04f3e995c773480b0076d">
 		<xsd:restriction base="DateType_DB95C8"/>
 	</xsd:simpleType>
-	<xsd:complexType name="DescriptionType" id="oagis-id-9dc9109b384b43299ecc0d140817f47b">
+	<xsd:complexType name="DescriptionTextType" id="oagis-id-9dc9109b384b43299ecc0d140817f47b">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">
 				<ccts_UniqueID>BDT000000</ccts_UniqueID>
@@ -3536,7 +3534,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			<!--				<xsd:attribute name="typeCode" type="NormalizedStringType" id="oagis-id-7c3c291f53984e90bed1749ac95a7f28"/> -->
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="NoteType" id="oagis-id-8d9b4b5c8b284fd0b59b246262bcafa2">
+	<xsd:complexType name="NoteTextType" id="oagis-id-8d9b4b5c8b284fd0b59b246262bcafa2">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A free form note. The lang attribute identifies the language that the note is in. The author identifies the author of the note. The enrtyDate indicates the date the note was entered or last modified.</xsd:documentation>
 		</xsd:annotation>
@@ -3555,9 +3553,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:complexType name="TemperatureMeasureType" id="oagis-id-4a641b3b6a074d5b909b425aeec9caaa">
 		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TemperatureMeasureType is logically derived from UN/CEFACT TBG17 ABIE TemperatureType as defined in the Reusable Aggregate Business Information Entity (RUABIE) XML Schema file.
-
-</xsd:documentation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TemperatureMeasureType is logically derived from UN/CEFACT TBG17 ABIE TemperatureType as defined in the Reusable Aggregate Business Information Entity (RUABIE) XML Schema file.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="MeasureType"/>
@@ -3596,12 +3592,12 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<!--=======================-->
 	<!--Structured DataTypes-->
 	<!--=======================-->
-	<xsd:complexType name="NameValuePairType" id="oagis-id-e298a36a331247c3a2a4a585d5754531">
+	<xsd:complexType name="NameValuePairValueType" id="oagis-id-e298a36a331247c3a2a4a585d5754531">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the tag and information of the new information to be passed.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="StringType">
+			<xsd:extension base="ValueType">
 				<xsd:attribute name="name" type="xsd:normalizedString" use="required" id="oagis-id-8b03854b876742dc9c1d1bedddf2755d">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the name of the tag for the information being passed.</xsd:documentation>
@@ -3630,25 +3626,25 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:element name="RecordFieldValue" type="RecordFieldValueType" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
-	<xsd:element name="AcceptableValue" type="NameValuePairType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
+	<xsd:element name="AcceptableValue" type="NameValuePairValueType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The value that would represents a satisfactory outcome </xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="EnvironmentalParameterValue" type="NameValuePairType" id="oagis-id-2c9446e048e54fc8bb7ba3d84883bdcd"/>
+	<xsd:element name="EnvironmentalParameterValue" type="NameValuePairValueType" id="oagis-id-2c9446e048e54fc8bb7ba3d84883bdcd"/>
 	<xsd:element name="LeadTimeValue" type="ValueType" id="oagis-id-9839a510a09849ea8113453f97fe58e5"/>
-	<xsd:element name="NameValue" type="NameValuePairType" id="oagis-id-74bdcf5938814416af46067dba04e330">
+	<xsd:element name="NameValue" type="NameValuePairValueType" id="oagis-id-74bdcf5938814416af46067dba04e330">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the tag and information of the new information to be passed.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ResultValue" type="NameValuePairType" id="oagis-id-aba5faa65f984d82a81f74d12db45d57">
+	<xsd:element name="ResultValue" type="NameValuePairValueType" id="oagis-id-aba5faa65f984d82a81f74d12db45d57">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">NameValue pair for representing a test or analysis result</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="TestedPointValue" type="NameValuePairType" id="oagis-id-35c62681d1b34067a68b79967dedb0a4"/>
-	<xsd:element name="TestMethodValue" type="NameValuePairType" id="oagis-id-6f0b5e2b31ae4992aec2635c33a213e7">
+	<xsd:element name="TestedPointValue" type="NameValuePairValueType" id="oagis-id-35c62681d1b34067a68b79967dedb0a4"/>
+	<xsd:element name="TestMethodValue" type="NameValuePairValueType" id="oagis-id-6f0b5e2b31ae4992aec2635c33a213e7">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The actual method or process used to perform a test</xsd:documentation>
 		</xsd:annotation>
@@ -3657,7 +3653,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:complexType name="PreferredNameType" id="oagis-id-55e3dee204b449fab4dac08c5893c031">
 		<xsd:simpleContent>
 			<xsd:extension base="NameType">
-				<xsd:attribute name="preferredIndicator" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
+				<xsd:attribute name="preferred" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
 			</xsd:extension>
 			<!--				<xsd:attribute name="preferred" type="IndicatorType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>  -->
 		</xsd:simpleContent>
@@ -4781,8 +4777,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Country Subdivision_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange 
-independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
+				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
 supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Country Subdivision</ccts_QualifierTerm>
@@ -4841,7 +4837,7 @@ supplementary information.</ccts_Definition>
 						</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-d68e1a8121944c03a721773885265c71"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-d68e1a8121944c03a721773885265c71"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -5114,8 +5110,8 @@ supplementary information.</ccts_Definition>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Delivery Point_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange 
-independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
+				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
 supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Delivery Point</ccts_QualifierTerm>
@@ -5605,8 +5601,8 @@ supplementary information.</ccts_Definition>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Gender_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange 
-independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
+				<ccts_Definition>A character string (letters, figures, or symbols) that for brevity and/or languange
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
 supplementary information.</ccts_Definition>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Gender</ccts_QualifierTerm>

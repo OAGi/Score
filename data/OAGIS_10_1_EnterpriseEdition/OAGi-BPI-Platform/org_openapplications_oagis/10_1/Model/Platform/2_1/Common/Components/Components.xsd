@@ -13453,7 +13453,7 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">A request to perform a specific test</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="DesiredPointValue" type="NameValuePairType" id="oagis-id-edb1a60aaff746239c19324e4b8ca29c"/>
+	<xsd:element name="DesiredPointValue" type="NameValuePairValueType" id="oagis-id-edb1a60aaff746239c19324e4b8ca29c"/>
 	<!---->
 	<xsd:complexType name="TestDetailBaseType" id="oagis-id-0082677cb2ff488ea2a80873456e310b">
 		<xsd:annotation>
@@ -13636,8 +13636,8 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">A representation of some limits usually expressed as a high and low limit</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="UpperLimit" type="NameValuePairType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
-	<xsd:element name="LowerLimit" type="NameValuePairType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
+	<xsd:element name="UpperLimit" type="NameValuePairValueType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
+	<xsd:element name="LowerLimit" type="NameValuePairValueType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
 	<!---->
 	<xsd:complexType name="LogisticEquipmentBaseType" id="oagis-id-becfd5c4010b44f9a5733c5584140fb9">
 		<xsd:complexContent>
