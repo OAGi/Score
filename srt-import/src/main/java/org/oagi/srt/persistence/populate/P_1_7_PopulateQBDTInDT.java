@@ -448,7 +448,7 @@ public class P_1_7_PopulateQBDTInDT {
         String baseDen = Utility.typeToDen(base);
         baseDataType = getDataTypeWithDen(baseDen);
 
-        if(baseDataType == null){
+        if (baseDataType == null) {
             DataTypeInfoHolder baseDataTypeInfoHolder = dtiHolderMap.get(base);
             if (baseDataTypeInfoHolder == null) {
                 throw new IllegalStateException("Unknown QBDT: " + base);
@@ -504,12 +504,12 @@ public class P_1_7_PopulateQBDTInDT {
 
         String dataTypeTerm = dataType.getDataTypeTerm();
 
-		//we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
-        if(base.endsWith("CodeContentType")){
+        //we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
+        if (base.endsWith("CodeContentType")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
             int codeListId = getCodeListId(base.substring(0, base.indexOf("CodeContentType")));
-            bdtPriRestri.setCodeListId(getCodeListId(base.substring(0, base.indexOf("CodeContentType"))));
+            bdtPriRestri.setCodeListId(codeListId);
             bdtPriRestri.setDefault(false);
             bdtPriRestriListForSaving.add(bdtPriRestri); //for CodeList
 
@@ -520,8 +520,7 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
             }//For inherited
-        }
-        else if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
+        } else if (dataTypeTerm.equalsIgnoreCase("Identifier") && base.endsWith("IDContentType")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
             bdtPriRestri.setAgencyIdListId(getAgencyListID());
@@ -535,8 +534,7 @@ public class P_1_7_PopulateQBDTInDT {
                 inheritedBdtPriRestri.setDefault(baseBDTPriRestri.isDefault());
                 bdtPriRestriListForSaving.add(inheritedBdtPriRestri);
             }//For inherited
-        }
-        else {
+        } else {
             for (BusinessDataTypePrimitiveRestriction baseBDTPriRestri : al) {
                 BusinessDataTypePrimitiveRestriction inheritedBdtPriRestri = new BusinessDataTypePrimitiveRestriction();
                 inheritedBdtPriRestri.setBdtId(dataType.getDtId());

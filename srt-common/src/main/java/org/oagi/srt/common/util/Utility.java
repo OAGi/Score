@@ -41,8 +41,8 @@ public class Utility {
     }
 
     /**
-     * @deprecated
      * @see #denToName(String)
+     * @deprecated
      */
     public static String DenToName(String den) {
         den = den.substring(0, den.indexOf(". Type")).replaceAll(" ", "") + "Type";
@@ -315,10 +315,9 @@ public class Utility {
         String denWithQualifier = "";
         baseDen = Utility.denWithoutUUID(baseDen);
 
-        if(!baseDen.equals("Code Content. Type") && baseDen.endsWith("Code Content. Type")){
+        if (!baseDen.equals("Code Content. Type") && baseDen.endsWith("Code Content. Type")) {
             denWithQualifier = qualifier + "_ " + "Code. Type";
-        }
-        else {
+        } else {
             denWithQualifier = qualifier + "_ " + baseDen;
         }
 
@@ -344,8 +343,8 @@ public class Utility {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, "Type");
             }
 
-            String baseType = baseDen.replace(" ","").replace("_","").replace(".","");
-            if(type.contains(baseType)){
+            String baseType = baseDen.replace(" ", "").replace("_", "").replace(".", "");
+            if (type.contains(baseType)) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, baseType);
             }
 
@@ -353,10 +352,9 @@ public class Utility {
             qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeContentType");
         } else if (baseDen.endsWith("Code Content. Type")) {
             int pos = type.lastIndexOf("CodeType");
-            if(pos != -1) {
+            if (pos != -1) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, "CodeType");
-            }
-            else {
+            } else {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, "Type");
             }
         } else {
