@@ -120,8 +120,7 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
                 .collect(Collectors.toMap(BasicCoreComponentProperty::getBccpId, Function.identity()));
 
         List<BasicCoreComponent> bccList = bccRepository.findAll();
-        findBCCByToBccpIdAndEntityTypeIs1Map = bccList.stream()
-                .filter(e -> e.getEntityType() == 1)
+        findBCCByToBccpIdMap = bccList.stream()
                 .collect(Collectors.groupingBy(BasicCoreComponent::getToBccpId));
         findBccByFromAccIdMap = bccList.stream()
                 .collect(Collectors.groupingBy(BasicCoreComponent::getFromAccId));
@@ -272,10 +271,11 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return findBccpMap.get(bccpId);
     }
 
-    private Map<Integer, List<BasicCoreComponent>> findBCCByToBccpIdAndEntityTypeIs1Map;
+    private Map<Integer, List<BasicCoreComponent>> findBCCByToBccpIdMap;
+
     @Override
-    public List<BasicCoreComponent> findBCCByToBccpIdAndEntityTypeIs1(int toBccpId) {
-        return (findBCCByToBccpIdAndEntityTypeIs1Map.containsKey(toBccpId)) ? findBCCByToBccpIdAndEntityTypeIs1Map.get(toBccpId) : Collections.emptyList();
+    public List<BasicCoreComponent> findBCCByToBccpId(int toBccpId) {
+        return (findBCCByToBccpIdMap.containsKey(toBccpId)) ? findBCCByToBccpIdMap.get(toBccpId) : Collections.emptyList();
     }
 
     private Map<Integer, List<BasicCoreComponent>> findBccByFromAccIdMap;

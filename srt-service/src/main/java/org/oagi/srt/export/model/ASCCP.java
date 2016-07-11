@@ -54,4 +54,8 @@ public abstract class ASCCP implements Component {
     public boolean isReusableIndicator() {
         return asccp.isReusableIndicator();
     }
+
+    public boolean isNillable() {
+        return asccp.isNillable();
+    }
 }

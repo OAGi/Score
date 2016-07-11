@@ -159,15 +159,27 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     private void createBCCP(Map<Integer, SchemaModule> moduleMap) {
         for (BasicCoreComponentProperty bccp : importedDataProvider.findBCCP()) {
 
-            List<BasicCoreComponent> bccList = importedDataProvider.findBCCByToBccpIdAndEntityTypeIs1(bccp.getBccpId());
-            if (bccList.isEmpty()) {
-                continue;
-            }
-            DataType bdt = importedDataProvider.findDT(bccp.getBdtId());
+            List<BasicCoreComponent> bccList = importedDataProvider.findBCCByToBccpId(bccp.getBccpId());
+            if (isAvailable(bccList)) {
+                DataType bdt = importedDataProvider.findDT(bccp.getBdtId());
 
-            SchemaModule schemaModule = moduleMap.get(bccp.getModule().getModuleId());
-            schemaModule.addBCCP(new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen()));
+                SchemaModule schemaModule = moduleMap.get(bccp.getModule().getModuleId());
+                schemaModule.addBCCP(
+                        new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen(),
+                                bccp.isNillable(), bccp.getDefaultValue()));
+            }
         }
+    }
+
+    private boolean isAvailable(List<BasicCoreComponent> bccList) {
+        if (bccList.isEmpty()) {
+            return true;
+        }
+
+        int sumOfEntityTypes = bccList.stream()
+                .mapToInt(e -> e.getEntityType())
+                .sum();
+        return sumOfEntityTypes != 0;
     }
 
     private void createACC(Map<Integer, SchemaModule> moduleMap) {

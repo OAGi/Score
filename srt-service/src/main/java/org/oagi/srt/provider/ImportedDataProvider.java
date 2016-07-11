@@ -46,7 +46,7 @@ public interface ImportedDataProvider {
 
     public BasicCoreComponentProperty findBCCP(int bccpId);
 
-    public List<BasicCoreComponent> findBCCByToBccpIdAndEntityTypeIs1(int toBccpId);
+    public List<BasicCoreComponent> findBCCByToBccpId(int toBccpId);
 
     public List<BasicCoreComponent> findBCCByFromAccId(int fromAccId);
 

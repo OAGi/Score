@@ -17,6 +17,7 @@ import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -322,7 +323,14 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitBCCP(BCCP bccp) throws Exception {
-        addSimpleElement(bccp);
+        Element element = addSimpleElement(bccp);
+        if (bccp.isNillable()) {
+            element.setAttribute("nillable", "true");
+        }
+        String defaultValue = bccp.getDefaultValue();
+        if (!StringUtils.isEmpty(defaultValue)) {
+            element.setAttribute("default", defaultValue);
+        }
     }
 
     private Element addSimpleElement(org.oagi.srt.export.model.Component component) {
@@ -438,6 +446,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                     }
 
                     attributeElement.setAttribute("id", bcc.getGuid());
+                    if (bcc.isNillable()) {
+                        attributeElement.setAttribute("nillable", "true");
+                    }
+                    String defaultValue = bcc.getDefaultValue();
+                    if (!StringUtils.isEmpty(defaultValue)) {
+                        attributeElement.setAttribute("default", defaultValue);
+                    }
 
                     if (basedACC != null) {
                         Element complexContentElement = complexTypeElement.getChild("complexContent", XSD_NS);
@@ -492,7 +507,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         if (asccpComplexType.isGroup()) {
             return;
         }
-        addSimpleElement(asccpComplexType);
+        Element element = addSimpleElement(asccpComplexType);
+        if (asccpComplexType.isNillable()) {
+            element.setAttribute("nillable", "true");
+        }
     }
 
     @Override
