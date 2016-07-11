@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate.helper;
 
 import org.oagi.srt.repository.entity.Module;
+import org.w3c.dom.Element;
 
 import java.io.File;
 import java.util.Collection;
@@ -33,4 +34,5 @@ public interface Declaration {
 
     public boolean isNillable();
     public String getDefaultValue();
+    public Element getRawElement();
 }

@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -228,10 +229,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                double refCnt = (Double) Context.xPath.evaluate("count(./@ref)", element, XPathConstants.NUMBER);
-                boolean reusableIndicator = (refCnt == 0) ? false : true;
-
-                createASCCP(elementDecl, reusableIndicator);
+                createASCCP(elementDecl, getReusableIndicator(elementDecl.getTypeDecl()));
             }
 
             NodeList groups = (NodeList) Context.xPath.evaluate("//xsd:group", document, XPathConstants.NODESET);
@@ -259,13 +257,21 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                double refCnt = (Double) Context.xPath.evaluate("count(./@ref)", group, XPathConstants.NUMBER);
-                boolean reusableIndicator = (refCnt == 0) ? false : true;
-
-                createASCCP(groupDecl, reusableIndicator);
+                createASCCP(groupDecl, getReusableIndicator(groupDecl));
             }
 
         }
+    }
+
+    private boolean getReusableIndicator(Declaration declaration) {
+        double refCnt;
+        String expression = "count(.//@ref)";
+        try {
+            refCnt = (Double) Context.xPath.evaluate(expression, declaration.getRawElement(), XPathConstants.NUMBER);
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(expression + " doesn't support exception?", e);
+        }
+        return (refCnt == 0) ? false : true;
     }
 
     private File[] getBODs(File f) {
@@ -282,7 +288,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return createASCCP(declaration, null, reusableIndicator);
     }
 
-    private AssociationCoreComponentProperty createASCCP(Declaration declaration, AggregateCoreComponent acc, boolean reusableIndicator) {
+    private AssociationCoreComponentProperty createASCCP(Declaration declaration,
+                                                         AggregateCoreComponent acc, boolean reusableIndicator) {
         String asccpGuid = declaration.getId();
         String definition = declaration.getDefinition();
         Module module = declaration.getModule();

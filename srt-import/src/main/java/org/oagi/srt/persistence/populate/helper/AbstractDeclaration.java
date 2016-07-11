@@ -305,4 +305,9 @@ public abstract class AbstractDeclaration implements Declaration {
         String defaultValue = element.getAttribute("default");
         return StringUtils.isEmpty(defaultValue) ? null : defaultValue.trim();
     }
+
+    @Override
+    public Element getRawElement() {
+        return element;
+    }
 }
