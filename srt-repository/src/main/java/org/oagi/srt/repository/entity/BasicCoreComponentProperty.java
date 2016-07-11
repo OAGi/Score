@@ -90,6 +90,12 @@ public class BasicCoreComponentProperty implements Serializable {
     @Column
     private Integer currentBccpId;
 
+    @Column(name = "is_nillable", nullable = false)
+    private boolean nillable;
+
+    @Column
+    private String defaultValue;
+
     public BasicCoreComponentProperty() {}
 
     public BasicCoreComponentProperty(int bccpId, String den) {
@@ -282,6 +288,22 @@ public class BasicCoreComponentProperty implements Serializable {
         this.currentBccpId = currentBccpId;
     }
 
+    public boolean isNillable() {
+        return nillable;
+    }
+
+    public void setNillable(boolean nillable) {
+        this.nillable = nillable;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -299,6 +321,7 @@ public class BasicCoreComponentProperty implements Serializable {
         if (revisionNum != that.revisionNum) return false;
         if (revisionTrackingNum != that.revisionTrackingNum) return false;
         if (revisionAction != that.revisionAction) return false;
+        if (nillable != that.nillable) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
         if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
@@ -312,7 +335,9 @@ public class BasicCoreComponentProperty implements Serializable {
         if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
             return false;
         if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentBccpId != null ? currentBccpId.equals(that.currentBccpId) : that.currentBccpId == null;
+        if (currentBccpId != null ? !currentBccpId.equals(that.currentBccpId) : that.currentBccpId != null)
+            return false;
+        return defaultValue != null ? defaultValue.equals(that.defaultValue) : that.defaultValue == null;
 
     }
 
@@ -339,6 +364,8 @@ public class BasicCoreComponentProperty implements Serializable {
         result = 31 * result + revisionAction;
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (currentBccpId != null ? currentBccpId.hashCode() : 0);
+        result = 31 * result + (nillable ? 1 : 0);
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
         return result;
     }
 
@@ -366,6 +393,8 @@ public class BasicCoreComponentProperty implements Serializable {
                 ", revisionAction=" + revisionAction +
                 ", releaseId=" + releaseId +
                 ", currentBccpId=" + currentBccpId +
+                ", nillable=" + nillable +
+                ", defaultValue='" + defaultValue + '\'' +
                 '}';
     }
 }

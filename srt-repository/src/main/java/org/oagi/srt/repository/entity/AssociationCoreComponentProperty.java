@@ -91,6 +91,9 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column
     private Integer currentAsccpId;
 
+    @Column(name = "is_nillable", nullable = false)
+    private boolean nillable;
+
     public AssociationCoreComponentProperty() {}
 
     public AssociationCoreComponentProperty(int asccpId, String den) {
@@ -285,6 +288,14 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.currentAsccpId = currentAsccpId;
     }
 
+    public boolean isNillable() {
+        return nillable;
+    }
+
+    public void setNillable(boolean nillable) {
+        this.nillable = nillable;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -303,6 +314,7 @@ public class AssociationCoreComponentProperty implements Serializable {
         if (deprecated != that.deprecated) return false;
         if (revisionNum != that.revisionNum) return false;
         if (revisionTrackingNum != that.revisionTrackingNum) return false;
+        if (nillable != that.nillable) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
@@ -342,6 +354,7 @@ public class AssociationCoreComponentProperty implements Serializable {
         result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (currentAsccpId != null ? currentAsccpId.hashCode() : 0);
+        result = 31 * result + (nillable ? 1 : 0);
         return result;
     }
 
@@ -369,6 +382,7 @@ public class AssociationCoreComponentProperty implements Serializable {
                 ", revisionAction=" + revisionAction +
                 ", releaseId=" + releaseId +
                 ", currentAsccpId=" + currentAsccpId +
+                ", nillable=" + nillable +
                 '}';
     }
 }

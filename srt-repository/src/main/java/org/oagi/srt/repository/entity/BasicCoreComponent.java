@@ -93,6 +93,12 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
+    @Column(name = "is_nillable", nullable = false)
+    private boolean nillable;
+
+    @Column
+    private String defaultValue;
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();
@@ -292,6 +298,22 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         this.deprecated = deprecated;
     }
 
+    public boolean isNillable() {
+        return nillable;
+    }
+
+    public void setNillable(boolean nillable) {
+        this.nillable = nillable;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -313,6 +335,7 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         if (revisionNum != that.revisionNum) return false;
         if (revisionTrackingNum != that.revisionTrackingNum) return false;
         if (deprecated != that.deprecated) return false;
+        if (nillable != that.nillable) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (den != null ? !den.equals(that.den) : that.den != null) return false;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
@@ -323,7 +346,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
             return false;
         if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentBccId != null ? currentBccId.equals(that.currentBccId) : that.currentBccId == null;
+        if (currentBccId != null ? !currentBccId.equals(that.currentBccId) : that.currentBccId != null) return false;
+        return defaultValue != null ? defaultValue.equals(that.defaultValue) : that.defaultValue == null;
 
     }
 
@@ -351,6 +375,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (currentBccId != null ? currentBccId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
+        result = 31 * result + (nillable ? 1 : 0);
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
         return result;
     }
 
@@ -379,6 +405,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
                 ", releaseId=" + releaseId +
                 ", currentBccId=" + currentBccId +
                 ", deprecated=" + deprecated +
+                ", nillable=" + nillable +
+                ", defaultValue='" + defaultValue + '\'' +
                 '}';
     }
 }
