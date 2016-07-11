@@ -28,6 +28,10 @@ public class BDTSC implements Component {
             "Text".equals(representationTerm)) { // exceptional case. 'expressionLanguageText' must be 'expressionLanguage'.
             representationTerm = "";
         }
+        // exceptional case. 'preferredIndicator' must be 'preferred'.
+        if ("oagis-id-9bb9add40b5b415c8489b08bd4484907".equals(dtSc.getGuid())) {
+            representationTerm = "";
+        }
 
         if (propertyTerm.contains(representationTerm)) {
             String attrName = Character.toLowerCase(propertyTerm.charAt(0)) + propertyTerm.substring(1);
