@@ -30,4 +30,7 @@ public interface Declaration {
 
     public Collection<Declaration> getParticles(ParticleAction particleAction);
     public Collection<AttrDecl> getAttributes();
+
+    public boolean isNillable();
+    public String getDefaultValue();
 }

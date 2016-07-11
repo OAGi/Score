@@ -325,6 +325,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setNamespaceId(namespaceId);
         asccp.setReleaseId(releaseId);
         asccp.setReusableIndicator(reusableIndicator);
+        asccp.setNillable(declaration.isNillable());
         asccpRepository.saveAndFlush(asccp);
 
         return asccp;
@@ -533,6 +534,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bcc.setCreatedBy(userId);
         bcc.setLastUpdatedBy(userId);
         bcc.setOwnerUserId(userId);
+        bcc.setNillable(declaration.isNillable());
+        bcc.setDefaultValue(declaration.getDefaultValue());
         bccRepository.saveAndFlush(bcc);
 
         return true;
@@ -597,6 +600,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setNamespaceId(namespaceId);
             Module module = declaration.getModule();
             bccp.setModule(module);
+            bccp.setNillable(declaration.isNillable());
+            bccp.setDefaultValue(declaration.getDefaultValue());
             bccpRepository.saveAndFlush(bccp);
             return bccp;
         } else {

@@ -345,42 +345,9 @@ public class P_1_7_PopulateQBDTInDT {
                 Node documentationFromXSD = xHandler.getNode(element, ".//xsd:documentation | .//*[local-name()=\"ccts_Definition\"]");
                 String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
 
-                Module module = elementDecl.getModule();
                 // add BCCP
-                addToBCCP(guid, bccp, dataType, definition, module);
+                addToBCCP(guid, bccp, dataType, definition, elementDecl);
             }
-        }
-    }
-
-    private void insertDTAndBCCP(NodeList elementsFromXSD, XPathHandler xHandler) throws Exception {
-        for (int i = 0; i < elementsFromXSD.getLength(); i++) {//ElementsFromXSD don't have CodeContentType, IDContentType
-            Element element = (Element) elementsFromXSD.item(i);
-            String bccp = element.getAttribute("name");
-            String guid = element.getAttribute("id");
-            String type = element.getAttribute("type");
-
-            DataTypeInfoHolder dataTypeInfoHolder = dtiHolderMap.get(type);
-            if (dataTypeInfoHolder == null) {
-                throw new IllegalStateException("Unknown QBDT: " + type);
-            }
-
-            DataType dataType = dataTypeRepository.findOneByGuid(dataTypeInfoHolder.getGuid());
-            if (dataType == null) {
-                // add new QBDT
-                dataType = addToDT(dataTypeInfoHolder, type, xHandler);
-                if (dataType == null) {
-                    continue;
-                }
-
-                // add DT_SC
-                addToDTSC(xHandler, type, dataType);
-            }
-
-            Node documentationFromXSD = xHandler.getNode(element, ".//xsd:documentation | .//*[local-name()=\"ccts_Definition\"]");
-            String definition = (documentationFromXSD != null) ? documentationFromXSD.getTextContent() : null;
-
-            // add BCCP
-            addToBCCP(guid, bccp, dataType, definition, null);
         }
     }
 
@@ -550,7 +517,7 @@ public class P_1_7_PopulateQBDTInDT {
         }
     }
 
-    private void addToBCCP(String guid, String name, DataType dataType, String definition, Module module) throws Exception {
+    private void addToBCCP(String guid, String name, DataType dataType, String definition, ElementDecl elementDecl) throws Exception {
         if (bccpRepository.existsByGuid(guid)) {
             return;
         }
@@ -570,8 +537,11 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setOwnerUserId(userId);
         bccp.setDeprecated(false);
         bccp.setReleaseId(releaseId);
+        Module module = elementDecl.getModule();
         bccp.setModule(module);
         bccp.setNamespaceId(namespaceId);
+        bccp.setNillable(elementDecl.isNillable());
+        bccp.setDefaultValue(elementDecl.getDefaultValue());
         bccpRepository.save(bccp);
     }
 

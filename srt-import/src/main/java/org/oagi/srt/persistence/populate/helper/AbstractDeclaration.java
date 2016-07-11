@@ -294,4 +294,15 @@ public abstract class AbstractDeclaration implements Declaration {
         }
         return particles;
     }
+
+    @Override
+    public boolean isNillable() {
+        return element.hasAttribute("nillable") ? Boolean.valueOf(element.getAttribute("nillable")) : false;
+    }
+
+    @Override
+    public String getDefaultValue() {
+        String defaultValue = element.getAttribute("default");
+        return StringUtils.isEmpty(defaultValue) ? null : defaultValue.trim();
+    }
 }
