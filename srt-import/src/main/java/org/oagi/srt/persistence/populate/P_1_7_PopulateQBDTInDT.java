@@ -382,7 +382,8 @@ public class P_1_7_PopulateQBDTInDT {
                 bdtScPriRestriListForSaving.add(bdtScPriRestri);
             }
 
-        } else { // else if (new SC)
+        }
+        else { // else if (new SC)
             populateDefaultAndUnqualifiedBDT.populateBDTSCPrimitiveRestrictionWithAttribute(dtscVO, type);
         }
 
@@ -551,21 +552,6 @@ public class P_1_7_PopulateQBDTInDT {
         int ownerDtId = qbdtVO.getDtId();
 
         List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
-        for (DataTypeSupplementaryComponent dtsc_vo : dtsc_vos) {
-            DataTypeSupplementaryComponent inheritedDtSc = new DataTypeSupplementaryComponent();
-            inheritedDtSc.setGuid(Utility.generateGUID());
-            inheritedDtSc.setPropertyTerm(dtsc_vo.getPropertyTerm());
-            inheritedDtSc.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
-            inheritedDtSc.setOwnerDtId(ownerDtId);
-
-            inheritedDtSc.setMinCardinality(dtsc_vo.getMinCardinality());
-            inheritedDtSc.setMaxCardinality(dtsc_vo.getMaxCardinality());
-            inheritedDtSc.setBasedDtScId(dtsc_vo.getDtScId());
-
-            dtScRepository.saveAndFlush(inheritedDtSc);
-
-            insertBDTSCPrimitiveRestriction(inheritedDtSc, 1, "", "");
-        }
 
         // new SC
         NodeList attributeList = xHandler.getNodeList("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute");
@@ -579,6 +565,7 @@ public class P_1_7_PopulateQBDTInDT {
             int max_cardinality = 1;
 
             for (int i = 0; i < attributeList.getLength(); i++) {
+                boolean isNew = true;
                 Node attribute = attributeList.item(i);
                 Element attrElement = (Element) attribute;
                 dt_sc_guid = attrElement.getAttribute("id");
@@ -658,8 +645,17 @@ public class P_1_7_PopulateQBDTInDT {
 //				in this case, the target dtsc is new? or not?
 
                 logger.trace(attrName + " " + representation_term);
-                DataTypeSupplementaryComponent duplicate = checkDuplicate(dtSc);
-                if (duplicate == null) {
+
+                for(int j=0; j<dtsc_vos.size(); j++){
+                    if(dtSc.getPropertyTerm().equals(dtsc_vos.get(j).getPropertyTerm()) &&
+                       dtSc.getRepresentationTerm().equals(dtsc_vos.get(j).getRepresentationTerm())){
+                        dtSc.setBasedDtScId(dtsc_vos.get(j).getDtScId());
+                        isNew = false;
+                        break;
+                    }
+                }
+
+                if (isNew) {
                     dtScRepository.saveAndFlush(dtSc);
 
                     // populate CDT_SC_Allowed_Primitives
@@ -697,10 +693,30 @@ public class P_1_7_PopulateQBDTInDT {
 
                     insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 } else {
-                    dtSc.setDtScId(duplicate.getDtScId());
-                    dtSc.setBasedDtScId(duplicate.getBasedDtScId());
-                    dtScRepository.save(dtSc);
+                    dtScRepository.saveAndFlush(dtSc);
+                    insertBDTSCPrimitiveRestriction(getDataTypeSupplementaryComponent(dt_sc_guid, ownerDtId), 0, attrElement.getAttribute("name"), attrElement.getAttribute("type"));
                 }
+            }
+        }
+
+        for (DataTypeSupplementaryComponent baseDtsc : dtsc_vos) {
+            DataTypeSupplementaryComponent inheritedDtSc = new DataTypeSupplementaryComponent();
+            inheritedDtSc.setGuid(Utility.generateGUID());
+            inheritedDtSc.setPropertyTerm(baseDtsc.getPropertyTerm());
+            inheritedDtSc.setRepresentationTerm(baseDtsc.getRepresentationTerm());
+            inheritedDtSc.setOwnerDtId(ownerDtId);
+
+            DataTypeSupplementaryComponent duplicate = checkDuplicate(inheritedDtSc);
+
+            if(duplicate==null) {
+
+                inheritedDtSc.setMinCardinality(baseDtsc.getMinCardinality());
+                inheritedDtSc.setMaxCardinality(baseDtsc.getMaxCardinality());
+                inheritedDtSc.setBasedDtScId(baseDtsc.getDtScId());
+
+                dtScRepository.saveAndFlush(inheritedDtSc);
+
+                insertBDTSCPrimitiveRestriction(inheritedDtSc, 1, "", "");
             }
         }
     }
