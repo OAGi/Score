@@ -1,15 +1,12 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.common.SRTConstants;
-import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.repository.ContextCategoryRepository;
-import org.oagi.srt.repository.ContextSchemeRepository;
 import org.oagi.srt.repository.entity.ContextCategory;
 import org.oagi.srt.repository.entity.ContextScheme;
+import org.oagi.srt.service.ContextCategoryService;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +25,7 @@ import java.util.stream.Collectors;
 public class ContextCategoryHandler extends UIHandler {
 
     @Autowired
-    private ContextCategoryRepository contextCategoryRepository;
-
-    @Autowired
-    private ContextSchemeRepository contextSchemeRepository;
+    private ContextCategoryService contextCategoryService;
 
     private String name;
     private String description;
@@ -76,7 +70,7 @@ public class ContextCategoryHandler extends UIHandler {
     }
 
     public List<ContextCategory> getContextCategories() {
-        contextCategories = contextCategoryRepository.findAll();
+        contextCategories = contextCategoryService.findAll(Sort.Direction.DESC, "ctxCategoryId");
         return contextCategories;
     }
 
@@ -103,11 +97,10 @@ public class ContextCategoryHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void createContextCategory() {
-        ContextCategory contextCategory = new ContextCategory();
-        contextCategory.setName(this.name);
-        contextCategory.setDescription(this.description);
-        contextCategory.setGuid(Utility.generateGUID());
-        contextCategoryRepository.save(contextCategory);
+        contextCategoryService.newContextCategoryBuilder()
+                .name(this.name)
+                .description(this.description)
+                .build();
     }
 
     public List<String> completeInput(String query) {
@@ -153,7 +146,7 @@ public class ContextCategoryHandler extends UIHandler {
         contextCategory.setGuid(this.GUID);
         contextCategory.setCtxCategoryId(this.id);
 
-        contextCategoryRepository.save(contextCategory);
+        contextCategoryService.update(contextCategory);
         refreshContextCategories();
         setSelectedCategory(contextCategory);
     }
@@ -164,21 +157,8 @@ public class ContextCategoryHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void delete(int id) {
-        try {
-            contextCategoryRepository.delete(id);
-            refreshContextCategories();
-        } catch (DataAccessException e) {
-            if (e.getLocalizedMessage().contains(SRTConstants.FOREIGNKEY_ERROR_MSG)) {
-                List<ContextScheme> contextSchemes = contextSchemeRepository.findByCtxCategoryId(id);
-                String msg = partResult(contextSchemes);
-
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, SRTConstants.CANNOT_DELETE_CONTEXT_CATEGORTY + msg, null);
-                FacesContext.getCurrentInstance().addMessage(null, message);
-                this.selectedCategory = null;
-            } else {
-                e.printStackTrace();
-            }
-        }
+        contextCategoryService.deleteById(id);
+        refreshContextCategories();
     }
 
     private String partResult(List<ContextScheme> list) {
@@ -202,7 +182,7 @@ public class ContextCategoryHandler extends UIHandler {
         contextCategory.setDescription(eventObject.getDescription());
         contextCategory.setGuid(eventObject.getGuid());
         contextCategory.setCtxCategoryId(eventObject.getCtxCategoryId());
-        contextCategoryRepository.save(contextCategory);
+        contextCategoryService.update(contextCategory);
     }
 
     public void onRowCancel(RowEditEvent event) {
