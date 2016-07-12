@@ -31,7 +31,8 @@
 	<!-- ====================================================================== -->
 	<!-- =====  Root Element Declaration				      ===== -->
 	<!-- ====================================================================== -->
-	<xsd:element name="clm63055D08B_AgencyIdentification" type="clm63055D08B_AgencyIdentificationContentType" id="oagis-id-db50071000454f9d9d24563b579c96b2"/>
+	<!--<xsd:element name="clm63055D08B_AgencyIdentification" type="clm63055D08B_AgencyIdentificationContentType" id="oagis-id-db50071000454f9d9d24563b579c96b2"/>
+-->
 	<!-- ====================================================================== -->
 	<!-- =====  Type Definitions					      ===== -->
 	<!-- ====================================================================== -->
