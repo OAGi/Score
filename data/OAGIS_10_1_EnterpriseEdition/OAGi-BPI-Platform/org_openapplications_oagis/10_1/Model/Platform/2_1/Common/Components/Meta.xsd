@@ -355,7 +355,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 		<xsd:sequence>
 			<xsd:element ref="ID" id="oagis-id-59fccca73c224f96a9ae7ea4138c28cf" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="schemeID" type="xsd:normalizedString" use="optional" id="oagis-id-aa692ebb145d494d82564a5cb9130a28">
+		<xsd:attribute name="schemeID" type="IDType_B3F14E" use="optional" id="oagis-id-aa692ebb145d494d82564a5cb9130a28">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -371,7 +371,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-9451f00af62a4b968c391f2864e67991">
+		<xsd:attribute name="schemeVersionID" type="IDType_B3F14E" use="optional" id="oagis-id-9451f00af62a4b968c391f2864e67991">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
