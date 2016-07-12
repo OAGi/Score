@@ -6253,7 +6253,9 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:complexType name="NamedIDsType" abstract="false" id="oagis-id-a8e649deeb074d118d71949f831cc76f" mixed="false">
+	<xsd:sequence>
 		<xsd:group ref="NamedIDsGroup" id="oagis-id-54db3d59f147427aa552e9b6064d5939" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:group name="SequencedIDsGroup" id="oagis-id-1865b226967e48f1824883eb0e881f92">
 		<xsd:sequence>
@@ -6264,7 +6266,9 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Contains the sequenced identifier for the associated component or noun.</xsd:documentation>
 		</xsd:annotation>
+		<xsd:sequence>
 		<xsd:group ref="SequencedIDsGroup" id="oagis-id-005c96018e9f4a018b2ca39c2b8af29e" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="LotIDs" type="SequencedIDsType" abstract="false" nillable="false" id="oagis-id-8a24154b8d28492eb7424e4ee118aa4d">
 		<xsd:annotation>
