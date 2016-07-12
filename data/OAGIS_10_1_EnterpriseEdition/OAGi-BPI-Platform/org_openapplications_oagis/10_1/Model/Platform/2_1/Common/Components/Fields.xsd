@@ -4460,7 +4460,59 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:complexType name="ConfirmationCodeType" id="oagis-id-8311a261bc5348dda91cba90fa83429e">
 		<xsd:simpleContent>
-			<xsd:extension base="ConfirmationCodeContentType"/>
+			<xsd:extension base="ConfirmationCodeContentType">
+				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-fe6422f9632e4e07addb64ad18f43590">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of a list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-4c374723ecfb44b39a492504eb0e5f71">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Agency. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the agency that manages the code list</ccts_Definition>
+							<ccts_PropertyTermName>List Agency</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>True</ccts_DefaultIndicator>
+								<ccts_SchemeOrListID>3055</ccts_SchemeOrListID>
+								<ccts_SchemeOrListVersionID>D08B</ccts_SchemeOrListVersionID>
+								<ccts_SchemeOrListAgencyID>6</ccts_SchemeOrListAgencyID>
+								<ccts_SchemeOrListModificationAllowedIndicator>False</ccts_SchemeOrListModificationAllowedIndicator>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-86fcddc6c6dd4389b3024e7f6644a5bc">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Version. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the version of the list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List Version</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="ContactLocationCodeType" id="oagis-id-250d8771469544d88b7bb7607432da93">
