@@ -232,6 +232,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
                 boolean isChildOfSchema = false;
                 for(int j=0; j<childOfSchemaElements.getLength(); j++){
+                    Element checkElement = (Element) childOfSchemaElements.item(j);
                     String checkGuid = checkElement.getAttribute("id");
                     if(checkGuid.equals(guid)){
                         isChildOfSchema=true;
@@ -275,6 +276,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
                 boolean isChildOfSchema = false;
                 for(int j=0; j<childOfSchemaGroups.getLength(); j++){
+                    Element checkGroup = (Element) childOfSchemaGroups.item(j);
                     String checkGuid = checkGroup.getAttribute("id");
                     if(checkGuid.equals(guid)){
                         isChildOfSchema=true;
