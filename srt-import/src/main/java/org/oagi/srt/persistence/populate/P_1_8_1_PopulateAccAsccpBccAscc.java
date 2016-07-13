@@ -230,19 +230,10 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                boolean isChildOfSchema = false;
-                for(int j=0; j<childOfSchemaElements.getLength(); j++){
-                    Element checkElement = (Element) childOfSchemaElements.item(j);
-                    String checkGuid = checkElement.getAttribute("id");
-                    if(checkGuid.equals(guid)){
-                        isChildOfSchema=true;
-                        break;
-                    }
-                }
-                if(isChildOfSchema) {
+                boolean isChildOfSchema = isChildOfSchema(childOfSchemaElements, guid);
+                if (isChildOfSchema) {
                     createASCCP(elementDecl, true);
-                }
-                else {
+                } else {
                     createASCCP(elementDecl, getReusableIndicator(elementDecl.getTypeDecl()));
                 }
             }
@@ -274,24 +265,28 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                boolean isChildOfSchema = false;
-                for(int j=0; j<childOfSchemaGroups.getLength(); j++){
-                    Element checkGroup = (Element) childOfSchemaGroups.item(j);
-                    String checkGuid = checkGroup.getAttribute("id");
-                    if(checkGuid.equals(guid)){
-                        isChildOfSchema=true;
-                        break;
-                    }
-                }
-                if(isChildOfSchema) {
+                boolean isChildOfSchema = isChildOfSchema(childOfSchemaGroups, guid);
+                if (isChildOfSchema) {
                     createASCCP(groupDecl, true);
-                }
-                else {
+                } else {
                     createASCCP(groupDecl, getReusableIndicator(groupDecl));
                 }
             }
 
         }
+    }
+
+    private boolean isChildOfSchema(NodeList childrenList, String guid) {
+        boolean isChildOfSchema = false;
+        for (int j = 0; j < childrenList.getLength(); j++) {
+            Element checkGroup = (Element) childrenList.item(j);
+            String checkGuid = checkGroup.getAttribute("id");
+            if (checkGuid.equals(guid)) {
+                isChildOfSchema = true;
+                break;
+            }
+        }
+        return isChildOfSchema;
     }
 
     private boolean getReusableIndicator(Declaration declaration) {

@@ -3,7 +3,7 @@ package org.oagi.srt.persistence.populate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ImportApplication.class)
@@ -43,7 +42,7 @@ public class P_1_8_PopulateAccAsccpBccAsccTestCase extends AbstractTransactional
     private BasicCoreComponentRepository bccRepository;
 
     @Test
-    public void testASCCPReusableIndicator(){
+    public void testASCCPReusableIndicator() {
         List<String> localElementGuidList = Arrays.asList(
                 "oagis-id-6ce9635b4e6c4173ab258b09df671dec",
                 "oagis-id-800f79ec3b334a09ab9d40613fb93e5d",
@@ -1571,16 +1570,15 @@ public class P_1_8_PopulateAccAsccpBccAsccTestCase extends AbstractTransactional
                 "oagis-id-ccf3b39d4fc84308bd7fff69e99a35c8",
                 "oagis-id-f52651a327e84a96b1a14470982947a2",
                 "oagis-id-51314c5f0ac64c00b0bb9819ae579400"
-                );
+        );
 
         List<AssociationCoreComponentProperty> allAsccp = asccpRepository.findAll();
 
-        for(int i=0; i<allAsccp.size(); i++){
+        for (int i = 0; i < allAsccp.size(); i++) {
             AssociationCoreComponentProperty asccp = allAsccp.get(i);
-            if(localElementGuidList.contains(asccp.getGuid())){
+            if (localElementGuidList.contains(asccp.getGuid())) {
                 assertEquals(false, asccp.isReusableIndicator());
-            }
-            else {
+            } else {
                 assertEquals(true, asccp.isReusableIndicator());
             }
         }
