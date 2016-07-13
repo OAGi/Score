@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/PlanningSchedule.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="PlanningSchedule" type="PlanningScheduleType" id="oagis-id-48e7b4dde18440b1b24ffa32142e3a4a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Indicates a demand forecast sent from a customer to a supplier, or a supply schedule sent from a supplier to a customer.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PlanningScheduleHeader" type="PlanningScheduleHeaderType" id="oagis-id-8d817d3507524010b5554ea9d029f791">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Header level information for the schedule.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PlanningScheduleLine" type="PlanningScheduleLineType" id="oagis-id-6c946982e4a54b8ebffb71938483339e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Line level information for the schedule.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PlanningScheduleDetail" type="PlanningScheduleDetailType" id="oagis-id-dd47c7446912444fb1952d0149b39a08">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Additional detail for each line item.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Bucket" type="FlexibleBucketType" id="oagis-id-ea0e448d5161495fa261cdf59eb1e3f5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">All time bucket definitions used within the schedule.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ItemQuantityBucket" type="ItemQuantityBucketType" id="oagis-id-78eaf17b4fba42aaa19a8a1ba3870237"/>
+	<xsd:element name="ProductTypeInventory" type="ProductTypeInventoryType" id="oagis-id-6eab5eb5705e4246aa8f092377ed8399">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Inventory by type of product in a planning schedule or forecast.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ProductQuantityShipmentReceipt" type="ProductQuantityShipmentReceiptType" id="oagis-id-4dac9c1fd95249bc813f2f252bb41f48">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">A product quantity shipment receipt.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PlanningScheduleType" id="oagis-id-a9abd6a7e79d4434bea2c3582d33fe46">
+		<xsd:sequence>
+			<xsd:element ref="PlanningScheduleHeader" id="oagis-id-5a062fdebc2b4c1eb845dc466361e7f1" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Header level information for the schedule.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PlanningScheduleLine" id="oagis-id-e4bc3d37e75a452686e87c3f37418523" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Line level information for the schedule.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-636d9e8315f24dc3b2ac95299aa855f0"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-647eca09eabc4248bca64129d1889a81"/>
+	</xsd:complexType>
+	<xsd:complexType name="PlanningScheduleHeaderBaseType" id="oagis-id-f52044986a5649d0984889557871362f">
+		<xsd:complexContent>
+			<xsd:extension base="ScheduleHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Bucket" id="oagis-id-3c17b88819f349dd9bdd01975fde09a4" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">All time bucket definitions used within the schedule.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FinalForecastIndicator" id="oagis-id-5cc015d6053b467ab953474c276031ec" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">An indicator specifying a final forecast.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SubContractIndicator" id="oagis-id-e4d0af8b441a42deb993dfb4ad617cce" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">An indicator specifying sub contract.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PlanningScheduleHeaderType" id="oagis-id-5778f794be024763973d9a02219fc3b0">
+		<xsd:complexContent>
+			<xsd:extension base="PlanningScheduleHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PlanningScheduleHeaderExtensionType" id="oagis-id-a49235979daa4b0aa84dc26480579d44" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PlanningScheduleLineBaseType" id="oagis-id-dd83483b71f546978ae89edf34724f9c">
+		<xsd:complexContent>
+			<xsd:extension base="ScheduleLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="MaximumQuantity" id="oagis-id-4b88257a7cf5477aa05b1d05e16ed5fa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The customer's actual requested amount of the item to be shipped.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MinimumQuantity" id="oagis-id-029c55f836f64815a9c07cc829a02e59" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The customer's actual requested amount of the item to be shipped.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Property" id="oagis-id-151dfde576fe4d8ebffebf4852b720b9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Represents the Properties or Features of the associated entity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PlanningScheduleDetail" id="oagis-id-65722de46ed84837a6ee1be04cf96160" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Additional detail for each line item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScheduleException" id="oagis-id-df0a66d26f1c40b2b10c27b1e5131969" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Exception detail for Detail or Lline information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TransportationTimePeriod" id="oagis-id-1463d5ceb2d145d5a6e738d9b0f936ab" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An explicit period of time for the transportation.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="UnitPrice" id="oagis-id-d27bf22e71394a83bc447bc5d975a83b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Unit price of the item for the number of items in the unitCode specified in the PerQuantity elements.
+
+In most cases the unitCode of the PerQuantity is the same as the unitCode of the Quantity element above.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ReleaseNumberID" id="oagis-id-9e4857a70ccf41cea0735d0e8af1a1d4" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Release Number in the case of Blanket POs</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AccumulativeReceivedQuantity" id="oagis-id-e8373e44b221475f99fbff2afffbc461" minOccurs="0"/>
+					<xsd:element ref="ItemQuantityBucket" id="oagis-id-837a8b0418fd4c2898025fac68e8dd05" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductTypeInventory" id="oagis-id-2bc5526edcc7458e9e45a67d255d50c9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Inventory by type of product in a planning schedule or forecast.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ProductQuantityShipmentReceipt" id="oagis-id-40060fb6db464fd793bbe5d0fef93bb9" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">A product quantity shipment receipt.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PlanningScheduleLineType" id="oagis-id-6fa9139947594c278c5de7ad22a1b9e4">
+		<xsd:complexContent>
+			<xsd:extension base="PlanningScheduleLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PlanningScheduleLineExtensionType" id="oagis-id-80378063136c4e23aca9fbc85053ee3f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PlanningScheduleDetailBaseType" id="oagis-id-a1da5c53060d4af4b4fe3ec2f704fcb7">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="PriorityCode" id="oagis-id-730e1224ce03482c863653d8a22428d0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the priority or urgency of the associated entity. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BucketTypeCode" id="oagis-id-3b64531c68ab4a4188c2b132a003829e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies a bucket defined above for the type of buckets the plan has requested. Examples of values for this field include Days, Weeks (Starting Monday for 5 Days), Calendar Months, Lunar Months (Starting Jan 1st 28 Days per period, Balance on Last Period), Quarters (Starting Jan 1st. 3 Calendar Months Each.) or some other user defined and named value.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AuthorizationID" id="oagis-id-92e837c168a645c29e821b61e1e06670" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifyies the authorization level of the user or application that is sending the Business Object Document Message. This authorization level being recognized be the receiving system indicates what can be done on the receiving system(s).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EffectiveTimePeriod" id="oagis-id-80b2065a63994b49897244eb320424cc" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the time period in which the associated component is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemQuantity" id="oagis-id-b8f5693cbdfa4c76a0c584046443e43c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MaximumQuantity" id="oagis-id-f41868da68f542b0b047f6eebf7f5ef5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The customer's actual requested amount of the item to be shipped.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="MinimumQuantity" id="oagis-id-a99278db01794d229d0287b4ffd31683" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The customer's actual requested amount of the item to be shipped.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LabourDuration" id="oagis-id-cfdbca1ce1184e8ab23690cb20b7bb3b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Number of hours.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LastShipmentDateTime" id="oagis-id-c8b0810aacf1424f8d83a93080b28098" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date and time an item was shipped. It is used to specify the last shipment date for the particular sequenced part.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LastShipmentReceivedQuantity" id="oagis-id-fa43a9d07b6542128f0ec7afd3cb4989" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the actual amount shipped. It is used to specify the last quanity recieved for a particular sequenced part.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RespondingScheduleReference" id="oagis-id-99a8df8edd0a465aae643e4eeb8eee51" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the previously received plan schedule that this new schedule is responding to as a reference.  The typical scenario is a supplier uses a Sync PlanningSchedule or Sync ShipmentSchedule to respond to a customer demand schedule, and this will identify the customer demand schedule that this supplier previously received.  The date and time is also used in identifying the previously received plan schedule that the new plan schedule is responding to.  Note that the combination of document id, document date, and revision number can uniquely identify a plan schedule.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">DateType indicates whether the dates specified on the schedule are delivery based or shipment based.  Dates specified on the schedule include FromDateTime and ToDateTime at Header and Line levels.
+ScheduleType indicates whether the PlanningSchedule is a demand schedule from a customer or a supply schedule from a supplier.
+For the supplier schedule to respond to the original demand schedule, the RespondingScheduleReference is used to identify the customer's original demand schedule that it is responding to.
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ScheduleException" id="oagis-id-5d05d0b4a7994d9fa60caaf704371800" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Exception detail for Detail or Lline information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Status" id="oagis-id-7fe67be0cc7a4175af69dc729e58e23e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemQuantityBucket" id="oagis-id-00467de5156c4840a7a6a61636f09d21" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductTypeInventory" id="oagis-id-8e21aa7e7a49467db2a163fbd3de2776" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Inventory by type of product in a planning schedule or forecast.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="FixedPlanningScheduleDetailIndicator" id="oagis-id-b43188e84a3a4989a4eff711ab6fbe07" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">An indicator specifying a fixed shipping schedule detail.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-0a4ede37639b4f07a57e244f6b8113d0" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PlanningScheduleDetailType" id="oagis-id-257517ba802a4c19ac8a530cf4b24525">
+		<xsd:complexContent>
+			<xsd:extension base="PlanningScheduleDetailBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="PlanningScheduleDetailExtensionType" id="oagis-id-af13b989981348adbea89847af54e7f2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="FlexibleBucketBaseType" id="oagis-id-4fd0c3e9d72d4d29a2d28af270f7dfea">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This Data Type is used to communicate a flexible bucket definition. The value of Identifier can be taken from predefined values such as Day, Week, etc. or it can hold a user defined identifier with a specific time period. In any case the actual time period and Identifier must be used.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="Name" id="oagis-id-a9c12bec726349e79366ac9f8e997b60" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Name of the object in which associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TimePeriod" id="oagis-id-25fb9082f97e450096438c17b19d720b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An explicit period of time for the bucket.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="FlexibleBucketType" id="oagis-id-0205f8f0d24241c8b3f05ea2a41d0060">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This Data Type is used to communicate a flexible bucket definition. The value of Identifier can be taken from predefined values such as Day, Week, etc. or it can hold a user defined identifier with a specific time period. In any case the actual time period and Identifier must be used.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FlexibleBucketBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="FlexibleBucketExtensionType" id="oagis-id-8db909ffc53447bc980f47fafc9f86d1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemQuantityBucketBaseType" id="oagis-id-2bc69671985941a89573f1156d6ffe1c">
+		<xsd:complexContent>
+			<xsd:extension base="FlexibleBucketBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Quantity" id="oagis-id-532a225ad2e94402a7625ba7d2f9f749" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Status" id="oagis-id-a8df047033154c6fb3683db45c913172" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemQuantityBucketType" id="oagis-id-5c5c142d816a46b1a6989e2b3f8b1f74">
+		<xsd:complexContent>
+			<xsd:extension base="ItemQuantityBucketBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ItemQuantityBucketExtensionType" id="oagis-id-b67fe076653d4816b6ad73d2315c1e5b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductTypeInventoryBaseType" id="oagis-id-c3bf8b5ac5b149fdb9fb467b4a2eb693">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemQuantity" id="oagis-id-27c658fa44344f4496e756e187524c2a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is used to describe the quantity of item's, products or resources being budgeted, produced, purchased, received, sold, or used.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Status" id="oagis-id-0e368e099dbc4aa187f8198105c6a250" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductTypeInventoryType" id="oagis-id-453e8a29d14d4b07b7ecdf586b35195c">
+		<xsd:complexContent>
+			<xsd:extension base="ProductTypeInventoryBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductTypeInventoryExtensionType" id="oagis-id-ec26aa7a42ff4ed29798b8f55873d3d2" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductQuantityShipmentReceiptBaseType" id="oagis-id-bcbc1aaeb1534a39ac3b6c0cb266eff5">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="DateTime" id="oagis-id-24d1afe679024abc99af2e839b3bec58" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.starstandards.org">Date and time that the associated entity took place .</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-4992e8c6fe7d4fb8b51671d4f3e1da43" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProductQuantityShipmentReceiptType" id="oagis-id-136a5b44ce8d4ed38a8ad9fc2f6685d1">
+		<xsd:complexContent>
+			<xsd:extension base="ProductQuantityShipmentReceiptBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ProductQuantityShipmentReceiptExtensionType" id="oagis-id-92a61276f1b34f98ad18d6c761f401be" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

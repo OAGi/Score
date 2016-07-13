@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowPartyScreenResponse.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PartyScreenResponse.xsd"/>
+	<xsd:element name="ShowPartyScreenResponse" type="ShowPartyScreenResponseType" id="oagis-id-5faac6c3c4a942a38a642c07f7846142">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowPartyScreenResponse is to supply PartyScreenResponse information to another business application module.  This BOD may also be initiated by the sending system as a response to a GetPartyScreenResponse.
+.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowPartyScreenResponseType" id="oagis-id-3f156936d21047a1a8c1b2a67dada4bb">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowPartyScreenResponseDataAreaType" id="oagis-id-a31784a0f4734545b23b6f77dc5d3263">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowPartyScreenResponse. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (PartyScreenResponse).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowPartyScreenResponseDataAreaType" id="oagis-id-5bbc922e898d43afbdd6c96c1ab146ad">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-e7deba83132a4e44a5a491e71e598061"/>
+			<xsd:element ref="PartyScreenResponse" maxOccurs="unbounded" id="oagis-id-4aa58649b1a14ae8ad818f2eb237209d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

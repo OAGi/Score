@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseCommercialInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CommercialInvoice.xsd"/>
+	<xsd:element name="SyncResponseCommercialInvoice" type="SyncResponseCommercialInvoiceType" id="oagis-id-0126f7ce5f654a9f8dddcd4d0b3ac318">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponse CommercialInvoice is to communicate CommercialInvoice Information from the owner of a CommercialInvoice  to another business application module.  The receiver of this BOD does is expected to take the information provided and populate their information on the CommercialInvoice from this BOD.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseCommercialInvoiceType" id="oagis-id-3df91ad5cb234cb6afab98d873e57ae6">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseCommercialInvoiceDataAreaType" id="oagis-id-4d25749e47f24842b0f360328136bda7">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseCommercialInvoice. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (CommercialInvoice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseCommercialInvoiceDataAreaType" id="oagis-id-bb29323206ec48e4982271708888182f">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-e1eaac192db84a05a566e81a9574d133"/>
+			<xsd:element ref="CommercialInvoice" maxOccurs="unbounded" id="oagis-id-d525e9ccd2054030a89c34932ebb5df1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseProductionOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ProductionOrder.xsd"/>
+	<xsd:element name="SyncResponseProductionOrder" type="SyncResponseProductionOrderType" id="oagis-id-a6bdbd5fea564974af4360155d77d0c2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseProductionOrder is to communicate the response to a ProductionOrder message from one business application to one or more other business applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseProductionOrderType" id="oagis-id-2e2d2f51613c41e88dc32e6bff36706f">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseProductionOrderDataAreaType" id="oagis-id-a2dcf7558a3d429cb597e32952434b38">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseProductionOrder. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ProductionOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseProductionOrderDataAreaType" id="oagis-id-a9ff65a14cfa410ca074457675aea584">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-313be1b506094cbb81586982774f18f5"/>
+			<xsd:element ref="ProductionOrder" maxOccurs="unbounded" id="oagis-id-359d1a2c7830435a990f02df2b72b10a"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

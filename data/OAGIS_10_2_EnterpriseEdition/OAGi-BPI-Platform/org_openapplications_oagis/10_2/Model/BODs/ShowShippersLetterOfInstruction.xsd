@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowShippersLetterOfInstruction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersLetterOfInstruction.xsd"/>
+	<xsd:element name="ShowShippersLetterOfInstruction" type="ShowShippersLetterOfInstructionType" id="oagis-id-58012423cd64487980c0b62437d310bd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowShippersLetterOfInstruction is to supply ShippersLetterOfInstruction information to another business application module. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowShippersLetterOfInstructionType" id="oagis-id-0048a574536747f9a26116de1bc82362">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowShippersLetterOfInstructionDataAreaType" id="oagis-id-685192f413bf4af79e70e170593d7c3b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowShippersLetterOfInstruction. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the response from the request for information through a Get on the Noun (ShippersLetterOfInstruction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowShippersLetterOfInstructionDataAreaType" id="oagis-id-02705a1338b14fcdbcf74049f7be2cfd">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-d95edd3b3a4547949d526c4a55d6fbe2"/>
+			<xsd:element ref="ShippersLetterOfInstruction" maxOccurs="unbounded" id="oagis-id-937dc4bf9a504e6989868e75d2f5df2f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

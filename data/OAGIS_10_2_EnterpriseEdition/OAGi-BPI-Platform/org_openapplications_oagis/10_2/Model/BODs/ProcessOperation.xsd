@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessOperation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Operation.xsd"/>
+        <xsd:element name="ProcessOperation" type="ProcessOperationType" id="oagis-id-d7347f16bb88436aaa920b393af89934">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessOperation is to enable an application to provide online shopping Operations from another business application module.  The ProcessOperation is provided in a a publishe/subscribe or broadcast buiness exchange where an application other than the owner or the master of the given information provides it to the business applications that owns the data in order to have it process or perform a function with the information.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessOperationType" id="oagis-id-b4b8110049474b948c023fba57c456e5">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessOperationDataAreaType" id="oagis-id-3099f336e7884b95ae30fdd1e3c9c043">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessOperation. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (Operation).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessOperationDataAreaType" id="oagis-id-ae246c083df14e829d8079e6a1c32b98">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-57c8ef313761462ea16fe79ea5d4b164"/>
+                        <xsd:element ref="Operation" maxOccurs="unbounded" id="oagis-id-dc6b3e9b53334b1095d3edb0682a5647"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

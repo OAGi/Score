@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelSalesOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/SalesOrder.xsd"/>
+        <xsd:element name="CancelSalesOrder" type="CancelSalesOrderType" id="oagis-id-2380afd8d6684480a72ba43e7c427bd0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Cancel SalesOrder is to communicate from one business application to one or more other business applications that a previous Sales Order, line, or schedule is no longer needed.
+
+Processing Note:  This cancel must refer to the original document, item, and schedule.  To cancel the entire order, include only the Salesorder Header information for the instance of the Salesorder you wish to cancel.  To cancel a SalesOrder Line or SalesOrder Schedule, each line or schedule to be cancelled must be included in the occurrence of the BOD with the Corresponding LineNumber.  If a schedule is to be cancelled, the line that the schedule refers to MUST be included or the schedule can not be found.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="CancelSalesOrderType" id="oagis-id-dfc7c6c504f74693b1dec73a7a45c87b">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="CancelSalesOrderDataAreaType" id="oagis-id-1c2d96575b81400f81ce3f23f0069d5d">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelSalesOrder. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (SalesOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="CancelSalesOrderDataAreaType" id="oagis-id-6c60b1339af9459f934581cd567a4902">
+                <xsd:sequence>
+                        <xsd:element ref="Cancel" id="oagis-id-5e3a5d36cba94ae69ccc06eb4d0d6ac9"/>
+                        <xsd:element ref="SalesOrder" maxOccurs="unbounded" id="oagis-id-ee2890940ee5401698d78388e6b2c57a"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

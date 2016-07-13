@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessOnlineSession.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/OnlineSession.xsd"/>
+	<xsd:element name="ProcessOnlineSession" type="ProcessOnlineSessionType" id="oagis-id-dd6b9c1e1c774a9bbc67b12beec5a620">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessOnlineSession is to enable an application to request specific online OnlineSession from another business application module.  The response to the ProcessOnlineSession is the ShowOnlineSession.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProcessOnlineSessionType" id="oagis-id-dcbdbbce98eb42feb3545b70bbaa09a2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ProcessOnlineSessionDataAreaType" id="oagis-id-a49ffa4dc1d3445cbd4ca6a36164de2c">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessOnlineSession. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (OnlineSession).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessOnlineSessionDataAreaType" id="oagis-id-0709f86c9bed4ffb83a0008e0fcee5c3">
+		<xsd:sequence>
+			<xsd:element ref="Process" id="oagis-id-d3838db1757b43168856dde0373c2011"/>
+			<xsd:element ref="OnlineSession" maxOccurs="unbounded" id="oagis-id-60f9a799cbaf4c07a7efb54d2bffaa67"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessPickList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PickList.xsd"/>
+        <xsd:element name="ProcessPickList" type="ProcessPickListType" id="oagis-id-be769056f80c4678962588638eadf3a6">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ProcessPickList is to Process the details of an individual Picking List from a plant level to an ERP system. This BOD will usually cause Processs to occur.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessPickListType" id="oagis-id-255c3263a3574a99880c8cc3219edfd9">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessPickListDataAreaType" id="oagis-id-c6763a8e680749c5b04c04fc7bf2fc32">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessPickList. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (PickList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessPickListDataAreaType" id="oagis-id-3c03cd0273de4db6b59b7f2c34cb7833">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-f87604ac4f4948ac90e40834af9dcd65"/>
+                        <xsd:element ref="PickList" maxOccurs="unbounded" id="oagis-id-f7a572a844dc4ae9819ef70410d5b315"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

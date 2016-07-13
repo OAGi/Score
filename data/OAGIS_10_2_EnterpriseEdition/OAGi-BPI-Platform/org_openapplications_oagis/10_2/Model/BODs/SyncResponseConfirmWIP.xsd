@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseConfirmWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ConfirmWIP.xsd"/>
+	<xsd:element name="SyncResponseConfirmWIP" type="SyncResponseConfirmWIPType" id="oagis-id-6a530fa3ba1f45d69c7d96dd6cf6ba5e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseConfirmWIP is to respond to a request for the data necessary to perform a confirmation of the movement of WIP (Work in Progress).
+
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseConfirmWIPType" id="oagis-id-88fdee515e1c40c1981aea3b46ea9e22">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseConfirmWIPDataAreaType" id="oagis-id-68c850f48f3f4beab25eae481b672265">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseConfirmWIP. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ConfirmWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseConfirmWIPDataAreaType" id="oagis-id-3797e4a00ae446e2af5b265b5c9c2cbe">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-209b8ffdb4ec4cf5abc773aaa8458030"/>
+			<xsd:element ref="ConfirmWIP" maxOccurs="unbounded" id="oagis-id-c4fa093420054600b400b57164c549ec"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelIssueInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/IssueInventory.xsd"/>
+	<xsd:element name="CancelIssueInventory" type="CancelIssueInventoryType" id="oagis-id-a42862121a6d4e3cb1f202e48b4ccfee">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelIssueInventory is to reflect an unplanned issue of an item to a miscellaneous location.
+
+Possible reasons for this include:
+1. Somebody broke the material,
+2. The material is defective and needs replacing, 
+3. The material is used up and needs replenishment.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelIssueInventoryType" id="oagis-id-98f4ed55e6d744ddbd5ba29e36dcb012">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelIssueInventoryDataAreaType" id="oagis-id-88c1ee6dfa0244a284a1ffd40773dbc5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelIssueInventory. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (IssueInventory).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelIssueInventoryDataAreaType" id="oagis-id-6acd4abed8314ff89526d3edaf9cf59f">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-2f9de620c7c5410aa424636edc85b784"/>
+			<xsd:element ref="IssueInventory" maxOccurs="unbounded" id="oagis-id-18f6f5ad7f3449a5b31ae9096045a6e5"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

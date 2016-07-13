@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Global/Developer/Nouns/InspectDelivery.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="InspectDelivery" type="InspectDeliveryType" id="oagis-id-ab314c9c6b1342558c51f3f75c87aba8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Reports the InspectDelivery of items identifies in the source document.
+
+Typically, the source document is a Purchase Order. However, in some cases, the goods inspected may already be in inventory in a queue awaiting InspectDelivery. In this case the visibility to the PO may no longer be available, in which case the DeliveryReceipt reference must be used. 
+
+This may also require an Inventory event to occur to ensure the status of the goods is updated in Inventory to reflect whether the goods are available for Inventory use after InspectDelivery.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RejectionDetails" type="RejectionDetailsType" id="oagis-id-a135c69efb87408abe5c778424750985">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This describes the reasons for rejecting or accepting the corresponding quantity</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ToBeInspectedQuantity" type="QuantityType" id="oagis-id-bb5d563ace9f48fba95e9a5e1e998df0"/>
+	<xsd:element name="InspectorParty" type="PartyType" id="oagis-id-36a914f0b0794952a2c053ff08a041e6"/>
+	<xsd:complexType name="InspectDeliveryBaseType" id="oagis-id-71115c2d2c434e168f24565cba2a1bbb">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-263ade5d2dbe460cb9ee6b6518d4a5b9"/>
+					<xsd:element ref="ToBeInspectedQuantity" id="oagis-id-4740117812964d2ba9a47e4550107e7f" minOccurs="0"/>
+					<xsd:element ref="PriorityCode" id="oagis-id-3a6f5d17113e4408bb652784a6c7de51" minOccurs="0"/>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-5835066628e64d46b9899f37fadc1322"/>
+					<xsd:element ref="RejectedQuantity" id="oagis-id-c21bb6ef702a4aeaa282907a2d485a97" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the quantity rejected for the specified Reason</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AcceptedQuantity" id="oagis-id-3f03952eb9ed42dcb5291540e80b9420" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">This identifies the total quantity acceptedagainst this InspectDelivery line</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectedQuantity" id="oagis-id-f6dc210192ff4025bd6b96566a86511e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Number of inventory items that have been inspected.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalQuantity" id="oagis-id-b0f239e1faa94e1f88b752966252ecf7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Total number of associated entities. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-8819d979d25341b0b678955308a8abc3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ReceivedDateTime" id="oagis-id-42a13f8f15114f3a87a016e0d9656bfc" minOccurs="0"/>
+					<xsd:element ref="ScheduledDeliveryDateTime" id="oagis-id-42d6563b12f642c5bd2afe761a90b041" minOccurs="0"/>
+					<xsd:element ref="PromisedDeliveryDateTime" id="oagis-id-86e9a119078a484490293646bbe7f27d" minOccurs="0"/>
+					<xsd:element ref="PlannedDateTime" id="oagis-id-0d934fbdb0f14268a8ae7ae8a8e3746f" minOccurs="0"/>
+					<xsd:element ref="UnitCost" id="oagis-id-1d4d1efb56714372907e0a4450146a33" minOccurs="0"/>
+					<xsd:element ref="TestRequest" id="oagis-id-5249cbae347a450fa9524c2242c461aa" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PurchasingParty" id="oagis-id-5b6f8c91638245a0a137bece656ceeae" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the party that purchased the goods or services.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="SupplierParty" id="oagis-id-efa4534a9f08405d8d29814ee3923f52" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectorParty" id="oagis-id-dc2fe619260c4fa78a879292bc58fc99" minOccurs="0"/>
+					<xsd:element ref="InspectorContact" id="oagis-id-d832044aa86d4e0c98957b45b7c54baa" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the contact information of the person, organization, department, or group that is to or has inspected the contents communicated by the document or line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectDeliveryReference" id="oagis-id-e149eab6e08741b685007c97376d86b7" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PurchaseOrderReference" id="oagis-id-c215141121eb4c69817f21a3a10c8fbd" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to a PurchaseOrder</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DeliveryReference" id="oagis-id-dc01b585792c4b17aa39a2c88a4648a1" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is a reference to the Delivery document.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RejectionDetails" id="oagis-id-0d24ff27d2894dd4b5b4393fb28ae415" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">This describes the reasons for rejecting or accepting the corresponding quantity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Effectivity" id="oagis-id-ca7d1ccd60c74623b96bf564c082e43b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Specifies effectivity of an associated object. Effectivity is expressed may be expressed as: multiple ranges, values, time period or as associated to a specific Item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-12669af8a3494804921ef36af7cbfdb4"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-b73ced2acc414f2a995992dd9716c686"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InspectDeliveryType" id="oagis-id-76b6c39a9be44b659987677243301bcc">
+		<xsd:complexContent>
+			<xsd:extension base="InspectDeliveryBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InspectDeliveryExtensionType" id="oagis-id-660184dbb15f45a39046131711a6718c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RejectionDetailsBaseType" id="oagis-id-1805d4b1edc1468f85a3d64c1962566e">
+		<xsd:complexContent>
+			<xsd:extension base="StatusLineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="InventoryItemInstanceIdentification" id="oagis-id-ccfff60b788347feb4f90ae0f74045cf" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides the identifiers that an instance of inventory is known.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RejectedQuantity" id="oagis-id-f120adaf031745ef9e3e8f389b99bfd7" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the quantity rejected for the specified Reason</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AcceptedQuantity" id="oagis-id-fb34b9871a39460db6f0bf6fe79fd0b1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the quantity accepted.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectedQuantity" id="oagis-id-ffde1e34c8564f4289c5d23e1e79c1c4" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Number of inventory items that have been inspected.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalQuantity" id="oagis-id-0185aafc4a014fdeb7f3a7b563d1df9e" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Total number of associated entities. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Quantity" id="oagis-id-f334f9ad23364845beed711ecf57a7c2" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ReasonCode" id="oagis-id-1e4adeafd54f4521b4f7e09fa64d9170" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the reason for an activity</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InspectorParty" id="oagis-id-5e35f588548341889bb5c384f5759caa" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Party" id="oagis-id-12d3372f0d9e4dc880cad61d95c2a5c5" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RejectionDetailsType" id="oagis-id-6bac47944905430583ebaad023ab4280">
+		<xsd:complexContent>
+			<xsd:extension base="RejectionDetailsBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="RejectionDetailsExtensionType" id="oagis-id-df6e6272bbcb4e09a5ea98315ea45295" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

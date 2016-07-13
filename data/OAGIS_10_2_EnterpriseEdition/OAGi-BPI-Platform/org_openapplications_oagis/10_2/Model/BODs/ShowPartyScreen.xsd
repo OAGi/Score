@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowPartyScreen.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PartyScreen.xsd"/>
+	<xsd:element name="ShowPartyScreen" type="ShowPartyScreenType" id="oagis-id-3ece65b15c204cc189f398f24b0f5a7a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowPartyScreen is to supply PartyScreen information to another business application module.  This BOD may also be initiated by the sending system as a response to a GetPartyScreen.
+.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ShowPartyScreenType" id="oagis-id-8be7f7eb8f154acd8111acfc8c6aead1">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ShowPartyScreenDataAreaType" id="oagis-id-c28d8cbf17504230871483fb838f024a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowPartyScreen. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (PartyScreen).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ShowPartyScreenDataAreaType" id="oagis-id-ddef7f2a59f54a35a740d482f3b9aa16">
+		<xsd:sequence>
+			<xsd:element ref="Show" id="oagis-id-a8ec970094554d99b1fde281ec633560"/>
+			<xsd:element ref="PartyScreen" maxOccurs="unbounded" id="oagis-id-e1725310920742e2a582ca79444ce82e"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

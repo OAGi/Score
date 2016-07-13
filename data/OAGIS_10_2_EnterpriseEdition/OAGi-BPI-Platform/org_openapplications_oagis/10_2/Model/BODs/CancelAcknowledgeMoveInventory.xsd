@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeMoveInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MoveInventory.xsd"/>
+	<xsd:element name="CancelAcknowledgeMoveInventory" type="CancelAcknowledgeMoveInventoryType" id="oagis-id-9a24db8f96d144c29d1cad1e111a8037">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeMoveInventory is to give the organization the ability to do a quantity movement of materials from one organizational unit to another organizational unit. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeMoveInventoryType" id="oagis-id-0c576a6fb2224181a817b9e952b5957d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeMoveInventoryDataAreaType" id="oagis-id-f5aaee4e379e4d9eb7beacdc9febf592">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeMoveInventory. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (MoveInventory).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeMoveInventoryDataAreaType" id="oagis-id-dd887dcb9fe246ffbbedf4915db6be93">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-d1b9078c7035454d90ed8c60ca1e7536"/>
+			<xsd:element ref="MoveInventory" maxOccurs="unbounded" id="oagis-id-e33fd59ed7444e9098fcac248f527935"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

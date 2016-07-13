@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangePartyScreen.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PartyScreen.xsd"/>
+	<xsd:element name="ChangePartyScreen" type="ChangePartyScreenType" id="oagis-id-6730d57d52e04e50aef827f55b30711b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangePartyScreen is to transmit an PartyScreen. Indicating that the receiver of the PartyScreen is to Change the PartyScreen.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangePartyScreenType" id="oagis-id-20e5d9cc07d2446e9225d297d31cbfe9">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangePartyScreenDataAreaType" id="oagis-id-220c51ce85594c08bc24cc3be22a7ded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangePartyScreen. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (PartyScreen).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangePartyScreenDataAreaType" id="oagis-id-ac549ef13d0746308afcd3d1171fb1da">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-1bdead24a57447bc92e933bc8e6bd4b0"/>
+			<xsd:element ref="PartyScreen" maxOccurs="unbounded" id="oagis-id-ab005a0a124640bfb087fae6b054f3b6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

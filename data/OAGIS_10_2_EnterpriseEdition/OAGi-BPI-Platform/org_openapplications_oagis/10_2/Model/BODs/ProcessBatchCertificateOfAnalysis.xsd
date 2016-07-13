@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessBatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BatchCertificateOfAnalysis.xsd"/>
+        <xsd:element name="ProcessBatchCertificateOfAnalysis" type="ProcessBatchCertificateOfAnalysisType" id="oagis-id-3364aad9990d43cbbab7b5ba7085c77e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Process BatchCertificateOfAnalysis Business Object Document is to transmit a purchase order to a supplier's order management application.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ProcessBatchCertificateOfAnalysisType" id="oagis-id-c038aceb20074756a5cfe79bcf593389">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ProcessBatchCertificateOfAnalysisDataAreaType" id="oagis-id-b8604f7395874e7f9ec13a0a723ceb13">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessBatchCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (BatchCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ProcessBatchCertificateOfAnalysisDataAreaType" id="oagis-id-5648ce3c020546e699e4ce42422b3b24">
+                <xsd:sequence>
+                        <xsd:element ref="Process" id="oagis-id-0a833c24e39f4eb9ada9aae7c275950a"/>
+                        <xsd:element ref="BatchCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-1b4b4e1f45774cb48215c50e57ff20fc"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

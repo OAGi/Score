@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- ====================================================================== --><!-- =====  OAGi Time Zone Code - Code List XML Schema File                            ===== --><!-- ====================================================================== --><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+
+	This file is an implementation of a Business Code List as defined by UN/CEFACT XML Naming and Design Rules v3.0 of the 
+	Time Zone Code List from UN/CEFACT Time Zone Code.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_TimeZoneCode_1.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<!-- ====================================================================== -->
+	<!-- =====  Element Declarations				      ===== -->
+	<!-- ====================================================================== -->
+	<!-- =====  Root Element Declaration				      ===== -->
+	<!-- ====================================================================== -->
+	<xsd:element name="TimeZoneCode" type="clm6TimeZoneCode1_TimeZoneCodeContentType" id="oagis-id-825e726fff1149ed98b431a942cbbdba"/>
+	<!-- ====================================================================== -->
+	<!-- =====  Type Definitions					      ===== -->
+	<!-- ====================================================================== -->
+	<!-- =====  Type Definition: Time Zone Code Content	      ===== -->
+	<!-- ====================================================================== -->
+	<xsd:simpleType name="clm6TimeZoneCode1_TimeZoneCodeContentType" id="oagis-id-44ec8e62b49c44a997637034a5be4f2e">
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="10"/>
+			<xsd:enumeration value="M0100">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+01:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0100EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Azores</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0200">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-02:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0300">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-03:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0300BR">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Brazil East</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0300GL">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Greenland</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0300US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>St Pierre and Miquelon</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0330US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Newfoundland</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0400">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-04:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0400BR">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Brazil West</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0400CL">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Chile</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0400GL">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Western Greenland</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0400PY">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Paraguay</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0400US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Atlantic Time (Halifax)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0500">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-05:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0500BR">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Brazil Andes</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0500CU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Cuba</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0500US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Eastern Time (New York)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0600">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-06:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0600CL">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Chile Easter Island</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0600US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Central Time (Dallas)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0700">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-07:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0700US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Mountain Time (Denver)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0800">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-08:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0800US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Pacific Time (Los Angeles)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0830">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-08:30</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0900">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-09:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M0900US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Alaska (Anchorage)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M1000">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-10:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M1000US">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Hawaii / Alaska (Aleutian)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M1100">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-11:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="M1200">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC-12:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0000">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0000EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Western Europe</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0100">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+01:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0100EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Central Europe</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0100NA">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Namibia</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0200">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+02:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0200EG">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Egypt</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0200EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Eastern Europe</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0200IL">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Israel</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0200JO">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Jordan</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0200SY">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Syria</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0300">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+03:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0300EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (Moscow)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0300IQ">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Iraq</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0330IR">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Iran</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0400">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+04:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0400EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+04)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0430">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+04:30</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0500">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+05:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0500EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+05)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0530">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+05:30</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0545">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+05:45</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0600">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+06:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0600EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+06)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0630">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+06:30</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0700">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+07:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0700EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+07)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0800">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+08:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0800EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+08)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0900">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+09:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0900EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+09)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0930">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+09:30</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P0930AUS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Australia South Australia</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1000">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+10:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1000AUS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Australia Capital Territories</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1030AUS">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Australia Lord Howe Island</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1000EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+10)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1100">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+11:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1100EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+11)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1200">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+12:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1200EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+12)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1200NZ">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>New Zealand</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1245NZ">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>New Zealand Chatham Islands</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1300">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+13:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1300EU">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>Russia (UTC+13)</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="P1400">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Definition>UTC+14:00</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

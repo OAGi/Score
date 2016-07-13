@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeShippersLetterOfInstruction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersLetterOfInstruction.xsd"/>
+	<xsd:element name="CancelAcknowledgeShippersLetterOfInstruction" type="CancelAcknowledgeShippersLetterOfInstructionType" id="oagis-id-30a11ca6d2624b2f88a1192c541000c4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeShippersLetterOfInstruction Business Object Document is to CancelAcknowledge receipt of the ShippersLetterOfInstruction</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeShippersLetterOfInstructionType" id="oagis-id-7e0e79eec64d4627afc9b80493b55d16">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeShippersLetterOfInstructionDataAreaType" id="oagis-id-82facea802df49f18072b77f57e0589a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeShippersLetterOfInstruction. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (ShippersLetterOfInstruction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeShippersLetterOfInstructionDataAreaType" id="oagis-id-656d3adff9024c349f4e629b952d6d20">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-afa07e4ca9314e5c841d33c9e428b4d0"/>
+			<xsd:element ref="ShippersLetterOfInstruction" maxOccurs="unbounded" id="oagis-id-92082711c95343048c2e6e30adf70143"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

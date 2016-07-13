@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowCreditStatus.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CreditStatus.xsd"/>
+        <xsd:element name="ShowCreditStatus" type="ShowCreditStatusType" id="oagis-id-95ddc9ea5d714c9e96ae5f99dbddf7b9">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowCreditStatus is to supply CreditStatus information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowCreditStatusType" id="oagis-id-754a0c7247074de998a8a1534f758bbd">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowCreditStatusDataAreaType" id="oagis-id-223083451a074c47b0410d14c8c2268c">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowCreditStatus. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (CreditStatus).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowCreditStatusDataAreaType" id="oagis-id-12c8951622784fd4a04146c6bd5deebd">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-056677f848b44ab4afaef6f129599b54"/>
+                        <xsd:element ref="CreditStatus" maxOccurs="unbounded" id="oagis-id-097386ac5cfe416697a3321f5e87fa7e"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

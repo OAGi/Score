@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeAcknowledgeSplitWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SplitWIP.xsd"/>
+	<xsd:element name="ChangeAcknowledgeSplitWIP" type="ChangeAcknowledgeSplitWIPType" id="oagis-id-f632891e77764c8b8fd4c1ff4e1385b6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeSplitWIP is to notify a Manufacturing Application of the creation of multiple production lots from a single production lot of a product being made on a production order. The business environment most likely to require this capability is a lot based discrete manufacturing scenario.
+
+This BOD communicates the originating lot, the resulting lots, their quantities, and the processing step at which this event occurred, along with the time at which this event occurred.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeSplitWIPType" id="oagis-id-06fab789de75482581ae33bc7f10a2c2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeSplitWIPDataAreaType" id="oagis-id-28d19db3c98d47d48c6dbf2c63bd6007">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessSplitWIP. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (SplitWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeSplitWIPDataAreaType" id="oagis-id-2a3ad5c09d4348ce9786a991a1fd79a1">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-f85435c67e0845a096216ef789c2a30a"/>
+			<xsd:element ref="SplitWIP" maxOccurs="unbounded" id="oagis-id-d13bae37e5ce4dc0b415f37bfd5a3ab7"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

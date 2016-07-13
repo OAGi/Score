@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/LoadReceivable.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Receivable.xsd"/>
+        <xsd:element name="LoadReceivable" type="LoadReceivableType" id="oagis-id-429e729807c0442f9ab5d00b9b537565">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the LoadReceiveable is to transmit data to create a receivable open item in a receivable application from the billing information generated in an order management application.  The LoadReceiveable may also update the General Ledger, depending on the specific architecture of the accounting application.
+
+The scope of the LoadReceiveable is to create a BOD to recognize customer obligation (accounts receivable asset).  Specific transactions include:
+1.	Sales Invoice
+2.	Credit Memo
+3.	Debit Memo
+4.	Charge Back
+
+The LoadReceiveable may also be used for transaction that do not originate from an order management application.
+
+The following two models illustrate that the LoadReceiveable may, in some cases, be adequate to update the financial applications, i.e., Receivables and General Ledger, and in other cases, will also require the PostJournal Business Object Document (BOD) to assure the General Ledger account balances are updated.
+</xsd:documentation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">In the model above, the receivable application is a sub-ledger of the general ledger.  Updates to G/L balances occur via the receivables module, therefore the Load Receivable contains both receivable and general ledger transaction information.</xsd:documentation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">This other model illustrates the environment that sometime exists when General Ledger updates occur directly from the Order Management application.  The reconciliation between the receivable and general ledger is a function within the financial applications and not of the integration space.  This model allows the G/L balances to be updated in either detail or summarized form.
+
+The scope of the role of the receivable application includes functions such as:
+·	Allowing Cash Application
+·	Dunning
+·	Dispute management
+</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="LoadReceivableType" id="oagis-id-a57737c1c36f47febebca1993078035b">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="LoadReceivableDataAreaType" id="oagis-id-18bf3e34a15e46c4a311f712919de750">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case LoadReceivable. The information consists of a Verb and one or more Nouns. The verb (Load) indicates the action to be performed on the Noun (Receivable).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="LoadReceivableDataAreaType" id="oagis-id-4d51de1ed3e54bd7a38602499e8ed8b0">
+                <xsd:sequence>
+                        <xsd:element ref="Load" id="oagis-id-5adc813dab764e99a4d93ffc1e099390"/>
+                        <xsd:element ref="Receivable" maxOccurs="unbounded" id="oagis-id-1b04bbab3b9b406186575a2904c535b1"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

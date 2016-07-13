@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/PostJournalEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/JournalEntry.xsd"/>
+        <xsd:element name="PostJournalEntry" type="PostJournalEntryType" id="oagis-id-1411f889ffe74391b6524f377a42c9f6">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the PostJournal is to transmit data necessary to create a journal entry from any sub ledger business application to a general ledger application.
+
+Many applications in the enterprise environment create data that cause changes in the account balances of a 
+general ledger application.  Some components that have activity which will be reflected in a general ledger 
+application are:
+
+1.	Benefits
+2.	Costing
+3.	Human Resources
+4.	Inventory Control
+5.	Manufacturing
+6.	Payroll
+7.	Production
+8.	Treasury
+
+By no means is this a complete list of all the components that create activity which generate a journal entry.
+
+Many tasks that occur within the enterprise applications cause the creation of a General Ledger journal entry.  
+Tasks relate directly to the Component.  For example, the adjustment of inventory value is a task that occurs within 
+the Inventory Control Component.  Some of the tasks that would be catalysts for changes in a general ledger include:
+
+1.	Receiving Inventory
+2.	Issuing Inventory
+3.	Transferring Inventory
+4.	Adjusting Inventory Value
+5.	Adjusting Inventory Count
+6.	Calculating Material Variances
+7.	Calculating Labor Variances
+8.	Calculating Overhead Variances</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="PostJournalEntryType" id="oagis-id-1070fd0354c34a20913fec2b4902510f">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="PostJournalEntryDataAreaType" id="oagis-id-5d6f744f64a2434496ad28e77c5b1905">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case PostJournalEntry. The information consists of a Verb and one or more Nouns. The verb (Post) indicates the action to be performed on the Noun (JournalEntry).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="PostJournalEntryDataAreaType" id="oagis-id-e98eead44e6845c5afafee8f51b73850">
+                <xsd:sequence>
+                        <xsd:element ref="Post" id="oagis-id-67de82efca7e419e8686140de888de21"/>
+                        <xsd:element ref="JournalEntry" maxOccurs="unbounded" id="oagis-id-78867ba7c3e3453b82105ed95fde03b4"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

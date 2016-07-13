@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeRequireProduct.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/RequireProduct.xsd"/>
+	<xsd:element name="CancelAcknowledgeRequireProduct" type="CancelAcknowledgeRequireProductType" id="oagis-id-ebcc58a78cd54387a4d20c2a21ca007c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeRequireProduct is to communicate the response to a RequireProduct message from one business application to one or more other business applications</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeRequireProductType" id="oagis-id-ac235165689140a68893d8fc11fe4e78">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeRequireProductDataAreaType" id="oagis-id-a68b3a54b5314f59ab062a0fe34c442d">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeRequireProduct. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (RequireProduct).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeRequireProductDataAreaType" id="oagis-id-15791d644b9c45f594305413c2885f1d">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-b72ac7594bdb491fb5564881df2794ec"/>
+			<xsd:element ref="RequireProduct" maxOccurs="unbounded" id="oagis-id-43aa745cdd474f55ae3112526682a0e6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

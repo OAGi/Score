@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeRouting.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Routing.xsd"/>
+	<xsd:element name="ChangeRouting" type="ChangeRoutingType" id="oagis-id-a7b3fe4c906d438da3707cb6c04dd0be">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeRouting is to communicate to a business application component or system the need to create a new Routing or to update an existing Routing structure.
+
+This BOD may be necessary to address the Make to Order, Assemble to Order, and Finished Goods business ordering scenarios in a Logistics to Manufacturing application integration scenario.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeRoutingType" id="oagis-id-bed23dd4b2b345d593d6f4f80319b4a8">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeRoutingDataAreaType" id="oagis-id-42e647548c4c4a88b0a7d2738dc728d5">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeRouting. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (Routing).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeRoutingDataAreaType" id="oagis-id-71546d4fc49c419998b9e20d4f80e989">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-9f6ccaf4e39146a9b11b3b7958818714"/>
+			<xsd:element ref="Routing" maxOccurs="unbounded" id="oagis-id-5c63482fc64842aebc46abd9e70ca56e"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

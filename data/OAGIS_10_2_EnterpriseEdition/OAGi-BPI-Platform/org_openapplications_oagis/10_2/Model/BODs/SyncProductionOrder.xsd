@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncProductionOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/ProductionOrder.xsd"/>
+        <xsd:element name="SyncProductionOrder" type="SyncProductionOrderType" id="oagis-id-886f3df54f8b401281178c11e6b7e029">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncProductionOrder is to ensure that all business software components in a specific integration instance have the current Production Order information.  This BOD is commonly used in a publish and subscribe integration environment.
+
+This BOD commonly causes updates to occur.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncProductionOrderType" id="oagis-id-7d515d71f8a348168cda1b6e750a2165">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncProductionOrderDataAreaType" id="oagis-id-73d501508093499f85b8b57977cf0dbf">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncProductionOrder. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (ProductionOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncProductionOrderDataAreaType" id="oagis-id-79b208ece6bc47b6b1269f4e4ea92cb1">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-e302a9e8755948f39664c630c0d6ae1c"/>
+                        <xsd:element ref="ProductionOrder" maxOccurs="unbounded" id="oagis-id-9d608aae47f1409290e195818f5ea4f5"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

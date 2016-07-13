@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeMaintenanceOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MaintenanceOrder.xsd"/>
+	<xsd:element name="CancelAcknowledgeMaintenanceOrder" type="CancelAcknowledgeMaintenanceOrderType" id="oagis-id-3a1b6ce3c1564c1c8bffa1d634d2549e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeMaintenanceOrder is to publish to a business application component or system the need to create or CancelAcknowledge a Maintenance Order.
+
+One possible scenario is the synchronization of Maintenance Order between field devices, service trucks, etc. with a CMMS system.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeMaintenanceOrderType" id="oagis-id-5b611225f9624e8d8eca4ba3f80c6db9">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeMaintenanceOrderDataAreaType" id="oagis-id-5b7acf10e77242c79d2d45fe6894784e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeMaintenanceOrder. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (MaintenanceOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeMaintenanceOrderDataAreaType" id="oagis-id-2c47efbe9c2149e6a5f29662ef5dac2f">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-2a52e81125944a1eb98781af5ba34958"/>
+			<xsd:element ref="MaintenanceOrder" maxOccurs="unbounded" id="oagis-id-8702da493cf24039a569eeb16664976b"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

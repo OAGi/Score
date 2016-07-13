@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeShippersLetterOfInstruction.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ShippersLetterOfInstruction.xsd"/>
+	<xsd:element name="ChangeShippersLetterOfInstruction" type="ChangeShippersLetterOfInstructionType" id="oagis-id-1f86a5dfe3184cfa9c4349b88ad696f4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeShippersLetterOfInstruction is to transmit an ShippersLetterOfInstruction from a supplier to a customer. Indicating that the receiver of the ShippersLetterOfInstruction is to Change the ShippersLetterOfInstruction for payment.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeShippersLetterOfInstructionType" id="oagis-id-c996a7ac0f214f99aea9f59317cc63ad">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeShippersLetterOfInstructionDataAreaType" id="oagis-id-e8cd8fae4f70456e9867122a05aac7f1">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeShippersLetterOfInstruction. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (ShippersLetterOfInstruction).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeShippersLetterOfInstructionDataAreaType" id="oagis-id-5f62735424904741b864770df426ee5a">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-5f0521a515d747e3bdf795c40c97934d"/>
+			<xsd:element ref="ShippersLetterOfInstruction" maxOccurs="unbounded" id="oagis-id-b2ffa92fb1344982bbc555e8dca67b33"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

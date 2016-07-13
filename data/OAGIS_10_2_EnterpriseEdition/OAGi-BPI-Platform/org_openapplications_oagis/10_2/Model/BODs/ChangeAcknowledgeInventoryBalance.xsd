@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeAcknowledgeInventoryBalance.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/InventoryBalance.xsd"/>
+	<xsd:element name="ChangeAcknowledgeInventoryBalance" type="ChangeAcknowledgeInventoryBalanceType" id="oagis-id-eae9c716b39941e58efde6a2ebe32f71">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeInventoryBalance is to enable the communication of a Change in the InventoryBalance data that exists on separate Inventory databases.
+
+This data is not the master data that describes the attributes of the item such as dimensions, weight, or unit of measure.  
+
+This is data that describes the ITEM as it exists at a specific location. It is</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeInventoryBalanceType" id="oagis-id-cf32a13c6969421ea8d6f3f043fef129">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeInventoryBalanceDataAreaType" id="oagis-id-34e8f6b190d944bb85b5cff026bd16f0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeInventoryBalance. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (InventoryBalance).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeInventoryBalanceDataAreaType" id="oagis-id-41ec1779d213410883baf8f2c5ad92b1">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-c528d7f3555749c6b7f53cb902793a4f"/>
+			<xsd:element ref="InventoryBalance" maxOccurs="unbounded" id="oagis-id-f24ff0aa174e472f804972a1e770a28b"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

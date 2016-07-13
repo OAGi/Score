@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncPartyMaster.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PartyMaster.xsd"/>
+        <xsd:element name="SyncPartyMaster" type="SyncPartyMasterType" id="oagis-id-0d18bdd356bd4b10b05bbb247cac7dbe">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncPartyMaster is to facilitate keeping party information synchronized that exists on separate data bases.  The SyncPartyMaster allows the adding of new party and the modification of previously established PartyMaster.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncPartyMasterType" id="oagis-id-2ab2b3b7a65745f9a7d6a879a9a8c5fb">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncPartyMasterDataAreaType" id="oagis-id-e9cce0e24a944c91a517c5d6f03b67b6">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncPartyMaster. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (PartyMaster).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncPartyMasterDataAreaType" id="oagis-id-e56ccde51f4c433ea5b544e45d19b85e">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-50236d1fc2b64bc99a049cfab505ac42"/>
+                        <xsd:element ref="PartyMaster" maxOccurs="unbounded" id="oagis-id-4955430f20154ee096e007618c91d56e"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

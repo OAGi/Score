@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeSalesOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/SalesOrder.xsd"/>
+	<xsd:element name="CancelAcknowledgeSalesOrder" type="CancelAcknowledgeSalesOrderType" id="oagis-id-c32add2701074f059f079272ea430e56">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">CancelAcknowledgeSalesOrder is being deprecated as of OAGIS 9.0. CancelAcknowledgeSalesOrder will be made available for the next three releases. OAGi recommend using ProcessSalesOrder for all new development.
+
+
+The purpose of the CancelAcknowledge Salesorder is to communicate from one business application to one or more other business applications that a Sales Order has been CancelAcknowledgeed or needs to be CancelAcknowledgeed, depending on the business case.
+
+This BOD commonly causes updates to occur.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeSalesOrderType" id="oagis-id-ffd25f06d9cb4005a30decc33408ad18">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeSalesOrderDataAreaType" id="oagis-id-cd305952df1845e5a7842815de34ea19">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeSalesOrder. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (SalesOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeSalesOrderDataAreaType" id="oagis-id-3270509f817e428daa433c773828528a">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-ea1d0666c52e48268bb2002bcb5827c5"/>
+			<xsd:element ref="SalesOrder" maxOccurs="unbounded" id="oagis-id-08a790e09f6f46ebbbc4d70dfa9fa17c"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

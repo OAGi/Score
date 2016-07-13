@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/AcknowledgeCarrierRoute.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CarrierRoute.xsd"/>
+	<xsd:element name="AcknowledgeCarrierRoute" type="AcknowledgeCarrierRouteType" id="oagis-id-cdede32de16d45b8bfb3de3697468ada">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the AcknowledgeCarrierRoute is to enable an application to provide  Carrier Route information from another business application module.  The AcknowledgeCarrierRoute is typiically provided in a publish/subscribe or broadcast environment. Where the sending system is the master application of the information being provided, where the information is sent to other business applications that need to know the information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AcknowledgeCarrierRouteType" id="oagis-id-6acfc923908e44f9a490ccd16845f8ac">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="AcknowledgeCarrierRouteDataAreaType" id="oagis-id-2aaa816503ca42a9b523d951356b621a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeCarrierRoute. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (CarrierRoute).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AcknowledgeCarrierRouteDataAreaType" id="oagis-id-4a0836db2d034a20b98f1747c3192360">
+		<xsd:sequence>
+			<xsd:element ref="Acknowledge" id="oagis-id-1a9304e27d1b489ea11e09e0c0cfd04a"/>
+			<xsd:element ref="CarrierRoute" maxOccurs="unbounded" id="oagis-id-d50368bde9dd4c138f2c4efaf9f0298f"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

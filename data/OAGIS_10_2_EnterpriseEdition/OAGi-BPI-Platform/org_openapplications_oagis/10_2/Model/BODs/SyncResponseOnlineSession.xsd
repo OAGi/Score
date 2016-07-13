@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseOnlineSession.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/OnlineSession.xsd"/>
+	<xsd:element name="SyncResponseOnlineSession" type="SyncResponseOnlineSessionType" id="oagis-id-478b1350f8cd4aedb8ee453da39213a5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseOnlineSession is to enable an application to request specific online OnlineSession from another business application module.  The response to the GetOnlineSession is the SyncResponseOnlineSession.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseOnlineSessionType" id="oagis-id-560fcb85076d4a1bb8f5c9303abfa7bd">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseOnlineSessionDataAreaType" id="oagis-id-46d020c94abb42ae84e4c65a2094dbb1">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseOnlineSession. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (OnlineSession).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseOnlineSessionDataAreaType" id="oagis-id-df63d0c67aee43489e85b4b9c9537dbe">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-4e2b856390d047238649f6186bf5b8f2"/>
+			<xsd:element ref="OnlineSession" maxOccurs="unbounded" id="oagis-id-edc0069c1d184b9098e9e555f82cb5a9"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
