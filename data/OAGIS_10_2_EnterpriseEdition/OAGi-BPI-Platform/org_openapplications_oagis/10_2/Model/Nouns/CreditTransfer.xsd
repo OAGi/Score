@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/CreditTransfer.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="CreditTransfer" type="CreditTransferType" id="oagis-id-5a8258e18f354197acce0c1d72390319"/>
+	<xsd:element name="CreditTransferPayment" type="CreditTransferPaymentType" id="oagis-id-935b1764cd9c49059ba69641a9aa7843">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Set of characteristics that applies to the debit sideof the payment transactions included in the payment initiation.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CreditTransferAgreement" type="TransferAgreementType" id="oagis-id-4e8a0ceb890442c081d0ac9fa17da68f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Set of elements that further identifies the type of credit transfer being requested by the initiating party.
+
+Business Rule: This component may be present if payment method is TRF. It must not be present if payment method is CHK.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CreditTransferHeader" type="CreditTransferHeaderType" id="oagis-id-02becf5edc0241f6b15f62b006151430"/>
+	<xsd:complexType name="CreditTransferType" id="oagis-id-b3243f1afdcd4f60a2bc8d54b00a5caa">
+		<xsd:sequence>
+			<xsd:element ref="CreditTransferHeader" id="oagis-id-3645a2520ce74346a4dcf7a666abf80c" minOccurs="0"/>
+			<xsd:element ref="CreditTransferPayment" id="oagis-id-4c3e173798a7494180ef29ca6d5bc777" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Set of characteristics that applies to the debit sideof the payment transactions included in the payment initiation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f79bdb0eeedf41fd99c167adbcca43aa"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-27561ac5f6bc4e6c9b8e34dbadb927b1"/>
+	</xsd:complexType>
+	<xsd:complexType name="CreditTransferHeaderBaseType" id="oagis-id-ad1297549c6348bfa05aea802337e6b3">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="AuthorizationID" id="oagis-id-a70f51ede89842bdb6028d2c144497a5" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifyies the authorization level of the user or application that is sending the Business Object Document Message. This authorization level being recognized be the receiving system indicates what can be done on the receiving system(s).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="BatchBookingIndicator" id="oagis-id-e1818e057bd647d58ec238ec1625d4d5" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that the initiating party requests a batch entry for the sum of the amounts of all transactions included in the payment initiation. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TotalTransactionsNumber" id="oagis-id-d53b8215e1824507975a71e7412edb15" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Number of individual transactions contained in the payment initiation, i.e., the number of occurrences of payment transaction. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="GroupingIndicator" id="oagis-id-83007dcf1226454ca605aac6592a2897" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates that the common debit information in the transactions is included once and not repeated for each transaction.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="InitiatingParty" id="oagis-id-291baed791b14ab9873b97528700803b" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Party initiating the payment to the forwarding or first agent. This can be the debtor (in a credit transfer), the creditor (in a direct debit) or a party that initiates the payment on behalf of the debtor or creditor.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ForwardingAgentParty" id="oagis-id-0814cd136cf44d979b0956c6a71b9251" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Financial institution that receives the payment transaction from the account owner or authorised party and processes the instruction. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-0fb2d136084047639fb8739f50177065" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CreditTransferHeaderType" id="oagis-id-cbafc2586b3248b5968928f36537822a">
+		<xsd:complexContent>
+			<xsd:extension base="CreditTransferHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CreditTransferHeaderExtensionType" id="oagis-id-2ff510b440234c97a24278259fc793dc" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CreditTransferPaymentBaseType" id="oagis-id-f9d4adecf58f42f0b28bf76330d81047">
+		<xsd:complexContent>
+			<xsd:extension base="TransferPaymentBaseType">
+				<xsd:sequence>
+					<xsd:element ref="CreditTransferAgreement" id="oagis-id-a1221048a6524a4eac812852527f3172" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Set of elements that further identifies the type of credit transfer being requested by the initiating party.
+
+Business Rule: This component may be present if payment method is TRF. It must not be present if payment method is CHK.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CreditTransferPaymentType" id="oagis-id-e75ff42b1cc04fe88801a5834cc35f88">
+		<xsd:complexContent>
+			<xsd:extension base="CreditTransferPaymentBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="CreditTransferPaymentExtensionType" id="oagis-id-e82775d041a74f74ae79792276024f9e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

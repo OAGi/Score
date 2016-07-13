@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- ==================================================================== --><!-- ===== XML Schema Builtin Type Extension XML Schema File 								    ===== --><!-- ==================================================================== --><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:  OAGIS 10_2 Platform 2_2 
+   Date:               		10 June 2016
+   Copyright 			    1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name:/OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Platform/2_2/DataTypes/XMLSchemaBuiltinType_1.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- ================================================================== -->
+	<!-- =====  Type Definitions                                                                                    ===== -->
+	<!-- =================================================================== -->
+	<!-- ===== Type Definitions Duration                                                                        ===== -->
+	<!-- =================================================================== -->
+	<xsd:simpleType name="xbt_WeekDurationType" id="oagis-id-80616f4a5e99418a8c8e2257f7d7f2e1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: nW</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="\d+W"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- =================================================================== -->
+	<!-- ===== Type Definitions Date                                                                                ===== -->
+	<!-- =================================================================== -->
+	<xsd:simpleType name="xbt_CenturyType" id="oagis-id-433b017552a14828a92821fd2540d790">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: CC</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{2}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateType" id="oagis-id-091a8db6113c4561b9d8e94d155ed3d6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DD</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:date">
+			<!--
+			<xsd:pattern value="([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30)"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])"/> -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekType" id="oagis-id-eb3f235d24224cdab6aba9b84029de48">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-D</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearType" id="oagis-id-8728b7a6228a44cba6d8d36a8383cf01">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDD</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayType" id="oagis-id-1026a85c4c6c409c8d7d372be8d1e342">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DD</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:gDay"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayType" id="oagis-id-e194181a3e244573a218cff868f9b8b1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: --MM-DD</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:gMonthDay"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthType" id="oagis-id-452dd611690e42e283d4415f36968957">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: --MM--</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:gMonth"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekType" id="oagis-id-afee1a4d06b847efbb8093ef70eb8e31">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayType" id="oagis-id-79e58a22ca434265a3a84bce834345c7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-D</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayType" id="oagis-id-3e52f0c7d8434440b9d51ce66d44fa20">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDD</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearMonthType" id="oagis-id-81df1d2568b0479eac34da10e162ad60">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:gYearMonth">
+			<!-- <xsd:pattern value="[0-9]{4}-(0[1-9]|1[012]) "/> -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearType" id="oagis-id-666bfe5169db45da9106d4a1180fa3ad">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:gYear">
+			<!-- <xsd:pattern value="[0-9]{4}"/>  -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekType" id="oagis-id-ec0a1a94037244a5a87dfc9576597052">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayType" id="oagis-id-0308cb9ce0e942c282e32bfc5fe54964">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-D</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- =================================================================== -->
+	<!-- ===== Type Definitions Time                                                                                ===== -->
+	<!-- =================================================================== -->
+	<xsd:simpleType name="xbt_HourMinuteType" id="oagis-id-4309c8b3d4dd4a55aac8b77b45349225">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([01][0-9]|2[0-3]):[0-5][0-9])|(24:00)"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_HourMinuteUTCType" id="oagis-id-209171f5013d45189366809513dd4eb5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_HourMinuteUTCOffsetType" id="oagis-id-3dccd32b0c83492193405b2b7d45718b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_HourType" id="oagis-id-aa32cddc0f424875b99bffc8e03062c4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_HourUTCType" id="oagis-id-a68f39de054a46639fa3dfb18a0400f2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_HourUTCOffsetType" id="oagis-id-da2d738cd888442db0041dd681709b09">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([0-1][0-9]|2[0-4])([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MinuteType" id="oagis-id-88d2834a41034632a4b87794b0865be8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MinuteSecondType" id="oagis-id-2e46436523754fdd9217fdec25d9745a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-[0-5][0-9]:[0-5][0-9](|(\.[0-9]+))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_SecondType" id="oagis-id-ecc37aa6bfaa4a8a9e4693f1b1de64cd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: --ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--[0-5][0-9](|(\.[0-9]+))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_TimeType" id="oagis-id-0cb95b920dfd454481e3882577c40c8a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:time">
+			<!-- <xsd:pattern value="(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+))|(24:00:00))"/>  -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_TimeUTCType" id="oagis-id-69faa0c0400b4ddba58711e67ee7a885">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:time">
+			<!--  <xsd:pattern value="(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+))|(24:00:00))Z"/>  -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_TimeUTCOffsetType" id="oagis-id-cbc4715d7d834bd48311c7e830b60329">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: hh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:time">
+			<!-- <xsd:pattern value="(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>  -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- =================================================================== -->
+	<!-- ===== Type Definitions DateTime                                                                       ===== -->
+	<!-- =================================================================== -->
+	<xsd:simpleType name="xbt_DateHourMinuteType" id="oagis-id-081408e19d034aa89f3fde2c3857f3ed">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T(([01][0-9]|2[0-3]):[0-5][0-9])|(24:00)"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])T(([01][0-9]|2[0-3]):[0-5][0-9])|(24:00)"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])T(([01][0-9]|2[0-3]):[0-5][0-9])|(24:00)"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateHourMinuteUTCType" id="oagis-id-3b54f63b41304d2681ec4483a32e93a5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateHourMinuteUTCOffsetType" id="oagis-id-4d76974f62f7449f90971f5274210f76">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateHourType" id="oagis-id-6956a5617be6444f9ac873aafdc3ec03">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T(([01][0-9])|(2[0-4]))"/>
+			<xsd:pattern value="(([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9]))T(([01][0-9])|(2[0-4]))"/>
+			<xsd:pattern value="(([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8]))T(([01][0-9])|(2[0-4]))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateHourUTCType" id="oagis-id-4c0aecdfac86489c8e9a8e3f967bdb15">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T(([01][0-9])|(2[0-4]))Z"/>
+			<xsd:pattern value="(([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9]))T(([01][0-9])|(2[0-4]))Z"/>
+			<xsd:pattern value="(([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8]))T(([01][0-9])|(2[0-4]))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateHourUTCOffsetType" id="oagis-id-95265612564847f2bf62e9437a8de7f1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T(([01][0-9])|(2[0-4]))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="(([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9]))T(([01][0-9])|(2[0-4]))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="(([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8]))T(([01][0-9])|(2[0-4]))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateTimeType" id="oagis-id-6461945aa5e943399753cfbbdd6f0fcf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:dateTime">
+			<!-- <xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/> -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateTimeUTCType" id="oagis-id-6492a9f32b9b4c96a85ae88250aa144b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:dateTime">
+			<!-- <xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>  -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DateTimeUTCOffsetType" id="oagis-id-c815e20baf7c4b6a9cc5b778baac83f7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-MM-DDThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:dateTime">
+			<!-- <xsd:pattern value="(([0-9]{4})-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|([0-9]{4})-((0[469])|(11))-(0[1-9]|[12][0-9]|30))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-(02)-(0[1-9]|1[0-9]|2[0-9])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-(02)-(0[1-9]|1[0-9]|2[0-8])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>  -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayHourMinuteType" id="oagis-id-de4ce9cc474943a5b2b8511addd19650">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayHourMinuteUTCType" id="oagis-id-8d997984bf9b4831b1da8262b00e3f8a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayHourMinuteUTCOffsetType" id="oagis-id-8034691f742c4bf3a3d8545d9a902d76">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayHourType" id="oagis-id-3bb15366681e4a0dac8db899be25f9ab">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayHourUTCType" id="oagis-id-f8496c9362fb43cc802d8f39e89aa039">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayHourUTCOffsetType" id="oagis-id-0b7c85961c28403bb27ef7e5bb94244f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T([0-1][0-9]|2[0-4])[\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekHourMinuteType" id="oagis-id-5586130be8354b6597be1b49077e003e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekHourMinuteUTCType" id="oagis-id-9dfa09f67b204b549bc86eadc58c842c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekHourMinuteUTCOffsetType" id="oagis-id-9ddf0dd6294545aeba9afd572bf10644">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekHourType" id="oagis-id-f87f50239b094a0fb9325e8b101597c4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekHourUTCType" id="oagis-id-8939463099a741b4bd7d3552c82f18e8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekHourUTCOffsetType" id="oagis-id-638dae37e7354753aad3199bb3d41889">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T([0-1][0-9]|2[0-4])[\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekTimeType" id="oagis-id-313594ed32984cb88b89f8b22523b5e3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekTimeUTCType" id="oagis-id-1936f0ecaa2b454798bf0f7d9157abf5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfWeekTimeUTCOffsetType" id="oagis-id-40c5c0ee124f42f8a984b703b9c84c94">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -W-DThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearHourMinuteType" id="oagis-id-d735bb38d9d54775adad16e1a1e893ff">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearHourMinuteUTCType" id="oagis-id-efe2a41e9be74ff8a7bf39aaf469b006">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearHourMinuteUTCOffsetType" id="oagis-id-fba3741186c1448b9a0e9e14d6b827a7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearHourType" id="oagis-id-9d99fd7a2a754d98903fba7de1f89d15">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearHourUTCType" id="oagis-id-f956193de5d642a38725908ff6ed8f15">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearHourUTCOffsetType" id="oagis-id-855ed484566e497fb23f177da8f27e0d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T([0-1][0-9]|2[0-4])([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearTimeType" id="oagis-id-d52d072ed42f4ecc9bb6ec3b770b7cee">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearTimeUTCType" id="oagis-id-58ada9ce2f2d4165818f15252b9d2a23">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayOfYearTimeUTCOffsetType" id="oagis-id-a20fa96e04eb4f9b9e543ca706b6b7c6">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -DDDThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayTimeType" id="oagis-id-7890afe3747b4517a7eda35616446161">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayTimeUTCType" id="oagis-id-76fa23e4ac334dfc9a7d62ebf2442ba3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_DayTimeUTCOffsetType" id="oagis-id-1a3c92aec91e4d30a5a7d3c797c024a2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: ---DDThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="---(0[1-9]|[12][0-9]|3[01])T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayHourMinuteType" id="oagis-id-72d78a8834084fbe961d007500feb49f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayHourMinuteUTCType" id="oagis-id-1b9cd77028404c4a89e07725dc260c34">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayHourMinuteUTCOffsetType" id="oagis-id-7a03e1ca3cad4863bb75b293f864e37b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayHourType" id="oagis-id-573d48bd6e894166803a644b67a1f070">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayHourUTCType" id="oagis-id-3d59312dc09e4ddda25f42e4e78c8cc8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayHourUTCOffsetType" id="oagis-id-68b8369c39ab443ca8f1d234dc5f71ff">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T([0-1][0-9]|2[0-4])[\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayTimeType" id="oagis-id-ac7823e323ef40faaba1c399c60ac2c8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayTimeUTCType" id="oagis-id-8bf799b211f94dd1bceb83f72b53fe08">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_MonthDayTimeUTCOffsetType" id="oagis-id-4515295e8ca442be9c8cf9f507f9e3a5">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -MM-DDThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="--(((0[13578]-(0[1-9]|[12][0-9]|3[01]))|(1[02]-(0[1-9]|[12][0-9]|3[01])))|((0[469]-(0[1-9]|[12][0-9]|30))|(11-(0[1-9]|[12][0-9]|30)))|(02-(0[1-9]|1[0-9]|2[0-9])))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayHourMinuteType" id="oagis-id-c675dddbdd4c4a67b065559512650a2e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayHourMinuteUTCType" id="oagis-id-1b5daa63d86847e9af90900363e4e157">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayHourMinuteUTCOffsetType" id="oagis-id-8f9c61c5d7854b2eb8116877bd20ff81">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayHourType" id="oagis-id-59d462c28fcd4918849fdcbb21742d52">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayHourUTCType" id="oagis-id-ce21e7cbf83a4d6bbb94131ac24a5c36">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayHourUTCOffsetType" id="oagis-id-f1ea337c83df4defb910edb8b271f648">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T([0-1][0-9]|2[0-4])[\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayTimeType" id="oagis-id-ff37a5bfb6074e4792ad81effb70a7ba">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayTimeUTCType" id="oagis-id-01518e59c03a44afad7e59c1cb3449a8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_WeekDayTimeUTCOffsetType" id="oagis-id-755da5afd41246d79f13500995a1ba41">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: -Www-DThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayHourMinuteType" id="oagis-id-b1e653ab9c4b4cb48853fc95043c364d">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayHourMinuteUTCType" id="oagis-id-4d87cce3b7614597a42b06ccf293d541">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayHourMinuteUTCOffsetType" id="oagis-id-8cd427823f3d485fbc88676577a5b31f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayHourType" id="oagis-id-67fe91295baf4ed78065c165b569148a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T([0-1][0-9]|2[0-4])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayHourUTCType" id="oagis-id-3e6a71fb775248e29b1faa3c3d141f86">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T([0-1][0-9]|2[0-4])Z"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayHourUTCOffsetType" id="oagis-id-b343cfceaaf94f858f7e8dc2e8e13723">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T([0-1][0-9]|2[0-4])([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T([0-1][0-9]|2[0-4])([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayTimeType" id="oagis-id-ad60b10e09784a61a1d56be369323af0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayTimeUTCType" id="oagis-id-e73a0fc8f62942c480588516f84056fb">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearDayTimeUTCOffsetType" id="oagis-id-f8860e80bda24868ae5d61b20467ddff">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-DDDThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-6]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+			<xsd:pattern value="([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])-((00[1-9])|(0[1-9][0-9])|([1-2][0-9][0-9])|(3[0-5][0-9])|(36[0-5]))T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayHourMinuteType" id="oagis-id-efa8682deee84c1ab60a09e4bfce2b94">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayHourMinuteUTCType" id="oagis-id-2b1292fdae0941168231281cc7b7bfc0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh:mmZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayHourMinuteUTCOffsetType" id="oagis-id-1160d7f16a9e4421a3f1993bfeeef85b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh:mm+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9])|(24:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayHourType" id="oagis-id-acd5ebf974234f3f93c1a4f254d64c5f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T([0-1][0-9]|2[0-4])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayHourUTCType" id="oagis-id-497c4098c17743b087d3d25527f3e985">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThhZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T([0-1][0-9]|2[0-4])Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayHourUTCOffsetType" id="oagis-id-a08f817ffde5441da26d6bad41cda9b2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T([0-1][0-9]|2[0-4])[\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayTimeType" id="oagis-id-0a131e697fcf409d9d5aeea7ed9f5554">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh:mm:ss</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayTimeUTCType" id="oagis-id-c940f792c84344cf9ee2bc450d5073b1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh:mm:ssZ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))Z"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="xbt_YearWeekDayTimeUTCOffsetType" id="oagis-id-bd2e6cf3f01a4a90b9ec141fc908f531">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">ISO 8601 format: YYYY-Www-DThh:mm:ss+hh:mm</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9]{4}-W(0[1-9]|[1-4][0-9]|5[0123])-[1-7]T((([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](|(\.[0-9]+)))|(24:00:00))([\+|\-]([0-1][0-9]|2[0-3]):[0-5][0-9])"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

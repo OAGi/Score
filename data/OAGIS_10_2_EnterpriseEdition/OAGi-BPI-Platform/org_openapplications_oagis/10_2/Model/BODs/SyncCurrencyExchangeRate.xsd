@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncCurrencyExchangeRate.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/CurrencyExchangeRate.xsd"/>
+        <xsd:element name="SyncCurrencyExchangeRate" type="SyncCurrencyExchangeRateType" id="oagis-id-ef198c49b65d43ee8f7098238e522ea0">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncCurrencyExchangeRate is to enable the passing of updates of currency exchange rates to other applications that have exchange rate tables.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncCurrencyExchangeRateType" id="oagis-id-e37a798d03be4b5d9d9f402dbf7a42c9">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncCurrencyExchangeRateDataAreaType" id="oagis-id-6d3ed2c81a6d43e5b6c567e5621af2ca">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncCurrencyExchangeRate. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (CurrencyExchangeRate).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncCurrencyExchangeRateDataAreaType" id="oagis-id-355b6e3c174848a8978a86806ee5c477">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-fffe38e10b55452f91cb6d73adaf1961"/>
+                        <xsd:element ref="CurrencyExchangeRate" maxOccurs="unbounded" id="oagis-id-7428a63b449c40beacd3232654bb5892"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

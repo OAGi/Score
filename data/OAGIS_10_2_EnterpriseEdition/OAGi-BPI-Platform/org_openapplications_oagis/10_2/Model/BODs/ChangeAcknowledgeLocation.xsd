@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeAcknowledgeLocation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Location.xsd"/>
+	<xsd:element name="ChangeAcknowledgeLocation" type="ChangeAcknowledgeLocationType" id="oagis-id-72f19138b3864f91a7f2e803c341d763">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledge Location is to enable a mechanism to ensure that the physical location identifiers are ChangeAcknowledgehronized between the business applications that require this to communicate clearly.  This is particularly critical when only the codes that identify locations are used.  Without the meaning of the codes clearly communicated, the integration is not effective.  This BOD enables the Location codes to be ChangeAcknowledgehronized among business applications.
+
+This BOD may also be initiated by the sending system upon some event occurring.
+
+There are many possible business applications in several environments that may use this capability. For example, a MRP, Inventory, or Manufacturing business application could use this to communicate Location information.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeLocationType" id="oagis-id-ec620b26b8f0446c9fc2fdfc38c7a889">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeLocationDataAreaType" id="oagis-id-58bb5bfa1d9442ab9098afab9e76a4fc">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeLocation. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (Location).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeLocationDataAreaType" id="oagis-id-d029e88454cc419b8e1c6987e2058cd8">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-266b48af0e1845359c5bd9eed69dd754"/>
+			<xsd:element ref="Location" maxOccurs="unbounded" id="oagis-id-6f55e0edd44e4e95af2ab0292bf00af0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

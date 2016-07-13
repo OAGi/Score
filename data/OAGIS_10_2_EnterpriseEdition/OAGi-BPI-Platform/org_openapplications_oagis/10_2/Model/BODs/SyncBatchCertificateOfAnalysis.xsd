@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncBatchCertificateOfAnalysis.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/BatchCertificateOfAnalysis.xsd"/>
+        <xsd:element name="SyncBatchCertificateOfAnalysis" type="SyncBatchCertificateOfAnalysisType" id="oagis-id-e7e39d1045304982a483272d1c532422">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Sync BatchCertificateOfAnalysis is to facilitate keeping purchase order information synchronized on separate data bases throughout an enterprise.  The Sync BatchCertificateOfAnalysis allows the adding of new purchase orders and the modification of previously established purchase orders.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncBatchCertificateOfAnalysisType" id="oagis-id-96fd0b54020d468aa76272d84bb15ea4">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncBatchCertificateOfAnalysisDataAreaType" id="oagis-id-a15b1093cedc4bf785de868555ece69e">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncBatchCertificateOfAnalysis. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (BatchCertificateOfAnalysis).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncBatchCertificateOfAnalysisDataAreaType" id="oagis-id-2fb5eb64542e4a729fa730acc5fc7e04">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-bd24d4943a5b4acaa6bf50beef4c6aa2"/>
+                        <xsd:element ref="BatchCertificateOfAnalysis" maxOccurs="unbounded" id="oagis-id-0bd921e726be4caf89aa3376805d4ff4"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

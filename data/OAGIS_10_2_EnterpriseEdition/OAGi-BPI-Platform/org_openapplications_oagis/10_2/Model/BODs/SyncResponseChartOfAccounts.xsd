@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseChartofAccounts.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/ChartOfAccounts.xsd"/>
+	<xsd:element name="SyncResponseChartOfAccounts" type="SyncResponseChartOfAccountsType" id="oagis-id-2c470414bdac44299358f6e606d2f897">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseChartOfAccounts is to distribute general ledger chart of accounts code identifiers to other applications to store for validation purposes.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseChartOfAccountsType" id="oagis-id-72a132ef178743b1b53ea59cc4281ad5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseChartOfAccountsDataAreaType" id="oagis-id-12fb4b7355d148fead605bb67d3680ad">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseChartOfAccounts. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (ChartOfAccounts).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseChartOfAccountsDataAreaType" id="oagis-id-755c064a6b0a40acac96fe9b1961b8ce">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-f43a3027acd443a0b8ff1a464726573c"/>
+			<xsd:element ref="ChartOfAccounts" maxOccurs="unbounded" id="oagis-id-9c1431dd67974cd7b7feffe40768b52e"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

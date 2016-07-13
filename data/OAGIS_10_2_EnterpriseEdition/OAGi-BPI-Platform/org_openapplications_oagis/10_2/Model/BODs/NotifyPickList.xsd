@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/NotifyPickList.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PickList.xsd"/>
+        <xsd:element name="NotifyPickList" type="NotifyPickListType" id="oagis-id-dd1a0daeb4524029b4be9d53ba779abe">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyPickList is to Notify the details of an individual Picking List from a plant level to an ERP system. This BOD will usually cause Notifys to occur.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="NotifyPickListType" id="oagis-id-69c04de1e0a343f2b020c6bbf4811911">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="NotifyPickListDataAreaType" id="oagis-id-d158c9dbff5c452ea15bc4273d677032">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyPickList. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (PickList).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="NotifyPickListDataAreaType" id="oagis-id-bf16e3e3a8e44a5a9aabf37b8c200ca6">
+                <xsd:sequence>
+                        <xsd:element ref="Notify" id="oagis-id-eb38a5c1ee544dea8c8b94c2c8632fa5"/>
+                        <xsd:element ref="PickList" maxOccurs="unbounded" id="oagis-id-f9cc1a3847b64dd08963250c950cf0c4"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

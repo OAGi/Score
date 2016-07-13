@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeConfiguration.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Configuration.xsd"/>
+	<xsd:element name="ChangeConfiguration" type="ChangeConfigurationType" id="oagis-id-006ddf8ea9a94d908ceb3bb38198eaf7">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeConfiguration is to enable an application to provide Configuration information from one business application to another business application. The ChangeConfiguration is  to communicate the request to Change a Configuration. The response to the Configuration is provided in the RespondConfiguration.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeConfigurationType" id="oagis-id-f35477e781464808a981969e6e6d4293">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeConfigurationDataAreaType" id="oagis-id-d688ecdface04d6380a7474088139380">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangePurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeConfigurationDataAreaType" id="oagis-id-0001a869f4ed48c1927858f0dee84f45">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-2867da6cee80472ea61a561cd63c9aca"/>
+			<xsd:element ref="Configuration" maxOccurs="unbounded" id="oagis-id-213a9d17e73e465ebf8e11175af03db7"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

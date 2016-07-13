@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncPurchaseOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/PurchaseOrder.xsd"/>
+        <xsd:element name="SyncPurchaseOrder" type="SyncPurchaseOrderType" id="oagis-id-281926aeb6124e5e88a03daf9c199b24">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the Sync PurchaseOrder is to facilitate keeping purchase order information synchronized on separate data bases throughout an enterprise.  The Sync PurchaseOrder allows the adding of new purchase orders and the modification of previously established purchase orders.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="SyncPurchaseOrderType" id="oagis-id-e478c63445e141f6a5b26f709509d63f">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="SyncPurchaseOrderDataAreaType" id="oagis-id-cd703c0cdadf4d0dab501ef1d0cc0a6a">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncPurchaseOrder. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (PurchaseOrder).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="SyncPurchaseOrderDataAreaType" id="oagis-id-5d994d4ca3af4f3fbb65be075771fb8f">
+                <xsd:sequence>
+                        <xsd:element ref="Sync" id="oagis-id-ae142b47497748d0a4ba50fdea50d453"/>
+                        <xsd:element ref="PurchaseOrder" maxOccurs="unbounded" id="oagis-id-65911a1e99ec462699a8d272970e5682"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

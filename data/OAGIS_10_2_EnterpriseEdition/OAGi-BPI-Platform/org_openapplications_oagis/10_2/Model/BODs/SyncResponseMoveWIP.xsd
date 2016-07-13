@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseMoveWIP.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MoveWIP.xsd"/>
+	<xsd:element name="SyncResponseMoveWIP" type="SyncResponseMoveWIPType" id="oagis-id-9db0b4bd1d4e493fbfbf3bc9dc04dfac">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SyncResponseMoveWIP is to notify a Manufacturing Application of the progression through the production processing steps or operations of a product being made on a production order. The business environments most likely to require this capability are any type of manufacturing scenario.
+
+This BOD communicates which processing step the product is coming from and which step it is being moved to, along with the quantity moving and the time this event occurred.
+
+This BOD assumes that the applications involved in this business scenario will have already synchronized the production item and its BOM/Routing information.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncResponseMoveWIPType" id="oagis-id-de26dc1d051d49d5bc2485dfa36e30e5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncResponseMoveWIPDataAreaType" id="oagis-id-a1f6b5ee17f54f00b6766be7ae0803ed">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseMoveWIP. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (MoveWIP).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncResponseMoveWIPDataAreaType" id="oagis-id-a7ee11b4a822424c8d998c74d9a00d67">
+		<xsd:sequence>
+			<xsd:element ref="SyncResponse" id="oagis-id-0dab24b4c61248b5ba36c0e2c284bc9e"/>
+			<xsd:element ref="MoveWIP" maxOccurs="unbounded" id="oagis-id-c667b3ca67d14a2892089cd2483dbd26"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

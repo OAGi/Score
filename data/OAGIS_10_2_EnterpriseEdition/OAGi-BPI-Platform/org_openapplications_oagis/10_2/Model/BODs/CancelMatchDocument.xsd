@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelMatchDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/MatchDocument.xsd"/>
+	<xsd:element name="CancelMatchDocument" type="CancelMatchDocumentType" id="oagis-id-7c1ac2bdf6d4486893956cf089e6ebd9">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelMatchDocument is to enable the communication of a Cancel in the MatchDocument data  concerning invoice matching  from another business application.
+
+
+The invoice matching process may include several document types, including the following:
+
+Two way match - Purchase Order and the Invoice 
+
+ Three way match - Purchase Order, Invoice, and the Receipt 
+
+Four way match - Purchase Order, Invoice, Receipt, and Inspection results 
+
+Note:  For the four way match, it is assumed that inspection results have been updated on the Purchase Order for visibility in matching.
+
+When matching takes place in the purchasing application, the purchasing application may have to request the accounts payable application to provide the supplier invoice to which purchasing transactions (purchase orders, goods receiving notes and inspection tickets) are to be matched.  This is the generally the situation when the invoice is initially entered into the accounts payable application.
+
+Note that in some situations, accounts payable will send invoices to the purchasing application unsolicited. In others, invoices are entered directly into the purchase order application or are created by the purchase order application when using evaluated receipt settlement (ERS) and in this instance, it is not necessary to perform the separate integration described in these chapters.
+
+When matching takes place in the accounts payable application, the purchasing application must inform the accounts payable application of the purchasing transactions (purchase orders, goods receiving notes and inspection tickets) to which the invoice (in accounts payable) is to be matched. Alternatively, the accounts payable application can request the information.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelMatchDocumentType" id="oagis-id-393e950756e346dca67a1dccb84590e5">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelMatchDocumentDataAreaType" id="oagis-id-554a72e0cd7047c4940945688a96985b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelMatchDocument. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (MatchDocument).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelMatchDocumentDataAreaType" id="oagis-id-c6d905238a2d4f4daaad86b77334c49d">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-b66c471a09e74343b56211bd90fc9179"/>
+			<xsd:element ref="MatchDocument" maxOccurs="unbounded" id="oagis-id-258b0cad6c8a4b95be99f81078c698bc"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

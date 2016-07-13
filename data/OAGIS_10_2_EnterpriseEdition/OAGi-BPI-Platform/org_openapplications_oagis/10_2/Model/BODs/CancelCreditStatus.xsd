@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelCreditStatus.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CreditStatus.xsd"/>
+	<xsd:element name="CancelCreditStatus" type="CancelCreditStatusType" id="oagis-id-74c6373a745f41e0a9a514688cf808ea">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelCreditStatus is to notify the customer order management application that the overall credit status of a trading partner has changed or status on specific order(s) are to be changed.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelCreditStatusType" id="oagis-id-4d2ca929f1444db7a37e3f616f68abe7">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelCreditStatusDataAreaType" id="oagis-id-95b30320f57941f79088707b061d16cc">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelCreditStatus. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (CreditStatus).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelCreditStatusDataAreaType" id="oagis-id-5cd225c0fa6c4f04a67b6db47371a4c1">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-98a3fdb2cd7345fab324d1e94d82bbb0"/>
+			<xsd:element ref="CreditStatus" maxOccurs="unbounded" id="oagis-id-499d25cf8a9847768009a98a34559e8c"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeWarehouseShippingOrder.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/WarehouseShippingOrder.xsd"/>
+	<xsd:element name="ChangeWarehouseShippingOrder" type="ChangeWarehouseShippingOrderType" id="oagis-id-48716cbaadc54861b2a02165a055f9a8">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeWarehouseShippingOrder is to communicate all (full record) Changes the WarehouseShippingOrder.  The ChangeWarehouseShippingOrder will also transmit changes to a WarehouseShippingOrder.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeWarehouseShippingOrderType" id="oagis-id-89878deb992140f7a044ec57c5d16cb9">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeWarehouseShippingOrderDataAreaType" id="oagis-id-3266afa0464c42198a56417c52d5580b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeWarehouseShippingOrder. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (WarehouseShippingOrder).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeWarehouseShippingOrderDataAreaType" id="oagis-id-c74f313a3f3c4ae7b6ea117225d22056">
+		<xsd:sequence>
+			<xsd:element ref="Change" id="oagis-id-0da2c6e38bf344afb52c8509fb3249e8"/>
+			<xsd:element ref="WarehouseShippingOrder" maxOccurs="unbounded" id="oagis-id-60fee89a24464be59e5e3cc09f280043"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

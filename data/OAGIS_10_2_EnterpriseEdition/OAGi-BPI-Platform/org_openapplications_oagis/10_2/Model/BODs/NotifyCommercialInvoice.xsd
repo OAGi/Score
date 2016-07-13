@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/NotifyCommercialInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/CommercialInvoice.xsd"/>
+	<xsd:element name="NotifyCommercialInvoice" type="NotifyCommercialInvoiceType" id="oagis-id-82116d7c12ee42eb9a93a55e73b3d046">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyCommercialInvoice is to communicate to a business application component or system the need to report an event occurre regarding a CommercialInvoice or to update an existing CommercialInvoice structure.
+
+This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyCommercialInvoiceType" id="oagis-id-ef48d5e24a3f4cc4aa9a3d2db3dc2fc8">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyCommercialInvoiceDataAreaType" id="oagis-id-5ee6503e747745548cd0f978ddc42e4b">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyCommercialInvoice. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (CommercialInvoice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyCommercialInvoiceDataAreaType" id="oagis-id-608aa4d8afd641598d5ef63cb7bf6fa5">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-4f7e57bea5d74c04aea71fdc6fe55700"/>
+			<xsd:element ref="CommercialInvoice" maxOccurs="unbounded" id="oagis-id-5aa15d64d1814223af68ebc3e788b29d"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

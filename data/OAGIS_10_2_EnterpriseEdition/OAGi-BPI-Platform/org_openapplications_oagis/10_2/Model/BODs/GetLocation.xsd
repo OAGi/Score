@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/GetLocation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Location.xsd"/>
+        <xsd:element name="GetLocation" type="GetLocationType" id="oagis-id-755753cadbc3453098be3ad161b9193e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetLocation is to enable an application to request specific Location information from another business application module.  The response to the GetLocation is the ShowLocation.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetLocationType" id="oagis-id-1cdf751404394534a8a3674fbba94962">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetLocationDataAreaType" id="oagis-id-7a351eaaae0149ca855d850c446615b0">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetLocation. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Location).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetLocationDataAreaType" id="oagis-id-2b3c979b634b48f7a89a99518a241538">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-f6b9b64d02f24577b006c5cd27a2aa59"/>
+                        <xsd:element ref="Location" maxOccurs="unbounded" id="oagis-id-dabf141371ec4335935f933906383eef"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

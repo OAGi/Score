@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeAcknowledgeInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/Invoice.xsd"/>
+	<xsd:element name="ChangeAcknowledgeInvoice" type="ChangeAcknowledgeInvoiceType" id="oagis-id-105f4f5591f245bdb5c7886ae5bdb649">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ChangeAcknowledgeInvoice is to notify another application about a ChangeAcknowledge in the Invoice</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChangeAcknowledgeInvoiceType" id="oagis-id-a3df7a00268647efa3ec018497cbfeab">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="ChangeAcknowledgeInvoiceDataAreaType" id="oagis-id-77c9b5fdcfa540f295d6f1abb8218c41">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeInvoice. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (Invoice).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ChangeAcknowledgeInvoiceDataAreaType" id="oagis-id-1b15acb1fc93434eb9a1ff89cf069b71">
+		<xsd:sequence>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-57b0b4333b744e1e921c2d9c3be71d9f"/>
+			<xsd:element ref="Invoice" maxOccurs="unbounded" id="oagis-id-ecaad60eb7d247ed852027f6f59fefd6"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

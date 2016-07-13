@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeOnlineSession.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/OnlineSession.xsd"/>
+	<xsd:element name="CancelAcknowledgeOnlineSession" type="CancelAcknowledgeOnlineSessionType" id="oagis-id-0bc1605eeffc46319c4426c19736eac2">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelAcknowledgeOnlineSession is to enable an application to request specific online OnlineSession from another business application module.  The response to the GetOnlineSession is the CancelAcknowledgeOnlineSession.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelAcknowledgeOnlineSessionType" id="oagis-id-cda6bd5218564216b63e1aad610f488d">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelAcknowledgeOnlineSessionDataAreaType" id="oagis-id-d0325b4c0eff4f24b61c796e1de1bd4f">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeOnlineSession. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (OnlineSession).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelAcknowledgeOnlineSessionDataAreaType" id="oagis-id-c602683a26f743c79a00a32d7eadb957">
+		<xsd:sequence>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-c01716ccb7f540feb9a639eb907ab2c9"/>
+			<xsd:element ref="OnlineSession" maxOccurs="unbounded" id="oagis-id-a14b125ad5cc42e3bd260aed1910f3a5"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

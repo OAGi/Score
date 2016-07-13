@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ShowInvoiceLedgerEntry.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/InvoiceLedgerEntry.xsd"/>
+        <xsd:element name="ShowInvoiceLedgerEntry" type="ShowInvoiceLedgerEntryType" id="oagis-id-9ae343abc83f4bc0ba08139764b09a0e">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the ShowInvoiceLedgerEntry is to supply InvoiceLedgerEntry information to another business application module. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="ShowInvoiceLedgerEntryType" id="oagis-id-42b431b6136340ab810349e0b9eaaca6">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="ShowInvoiceLedgerEntryDataAreaType" id="oagis-id-5576b236d95543ae9a3996f5cef40b87">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ShowInvoiceLedgerEntry. The information consists of a Verb and one or more Nouns. The verb (Show) indicates the action to be performed on the Noun (InvoiceLedgerEntry).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="ShowInvoiceLedgerEntryDataAreaType" id="oagis-id-d751f3d85ec6421aa075bca5ad1a61b0">
+                <xsd:sequence>
+                        <xsd:element ref="Show" id="oagis-id-d05d46f3c81543328c65c01d5096985d"/>
+                        <xsd:element ref="InvoiceLedgerEntry" maxOccurs="unbounded" id="oagis-id-16fe3a5166aa457cb374a680cb61711a"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

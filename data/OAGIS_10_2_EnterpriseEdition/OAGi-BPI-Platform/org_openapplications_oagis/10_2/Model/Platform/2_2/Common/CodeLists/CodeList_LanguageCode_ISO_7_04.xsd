@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+   
+	This file is an implementation of a Business Code List as defined by UN/CEFACT XML Naming and Design Rules v3.0 of the Language Code 
+	List from ISO (5_6392A_20081107).
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_LanguageCode_ISO_7_04.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:simpleType name="clm56392A20081107_LanguageCodeContentType" id="oagis-id-c5e8ac8c44894e54a147a870136da686">
+		<xsd:restriction base="xsd:normalizedString"/>
+	</xsd:simpleType>
+	<xsd:complexType name="clm56392A20081107_LanguageCodeType" id="oagis-id-7209aeacf8374178911c4d2eabea9dd8">
+		<xsd:simpleContent>
+			<xsd:extension base="clm56392A20081107_LanguageCodeContentType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/EngineeringWorkDocument.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="EngineeringWorkDocument" type="EngineeringWorkDocumentType" id="oagis-id-066f0e689d014bd39297b377348b1d1b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This document encompasses
+(1) EngineeringWorkRequest
+(2) EngineeringWorkOrder
+(3) EngineeringBOM. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringWorkOrder" type="EngineeringWorkOrderType" id="oagis-id-4de45d07faca404aa369339ecdabe8e1"/>
+	<xsd:element name="EngineeringWorkRequest" type="EngineeringWorkRequestType" id="oagis-id-46e27073aa5248c2bcc4d36cc667d8e0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "work_request" entity.  AP214-FDIS Definition: A Work_request is the solicitation for some work to be done.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EngineeringActivity" type="EngineeringActivityType" id="oagis-id-40827f36b9d94ce682a797a221aa2b63">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "activity" entity.  AP214-FDIS-Definition: An Activity is the act of achieving or accomplishing an action.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DesignInstance" type="DesignInstanceType" id="oagis-id-cd75b25e937c4e93b2261093d54de794"/>
+	<xsd:element name="WorkOrders" type="WorkOrdersType" id="oagis-id-bc52dce8f285414880f3b8cc4968a142">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "work_order" entity.  AP214-FDIS Definition: A Work_order is the authorization for one or more Activity objects to be performed.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DesignDeviationPermitEngineeringWorkOrder" type="EngineeringWorkOrderType" id="oagis-id-c9ff15d206cc405880282234ebe9338e"/>
+	<xsd:element name="DesignReleaseEngineeringWorkOrder" type="EngineeringWorkOrderType" id="oagis-id-ddcb572d43754c0497bbe6ad980e1a07"/>
+	<xsd:element name="ManagementResolutionEngineeringWorkOrder" type="EngineeringWorkOrderType" id="oagis-id-63b8122743f24d3ca77754d538a38eae"/>
+	<xsd:element name="ManufacturingReleaseEngineeringWorkOrder" type="EngineeringWorkOrderType" id="oagis-id-f5e7210f171542f581f44dee4f794769"/>
+	<xsd:element name="ProductDeviationPermitEngineeringWorkOrder" type="EngineeringWorkOrderType" id="oagis-id-73edbc03fdec40d682fd233938f144ad"/>
+	<xsd:element name="EngineeringApproval" type="EngineeringApprovalType" id="oagis-id-0edfb7938c104cd0866d35c3febe267c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "approval" entity.  AP214-FDIS-Definition: An Approval is a judgement concerning the quality of those product data that are subject of the Approval.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="NextHigherAssembly" type="NextHigherAssemblyType" id="oagis-id-d0a50ef9a1484a389ea110404829de6a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "next_higher_assembly" entity.  AP214-FDIS Definition: A Next_higher_assembly is a relationship where the attribute 'related' specifies a constituent of an assembly and the attribute 'relating' specifies the immediate parent assembly of the constituent.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="AppliedItemDesignReference" type="ItemDesignReferenceType" id="oagis-id-194f7e91b83c44eb9dd39083f08e7595"/>
+	<xsd:element name="ChildAssemblyItemDesignReference" type="ItemDesignReferenceType" id="oagis-id-4625d38d07fb410a80f947e1d3d40efa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Refers to an ItemInstance: a constituent of an assembly.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ItemDesignReference" type="ItemDesignReferenceType" id="oagis-id-8cde14bd554445888105b1e75d0664c3"/>
+	<xsd:element name="ParentAssemblyItemDesignReference" type="ItemDesignReferenceType" id="oagis-id-71e6761bbc5940a4988202ed9bdb9c59">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Refers to an ItemInstance: the immediate parent assembly of the constituent.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ChildEngineeringActivityIDs" type="SequencedIDsType" id="oagis-id-b3d8e2c6938d4d128dfe11511b8becba">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the child engineering Activity IDs. These may have a sequence indicator that specifies the order in which they are to be performed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="EngineeringWorkDocumentBaseType" id="oagis-id-9c63f139d92f4a7bab827330cb785aec">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="EngineeringWorkRequest" id="oagis-id-b6d6ead490874039846645b7cc1ae5bb" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "work_request" entity.  AP214-FDIS Definition: A Work_request is the solicitation for some work to be done.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="WorkOrders" id="oagis-id-0c425b0c0ba44d36ba6d4e6675871922" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "work_order" entity.  AP214-FDIS Definition: A Work_order is the authorization for one or more Activity objects to be performed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="EngineeringActivity" id="oagis-id-6ed20687887e4f3692e905caf9758206" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "activity" entity.  AP214-FDIS-Definition: An Activity is the act of achieving or accomplishing an action.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="ReferencesGroup" id="oagis-id-d2302e0acb834f34a2c4d3a67e89a3e4" minOccurs="0"/>
+					<xsd:element ref="EngineeringApproval" id="oagis-id-d7e78fb5e00949a5813d1ad4fe854a71" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "approval" entity.  AP214-FDIS-Definition: An Approval is a judgement concerning the quality of those product data that are subject of the Approval.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Item" id="oagis-id-538ae0f3d00b41b0b74f5b22460bfb07" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Item associated with the Line or Detail of a transaction. The item provides the details of the generic Item component information. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemInstance" id="oagis-id-bd5e418f48ef4c4aac90d281561754c3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DesignInstance" id="oagis-id-4dbb97299dc440189d818da12c8538f7" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="NextHigherAssembly" id="oagis-id-544548db19574385bbaa065b9c390a9b" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "next_higher_assembly" entity.  AP214-FDIS Definition: A Next_higher_assembly is a relationship where the attribute 'related' specifies a constituent of an assembly and the attribute 'relating' specifies the immediate parent assembly of the constituent.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringWorkDocumentType" id="oagis-id-8cfce8c83df54000bede9084c897da72">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringWorkDocumentBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringWorkDocumentExtensionType" id="oagis-id-9f3ac553c0d64e0091ae2620dddca6c4" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringWorkRequestBaseType" id="oagis-id-78fedaefcb2b4b96a19869464f349195">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="RequesterParty" id="oagis-id-057280767320454a922ae3c691a9709c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ItemDesignReference" id="oagis-id-0e938165c50240e391053e3745e29106" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="EngineeringWorkRequestCodeContentType" id="oagis-id-391c1e270b9442b6b6302284ea9afcc8"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-9b08c730455f4c95809db3b5d196a96a"/>
+				<xsd:attribute name="status" type="EngineeringWorkRequestStatusCodeContentType" id="oagis-id-14fba4bb07f84efb9a384e3b7271b33a">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the status of the Work Request.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringWorkRequestType" id="oagis-id-a24fbb6c403f49b68d26ad2c60faafec">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringWorkRequestBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringWorkRequestExtensionType" id="oagis-id-d8ab8c7f8884428b968ca7329f924950" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringActivityBaseType" id="oagis-id-6a606bdc6a2242ae92e9290e01996618">
+		<xsd:complexContent>
+			<xsd:extension base="ProjectReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ResolvedRequestIdentification" id="oagis-id-dc821e0243944e6cbff1f56f7de797af" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ConcernedParty" id="oagis-id-c3e02afec3384942b094f3ababc4246d" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="SupplierParty" id="oagis-id-dec0695a85eb4c6ca6d14e67c4c7500c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the supplier organization/entity of the items or inventory for the associated transaction.
+
+In most cases there is one SupplierParty per transaction. i.e. one SupplierParty for a given PurchaseOrder. However in the cases where an transaction Broker is involved there are cases where a single transaction may have different SupplierParties at the line level or in the case of a Catalog for the Catalog. 
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RequesterParty" id="oagis-id-bb081693f3d3459ab96d57f664e2b38c" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The party that requested the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualTimePeriod" id="oagis-id-d01846c036af496384969770cba53338" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the time period in which the actual event(s) occurred.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PlannedTimePeriod" id="oagis-id-dd235b5caf6e4e6094c3dfb6221071ff" minOccurs="0"/>
+					<xsd:element ref="MethodName" id="oagis-id-9d94e64f886240aea045347391e4252a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="MethodConsequenceText" id="oagis-id-7db144de29784382a623f9874f5d2b0d" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="MethodDescription" id="oagis-id-f03c79d9ea4047578ab27cc589ae9f22" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ParentEngineeringActivityID" id="oagis-id-80943614bc9a4e9a8fbcfd07e2f19498" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the Engineering Activity that is the parrent of the current Engineering Activity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ChildEngineeringActivityIDs" id="oagis-id-b626d5258c404aa1b2c5832a01590c53" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringActivityType" id="oagis-id-aab527593ed644cb80a6c92e64dc7019">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringActivityBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringActivityExtensionType" id="oagis-id-ce6dd76f8b4d4a959de40cfe0a5d6d38" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringApprovalBaseType" id="oagis-id-e4239d30674149e5a75ab4c329e4b948">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "approval" entity.  AP214-FDIS-Definition: An Approval is a judgement concerning the quality of those product data that are subject of the Approval.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="LevelCode" id="oagis-id-c1bf137f974e44a3a2d2d3815e79a47d" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the level of the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Status" id="oagis-id-58445332a2744f0ea59ad298f81fd573" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the status of the associated object by providing the Status Code along with a description and when the status is effective.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AppliedItemDesignReference" id="oagis-id-3f023e0ad7874e07b8ae1456d26e2eec" minOccurs="0"/>
+					<xsd:element ref="ApprovedByParty" id="oagis-id-354735527f624959a20b2d6fad1c28c9" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="PlannedDateTime" id="oagis-id-c4c396365a534372a90775391463da15" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the planned datetime for the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ActualDateTime" id="oagis-id-254f1b57242147c5a5378f36c5e34bb6" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the actual datetime of the associated entity.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Party" id="oagis-id-fae41de3bfd14ff2ba1109efa22be41a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A generic Party  for non-validated or application-validated parties. A work-around for situations where Schema-validation of Parties is not feasible or not desired.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringApprovalType" id="oagis-id-8042861259524427b8943bb5e7add88f">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "approval" entity.  AP214-FDIS-Definition: An Approval is a judgement concerning the quality of those product data that are subject of the Approval.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringApprovalBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringApprovalExtensionType" id="oagis-id-e10cd35d95ec48fb8869ed83ec086760" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NextHigherAssemblyBaseType" id="oagis-id-04fd8a3e579f43d2bfb45e538aae62c3">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "next_higher_assembly" entity.  AP214-FDIS Definition: A next_higher_assembly is a relationship where the attribute 'related' specifies a constituent of an assembly and the attribute 'relating' specifies the immediate parent assembly of the constituent.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ParentAssemblyItemDesignReference" id="oagis-id-5575048494aa4686b259c6e94d204b3a" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Refers to an ItemInstance: the immediate parent assembly of the constituent.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ChildAssemblyItemDesignReference" id="oagis-id-56bc00738bb4472593056f374435538c" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Refers to an ItemInstance: a constituent of an assembly.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="PlacementText" id="oagis-id-1cf7061ffbf746a7952222681f1dbf7a" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">STEP "placement" attribute of "next_higher_assembly" entity.  AP214-FDIS Definition: The placement specifies the Geometric_model_relationship_with_transformation</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NextHigherAssemblyType" id="oagis-id-9f7f5a0d90dc407fb91662e2c9e98c41">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">STEP "next_higher_assembly" entity.  AP214-FDIS Definition: A next_higher_assembly is a relationship where the attribute 'related' specifies a constituent of an assembly and the attribute 'relating' specifies the immediate parent assembly of the constituent.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="NextHigherAssemblyBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="NextHigherAssemblyExtensionType" id="oagis-id-492428daf8d34fb2bca0036451f0527f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DesignInstanceBaseType" id="oagis-id-f6d76a25966447ff88757ba4c06c548b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This is the STEP quantified_instance and single_instance.  If the Quantity element has value zero or is not present, then this is a single_instance.  STEP "item_instance" entity.  AP214-FDIS Definition: An item_instance is the occurrence of an object in a product structure that is defined eiher by a Design_discipline_item_definition or by a Product_identification.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemDesignReference" id="oagis-id-8bc54b4f387f490b825605d4c4708da9" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Refers to he DesignItem or DesignDisciplineItemDefinition that this is an instance of.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="FreeFormTextGroup" id="oagis-id-a1e5b28030094006a4856c944230b13c"/>
+					<xsd:element ref="Quantity" id="oagis-id-0401289459554476830157a5f6e1d3e8" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the quantity of the associated service or item that is addresses by the component in which the quantity is associated.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DesignInstanceType" id="oagis-id-415fa92e207845bcb9270d54ff3594ef">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">This is the STEP quantified_instance and single_instance.  If the Quantity element has value zero or is not present, then this is a single_instance.  STEP "item_instance" entity.  AP214-FDIS Definition: An item_instance is the occurrence of an object in a product structure that is defined eiher by a Design_discipline_item_definition or by a Product_identification.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DesignInstanceBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="DesignInstanceExtensionType" id="oagis-id-cb288de4681b46ba8ce60427323ac73d" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WorkOrdersBaseType" id="oagis-id-07f3b103160f4e9cba24e1c78fe1a65c">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="EngineeringWorkOrder" id="oagis-id-46d45bef1da94e3b8956b93a29921898" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DesignDeviationPermitEngineeringWorkOrder" id="oagis-id-59f02d60f5f14940be40c617dcf8bd93" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DesignReleaseEngineeringWorkOrder" id="oagis-id-366f2f656780490fb4d586389e092ea3" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ManagementResolutionEngineeringWorkOrder" id="oagis-id-36efd1c164d54a5690c076e8c56c251a" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ProductDeviationPermitEngineeringWorkOrder" id="oagis-id-e9277e11aa4b40e4afc2b86af08c37a8" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ManufacturingReleaseEngineeringWorkOrder" id="oagis-id-5882c25271744db1b1d5db13f69be461" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="WorkOrdersType" id="oagis-id-b5db4a9067db4b0ba3324fa0eac54e85">
+		<xsd:complexContent>
+			<xsd:extension base="WorkOrdersBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="WorkOrdersExtensionType" id="oagis-id-8997318fae7d4038b52483d4ee755111" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringWorkOrderBaseType" id="oagis-id-f29dc5680c1c4b2bb5740717f82f0bfd">
+		<xsd:complexContent>
+			<xsd:extension base="StatusHeaderBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemDesignReference" id="oagis-id-8c967ff37fa84fb38513236ec5ec57f4" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="typeCode" type="EngineeringWorkRequestCodeContentType" id="oagis-id-ca5ad8da9dde48ea893eb95eb734515e"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-2d679f4524164abd857f64f40da980d5"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EngineeringWorkOrderType" id="oagis-id-658735d5ee5440a49f4abec16c207820">
+		<xsd:complexContent>
+			<xsd:extension base="EngineeringWorkOrderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="EngineeringWorkOrderExtensionType" id="oagis-id-bcfe724e4a6d4916952081689c0a1888" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemDesignReferenceBaseType" id="oagis-id-3704664982984eac8be95918a2025f49">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Reference to an entity involved in describing designs.  Refers either to a DesignItem (using ItemIds), an OrderItem (using ItemIds) a DesignDisciplineItemDefinition (using a DesignDisciplineItemDefinitionId), an Instance (using a DesignInstanceId), or a NextHigherAssembly (using a NextHigherAssemblyId).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:element ref="ItemIdentification" id="oagis-id-76435eae86e54352bdc236547163afca" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Item identifiers that uniquily identify a given item. These identifiers may be specific to the party in which they make reference.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DesignDisciplineItemDefinitionID" id="oagis-id-67adfbdacd214944bf20bf664a8ff209" minOccurs="0"/>
+					<xsd:element ref="DesignInstanceID" id="oagis-id-34043d2aae7e4f8c8f35063adfc0fcc2" minOccurs="0"/>
+					<xsd:element ref="NextHigherAssemblyID" id="oagis-id-2ac3755964a2422490b02d5f4b0534ed" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ItemDesignReferenceType" id="oagis-id-1f855bef64544ed29c33b53c01159a82">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Reference to an entity involved in describing designs.  Refers either to a DesignItem (using ItemIds), an OrderItem (using ItemIds) a DesignDisciplineItemDefinition (using a DesignDisciplineItemDefinitionId), an Instance (using a DesignInstanceId), or a NextHigherAssembly (using a NextHigherAssemblyId).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ItemDesignReferenceBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="ItemDesignReferenceExtensionType" id="oagis-id-879621f391e24ca29091f209c93d2074" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

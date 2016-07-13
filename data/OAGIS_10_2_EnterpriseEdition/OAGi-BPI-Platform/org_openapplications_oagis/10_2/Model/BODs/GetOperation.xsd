@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/GetOperation.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Operation.xsd"/>
+        <xsd:element name="GetOperation" type="GetOperationType" id="oagis-id-456bccb215514c2da518bb7ee4c9f720">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetOperation is to enable an application to request specific online shopping Operation from another business application module.  The response to the GetOperation is the ShowOperation.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetOperationType" id="oagis-id-0afb1c57afc74740ac8c810be03c9fc3">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetOperationDataAreaType" id="oagis-id-5f1bbcfdf44749cf87bfc0a7d4eb7d69">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetOperation. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Operation).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetOperationDataAreaType" id="oagis-id-7bab4016cc644112bf0293cd080014d1">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-cae4117d899e42dc92fa2ffb45b9ca6a"/>
+                        <xsd:element ref="Operation" maxOccurs="unbounded" id="oagis-id-497ece7b05d94f90b2d13254124e0eb9"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

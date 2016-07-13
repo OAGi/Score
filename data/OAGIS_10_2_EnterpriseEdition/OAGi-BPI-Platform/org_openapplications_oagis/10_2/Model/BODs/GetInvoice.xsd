@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/GetInvoice.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+        <xsd:include schemaLocation="../Nouns/Invoice.xsd"/>
+        <xsd:element name="GetInvoice" type="GetInvoiceType" id="oagis-id-dba33def509a4d44a58ffeb5cddbee9b">
+                <xsd:annotation>
+                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetInvoice is to enable a request of an invoice. This BOD may be used as a request by a Customer to its Supplier. The SHowInvoice BOD would be the expected response.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="GetInvoiceType" id="oagis-id-c642d394af8748d7ada1cd31da6f4b71">
+                <xsd:complexContent>
+                        <xsd:extension base="BusinessObjectDocumentType">
+                                <xsd:sequence>
+                                        <xsd:element name="DataArea" type="GetInvoiceDataAreaType" id="oagis-id-afb5b5a51a3845379b5dc40c538cd324">
+                                                <xsd:annotation>
+                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetInvoice. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (Invoice).</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:element>
+                                </xsd:sequence>
+                        </xsd:extension>
+                </xsd:complexContent>
+        </xsd:complexType>
+        <xsd:complexType name="GetInvoiceDataAreaType" id="oagis-id-dcb1cd06c72c48469619f4c6ae2c0ca8">
+                <xsd:sequence>
+                        <xsd:element ref="Get" id="oagis-id-cddb9289b61e452a938ddd9c0bd854ae"/>
+                        <xsd:element ref="Invoice" maxOccurs="unbounded" id="oagis-id-3bc3ea36fae44ff095c5c822f7ab0df2"/>
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

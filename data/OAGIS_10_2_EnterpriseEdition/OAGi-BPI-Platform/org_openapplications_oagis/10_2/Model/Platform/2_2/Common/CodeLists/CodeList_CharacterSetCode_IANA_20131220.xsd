@@ -1,0 +1,2085 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== -->
+<!-- =====  IANA_CharacterSetCode_20070514 - Code List Schema Module  ===== -->
+<!-- ====================================================================== -->
+<!--
+
+   Schema agency: 	Open Applications Group 
+   OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+
+	This file is an implementation of a Business Code List as defined by UN/CEFACT XML Naming and Design Rules v3.0 of the 
+	Character Set Code List from IANA.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_CharacterSetCode_IANA_20131220.xsd
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3">
+	<!-- ====================================================================== -->
+	<!-- =====  Element Declarations				      ===== -->
+	<!-- ====================================================================== -->
+	<!-- =====  Root Element Declaration				      ===== -->
+	<!-- ====================================================================== -->
+	<xsd:element name="CharacterSetCode" type="clmIANACharacterSetCode20131220_CharacterSetCodeContentType" id="oagis-id-5b00beeb417146f7b565e03c2346ce15"/>
+	<!-- ====================================================================== -->
+	<!-- =====  Type Definitions					      ===== -->
+	<!-- ====================================================================== -->
+	<!-- =====  Type Definition: Character Set Content Type		      ===== -->
+	<!-- ====================================================================== -->
+	<xsd:simpleType name="clmIANACharacterSetCode20131220_CharacterSetCodeContentType" id="oagis-id-369bb5cf4149492e84fb5b070a98a12b">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="3">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ANSI_X3.4-1968</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="4">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-1:1987</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="5">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-2:1987</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="6">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-3:1988</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="7">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-4:1988</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="8">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-5:1988</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="9">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-6:1987</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="10">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-7:1987</ccts_Name>
+						<ccts_Definition>RFC1947,RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="11">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-8:1988</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="12">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-9:1989</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="13">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-10</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="14">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_6937-2-add</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="15">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_X0201</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="16">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_Encoding</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="17">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Shift_JIS</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="18">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Extended_UNIX_Code_Packed_Format_for_Japanese</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="19">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Extended_UNIX_Code_Fixed_Width_for_Japanese</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="20">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>BS_4730 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="21">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>SEN_850200_C</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="22">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IT</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="23">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ES</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="24">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>DIN_66003 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="25">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NS_4551-1 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="26">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NF_Z_62-010</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="27">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-10646-UTF-1</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="28">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_646.basic:1983</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="29">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>INVARIANT </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="30">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_646.irv:1983</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="31">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NATS-SEFI </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="32">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NATS-SEFI-ADD </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="33">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NATS-DANO </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="34">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NATS-DANO-ADD </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="35">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>SEN_850200_B</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="36">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>KS_C_5601-1987</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="37">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-2022-KR(preferred MIME name)</ccts_Name>
+						<ccts_Definition>RFC1557,Choi</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="38">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EUC-KR(preferred MIME name) </ccts_Name>
+						<ccts_Definition>RFC1557,Choi</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="39">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-2022-JP(preferred MIME name) </ccts_Name>
+						<ccts_Definition>RFC1468,Murai</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="40">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-2022-JP-2(preferred MIME name)</ccts_Name>
+						<ccts_Definition>RFC1554,Ohta</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="41">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6220-1969-jp </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="42">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6220-1969-ro </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="43">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>PT</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="44">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>greek7-old</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="45">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>latin-greek </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="46">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NF_Z_62-010_(1973)</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="47">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Latin-greek-1 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="48">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_5427</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="49">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6226-1978</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="50">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>BS_viewdata </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="51">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>INIS</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="52">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>INIS-8</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="53">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>INIS-cyrillic </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="54">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_5427:1981 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="55">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_5428:1980 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="56">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>GB_1988-80</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="57">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>GB_2312-80</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="58">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NS_4551-2</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="59">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>videotex-suppl </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="60">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>PT2</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="61">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ES2</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="62">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>MSZ_7795.3 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="63">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6226-1983 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="64">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>greek7 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="65">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ASMO_449 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="66">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>iso-ir-90</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="67">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6229-1984-a </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="68">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6229-1984-b </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="69">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6229-1984-b-add </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="70">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6229-1984-hand</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="71">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6229-1984-hand-add</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="72">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_C6229-1984-kana</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="73">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_2033-1983</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="74">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ANSI_X3.110-1983 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="75">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>T.61-7bit</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="76">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>T.61-8bit</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="77">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ECMA-cyrillic</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="78">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>CSA_Z243.4-1985-1</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="79">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>CSA_Z243.4-1985-2</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="80">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>CSA_Z243.4-1985-gr </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="81">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-6-E </ccts_Name>
+						<ccts_Definition>RFC1556,IANA</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="82">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-6-I </ccts_Name>
+						<ccts_Definition>RFC1556,IANA</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="83">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>T.101-G2</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="84">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-8-E</ccts_Name>
+						<ccts_Definition>RFC1556,Nussbacher</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="85">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-8-I</ccts_Name>
+						<ccts_Definition>RFC1556,Nussbacher</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="86">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>CSN_369103</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="87">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JUS_I.B1.002</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="88">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IEC_P27-1 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="89">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JUS_I.B1.003-serb</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="90">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JUS_I.B1.003-mac</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="91">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>greek-ccitt </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="92">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>NC_NC00-10:81 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="93">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_6937-2-25 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="94">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>GOST_19768-74 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="95">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_8859-supp </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="96">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO_10367-box </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="97">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>latin-lap </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="98">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>JIS_X0212-1990</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="99">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>DS_2089 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="100">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>us-dk </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="101">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>dk-us </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="102">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>KSC5636 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="103">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UNICODE-1-1-UTF-7</ccts_Name>
+						<ccts_Definition>RFC1642</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="104">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-2022-CN</ccts_Name>
+						<ccts_Definition>RFC1922</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="105">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-2022-CN-EXT</ccts_Name>
+						<ccts_Definition>RFC1922</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="106">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-8</ccts_Name>
+						<ccts_Definition>RFC3629</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="109">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-13</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="110">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-14</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="111">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-15</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="112">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-16</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="113">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>GBK</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="114">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>GB18030</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="115">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>OSD_EBCDIC_DF04_15</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="116">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>OSD_EBCDIC_DF03_IRV</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="117">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>OSD_EBCDIC_DF04_1</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="118">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-11548-1</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="119">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>KZ-1048</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1000">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-10646-UCS-2</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1001">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-10646-UCS-4</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1002">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-10646-UCS-Basic</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1003">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-10646-Unicode-Latin1</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1004">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-10646-J-1</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1005">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-Unicode-IBM-1261</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1006">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-Unicode-IBM-1268</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1007">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-Unicode-IBM-1276</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1008">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-Unicode-IBM-1264</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1009">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-Unicode-IBM-1265</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1010">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UNICODE-1-1</ccts_Name>
+						<ccts_Definition>RFC1641</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1011">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>SCSU</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1012">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-7</ccts_Name>
+						<ccts_Definition>RFC2152</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1013">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-16BE</ccts_Name>
+						<ccts_Definition>RFC2781</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1014">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-16LE</ccts_Name>
+						<ccts_Definition>RFC2781</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1015">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-16</ccts_Name>
+						<ccts_Definition>RFC2781</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1016">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>CESU-8</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1017">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-32</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1018">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-32BE</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1019">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UTF-32LE</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1020">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>BOCU-1</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2000">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-1-Windows-3.0-Latin-1</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2001">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-1-Windows-3.1-Latin-1 </ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2002">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-2-Windows-Latin-2 </ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2003">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>ISO-8859-9-Windows-Latin-5 </ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2004">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>hp-roman8</ccts_Name>
+						<ccts_Definition>HP-PCL5,RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2005">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Adobe-Standard-Encoding</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2006">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Ventura-US </ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2007">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Ventura-International</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2008">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>DEC-MCS </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2009">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM850</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2012">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>PC8-Danish-Norwegian</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2013">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM862</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2014">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>PC8-Turkish</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2015">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM-Symbols </ccts_Name>
+						<ccts_Definition>IBM-CIDT</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2016">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM-Thai</ccts_Name>
+						<ccts_Definition>IBM-CIDT</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2017">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>HP-Legal</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2018">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>HP-Pi-font</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2019">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>HP-Math8</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2020">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Adobe-Symbol-Encoding</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2021">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>HP-DeskTop</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2022">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Ventura-Math</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2023">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Microsoft-Publishing</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2024">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Windows-31J</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2025">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>GB2312</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2026">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Big5</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2027">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>macintosh </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2028">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM037</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2029">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM038</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2030">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM273</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2031">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM274</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2032">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM275</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2033">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM277</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2034">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM278</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2035">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM280</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2036">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM281</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2037">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM284</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2038">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM285</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2039">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM290</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2040">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM297</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2041">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM420</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2042">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM423</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2043">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM424</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2011">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM437</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2044">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM500</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2045">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM851</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2010">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM852</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2046">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM855</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2047">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM857</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2048">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM860</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2049">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM861</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2050">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM863</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2051">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM864</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2052">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM865</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2053">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM868</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2054">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM869</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2055">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM870</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2056">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM871</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2057">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM880</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2058">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM891</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2059">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM903</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2060">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM904</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2061">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM905</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2062">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM918</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2063">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM1026 </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2064">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-AT-DE</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2065">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-AT-DE-A</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2066">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-CA-FR</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2067">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-DK-NO</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2068">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-DK-NO-A</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2069">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-FI-SE</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2070">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-FI-SE-A</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2071">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-FR </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2072">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-IT </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2073">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-PT </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2074">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-ES </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2075">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-ES-A </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2076">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-ES-S </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2077">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-UK </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2078">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>EBCDIC-US </ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2079">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>UNKNOWN-8BIT </ccts_Name>
+						<ccts_Definition>RFC1428</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2080">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>MNEMONIC</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2081">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>MNEM</ccts_Name>
+						<ccts_Definition>RFC1345,KXS2</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2082">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>VISCII </ccts_Name>
+						<ccts_Definition>RFC1456</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2083">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>VIQR </ccts_Name>
+						<ccts_Definition>RFC1456</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2084">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>KOI8-R</ccts_Name>
+						<ccts_Definition>RFC1489</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2085">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>HZ-GB-2312</ccts_Name>
+						<ccts_Definition>RFC1842, RFC1843</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2086">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM866</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2087">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM775</ccts_Name>
+						<ccts_Definition>HP-PCL5</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2088">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>KOI8-U</ccts_Name>
+						<ccts_Definition>RFC2319</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2089">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM00858</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2090">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM00924</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2091">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01140</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2092">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01141</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2093">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01142</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2094">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01143</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2095">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01144</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2096">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01145</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2097">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01146</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2098">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01147</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2099">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01148</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2100">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM01149</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2101">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Big5-HKSCS</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2102">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>IBM1047</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2103">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>PTCP154</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2104">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>Amiga-1251</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2105">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>KOI7-switched</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2106">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>BRF</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2107">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>TSCII</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2250">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1250</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2251">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1251</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2252">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1252</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2253">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1253</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2254">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1254</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2255">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1255</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2256">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1256</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2257">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1257</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2258">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>windows-1258</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2259">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>TIS-620</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2260">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">
+						<ccts_Name>CP50220</ccts_Name>
+						<ccts_Definition/>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

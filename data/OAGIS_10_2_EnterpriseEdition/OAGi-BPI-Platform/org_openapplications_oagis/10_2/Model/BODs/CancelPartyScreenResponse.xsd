@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+
+   Schema agency: 	Open Applications Group 
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+    
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelPartyScreenResponse.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/PartyScreenResponse.xsd"/>
+	<xsd:element name="CancelPartyScreenResponse" type="CancelPartyScreenResponseType" id="oagis-id-fd4092500c814a138388c86d076ac3d4">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the CancelPartyScreenResponse is to transmit an PartyScreenResponse. Indicating that the receiver of the PartyScreenResponse is to Cancel the PartyScreenResponse.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CancelPartyScreenResponseType" id="oagis-id-e23ae13d55e44edaaa005ca365f6d2e2">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="CancelPartyScreenResponseDataAreaType" id="oagis-id-d85d736daa4048c8a02a99b5d45f206e">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelPartyScreenResponse. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (PartyScreenResponse).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CancelPartyScreenResponseDataAreaType" id="oagis-id-10b4e19d8d004c92943a24c160b9fe6d">
+		<xsd:sequence>
+			<xsd:element ref="Cancel" id="oagis-id-fd856f19f5ef4cb1adf67865630abaf4"/>
+			<xsd:element ref="PartyScreenResponse" maxOccurs="unbounded" id="oagis-id-6d7d2ce64aa64286adcc2938073c4eb4"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

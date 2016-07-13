@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+
+
+
+
+   Schema agency: 	Open Applications Group 
+
+
+   OAGIS® Revision:    OAGIS 10_2  
+   Date:               10 June 2016
+   Copyright 1997-2016, All Rights Reserved 
+
+  	
+   Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
+  
+  
+   This is an OAGIS® BOD XML Schema (XSD) Definition.
+
+   License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
+
+   For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
+    
+   XML Schema 
+     
+    Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/MoveInventory.xsd
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
+	<xsd:element name="MoveInventory" type="MoveInventoryType" id="oagis-id-a3553514533c4cd4bec55d609289c691"/>
+	<xsd:element name="MoveInventoryHeader" type="MoveInventoryHeaderType" id="oagis-id-c702df1b47a641fda97e5da4dcef938c">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the things common to the entire Movement.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="MoveInventoryLine" type="MoveInventoryLineType" id="oagis-id-c333fee7bd1c4643900cad3139addfc0">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the line items being Movemented providing information about the source and destination of the Movement.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="InventoryDestination" type="InventoryDestinationType" id="oagis-id-f4287f35efd34639a66ebe76be22700b">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Is the destination of the inventory being moved.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="MoveInventoryType" id="oagis-id-8d79be8e95cd417d8dbef89e28a6d276">
+		<xsd:sequence>
+			<xsd:element ref="MoveInventoryHeader" id="oagis-id-7593e867ced748139fd5521d4da0357c" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the things common to the entire Movement.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="MoveInventoryLine" id="oagis-id-8ecc08fc51b946d98dc0178807f6cd79" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation source="http://www.openapplications.org/oagis/10">Identifies the line items being Movemented providing information about the source and destination of the Movement.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-f0c54e514eb44d76936aa7122c381ca4"/>
+		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-9b43430a969842ecbae3f474a6a0f72a"/>
+	</xsd:complexType>
+	<xsd:complexType name="MoveInventoryHeaderType" id="oagis-id-35b009afd01e46788505d466a2a9e8af">
+		<xsd:complexContent>
+			<xsd:extension base="HeaderBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MoveInventoryHeaderExtensionType" id="oagis-id-d126cddeab0243a4ab30f7d8ce55256f" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MoveInventoryLineBaseType" id="oagis-id-e2662d3d7d7f48b39d96618060fa23d1">
+		<xsd:complexContent>
+			<xsd:extension base="LineBaseType">
+				<xsd:sequence>
+					<xsd:element ref="ItemInstance" minOccurs="0" maxOccurs="unbounded" id="oagis-id-e1416fb98f4e49e08561d8bc30f12dc2"/>
+					<xsd:element ref="Quantity" id="oagis-id-62e28b26e83f4e4b86424f8c9304af79" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-65821ff100e74edabad2e17b65fb9976"/>
+					<xsd:element ref="InventoryDestination" id="oagis-id-a82cb4f077ca40f6a229aee26cf3b9c0" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is the destination of the inventory being moved.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MoveInventoryLineType" id="oagis-id-b6f00be10bfb453f880b9b482665e713">
+		<xsd:complexContent>
+			<xsd:extension base="MoveInventoryLineBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="MoveInventoryLineExtensionType" id="oagis-id-66cf88a8352e48968bc630157cfc9e1e" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InventoryDestinationBaseType" id="oagis-id-95f9db7262544468b775c1764a774657">
+		<xsd:complexContent>
+			<xsd:extension base="IdentificationType">
+				<xsd:sequence>
+					<xsd:group ref="InventoryTransactionGroup" id="oagis-id-d8d3186a0f11415eb0bd4f19a1b4563a" minOccurs="0"/>
+					<xsd:element ref="RequiredDateTime" id="oagis-id-ad5b8e2ba0db4b32b366ab4a1fcab576" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates the date the goods or services must be delivered to the customer. Specified by the customer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="InventoryDestinationType" id="oagis-id-6ed08f67e0a144a0b6732f915e6f2717">
+		<xsd:complexContent>
+			<xsd:extension base="InventoryDestinationBaseType">
+				<xsd:sequence>
+					<xsd:element name="Extension" type="InventoryDestinationExtensionType" id="oagis-id-c0fabab0c96c44d8ae5e6c7073e34b37" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The Open Applications Group will make best efforts to quickly consider all proposed submissions.The Extension is always the last element in all components, except where the component has been extended inline.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>
