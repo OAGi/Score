@@ -205,6 +205,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         } else {
             Document document = Context.loadDocument(file.toURI().toString());
             NodeList elements = (NodeList) Context.xPath.evaluate("//xsd:element", document, XPathConstants.NODESET);
+            NodeList childOfSchemaElements = (NodeList) Context.xPath.evaluate("/xsd:schema/xsd:element", document, XPathConstants.NODESET);
             for (int i = 0, len = elements.getLength(); i < len; ++i) {
                 Element element = (Element) elements.item(i);
                 String guid = element.getAttribute("id");
@@ -229,10 +230,25 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                createASCCP(elementDecl, getReusableIndicator(elementDecl.getTypeDecl()));
+                boolean isChildOfSchema = false;
+                for(int j=0; j<childOfSchemaElements.getLength(); j++){
+                    String checkGuid = checkElement.getAttribute("id");
+                    if(checkGuid.equals(guid)){
+                        isChildOfSchema=true;
+                        break;
+                    }
+                }
+                if(isChildOfSchema) {
+                    createASCCP(elementDecl, true);
+                }
+                else {
+                    createASCCP(elementDecl, getReusableIndicator(elementDecl.getTypeDecl()));
+                }
             }
 
             NodeList groups = (NodeList) Context.xPath.evaluate("//xsd:group", document, XPathConstants.NODESET);
+            NodeList childOfSchemaGroups = (NodeList) Context.xPath.evaluate("/xsd:schema/xsd:group", document, XPathConstants.NODESET);
+
             for (int i = 0, len = groups.getLength(); i < len; ++i) {
                 Element group = (Element) groups.item(i);
                 String guid = group.getAttribute("id");
@@ -257,7 +273,20 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 }
                 logger.info("Found unused ASCCP name " + name + ", GUID " + guid + " from " + module);
 
-                createASCCP(groupDecl, getReusableIndicator(groupDecl));
+                boolean isChildOfSchema = false;
+                for(int j=0; j<childOfSchemaGroups.getLength(); j++){
+                    String checkGuid = checkGroup.getAttribute("id");
+                    if(checkGuid.equals(guid)){
+                        isChildOfSchema=true;
+                        break;
+                    }
+                }
+                if(isChildOfSchema) {
+                    createASCCP(groupDecl, true);
+                }
+                else {
+                    createASCCP(groupDecl, getReusableIndicator(groupDecl));
+                }
             }
 
         }
