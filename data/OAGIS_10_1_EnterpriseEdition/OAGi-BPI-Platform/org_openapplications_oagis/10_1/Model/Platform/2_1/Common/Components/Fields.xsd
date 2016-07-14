@@ -6093,7 +6093,59 @@ supplementary information.</ccts_Definition>
 	</xsd:complexType>
 	<xsd:complexType name="MimeCodeType" id="oagis-id-481ad1c0f5e04ddaa1a9e6d124a81956">
 		<xsd:simpleContent>
-			<xsd:extension base="MIMECodeContentType"/>
+			<xsd:extension base="MIMECodeContentType">
+				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-9ac83370a6de465da589eeda41067ec7">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of a list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-624aaf9381c84b569c5562c4b536f857">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Agency. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the agency that manages the code list</ccts_Definition>
+							<ccts_PropertyTermName>List Agency</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>True</ccts_DefaultIndicator>
+								<ccts_SchemeOrListID>3055</ccts_SchemeOrListID>
+								<ccts_SchemeOrListVersionID>D08B</ccts_SchemeOrListVersionID>
+								<ccts_SchemeOrListAgencyID>6</ccts_SchemeOrListAgencyID>
+								<ccts_SchemeOrListModificationAllowedIndicator>False</ccts_SchemeOrListModificationAllowedIndicator>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-5fac2c57129f4cc2b590f9af9f2f6cce">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Version. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the version of the list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List Version</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="PaymentBasisCodeType" id="oagis-id-0f3c04d8c8954282a3946a2fef821f2d">
@@ -6416,8 +6468,13 @@ supplementary information.</ccts_Definition>
 	</xsd:complexType>
 	<xsd:complexType name="ProcessCategoryCodeType" id="oagis-id-653072097f904ab2a22386d5c4ad201b">
 		<xsd:simpleContent>
-			<xsd:extension base="ProcessCategoryCodeContentType">
-				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-8bd83370a6de465da589eeda41067ec7">
+			<xsd:extension base="ProcessCategoryCodeContentType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="ProcessConfirmationCodeType" id="oagis-id-87c569b9b0a541caadccf1b2514539dd">
+		<xsd:simpleContent>
+			<xsd:extension base="ProcessConfirmationCodeContentType">
+				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-8bd83370a6de465da589eeda41067777">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6433,7 +6490,7 @@ supplementary information.</ccts_Definition>
 						</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-9a3aaf9381c84b569c5562c4b536f857">
+				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-9a3aaf9381c84b569c5562c4b536f549">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6452,7 +6509,7 @@ supplementary information.</ccts_Definition>
 						</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-1ffc2c57129f4cc2b590f9af9f2f6cce">
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-1ffc2c57129f4cc2b590f9af9f2f6abc">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6469,11 +6526,6 @@ supplementary information.</ccts_Definition>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:complexType name="ProcessConfirmationCodeType" id="oagis-id-87c569b9b0a541caadccf1b2514539dd">
-		<xsd:simpleContent>
-			<xsd:extension base="ProcessConfirmationCodeContentType"/>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="ReasonCodeType" id="oagis-id-d558f96782dc4b7494790eb40bb98b2a">
@@ -6671,7 +6723,59 @@ supplementary information.</ccts_Definition>
 	</xsd:complexType>
 	<xsd:complexType name="ResourceTypeCodeType" id="oagis-id-2abdd58302114d6a84af5d24d59e0313">
 		<xsd:simpleContent>
-			<xsd:extension base="ResourceTypeCodeContentType"/>
+			<xsd:extension base="ResourceTypeCodeContentType">
+				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-e5305a520c744ec49ebdd5e73d7c3afb">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of a list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencyID" type="clm63055D08B_AgencyIdentificationContentType" use="optional" id="oagis-id-f0da5d47af4d401ca9f1e041c16774ca">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Agency. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the agency that manages the code list</ccts_Definition>
+							<ccts_PropertyTermName>List Agency</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>True</ccts_DefaultIndicator>
+								<ccts_SchemeOrListID>3055</ccts_SchemeOrListID>
+								<ccts_SchemeOrListVersionID>D08B</ccts_SchemeOrListVersionID>
+								<ccts_SchemeOrListAgencyID>6</ccts_SchemeOrListAgencyID>
+								<ccts_SchemeOrListModificationAllowedIndicator>False</ccts_SchemeOrListModificationAllowedIndicator>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-b1a04e2a0ccd4f368414fd06ceaef187">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">
+							<ccts_Cardinality>0..1</ccts_Cardinality>
+							<ccts_DictionaryEntryName>Code. List Version. Identifier</ccts_DictionaryEntryName>
+							<ccts_Definition>The identification of the version of the list of codes</ccts_Definition>
+							<ccts_PropertyTermName>List Version</ccts_PropertyTermName>
+							<ccts_RepresentationTermName>Identifier</ccts_RepresentationTermName>
+							<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+							<ccts_SupplementaryComponentValueDomain>
+								<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+								<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+							</ccts_SupplementaryComponentValueDomain>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="ResponseCodeType" id="oagis-id-dfb3832a38cb4ab68257c1a056de063d">
