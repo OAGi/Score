@@ -2975,6 +2975,222 @@
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
+			<xsd:enumeration value="372">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Agent of ship at the intended port of arrival</ccts_Name>
+						<ccts_Definition>Name and contact details of the agent of the ship at the intended port of arrival.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="373">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>US Air Force</ccts_Name>
+						<ccts_Definition>The aerial warfare division of the U.S. Department of Defense.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="374">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>US, Bureau of Explosives</ccts_Name>
+						<ccts_Definition>A self-policing agency to promote the safe transportation of explosives and other hazardous materials on roads and railways.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="375">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Basel Convention Secretariat</ccts_Name>
+						<ccts_Definition>Agency which maintains the list and specifications of goods for control of transboundary movements of hazardous wastes and their disposal.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="376">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>PANTONE</ccts_Name>
+						<ccts_Definition>Color code controlling organisation.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="377">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>IS, National Registry of Iceland</ccts_Name>
+						<ccts_Definition>The national registry of Iceland, responsible for legal registration ID for persons.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="378">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>IS, Internal Revenue Directorate of Iceland</ccts_Name>
+						<ccts_Definition>Tax authorities of Iceland, responsible for VAT codes and registration ID for legal entities.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="379">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>IANA (Internet Assigned Numbers Authority)</ccts_Name>
+						<ccts_Definition>The Internet Assigned Numbers Authority (IANA) is responsible for the global coordination of the DNS Root, IP addressing, and other Internet protocol resources.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="380">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Korea Customs Service</ccts_Name>
+						<ccts_Definition>The customs services department of the Government of the Republic of Korea.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="381">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Israel Tax Authority</ccts_Name>
+						<ccts_Definition>The customs and taxation services department of the State of Israel.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="382">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Israeli Ministry of Interior</ccts_Name>
+						<ccts_Definition>The Ministry of the State of Israel that is responsible for interior affairs including the issue of passports / travel documents.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="383">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>FR, LUMD (Logistique Urbaine Mutualisée Durable)</ccts_Name>
+						<ccts_Definition>Logistique Urbaine Mutualisée Durable, French organisation in charge of Urban Logistics.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="384">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>DE, BiPRO (Brancheninitiative Prozessoptimierung)</ccts_Name>
+						<ccts_Definition>BiPRO is the German association of Insurance Companies, Brokers and Software Suppliers responsible for the development of standards for use by the insurance industry.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="385">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Ministry of Agriculture</ccts_Name>
+						<ccts_Definition>The Authority for agriculture in the Hashemite Kingdom of Jordan.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="386">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Customs</ccts_Name>
+						<ccts_Definition>The Customs Authority of the Hashemite Kingdom of Jordan.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="387">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Food &amp; Drug Administration</ccts_Name>
+						<ccts_Definition>The Food &amp; Drug Administration of the Hashemite Kingdom of Jordan.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="388">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Institution for Standards and Metrology</ccts_Name>
+						<ccts_Definition>The Institution for Standards and Metrology of the Hashemite Kingdom of Jordan.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="389">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Telecommunication Regulatory Commission</ccts_Name>
+						<ccts_Definition>The national authority of the Hashemite Kingdom of Jordan concerned with the regulation of telecommunications.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="390">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Nuclear Regulatory Commission</ccts_Name>
+						<ccts_Definition>The Nuclear Regulatory Commission of the Hashemite Kingdom of Jordan.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="391">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>JO, Jordan Ministry of Environment</ccts_Name>
+						<ccts_Definition>The government department of the Hashemite Kingdom of Jordan responsible for the protection of the environment.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="392">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Hazardous waste collector</ccts_Name>
+						<ccts_Definition>Party collecting hazardous waste.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="393">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Hazardous waste generator</ccts_Name>
+						<ccts_Definition>Party generating hazardous waste.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="394">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>Marketing agent</ccts_Name>
+						<ccts_Definition>Party authorized to market a product.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="395">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>BE, TELEBIB Centre</ccts_Name>
+						<ccts_Definition>The TELEBIB Centre is the Belgian association of Insurance Companies, Brokers and Software Suppliers responsible for the development of standards for use by the insurance industry.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="396">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>BE, BNB</ccts_Name>
+						<ccts_Definition>The Belgian National Bank, which delivers identifiers for, amongst others, Insurers and Re-insurers.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="397">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>BE, FSMA</ccts_Name>
+						<ccts_Definition>The Belgian Financial Services Market Authority, which delivers identifiers for, amongst others, Intermediaries in insurance business.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="398">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						<ccts_Name>FR, PHAST</ccts_Name>
+						<ccts_Definition>French association responsible for standardization, coordination and promotion of EDI and Data Exchange applications in Health and Hospital sector.</ccts_Definition>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="ZZZ">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10">
