@@ -545,6 +545,15 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:simpleType name="CodeType_1E7368" id="oagis-id-d2f721a297684b538e7dbb88cf5526bc">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                <ccts_UniqueID>1E7368</ccts_UniqueID>
+                <ccts_VersionID>1.0</ccts_VersionID>
+                <ccts_DictionaryEntryName>Code. Type</ccts_DictionaryEntryName>
+                <ccts_Definition>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values</ccts_Definition>
+                <ccts_DataTypeTermName>Code</ccts_DataTypeTermName>
+            </xsd:documentation>
+        </xsd:annotation>
 		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>
 	<!-- =================================================================== -->
@@ -10184,8 +10193,27 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:simpleType name="IDType_B3F14E" id="oagis-id-ff84535456d44233b6f0976d993b442d">
-		<xsd:restriction base="xsd:normalizedString"/>
-	</xsd:simpleType>
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                <ccts_UniqueID>B3F14E</ccts_UniqueID>
+                <ccts_VersionID>1.0</ccts_VersionID>
+                <ccts_DictionaryEntryName>Identifier. Type</ccts_DictionaryEntryName>
+                <ccts_Definition>An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency</ccts_Definition>
+                <ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:annotation>
+                <xsd:documentation source="http://www.openapplications.org/oagis/10">
+                    <ccts_ContentComponentValueDomain>
+                        <ccts_Definition>A character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency</ccts_Definition>
+                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+                        <ccts_PrimitiveTypeName>NormalizedString</ccts_PrimitiveTypeName>
+                    </ccts_ContentComponentValueDomain>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:restriction>
+    </xsd:simpleType>
 	<!-- =================================================================== -->
 	<xsd:complexType name="IDType_9054A1" id="oagis-id-fbfa4b045eb24af687bd3c6a8ca83a18">
 		<xsd:annotation>
@@ -12252,7 +12280,7 @@
 				<ccts_DataTypeTermName>Indicator</ccts_DataTypeTermName>
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="xsd:boolean">
+		<xsd:restriction base="xbt_BooleanTrueFalseType">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_ContentComponentValueDomain>
@@ -12262,8 +12290,6 @@
 					</ccts_ContentComponentValueDomain>
 				</xsd:documentation>
 			</xsd:annotation>
-			<xsd:pattern value="false"/>
-			<xsd:pattern value="true"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<!-- =================================================================== -->

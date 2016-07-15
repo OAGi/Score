@@ -63,7 +63,7 @@
 			<xsd:enumeration value="Carrier"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_AgencyRoleContentType" id="oagis-id-a9ee4e537bde4e2ba96fa1d0aa04dba7">
+	<xsd:simpleType name="oacl_AgencyRoleCodeContentType" id="oagis-id-a9ee4e537bde4e2ba96fa1d0aa04dba7">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
 		</xsd:annotation>
@@ -219,7 +219,7 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_ContactLocationCodeContentType" id="oagis-id-6233008ff5874c15a76000e186e0130d">
 		<xsd:union memberTypes="oacl_ContactLocationCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_ControlAssertionEnumerationType" id="oagis-id-64ffe9653e934bee80d9051818bf3b94">
+	<xsd:simpleType name="oacl_ControlAssertionCodeEnumerationType" id="oagis-id-64ffe9653e934bee80d9051818bf3b94">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Completeness"/>
 			<xsd:enumeration value="Existence or Occurance"/>
@@ -228,8 +228,8 @@ borne by the beneficiary customer.</xsd:documentation>
 			<xsd:enumeration value="Valuation or Measurement"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_ControlAssertionContentType" id="oagis-id-46dded6e75894d85a7e772090cb42c5b">
-		<xsd:union memberTypes="xsd:token oacl_ControlAssertionEnumerationType"/>
+	<xsd:simpleType name="oacl_ControlAssertionCodeContentType" id="oagis-id-46dded6e75894d85a7e772090cb42c5b">
+		<xsd:union memberTypes="xsd:token oacl_ControlAssertionCodeEnumerationType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ControlCodeEnumerationType" id="oagis-id-58a748fc51eb421a862db5fcfcf85c3b">
 		<xsd:restriction base="xsd:token">
@@ -239,9 +239,9 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ControlCodeContentType" id="oagis-id-f01cb1632cbd4ae89cf1b9841c40e2f0">
-		<xsd:union memberTypes="xsd:token oacl_CountryCodeEnumerationType"/>
+		<xsd:union memberTypes="xsd:token oacl_ControlCodeEnumerationType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_ControlComponentEnumerationType" id="oagis-id-af274f44caad4162804061f2342a3715">
+	<xsd:simpleType name="oacl_ControlComponentCodeEnumerationType" id="oagis-id-af274f44caad4162804061f2342a3715">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Risk Assessment"/>
 			<xsd:enumeration value="Monitoring"/>
@@ -250,8 +250,8 @@ borne by the beneficiary customer.</xsd:documentation>
 			<xsd:enumeration value="Information and Communication"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_ControlComponentContentType" id="oagis-id-be54304dfda44246aa554217f5be5124">
-		<xsd:union memberTypes="xsd:token oacl_ControlComponentEnumerationType"/>
+	<xsd:simpleType name="oacl_ControlComponentCodeContentType" id="oagis-id-be54304dfda44246aa554217f5be5124">
+		<xsd:union memberTypes="xsd:token oacl_ControlComponentCodeEnumerationType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_CountryCodeEnumerationType" id="oagis-id-e28b4633be8e480480706595baaa42f2">
 		<xsd:restriction base="xsd:token"/>
@@ -576,7 +576,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_EngineeringWorkRequestStatusCodeContentType" id="oagis-id-0073c51b321e42e795d1b48116a7620f">
-		<xsd:union memberTypes="oacl_EngineeringWorkRequestCodeEnumerationType xsd:token"/>
+		<xsd:union memberTypes="oacl_EngineeringWorkRequestStatusCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_FinalAgentInstructionCodeEnumerationType" id="oagis-id-ff46417e01b640a78776bd03ec58fc8f">
 		<xsd:restriction base="xsd:token">
@@ -666,7 +666,7 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_MatchCodeContentType" id="oagis-id-0a1384322190497499cf2ca6b26d8934">
 		<xsd:union memberTypes="oacl_MatchCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_MatchDocumentEnumerationType" id="oagis-id-7c9d9573d51546f89f0b7f09566acc7a">
+	<xsd:simpleType name="oacl_MatchDocumentCodeEnumerationType" id="oagis-id-7c9d9573d51546f89f0b7f09566acc7a">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Invoice"/>
 			<xsd:enumeration value="Purchase Order"/>
@@ -674,8 +674,8 @@ borne by the beneficiary customer.</xsd:documentation>
 			<xsd:enumeration value="Inspection"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_MatchDocumentContentType" id="oagis-id-f516abfd2be844d3acf481ed8b1399c3">
-		<xsd:union memberTypes="oacl_MatchDocumentEnumerationType xsd:token"/>
+	<xsd:simpleType name="oacl_MatchDocumentCodeContentType" id="oagis-id-f516abfd2be844d3acf481ed8b1399c3">
+		<xsd:union memberTypes="oacl_MatchDocumentCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_MIMECodeContentType" id="oagis-id-51ed08216606417b9b9266b464c204f7">
 		<xsd:union memberTypes="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeContentType xsd:token"/>
@@ -824,7 +824,7 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_PaymentTermCodeContentType" id="oagis-id-b9d13739f3fc4fbfa790ebd62972bcfd">
 		<xsd:union memberTypes="oacl_PaymentTermCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_ProcessCategoryEnumerationType" id="oagis-id-87ad6a845d3349528d261df0517bf2aa">
+	<xsd:simpleType name="oacl_ProcessCategoryCodeEnumerationType" id="oagis-id-87ad6a845d3349528d261df0517bf2aa">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Processes may be categorized as Routine, Non-Routine or Estimating.</xsd:documentation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">An example of a Routine Process is recording costs of goods sold.</xsd:documentation>
@@ -839,8 +839,8 @@ borne by the beneficiary customer.</xsd:documentation>
 			<xsd:enumeration value="Estimating"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_ProcessCategoryContentType" id="oagis-id-1bb1a4c4d6784b558be0f40d43404424">
-		<xsd:union memberTypes="xsd:token oacl_ProcessCategoryEnumerationType"/>
+	<xsd:simpleType name="oacl_ProcessCategoryCodeContentType" id="oagis-id-1bb1a4c4d6784b558be0f40d43404424">
+		<xsd:union memberTypes="xsd:token oacl_ProcessCategoryCodeEnumerationType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_ProcessConfirmationCodeEnumerationType" id="oagis-id-c398ee4caace4d398d80156f8362af00">
 		<xsd:annotation>
@@ -946,7 +946,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:union memberTypes="oacl_ResponseCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="oacl_RiskTypeEnumerationType" id="oagis-id-4f337a2efc5c409b9af300a8a359ce89">
+	<xsd:simpleType name="oacl_RiskCodeEnumerationType" id="oagis-id-4f337a2efc5c409b9af300a8a359ce89">
 		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="Compliance with applicable laws and regulations"/>
 			<xsd:enumeration value="Effectiveness and efficiency of operations"/>
@@ -954,7 +954,7 @@ borne by the beneficiary customer.</xsd:documentation>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_RiskCodeContentType" id="oagis-id-ba592aa0ac6e4b75a4079327b9e988c4">
-		<xsd:union memberTypes="xsd:token oacl_RiskTypeEnumerationType"/>
+		<xsd:union memberTypes="xsd:token oacl_RiskCodeEnumerationType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_SalesActivityCodeEnumerationType" id="oagis-id-85c9478b650b454cb1b787b2f73c5bd3">
 		<xsd:restriction base="xsd:token">

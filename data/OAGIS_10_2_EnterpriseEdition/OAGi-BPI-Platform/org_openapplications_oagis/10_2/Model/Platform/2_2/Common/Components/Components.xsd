@@ -6588,6 +6588,7 @@ Possible values:
 		</xsd:sequence>
 	</xsd:group>
 	<!---->
+    <!--
 	<xsd:complexType name="EMailType" abstract="false" id="oagis-id-e9002e73d32244fbab0724e062f0f7ea" mixed="false">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides the email address to be associated with a given element.</xsd:documentation>
@@ -6598,6 +6599,7 @@ Possible values:
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	-->
 	<xsd:complexType name="EventBaseType" abstract="false" id="oagis-id-56adc9de89f642abaa1aa806f18dc0e3" mixed="false">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">Event Type for specifying information about an identifiable occurrence in time</xsd:documentation>
@@ -10438,7 +10440,7 @@ The following are a couple of examples: Setup, Tear-down, Run</xsd:documentation
 					</xsd:element>
 				</xsd:sequence>
 				<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-2ada2265fa9d432a8ba09b1a3718ad13"/>
-				<xsd:attribute name="actionCode" type="CodeType_1E7368" id="oagis-id-e72a1c2287da4dc4bd201362fff590b6"/>
+				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-e72a1c2287da4dc4bd201362fff590b6"/>
 				<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-c591acc5b0614dfab5fa528033b7551f">
 					<xsd:annotation>
 						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">When an object occurs multiple times, this sequence number can be used to provide the order.</xsd:documentation>
@@ -13838,6 +13840,8 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">A representation of some limits usually expressed as a high and low limit</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
+    <xsd:element name="UpperLimit" type="NameValuePairType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
+    <xsd:element name="LowerLimit" type="NameValuePairType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
 	<!---->
 	<xsd:complexType name="LogisticEquipmentBaseType" id="oagis-id-becfd5c4010b44f9a5733c5584140fb9">
 		<xsd:complexContent>
@@ -13917,6 +13921,8 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="ChargeAmountRange" type="AmountRangeType" id="oagis-id-0efcf5e2066c40e5bb5a14706c240915"/>
+    <xsd:element name="MinimumAmount" type="OpenAmountType" id="oagis-id-6d1c7ec5b7d84e80b190825b1782c147"/>
+    <xsd:element name="MaximumAmount" type="OpenAmountType" id="oagis-id-f12b0a09c0b345b1a959ee10a4fcd364"/>
 	<!---->
 	<xsd:complexType name="QuantityRangeType" id="oagis-id-c37df60530554ecdb0af52f5fa983aba">
 		<xsd:sequence>
