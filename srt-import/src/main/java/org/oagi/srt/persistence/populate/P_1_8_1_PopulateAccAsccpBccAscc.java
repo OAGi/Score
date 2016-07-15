@@ -29,6 +29,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
+
 @Component
 public class P_1_8_1_PopulateAccAsccpBccAscc {
 
@@ -83,7 +86,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         logger.info("### 1.8 Start");
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
         namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
 
         populate();
@@ -138,10 +141,10 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         Collection<File> targetFiles = Arrays.asList(
                 new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
                 new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/BODs"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Common/Components"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Extension"));
+                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/BODs"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Nouns"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Common/Components"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Extension"));
         for (File file : targetFiles) {
             populateUnusedACC(file);
         }

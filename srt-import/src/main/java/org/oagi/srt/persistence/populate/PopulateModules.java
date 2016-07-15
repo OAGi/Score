@@ -30,6 +30,8 @@ import javax.xml.xpath.XPathConstants;
 import java.io.File;
 import java.io.IOException;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+
 @Component
 public class PopulateModules {
 
@@ -64,7 +66,7 @@ public class PopulateModules {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### Module population Start");
 
-        release = releaseRepository.findOneByReleaseNum("10.1");
+        release = releaseRepository.findOneByReleaseNum(OAGIS_VERSION);
         namespace = namespaceRepository.findByUri("http://www.openapplications.org/oagis/10");
 
         populateModule(baseDataDirectory);

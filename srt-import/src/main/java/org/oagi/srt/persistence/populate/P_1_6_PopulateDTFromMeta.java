@@ -21,6 +21,8 @@ import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+
 /**
  * Created by tnk11 on 6/27/2016.
  */
@@ -90,7 +92,7 @@ public class P_1_6_PopulateDTFromMeta {
         StringXBTId= xbtRepository.findOneByBuiltInType("xsd:string").getXbtId();
         TokenXBTId= xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
         userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 
         importAdditionalBDT();

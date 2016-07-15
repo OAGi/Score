@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
+
 @Component
 public class PopulateBlobContents {
 
@@ -46,12 +49,12 @@ public class PopulateBlobContents {
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws IOException {
-        Release release = releaseRepository.findOneByReleaseNum("10.1");
+        Release release = releaseRepository.findOneByReleaseNum(OAGIS_VERSION);
 
         Collection<File> files = Arrays.asList(
-                new File(baseDataDirectory, "Model/Platform/2_1/Common/DataTypes"),
-                new File(baseDataDirectory, "Model/Platform/2_1/Common/ISO20022"),
-                new File(baseDataDirectory, "Model/Platform/2_1/OAGi-Platform.xsd"));
+                new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/Common/DataTypes"),
+                new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/Common/ISO20022"),
+                new File(baseDataDirectory, "Model" + PLATFORM_PATH + "/OAGi-Platform.xsd"));
 
         for (File file : files) {
             populate(file, release);

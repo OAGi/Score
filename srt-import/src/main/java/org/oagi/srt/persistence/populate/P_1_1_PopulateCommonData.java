@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_RELEASE_NOTE;
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+
 @Component
 public class P_1_1_PopulateCommonData {
 
@@ -90,60 +93,9 @@ public class P_1_1_PopulateCommonData {
 
     private Release populateRelease(Namespace namespace) {
         Release release = new Release();
-        release.setReleaseNum("10.1");
+        release.setReleaseNum(OAGIS_VERSION);
         release.setNamespaceId(namespace.getNamespaceId());
-        release.setReleaseNote("Open Applications Group\n" +
-                "Interface Specification XMLSchemas and Sample XML Files\n" +
-                "\n" +
-                "OAGIS Release 10_1\n" +
-                "\n" +
-                "27 June 2014\n" +
-                "\n" +
-                "\n" +
-                "OAGIS Release 10_1 is a general availability release of OAGIS the release\n" +
-                "date is 27 June 2014.\n" +
-                "\n" +
-                "This release is the continuation of the focus on enabling integration that\n" +
-                "the Open Applications Group and its members are known.\n" +
-                "\n" +
-                "Please provide all feedback to the OAGI Architecture Team via the Feedback\n" +
-                "Forum at: oagis@openapplications.org\n" +
-                "\n" +
-                "These XML reference files continue to evolve.  Please feel\n" +
-                "free to use them, but check www.openapplications.org for the most\n" +
-                "recent updates.\n" +
-                "\n" +
-                "OAGIS Release 10_1 includes:\n" +
-                "\n" +
-                "  - Addition of more Open Parties and Quantities from implementation feedback.\n" +
-                "  - Updates to the ConfirmBOD to make easier to use.\n" +
-                "  - Addtion of DocumentReferences and Attachments for PartyMaster\n" +
-                "  - Support for UN/CEFACT Core Components 3.0.\n" +
-                "  - Support for UN/CEFACT XML Naming and Design Rules 3.0\n" +
-                "  - Support for UN/CEFACT Data Type Catalog 3.1\n" +
-                "  - Support for Standalone BODs using Local elements.\n" +
-                "\n" +
-                "\n" +
-                "NOTICE: We recommend that you install on your root directory drive as the\n" +
-                "paths may be too long otherwise.\n" +
-                "\n" +
-                "As with all OAGIS releases OAGIS Release 10_1 contains XML Schema. To view\n" +
-                "XML Schema it is recommended that you use an XML IDE, as the complete structure\n" +
-                "of the Business Object Documents are not viewable from a single file.\n" +
-                "\n" +
-                "Note that the sample files were used to verify the XMLSchema\n" +
-                "development, and do not necessarily reflect actual business\n" +
-                "transactions.  In many cases,the data entered in the XML files are just\n" +
-                "placeholder text.  Real-world examples for each transaction will be\n" +
-                "provided as they become available. If you are interested in providing\n" +
-                "real-world examples please contact oagis@openapplications.org\n" +
-                "\n" +
-                "Please send suggestions or bug reports to oagis@openapplications.org\n" +
-                "\n" +
-                "Thank you for your interest and support.\n" +
-                "\n" +
-                "Best Regards,\n" +
-                "The Open Applications Group Architecture Council\n");
+        release.setReleaseNote(OAGIS_RELEASE_NOTE);
 
         releaseRepository.saveAndFlush(release);
         return release;

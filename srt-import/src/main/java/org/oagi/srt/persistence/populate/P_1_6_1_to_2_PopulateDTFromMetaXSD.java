@@ -22,6 +22,8 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+
 /**
  * @author Jaehun Lee
  * @author Yunsu Lee
@@ -131,7 +133,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
         logger.info("### 1.6. Start");
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);

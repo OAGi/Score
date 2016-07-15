@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.CODELIST_CHARACTER_SET_CODE_IANA_FILENAME;
+
 /**
  * @author Jaehun Lee
  * @version 1.0
@@ -58,7 +60,7 @@ public class P_1_4_PopulateCodeList {
                 {"CodeList_DateTimeFormatCode_1", "314"},
                 {"CodeList_TimeFormatCode_1", "314"},
 
-                {"CodeList_CharacterSetCode_IANA_20070514", "379"},
+                {CODELIST_CHARACTER_SET_CODE_IANA_FILENAME, "379"},
                 {"CodeList_MIMEMediaTypeCode_IANA_7_04", "379"},
 
                 {"CodeList_CurrencyCode_ISO_7_04", "5"},

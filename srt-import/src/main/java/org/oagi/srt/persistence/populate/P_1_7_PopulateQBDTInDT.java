@@ -35,6 +35,8 @@ import java.io.File;
 import java.util.*;
 
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 
 /**
  * @author Yunsu Lee
@@ -229,7 +231,7 @@ public class P_1_7_PopulateQBDTInDT {
         fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
         namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
 
         prepareForBCCP(SRTConstants.FIELDS_XSD_FILE_PATH,
@@ -249,8 +251,8 @@ public class P_1_7_PopulateQBDTInDT {
         for (File directory : Arrays.asList(
                 new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
                 new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/BODs"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Platform/2_1/Nouns"))) {
+                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/BODs"),
+                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Nouns"))) {
             files.addAll(Arrays.asList(directory.listFiles((dir, name) -> name.endsWith(".xsd") && !name.endsWith("IST.xsd"))));
         }
 

@@ -19,6 +19,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+
 /**
  * @author Nasif Sikder
  * @author Jaehun Lee
@@ -72,7 +74,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDT {
         logger.info("### 1.5.1-2 Start");
 
         userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum("10.1");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
 
         for (int i = 0; i < Types.dataTypeList.length; i++) {
             importDataTypeList(Types.dataTypeList[i]);
