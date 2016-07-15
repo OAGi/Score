@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -147,9 +148,9 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         try {
             dataTypeTerm = dataTypeTermElement.getTextContent().substring(0, dataTypeTermElement.getTextContent().indexOf(". Type"));
             if (dataTypeTerm == "")
-                logger.debug("Error getting the data type term for the unqualified BDT: " + dataType);
+                logger.error("Error getting the data type term for the unqualified BDT: " + dataType);
         } catch (Exception e) {
-            logger.debug("Error getting the data type term for the unqualified BDT: " + dataType + " Stacktrace:" + e.getMessage());
+            logger.error("Error getting the data type term for the unqualified BDT: " + dataType, e);
         }
 
         //Definitions
@@ -223,7 +224,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     public DataType insertDefault_BDTStatement(String typeName, String dataTypeTerm, String definition,
                                                String ccDefinition, String id, Module module) throws Exception {
-        int basedDTID = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0).getDtId();
+        DataType basedDT = dataTypeRepository.findOneByDataTypeTermAndType(dataTypeTerm, 0);
+        if (basedDT == null) {
+            throw new IllegalStateException("Can't find based CDT by '" + dataTypeTerm + "'");
+        }
+        int basedDTID = basedDT.getDtId();
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
             logger.debug("Inserting default bdt whose name is " + typeName);
@@ -347,7 +352,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
         typeName = dataType;
         String type = "simple";
-        Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
+        String expressionPrefix = "//xsd:" + type + "Type[@name = '" + typeName + "']";
+        Node dataTypeTermNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 
         Element dataTypeTermElement = (Element) dataTypeTermNode;
         dataTypeTerm = dataTypeTermElement.getTextContent();
@@ -356,26 +362,26 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 dataTypeTerm = dataTypeTerm.substring(0, dataTypeTerm.length() - 6);
 
         //Definitions
-        Node definitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+        Node definitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
         Element definitionElement = (Element) definitionNode;
-        Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+        Node ccDefinitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
         if (ccDefinitionNode == null)
-            ccDefinitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+            ccDefinitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
         if (ccDefinitionNode == null)
-            ccDefinitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+            ccDefinitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
         Element ccDefinitionElement = (Element) ccDefinitionNode;
 
-        Node aNodeBDT = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']");
+        Node aNodeBDT = businessDataType_xsd.getNode(expressionPrefix);
         Element aElementBDT = (Element) aNodeBDT;
 
-        Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
+        Node union = businessDataType_xsd.getNode(expressionPrefix + "/xsd:union");
         int defaultId = -1;
         if (union != null) {
             defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
-            Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
+            Node xsdTypeNameNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:extension");
             if (xsdTypeNameNode == null)
-                xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:restriction");
+                xsdTypeNameNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:restriction");
             if (xsdTypeNameNode != null) {
                 Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                 xsdTypeName = xsdTypeNameElement.getAttribute("base");
@@ -452,6 +458,14 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 continue;
 
             Node typeNameNode = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']/xsd:restriction");
+            /*
+             * In Fields.xsd of OAGIS 10.2 have two exceptional cases, 'OperatorCodeType' and 'TestSampleHandlingCodeType'.
+             * These elements should be ignored at this time and have 'xsd:enumeration' as a children.
+             */
+            NodeList nodeList = fields_xsd.getNodeList(typeNameNode, ".//xsd:enumeration");
+            if (nodeList.getLength() > 0) {
+                continue;
+            }
             logger.debug("Importing " + dataType + " now in the exception ");
             Element typeNameElement = (Element) typeNameNode;
             typeName = typeNameElement.getAttribute("base");
@@ -459,41 +473,46 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             Node aNodeTN = fields_xsd.getNode("//xsd:" + type + "Type[@name = '" + dataType + "']");
             Element aElementTN = (Element) aNodeTN;
 
-            //Data Type Term
-
-            Node dataTypeTermNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
+            // Data Type Term
+            String expressionPrefix = "//xsd:" + type + "Type[@name = '" + typeName + "']";
+            Node dataTypeTermNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_DictionaryEntryName\"]");
 
             Element dataTypeTermElement = (Element) dataTypeTermNode;
             try {
                 dataTypeTerm = dataTypeTermElement.getTextContent().substring(0, dataTypeTermElement.getTextContent().indexOf(". Type"));
-                if (dataTypeTerm == "")
-                    System.err.println("Error getting the data type term for the unqualified BDT in the exception: " + dataType);
+                if (StringUtils.isEmpty(dataTypeTerm))
+                    logger.error("Error getting the data type term for the unqualified BDT in the exception: " + dataType);
             } catch (Exception e) {
-                System.err.println("Error getting the data type term for the unqualified BDT in the exception: " + dataType + " Stacktrace:" + e.getMessage());
+                logger.error("Error getting the data type term for the unqualified BDT in the exception: " + dataType, e);
             }
 
-            //Definitions
-            Node definitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
+            // Definitions
+            Node definitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:annotation/xsd:documentation/*[local-name()=\"ccts_Definition\"]");
             Element definitionElement = (Element) definitionNode;
-            Node ccDefinitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+            Node ccDefinitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:simpleContent/xsd:extension/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
             if (ccDefinitionNode == null)
-                ccDefinitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+                ccDefinitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:restriction/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
             if (ccDefinitionNode == null)
-                ccDefinitionNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
+                ccDefinitionNode = businessDataType_xsd.getNode(expressionPrefix + "/xsd:union/xsd:annotation/xsd:documentation//*[local-name()=\"ccts_Definition\"]");
             Element ccDefinitionElement = (Element) ccDefinitionNode;
 
-            Node aNodeBDT = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']");
+            Node aNodeBDT = businessDataType_xsd.getNode(expressionPrefix);
+            if (aNodeBDT == null) {
+                logger.error("Can't find node using the following XPATH expression in " +
+                        SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH + ": \"" + expressionPrefix + "\"");
+                continue;
+            }
             Element aElementBDT = (Element) aNodeBDT;
 
-            Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
+            Node union = businessDataType_xsd.getNode(expressionPrefix + "/xsd:union");
             int defaultId = -1;
 
             if (union != null) {
                 defaultId = xbtRepository.findOneByName("token").getXbtId();
             } else {
-                Node xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:extension");
+                Node xsdTypeNameNode = businessDataType_xsd.getNode(expressionPrefix + "//xsd:extension");
                 if (xsdTypeNameNode == null)
-                    xsdTypeNameNode = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']//xsd:restriction");
+                    xsdTypeNameNode = businessDataType_xsd.getNode(expressionPrefix + "//xsd:restriction");
                 if (xsdTypeNameNode != null) {
                     Element xsdTypeNameElement = (Element) xsdTypeNameNode;
                     xsdTypeName = xsdTypeNameElement.getAttribute("base");
@@ -508,13 +527,14 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 }
             }
 
-            DataType dVO1 = new DataType();
+            DataType dVO1;
 
             if (check_BDT(aElementBDT.getAttribute("id"))) {
                 logger.debug("Default BDT is already existing");
                 dVO1 = dataTypeRepository.findOneByGuid(aElementBDT.getAttribute("id"));
             } else {
-                dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm, definitionElement.getTextContent(),
+                dVO1 = insertDefault_BDTStatement(typeName, dataTypeTerm,
+                        (definitionElement != null) ? definitionElement.getTextContent() : null,
                         (ccDefinitionElement != null) ? ccDefinitionElement.getTextContent() : null, aElementBDT.getAttribute("id"), module);
                 logger.debug("Inserting bdt primitive restriction for exceptional default bdt");
                 insertBDTPrimitiveRestrictionForExceptionalBDT(dVO1.getBasedDtId(), dVO1.getDtId(), defaultId);
@@ -620,7 +640,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         typeName = aElementTN.getAttribute("base");
 
         String den = Utility.typeToDen(typeName);
-        DataType dVO1 = dataTypeRepository.findByDen(den).get(0);
+        List<DataType> dataTypesByDen = dataTypeRepository.findByDen(den);
+        if (dataTypesByDen.isEmpty()) {
+            throw new IllegalStateException("Can't find data type by DEN: " + den);
+        }
+        DataType dVO1 = dataTypesByDen.get(0);
         baseDataTypeTerm = dVO1.getDataTypeTerm();
         baseGUID = dVO1.getGuid();
 

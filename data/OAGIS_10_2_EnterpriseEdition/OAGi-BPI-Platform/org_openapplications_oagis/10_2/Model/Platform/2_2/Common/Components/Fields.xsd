@@ -2,23 +2,23 @@
 <!-- edited with XMLSpy v2016 rel. 2 (x64) (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
 <!--
 
-   Schema agency: 	Open Applications Group 
-   OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
+   Schema agency: 	Open Applications Group
+   OAGIS® Revision:    OAGIS 10_2 Platform 2_2
    Date:               10 June 2016
-   Copyright 1997-2016, All Rights Reserved 
+   Copyright 1997-2016, All Rights Reserved
 
-  	
+
    Copyright (C) Open Applications Group (1997-2016). All Rights Reserved.
-  
-  
+
+
    This is an OAGIS® BOD XML Schema (XSD) Definition.
 
    License information for this file is provided in the file **OAGi License Agreement.txt** that is provided with this download package.
 
    For support, more information, or to report implementation bugs, please contact the Open Applications Group at oagis@openapplications.org.
-    
-   XML Schema 
-     
+
+   XML Schema
+
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Platform/2_2//Common/Components/Fields.xsd
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
@@ -535,9 +535,9 @@ IST limits these values to CreditTransfer (TRF) and Checque (CHK).</xsd:document
 
 The United Nations Trade Facilitation Information Exchange (UN/TraFIX) has established the following codes (INCOTERMS 2010) for use in international trade. (See http://www.unece.org/cefact/recommendations/rec_index.htm).  These terms may also be found in the United States Uniform Commercial Code (UCC).
 
-EXAMPLES 
-General transport	
-EXW - Ex Works ... (named place) 
+EXAMPLES
+General transport
+EXW - Ex Works ... (named place)
 FCA - Free Carrier ... (named place)
 CPT - Carriage Paid ... (named place of destination)
 CIP - Carriage and Insurance Paid To ... (named place of destination)
@@ -1748,7 +1748,7 @@ Is the bill of lading identifier.</xsd:documentation>
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A G/L entity is the smallest organizational unit for which individual financial statements must be drawn up according to relevant commercial law.
 
-It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction. 
+It is normally the primary balancing segment of the GL Account structure.  Typically, this is the owning entity for the transaction.
 
 Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Association Name</xsd:documentation>
 		</xsd:annotation>
@@ -2106,7 +2106,7 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 
 Examples of a valid TRACKINGID include:
 •An express parcel tracking number as typically assigned by UPS, DHL, Fedex or other similar carriers.
-•A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.  
+•A UCC (Uniform Code Council) Serialized Shipping Container (SCC-18) identifier, as assigned by the shipper.
 •A "Pro Number" (Progressive Number), as assigned by an LTL (less-than-truckload) freight carrier.  Since the same Pro Number can be assigned to multiple shipping units within an LTL shipment, the SHIPUNITSEQ and SHIPUNITTOT field identifiers may be used to identify the individual pieces.
 •The unique identifier of a motor freight trailer, railroad box or tank car, ocean freight container or other transportation vessel.
 </xsd:documentation>
@@ -2580,7 +2580,7 @@ Examples of this maybe the Altitude in the case of a map of the world, or the he
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The catch weight conversion factor is a stock keeping conversion factor for inventory goods.  This is a special conversion factor for when the units of measure can not be converted using arithmetic.  This conversion factor is used with the CatchWeightQuantity.
 
-Examples of the use of this factor include:	
+Examples of the use of this factor include:
 Number of Chickens to a Box
 Number of units of a chemical in a barrel</xsd:documentation>
 		</xsd:annotation>
@@ -3397,7 +3397,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<!--Primitive Types-->
 	<!--=======================-->
 	<xsd:simpleType name="NormalizedStringType" id="oagis-id-d26b22f9103744edb0a4d3728aefc26e">
-		<xsd:restriction base="xsd:normalizedString"/>
+		<xsd:restriction base="CodeType_1E7368"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="TokenType" id="oagis-id-e28a3e09aa6e42339e11a0c740362ca9">
 		<xsd:restriction base="xsd:token"/>
@@ -3921,13 +3921,22 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!--=======================-->
+	<!--ID Content Types-->
+	<!--=======================-->
+	<xsd:simpleType name="IDContentType" id="oagis-id-08d6ade226fd42488b53c0815664e246">
+		<xsd:restriction base="IDType_B3F14E"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AgencyIDContentType" id="oagis-id-0624ca38925d43929a6f7d8b7b7e4304">
+		<xsd:restriction base="clm63055D08B_AgencyIdentificationContentType"/>
+	</xsd:simpleType>
+	<!--=======================-->
 	<!--Code Content Types-->
 	<!--=======================-->
 	<xsd:simpleType name="ActionCodeContentType" id="oagis-id-08d6ade226fd42488b53c0815664ccf3">
 		<xsd:restriction base="oacl_ActionCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="AgencyRoleContentType" id="oagis-id-e1b0c9f2b79a41da91200c26f1786453">
-		<xsd:restriction base="oacl_AgencyRoleContentType"/>
+	<xsd:simpleType name="AgencyRoleCodeContentType" id="oagis-id-e1b0c9f2b79a41da91200c26f1786453">
+		<xsd:restriction base="oacl_AgencyRoleCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="CategoryCodeContentType" id="oagis-id-ad482ed644fb464485b6c2810c11981a">
 		<xsd:restriction base="oacl_CategoryCodeContentType"/>
@@ -3956,14 +3965,14 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="ContactLocationCodeContentType" id="oagis-id-0c4a51622f0b40a49fe848b7af3ed85f">
 		<xsd:restriction base="oacl_ContactLocationCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="ControlAssertionContentType" id="oagis-id-785caa3c0a6e44809afd2edf2bf0cbd6">
-		<xsd:restriction base="oacl_ControlAssertionContentType"/>
+	<xsd:simpleType name="ControlAssertionCodeContentType" id="oagis-id-785caa3c0a6e44809afd2edf2bf0cbd6">
+		<xsd:restriction base="oacl_ControlAssertionCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="ControlCodeContentType" id="oagis-id-397b2c60a50b4a6bb8fd8c27e42997c7">
 		<xsd:restriction base="oacl_ControlCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="ControlComponentContentType" id="oagis-id-64d632d770164bcab04f1c0540f51685">
-		<xsd:restriction base="oacl_ControlComponentContentType"/>
+	<xsd:simpleType name="ControlComponentCodeContentType" id="oagis-id-64d632d770164bcab04f1c0540f51685">
+		<xsd:restriction base="oacl_ControlComponentCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="CountryCodeContentType" id="oagis-id-466610673ec34b6c8c647d0f8b17fd1b">
 		<xsd:restriction base="oacl_CountryCodeContentType"/>
@@ -4025,8 +4034,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="MatchCodeContentType" id="oagis-id-759137981ae74166984f50605929cb75">
 		<xsd:restriction base="oacl_MatchCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="MatchDocumentContentType" id="oagis-id-41b7326252df4817b948d13c2afef2b0">
-		<xsd:restriction base="oacl_MatchDocumentContentType"/>
+	<xsd:simpleType name="MatchDocumentCodeContentType" id="oagis-id-41b7326252df4817b948d13c2afef2b0">
+		<xsd:restriction base="oacl_MatchDocumentCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="MIMECodeContentType" id="oagis-id-6b6bdc9d48d247cd8f7b81d0db789409">
 		<xsd:restriction base="oacl_MIMECodeContentType"/>
@@ -4052,8 +4061,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:simpleType name="PaymentTermCodeContentType" id="oagis-id-e2ef95b8bc5144faa561093e65d8c9e4">
 		<xsd:restriction base="oacl_PaymentTermCodeContentType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="ProcessCategoryContentType" id="oagis-id-2100a1bfb8c74071b9fc22130140af6a">
-		<xsd:restriction base="oacl_ProcessCategoryContentType"/>
+	<xsd:simpleType name="ProcessCategoryCodeContentType" id="oagis-id-2100a1bfb8c74071b9fc22130140af6a">
+		<xsd:restriction base="oacl_ProcessCategoryCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="ProcessConfirmationCodeContentType" id="oagis-id-198877b27f75423f8bafd3f82803dd46">
 		<xsd:restriction base="oacl_ProcessConfirmationCodeContentType"/>
@@ -4638,7 +4647,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:complexType name="ControlAssertionType" id="oagis-id-34c5204633a54894846863a99618f567">
 		<xsd:simpleContent>
-			<xsd:extension base="ControlAssertionContentType">
+			<xsd:extension base="ControlAssertionCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-ef3ed7b7779145d8b49da60c24f5b6a0">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
@@ -4695,7 +4704,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:complexType name="ControlComponentType" id="oagis-id-31e2c152a1c8458e8d0ecda03db61206">
 		<xsd:simpleContent>
-			<xsd:extension base="ControlComponentContentType">
+			<xsd:extension base="ControlComponentCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-e47690b640464528973b475a6764aee2">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
@@ -4882,8 +4891,8 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Country Subdivision_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange 
-independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
+				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
 supplementary information.</ccts_DefinitionText>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Country Subdivision</ccts_QualifierTerm>
@@ -5215,8 +5224,8 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Delivery Point_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange 
-independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
+				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
 supplementary information.</ccts_DefinitionText>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Delivery Point</ccts_QualifierTerm>
@@ -5774,8 +5783,8 @@ supplementary information.</ccts_DefinitionText>
 				<ccts_CategoryCode>BDT</ccts_CategoryCode>
 				<ccts_DictionaryEntryName>Gender_ Code. Type</ccts_DictionaryEntryName>
 				<ccts_VersionID>1.0</ccts_VersionID>
-				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange 
-independence may be used to represent or replace a definitive value or text of an attribute together with relevant 
+				<ccts_DefinitionText>A character string (letters, figures, or symbols) that for brevity and/or languange
+independence may be used to represent or replace a definitive value or text of an attribute together with relevant
 supplementary information.</ccts_DefinitionText>
 				<ccts_RepresentationTermName>Code</ccts_RepresentationTermName>
 				<ccts_QualifierTerm>Gender</ccts_QualifierTerm>

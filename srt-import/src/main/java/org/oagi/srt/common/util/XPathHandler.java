@@ -27,7 +27,11 @@ public class XPathHandler {
     }
 
     public NodeList getNodeList(String xPathExpression) throws XPathExpressionException {
-        return (NodeList) Context.xPath.compile(xPathExpression).evaluate(xmlDocument, XPathConstants.NODESET);
+        return getNodeList(xmlDocument, xPathExpression);
+    }
+
+    public NodeList getNodeList(Object item, String xPathExpression) throws XPathExpressionException {
+        return (NodeList) Context.xPath.compile(xPathExpression).evaluate(item, XPathConstants.NODESET);
     }
 
     public Node getNode(String xPathExpression) throws XPathExpressionException {
