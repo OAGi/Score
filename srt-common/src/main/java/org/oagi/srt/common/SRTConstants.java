@@ -55,7 +55,7 @@ public class SRTConstants {
 	/*
 	 * To choose OAGIS version
 	 */
-	public static final String OAGIS_VERSION = "10.1";
+	public static final String OAGIS_VERSION = "10.2";
 
 	public static final String BASE_DATA_PATH;
 	public static final String PLATFORM_PATH;
