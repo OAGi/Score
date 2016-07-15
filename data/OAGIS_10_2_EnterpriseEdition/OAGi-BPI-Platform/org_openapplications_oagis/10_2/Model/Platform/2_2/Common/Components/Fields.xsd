@@ -3397,13 +3397,13 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<!--Primitive Types-->
 	<!--=======================-->
 	<xsd:simpleType name="NormalizedStringType" id="oagis-id-d26b22f9103744edb0a4d3728aefc26e">
-		<xsd:restriction base="CodeType_1E7368"/>
+		<xsd:restriction base="TextType_0VCBX4"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="TokenType" id="oagis-id-e28a3e09aa6e42339e11a0c740362ca9">
-		<xsd:restriction base="xsd:token"/>
+		<xsd:restriction base="TextType_0F0ZL2"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="StringType" id="oagis-id-310d5bf351c143ed80c16ee9ef837271">
-		<xsd:restriction base="xsd:string"/>
+		<xsd:restriction base="TextType_62S0B4"/>
 	</xsd:simpleType>
 	<!--=======================-->
 	<!--Data Types-->
@@ -3957,7 +3957,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		<xsd:restriction base="oacl_CheckInstructionCodeContentType"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="CodeContentType" id="oagis-id-5646bf52a97b48adb50ded6ff8c38354">
-		<xsd:restriction base="NormalizedStringType"/>
+		<xsd:restriction base="CodeType_1E7368"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="ConfirmationCodeContentType" id="oagis-id-d96bfeb7f20a40b48e5ef2f6fe7a870c">
 		<xsd:restriction base="oacl_ConfirmationCodeContentType"/>
