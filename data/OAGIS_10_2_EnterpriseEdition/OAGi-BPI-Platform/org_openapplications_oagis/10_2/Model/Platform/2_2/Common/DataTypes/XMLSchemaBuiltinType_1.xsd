@@ -22,6 +22,18 @@
 	<!-- ================================================================== -->
 	<!-- =====  Type Definitions                                                                                    ===== -->
 	<!-- =================================================================== -->
+	<!-- ===== Type Definitions Boolean                                                                        ===== -->
+	<!-- =================================================================== -->
+	<xsd:simpleType name="xbt_BooleanTrueFalseType" id="oagis-id-76437f4a5e99418a8c8e2257f7d7f2e1">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">Boolean with 'true' or 'false' literals only.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:boolean">
+			<xsd:pattern value="false"/>
+			<xsd:pattern value="true"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- =================================================================== -->
 	<!-- ===== Type Definitions Duration                                                                        ===== -->
 	<!-- =================================================================== -->
 	<xsd:simpleType name="xbt_WeekDurationType" id="oagis-id-5e9e51b71a664530bbb87ad2d55e4125">

@@ -1000,6 +1000,9 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_SystemEnvironmentCodeContentType" id="oagis-id-9aa6992a44c349b5b9a2ab7dbc51e939">
 		<xsd:union memberTypes="oacl_SystemEnvironmentCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TimeZoneCodeContentType" id="oagis-id-9aa6992a44c349b5b9a2ab7dbc51e945">
+		<xsd:union memberTypes="clm6TimeZoneCode1_TimeZoneCodeContentType xsd:token"/>
+	</xsd:simpleType>
 	<xsd:simpleType name="oacl_TaxCodeEnumerationType" id="oagis-id-df190df7a6324876a806c1dba81abc17">
 		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>

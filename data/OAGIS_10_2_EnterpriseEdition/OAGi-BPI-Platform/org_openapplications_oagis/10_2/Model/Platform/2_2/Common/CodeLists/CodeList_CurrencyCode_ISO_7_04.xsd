@@ -31,7 +31,7 @@ Venezuala (VEB-&gt;VEF)
 The OAGi implementation of this codelist is deprecating the old values in facor of the new values indicated here. As such the old values will remain until the next maor version of OAGIS.</xsd:documentation>
 	</xsd:annotation>
 	<xsd:simpleType name="clm542173A20090305_ISO3AlphaCurrencyCodeContentType" id="oagis-id-b219e03523e04d1fb3379d37001c8f0c">
-		<xsd:restriction base="xsd:normalizedString">
+		<xsd:restriction base="xsd:token">
 			<xsd:enumeration value="AED">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">

@@ -44,21 +44,22 @@
 			<xsd:any namespace="##any" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
+	<xsd:element name="AnyExtension" type="AnyUserAreaType" id="oagis-id-e932d9a6d5ca4582a6a22a18e90b4444"/>
 	<xsd:complexType name="OpenUserAreaType" id="oagis-id-074aaa3b57a74320a13f1ddc8de0a19f">
 		<xsd:sequence>
-			<xsd:element name="AnyExtension" type="AnyUserAreaType" id="oagis-id-e932d9a6d5ca4582a6a22a18e90bfe34" minOccurs="0"/>
-			<xsd:element name="Amount" type="OpenAmountType" id="oagis-id-85da5dd8db79459cb87ceb048a83f602" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Code" type="OpenCodeType" id="oagis-id-c57978e8532d48f69f096c2dd1be3561" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="DateTime" type="OpenDateTimeType" id="oagis-id-5de2387b6c95450fa23e641723962686" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="ID" type="OpenIDType" id="oagis-id-8e9611018ad849a0b35b1ac77ef08e0e" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Indicator" type="OpenIndicatorType" id="oagis-id-091eb7ecb9774a759801d471da86305d" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Measure" type="OpenMeasureType" id="oagis-id-a4410b003c504fedbdb38a1a799d4f6b" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Name" type="OpenNameType" id="oagis-id-eb7e10662a0347cd857dfbeb16b7775c" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Number" type="OpenNumberType" id="oagis-id-8ecff0393a434d80bb8dcd46dd2c8964" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Quantity" type="OpenQuantityType" id="oagis-id-7777d98cb866457187ce0ad31fc97b97" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Text" type="OpenTextType" id="oagis-id-4fe43ebc5082476fbd480a0b7e190ce8" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="Time" type="OpenTimeType" id="oagis-id-bc02b1d64fa34bf0832d18906ecc7d43" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="ValueText" type="OpenFieldValueType" id="oagis-id-15f1543ca2c8444c96ba7ec2521736b5" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="AnyExtension" id="oagis-id-e932d9a6d5ca4582a6a22a18e90bfe34" minOccurs="0"/>
+			<xsd:element ref="Amount" id="oagis-id-85da5dd8db79459cb87ceb048a83f602" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Code" id="oagis-id-c57978e8532d48f69f096c2dd1be3561" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="DateTime" id="oagis-id-5de2387b6c95450fa23e641723962686" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="ID" id="oagis-id-8e9611018ad849a0b35b1ac77ef08e0e" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Indicator" id="oagis-id-091eb7ecb9774a759801d471da86305d" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Measure" id="oagis-id-a4410b003c504fedbdb38a1a799d4f6b" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Name" id="oagis-id-eb7e10662a0347cd857dfbeb16b7775c" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Number" id="oagis-id-8ecff0393a434d80bb8dcd46dd2c8964" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Quantity" id="oagis-id-7777d98cb866457187ce0ad31fc97b97" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Text" id="oagis-id-4fe43ebc5082476fbd480a0b7e190ce8" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Time" id="oagis-id-bc02b1d64fa34bf0832d18906ecc7d43" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="ValueText" id="oagis-id-15f1543ca2c8444c96ba7ec2521736b5" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-c97f9c47388f4a64bb50cd091862a8dc"/>
 		<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-098f947a98b342cbab79e3d92246b697"/>
@@ -77,7 +78,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!---->
-	<xsd:element name="AccountingPeriodExtension" id="oagis-id-0fc1e28f43304f519c02e8ddb589dfc5"/>
+	<xsd:element name="AccountingPeriodExtension" type="AccountingPeriodExtensionType" id="oagis-id-0fc1e28f43304f519c02e8ddb589dfc5"/>
 	<xsd:complexType name="AccountingPeriodExtensionType" id="oagis-id-afc9c470011e4299840f91c030434d74">
 		<xsd:complexContent>
 			<xsd:extension base="AllExtensionType">

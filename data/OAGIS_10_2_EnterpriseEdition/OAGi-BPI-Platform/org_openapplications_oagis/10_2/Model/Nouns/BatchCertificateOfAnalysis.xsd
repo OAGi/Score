@@ -17,7 +17,7 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/BatchCertificateOfAnalysis.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:ns1="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
 	<xsd:element name="BatchCertificateOfAnalysis" type="BatchCertificateOfAnalysisType" id="oagis-id-2da2825af3fe4d35b5f5c8ca5b471c4f">
 		<xsd:annotation>
