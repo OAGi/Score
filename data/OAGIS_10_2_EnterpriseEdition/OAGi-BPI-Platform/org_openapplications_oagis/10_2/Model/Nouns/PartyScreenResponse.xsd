@@ -23,7 +23,7 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/PartyMaster.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:hr="http://www.hr-xml.org/3" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
 	<xsd:element name="PartyScreenResponse" type="PartyScreenResponseType" id="oagis-id-8926dc448f4247b897552c61007a97e4">
 		<xsd:annotation>

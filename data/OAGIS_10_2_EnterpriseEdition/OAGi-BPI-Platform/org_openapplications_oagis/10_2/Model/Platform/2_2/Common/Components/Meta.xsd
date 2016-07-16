@@ -82,8 +82,8 @@ This element supports any digital signature specification that is available toda
 This allows the user to carry a digital signature in the xml instance of a BOD. The choice of which digital signature to use is left up to the user and their integration needs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="ScenarioID" type="IDType" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd2" minOccurs="0"/>
-			<xsd:element name="CorrelationID" type="IDType" id="oagis-id-8608944406234866817301e39693fd90" minOccurs="0"/>
+			<xsd:element ref="ScenarioID" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd3" minOccurs="0"/>
+			<xsd:element ref="CorrelationID" id="oagis-id-8608944406234866817301e39693fd91" minOccurs="0"/>
 			<xsd:element ref="BODID" id="oagis-id-afa1894b0cd449b68f65ec602f2e9c96" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The BODId provides a place to carry a Globally Unique Identifier (GUID) that will make each Business Object Document instance uniquely identifiable.
@@ -352,7 +352,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 		<xsd:sequence>
 			<xsd:element ref="ID" id="oagis-id-59fccca73c224f96a9ae7ea4138c28cf" maxOccurs="unbounded"/>
 		</xsd:sequence>
-		<xsd:attribute name="schemeID" type="xsd:normalizedString" use="optional" id="oagis-id-aa692ebb145d494d82564a5cb9130a28">
+		<xsd:attribute name="schemeID" type="IDType_B3F14E" use="optional" id="oagis-id-aa692ebb145d494d82564a5cb9130a28">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -368,7 +368,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-9451f00af62a4b968c391f2864e67991">
+		<xsd:attribute name="schemeVersionID" type="IDType_B3F14E" use="optional" id="oagis-id-9451f00af62a4b968c391f2864e67991">
 			<xsd:annotation>
 				<xsd:documentation xml:lang="en">
 					<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -1203,5 +1203,7 @@ Always - Always send a confirmation Business Object Document regardless</xsd:doc
 		</xsd:sequence>
 	</xsd:complexType>
 	<!---->
+	<xsd:element name="ScenarioID" type="IDType" id="oagis-id-d46c7e4a607e47d0b9388c7a20c13bd2"/>
+	<xsd:element name="CorrelationID" type="IDType" id="oagis-id-8608944406234866817301e39693fd90"/>
 	<xsd:element name="BusinessObjectDocument" type="BusinessObjectDocumentType" id="oagis-id-31e578bda6d249818dfc52181497d777"/>
 </xsd:schema>
