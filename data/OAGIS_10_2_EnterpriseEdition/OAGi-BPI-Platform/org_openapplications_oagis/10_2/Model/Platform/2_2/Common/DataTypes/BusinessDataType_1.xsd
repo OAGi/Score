@@ -22517,6 +22517,73 @@
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
+
+    <xsd:simpleType name="TextType_62S0C1" id="oagis-id-89be97039be04d6f9cfda107d75926b5">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                <ccts_UniqueID>62S0C1</ccts_UniqueID>
+                <ccts_VersionID>1.0</ccts_VersionID>
+                <ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
+                <ccts_Definition>Text is a character string such as a finite set of characters generally in  the form of words of a language</ccts_Definition>
+                <ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation source="http://www.openapplications.org/oagis/10">
+                    <ccts_ContentComponentValueDomain>
+                        <ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
+                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+                        <ccts_PrimitiveTypeName>String</ccts_PrimitiveTypeName>
+                    </ccts_ContentComponentValueDomain>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="TextType_0VCBZ5" id="oagis-id-42a03ed19450453da6c87fe8eadabfa4">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                <ccts_UniqueID>0VCBZ5</ccts_UniqueID>
+                <ccts_VersionID>1.0</ccts_VersionID>
+                <ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
+                <ccts_Definition>A text is a character string such as a finite set of characters generally in the form of words of a language</ccts_Definition>
+                <ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:annotation>
+                <xsd:documentation source="http://www.openapplications.org/oagis/10">
+                    <ccts_ContentComponentValueDomain>
+                        <ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
+                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+                        <ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+                    </ccts_ContentComponentValueDomain>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="TextType_0F0ZX1" id="oagis-id-d5cb8551edf041389893fee25a496395">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                <ccts_UniqueID>0F0ZX1</ccts_UniqueID>
+                <ccts_VersionID>1.0</ccts_VersionID>
+                <ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
+                <ccts_Definition>A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept</ccts_Definition>
+                <ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:token">
+            <xsd:annotation>
+                <xsd:documentation source="http://www.openapplications.org/oagis/10">
+                    <ccts_ContentComponentValueDomain>
+                        <ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
+                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+                        <ccts_PrimitiveTypeName>Token</ccts_PrimitiveTypeName>
+                    </ccts_ContentComponentValueDomain>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:restriction>
+    </xsd:simpleType>
 	<!-- =================================================================== -->
 	<!-- =====                                          Time Type                                                                 ===== -->
 	<!-- =====       Use when the time format is fixed at design time                                      ===== -->
