@@ -737,7 +737,7 @@ That is, in a GetListPurchaseOrder, if one or more PurchaseOrders with a TotalPr
 The expressionLanguage indicates the expression language being used. In order for the ReturnCriteria expression to be evaluable by the BOD recipient, the recipient must be capable of processing and interpreting the specified expression language. XPath is the default, due to its ubiquity among XML processing technologies. </xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="TextType_0F0ZL2">
+			<xsd:extension base="TextType_0F0ZX1">
 				<xsd:attribute name="expressionLanguage" type="xsd:normalizedString" use="optional" id="oagis-id-99f7c6c49493417191e281586fbe9223"/>
 			</xsd:extension>
 		</xsd:simpleContent>
@@ -755,8 +755,8 @@ That is, in a GetListPurchaseOrder, if one or more PurchaseOrders with a TotalPr
 The expressionLanguage indicates the expression language being used. In order for the ReturnCriteria expression to be evaluable by the BOD recipient, the recipient must be capable of processing and interpreting the specified expression language. XPath is the default, due to its ubiquity among XML processing technologies. </xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="TextType_0F0ZL2">
-				<xsd:attribute name="actionCode" type="ActionCodeContentType" use="required" id="oagis-id-c05ff56ed80d42d59fdeabddb5891126"/>
+			<xsd:extension base="TextType_0F0ZX1">
+				<xsd:attribute name="actionCode" type="oacl_ActionCodeContentType" use="required" id="oagis-id-c05ff56ed80d42d59fdeabddb5891126"/>
 				<xsd:attribute name="expressionLanguage" type="xsd:normalizedString" use="optional" id="oagis-id-314bd79fb54147c993bafd54d37101aa"/>
 			</xsd:extension>
 		</xsd:simpleContent>
@@ -790,8 +790,8 @@ That is, in a GetListPurchaseOrder, if one or more PurchaseOrders with a TotalPr
 The expressionLanguage indicates the expression language being used. In order for the ReturnCriteria expression to be evaluable by the BOD recipient, the recipient must be capable of processing and interpreting the specified expression language. XPath is the default, due to its ubiquity among XML processing technologies. </xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:extension base="TextType_0F0ZL2">
-				<xsd:attribute name="actionCode" type="ResponseActionCodeContentType" use="required" id="oagis-id-1c020ca70a2440a0b490fabaed6100a5"/>
+			<xsd:extension base="TextType_0F0ZX1">
+				<xsd:attribute name="actionCode" type="oacl_ResponseActionCodeContentType" use="required" id="oagis-id-1c020ca70a2440a0b490fabaed6100a5"/>
 				<xsd:attribute name="expressionLanguage" type="xsd:normalizedString" use="optional" id="oagis-id-d3f9ec6ec1974ffd93168e4d39262ed1"/>
 			</xsd:extension>
 		</xsd:simpleContent>
