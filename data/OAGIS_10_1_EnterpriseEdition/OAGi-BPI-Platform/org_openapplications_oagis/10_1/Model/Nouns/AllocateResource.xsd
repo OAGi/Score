@@ -26,7 +26,7 @@
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_1/Model/Nouns/AllocateResource.xsd
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="9_4">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10"  targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_1/Common/Components/Components.xsd"/>
 	<xsd:element name="AllocateResource" type="AllocateResourceType" id="oagis-id-ccf98992ab8f4b94b39140f2b1b850fd">
 		<xsd:annotation>
