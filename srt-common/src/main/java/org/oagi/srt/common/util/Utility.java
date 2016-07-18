@@ -384,9 +384,6 @@ public class Utility {
 //			qualifier= p1.substring(0, pos);
 //		}
         qualifier = qualifier.trim();
-        if (qualifier.equalsIgnoreCase("MIME")) {
-            qualifier = "MIME";
-        }
         //System.out.println("\t\t"+qualifier);
         return qualifier;
     }
