@@ -3634,7 +3634,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:complexType name="OpenFieldValueType" id="oagis-id-a443aea7aa634ae8aa57bfad38762ef1">
 		<xsd:simpleContent>
-			<xsd:extension base="RecordFieldValueType">
+			<xsd:extension base="ValueType">
 				<xsd:attribute name="formatCode" type="xsd:token" id="oagis-id-9034f3521cc84e0e93b4b10e54bb46a3"/>
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-c736ced2c5d24d85a2fb47f608a85a95"/>
 			</xsd:extension>
