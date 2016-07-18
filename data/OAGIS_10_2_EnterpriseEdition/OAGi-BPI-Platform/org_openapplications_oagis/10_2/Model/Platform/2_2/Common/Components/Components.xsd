@@ -14619,12 +14619,13 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!---->
+    <xsd:element name="ValueSet" type="ValueSetType" id="oagis-id-b2cfc8f4c9c24648a092a6e99fc14b69"/>
 	<xsd:complexType name="ValueSetType" id="oagis-id-7431801f4045466499b199ac0487cd77">
-		<xsd:sequence>
-			<xsd:element name="Value" type="ValueType" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9" minOccurs="0" maxOccurs="unbounded"/>
-		</xsd:sequence>
+        <xsd:sequence>
+            <xsd:element ref="Value" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82ea" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="ValueSet" type="ValueSetType" id="oagis-id-b2cfc8f4c9c24648a092a6e99fc14b69"/>
+    <xsd:element name="Value" type="ValueType" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9"/>
 	<!---->
 	<xsd:complexType name="ProcedureStepBaseType" id="oagis-id-d345ff934a3f416e82226399931af4c7">
 		<xsd:complexContent>
@@ -14730,7 +14731,7 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 			<xsd:extension base="IdentificationType">
 				<xsd:sequence>
 					<xsd:element ref="Name" id="oagis-id-80513f2827394a93818f7ec4e79ac080" minOccurs="0"/>
-					<xsd:element name="ValuePrimitiveCode" type="OpenCodeType" id="oagis-id-225b6dcae4134aaa949fa606ad8404e9" minOccurs="0"/>
+					<xsd:element ref="ValuePrimitiveCode" id="oagis-id-225b6dcae4134aaa949fa606ad8404ea" minOccurs="0"/>
 					<xsd:element ref="SignificantDigitsNumber" id="oagis-id-154a6f59bc2e4db8ab7ea9228571bfe5" minOccurs="0"/>
 					<xsd:element ref="UnitCode" id="oagis-id-933759bde46a4be9bc9c3b6fc6c56bc6" minOccurs="0"/>
 					<xsd:element ref="ValueRange" id="oagis-id-155f3c880454462691f55e02a5f25b42" minOccurs="0" maxOccurs="unbounded"/>
@@ -14869,14 +14870,7 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 					<xsd:element ref="ManufacturingName" id="oagis-id-f1810ef985eb4bfbad66a068a44e785c" minOccurs="0"/>
 					<xsd:element ref="ModelID" id="oagis-id-d8acd83052d24c04be35cc19ab94a5f4" minOccurs="0"/>
 					<xsd:element ref="EquipmentCategoryCode" id="oagis-id-eff07aaf4fb74b708142eef183d0b50f" minOccurs="0" maxOccurs="unbounded"/>
-					<xsd:element name="EquipmentCalloborationRequirement" id="oagis-id-ff62477c2ab442959351597ec5a493aa" minOccurs="0" maxOccurs="unbounded">
-						<xsd:complexType id="oagis-id-00fd0de1f1124560809fb3a3bd37a1b5">
-							<xsd:sequence>
-								<xsd:element ref="Measure" id="oagis-id-144d44ec22cb4b5ca4ad5abb1481405e" minOccurs="0"/>
-								<xsd:element ref="ValueRange" id="oagis-id-8ffe7bb46943492eb68d1e0f26bf8fdc" minOccurs="0"/>
-							</xsd:sequence>
-						</xsd:complexType>
-					</xsd:element>
+					<xsd:element ref="EquipmentCalloborationRequirement" id="oagis-id-ff62477c2ab442959351597ec5a493ab" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -14986,4 +14980,12 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
     <xsd:element name="OrganizationUnitID" type="IDType" id="oagis-id-f55ff9f88e824ce4aca1652de4e2960b"/>
     <xsd:element name="PurposeCode" type="CodeType" id="oagis-id-153c772c244644e1af1ec038a241d111"/>
     <xsd:element name="ResultName" type="NameType" id="oagis-id-8264b83fb73244f4825421ffefe866cd"/>
+    <xsd:element name="ValuePrimitiveCode" type="OpenCodeType" id="oagis-id-225b6dcae4134aaa949fa606ad8404e9"/>
+    <xsd:element name="EquipmentCalloborationRequirement" type="EquipmentCalloborationRequirementType" id="oagis-id-ff62477c2ab442959351597ec5a493aa"/>
+    <xsd:complexType name="EquipmentCalloborationRequirementType" id="oagis-id-00fd0de1f1124560809fb3a3bd37a1b5">
+        <xsd:sequence>
+            <xsd:element ref="Measure" id="oagis-id-144d44ec22cb4b5ca4ad5abb1481405e" minOccurs="0"/>
+            <xsd:element ref="ValueRange" id="oagis-id-8ffe7bb46943492eb68d1e0f26bf8fdc" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
 </xsd:schema>
