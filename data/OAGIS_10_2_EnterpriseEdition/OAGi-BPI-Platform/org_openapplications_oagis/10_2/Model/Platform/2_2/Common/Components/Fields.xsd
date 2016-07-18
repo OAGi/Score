@@ -651,6 +651,7 @@ CIF - Cost, Insurance and Freight ... (named port of destination)</xsd:documenta
 	<xsd:simpleType name="OperatorCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c142709">
 		<xsd:restriction base="oacl_OperatorCodeContentType"/>
 	</xsd:simpleType>
+	<xsd:element name="OperatorCode" type="OperatorCodeType" id="oagis-id-181938b7b40847ef8e6159493978ebb3"/>
 	<xsd:element name="OpportunityMethodCode" type="OpenCodeType" nillable="true" id="oagis-id-d88d118738ac4dc286411a138eb5c6da">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Method used for marketing opportunity.  Example -Survey/Marketing</xsd:documentation>
@@ -1068,6 +1069,11 @@ When used in the context of a Schedule, ScheduleType indicates whether the Sched
 		</xsd:annotation>
 	</xsd:element>
 	<!---->
+	<xsd:element name="TestSampleHandlingCode" type="TestSampleHandlingCodeType" id="oagis-id-31d4d2ff73844a018114d03e5126b6ca">
+		<xsd:annotation>
+			<xsd:documentation>Special handling codes, such as SamplingRequired, SampleDestroyed, SampleOneTimeUse, CalculatedTest, RetainSample, SubsampleRequired, CreateComposite.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
 	<xsd:complexType name="TestSampleHandlingCodeType" id="oagis-id-31d4d2ff73844a018114d03e5126b6ca">
 		<xsd:simpleContent>
 			<xsd:extension base="TestSampleHandlingCodeContentType">
@@ -1125,7 +1131,7 @@ When used in the context of a Schedule, ScheduleType indicates whether the Sched
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:simpleType name="TestSampleHandlingCodeContentType" id="oagis-id-740dd2f4526741cc9f8532181c142709">
+	<xsd:simpleType name="TestSampleHandlingCodeContentType" id="oagis-id-1c8c7b5ecf2d4ff9909075e8a81c59a5">
 		<xsd:restriction base="oacl_TestSampleHandlingCodeContentType"/>
 	</xsd:simpleType>
 	<!--=======================-->
