@@ -6468,7 +6468,7 @@ supplementary information.</ccts_Definition>
 	</xsd:complexType>
 	<xsd:complexType name="ProcessCategoryCodeType" id="oagis-id-653072097f904ab2a22386d5c4ad201b">
 		<xsd:simpleContent>
-			<xsd:extension base="ProcessCategoryCodeContentType"/>
+			<xsd:extension base="ProcessCategoryCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-947cb370a6de465da589eeda41061592">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
@@ -6504,7 +6504,7 @@ supplementary information.</ccts_Definition>
 						</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-1ffc2c57129f4cc2b590f9af9f2f6abc">
+				<xsd:attribute name="listVersionID" type="xsd:normalizedString" use="optional" id="oagis-id-1ffc2c57129f4cc2b590f9af9f2f6459">
 					<xsd:annotation>
 						<xsd:documentation xml:lang="en">
 							<ccts_Cardinality>0..1</ccts_Cardinality>
@@ -6519,7 +6519,8 @@ supplementary information.</ccts_Definition>
 							</ccts_SupplementaryComponentValueDomain>
 						</xsd:documentation>
 					</xsd:annotation>
-				</xsd:attribute>			
+				</xsd:attribute>
+			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="ProcessConfirmationCodeType" id="oagis-id-87c569b9b0a541caadccf1b2514539dd">
