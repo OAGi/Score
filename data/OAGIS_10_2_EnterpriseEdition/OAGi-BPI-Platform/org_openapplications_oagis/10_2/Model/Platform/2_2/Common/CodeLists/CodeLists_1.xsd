@@ -680,6 +680,31 @@ borne by the beneficiary customer.</xsd:documentation>
 	<xsd:simpleType name="oacl_MIMECodeContentType" id="oagis-id-51ed08216606417b9b9266b464c204f7">
 		<xsd:union memberTypes="clmIANAMIMEMediaType20090304_MIMEMediaTypeCodeContentType xsd:token"/>
 	</xsd:simpleType>
+	<xsd:simpleType name="oacl_OperatorCodeEnumerationType" id="oagis-id-f63f1d0aa3c34e7cab8efe42ab5f89cf">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The mathematical relational operator.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="EQ"/>
+			<xsd:enumeration value="LT"/>
+			<xsd:enumeration value="LE"/>
+			<xsd:enumeration value="GT"/>
+			<xsd:enumeration value="GE"/>
+			<xsd:enumeration value="NE"/>
+			<xsd:enumeration value="IN"/>
+			<xsd:enumeration value="NOTIN"/>
+			<xsd:enumeration value="INCLUSIVE_BETWEEN"/>
+			<xsd:enumeration value="EXCLUSIVE_BETWEEN"/>
+			<xsd:enumeration value="INCLUSIVE_OUTSIDE"/>
+			<xsd:enumeration value="EXCLUSIVE_OUTSIDE"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_OperatorCodeContentType" id="oagis-id-49c1788460864e99b0872d0a6e58bf1a">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_OperatorCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
 	<xsd:simpleType name="oacl_PartyCategoryCodeEnumerationType" id="oagis-id-f0eaec1e35124594afc96b1ed82559fa">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This list of Party Categories.</xsd:documentation>
@@ -1008,6 +1033,26 @@ borne by the beneficiary customer.</xsd:documentation>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_TaxCodeContentType" id="oagis-id-19df69be3a5b4080a693730044647de3">
 		<xsd:union memberTypes="oacl_TaxCodeEnumerationType xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TestSampleHandlingCodeEnumerationType" id="oagis-id-f63f1d0aa3c34e7cab8efe1115557faa">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Test Sample Handling Code List.  </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="SamplingRequired"/>
+			<xsd:enumeration value="SampleDestroyed"/>
+			<xsd:enumeration value="SampleOneTimeUse"/>
+			<xsd:enumeration value="CalculatedTest"/>
+			<xsd:enumeration value="RetainSample"/>
+			<xsd:enumeration value="SubsampleRequired"/>
+			<xsd:enumeration value="CreateComposite"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="oacl_TestSampleHandlingCodeContentType" id="oagis-id-49c1788460864e99b0872d8056afcd24">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user to use any of the codes that OAGi defines or add additional values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="oacl_TestSampleHandlingCodeEnumerationType xsd:token"/>
 	</xsd:simpleType>
 	<xsd:simpleType name="oacl_TransferCodeEnumerationType" id="oagis-id-8fe94a19fa2f4efbab618ac7acd8f094">
 		<xsd:restriction base="xsd:token">
