@@ -306,7 +306,6 @@ public class P_1_7_PopulateQBDTInDT {
             if (StringUtils.isEmpty(guid)) {
                 continue;
             }
-
             XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, bccp);
             if (xsElementDecl == null) {
                 throw new IllegalStateException("Could not find " + bccp + ", GUID " + guid + " BCCP");
@@ -475,7 +474,7 @@ public class P_1_7_PopulateQBDTInDT {
         String dataTypeTerm = dataType.getDataTypeTerm();
 
         //we need 3 cases : CodeContentQBDTs, IDContentQBDT, and other QBDTs
-        if (base.endsWith("CodeContentType")) {
+        if (base.endsWith("CodeContentType") && base.startsWith("oacl")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
             int codeListId = getCodeListId(base.substring(0, base.indexOf("CodeContentType")));
@@ -618,6 +617,9 @@ public class P_1_7_PopulateQBDTInDT {
                         representation_term = "Text";
                     else if (attrType.equals("xbt_BooleanTrueFalseType"))
                         representation_term = "Indicator";
+                    else if (attrName.equals("preferred")){
+                        representation_term = "Indicator";
+                    }
                 }
 
                 Node documentationNode = xHandler.getNode("//xsd:complexType[@id = '" + qbdtVO.getGuid() + "']/xsd:simpleContent/xsd:extension/xsd:attribute/xsd:annotation/xsd:documentation");
