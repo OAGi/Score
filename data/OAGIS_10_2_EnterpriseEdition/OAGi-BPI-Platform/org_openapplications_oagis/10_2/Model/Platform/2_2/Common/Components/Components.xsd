@@ -14619,12 +14619,13 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!---->
+    <xsd:element name="ValueSet" type="ValueSetType" id="oagis-id-b2cfc8f4c9c24648a092a6e99fc14b69"/>
 	<xsd:complexType name="ValueSetType" id="oagis-id-7431801f4045466499b199ac0487cd77">
-		<xsd:sequence>
-			<xsd:element name="Value" type="ValueType" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9" minOccurs="0" maxOccurs="unbounded"/>
-		</xsd:sequence>
+        <xsd:sequence>
+            <xsd:element ref="Value" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82ea" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="ValueSet" type="ValueSetType" id="oagis-id-b2cfc8f4c9c24648a092a6e99fc14b69"/>
+    <xsd:element name="Value" type="ValueType" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9"/>
 	<!---->
 	<xsd:complexType name="ProcedureStepBaseType" id="oagis-id-d345ff934a3f416e82226399931af4c7">
 		<xsd:complexContent>
