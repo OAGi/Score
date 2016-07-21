@@ -19,7 +19,7 @@ public class XPathHandler {
     }
 
     public XPathHandler(File file) throws Exception {
-        xmlDocument = Context.loadDocument(file.toURI().toString());
+        xmlDocument = Context.loadDocument(file);
     }
 
     public XPathExpression compile(String expression) throws XPathExpressionException {

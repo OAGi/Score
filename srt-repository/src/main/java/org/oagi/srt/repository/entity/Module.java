@@ -36,6 +36,9 @@ public class Module implements Serializable {
     @JoinColumn(name = "namespace_id", nullable = false)
     private Namespace namespace;
 
+    @Column(length = 45)
+    private String versionNum;
+
     public int getModuleId() {
         return moduleId;
     }
@@ -68,6 +71,14 @@ public class Module implements Serializable {
         this.namespace = namespace;
     }
 
+    public String getVersionNum() {
+        return versionNum;
+    }
+
+    public void setVersionNum(String versionNum) {
+        this.versionNum = versionNum;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,7 +89,8 @@ public class Module implements Serializable {
         if (moduleId != module1.moduleId) return false;
         if (module != null ? !module.equals(module1.module) : module1.module != null) return false;
         if (release != null ? !release.equals(module1.release) : module1.release != null) return false;
-        return namespace != null ? namespace.equals(module1.namespace) : module1.namespace == null;
+        if (namespace != null ? !namespace.equals(module1.namespace) : module1.namespace != null) return false;
+        return versionNum != null ? versionNum.equals(module1.versionNum) : module1.versionNum == null;
 
     }
 
@@ -88,6 +100,7 @@ public class Module implements Serializable {
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (release != null ? release.hashCode() : 0);
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
+        result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
         return result;
     }
 
@@ -98,6 +111,7 @@ public class Module implements Serializable {
                 ", module='" + module + '\'' +
                 ", release=" + release +
                 ", namespace=" + namespace +
+                ", versionNum='" + versionNum + '\'' +
                 '}';
     }
 }

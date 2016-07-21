@@ -39,6 +39,14 @@ public class Context {
         xPath.setNamespaceContext(new OAGiNamespaceContext());
     }
 
+    public static Document loadDocument(File file) {
+        return loadDocument(file.toURI());
+    }
+
+    public static Document loadDocument(URI uri) {
+        return loadDocument(uri.toString());
+    }
+
     public static Document loadDocument(String uri) {
         String module = Utility.extractModuleName(uri);
 

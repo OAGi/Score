@@ -34,6 +34,10 @@ public class SchemaModule {
         return FilenameUtils.separatorsToSystem(module.getModule());
     }
 
+    public String getVersionNum() {
+        return module.getVersionNum();
+    }
+
     public void addInclude(SchemaModule schemaModule) {
         includeModules.put(dependedModuleSize++, schemaModule);
     }

@@ -166,7 +166,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 populateUnusedACC(child);
             }
         } else {
-            Document document = Context.loadDocument(file.toURI().toString());
+            Document document = Context.loadDocument(file);
             NodeList complexTypes = (NodeList) Context.xPath.evaluate("//xsd:complexType", document, XPathConstants.NODESET);
             for (int i = 0, len = complexTypes.getLength(); i < len; ++i) {
                 Element complexType = (Element) complexTypes.item(i);
@@ -206,7 +206,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 populateUnusedASCCP(child);
             }
         } else {
-            Document document = Context.loadDocument(file.toURI().toString());
+            Document document = Context.loadDocument(file);
             NodeList elements = (NodeList) Context.xPath.evaluate("//xsd:element", document, XPathConstants.NODESET);
             NodeList childOfSchemaElements = (NodeList) Context.xPath.evaluate("/xsd:schema/xsd:element", document, XPathConstants.NODESET);
             for (int i = 0, len = elements.getLength(); i < len; ++i) {

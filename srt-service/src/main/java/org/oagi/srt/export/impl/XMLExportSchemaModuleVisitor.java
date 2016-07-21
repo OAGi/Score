@@ -65,6 +65,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         schemaElement.setAttribute("targetNamespace", SRTConstants.OAGI_NS);
         schemaElement.setAttribute("elementFormDefault", "qualified");
         schemaElement.setAttribute("attributeFormDefault", "unqualified");
+        String versionNum = schemaModule.getVersionNum();
+        if (!StringUtils.isEmpty(versionNum)) {
+            schemaElement.setAttribute("version", versionNum);
+        }
 
         this.document.addContent(schemaElement);
         this.rootElement = schemaElement;

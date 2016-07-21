@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -27,6 +28,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 
@@ -92,8 +94,21 @@ public class PopulateModules {
                 module.setRelease(release);
                 module.setNamespace(namespace);
 
+                String versionNum = getVersion(file);
+                module.setVersionNum(versionNum);
+
                 moduleRepository.save(module);
             }
+        }
+    }
+
+    private String getVersion(File file) {
+        Document document = Context.loadDocument(file);
+        try {
+            String version = Context.xPath.evaluate("//xsd:schema/@version", document);
+            return StringUtils.isEmpty(version) ? null : version.trim();
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);
         }
     }
 

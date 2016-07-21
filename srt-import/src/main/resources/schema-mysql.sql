@@ -16,6 +16,7 @@ CREATE TABLE `module` (
   `module` varchar(100) NOT NULL COMMENT 'This semantically the same as the module columns in CC tables.',
   `release_id` int(11) unsigned NOT NULL,
   `namespace_id` int(11) unsigned NOT NULL COMMENT 'Note that a release record has a namespace associated. The namespace_id if specified override the release''s namespace.',
+  `version_num` varchar(45) NULL COMMENT 'This is the version number to be output in the schema module if the expression supported and the information is available for the expression generator.',
   PRIMARY KEY (`module_id`),
   KEY `module_release_id_fk` (`release_id`),
   KEY `module_namespace_id_fk` (`namespace_id`),
