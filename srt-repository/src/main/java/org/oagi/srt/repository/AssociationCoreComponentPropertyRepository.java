@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
+
 public interface AssociationCoreComponentPropertyRepository extends JpaRepository<AssociationCoreComponentProperty, Integer> {
 
     @Query("select a from AssociationCoreComponentProperty a order by a.propertyTerm asc")
@@ -43,4 +45,7 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
             "asbiep.basedAsccpId = asccp.asccpId and " +
             "asccp.propertyTerm like %?1%")
     public List<String> findPropertyTermByropertyTermContains(String propertyTerm);
+
+    @Query("select a from AssociationCoreComponentProperty a where a.den = '" + ANY_ASCCP_DEN + "'")
+    public AssociationCoreComponentProperty findAny();
 }

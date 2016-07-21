@@ -64,7 +64,7 @@ public class AssociationCoreComponentProperty implements Serializable {
     private int state;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "module_id", nullable = false)
+    @JoinColumn(name = "module_id")
     private Module module;
 
     @Column(nullable = false)

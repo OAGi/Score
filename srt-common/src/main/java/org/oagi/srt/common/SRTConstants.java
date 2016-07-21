@@ -227,4 +227,6 @@ public class SRTConstants {
 	public static final String FOREIGNKEY_ERROR_MSG = "a foreign key constraint fails";
 	public static final String CANNOT_DELETE_CONTEXT_CATEGORTY = "Fail to delete. The context category is referenced by the following context schemes: ";
 	public static final String CANNOT_DELETE_CONTEXT_SCHEME = "Fail to delete. Some of values of the context scheme are referenced by the following business contexts: ";
+
+	public static final String ANY_ASCCP_DEN = "Any Property. Any Structured Content";
 }

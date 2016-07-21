@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 
@@ -89,10 +90,40 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
         namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
 
+        populateForAny();
         populate();
         populateUnused();
 
         logger.info("### 1.8 End");
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void populateForAny() throws Exception {
+        AggregateCoreComponent anyACC = new AggregateCoreComponent();
+        anyACC.setGuid(Utility.generateGUID());
+        anyACC.setObjectClassTerm("Any Structured Content");
+        anyACC.setDen(anyACC.getObjectClassTerm() + ". Details");
+        anyACC.setDefinition("This is corresponding to the xsd:any with the processContents = “strict” and any namespace.");
+        anyACC.setOagisComponentType(5);
+        anyACC.setOwnerUserId(userId);
+        anyACC.setCreatedBy(userId);
+        anyACC.setLastUpdatedBy(userId);
+        anyACC.setReleaseId(releaseId);
+        anyACC.setNamespaceId(namespaceId);
+        accRepository.saveAndFlush(anyACC);
+
+        AssociationCoreComponentProperty anyASCCP = new AssociationCoreComponentProperty();
+        anyASCCP.setGuid(Utility.generateGUID());
+        anyASCCP.setPropertyTerm("Any Property");
+        anyASCCP.setRoleOfAccId(anyACC.getAccId());
+        anyASCCP.setDen(ANY_ASCCP_DEN);
+        anyASCCP.setReusableIndicator(true);
+        anyASCCP.setOwnerUserId(userId);
+        anyASCCP.setCreatedBy(userId);
+        anyASCCP.setLastUpdatedBy(userId);
+        anyASCCP.setReleaseId(releaseId);
+        anyASCCP.setNamespaceId(namespaceId);
+        asccpRepository.saveAndFlush(anyASCCP);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -386,7 +417,13 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             Declaration refDecl = asccOrBccElement.getRefDecl();
             boolean isLocalElement = (refDecl == null);
 
-            AssociationCoreComponentProperty asccp = asccpRepository.findOneByGuid(guid);
+            AssociationCoreComponentProperty asccp;
+            if (asccOrBccElement instanceof AnyDecl) {
+                asccp = asccpRepository.findAny();
+            } else {
+                asccp = asccpRepository.findOneByGuid(guid);
+            }
+
             if (asccp != null) {
                 Declaration particle = (isLocalElement) ? asccOrBccElement : refDecl;
                 if (particle.canBeAscc()) {

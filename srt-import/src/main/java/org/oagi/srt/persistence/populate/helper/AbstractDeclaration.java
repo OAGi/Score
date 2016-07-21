@@ -22,7 +22,7 @@ import java.util.*;
 
 public abstract class AbstractDeclaration implements Declaration {
     protected Context context;
-    protected XSDeclaration xsDeclaration;
+    protected XSComponent xsComponent;
     private Element element;
 
     private Declaration reference;
@@ -30,19 +30,19 @@ public abstract class AbstractDeclaration implements Declaration {
     private Transformer transformer;
     private final int INDENT_AMOUNT = 2;
 
-    public AbstractDeclaration(Context context, XSDeclaration xsDeclaration, Element element) {
+    public AbstractDeclaration(Context context, XSComponent xsComponent, Element element) {
         if (context == null) {
             throw new IllegalArgumentException("'context' paremeter must not be null.");
         }
-        if (xsDeclaration == null) {
-            throw new IllegalArgumentException("'xsDeclaration' paremeter must not be null.");
+        if (xsComponent == null) {
+            throw new IllegalArgumentException("'xsComponent' paremeter must not be null.");
         }
         if (element == null) {
             throw new IllegalArgumentException("'element' paremeter must not be null.");
         }
 
         this.context = context;
-        this.xsDeclaration = xsDeclaration;
+        this.xsComponent = xsComponent;
         this.element = element;
 
         TransformerFactory transFactory = TransformerFactory.newInstance();
@@ -91,7 +91,11 @@ public abstract class AbstractDeclaration implements Declaration {
     }
 
     public String getName() {
-        return this.xsDeclaration.getName();
+        if (xsComponent instanceof XSDeclaration) {
+            return ((XSDeclaration) xsComponent).getName();
+        } else {
+            return null;
+        }
     }
 
     public String getDefinition() {
@@ -191,13 +195,13 @@ public abstract class AbstractDeclaration implements Declaration {
 
     @Override
     public Module getModule() {
-        String systemId = xsDeclaration.getLocator().getSystemId();
+        String systemId = xsComponent.getLocator().getSystemId();
         return context.findByModule(Utility.extractModuleName(systemId));
     }
 
     @Override
     public File getModuleAsFile() {
-        String systemId = xsDeclaration.getLocator().getSystemId();
+        String systemId = xsComponent.getLocator().getSystemId();
         try {
             return new File(new URI(systemId).toURL().getFile());
         } catch (Exception e) {
@@ -205,92 +209,103 @@ public abstract class AbstractDeclaration implements Declaration {
         }
     }
 
-    protected Collection<XSDeclaration> asXSDeclarations(XSTerm xsTerm) {
+    protected Collection<XSComponent> asXSComponents(XSTerm xsTerm) {
         if (xsTerm == null) {
             return Collections.emptyList();
         }
         if (xsTerm.isModelGroup()) {
-            List<XSDeclaration> xsParticles = new ArrayList();
+            List<XSComponent> xsParticles = new ArrayList();
             for (XSParticle child : xsTerm.asModelGroup().getChildren()) {
-                xsParticles.addAll(asXSDeclarations(child.getTerm()));
+                xsParticles.addAll(asXSComponents(child.getTerm()));
             }
             return xsParticles;
         } else if (xsTerm.isElementDecl()) {
             return Arrays.asList(xsTerm.asElementDecl());
         } else if (xsTerm.isModelGroupDecl()) {
             return Arrays.asList(xsTerm.asModelGroupDecl());
+        } else if (xsTerm.isWildcard()) {
+            return Arrays.asList(xsTerm.asWildcard());
         } else {
             return Collections.emptyList();
         }
     }
 
     protected Collection<Declaration> getParticles(XSTerm xsTerm, ParticleAction particleAction) {
-        Collection<XSDeclaration> xsDeclarations = asXSDeclarations(xsTerm);
-        if (xsDeclarations.isEmpty()) {
+        Collection<XSComponent> xsComponents = asXSComponents(xsTerm);
+        if (xsComponents.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<Declaration> particles = new ArrayList();
-        for (XSDeclaration xsDeclaration : xsDeclarations) {
-            boolean isGroup = (xsDeclaration instanceof XSModelGroupDecl);
-            String elementName = xsDeclaration.getName();
-            Declaration particle = null;
-            String expression;
-            if (isGroup) {
-                expression = ".//xsd:group[@ref='" + elementName + "']";
-                Element particleElement = context.evaluateElement(expression, this.element);
-                if (particleElement != null) {
-                    particle = new GroupDecl(context, xsDeclaration, particleElement);
-                }
+        for (XSComponent xsComponent : xsComponents) {
+            if (xsComponent instanceof XSWildcard) {
+                XSWildcard xsWildcard = (XSWildcard) xsComponent;
+                Element anyElement = context.evaluateElement(".//xsd:any", this.element);
+                particles.add(new AnyDecl(context, xsWildcard, anyElement));
             } else {
-                expression = ".//xsd:element[@ref='" + elementName + "']";
-                Element particleElement = context.evaluateElement(expression, this.element);
-                if (particleElement != null) {
-                    particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
-                }
-            }
+                XSDeclaration xsDeclaration = (XSDeclaration) xsComponent;
 
-            boolean isLocalElement = (particle == null);
-            if (isLocalElement) {
+                boolean isGroup = (xsDeclaration instanceof XSModelGroupDecl);
+                String elementName = xsDeclaration.getName();
+
+                Declaration particle = null;
+                String expression;
                 if (isGroup) {
-                    particle = new GroupDecl(context, xsDeclaration, this.element);
-                } else {
-                    expression = ".//xsd:element[@name='" + elementName + "']";
+                    expression = ".//xsd:group[@ref='" + elementName + "']";
                     Element particleElement = context.evaluateElement(expression, this.element);
-                    particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
-                }
-
-                if (particleAction != null) {
-                    particleAction.runWhenParticleIsLocalElement(particle);
-                }
-            }
-
-            if (!isLocalElement) {
-                Declaration reference;
-                if (isGroup) {
-                    expression = "//xsd:group[@name='" + elementName + "']";
-                    XSDeclaration xsReference =
-                            context.getModelGroupDecl(SRTConstants.OAGI_NS, elementName);
-                    if (xsReference == null) {
-                        throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
+                    if (particleElement != null) {
+                        particle = new GroupDecl(context, xsDeclaration, particleElement);
                     }
-                    Element referenceElement = context.evaluateElement(expression, xsReference);
-                    reference = new GroupDecl(context, xsReference, referenceElement);
                 } else {
-                    expression = "//xsd:element[@name='" + elementName + "']";
-                    XSDeclaration xsReference =
-                            context.getElementDecl(SRTConstants.OAGI_NS, elementName);
-                    if (xsReference == null) {
-                        throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
+                    expression = ".//xsd:element[@ref='" + elementName + "']";
+                    Element particleElement = context.evaluateElement(expression, this.element);
+                    if (particleElement != null) {
+                        particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
                     }
-                    Element referenceElement = context.evaluateElement(expression, xsReference);
-                    reference = new ElementDecl(context, (XSElementDecl) xsReference, referenceElement);
                 }
 
-                particle.setRefDecl(reference);
-            }
+                boolean isLocalElement = (particle == null);
+                if (isLocalElement) {
+                    if (isGroup) {
+                        particle = new GroupDecl(context, xsDeclaration, this.element);
+                    } else {
+                        expression = ".//xsd:element[@name='" + elementName + "']";
+                        Element particleElement = context.evaluateElement(expression, this.element);
+                        particle = new ElementDecl(context, (XSElementDecl) xsDeclaration, particleElement);
+                    }
 
-            particles.add(particle);
+                    if (particleAction != null) {
+                        particleAction.runWhenParticleIsLocalElement(particle);
+                    }
+                }
+
+                if (!isLocalElement) {
+                    Declaration reference;
+                    if (isGroup) {
+                        expression = "//xsd:group[@name='" + elementName + "']";
+                        XSDeclaration xsReference =
+                                context.getModelGroupDecl(SRTConstants.OAGI_NS, elementName);
+                        if (xsReference == null) {
+                            throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
+                        }
+                        Element referenceElement = context.evaluateElement(expression, xsReference);
+                        reference = new GroupDecl(context, xsReference, referenceElement);
+                    } else {
+                        expression = "//xsd:element[@name='" + elementName + "']";
+                        XSDeclaration xsReference =
+                                context.getElementDecl(SRTConstants.OAGI_NS, elementName);
+                        if (xsReference == null) {
+                            throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
+                        }
+                        Element referenceElement = context.evaluateElement(expression, xsReference);
+                        reference = new ElementDecl(context, (XSElementDecl) xsReference, referenceElement);
+                    }
+
+                    particle.setRefDecl(reference);
+                }
+
+                particles.add(particle);
+            }
         }
         return particles;
     }

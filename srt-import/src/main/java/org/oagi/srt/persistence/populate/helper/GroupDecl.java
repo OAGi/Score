@@ -35,6 +35,6 @@ public class GroupDecl extends AbstractDeclaration {
 
     @Override
     public Collection<Declaration> getParticles(ParticleAction particleAction) {
-        return getParticles(((XSTerm) xsDeclaration).asModelGroupDecl().getModelGroup(), particleAction);
+        return getParticles(((XSTerm) xsComponent).asModelGroupDecl().getModelGroup(), particleAction);
     }
 }
