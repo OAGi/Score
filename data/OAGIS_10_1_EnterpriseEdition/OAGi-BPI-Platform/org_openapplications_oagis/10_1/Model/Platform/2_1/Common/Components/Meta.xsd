@@ -258,7 +258,7 @@ The Open Applications Group has not constructed the list of valid Component name
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows any digital Signatures to be added to the Instance of the BOD Instance in order to sign for any portion of the BOD content.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:any namespace="##any" minOccurs="0"/>
+			<xsd:any namespace="##any" minOccurs="0" id="oagis-id-44622f35a5b547da899fea2d7753bf96"/>
 		</xsd:sequence>
 		<xsd:attribute name="qualifyingAgencyId" type="NormalizedStringType" use="optional" id="oagis-id-329bb34257c141368a9dd472862fd4c0"/>
 	</xsd:complexType>
