@@ -369,7 +369,16 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
         // for ASCC or BCC (Sequence Key != 0)
         for (CoreComponent coreComponent : coreComponents) {
-            if (coreComponent instanceof BasicCoreComponent) {
+            if (coreComponent.getDen().endsWith("Any Structured Content")) {
+                Element anyElement = new Element("any", XSD_NS);
+
+                anyElement.setAttribute("namespace", "##any");
+                anyElement.setAttribute("processContents", "strict");
+                setCardinalities(anyElement, coreComponent);
+                anyElement.setAttribute("id", coreComponent.getGuid());
+
+                sequenceElement.addContent(anyElement);
+            } else if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
                 BasicCoreComponentProperty bccp = importedDataProvider.findBCCP(bcc.getToBccpId());
 

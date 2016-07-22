@@ -184,8 +184,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
 
     private void createACC(Map<Integer, SchemaModule> moduleMap) {
         for (AggregateCoreComponent acc : importedDataProvider.findACC()) {
-
-            SchemaModule schemaModule = moduleMap.get(acc.getModule().getModuleId());
+            Module module = acc.getModule();
+            if (module == null) {
+                continue;
+            }
+            SchemaModule schemaModule = moduleMap.get(module.getModuleId());
             schemaModule.addACC(ACC.newInstance(acc, importedDataProvider));
         }
     }
@@ -195,7 +198,11 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
                 importedDataProvider.findASCCP().stream()
                         .filter(e -> e.isReusableIndicator()).collect(Collectors.toList())) {
 
-            SchemaModule schemaModule = moduleMap.get(asccp.getModule().getModuleId());
+            Module module = asccp.getModule();
+            if (module == null) {
+                continue;
+            }
+            SchemaModule schemaModule = moduleMap.get(module.getModuleId());
             schemaModule.addASCCP(ASCCP.newInstance(asccp, importedDataProvider));
         }
     }
