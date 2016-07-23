@@ -1074,7 +1074,7 @@ When used in the context of a Schedule, ScheduleType indicates whether the Sched
 			<xsd:documentation>Special handling codes, such as SamplingRequired, SampleDestroyed, SampleOneTimeUse, CalculatedTest, RetainSample, SubsampleRequired, CreateComposite.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="TestSampleHandlingCodeType" id="oagis-id-31d4d2ff73844a018114d03e5126b6ca">
+	<xsd:complexType name="TestSampleHandlingCodeType" id="oagis-id-31d4d2ff73844a577434d03e5126b6ca">
 		<xsd:simpleContent>
 			<xsd:extension base="TestSampleHandlingCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-3d8eec0a38b94bc69d9d40d9d220724c">
@@ -4809,7 +4809,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="ControlAssertionType" id="oagis-id-34c5204633a54894846863a99618f567">
+	<xsd:complexType name="ControlAssertionCodeType" id="oagis-id-34c5204633a54894846863a99618f567">
 		<xsd:simpleContent>
 			<xsd:extension base="ControlAssertionCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-ef3ed7b7779145d8b49da60c24f5b6a0">
@@ -4866,7 +4866,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="ControlComponentType" id="oagis-id-31e2c152a1c8458e8d0ecda03db61206">
+	<xsd:complexType name="ControlComponentCodeType" id="oagis-id-31e2c152a1c8458e8d0ecda03db61206">
 		<xsd:simpleContent>
 			<xsd:extension base="ControlComponentCodeContentType">
 				<xsd:attribute name="listID" type="xsd:normalizedString" use="optional" id="oagis-id-e47690b640464528973b475a6764aee2">
