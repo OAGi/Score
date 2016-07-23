@@ -3719,7 +3719,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	</xsd:complexType>
 	<xsd:complexType name="OpenTimeType" id="oagis-id-fd79b936c42944f0818865b89e092257">
 		<xsd:simpleContent>
-			<xsd:extension base="ValueType">
+			<xsd:extension base="TimeType">
 				<xsd:attribute name="typeCode" type="xsd:token" use="optional" id="oagis-id-fe67f89596b34ea387d6d97167e31778"/>
 			</xsd:extension>
 		</xsd:simpleContent>
