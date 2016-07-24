@@ -336,6 +336,9 @@ public class Utility {
 
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
         String qualifier = "";
+        if(baseDen.contains("Open_")) {
+            baseDen = baseDen.replace("Open_", "");
+        }
         if (dataTypeTerm.equals("Text")) {
             if (type.contains("Text")) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, "Text");
@@ -344,7 +347,7 @@ public class Utility {
             }
 
             String baseType = baseDen.replace(" ", "").replace("_", "").replace(".", "");
-            if (type.contains(baseType)) {
+            if (type.contains (baseType)) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, baseType);
             }
 
@@ -533,5 +536,8 @@ public class Utility {
     public static void main(String args[]) {
         String str = "Amount_0723C8. Type";
         System.out.println(denToTypeName(str));
+
+        System.out.println(qualifier("TypedSequencedTextType", "Sequenced_ Open_ Text. Type", "Text"));
+
     }
 }
