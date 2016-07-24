@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) -->
+<!--
 
 
 
@@ -23,15 +25,16 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/RiskControlLibrary.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
 	<xsd:element name="RiskControlLibrary" type="RiskControlLibraryType" id="oagis-id-e7e7520401414152a39cbc7cf7c0c72e"/>
 	<xsd:element name="ControlProcess" type="ControlProcessType" id="oagis-id-4487194114394277aca4e36e50e2bb57"/>
 	<xsd:element name="Risk" type="RiskType" id="oagis-id-e29e63c90fea4c8ba4a375744af64b50"/>
 	<xsd:element name="Control" type="ControlType" id="oagis-id-1c9a8d5701bd468285012d3badb0f94e"/>
 	<xsd:element name="TestingProcedure" type="TestingProcedureType" id="oagis-id-cd19a2c56d04479fb7a5a5acac12ac50"/>
-	<xsd:element name="ControlAssertion" type="ControlAssertionType" id="oagis-id-8461a61e491447e5afebfe5df739ed0f"/>
-	<xsd:element name="ControlComponent" type="ControlComponentType" id="oagis-id-03b3668fb88d44149afae57b384690fc"/>
+	<xsd:element name="ControlAssertion" type="ControlAssertionCodeType" id="oagis-id-8461a61e491447e5afebfe5df739ed0f"/>
+	<xsd:element name="ControlComponent" type="ControlComponentCodeType" id="oagis-id-03b3668fb88d44149afae57b384690fc"/>
 	<xsd:element name="ControlCodeType" type="ControlCodeType" id="oagis-id-c2815691ba4a41638cb6a26d04339ddf"/>
 	<xsd:element name="ControlObjectiveCategory" type="RiskCodeType" id="oagis-id-c17adb973a17431c8910b902bb838999"/>
 	<xsd:element name="TestingProcedureStep" type="TestingProcedureStepType" id="oagis-id-c0d8f7ce88174443bffe23f136bdca45"/>
