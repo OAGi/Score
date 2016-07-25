@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_2 Platform 2_2
@@ -40,7 +41,7 @@
 	<!---->
 	<xsd:complexType name="AnyUserAreaType" id="oagis-id-8f621d422cb84f09a606d31870cbbf92">
 		<xsd:sequence>
-			<xsd:any namespace="##any" processContents="strict" id="oagis-id-c68e449c31bf4b1dbecbf7075722dc6d" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:any namespace="##any" processContents="strict" minOccurs="0" maxOccurs="unbounded" id="oagis-id-c68e449c31bf4b1dbecbf7075722dc6d"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="AnyExtension" type="AnyUserAreaType" id="oagis-id-e932d9a6d5ca4582a6a22a18e90b4444"/>
