@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,34 +24,35 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncTestMethod.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
-        <xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
-        <xsd:element name="SyncTestMethod" type="SyncTestMethodType" id="oagis-id-9712b728b0d34677a367b2a3555bcdfa">
-                <xsd:annotation>
-                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
+	<xsd:element name="SyncTestMethod" type="SyncTestMethodType" id="oagis-id-b23ce16c6e434b5f8f66da1a2517170e">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
 This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
 
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to synchronize a Bill of Material.</xsd:documentation>
-                </xsd:annotation>
-        </xsd:element>
-        <xsd:complexType name="SyncTestMethodType" id="oagis-id-d048f400279b4d8e8d6bd6047e1c80b2">
-                <xsd:complexContent>
-                        <xsd:extension base="BusinessObjectDocumentType">
-                                <xsd:sequence>
-                                        <xsd:element name="DataArea" type="SyncTestMethodDataAreaType" id="oagis-id-415bc79809844caea49a49366a0f4827">
-                                                <xsd:annotation>
-                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncTestMethod. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
-                                                </xsd:annotation>
-                                        </xsd:element>
-                                </xsd:sequence>
-                        </xsd:extension>
-                </xsd:complexContent>
-        </xsd:complexType>
-        <xsd:complexType name="SyncTestMethodDataAreaType" id="oagis-id-2311fc0a0b7b495d81e7a6c81d7865f8">
-                <xsd:sequence>
-                        <xsd:element ref="Sync" id="oagis-id-55dd77dc24dc49339d05a29ae924316f"/>
-                        <xsd:element ref="TestMethod" maxOccurs="unbounded" id="oagis-id-158273b075154dff888fdfbdc430deec"/>
-                </xsd:sequence>
-        </xsd:complexType>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SyncTestMethodType" id="oagis-id-d8e38ecec49b41c5973817b9c996e7ca">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="SyncTestMethodDataAreaType" id="oagis-id-be06e5f56abb40198b6ff05f5b6b2636">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncTestMethod. The information consists of a Verb and one or more Nouns. The verb (Sync) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="SyncTestMethodDataAreaType" id="oagis-id-33f65a298ba245dc8c423aee62077ad1">
+		<xsd:sequence>
+			<xsd:element ref="Sync" id="oagis-id-65f61ec3773344f989e38eaa03cea577"/>
+			<xsd:element ref="TestMethod" id="oagis-id-2f536423ae4e4c47a48692d7ae383fd1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,36 +24,37 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/NotifyTestMethod.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
-        <xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
-        <xsd:element name="NotifyTestMethod" type="NotifyTestMethodType" id="oagis-id-6539a93cd21f41a48ac086cfda7d579f">
-                <xsd:annotation>
-                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
+	<xsd:element name="NotifyTestMethod" type="NotifyTestMethodType" id="oagis-id-46bdf9e24a5949dc927ea6382d4c4011">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the NotifyTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
 This BOD may be necessary to address the Make to Order, Assemble to Order, or Mixed Mode business ordering scenarios in a Order Management to Manufacturing application integration scenario.
 
 There are many possible business applications in several environments that may usethis capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement of a Bill of Material.
 
 This information is provided as information it is up to the receiving system to determine what to do with it.  </xsd:documentation>
-                </xsd:annotation>
-        </xsd:element>
-        <xsd:complexType name="NotifyTestMethodType" id="oagis-id-9d4c399506974ad3b5ec81f246920873">
-                <xsd:complexContent>
-                        <xsd:extension base="BusinessObjectDocumentType">
-                                <xsd:sequence>
-                                        <xsd:element name="DataArea" type="NotifyTestMethodDataAreaType" id="oagis-id-4cc15580f6484ec6952f3f859cfa3920">
-                                                <xsd:annotation>
-                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyTestMethod. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
-                                                </xsd:annotation>
-                                        </xsd:element>
-                                </xsd:sequence>
-                        </xsd:extension>
-                </xsd:complexContent>
-        </xsd:complexType>
-        <xsd:complexType name="NotifyTestMethodDataAreaType" id="oagis-id-9f096c33c6b445719ec52d9f7112ed0b">
-                <xsd:sequence>
-                        <xsd:element ref="Notify" id="oagis-id-fa98970ab14441c3a72bd44a195192d0"/>
-                        <xsd:element ref="TestMethod" maxOccurs="unbounded" id="oagis-id-350c777ec384468a819d6a0d1c66dbc8"/>
-                </xsd:sequence>
-        </xsd:complexType>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NotifyTestMethodType" id="oagis-id-cefc060f7d8648e5b500129a267e8a9c">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="NotifyTestMethodDataAreaType" id="oagis-id-60341c5b7fff4bd4b257e2c8eba1e13a">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case NotifyTestMethod. The information consists of a Verb and one or more Nouns. The verb (Notify) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NotifyTestMethodDataAreaType" id="oagis-id-558489edfdeb4e65aef8c6f9f7826264">
+		<xsd:sequence>
+			<xsd:element ref="Notify" id="oagis-id-a06187873c7947578b91c5cb39f57582"/>
+			<xsd:element ref="TestMethod" id="oagis-id-8746c1d6d5124195a7010026a3aed1ad" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema>

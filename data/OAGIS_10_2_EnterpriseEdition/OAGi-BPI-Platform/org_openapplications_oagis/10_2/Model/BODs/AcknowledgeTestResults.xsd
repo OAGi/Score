@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
    Schema agency: 	Open Applications Group 
 
@@ -20,9 +21,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/AcknowledgeTestResults.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestResults.xsd"/>
-	<xsd:element name="AcknowledgeTestResults" type="AcknowledgeTestResultsType" id="oagis-id-d33e764ca8a34be982ddc2c03297f525">
+	<xsd:element name="AcknowledgeTestResults" type="AcknowledgeTestResultsType" id="oagis-id-557a48b0d2dc4695a6525ef24cb7de4d">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestResults is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -31,11 +33,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Acknowledgehronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="AcknowledgeTestResultsType" id="oagis-id-49831133a4ff4586a208398eb5236477">
+	<xsd:complexType name="AcknowledgeTestResultsType" id="oagis-id-63ee0418e08d4c5496f5f991912532f4">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="AcknowledgeTestResultsDataAreaType" id="oagis-id-cf2c1df2881a434f8cce0855c301a0c8">
+					<xsd:element name="DataArea" type="AcknowledgeTestResultsDataAreaType" id="oagis-id-f746478b93b14ba4a737eaadd294324e">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case AcknowledgeTestResults. The information consists of a Verb and one or more Nouns. The verb (Acknowledge) indicates the action to be performed on the Noun (TestResults).</xsd:documentation>
 						</xsd:annotation>
@@ -44,10 +46,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="AcknowledgeTestResultsDataAreaType" id="oagis-id-c9e79fe541bf4e25be70f80abe4e3145">
+	<xsd:complexType name="AcknowledgeTestResultsDataAreaType" id="oagis-id-a74591953bb64398a435720482d7ef51">
 		<xsd:sequence>
-			<xsd:element ref="Acknowledge" id="oagis-id-f8b4f55ad21d471dbbe204a156e520f7"/>
-			<xsd:element ref="TestResults" maxOccurs="unbounded" id="oagis-id-0cdae06e26314915b44fd03bc405582e"/>
+			<xsd:element ref="Acknowledge" id="oagis-id-cd08ef452a29428dbbff03f0863285ed"/>
+			<xsd:element ref="TestResults" id="oagis-id-7f8d551cd0dc414f82f9f46de0bcc24b" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,32 +24,33 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/GetTestMethod.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
-        <xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
-        <xsd:element name="GetTestMethod" type="GetTestMethodType" id="oagis-id-d57e025982a14700817e8f00c8ee148d">
-                <xsd:annotation>
-                        <xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetTestMethod is to enable an application to request specific Item Bill of Material information from another business application module.  The response to the GetTestMethod is the ShowTestMethod.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
+	<xsd:element name="GetTestMethod" type="GetTestMethodType" id="oagis-id-1edee5f1011944ae9dee9fbc46bfa0fd">
+		<xsd:annotation>
+			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the GetTestMethod is to enable an application to request specific Item Bill of Material information from another business application module.  The response to the GetTestMethod is the ShowTestMethod.
 
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate Item Bill of Material information.</xsd:documentation>
-                </xsd:annotation>
-        </xsd:element>
-        <xsd:complexType name="GetTestMethodType" id="oagis-id-f6b85b6a12f845848c6b2fd39e7ea577">
-                <xsd:complexContent>
-                        <xsd:extension base="BusinessObjectDocumentType">
-                                <xsd:sequence>
-                                        <xsd:element name="DataArea" type="GetTestMethodDataAreaType" id="oagis-id-8471ba2c21d74831b5d8b229f226a8af">
-                                                <xsd:annotation>
-                                                        <xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetTestMethod. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
-                                                </xsd:annotation>
-                                        </xsd:element>
-                                </xsd:sequence>
-                        </xsd:extension>
-                </xsd:complexContent>
-        </xsd:complexType>
-        <xsd:complexType name="GetTestMethodDataAreaType" id="oagis-id-aac7efe4a52f4a56850db6aff2bfa3be">
-                <xsd:sequence>
-                        <xsd:element ref="Get" id="oagis-id-539da7b44f964e6ab4c64a63a369b9a4"/>
-                        <xsd:element ref="TestMethod" maxOccurs="unbounded" id="oagis-id-aa154e53f6e04e64bbcdff3a36b264e9"/>
-                </xsd:sequence>
-        </xsd:complexType>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GetTestMethodType" id="oagis-id-5cf5e9fb82ff4d608123386fa0e2b918">
+		<xsd:complexContent>
+			<xsd:extension base="BusinessObjectDocumentType">
+				<xsd:sequence>
+					<xsd:element name="DataArea" type="GetTestMethodDataAreaType" id="oagis-id-ff7e5fc01dab43fd807eada8cf2dfc93">
+						<xsd:annotation>
+							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case GetTestMethod. The information consists of a Verb and one or more Nouns. The verb (Get) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="GetTestMethodDataAreaType" id="oagis-id-d2845933101c4221a1af07aa0028a35d">
+		<xsd:sequence>
+			<xsd:element ref="Get" id="oagis-id-6050214b0fe04846b97711e232d7887c"/>
+			<xsd:element ref="TestMethod" id="oagis-id-7e4c6b18f4ab40edbd452089d19175e0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ProcessTestMethod.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
-	<xsd:element name="ProcessTestMethod" type="ProcessTestMethodType" id="oagis-id-73cdde19f51f4e3eb77ed6c29f7780fc">
+	<xsd:element name="ProcessTestMethod" type="ProcessTestMethodType" id="oagis-id-bd71e706eca844f18e84e9f0d527e81a">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Processhronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ProcessTestMethodType" id="oagis-id-76a07ce974654cd18bd753b3fd570084">
+	<xsd:complexType name="ProcessTestMethodType" id="oagis-id-b3d615e2cb69417fb00adb1d8798af27">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="ProcessTestMethodDataAreaType" id="oagis-id-b7f143dad7104788bbec5b7dee8463c4">
+					<xsd:element name="DataArea" type="ProcessTestMethodDataAreaType" id="oagis-id-db51ba9cda6948e4b3804ac6820a4f60">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ProcessTestMethod. The information consists of a Verb and one or more Nouns. The verb (Process) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="ProcessTestMethodDataAreaType" id="oagis-id-2817933ae634438cb26b93d82a894d99">
+	<xsd:complexType name="ProcessTestMethodDataAreaType" id="oagis-id-66ec0674ae1a4a32b49baadfa534dacf">
 		<xsd:sequence>
-			<xsd:element ref="Process" id="oagis-id-7a4fee6291b949059717485f474d1d70"/>
-			<xsd:element ref="TestMethod" maxOccurs="unbounded" id="oagis-id-d60e202c39df4bb1a0dc7d490543e4c2"/>
+			<xsd:element ref="Process" id="oagis-id-a62e7de705f14dcf97755d1a22c36deb"/>
+			<xsd:element ref="TestMethod" id="oagis-id-1222bd288fb647fe9248d494c3bf39cf" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>
