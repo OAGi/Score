@@ -207,7 +207,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             }
             codeListElement.addContent(unionElement);
             rootElement.addContent(codeListElement);
-
         } else {
             Element codeListElement = new Element("simpleType", XSD_NS);
             codeListElement.setAttribute("name", name + "ContentType");
@@ -220,6 +219,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             } else {
                 addRestriction(codeListElement, values);
             }
+            rootElement.addContent(codeListElement);
         }
     }
 
@@ -430,7 +430,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             extensionElement.setAttribute("base", basedACC.getTypeName());
             complexContentElement.addContent(extensionElement);
 
-            if (!sequenceElement.getContent().isEmpty()) {
+            if (!sequenceElement.getContent().isEmpty() || (basedACC.getTypeName().equals("AllExtensionType")) || (accComplexType.getTypeName().equals("AllExtensionType"))) {
                 extensionElement.addContent(sequenceElement);
             }
         } else {
