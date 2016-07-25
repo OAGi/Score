@@ -194,22 +194,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
             addRestriction(codeListElement, schemaCodeList.getValues());
             rootElement.addContent(codeListElement);
-        }
 
-        Element codeListElement = new Element("simpleType", XSD_NS);
-        codeListElement.setAttribute("name", name + "ContentType");
-        codeListElement.setAttribute("id", schemaCodeList.getGuid());
-
-        if (name.startsWith("clm")) {
-            Collection<String> values = schemaCodeList.getValues();
-            if (values.isEmpty()) {
-                Element restrictionElement = new Element("restriction", XSD_NS);
-                restrictionElement.setAttribute("base", "xsd:normalizedString");
-                codeListElement.addContent(restrictionElement);
-            } else {
-                addRestriction(codeListElement, values);
-            }
-        } else {
+            codeListElement = new Element("simpleType", XSD_NS);
+            codeListElement.setAttribute("name", name + "ContentType");
+            codeListElement.setAttribute("id", schemaCodeList.getGuid());
             Element unionElement = new Element("union", XSD_NS);
             SchemaCodeList baseCodeList = schemaCodeList.getBaseCodeList();
             if (baseCodeList == null) {
@@ -218,9 +206,21 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
                 unionElement.setAttribute("memberTypes", baseCodeList.getName() + "ContentType" + " xsd:token");
             }
             codeListElement.addContent(unionElement);
-        }
+            rootElement.addContent(codeListElement);
 
-        rootElement.addContent(codeListElement);
+        } else {
+            Element codeListElement = new Element("simpleType", XSD_NS);
+            codeListElement.setAttribute("name", name + "ContentType");
+            codeListElement.setAttribute("id", schemaCodeList.getGuid());
+            Collection<String> values = schemaCodeList.getValues();
+            if (values.isEmpty()) {
+                Element restrictionElement = new Element("restriction", XSD_NS);
+                restrictionElement.setAttribute("base", "xsd:normalizedString");
+                codeListElement.addContent(restrictionElement);
+            } else {
+                addRestriction(codeListElement, values);
+            }
+        }
     }
 
     @Override
