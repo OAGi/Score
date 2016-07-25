@@ -314,13 +314,14 @@ public class Utility {
     public static String denWithQualifier(String qualifier, String baseDen) {
         String denWithQualifier = "";
         baseDen = Utility.denWithoutUUID(baseDen);
-
+        if (baseDen.startsWith("Open_ ")) {
+            baseDen = baseDen.replace("Open_ ", "");
+        }
         if (!baseDen.equals("Code Content. Type") && baseDen.endsWith("Code Content. Type")) {
             denWithQualifier = qualifier + "_ " + "Code. Type";
         } else {
             denWithQualifier = qualifier + "_ " + baseDen;
         }
-
         return denWithQualifier;
     }
 
@@ -336,8 +337,8 @@ public class Utility {
 
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
         String qualifier = "";
-        if (baseDen.contains("Open_")) {
-            baseDen = baseDen.replace("Open_", "");
+        if (baseDen.contains("Open_ ")) {
+            baseDen = baseDen.replace("Open_ ", "");
         }
         if (dataTypeTerm.equals("Text")) {
             if (type.contains("Text")) {
