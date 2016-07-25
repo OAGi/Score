@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
@@ -20,7 +21,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_CurrencyCode_ISO_7_04.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:annotation>
 		<xsd:documentation source="http://www.openapplications.org/oagis/10">The following currentcy codes have been updated based upon the changes made by ISO.
 
@@ -1224,9 +1226,11 @@ The OAGi implementation of this codelist is deprecating the old values in facor 
 			</xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
+	<!--
 	<xsd:complexType name="clm542173A20090305_ISO3AlphaCurrencyCodeType" id="oagis-id-4f1310d65d30460eb89ea90aefeadb9d">
 		<xsd:simpleContent>
 			<xsd:extension base="clm542173A20090305_ISO3AlphaCurrencyCodeContentType"/>
 		</xsd:simpleContent>
 	</xsd:complexType>
+-->
 </xsd:schema>

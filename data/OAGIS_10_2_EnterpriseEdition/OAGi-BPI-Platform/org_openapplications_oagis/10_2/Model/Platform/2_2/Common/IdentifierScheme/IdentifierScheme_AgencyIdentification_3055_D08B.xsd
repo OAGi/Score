@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- ====================================================================== --><!-- =====  UN/CEFACT Agency Identification Code - Code List XML Schema File                          ===== --><!-- ====================================================================== --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
+<!-- ====================================================================== -->
+<!-- =====  UN/CEFACT Agency Identification Code - Code List XML Schema File                          ===== -->
+<!-- ====================================================================== -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
@@ -20,13 +25,16 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Platform/2_2/IdentifierScheme/IdentifierScheme_AgencyIdentification_3055_D08B.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.3">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.3">
 	<!-- ====================================================================== -->
 	<!-- =====  Element Declarations				      ===== -->
 	<!-- ====================================================================== -->
 	<!-- =====  Root Element Declaration				      ===== -->
 	<!-- ====================================================================== -->
+	<!--
 	<xsd:element name="clm63055D08B_AgencyIdentification" type="clm63055D08B_AgencyIdentificationContentType" id="oagis-id-db50071000454f9d9d24563b579c96b2"/>
+-->
 	<!-- ====================================================================== -->
 	<!-- =====  Type Definitions					      ===== -->
 	<!-- ====================================================================== -->
