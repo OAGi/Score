@@ -329,14 +329,14 @@ public class Utility {
         String QCCDen = "";
         int posCodeContent = den.indexOf("Code Content");
         String part1 = den.substring(0, posCodeContent);
-        String part2 = den.substring(posCodeContent + 12);
+        String part2 = den.substring(posCodeContent + "Code Content".length());
 
         return part1 + "_ " + part2;
     }
 
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
         String qualifier = "";
-        if(baseDen.contains("Open_")) {
+        if (baseDen.contains("Open_")) {
             baseDen = baseDen.replace("Open_", "");
         }
         if (dataTypeTerm.equals("Text")) {
