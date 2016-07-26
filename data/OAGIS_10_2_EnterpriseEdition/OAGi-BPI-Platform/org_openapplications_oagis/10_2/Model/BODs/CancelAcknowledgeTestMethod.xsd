@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelAcknowledgeTestMethod.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
-	<xsd:element name="CancelAcknowledgeTestMethod" type="CancelAcknowledgeTestMethodType" id="oagis-id-8c942547317441d0a4af2e986d2a50c3">
+	<xsd:element name="CancelAcknowledgeTestMethod" type="CancelAcknowledgeTestMethodType" id="oagis-id-89446d41410542438336d6a056b95e72">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to CancelAcknowledgehronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="CancelAcknowledgeTestMethodType" id="oagis-id-db4e9723eede4831bd70aa730b7a350b">
+	<xsd:complexType name="CancelAcknowledgeTestMethodType" id="oagis-id-525058e369f9403fa507cd557e74db10">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="CancelAcknowledgeTestMethodDataAreaType" id="oagis-id-37ef09b893c54e949b72e9cf032132da">
+					<xsd:element name="DataArea" type="CancelAcknowledgeTestMethodDataAreaType" id="oagis-id-0a0625ddb5d54e539aa775618365395b">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelAcknowledgeTestMethod. The information consists of a Verb and one or more Nouns. The verb (CancelAcknowledge) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="CancelAcknowledgeTestMethodDataAreaType" id="oagis-id-cf7785efbbed41f58233cf3d1e996f3b">
+	<xsd:complexType name="CancelAcknowledgeTestMethodDataAreaType" id="oagis-id-0a26314b9ea24597b119d9f4704cdcf8">
 		<xsd:sequence>
-			<xsd:element ref="CancelAcknowledge" id="oagis-id-21ee386f211341d7be1c5a7561deb519"/>
-			<xsd:element ref="TestMethod" maxOccurs="unbounded" id="oagis-id-97142b655dbb4691af15dc4f8756d696"/>
+			<xsd:element ref="CancelAcknowledge" id="oagis-id-d1ed0d15c5da4e1fb541eafac5d9ea52"/>
+			<xsd:element ref="TestMethod" id="oagis-id-6ae03de43ecf4b3194307fb075ebff87" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

@@ -193,7 +193,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 		<xsd:complexContent>
 			<xsd:extension base="TestResultsDetailBaseType">
 				<xsd:sequence>
-					<xsd:element name="Extension" type="TestResultsDetailExtensionType" id="oagis-id-06ae2cfb46f647f7a326a144f7c8e0d9" minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="Extension" type="TestResultsDetailExtensionType" id="oagis-id-00599d451c70443dadf3ef304ffaf69b" minOccurs="0" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows the user of OAGIS to extend the specification in order to provide additional information that is not captured in OAGIS.</xsd:documentation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">This is done by defining the additional information in XML Schema and referencing the new schema in the xml instance document through the use of namespaces. Once this is done the additional information defined there can be carried in the BOD XML instance document.</xsd:documentation>

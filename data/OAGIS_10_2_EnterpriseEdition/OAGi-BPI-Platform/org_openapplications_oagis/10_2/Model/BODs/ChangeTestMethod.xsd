@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeTestMethod.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestMethod.xsd"/>
-	<xsd:element name="ChangeTestMethod" type="ChangeTestMethodType" id="oagis-id-9111f95f02dc4e1798965e51509876c1">
+	<xsd:element name="ChangeTestMethod" type="ChangeTestMethodType" id="oagis-id-7f748c5945bb4c0a88e2a484ab8b5149">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestMethod is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Changehronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ChangeTestMethodType" id="oagis-id-df6521cfa5154cbbbf8abcc742809c41">
+	<xsd:complexType name="ChangeTestMethodType" id="oagis-id-b840b5aadd424e23915087a2756ab657">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="ChangeTestMethodDataAreaType" id="oagis-id-273bc1baabfd4e628e51fb4fdc87498e">
+					<xsd:element name="DataArea" type="ChangeTestMethodDataAreaType" id="oagis-id-7f846c5c81ca406084e6426c2443135e">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeTestMethod. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (TestMethod).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="ChangeTestMethodDataAreaType" id="oagis-id-f2f6d7cb95914973a6c2f127747d2377">
+	<xsd:complexType name="ChangeTestMethodDataAreaType" id="oagis-id-3ace466b260245c28bd1c886d3231586">
 		<xsd:sequence>
-			<xsd:element ref="Change" id="oagis-id-ab97f4fe13014f24919aa9b95aa0f1c3"/>
-			<xsd:element ref="TestMethod" maxOccurs="unbounded" id="oagis-id-15fb68b8fd774e73a6053b4e1e9ae63d"/>
+			<xsd:element ref="Change" id="oagis-id-e20dbc863d874dbe8c4f06c4bb307ed2"/>
+			<xsd:element ref="TestMethod" id="oagis-id-c7c8ab60854e4186b992dc0b1ab56671" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

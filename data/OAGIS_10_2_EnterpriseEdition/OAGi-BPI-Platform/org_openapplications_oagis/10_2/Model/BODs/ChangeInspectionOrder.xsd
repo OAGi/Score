@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeInspectionOrder.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/InspectionOrder.xsd"/>
-	<xsd:element name="ChangeInspectionOrder" type="ChangeInspectionOrderType" id="oagis-id-9111f95f02dc4e1798965e51509876c1">
+	<xsd:element name="ChangeInspectionOrder" type="ChangeInspectionOrderType" id="oagis-id-156858372c02486b841713334810acf4">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynInspectionOrder is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Changehronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ChangeInspectionOrderType" id="oagis-id-df6521cfa5154cbbbf8abcc742809c41">
+	<xsd:complexType name="ChangeInspectionOrderType" id="oagis-id-4e289fe1be9d42afa52bccfe7458e7e4">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="ChangeInspectionOrderDataAreaType" id="oagis-id-273bc1baabfd4e628e51fb4fdc87498e">
+					<xsd:element name="DataArea" type="ChangeInspectionOrderDataAreaType" id="oagis-id-935dad4c0472475dbb86549713b80b70">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeInspectionOrder. The information consists of a Verb and one or more Nouns. The verb (Change) indicates the action to be performed on the Noun (InspectionOrder).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="ChangeInspectionOrderDataAreaType" id="oagis-id-f2f6d7cb95914973a6c2f127747d2377">
+	<xsd:complexType name="ChangeInspectionOrderDataAreaType" id="oagis-id-a447d1612cde400a802f64c56f8b87bd">
 		<xsd:sequence>
-			<xsd:element ref="Change" id="oagis-id-ab97f4fe13014f24919aa9b95aa0f1c3"/>
-			<xsd:element ref="InspectionOrder" maxOccurs="unbounded" id="oagis-id-15fb68b8fd774e73a6053b4e1e9ae63d"/>
+			<xsd:element ref="Change" id="oagis-id-b30074e8a3a34c2c9bd722319dce04ff"/>
+			<xsd:element ref="InspectionOrder" id="oagis-id-e9609969b47c444389721c1c7b65f792" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

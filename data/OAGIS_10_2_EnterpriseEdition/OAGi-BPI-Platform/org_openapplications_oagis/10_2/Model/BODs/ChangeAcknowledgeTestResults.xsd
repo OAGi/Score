@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/ChangeAcknowledgeTestResults.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestResults.xsd"/>
-	<xsd:element name="ChangeAcknowledgeTestResults" type="ChangeAcknowledgeTestResultsType" id="oagis-id-7c1cfcf6bed84976a83c14958a90ceb3">
+	<xsd:element name="ChangeAcknowledgeTestResults" type="ChangeAcknowledgeTestResultsType" id="oagis-id-7768e97bf0494ab39945a52bbe6df348">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestResults is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to ChangeAcknowledgehronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ChangeAcknowledgeTestResultsType" id="oagis-id-88d289153e834cbc84a3d4fc5ba8828a">
+	<xsd:complexType name="ChangeAcknowledgeTestResultsType" id="oagis-id-ed2f19d928124226aecd4cab18b18003">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="ChangeAcknowledgeTestResultsDataAreaType" id="oagis-id-bb4e51937f23467db2177bd42b6c088c">
+					<xsd:element name="DataArea" type="ChangeAcknowledgeTestResultsDataAreaType" id="oagis-id-2753f55ab20b4d06bd3993e087b49d39">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case ChangeAcknowledgeTestResults. The information consists of a Verb and one or more Nouns. The verb (ChangeAcknowledge) indicates the action to be performed on the Noun (TestResults).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="ChangeAcknowledgeTestResultsDataAreaType" id="oagis-id-803f772f290542f78a30106b876694e4">
+	<xsd:complexType name="ChangeAcknowledgeTestResultsDataAreaType" id="oagis-id-92dff44a1e2d4e379faa927c33c46960">
 		<xsd:sequence>
-			<xsd:element ref="ChangeAcknowledge" id="oagis-id-e6bda29872aa4b87a4afe98a8251d83f"/>
-			<xsd:element ref="TestResults" maxOccurs="unbounded" id="oagis-id-168ec3157a5e4b78ab5a7a2091c42112"/>
+			<xsd:element ref="ChangeAcknowledge" id="oagis-id-7e86a9c0945a437c86a3953bf67e5b5f"/>
+			<xsd:element ref="TestResults" id="oagis-id-92117045ce8141f59994c9f2b6bb7939" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

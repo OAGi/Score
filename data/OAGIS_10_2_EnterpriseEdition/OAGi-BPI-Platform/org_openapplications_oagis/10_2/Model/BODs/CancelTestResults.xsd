@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/CancelTestResults.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestResults.xsd"/>
-	<xsd:element name="CancelTestResults" type="CancelTestResultsType" id="oagis-id-1609da2ff54b423cb991443fead223e4">
+	<xsd:element name="CancelTestResults" type="CancelTestResultsType" id="oagis-id-1a6f0e4db8814fcf83d0cd5c98a43159">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestResults is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to Cancelhronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="CancelTestResultsType" id="oagis-id-93c14f67b3ee4689a89c006a5c4214b7">
+	<xsd:complexType name="CancelTestResultsType" id="oagis-id-51ee46ca1b544e0f834f409050b3c0bf">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="CancelTestResultsDataAreaType" id="oagis-id-fd30df67b0744053bc64572d20b265ed">
+					<xsd:element name="DataArea" type="CancelTestResultsDataAreaType" id="oagis-id-e6dd1c490b9b496fbb33a795c44535ae">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case CancelTestResults. The information consists of a Verb and one or more Nouns. The verb (Cancel) indicates the action to be performed on the Noun (TestResults).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="CancelTestResultsDataAreaType" id="oagis-id-45b64ca6b93a47ff8ca44279fd538077">
+	<xsd:complexType name="CancelTestResultsDataAreaType" id="oagis-id-3a5829cec8d047a08c42cb5b5512209a">
 		<xsd:sequence>
-			<xsd:element ref="Cancel" id="oagis-id-ae8e1417aba8436e962517052b6299e3"/>
-			<xsd:element ref="TestResults" maxOccurs="unbounded" id="oagis-id-e747bde0f1b040b88684239f591d0be3"/>
+			<xsd:element ref="Cancel" id="oagis-id-c2428ec6085d40c882d3fb9bf54affca"/>
+			<xsd:element ref="TestResults" id="oagis-id-e163019eb15f4daaa07f21e71a2cdf95" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>

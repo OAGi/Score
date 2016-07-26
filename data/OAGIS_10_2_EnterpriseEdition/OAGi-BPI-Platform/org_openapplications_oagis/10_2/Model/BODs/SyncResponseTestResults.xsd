@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
 
 
 
@@ -23,9 +24,10 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/BODs/SyncResponseTestResults.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Nouns/TestResults.xsd"/>
-	<xsd:element name="SyncResponseTestResults" type="SyncResponseTestResultsType" id="oagis-id-00d690953de14f40b316458a0770cc95">
+	<xsd:element name="SyncResponseTestResults" type="SyncResponseTestResultsType" id="oagis-id-0c767f5a997f4cd299c23d77c60409fc">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The purpose of the SynTestResults is to communicate to a business application module or system the need to initiate the creation of a Bill of Material structure.
 
@@ -34,11 +36,11 @@ This BOD may be necessary to address the Make to Order, Assemble to Order, or Mi
 There are many possible business applications in several environments that may use this capability. For example, an MRP, Inventory, or Manufacturing business application could use this to communicate the requirement to SyncResponsehronize a Bill of Material.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="SyncResponseTestResultsType" id="oagis-id-d13349df589d4b43a9f04ea1aa441d7b">
+	<xsd:complexType name="SyncResponseTestResultsType" id="oagis-id-ed529085613d4765bf6c1da3210db714">
 		<xsd:complexContent>
 			<xsd:extension base="BusinessObjectDocumentType">
 				<xsd:sequence>
-					<xsd:element name="DataArea" type="SyncResponseTestResultsDataAreaType" id="oagis-id-73cf5446a4614d0bb108e64196ff1d60">
+					<xsd:element name="DataArea" type="SyncResponseTestResultsDataAreaType" id="oagis-id-a7894031c2e0458baacdd61caf696bea">
 						<xsd:annotation>
 							<xsd:documentation source="http://www.openapplications.org/oagis/10">Is where the information that the BOD message carries is provided, in this case SyncResponseTestResults. The information consists of a Verb and one or more Nouns. The verb (SyncResponse) indicates the action to be performed on the Noun (TestResults).</xsd:documentation>
 						</xsd:annotation>
@@ -47,10 +49,10 @@ There are many possible business applications in several environments that may u
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="SyncResponseTestResultsDataAreaType" id="oagis-id-4d02f8dd84cd448c877dfe68e668cf97">
+	<xsd:complexType name="SyncResponseTestResultsDataAreaType" id="oagis-id-fe33ffe33d4e48f0a187e4006f556a3c">
 		<xsd:sequence>
-			<xsd:element ref="SyncResponse" id="oagis-id-d34004768dff4aa185adbaa9e524ed41"/>
-			<xsd:element ref="TestResults" maxOccurs="unbounded" id="oagis-id-21f6da4fcda74080aa34d038f288e38a"/>
+			<xsd:element ref="SyncResponse" id="oagis-id-47c560b0d1ea436ea470903d59d59cfc"/>
+			<xsd:element ref="TestResults" id="oagis-id-fe1a5cd03bc9466fb6e1af235be73477" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 </xsd:schema>
