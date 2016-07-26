@@ -14870,7 +14870,7 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 					<xsd:element ref="ManufacturingName" id="oagis-id-f1810ef985eb4bfbad66a068a44e785c" minOccurs="0"/>
 					<xsd:element ref="ModelID" id="oagis-id-d8acd83052d24c04be35cc19ab94a5f4" minOccurs="0"/>
 					<xsd:element ref="EquipmentCategoryCode" id="oagis-id-eff07aaf4fb74b708142eef183d0b50f" minOccurs="0" maxOccurs="unbounded"/>
-					<xsd:element ref="EquipmentCalloborationRequirement" id="oagis-id-ff62477c2ab442959351597ec5a493ab" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="EquipmentCollaborationRequirement" id="oagis-id-ff62477c2ab442959351597ec5a493ab" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -14981,8 +14981,8 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
     <xsd:element name="PurposeCode" type="CodeType" id="oagis-id-153c772c244644e1af1ec038a241d111"/>
     <xsd:element name="ResultName" type="NameType" id="oagis-id-8264b83fb73244f4825421ffefe866cd"/>
     <xsd:element name="ValuePrimitiveCode" type="OpenCodeType" id="oagis-id-225b6dcae4134aaa949fa606ad8404e9"/>
-    <xsd:element name="EquipmentCalloborationRequirement" type="EquipmentCalloborationRequirementType" id="oagis-id-ff62477c2ab442959351597ec5a493aa"/>
-    <xsd:complexType name="EquipmentCalloborationRequirementType" id="oagis-id-00fd0de1f1124560809fb3a3bd37a1b5">
+    <xsd:element name="EquipmentCollaborationRequirement" type="EquipmentCollaborationRequirementType" id="oagis-id-ff62477c2ab442959351597ec5a493aa"/>
+    <xsd:complexType name="EquipmentCollaborationRequirementType" id="oagis-id-00fd0de1f1124560809fb3a3bd37a1b5">
         <xsd:sequence>
             <xsd:element ref="Measure" id="oagis-id-144d44ec22cb4b5ca4ad5abb1481405e" minOccurs="0"/>
             <xsd:element ref="ValueRange" id="oagis-id-8ffe7bb46943492eb68d1e0f26bf8fdc" minOccurs="0"/>
