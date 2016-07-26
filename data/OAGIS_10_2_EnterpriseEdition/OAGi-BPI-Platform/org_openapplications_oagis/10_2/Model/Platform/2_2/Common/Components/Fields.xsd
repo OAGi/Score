@@ -885,7 +885,7 @@ The following are a couple of examples: Setup, Teardown, Run</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="NationalityCountryCode" type="CountryCodeType" nillable="true" id="oagis-id-001672500ef9475e8cedd92ca31d8ece"/>
-	<xsd:element name="HarmonizedTariffScheduleCode" type="HarmonizedTariffScheduleCodeType" nillable="true" id="oagis-id-070cc38a515b494ab83a9f9e8b92a337"/>
+	<xsd:element name="HarmonizedTariffScheduleCode" type="HarmonizedTariffScheduleOpenCodeType" nillable="true" id="oagis-id-070cc38a515b494ab83a9f9e8b92a337"/>
 	<xsd:element name="PortType" type="OpenCodeType" nillable="true" id="oagis-id-35dec89525494e23acefa2279839b25a"/>
 	<xsd:element name="OriginationCountryCode" type="CountryCodeType" nillable="true" id="oagis-id-0323418e1a8140fcb8f9fa8d28ae4cd8">
 		<xsd:annotation>
@@ -2011,7 +2011,7 @@ Synonyms are Business Unit, Fund, G/L Company, Joint Venture, Non-Profit Associa
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">The RedirectURL can be used to indicate a URL to which the Requesting application can be re-directed once the session initiated by this connection is completed. The session completion event is not recorded in this transaction.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ReferenceDesignatorID" type="SequencedIDType" nillable="true" id="oagis-id-1f1be4407e85429d95acaaabff9b9475">
+	<xsd:element name="ReferenceDesignatorID" type="SequencedOpenIDType" nillable="true" id="oagis-id-1f1be4407e85429d95acaaabff9b9475">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the reference designator on a Drawing or BluePrint where the BOM is used.
 
@@ -2415,7 +2415,7 @@ In other words if a given Option is choosen another Option out of the same Optio
 	<xsd:element name="InsuranceRequiredIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-f3f4f6d6784843d6b817f94a7990df28"/>
 	<xsd:element name="IntraCompanyTransferIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-9241ba3284a14ba0b99e1ca8fea2d191"/>
 	<xsd:element name="LegalIndicator" type="OpenIndicatorType" id="oagis-id-6b61c42262614b298df8c6ca543a4aee"/>
-	<xsd:element name="LicenseIndicator" type="LicenseIndicatorType" nillable="true" id="oagis-id-548c5604c8b044929c8164f36787b702">
+	<xsd:element name="LicenseIndicator" type="LicenseOpenIndicatorType" nillable="true" id="oagis-id-548c5604c8b044929c8164f36787b702">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates what type of licenses are required and indicates which are required.</xsd:documentation>
 		</xsd:annotation>
@@ -3095,34 +3095,34 @@ Number of units of a chemical in a barrel</xsd:documentation>
 	<!--=======================-->
 	<!--Temperature-->
 	<!--=======================-->
-	<xsd:element name="ActualTemperature" type="TemperatureMeasureType" nillable="true" id="oagis-id-4e631426a7b94032b5fdb0b1c3f490a0">
+	<xsd:element name="ActualTemperature" type="TemperatureOpenMeasureType" nillable="true" id="oagis-id-4e631426a7b94032b5fdb0b1c3f490a0">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the actual temperature taken at periodic times.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="EmergencyTemperature" type="TemperatureMeasureType" id="oagis-id-3f5f9f36f5d742619d569cf5ba768624"/>
-	<xsd:element name="FlashpointTemperature" type="TemperatureMeasureType" nillable="true" id="oagis-id-627113d0f8464f72826e11b1688f573c">
+	<xsd:element name="EmergencyTemperature" type="TemperatureOpenMeasureType" id="oagis-id-3f5f9f36f5d742619d569cf5ba768624"/>
+	<xsd:element name="FlashpointTemperature" type="TemperatureOpenMeasureType" nillable="true" id="oagis-id-627113d0f8464f72826e11b1688f573c">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">FlashpointTemperature is related to hazadous substances or goods, indicates the temperature at which the associated substance of goods become flammable, explossive or toxic..</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="MinimumTemperature" type="TemperatureMeasureType" nillable="true" id="oagis-id-36839149030b45e49d2098e7c0fb9dab">
+	<xsd:element name="MinimumTemperature" type="TemperatureOpenMeasureType" nillable="true" id="oagis-id-36839149030b45e49d2098e7c0fb9dab">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the lowest temperature that the associated item can be kept.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="MaximumTemperature" type="TemperatureMeasureType" nillable="true" id="oagis-id-54fb13181e2e47dc916cb5639387566a">
+	<xsd:element name="MaximumTemperature" type="TemperatureOpenMeasureType" nillable="true" id="oagis-id-54fb13181e2e47dc916cb5639387566a">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the maximum termperature that the associated item can be kept.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ReferenceTemperature" type="TemperatureMeasureType" id="oagis-id-2f3b85c79c204028b8594fb33a377855"/>
+	<xsd:element name="ReferenceTemperature" type="TemperatureOpenMeasureType" id="oagis-id-2f3b85c79c204028b8594fb33a377855"/>
 	<xsd:element name="Temperature" type="OpenMeasureType" nillable="true" id="oagis-id-6c6ef161dbe8424ab324c59ecfbf80d3">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Temperature of the associated entity.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="TransportTemperature" type="TemperatureMeasureType" id="oagis-id-fc05cd4c7d0f4bc58bdf12bee52c38b5"/>
+	<xsd:element name="TransportTemperature" type="TemperatureOpenMeasureType" id="oagis-id-fc05cd4c7d0f4bc58bdf12bee52c38b5"/>
 	<!--=======================-->
 	<!--Text-->
 	<!--=======================-->
@@ -3450,7 +3450,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 	<xsd:element name="PackingGroup" type="OpenTextType" nillable="true" id="oagis-id-d669c728a2ca4df0931c7c85ca90bc7a"/>
 	<xsd:element name="PreferredName" type="OpenNameType" id="oagis-id-a04ae681b08549d896c70ad026d3f164"/>
 	<xsd:element name="RoutingCarrierName" type="OpenNameType" id="oagis-id-11f6884817a14ac9843ff8093d2631f9"/>
-	<xsd:element name="Reason" type="SequencedTextType" nillable="true" id="oagis-id-fa892eb1e28c46088bc50394c62a8655"/>
+	<xsd:element name="Reason" type="SequencedOpenTextType" nillable="true" id="oagis-id-fa892eb1e28c46088bc50394c62a8655"/>
 	<xsd:element name="SamplingSiteName" type="OpenNameType" id="oagis-id-4e3609f29afa4a14ae5c03757b4d4d0a">
 		<xsd:annotation>
 			<xsd:documentation>the physical site which the sample is taken, often a specific spot in a VAT, etc.</xsd:documentation>
@@ -3787,7 +3787,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="TemperatureMeasureType" id="oagis-id-4a641b3b6a074d5b909b425aeec9caaa">
+	<xsd:complexType name="TemperatureOpenMeasureType" id="oagis-id-4a641b3b6a074d5b909b425aeec9caaa">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">TemperatureMeasureType is logically derived from UN/CEFACT TBG17 ABIE TemperatureType as defined in the Reusable Aggregate Business Information Entity (RUABIE) XML Schema file.
 
@@ -3876,19 +3876,19 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="ServiceLevelValue" type="ValueType" id="oagis-id-7bc5e0c79e0c4f2cacdd000fbe169591"/>
-	<xsd:complexType name="PreferredNameType" id="oagis-id-55e3dee204b449fab4dac08c5893c031">
+	<xsd:complexType name="PreferredOpenNameType" id="oagis-id-55e3dee204b449fab4dac08c5893c031">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenNameType">
 				<xsd:attribute name="preferred" type="xbt_BooleanTrueFalseType" use="optional" id="oagis-id-9bb9add40b5b415c8489b08bd4484907"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:element name="SalutationPreferredName" type="PreferredNameType" id="oagis-id-1fbae1f17a16483cbef250158ff3812c">
+	<xsd:element name="SalutationPreferredName" type="PreferredOpenNameType" id="oagis-id-1fbae1f17a16483cbef250158ff3812c">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Way the person is addressed e.g. Honorable etc?</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="SequencedCodeType" id="oagis-id-dac3c62369c54a5e8b996496f0438c64">
+	<xsd:complexType name="SequencedOpenCodeType" id="oagis-id-dac3c62369c54a5e8b996496f0438c64">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenCodeType">
 				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-f14c6ce3eae34517acb446241a38c629">
@@ -3963,7 +3963,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
-	<xsd:complexType name="SequencedIDType" id="oagis-id-0624ca38925d43929a6f7d8b7b7e0882">
+	<xsd:complexType name="SequencedOpenIDType" id="oagis-id-0624ca38925d43929a6f7d8b7b7e0882">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenIDType">
 				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-93d92483194641a3ac48a997ec4dbe5d">
@@ -3974,7 +3974,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="SequencedTextType" id="oagis-id-51e010d7a1e24ebe89fcf58989fefd1b">
+	<xsd:complexType name="SequencedOpenTextType" id="oagis-id-51e010d7a1e24ebe89fcf58989fefd1b">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenTextType">
 				<xsd:attribute name="sequenceNumber" type="xsd:decimal" id="oagis-id-39a5a53826024a65a2291f50d9feecd3">
@@ -3985,9 +3985,9 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="TypedSequencedTextType" id="oagis-id-c2bef83fa023429f96c2383d4304c7b2">
+	<xsd:complexType name="TypedSequencedOpenTextType" id="oagis-id-c2bef83fa023429f96c2383d4304c7b2">
 		<xsd:simpleContent>
-			<xsd:extension base="SequencedTextType">
+			<xsd:extension base="SequencedOpenTextType">
 				<xsd:attribute name="type" type="xsd:string" id="oagis-id-4228f5e4d6294040a8d813736f872bae"/>
 			</xsd:extension>
 		</xsd:simpleContent>
@@ -4005,14 +4005,14 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="LicenseIndicatorType" id="oagis-id-de63b187aff44fedb887d12a9035309a">
+	<xsd:complexType name="LicenseOpenIndicatorType" id="oagis-id-de63b187aff44fedb887d12a9035309a">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenIndicatorType">
 				<xsd:attribute name="name" type="oacl_LicenseTypeCodeContentType" use="required" id="oagis-id-db502068711649c385a0bd1f41d3a63d"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="HarmonizedTariffScheduleCodeType" id="oagis-id-3de49c6b04d2483d94e47b46e246aa4f">
+	<xsd:complexType name="HarmonizedTariffScheduleOpenCodeType" id="oagis-id-3de49c6b04d2483d94e47b46e246aa4f">
 		<xsd:simpleContent>
 			<xsd:extension base="OpenCodeType">
 				<xsd:attribute name="countryCode" type="oacl_CountryCodeContentType" id="oagis-id-aac395f92b5b44e389a6ba3a2f189dcd"/>

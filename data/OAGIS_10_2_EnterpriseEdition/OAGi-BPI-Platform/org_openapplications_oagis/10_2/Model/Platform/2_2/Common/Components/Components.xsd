@@ -6496,7 +6496,7 @@ Possible values:
 			<xsd:element ref="Text" id="oagis-id-1e20bae85ed84c18b1af0b4766f84ac2" minOccurs="1" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="AddressLine" type="SequencedTextType" abstract="false" nillable="false" id="oagis-id-a74f6ce1584e4878ae64e86c88561333"/>
+	<xsd:element name="AddressLine" type="SequencedOpenTextType" abstract="false" nillable="false" id="oagis-id-a74f6ce1584e4878ae64e86c88561333"/>
 	<xsd:element name="Interests" type="SequencedTextsType" abstract="false" nillable="false" id="oagis-id-d82ffdbbe1c540b5bc6e0a87e7ee8ee8">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Type of transaction the person or entity is interest in Ex. in case of Automobile, Buy. Sell. Lease or Trade, in some other business New, Renewal. </xsd:documentation>
@@ -6512,7 +6512,7 @@ Possible values:
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Accounting code elements</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="Element" type="TypedSequencedTextType" abstract="false" nillable="false" id="oagis-id-4898146f44484b0083056a4f4033fa87"/>
+	<xsd:element name="Element" type="TypedSequencedOpenTextType" abstract="false" nillable="false" id="oagis-id-4898146f44484b0083056a4f4033fa87"/>
 	<xsd:element name="GeneralLedgerNominalAccount" type="NormalizedStringType" abstract="false" nillable="true" id="oagis-id-7d11fc745fe64b87a924b0f77775b8c2">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the primary account classification within a chart of accounts. For example revenue, Fixed Asset, Land, Buildings, etc.</xsd:documentation>
