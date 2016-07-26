@@ -13,12 +13,14 @@ public abstract class ACC implements Component {
     private ACC basedAcc;
 
     private ImportedDataProvider importedDataProvider;
+    private int oagisComponentType;
 
     ACC(AggregateCoreComponent acc, ACC basedAcc,
         ImportedDataProvider importedDataProvider) {
         this.acc = acc;
         this.basedAcc = basedAcc;
         this.importedDataProvider = importedDataProvider;
+        this.oagisComponentType = acc.getOagisComponentType();
     }
 
     public static ACC newInstance(AggregateCoreComponent acc,
@@ -70,4 +72,7 @@ public abstract class ACC implements Component {
         return (asccp != null) && asccp.getRoleOfAccId() == getRawId();
     }
 
+    public int getOagisComponentType() {
+        return this.oagisComponentType;
+    }
 }

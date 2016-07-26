@@ -431,9 +431,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             extensionElement.setAttribute("base", basedACC.getTypeName());
             complexContentElement.addContent(extensionElement);
 
-            if (!sequenceElement.getContent().isEmpty() ||
-                    (basedACC.getTypeName().equals("AllExtensionType")) ||
-                    (accComplexType.getTypeName().equals("AllExtensionType"))) {
+            if (!sequenceElement.getContent().isEmpty() || accComplexType.getOagisComponentType()==2) {
                 extensionElement.addContent(sequenceElement);
             }
         } else {
