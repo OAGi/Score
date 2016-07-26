@@ -3749,6 +3749,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 		<xsd:simpleContent>
 			<xsd:extension base="ValueType">
 				<xsd:attribute name="formatCode" type="xsd:token" id="oagis-id-9034f3521cc84e0e93b4b10e54aa46a3"/>
+				<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-4f136bcc0e28436db11f3d6d99983cf3"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -3850,15 +3851,7 @@ The valid values for OPERATOR are: "Greater Then, Less Then, Greater Then or Equ
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:element name="RecordFieldValue" id="oagis-id-c5becb1fe22148cb86affb9dba443eca">
-		<xsd:complexType id="oagis-id-3e4fddf92fe340eea22d082abd905c0c">
-			<xsd:simpleContent>
-				<xsd:extension base="RecordFieldValueType">
-					<xsd:attribute name="typeCode" type="xsd:token" id="oagis-id-4f136bcc0e28436db11f3d6d99983cf3"/>
-				</xsd:extension>
-			</xsd:simpleContent>
-		</xsd:complexType>
-	</xsd:element>
+	<xsd:element name="RecordFieldValue" type="RecordFieldValueType" id="oagis-id-c5becb1fe22148cb86affb9dba443eca"/>
 	<xsd:element name="AcceptableValue" type="NameValuePairValueType" id="oagis-id-8481f83d71d14f10b59d46027d363265">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">The value that would represents a satisfactory outcome </xsd:documentation>
