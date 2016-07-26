@@ -37,6 +37,7 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
 @Component
 public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
+    private SchemaModule schemaModule;
     private File baseDir;
 
     private Document document;
@@ -58,6 +59,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void startSchemaModule(SchemaModule schemaModule) throws Exception {
+        this.schemaModule = schemaModule;
         this.document = createDocument();
 
         Element schemaElement = new Element("schema", XSD_NS);
@@ -352,6 +354,41 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
+        if (accComplexType.getName().startsWith("OAGIS10")) {
+            processOAGIS10(accComplexType);
+        } else {
+            processACCComplexType(accComplexType);
+        }
+    }
+
+    private void processOAGIS10(ACCComplexType accComplexType) throws Exception {
+        Element complexTypeElement = new Element("complexType", XSD_NS);
+
+        String name = accComplexType.getName();
+        complexTypeElement.setAttribute("name", name + "Type");
+        complexTypeElement.setAttribute("id", accComplexType.getGuid());
+
+        Element sequenceElement = new Element("sequence", XSD_NS);
+        complexTypeElement.addContent(sequenceElement);
+
+        String delimiter = name.replace("OAGIS10", "");
+        for (SchemaModule dependedModule : schemaModule.getDependedModules()) {
+            String path = dependedModule.getPath();
+            if (path.contains(delimiter + File.separator)) {
+                Element element = new Element("element", XSD_NS);
+
+                element.setAttribute("ref", path.substring(path.lastIndexOf(File.separator) + 1, path.length()).replace(".xsd", ""));
+                element.setAttribute("id", Utility.generateGUID());
+                element.setAttribute("minOccurs", "0");
+
+                sequenceElement.addContent(element);
+            }
+        }
+
+        rootElement.addContent(complexTypeElement);
+    }
+
+    private void processACCComplexType(ACCComplexType accComplexType) throws Exception {
         Element complexTypeElement;
         if (accComplexType.isGroup()) {
             complexTypeElement = new Element("group", XSD_NS);

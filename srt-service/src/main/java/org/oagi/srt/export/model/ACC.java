@@ -28,6 +28,7 @@ public abstract class ACC implements Component {
             case 1:
             case 2:
             case 3:
+            case 5:
                 ACC basedACC = null;
                 if (acc.getBasedAccId() > 0) {
                     AggregateCoreComponent basedAcc = importedDataProvider.findACC(acc.getBasedAccId());
