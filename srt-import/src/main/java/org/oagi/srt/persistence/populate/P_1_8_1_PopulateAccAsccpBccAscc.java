@@ -10,6 +10,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -29,12 +30,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
-import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
-import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
+import static org.oagi.srt.common.SRTConstants.*;
 
 @Component
-public class P_1_8_1_PopulateAccAsccpBccAscc {
+public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -75,6 +74,13 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
     private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        userId = userRepository.findAppUserIdByLoginId("oagis");
+        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
+        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
+    }
+
     public static void main(String[] args) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             P_1_8_1_PopulateAccAsccpBccAscc populateAccAsccpBccAscc =
@@ -85,10 +91,6 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.8 Start");
-
-        userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
-        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
 
         populateForAny();
         populate();
@@ -217,7 +219,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
                 Context context = new Context(file, moduleRepository);
 
-                XSComplexType xsComplexType = context.getComplexType(SRTConstants.OAGI_NS, name);
+                XSComplexType xsComplexType = context.getXSComplexType(SRTConstants.OAGI_NS, name);
                 TypeDecl typeDecl = new TypeDecl(context, xsComplexType, complexType);
                 createACC(typeDecl);
             }
@@ -257,7 +259,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 String module = Utility.extractModuleName(file.getAbsolutePath());
                 Context context = new Context(file, moduleRepository);
 
-                XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, name);
+                XSElementDecl xsElementDecl = context.getXSElementDecl(SRTConstants.OAGI_NS, name);
                 ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
                 if (!elementDecl.canBeAsccp()) {
                     continue;
@@ -292,7 +294,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 String module = Utility.extractModuleName(file.getAbsolutePath());
                 Context context = new Context(file, moduleRepository);
 
-                XSModelGroupDecl xsModelGroupDecl = context.getModelGroupDecl(SRTConstants.OAGI_NS, name);
+                XSModelGroupDecl xsModelGroupDecl = context.getXSModelGroupDecl(SRTConstants.OAGI_NS, name);
                 GroupDecl groupDecl = new GroupDecl(context, xsModelGroupDecl, group);
                 if (!groupDecl.canBeAsccp()) {
                     continue;
@@ -348,8 +350,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return createASCCP(declaration, null, reusableIndicator);
     }
 
-    private AssociationCoreComponentProperty createASCCP(Declaration declaration,
-                                                         AggregateCoreComponent acc, boolean reusableIndicator) {
+    AssociationCoreComponentProperty createASCCP(Declaration declaration,
+                                                 AggregateCoreComponent acc, boolean reusableIndicator) {
         String asccpGuid = declaration.getId();
         String definition = declaration.getDefinition();
         Module module = declaration.getModule();
@@ -454,23 +456,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         return acc;
     }
 
-    private AggregateCoreComponent doCreateACC(Declaration declaration) {
+    AggregateCoreComponent doCreateACC(Declaration declaration, int oagisComponentType) {
         String name = declaration.getName();
         int idx = name.lastIndexOf("Type");
         String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
         String den = objectClassTerm + ". Details";
-
-        int oagisComponentType = 1;
-        if (objectClassTerm.endsWith("Base")) {
-            oagisComponentType = 0;
-        } else if (objectClassTerm.endsWith("Extension") ||
-                   objectClassTerm.equals("Open User Area") ||
-                   objectClassTerm.equals("Any User Area") ||
-                   objectClassTerm.equals("All Extension")) {
-            oagisComponentType = 2;
-        } else if (objectClassTerm.endsWith("Group")) {
-            oagisComponentType = 3;
-        }
 
         String definition = declaration.getDefinition();
         Module module = declaration.getModule();
@@ -512,6 +502,26 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         accRepository.saveAndFlush(acc);
 
         return acc;
+    }
+
+    private AggregateCoreComponent doCreateACC(Declaration declaration) {
+        String name = declaration.getName();
+        int idx = name.lastIndexOf("Type");
+        String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
+
+        int oagisComponentType = 1;
+        if (objectClassTerm.endsWith("Base")) {
+            oagisComponentType = 0;
+        } else if (objectClassTerm.endsWith("Extension") ||
+                objectClassTerm.equals("Open User Area") ||
+                objectClassTerm.equals("Any User Area") ||
+                objectClassTerm.equals("All Extension")) {
+            oagisComponentType = 2;
+        } else if (objectClassTerm.endsWith("Group")) {
+            oagisComponentType = 3;
+        }
+
+        return doCreateACC(declaration, oagisComponentType);
     }
 
     private AssociationCoreComponent createASCC(AggregateCoreComponent fromAcc,
@@ -681,5 +691,4 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
         }
     }
-
 }

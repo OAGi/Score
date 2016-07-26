@@ -284,7 +284,7 @@ public abstract class AbstractDeclaration implements Declaration {
                     if (isGroup) {
                         expression = "//xsd:group[@name='" + elementName + "']";
                         XSDeclaration xsReference =
-                                context.getModelGroupDecl(SRTConstants.OAGI_NS, elementName);
+                                context.getXSModelGroupDecl(SRTConstants.OAGI_NS, elementName);
                         if (xsReference == null) {
                             throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
                         }
@@ -293,7 +293,7 @@ public abstract class AbstractDeclaration implements Declaration {
                     } else {
                         expression = "//xsd:element[@name='" + elementName + "']";
                         XSDeclaration xsReference =
-                                context.getElementDecl(SRTConstants.OAGI_NS, elementName);
+                                context.getXSElementDecl(SRTConstants.OAGI_NS, elementName);
                         if (xsReference == null) {
                             throw new IllegalStateException("Could not find XSDeclaration named '" + elementName + "'");
                         }

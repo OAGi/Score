@@ -24,6 +24,7 @@ public abstract class ASCCP implements Component {
             case 1:
             case 2:
             case 3:
+            case 5:
                 return new ASCCPComplexType(asccp, roleOfAcc);
             case 4: // @TODO: Not yet handled
                 return new ASCCPGroup(asccp, roleOfAcc);

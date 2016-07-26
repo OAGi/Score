@@ -24,10 +24,8 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Context {
 
@@ -134,20 +132,36 @@ public class Context {
         }
     }
 
-    public XSComplexType getComplexType(String ns, String localName) {
+    public XSComplexType getXSComplexType(String ns, String localName) {
         return xsSchemaSet.getComplexType(ns, localName);
     }
 
-    public XSElementDecl getElementDecl(String ns, String localName) {
+    public XSElementDecl getXSElementDecl(String ns, String localName) {
         return xsSchemaSet.getElementDecl(ns, localName);
     }
 
-    public XSModelGroupDecl getModelGroupDecl(String ns, String localName) {
+    public XSModelGroupDecl getXSModelGroupDecl(String ns, String localName) {
         return xsSchemaSet.getModelGroupDecl(ns, localName);
     }
 
-    public Iterator<XSElementDecl> iterateElementDecls() {
-        return xsSchemaSet.iterateElementDecls();
+    public Iterable<XSElementDecl> iterateXSElementDecls() {
+        final Iterator<XSElementDecl> xsElementDeclIterator = xsSchemaSet.iterateElementDecls();
+        return new Iterable<XSElementDecl>() {
+            @Override
+            public Iterator<XSElementDecl> iterator() {
+                return xsElementDeclIterator;
+            }
+            @Override
+            public void forEach(Consumer<? super XSElementDecl> action) {
+                if (xsElementDeclIterator.hasNext()) {
+                    action.accept(xsElementDeclIterator.next());
+                }
+            }
+            @Override
+            public Spliterator<XSElementDecl> spliterator() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     public Module findByModule(String module) {

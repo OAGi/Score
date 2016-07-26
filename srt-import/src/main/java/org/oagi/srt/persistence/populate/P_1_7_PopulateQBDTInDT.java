@@ -306,7 +306,7 @@ public class P_1_7_PopulateQBDTInDT {
             if (StringUtils.isEmpty(guid)) {
                 continue;
             }
-            XSElementDecl xsElementDecl = context.getElementDecl(SRTConstants.OAGI_NS, bccp);
+            XSElementDecl xsElementDecl = context.getXSElementDecl(SRTConstants.OAGI_NS, bccp);
             if (xsElementDecl == null) {
                 throw new IllegalStateException("Could not find " + bccp + ", GUID " + guid + " BCCP");
             }

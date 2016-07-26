@@ -3,10 +3,7 @@ package org.oagi.srt.export.model;
 import org.apache.commons.io.FilenameUtils;
 import org.oagi.srt.repository.entity.Module;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SchemaModule {
 
@@ -44,6 +41,18 @@ public class SchemaModule {
 
     public void addImport(SchemaModule schemaModule) {
         importModules.put(dependedModuleSize++, schemaModule);
+    }
+
+    public Collection<SchemaModule> getDependedModules() {
+        List<SchemaModule> dependedModules = new ArrayList();
+        for (int i = 0; i < dependedModuleSize; ++i) {
+            if (includeModules.containsKey(i)) {
+                dependedModules.add(includeModules.get(i));
+            } else {
+                dependedModules.add(importModules.get(i));
+            }
+        }
+        return Collections.unmodifiableCollection(dependedModules);
     }
 
     public void addAgencyId(AgencyId agencyId) {
