@@ -336,9 +336,6 @@ public class Utility {
 
     public static String qualifier(String type, String baseDen, String dataTypeTerm) {
         String qualifier = "";
-        if (baseDen.contains("Open_")) {
-            baseDen = baseDen.replace("Open_", "");
-        }
         if (dataTypeTerm.equals("Text")) {
             if (type.contains("Text")) {
                 qualifier = Utility.spaceSeparatorBeforeStr(type, "Text");
