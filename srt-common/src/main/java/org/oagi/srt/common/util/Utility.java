@@ -9,11 +9,15 @@ import java.util.regex.Pattern;
 public class Utility {
 
     public static String generateGUID() {
-        return "oagis-id-" + UUID.randomUUID().toString().replaceAll("-", "");
+        return generateGUID(UUID.randomUUID());
     }
 
     public static String generateGUID(byte[] bytes) {
-        return "oagis-id-" + UUID.nameUUIDFromBytes(bytes).toString().replaceAll("-", "");
+        return generateGUID(UUID.nameUUIDFromBytes(bytes));
+    }
+
+    public static String generateGUID(UUID uuid) {
+        return "oagis-id-" + uuid.toString().replaceAll("-", "");
     }
 
     public static String first(String den, boolean upp) {
