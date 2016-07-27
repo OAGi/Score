@@ -37,6 +37,9 @@ public class RunAll {
 
             P_1_8_1_PopulateAccAsccpBccAscc p8 = ctx.getBean(P_1_8_1_PopulateAccAsccpBccAscc.class);
             p8.run(ctx);
+
+            P_1_8_2_PopulateOAGISType p8_2 = ctx.getBean(P_1_8_2_PopulateOAGISType.class);
+            p8_2.run(ctx);
         }
     }
 }

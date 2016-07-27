@@ -46,13 +46,13 @@ public class P_1_8_2_PopulateOAGISType {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.8.2 Start");
 
-        populate(new File(MODEL_FOLDER_PATH + "/OAGIS.xsd"));
-        populate(new File(MODEL_FOLDER_PATH + "/OAGIS-Nouns.xsd"));
+        populate(new File(MODEL_FOLDER_PATH + "/OAGIS-Nouns.xsd"), 6);
+        populate(new File(MODEL_FOLDER_PATH + "/OAGIS.xsd"), 7);
 
         logger.info("### 1.8.2 End");
     }
 
-    private void populate(File file) throws Exception {
+    private void populate(File file, int oagisComponentType) throws Exception {
         if (file == null || !file.exists()) {
             return;
         }
@@ -69,7 +69,6 @@ public class P_1_8_2_PopulateOAGISType {
             XSElementDecl xsElementDecl = context.getXSElementDecl(SRTConstants.OAGI_NS, name);
             ElementDecl elementDecl = new ElementDecl(context, xsElementDecl, element);
 
-            int oagisComponentType = 5;
             AggregateCoreComponent acc = populateAccAsccpBccAscc.doCreateACC(elementDecl.getTypeDecl(), oagisComponentType);
             populateAccAsccpBccAscc.createASCCP(elementDecl, acc, true);
         }

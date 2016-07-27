@@ -32,9 +32,6 @@ public class P_1_6_PopulateDTFromMeta {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private DataTypeRepository dataTypeRepository;
 
     @Autowired
@@ -45,9 +42,6 @@ public class P_1_6_PopulateDTFromMeta {
 
     @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
-
-    @Autowired
-    private ReleaseRepository releaseRepository;
 
     @Autowired
     private ModuleRepository moduleRepository;
@@ -70,8 +64,9 @@ public class P_1_6_PopulateDTFromMeta {
     @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
-    private int userId;
-    private int releaseId;
+    @Autowired
+    private ImportUtil importUtil;
+
     private int NormalizedStringCDTPrimitiveId;
     private int StringCDTPrimitiveId;
     private int TokenCDTPrimitiveId;
@@ -91,8 +86,6 @@ public class P_1_6_PopulateDTFromMeta {
         NormalizedStringXBTId= xbtRepository.findOneByBuiltInType("xsd:normalizedString").getXbtId();
         StringXBTId= xbtRepository.findOneByBuiltInType("xsd:string").getXbtId();
         TokenXBTId= xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
-        userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
         meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
 
         importAdditionalBDT();
@@ -134,14 +127,14 @@ public class P_1_6_PopulateDTFromMeta {
             dataType.setContentComponentDefinition(null);
             dataType.setRevisionDoc(null);
             dataType.setState(3);
-            dataType.setCreatedBy(userId);
-            dataType.setLastUpdatedBy(userId);
-            dataType.setOwnerUserId(userId);
+            dataType.setCreatedBy(importUtil.getUserId());
+            dataType.setLastUpdatedBy(importUtil.getUserId());
+            dataType.setOwnerUserId(importUtil.getUserId());
             dataType.setRevisionDoc(null);
             dataType.setRevisionNum(0);
             dataType.setRevisionTrackingNum(0);
             dataType.setDeprecated(false);
-            dataType.setReleaseId(releaseId);
+            dataType.setReleaseId(importUtil.getReleaseId());
             dataType.setModule(module);
             logger.debug("Populating additional BDTs from meta whose name is " + name);
             dataTypeRepository.save(dataType);
