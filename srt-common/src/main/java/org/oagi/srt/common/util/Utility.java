@@ -12,6 +12,10 @@ public class Utility {
         return "oagis-id-" + UUID.randomUUID().toString().replaceAll("-", "");
     }
 
+    public static String generateGUID(byte[] bytes) {
+        return "oagis-id-" + UUID.nameUUIDFromBytes(bytes).toString().replaceAll("-", "");
+    }
+
     public static String first(String den, boolean upp) {
         den = den.substring(0, den.indexOf(".")).replace("_", " ").replaceAll(" ", "").replaceAll("Identifier", "ID");
         if (upp == false)
