@@ -120,7 +120,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     }
 
     private BdtsBlob loadBtdsBlob() {
-        BlobContent blobContent = blobContentRepository.findByModuleEndsWith("BusinessDataType_1.xsd");
+        BlobContent blobContent = blobContentRepository.findByModuleEndsWith("BusinessDataType_1");
         if (blobContent == null) {
             throw new IllegalStateException();
         }

@@ -535,7 +535,8 @@ public class Utility {
 
     public static String extractModuleName(String path) {
         int idx = path.indexOf("Model");
-        return (idx != -1) ? FilenameUtils.separatorsToWindows(path.substring(idx)) : path;
+        path = (idx != -1) ? FilenameUtils.separatorsToWindows(path.substring(idx)) : path;
+        return path.replace(".xsd", "");
     }
 
     public static void main(String args[]) {

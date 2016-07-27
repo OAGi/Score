@@ -390,9 +390,9 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             if (path.contains(delimiter + File.separator)) {
                 Element element = new Element("element", XSD_NS);
 
-                String bodName = path.substring(path.lastIndexOf(File.separator) + 1, path.length()).replace(".xsd", "");
+                String bodName = path.substring(path.lastIndexOf(File.separator) + 1, path.length());
                 element.setAttribute("ref", bodName);
-                element.setAttribute("id", Utility.generateGUID(bodName.getBytes()));
+                element.setAttribute("id", Utility.generateGUID((name + path).getBytes()));
                 element.setAttribute("minOccurs", "0");
 
                 sequenceElement.addContent(element);
@@ -608,7 +608,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         Path pathBase = Paths.get(this.moduleFile.getParentFile().getCanonicalPath());
         Path pathRelative = pathBase.relativize(pathAbsolute);
 
-        return FilenameUtils.separatorsToUnix(pathRelative.toString());
+        return FilenameUtils.separatorsToUnix(pathRelative.toString()) + ".xsd";
     }
 
     @Override
