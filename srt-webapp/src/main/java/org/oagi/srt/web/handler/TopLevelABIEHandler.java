@@ -354,7 +354,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    private void createBIEs() {
+    public void createBIEs() {
         int userId = userRepository.findAppUserIdByLoginId("oagis");
 
         AggregateCoreComponent acc =
@@ -493,8 +493,10 @@ public class TopLevelABIEHandler implements Serializable {
         } catch (StackOverflowError e) {
             throw e;
         }
-        coreComponents.addAll(gPosition, bList);
-        coreComponents.remove(gPosition + bList.size());
+        if (!bList.isEmpty()) {
+            coreComponents.addAll(gPosition, bList);
+            coreComponents.remove(gPosition + bList.size());
+        }
 
         for (int i = 0; i < coreComponents.size(); i++) {
             CoreComponent coreComponent = coreComponents.get(i);

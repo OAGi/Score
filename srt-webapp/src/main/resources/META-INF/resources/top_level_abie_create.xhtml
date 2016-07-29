@@ -245,7 +245,7 @@
 										<p:ajax event="select" listener="#{topLevelABIEHandler.expand}" update=":form:treeTable :form:details" />
 										<p:ajax event="collapse" listener="#{topLevelABIEHandler.collapse}" update=":form:treeTable :form:details" />
 										<f:facet name="header">
-											#{topLevelABIEHandler.selected.module}
+											#{topLevelABIEHandler.selected.module.module}
 										</f:facet>
 										<p:column headerText="BIEs">
 											<h:outputText value="#{aBIEView.name}" style="color:#{aBIEView.color};"/>

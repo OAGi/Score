@@ -1,5 +1,10 @@
 package org.oagi.srt.standalone;
 
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
@@ -9,20 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,6 +26,8 @@ import java.util.stream.Collectors;
 public class StandaloneXMLSchema {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static org.jdom2.Namespace XSD_NAMESPACE = org.jdom2.Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
     @Autowired
     private AgencyIdListRepository agencyIdListRepository;
@@ -98,28 +95,26 @@ public class StandaloneXMLSchema {
     @Autowired
     private BusinessObjectDocumentRepository bodRepository;
 
-    public String writeXSDFile(Document doc, String filename) throws TransformerException {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        DOMSource source = new DOMSource(doc);
-
+    public String writeXSDFile(Document doc, String filename) throws IOException {
         String filepath = SRTConstants.BOD_FILE_PATH + filename + ".xsd";
-        StreamResult result = new StreamResult(new File(filepath));
-        transformer.transform(source, result);
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(new File(filepath)))) {
+            outputter.output(doc, outputStream);
+            outputStream.flush();
+        }
+
         System.out.println(filepath + " is generated");
         return filepath;
     }
 
     public Element generateSchema(Document doc) {
-        Element schemaNode = doc.createElement("xsd:schema");
-        schemaNode.setAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
-        schemaNode.setAttribute("xmlns", "http://www.openapplications.org/oagis/10");
-        schemaNode.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
+        Element schemaNode = newElement("schema");
+        schemaNode.addNamespaceDeclaration(org.jdom2.Namespace.getNamespace("", "http://www.openapplications.org/oagis/10"));
+        schemaNode.addNamespaceDeclaration(org.jdom2.Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace"));
         schemaNode.setAttribute("targetNamespace", "http://www.openapplications.org/oagis/10");
         schemaNode.setAttribute("elementFormDefault", "qualified");
         schemaNode.setAttribute("attributeFormDefault", "unqualified");
-        doc.appendChild(schemaNode);
+        doc.addContent(schemaNode);
         return schemaNode;
     }
 
@@ -133,6 +128,10 @@ public class StandaloneXMLSchema {
         return tlABIEDOM;
     }
 
+    private Element newElement(String localName) {
+        return new Element(localName, XSD_NAMESPACE);
+    }
+
     public Element generateTopLevelASBIEP(AssociationBusinessInformationEntityProperty tlASBIEP,
                                           Element gSchemaNode,
                                           GenerationContext generationContext) {
@@ -143,17 +142,17 @@ public class StandaloneXMLSchema {
         if (generationContext.isCCStored(tlASBIEP.getGuid()))
             return gSchemaNode;
 
-        Element rootEleNode = gSchemaNode.getOwnerDocument().createElement("xsd:element");
-        gSchemaNode.appendChild(rootEleNode);
+        Element rootEleNode = newElement("element");
+        gSchemaNode.addContent(rootEleNode);
         rootEleNode.setAttribute("name", asccpVO.getPropertyTerm().replaceAll(" ", ""));
         rootEleNode.setAttribute("id", tlASBIEP.getGuid()); //rootEleNode.setAttribute("id", asccpVO.getASCCPGuid());
         //rootEleNode.setAttribute("type", Utility.second(asccpVO.getDen()).replaceAll(" ", "")+"Type");
-        Element annotation = gSchemaNode.getOwnerDocument().createElement("xsd:annotation");
-        Element documentation = gSchemaNode.getOwnerDocument().createElement("xsd:documentation");
+        Element annotation = newElement("annotation");
+        Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
         //documentation.setTextContent(asccpVO.getDefinition());
-        rootEleNode.appendChild(annotation);
-        annotation.appendChild(documentation);
+        rootEleNode.addContent(annotation);
+        annotation.addContent(documentation);
 
         //serm: what does this do?
         generationContext.addCCGuidIntoStoredCC(tlASBIEP.getGuid());
@@ -167,9 +166,9 @@ public class StandaloneXMLSchema {
 
         if (generationContext.isCCStored(gABIE.getGuid()))
             return gElementNode;
-        Element complexType = gElementNode.getOwnerDocument().createElement("xsd:complexType");
+        Element complexType = newElement("complexType");
         complexType.setAttribute("id", gABIE.getGuid());
-        gElementNode.appendChild(complexType);
+        gElementNode.addContent(complexType);
         //serm: why is this one called generateACC - the function name is not sensible.
         Element PNode = generateACC(gABIE, complexType, gElementNode, generationContext);
         return PNode;
@@ -179,16 +178,16 @@ public class StandaloneXMLSchema {
                                Element gElementNode, GenerationContext generationContext) {
 
         AggregateCoreComponent gACC = generationContext.queryBasedACC(gABIE);
-        Element PNode = complexType.getOwnerDocument().createElement("xsd:sequence");
+        Element PNode = newElement("sequence");
         //***complexType.setAttribute("id", Utility.generateGUID()); 		
         generationContext.addCCGuidIntoStoredCC(gACC.getGuid());
-        Element annotation = gElementNode.getOwnerDocument().createElement("xsd:annotation");
-        Element documentation = gElementNode.getOwnerDocument().createElement("xsd:documentation");
+        Element annotation = newElement("annotation");
+        Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
         //documentation.setTextContent(gACC.getDefinition());
-        complexType.appendChild(annotation);
-        annotation.appendChild(documentation);
-        complexType.appendChild(PNode);
+        complexType.addContent(annotation);
+        annotation.addContent(documentation);
+        complexType.addContent(PNode);
 
         return PNode;
     }
@@ -198,9 +197,9 @@ public class StandaloneXMLSchema {
         AggregateCoreComponent gACC = generationContext.queryBasedACC(gABIE);
         String accDen = gACC.getDen();
         if (accDen.equalsIgnoreCase("Any User Area. Details") || accDen.equalsIgnoreCase("Signature. Details")) {
-            Element any = gPNode.getOwnerDocument().createElement("xsd:any");
+            Element any = newElement("any");
             any.setAttribute("namespace", "##any");
-            gPNode.appendChild(any);
+            gPNode.addContent(any);
         }
 
         List<BusinessInformationEntity> childBIEs = generationContext.queryChildBIEs(gABIE);
@@ -230,45 +229,41 @@ public class StandaloneXMLSchema {
 //		if(isCCStored(bDT.getGuid()))
 //			return eNode;
 
-        Document ownerDocument = eNode.getOwnerDocument();
-        Element complexType = ownerDocument.createElement("xsd:complexType");
-        Element simpleContent = ownerDocument.createElement("xsd:simpleContent");
-        Element extNode = ownerDocument.createElement("xsd:extension");
+        Element complexType = newElement("complexType");
+        Element simpleContent = newElement("simpleContent");
+        Element extNode = newElement("extension");
         //complexType.setAttribute("name", Utility.DenToName(bDT.getDen())); 
         complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
         if (bDT.getDefinition() != null) {
-            Element annotation = ownerDocument.createElement("xsd:annotation");
-            Element documentation = ownerDocument.createElement("xsd:documentation");
+            Element annotation = newElement("annotation");
+            Element documentation = newElement("documentation");
             documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
             //documentation.setTextContent(bDT.getDefinition());
-            complexType.appendChild(annotation);
+            complexType.addContent(annotation);
         }
         generationContext.addCCGuidIntoStoredCC(bDT.getGuid());
 
-        complexType.appendChild(simpleContent);
-        simpleContent.appendChild(extNode);
+        complexType.addContent(simpleContent);
+        simpleContent.addContent(extNode);
 
-        Attr base = extNode.getOwnerDocument().createAttribute("base");
-        base.setNodeValue(getCodeListTypeName(gCL));
-        extNode.setAttributeNode(base);
-        eNode.appendChild(complexType);
+        extNode.setAttribute("base", getCodeListTypeName(gCL));
+        eNode.addContent(complexType);
         return eNode;
     }
 
 
-    public Attr setBDTBase(GenerationContext generationContext, DataType gBDT, Attr base) {
+    public String setBDTBase(GenerationContext generationContext, DataType gBDT) {
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                 generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-        base.setValue(aXSDBuiltInType.getBuiltInType());
 
-        return base;
+        return aXSDBuiltInType.getBuiltInType();
     }
 
-    public Attr setBDTBase(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, Attr base) {
+    public String setBDTBase(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE) {
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                 generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
@@ -276,9 +271,7 @@ public class StandaloneXMLSchema {
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
-        base.setValue(aXSDBuiltInType.getBuiltInType());
-
-        return base;
+        return aXSDBuiltInType.getBuiltInType();
     }
 
     public Element setBBIE_Attr_Type(GenerationContext generationContext, DataType gBDT, Element gNode) {
@@ -289,9 +282,7 @@ public class StandaloneXMLSchema {
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
-            Attr type = gNode.getOwnerDocument().createAttribute("type");
-            type.setValue(aXSDBuiltInType.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInType.getName())+"Type");
-            gNode.setAttributeNode(type);
+            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
         }
         return gNode;
     }
@@ -304,9 +295,7 @@ public class StandaloneXMLSchema {
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
-            Attr type = gNode.getOwnerDocument().createAttribute("type");
-            type.setValue(aXSDBuiltInType.getBuiltInType()); //type.setValue(Utility.toCamelCase(aXSDBuiltInType.getName())+"Type");
-            gNode.setAttributeNode(type);
+            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
         }
         return gNode;
     }
@@ -318,35 +307,32 @@ public class StandaloneXMLSchema {
 //		if(isCCStored(bDT.getGuid()))
 //			return eNode;
 
-        Document ownerDocument = eNode.getOwnerDocument();
-        Element complexType = ownerDocument.createElement("xsd:complexType");
-        Element simpleContent = ownerDocument.createElement("xsd:simpleContent");
-        Element extNode = ownerDocument.createElement("xsd:extension");
+        Element complexType = newElement("complexType");
+        Element simpleContent = newElement("simpleContent");
+        Element extNode = newElement("extension");
         //complexType.setAttribute("name", Utility.DenToName(bDT.getDen())); 
         complexType.setAttribute("id", Utility.generateGUID()); //complexType.setAttribute("id", bDT.getGuid());
         if (bDT.getDefinition() != null) {
-            Element annotation = ownerDocument.createElement("xsd:annotation");
-            Element documentation = ownerDocument.createElement("xsd:documentation");
+            Element annotation = newElement("annotation");
+            Element documentation = newElement("documentation");
             documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
             //documentation.setTextContent(bDT.getDefinition());
-            complexType.appendChild(annotation);
+            complexType.addContent(annotation);
         }
         generationContext.addCCGuidIntoStoredCC(bDT.getGuid());
 
-        complexType.appendChild(simpleContent);
-        simpleContent.appendChild(extNode);
+        complexType.addContent(simpleContent);
+        simpleContent.addContent(extNode);
 
         DataType gBDT = generationContext.queryAssocBDT(gBBIE);
 
-        Attr base = extNode.getOwnerDocument().createAttribute("base");
-
         if (gBBIE.getBdtPriRestriId() == 0)
-            base = setBDTBase(generationContext, gBDT, base);
+            extNode.setAttribute("base", setBDTBase(generationContext, gBDT));
         else {
-            base = setBDTBase(generationContext, gBBIE, base);
+            extNode.setAttribute("base", setBDTBase(generationContext, gBBIE));
         }
-        extNode.setAttributeNode(base);
-        eNode.appendChild(complexType);
+
+        eNode.addContent(complexType);
         return eNode;
     }
 
@@ -355,7 +341,7 @@ public class StandaloneXMLSchema {
 
         AssociationCoreComponent gASCC = generationContext.queryBasedASCC(gASBIE);
 
-        Element element = gPNode.getOwnerDocument().createElement("xsd:element");
+        Element element = newElement("element");
         element.setAttribute("id", gASBIE.getGuid()); //element.setAttribute("id", gASCC.getASCCGuid());
         element.setAttribute("minOccurs", String.valueOf(gASBIE.getCardinalityMin()));
         if (gASBIE.getCardinalityMax() == -1)
@@ -365,16 +351,16 @@ public class StandaloneXMLSchema {
         if (gASBIE.isNillable())
             element.setAttribute("nillable", String.valueOf(gASBIE.isNillable()));
 
-        while (!gPNode.getNodeName().equals("xsd:sequence")) {
-            gPNode = (Element) gPNode.getParentNode();
+        while (!gPNode.getName().equals("sequence")) {
+            gPNode = (Element) gPNode.getParentElement();
         }
-        Element annotation = element.getOwnerDocument().createElement("xsd:annotation");
-        Element documentation = element.getOwnerDocument().createElement("xsd:documentation");
+        Element annotation = newElement("annotation");
+        Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
         //documentation.setTextContent(gASBIE.getDefinition());
-        annotation.appendChild(documentation);
-        element.appendChild(annotation);
-        gPNode.appendChild(element);
+        annotation.addContent(documentation);
+        element.addContent(annotation);
+        gPNode.addContent(element);
         generationContext.addCCGuidIntoStoredCC(gASCC.getGuid());//check
         return element;
     }
@@ -391,28 +377,20 @@ public class StandaloneXMLSchema {
                                            Element eNode, GenerationContext generationContext) {
 
         BasicCoreComponent bccVO = generationContext.queryBasedBCC(gBBIE);
-        Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-        nameANode.setValue(Utility.second(bccVO.getDen(), true));
-        eNode.setAttributeNode(nameANode);
+        eNode.setAttribute("name", Utility.second(bccVO.getDen(), true));
         eNode.setAttribute("id", gBBIE.getGuid()); //eNode.setAttribute("id", bccVO.getGuid());
         generationContext.addCCGuidIntoStoredCC(bccVO.getGuid());
         if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
             System.out.println("Error");
         }
         if (gBBIE.isNillable()) {
-            Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
-            nillable.setValue("true");
-            eNode.setAttributeNode(nillable);
+            eNode.setAttribute("nillable", "true");
         }
         if (gBBIE.getDefaultValue() != null && gBBIE.getDefaultValue().length() != 0) {
-            Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
-            defaulta.setValue(gBBIE.getDefaultValue());
-            eNode.setAttributeNode(defaulta);
+            eNode.setAttribute("default", gBBIE.getDefaultValue());
         }
         if (gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
-            Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
-            fixedvalue.setValue(gBBIE.getFixedValue());
-            eNode.setAttributeNode(fixedvalue);
+            eNode.setAttribute("fixed", gBBIE.getFixedValue());
         }
 
         eNode.setAttribute("minOccurs", String.valueOf(gBBIE.getCardinalityMin()));
@@ -423,12 +401,12 @@ public class StandaloneXMLSchema {
         if (gBBIE.isNillable())
             eNode.setAttribute("nillable", String.valueOf(gBBIE.isNillable()));
 
-        Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
-        Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+        Element annotation = newElement("annotation");
+        Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
         //documentation.setTextContent(gBBIE.getDefinition());
-        annotation.appendChild(documentation);
-        eNode.appendChild(annotation);
+        annotation.addContent(documentation);
+        eNode.addContent(annotation);
 
         return eNode;
     }
@@ -437,39 +415,31 @@ public class StandaloneXMLSchema {
                                              Element eNode, GenerationContext generationContext) {
 
         BasicCoreComponent bccVO = generationContext.queryBasedBCC(gBBIE);
-        Attr nameANode = eNode.getOwnerDocument().createAttribute("name");
-        nameANode.setValue(Utility.second(bccVO.getDen(), false));
-        eNode.setAttributeNode(nameANode);
+        eNode.setAttribute("name", Utility.second(bccVO.getDen(), false));
         eNode.setAttribute("id", gBBIE.getGuid()); //eNode.setAttribute("id", bccVO.getGuid());
         generationContext.addCCGuidIntoStoredCC(bccVO.getGuid());
         if (gBBIE.getDefaultValue() != null && gBBIE.getFixedValue() != null) {
             System.out.println("Error");
         }
         if (gBBIE.isNillable()) {
-            Attr nillable = eNode.getOwnerDocument().createAttribute("nillable");
-            nillable.setValue("true");
-            eNode.setAttributeNode(nillable);
+            eNode.setAttribute("nillable", "true");
         }
         if (gBBIE.getDefaultValue() != null && gBBIE.getDefaultValue().length() != 0) {
-            Attr defaulta = eNode.getOwnerDocument().createAttribute("default");
-            defaulta.setValue(gBBIE.getDefaultValue());
-            eNode.setAttributeNode(defaulta);
+            eNode.setAttribute("default", gBBIE.getDefaultValue());
         }
         if (gBBIE.getFixedValue() != null && gBBIE.getFixedValue().length() != 0) {
-            Attr fixedvalue = eNode.getOwnerDocument().createAttribute("fixed");
-            fixedvalue.setValue(gBBIE.getFixedValue());
-            eNode.setAttributeNode(fixedvalue);
+            eNode.setAttribute("fixed", gBBIE.getFixedValue());
         }
         if (gBBIE.getCardinalityMin() >= 1)
             eNode.setAttribute("use", "required");
         else
             eNode.setAttribute("use", "optional");
-        Element annotation = eNode.getOwnerDocument().createElement("xsd:annotation");
-        Element documentation = eNode.getOwnerDocument().createElement("xsd:documentation");
+        Element annotation = newElement("annotation");
+        Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
         //documentation.setTextContent(gBBIE.getDefinition());
-        annotation.appendChild(documentation);
-        eNode.appendChild(annotation);
+        annotation.addContent(documentation);
+        eNode.addContent(annotation);
         return eNode;
     }
 
@@ -501,24 +471,19 @@ public class StandaloneXMLSchema {
     }
 
     public Element setBBIEType(GenerationContext generationContext, DataType gBDT, Element gNode) {
-        Attr tNode = gNode.getOwnerDocument().createAttribute("type");
-
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                 generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-        tNode.setValue(aXSDBuiltInType.getBuiltInType());
         if (aXSDBuiltInType.getBuiltInType() != null)
-            gNode.setAttributeNode(tNode);
+            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
 
         return gNode;
     }
 
     public Element setBBIEType(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, Element gNode) {
-        Attr tNode = gNode.getOwnerDocument().createAttribute("type");
-
         BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                 generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
@@ -526,9 +491,8 @@ public class StandaloneXMLSchema {
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
 
-        tNode.setValue(aXSDBuiltInType.getBuiltInType());
         if (aXSDBuiltInType.getBuiltInType() != null)
-            gNode.setAttributeNode(tNode);
+            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
 
         return gNode;
     }
@@ -538,14 +502,14 @@ public class StandaloneXMLSchema {
 
         BasicCoreComponent gBCC = generationContext.queryBasedBCC(gBBIE);
         Element eNode = null;
-        eNode = gPNode.getOwnerDocument().createElement("xsd:element");
+        eNode = newElement("element");
         eNode = handleBBIE_Elementvalue(gBBIE, eNode, generationContext);
         if (gBCC.getEntityType() == 1) {
-            while (!gPNode.getNodeName().equals("xsd:sequence")) {
-                gPNode = (Element) gPNode.getParentNode();
+            while (!gPNode.getName().equals("sequence")) {
+                gPNode = (Element) gPNode.getParentElement();
             }
 
-            gPNode.appendChild(eNode);
+            gPNode.addContent(eNode);
 
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(gBBIE);
 
@@ -576,9 +540,7 @@ public class StandaloneXMLSchema {
                     generateCodeList(aCL, gBDT, gSchemaNode, generationContext);
                 }
                 if (bbieScList.isEmpty()) {
-                    Attr tNode = eNode.getOwnerDocument().createAttribute("type");
-                    tNode.setNodeValue(getCodeListTypeName(aCL));
-                    eNode.setAttributeNode(tNode);
+                    eNode.setAttribute("type", getCodeListTypeName(aCL));
                     return eNode;
                 } else {
                     eNode = generateBDT(gBBIE, eNode, gSchemaNode, aCL, generationContext);
@@ -594,14 +556,14 @@ public class StandaloneXMLSchema {
             if (aCL == null) {
                 if (gBBIE.getBdtPriRestriId() == 0) {
                     if (bbieScList.isEmpty()) {
-                        eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
+                        eNode = newElement("attribute");
                         eNode = handleBBIE_Attributevalue(gBBIE, eNode, generationContext);
 
-                        while (!gPNode.getNodeName().equals("xsd:complexType")) {
-                            gPNode = (Element) gPNode.getParentNode();
+                        while (!gPNode.getName().equals("complexType")) {
+                            gPNode = (Element) gPNode.getParentElement();
                         }
 
-                        gPNode.appendChild(eNode);
+                        gPNode.addContent(eNode);
                         eNode = setBBIE_Attr_Type(generationContext, gBDT, eNode);
                         return eNode;
                     } else {
@@ -611,14 +573,14 @@ public class StandaloneXMLSchema {
                     }
                 } else {
                     if (bbieScList.isEmpty()) {
-                        eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
+                        eNode = newElement("attribute");
                         eNode = handleBBIE_Attributevalue(gBBIE, eNode, generationContext);
 
-                        while (!gPNode.getNodeName().equals("xsd:complexType")) {
-                            gPNode = (Element) gPNode.getParentNode();
+                        while (!gPNode.getName().equals("complexType")) {
+                            gPNode = (Element) gPNode.getParentElement();
                         }
 
-                        gPNode.appendChild(eNode);
+                        gPNode.addContent(eNode);
                         eNode = setBBIE_Attr_Type(generationContext, gBBIE, eNode);
                         return eNode;
                     } else {
@@ -628,23 +590,21 @@ public class StandaloneXMLSchema {
                     }
                 }
             } else { //is aCL null?
-                eNode = gPNode.getOwnerDocument().createElement("xsd:attribute");
+                eNode = newElement("attribute");
                 eNode = handleBBIE_Attributevalue(gBBIE, eNode, generationContext);
 
-                while (!gPNode.getNodeName().equals("xsd:complexType")) {
-                    gPNode = (Element) gPNode.getParentNode();
+                while (!gPNode.getName().equals("complexType")) {
+                    gPNode = (Element) gPNode.getParentElement();
                 }
 
-                gPNode.appendChild(eNode);
+                gPNode.addContent(eNode);
 
                 if (!generationContext.isCodeListGenerated(aCL)) {
                     generateCodeList(aCL, gBDT, gSchemaNode, generationContext);
                 }
                 if (bbieScList.isEmpty()) {
                     if (getCodeListTypeName(aCL) != null) {
-                        Attr tNode = eNode.getOwnerDocument().createAttribute("type");
-                        tNode.setNodeValue(getCodeListTypeName(aCL));
-                        eNode.setAttributeNode(tNode);
+                        eNode.setAttribute("type", getCodeListTypeName(aCL));
                     }
                     return eNode;
                 } else {
@@ -653,9 +613,7 @@ public class StandaloneXMLSchema {
                         return eNode;
                     } else {
                         if (getCodeListTypeName(aCL) != null) {
-                            Attr tNode = eNode.getOwnerDocument().createAttribute("type");
-                            tNode.setNodeValue(getCodeListTypeName(aCL));
-                            eNode.setAttributeNode(tNode);
+                            eNode.setAttribute("type", getCodeListTypeName(aCL));
                         }
                         return eNode;
                     }
@@ -666,99 +624,81 @@ public class StandaloneXMLSchema {
 
     public String getCodeListTypeName(CodeList gCL) { //confirm
         //String CodeListTypeName ="xsd:string";
-        String CodeListTypeName = gCL.getName() + (gCL.getName().endsWith("Code") == true ? "" : "Code") + "ContentType" + "_" + gCL.getAgencyId() + "_" + gCL.getListId() + "_" + gCL.getVersionId();
-        CodeListTypeName = CodeListTypeName.replaceAll(" ", "");
+        String CodeListTypeName = gCL.getName() + (gCL.getName().endsWith("Code") == true ? "" : "Code") + "ContentType";
+        CodeListTypeName = CodeListTypeName.replaceAll(" ", "").replaceAll("oacl_", "");
         return CodeListTypeName;
     }
 
-    public Attr setCodeListRestrictionAttr(GenerationContext generationContext, DataType gBDT, Attr base) {
+    public String setCodeListRestrictionAttr(GenerationContext generationContext, DataType gBDT) {
         BusinessDataTypePrimitiveRestriction dPrim = generationContext.findBdtPriRestriByBdtIdAndDefaultIsTrue(gBDT.getDtId());
         if (dPrim.getCodeListId() != 0) {
-            base.setNodeValue("xsd:token");
+            return "xsd:token";
         } else {
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMap =
                     generationContext.findCdtAwdPriXpsTypeMap(dPrim.getCdtAwdPriXpsTypeMapId());
             XSDBuiltInType aXSDBuiltInType =
                     generationContext.findXSDBuiltInType(aCDTAllowedPrimitiveExpressionTypeMap.getXbtId());
-            base.setNodeValue(aXSDBuiltInType.getBuiltInType());
+            return aXSDBuiltInType.getBuiltInType();
         }
-        return base;
     }
 
-    public Attr setCodeListRestrictionAttr(GenerationContext generationContext, DataTypeSupplementaryComponent gSC, Attr base) {
+    public String setCodeListRestrictionAttr(GenerationContext generationContext, DataTypeSupplementaryComponent gSC) {
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction dPrim =
                 generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(gSC.getDtScId());
         if (dPrim.getCodeListId() != 0) {
-            base.setNodeValue("xsd:token");
+            return "xsd:token";
         } else {
             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
                     generationContext.findCdtScAwdPriXpsTypeMap(dPrim.getCdtScAwdPriXpsTypeMapId());
             XSDBuiltInType aXSDBuiltInType = generationContext.findXSDBuiltInType(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
-            base.setNodeValue(aXSDBuiltInType.getBuiltInType());
+            return aXSDBuiltInType.getBuiltInType();
         }
-        return base;
     }
 
     public Element generateCodeList(CodeList gCL, DataType gBDT,
                                     Element gSchemaNode, GenerationContext generationContext) {
-        Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
-        Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
-        stNameNode.setValue(getCodeListTypeName(gCL));
-        stNode.setAttributeNode(stNameNode);
+        Element stNode = newElement("simpleType");
+        stNode.setAttribute("name", getCodeListTypeName(gCL));
 
-        Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
-        stIdNode.setValue(gCL.getGuid());
-        stNode.setAttributeNode(stIdNode);
+        stNode.setAttribute("id", gCL.getGuid());
 
-        Element rtNode = stNode.getOwnerDocument().createElement("xsd:restriction");
-        Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
-        base = setCodeListRestrictionAttr(generationContext, gBDT, base);
-        rtNode.setAttributeNode(base);
-        stNode.appendChild(rtNode);
+        Element rtNode = newElement("restriction");
+        rtNode.setAttribute("base", setCodeListRestrictionAttr(generationContext, gBDT));
+        stNode.addContent(rtNode);
 
         List<CodeListValue> gCLVs = generationContext.getCodeListValues(gCL);
         for (int i = 0; i < gCLVs.size(); i++) {
             CodeListValue bCodeListValue = gCLVs.get(i);
-            Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-            Attr value = stNode.getOwnerDocument().createAttribute("value");
-            value.setNodeValue(bCodeListValue.getValue());
-            enumeration.setAttributeNode(value);
-            rtNode.appendChild(enumeration);
+            Element enumeration = newElement("enumeration");
+            enumeration.setAttribute("value", bCodeListValue.getValue());
+            rtNode.addContent(enumeration);
         }
         generationContext.addGuidIntoGuidArrayList(gCL.getGuid());
-        gSchemaNode.appendChild(stNode);
+        gSchemaNode.addContent(stNode);
         return stNode;
     }
 
     public Element generateCodeList(CodeList gCL, DataTypeSupplementaryComponent gSC,
                                     Element gSchemaNode, GenerationContext generationContext) {
-        Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
-        Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
-        stNameNode.setValue(getCodeListTypeName(gCL));
-        stNode.setAttributeNode(stNameNode);
+        Element stNode = newElement("simpleType");
+        stNode.setAttribute("name", getCodeListTypeName(gCL));
 
-        Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
-        stIdNode.setValue(gCL.getGuid());
-        stNode.setAttributeNode(stIdNode);
+        stNode.setAttribute("id", gCL.getGuid());
 
-        Element rtNode = gSchemaNode.getOwnerDocument().createElement("xsd:restriction");
+        Element rtNode = newElement("restriction");
 
-        Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
-        base = setCodeListRestrictionAttr(generationContext, gSC, base);
-        rtNode.setAttributeNode(base);
-        stNode.appendChild(rtNode);
+        rtNode.setAttribute("base", setCodeListRestrictionAttr(generationContext, gSC));
+        stNode.addContent(rtNode);
 
         List<CodeListValue> gCLVs = generationContext.getCodeListValues(gCL);
         for (int i = 0; i < gCLVs.size(); i++) {
             CodeListValue bCodeListValue = gCLVs.get(i);
-            Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-            Attr value = stNode.getOwnerDocument().createAttribute("value");
-            value.setNodeValue(bCodeListValue.getValue());
-            enumeration.setAttributeNode(value);
-            rtNode.appendChild(enumeration);
+            Element enumeration = newElement("enumeration");
+            enumeration.setAttribute("value", bCodeListValue.getValue());
+            rtNode.addContent(enumeration);
         }
         generationContext.addGuidIntoGuidArrayList(gCL.getGuid());
-        gSchemaNode.appendChild(stNode);
+        gSchemaNode.addContent(stNode);
         return stNode;
     }
 
@@ -768,46 +708,40 @@ public class StandaloneXMLSchema {
         if (aBBIESC.getDefaultValue() != null && aBBIESC.getFixedValue() != null) {
             System.out.println("default and fixed value options handling error");
         } else if (aBBIESC.getDefaultValue() != null && aBBIESC.getDefaultValue().length() != 0) {
-            Attr default_att = aNode.getOwnerDocument().createAttribute("default");
-            default_att.setNodeValue(aBBIESC.getDefaultValue());
-            aNode.setAttributeNode(default_att);
+            aNode.setAttribute("default", aBBIESC.getDefaultValue());
         } else if (aBBIESC.getFixedValue() != null && aBBIESC.getFixedValue().length() != 0) {
-            Attr fixed_att = aNode.getOwnerDocument().createAttribute("fixed");
-            fixed_att.setNodeValue(aBBIESC.getFixedValue());
-            aNode.setAttributeNode(fixed_att);
+            aNode.setAttribute("fixed", aBBIESC.getFixedValue());
         }
         // Generate a DOM Attribute node
         /*
          * Section 3.8.1.22 GenerateSCs #2
          */
-        Attr aNameNode = aNode.getOwnerDocument().createAttribute("name");
-
         DataTypeSupplementaryComponent dtSc = generationContext.findDtSc(aBBIESC.getDtScId());
         String representationTerm = dtSc.getRepresentationTerm();
         String propertyTerm = dtSc.getPropertyTerm();
         if ("Text".equals(representationTerm) ||
             "Indicator".equals(representationTerm) && "Preferred".equals(propertyTerm) ||
             propertyTerm.contains(representationTerm)) {
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm));
+            aNode.setAttribute("name", Utility.toLowerCamelCase(propertyTerm));
         } else if ("Identifier".equals(representationTerm)) {
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm).concat("ID"));
+            aNode.setAttribute("name", Utility.toLowerCamelCase(propertyTerm).concat("ID"));
         } else {
-            aNameNode.setNodeValue(Utility.toLowerCamelCase(propertyTerm) + Utility.toCamelCase(representationTerm));
+            aNode.setAttribute("name", Utility.toLowerCamelCase(propertyTerm) + Utility.toCamelCase(representationTerm));
         }
 
-        aNode.setAttributeNode(aNameNode);
+
         if (aBBIESC.getMinCardinality() >= 1) {
             aNode.setAttribute("use", "required");
         } else {
             aNode.setAttribute("use", "optional");
         }
 
-        Element annotation = aNode.getOwnerDocument().createElement("xsd:annotation");
-        Element documentation = aNode.getOwnerDocument().createElement("xsd:documentation");
+        Element annotation = newElement("annotation");
+        Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
         //documentation.setTextContent(aBBIESC.getDefinition());
-        annotation.appendChild(documentation);
-        aNode.appendChild(annotation);
+        annotation.addContent(documentation);
+        aNode.addContent(annotation);
 
         return aNode;
     }
@@ -824,9 +758,7 @@ public class StandaloneXMLSchema {
                 if (cdtScAwdPriXpsTypeMap != null) {
                     XSDBuiltInType xbt = generationContext.findXSDBuiltInType(cdtScAwdPriXpsTypeMap.getXbtId());
                     if (xbt != null && xbt.getBuiltInType() != null) {
-                        Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
-                        aTypeNode.setNodeValue(xbt.getBuiltInType());
-                        gNode.setAttributeNode(aTypeNode);
+                        gNode.setAttribute("type", xbt.getBuiltInType());
                     }
                 }
             }
@@ -842,9 +774,7 @@ public class StandaloneXMLSchema {
                         generationContext.findCdtScAwdPriXpsTypeMap(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType = generationContext.findXSDBuiltInType(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
         if (aXSDBuiltInType.getBuiltInType() != null) {
-            Attr aTypeNode = gNode.getOwnerDocument().createAttribute("type");
-            aTypeNode.setNodeValue(aXSDBuiltInType.getBuiltInType());
-            gNode.setAttributeNode(aTypeNode);
+            gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
         }
         return gNode;
 
@@ -855,37 +785,34 @@ public class StandaloneXMLSchema {
                                Element gSchemaNode, GenerationContext generationContext) {
         Element tNode = gBBIENode;
         while (true) {
-            if (tNode.getNodeName().equals("xsd:simpleType") || tNode.getNodeName().equals("xsd:complexType"))
+            if (tNode.getName().equals("simpleType") || tNode.getName().equals("complexType"))
                 break;
-            tNode = (Element) tNode.getLastChild();
-            //tNode = (Element) tNode.getParentNode();
+            List<Element> children = tNode.getChildren();
+            tNode = children.get(children.size() - 1);
+            //tNode = (Element) tNode.getParentElement();
         }
-        Node tmp = tNode.getFirstChild();
-        do {
-            if (tmp.getNodeName().equals("xsd:simpleContent")) {
-                tNode = (Element) tmp.getFirstChild();
+        List<Element> children = tNode.getChildren();
+        for (Element child : children) {
+            if (child.getName().equals("simpleContent")) {
+                tNode = child.getChildren().get(0);
                 break;
             }
-            if (tmp.getNextSibling() != null)
-                tmp = tmp.getNextSibling();
-        } while (tmp != null);
+        }
 
-//		if(tNode.getFirstChild().getNodeName().equals("xsd:simpleContent"))
+//		if(tNode.getFirstChild().getName().equals("simpleContent"))
 //			tNode = (Element) tNode.getFirstChild().getFirstChild();
         //here
         for (int i = 0; i < gSCs.size(); i++) {
             BasicBusinessInformationEntitySupplementaryComponent aBBIESC = gSCs.get(i);
             if (aBBIESC.getMaxCardinality() == 0)
                 continue;
-            Element aNode = tNode.getOwnerDocument().createElement("xsd:attribute");
+            Element aNode = newElement("attribute");
             aNode = handleBBIESCvalue(generationContext, aBBIESC, aNode); //Generate a DOM Element Node, handle values
 
             //Get a code list object
             CodeList aCL = generationContext.getCodeList(aBBIESC);
             if (aCL != null) {
-                Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
-                stIdNode.setNodeValue(Utility.generateGUID());
-                aNode.setAttributeNode(stIdNode);
+                aNode.setAttribute("id", Utility.generateGUID());
             }
 
             AgencyIdList aAL = new AgencyIdList();
@@ -894,9 +821,7 @@ public class StandaloneXMLSchema {
                 aAL = generationContext.getAgencyIdList(aBBIESC);
 
                 if (aAL != null) {
-                    Attr stIdNode = aNode.getOwnerDocument().createAttribute("id");
-                    stIdNode.setNodeValue(aAL.getGuid());
-                    aNode.setAttributeNode(stIdNode);
+                    aNode.setAttribute("id", aAL.getGuid());
                 }
 
                 if (aAL == null) { //aAL = null?
@@ -909,9 +834,7 @@ public class StandaloneXMLSchema {
                     if (!generationContext.isAgencyListGenerated(aAL))  //isAgencyListGenerated(aAL)?
                         generateAgencyList(aAL, aBBIESC, gSchemaNode, generationContext);
                     if (getAgencyListTypeName(aAL) != null) {
-                        Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
-                        aTypeNode.setNodeValue(getAgencyListTypeName(aAL));
-                        aNode.setAttributeNode(aTypeNode);
+                        aNode.setAttribute("type", getAgencyListTypeName(aAL));
                     }
                 }
             } else { //aCL = null?
@@ -920,15 +843,13 @@ public class StandaloneXMLSchema {
                     generateCodeList(aCL, aDTSC, gSchemaNode, generationContext);
                 }
                 if (getCodeListTypeName(aCL) != null) {
-                    Attr aTypeNode = aNode.getOwnerDocument().createAttribute("type");
-                    aTypeNode.setNodeValue(getCodeListTypeName(aCL));
-                    aNode.setAttributeNode(aTypeNode);
+                    aNode.setAttribute("type", getCodeListTypeName(aCL));
                 }
             }
 //			if(isCCStored(aNode.getAttribute("id")))
 //				continue;
 //			storedCC.add(aNode.getAttribute("id"));
-            tNode.appendChild(aNode);
+            tNode.addContent(aNode);
         }
         return tNode;
     }
@@ -941,34 +862,25 @@ public class StandaloneXMLSchema {
 
     public Element generateAgencyList(AgencyIdList gAL, BasicBusinessInformationEntitySupplementaryComponent gSC,
                                       Element gSchemaNode, GenerationContext generationContext) {
-        Element stNode = gSchemaNode.getOwnerDocument().createElement("xsd:simpleType");
+        Element stNode = newElement("simpleType");
 
-        Attr stNameNode = gSchemaNode.getOwnerDocument().createAttribute("name");
-        stNameNode.setNodeValue(getAgencyListTypeName(gAL));
-        stNode.setAttributeNode(stNameNode);
+        stNode.setAttribute("name", getAgencyListTypeName(gAL));
+        stNode.setAttribute("id", gAL.getGuid());
 
-        Attr stIdNode = gSchemaNode.getOwnerDocument().createAttribute("id");
-        stIdNode.setNodeValue(gAL.getGuid());
-        stNode.setAttributeNode(stIdNode);
+        Element rtNode = newElement("restriction");
 
-        Element rtNode = gSchemaNode.getOwnerDocument().createElement("xsd:restriction");
-
-        Attr base = gSchemaNode.getOwnerDocument().createAttribute("base");
-        base.setNodeValue("xsd:token");
-        stNode.appendChild(rtNode);
-        rtNode.setAttributeNode(base);
+        rtNode.setAttribute("base", "xsd:token");
+        stNode.addContent(rtNode);
 
         List<AgencyIdListValue> gALVs = generationContext.findAgencyIdListValueByOwnerListId(gAL.getAgencyIdListId());
 
         for (int i = 0; i < gALVs.size(); i++) {
             AgencyIdListValue aAgencyIdListValue = gALVs.get(i);
-            Element enumeration = stNode.getOwnerDocument().createElement("xsd:enumeration");
-            stNode.appendChild(enumeration);
-            Attr value = stNode.getOwnerDocument().createAttribute("value");
-            value.setNodeValue(aAgencyIdListValue.getValue());
-            stNode.setAttributeNode(value);
+            Element enumeration = newElement("enumeration");
+            stNode.addContent(enumeration);
+            stNode.setAttribute("value", aAgencyIdListValue.getValue());
         }
-        gSchemaNode.appendChild(stNode);
+        gSchemaNode.addContent(stNode);
         generationContext.addGuidIntoGuidArrayList(gAL.getGuid());
         return stNode;
     }
@@ -1455,9 +1367,7 @@ public class StandaloneXMLSchema {
             AggregateBusinessInformationEntity abie =
                     generationContext.findAbie(bod.getTopLevelAbieId());
 
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.newDocument();
+            Document doc = new Document();
 
             Element schemaNode = generateSchema(doc);
             String filename = null;
@@ -1471,7 +1381,7 @@ public class StandaloneXMLSchema {
             } else {
                 AssociationBusinessInformationEntityProperty asbiep =
                         generationContext.receiveASBIEP(abie.getAbieId());
-                doc = docBuilder.newDocument();
+                doc = new Document();
                 schemaNode = generateSchema(doc);
                 doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
                 writeXSDFile(doc, "Package/" + abie.getGuid());

@@ -36,7 +36,7 @@ public class CoreComponentService {
         List<AssociationCoreComponent> ascc_tmp_assoc = coreComponentProvider.getASCCs(accId);
 
         List<CoreComponent> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
-        return Collections.unmodifiableList(coreComponents);
+        return coreComponents;
     }
 
     public List<CoreComponent> getCoreComponentsWithoutAttributes(
@@ -51,7 +51,7 @@ public class CoreComponentService {
         List<AssociationCoreComponent> ascc_tmp_assoc = coreComponentProvider.getASCCs(accId);
 
         List<CoreComponent> coreComponents = gatheringBySeqKey(bcc_tmp_assoc, ascc_tmp_assoc);
-        return Collections.unmodifiableList(coreComponents);
+        return coreComponents;
     }
 
     private List<CoreComponent> gatheringBySeqKey(
@@ -84,6 +84,6 @@ public class CoreComponentService {
             }
         }
 
-        return coreComponents;
+        return new ArrayList(coreComponents);
     }
 }
