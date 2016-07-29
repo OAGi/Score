@@ -20,7 +20,7 @@
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/OAGIS.xsd
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:oacl="http://www.openapplications.org/oagis/10/codelists" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="Platform/2_2/OAGi-Platform.xsd"/>
 	<xsd:include schemaLocation="OAGIS-Nouns.xsd"/>
 	<!-- =================================================================== -->
