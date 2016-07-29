@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,12 +34,9 @@ import java.util.List;
 import static org.oagi.srt.common.SRTConstants.*;
 
 @Component
-public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
+public class P_1_8_1_PopulateAccAsccpBccAscc {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private DataTypeRepository dataTypeRepository;
@@ -59,27 +57,13 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
     private AssociationCoreComponentRepository asccRepository;
 
     @Autowired
-    private ReleaseRepository releaseRepository;
-
-    @Autowired
-    private NamespaceRepository namespaceRepository;
-
-    @Autowired
     private ModuleRepository moduleRepository;
 
-    private int userId;
-    private int releaseId;
-    private int namespaceId;
+    @Autowired
+    private ImportUtil importUtil;
 
     private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
     private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
-        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
-    }
 
     public static void main(String[] args) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
@@ -107,11 +91,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
         anyACC.setDen(anyACC.getObjectClassTerm() + ". Details");
         anyACC.setDefinition("This is corresponding to the xsd:any with the processContents = “strict” and any namespace.");
         anyACC.setOagisComponentType(5);
-        anyACC.setOwnerUserId(userId);
-        anyACC.setCreatedBy(userId);
-        anyACC.setLastUpdatedBy(userId);
-        anyACC.setReleaseId(releaseId);
-        anyACC.setNamespaceId(namespaceId);
+        anyACC.setOwnerUserId(importUtil.getUserId());
+        anyACC.setCreatedBy(importUtil.getUserId());
+        anyACC.setLastUpdatedBy(importUtil.getUserId());
+        anyACC.setReleaseId(importUtil.getReleaseId());
+        anyACC.setNamespaceId(importUtil.getNamespaceId());
         accRepository.saveAndFlush(anyACC);
 
         AssociationCoreComponentProperty anyASCCP = new AssociationCoreComponentProperty();
@@ -120,11 +104,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
         anyASCCP.setRoleOfAccId(anyACC.getAccId());
         anyASCCP.setDen(ANY_ASCCP_DEN);
         anyASCCP.setReusableIndicator(true);
-        anyASCCP.setOwnerUserId(userId);
-        anyASCCP.setCreatedBy(userId);
-        anyASCCP.setLastUpdatedBy(userId);
-        anyASCCP.setReleaseId(releaseId);
-        anyASCCP.setNamespaceId(namespaceId);
+        anyASCCP.setOwnerUserId(importUtil.getUserId());
+        anyASCCP.setCreatedBy(importUtil.getUserId());
+        anyASCCP.setLastUpdatedBy(importUtil.getUserId());
+        anyASCCP.setReleaseId(importUtil.getReleaseId());
+        anyASCCP.setNamespaceId(importUtil.getNamespaceId());
         asccpRepository.saveAndFlush(anyASCCP);
     }
 
@@ -387,12 +371,12 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
         asccp.setDen(den);
         asccp.setState(3);
         asccp.setModule(module);
-        asccp.setCreatedBy(userId);
-        asccp.setLastUpdatedBy(userId);
-        asccp.setOwnerUserId(userId);
+        asccp.setCreatedBy(importUtil.getUserId());
+        asccp.setLastUpdatedBy(importUtil.getUserId());
+        asccp.setOwnerUserId(importUtil.getUserId());
         asccp.setDeprecated(false);
-        asccp.setNamespaceId(namespaceId);
-        asccp.setReleaseId(releaseId);
+        asccp.setNamespaceId(importUtil.getNamespaceId());
+        asccp.setReleaseId(importUtil.getReleaseId());
         asccp.setReusableIndicator(reusableIndicator);
         asccp.setNillable(declaration.isNillable());
         asccpRepository.saveAndFlush(asccp);
@@ -488,17 +472,17 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
         }
 
         acc.setOagisComponentType(oagisComponentType);
-        acc.setCreatedBy(userId);
-        acc.setLastUpdatedBy(userId);
-        acc.setOwnerUserId(userId);
+        acc.setCreatedBy(importUtil.getUserId());
+        acc.setLastUpdatedBy(importUtil.getUserId());
+        acc.setOwnerUserId(importUtil.getUserId());
         acc.setState(3);
         acc.setModule(module);
         acc.setDeprecated(false);
         if (declaration instanceof TypeDecl) {
             acc.setAbstract(((TypeDecl) declaration).isAbstract());
         }
-        acc.setNamespaceId(namespaceId);
-        acc.setReleaseId(releaseId);
+        acc.setNamespaceId(importUtil.getNamespaceId());
+        acc.setReleaseId(importUtil.getReleaseId());
         accRepository.saveAndFlush(acc);
 
         return acc;
@@ -560,10 +544,10 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
         ascc.setDefinition(definition);
         ascc.setState(3);
         ascc.setDeprecated(false);
-        ascc.setReleaseId(releaseId);
-        ascc.setCreatedBy(userId);
-        ascc.setLastUpdatedBy(userId);
-        ascc.setOwnerUserId(userId);
+        ascc.setReleaseId(importUtil.getReleaseId());
+        ascc.setCreatedBy(importUtil.getUserId());
+        ascc.setLastUpdatedBy(importUtil.getUserId());
+        ascc.setOwnerUserId(importUtil.getUserId());
         asccRepository.saveAndFlush(ascc);
 
         return ascc;
@@ -613,10 +597,10 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
         bcc.setState(3);
         bcc.setDefinition(declaration.getDefinition());
         bcc.setDeprecated(false);
-        bcc.setReleaseId(releaseId);
-        bcc.setCreatedBy(userId);
-        bcc.setLastUpdatedBy(userId);
-        bcc.setOwnerUserId(userId);
+        bcc.setReleaseId(importUtil.getReleaseId());
+        bcc.setCreatedBy(importUtil.getUserId());
+        bcc.setLastUpdatedBy(importUtil.getUserId());
+        bcc.setOwnerUserId(importUtil.getUserId());
         bcc.setNillable(declaration.isNillable());
         bcc.setDefaultValue(declaration.getDefaultValue());
         bccRepository.saveAndFlush(bcc);
@@ -675,12 +659,12 @@ public class P_1_8_1_PopulateAccAsccpBccAscc implements InitializingBean {
             bccp.setRepresentationTerm(representationTerm);
             bccp.setDen(den);
             bccp.setState(3);
-            bccp.setCreatedBy(userId);
-            bccp.setLastUpdatedBy(userId);
-            bccp.setOwnerUserId(userId);
+            bccp.setCreatedBy(importUtil.getUserId());
+            bccp.setLastUpdatedBy(importUtil.getUserId());
+            bccp.setOwnerUserId(importUtil.getUserId());
             bccp.setDeprecated(false);
-            bccp.setReleaseId(releaseId);
-            bccp.setNamespaceId(namespaceId);
+            bccp.setReleaseId(importUtil.getReleaseId());
+            bccp.setNamespaceId(importUtil.getNamespaceId());
             Module module = declaration.getModule();
             bccp.setModule(module);
             bccp.setNillable(declaration.isNillable());

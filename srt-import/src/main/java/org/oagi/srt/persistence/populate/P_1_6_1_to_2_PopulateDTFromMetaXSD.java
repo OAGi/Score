@@ -38,22 +38,16 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private DataTypeRepository dataTypeRepository;
 
     @Autowired
     private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
 
     @Autowired
-    private ReleaseRepository releaseRepository;
-
-    @Autowired
     private ModuleRepository moduleRepository;
 
-    private int userId;
-    private int releaseId;
+    @Autowired
+    private ImportUtil importUtil;
 
     public void importAdditionalBDT(XPathHandler xh) throws Exception {
         NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
@@ -89,14 +83,14 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
             dataType.setContentComponentDefinition(null);
             dataType.setRevisionDoc(null);
             dataType.setState(3);
-            dataType.setCreatedBy(userId);
-            dataType.setLastUpdatedBy(userId);
-            dataType.setOwnerUserId(userId);
+            dataType.setCreatedBy(importUtil.getUserId());
+            dataType.setLastUpdatedBy(importUtil.getUserId());
+            dataType.setOwnerUserId(importUtil.getUserId());
             dataType.setRevisionDoc(null);
             dataType.setRevisionNum(0);
             dataType.setRevisionTrackingNum(0);
             dataType.setDeprecated(false);
-            dataType.setReleaseId(releaseId);
+            dataType.setReleaseId(importUtil.getReleaseId());
             dataType.setModule(module);
             logger.debug("Populating additional BDTs from meta whose name is " + name);
             dataTypeRepository.saveAndFlush(dataType);
@@ -131,9 +125,6 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.6. Start");
-
-        userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
 
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
         XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);

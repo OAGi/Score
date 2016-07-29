@@ -48,9 +48,6 @@ public class P_1_7_PopulateQBDTInDT {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private AgencyIdListRepository agencyIdListRepository;
 
     @Autowired
@@ -90,13 +87,10 @@ public class P_1_7_PopulateQBDTInDT {
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     @Autowired
-    private ReleaseRepository releaseRepository;
-
-    @Autowired
-    private NamespaceRepository namespaceRepository;
-
-    @Autowired
     private ModuleRepository moduleRepository;
+
+    @Autowired
+    private ImportUtil importUtil;
 
     @Autowired
     private P_1_5_PopulateDefaultAndUnqualifiedBDT populateDefaultAndUnqualifiedBDT;
@@ -156,10 +150,6 @@ public class P_1_7_PopulateQBDTInDT {
                     '}';
         }
     }
-
-    private int userId;
-    private int releaseId;
-    private int namespaceId;
 
     private Map<String, DataTypeInfoHolder> dtiHolderMap;
 
@@ -229,10 +219,6 @@ public class P_1_7_PopulateQBDTInDT {
 
     private void populate() throws Exception {
         fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-
-        userId = userRepository.findAppUserIdByLoginId("oagis");
-        releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
-        namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
 
         prepareForBCCP(SRTConstants.FIELDS_XSD_FILE_PATH,
                 SRTConstants.META_XSD_FILE_PATH,
@@ -450,13 +436,13 @@ public class P_1_7_PopulateQBDTInDT {
         String definition = dataTypeInfoHolder.getDefinition();
         dataType.setDefinition(definition);
         dataType.setState(3);
-        dataType.setCreatedBy(userId);
-        dataType.setLastUpdatedBy(userId);
-        dataType.setOwnerUserId(userId);
+        dataType.setCreatedBy(importUtil.getUserId());
+        dataType.setLastUpdatedBy(importUtil.getUserId());
+        dataType.setOwnerUserId(importUtil.getUserId());
         dataType.setRevisionNum(0);
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
-        dataType.setReleaseId(releaseId);
+        dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
         dataTypeRepository.saveAndFlush(dataType);
@@ -534,14 +520,14 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dataType.getDataTypeTerm());
         bccp.setDefinition(definition);
         bccp.setState(3);
-        bccp.setCreatedBy(userId);
-        bccp.setLastUpdatedBy(userId);
-        bccp.setOwnerUserId(userId);
+        bccp.setCreatedBy(importUtil.getUserId());
+        bccp.setLastUpdatedBy(importUtil.getUserId());
+        bccp.setOwnerUserId(importUtil.getUserId());
         bccp.setDeprecated(false);
-        bccp.setReleaseId(releaseId);
+        bccp.setReleaseId(importUtil.getReleaseId());
         Module module = elementDecl.getModule();
         bccp.setModule(module);
-        bccp.setNamespaceId(namespaceId);
+        bccp.setNamespaceId(importUtil.getNamespaceId());
         bccp.setNillable(elementDecl.isNillable());
         bccp.setDefaultValue(elementDecl.getDefaultValue());
         bccpRepository.save(bccp);
@@ -885,13 +871,13 @@ public class P_1_7_PopulateQBDTInDT {
         String definition = dataTypeInfoHolder.getDefinition();
         dataType.setDefinition(definition);
         dataType.setState(3);
-        dataType.setCreatedBy(userId);
-        dataType.setLastUpdatedBy(userId);
-        dataType.setOwnerUserId(userId);
+        dataType.setCreatedBy(importUtil.getUserId());
+        dataType.setLastUpdatedBy(importUtil.getUserId());
+        dataType.setOwnerUserId(importUtil.getUserId());
         dataType.setRevisionNum(0);
         dataType.setRevisionTrackingNum(0);
         dataType.setDeprecated(false);
-        dataType.setReleaseId(releaseId);
+        dataType.setReleaseId(importUtil.getReleaseId());
         Module module = dataTypeInfoHolder.getModule();
         dataType.setModule(module);
         dataType = dataTypeRepository.saveAndFlush(dataType);

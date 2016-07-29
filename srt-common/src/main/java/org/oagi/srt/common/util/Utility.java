@@ -9,7 +9,15 @@ import java.util.regex.Pattern;
 public class Utility {
 
     public static String generateGUID() {
-        return "oagis-id-" + UUID.randomUUID().toString().replaceAll("-", "");
+        return generateGUID(UUID.randomUUID());
+    }
+
+    public static String generateGUID(byte[] bytes) {
+        return generateGUID(UUID.nameUUIDFromBytes(bytes));
+    }
+
+    public static String generateGUID(UUID uuid) {
+        return "oagis-id-" + uuid.toString().replaceAll("-", "");
     }
 
     public static String first(String den, boolean upp) {
@@ -527,7 +535,8 @@ public class Utility {
 
     public static String extractModuleName(String path) {
         int idx = path.indexOf("Model");
-        return (idx != -1) ? FilenameUtils.separatorsToWindows(path.substring(idx)) : path;
+        path = (idx != -1) ? FilenameUtils.separatorsToWindows(path.substring(idx)) : path;
+        return path.replace(".xsd", "");
     }
 
     public static void main(String args[]) {

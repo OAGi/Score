@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
+<!--
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_2  
    Date:               		  10 June 2016
@@ -17,7 +19,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/OAGIS.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" xmlns:oacl="http://www.openapplications.org/oagis/10/codelists" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="Platform/2_2/OAGi-Platform.xsd"/>
 	<xsd:include schemaLocation="OAGIS-Nouns.xsd"/>
 	<!-- =================================================================== -->
@@ -1130,6 +1133,40 @@
 	<xsd:element name="OAGIS10BODs" type="OAGIS10BODsType" id="oagis-id-f3ed8e216f6e4df7a4143f6a8babc42b"/>
 	<xsd:complexType name="OAGIS10BODsType" id="oagis-id-1a0c82a0401a47ce85f9503125aba09c">
 		<xsd:sequence>
+			<xsd:element ref="AcknowledgeField" id="oagis-id-1a3ce65ae2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="AcknowledgeTable" id="oagis-id-8fe537cfe2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="AcknowledgeUOMGroup" id="oagis-id-2e780fcae2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeField" id="oagis-id-5472e577e2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeTable" id="oagis-id-6e3aced7e2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeUOMGroup" id="oagis-id-8367f333e2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="CancelField" id="oagis-id-355fea35e2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="CancelTable" id="oagis-id-6819fc5ae2134f08a4729790ff3e5678" minOccurs="0"/>
+			<xsd:element ref="CancelUOMGroup" id="oagis-id-6819fc5ae2134f08a472979034d4e2a3" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeField" id="oagis-id-6819fc5ae2134f08a472979016539f3a" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeTable" id="oagis-id-6819fc5ae2134f08a47297906754eaf3" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeUOMGroup" id="oagis-id-6819fc5ae2134f08a4729790754faec3" minOccurs="0"/>
+			<xsd:element ref="ChangeField" id="oagis-id-6819fc564290cf28a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ChangeTable" id="oagis-id-875df3ae4290cf28a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ChangeUOMGroup" id="oagis-id-681ccee335634f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ConfirmBOD" id="oagis-id-6819fff420087f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="GetField" id="oagis-id-6819fc8a45378c08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="GetTable" id="oagis-id-73dd55f1e2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="GetUOMGroup" id="oagis-id-00874d22e2134f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="NotifyField" id="oagis-id-6819fc7f3a244508a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="NotifyTable" id="oagis-id-6819fc5a4cca56f8a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="NotifyUOMGroup" id="oagis-id-6819f67d32ae3f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ProcessField" id="oagis-id-68194s33ee094f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ProcessTable" id="oagis-id-6819fc5ae2134f5a3cb68290273b640d" minOccurs="0"/>
+			<xsd:element ref="ProcessUOMGroup" id="oagis-id-6819f775a3322f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ShowField" id="oagis-id-6819fc5ae2084fab84729790273b640d" minOccurs="0"/>
+			<xsd:element ref="ShowTable" id="oagis-id-6819fc5ae2134f08f4ac3356273b640d" minOccurs="0"/>
+			<xsd:element ref="ShowUOMGroup" id="oagis-id-6819fc5ae902543c34729790273b640d" minOccurs="0"/>
+			<xsd:element ref="SyncField" id="oagis-id-6819fc5ae213ad4608cf9790273b640d" minOccurs="0"/>
+			<xsd:element ref="SyncResponseField" id="oagis-id-6819fc5ae848c47534729790273b640d" minOccurs="0"/>
+			<xsd:element ref="SyncResponseTable" id="oagis-id-6819fc5a55305ca3a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="SyncResponseUOMGroup" id="oagis-id-6819975fd23c4f08a4729790273b640d" minOccurs="0"/>
+			<xsd:element ref="SyncTable" id="oagis-id-6819fc5ae2134f08cc336722273b640d" minOccurs="0"/>
+			<xsd:element ref="SyncUOMGroup" id="oagis-id-6819fc99e335cb08a4729790273b640d" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeAllocateResource" id="oagis-id-a91df375d73c4148ac3f9383e240cad5" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeBatchCertificateOfAnalysis" id="oagis-id-83fe2fe7324045188f9c41ff3f908d81" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeBOM" id="oagis-id-ba247915c5764dbd84ed6944bb31851e" minOccurs="0"/>
@@ -1155,8 +1192,7 @@
 			<xsd:element ref="AcknowledgeFreightInvoice" id="oagis-id-e9be83c96acb424293b34b71886f858c" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeHazardousMaterialShipmentDocument" id="oagis-id-953d36bc922a4077aef004020d58289c" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeInspectDelivery" id="oagis-id-de1da06fd3c148a69de32788d811aee8" minOccurs="0"/>
-			<xsd:element ref="AcknowledgeInspectionOrder" minOccurs="0" id="oagis-id-57a02eb4dc5549358fc9f2872ecc308a"/>
-			
+			<xsd:element ref="AcknowledgeInspectionOrder" id="oagis-id-57a02eb4dc5549358fc9f2872ecc308a" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeInventoryBalance" id="oagis-id-063080c45e494f96acee2ae841e92556" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeInventoryConsumption" id="oagis-id-869f0a21c0794843be7d444833347d85" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeInventoryCount" id="oagis-id-45a4bb83e8784a428313170929c2f625" minOccurs="0"/>
@@ -1212,10 +1248,9 @@
 			<xsd:element ref="AcknowledgeShippersLetterOfInstruction" id="oagis-id-b6f69b007cff46f3ad947c481e106243" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeSplitWIP" id="oagis-id-c91355a3f7b3450a8a72503bffdf0dee" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeSupplierPartyMaster" id="oagis-id-376c085764b046de8d5e699cda6295d8" minOccurs="0"/>
-			<xsd:element ref="AcknowledgeTestMethod" minOccurs="0" id="oagis-id-d57e8f8660db47c988e1f873eadd886e"/>
-			<xsd:element ref="AcknowledgeTestResults" minOccurs="0" id="oagis-id-b4fdb1470b4949c1a20e12736f570198"/>
-			<xsd:element ref="AcknowledgeTestSpecification" minOccurs="0" id="oagis-id-e6b5a64b1d6f40598aa39feb7f5f3e8f"/>
-			
+			<xsd:element ref="AcknowledgeTestMethod" id="oagis-id-d57e8f8660db47c988e1f873eadd886e" minOccurs="0"/>
+			<xsd:element ref="AcknowledgeTestResults" id="oagis-id-b4fdb1470b4949c1a20e12736f570198" minOccurs="0"/>
+			<xsd:element ref="AcknowledgeTestSpecification" id="oagis-id-e6b5a64b1d6f40598aa39feb7f5f3e8f" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeWarehouseShippingAdvice" id="oagis-id-a9a36fa32c944631afa3f2acc1344895" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeWarehouseShippingOrder" id="oagis-id-4ad6d8875c09417f92eb54ef242e7d3e" minOccurs="0"/>
 			<xsd:element ref="AcknowledgeWarrantyClaim" id="oagis-id-168877b172a24154a7c286d665bce42d" minOccurs="0"/>
@@ -1248,8 +1283,7 @@
 			<xsd:element ref="CancelAcknowledgeFreightInvoice" id="oagis-id-12308d06c127485db04ed08aaba52143" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeHazardousMaterialShipmentDocument" id="oagis-id-952aa14d2c0e4ccc83628b8fb1454c78" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeInspectDelivery" id="oagis-id-cf9762f1494545278ac2e26f3aa5f599" minOccurs="0"/>
-				<xsd:element ref="CancelAcknowledgeInspectionOrder" minOccurs="0" id="oagis-id-9418f1d86ca748c6b79906e4e8b05571"/>		
-			
+			<xsd:element ref="CancelAcknowledgeInspectionOrder" id="oagis-id-9418f1d86ca748c6b79906e4e8b05571" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeInventoryBalance" id="oagis-id-89e02d5e9c224593b8bdc19da2043dd8" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeInventoryConsumption" id="oagis-id-07b04c428424490ab3f038d05d0ba7d8" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeInventoryCount" id="oagis-id-6b206d0a37494645b3e3e970ce68ebfb" minOccurs="0"/>
@@ -1311,10 +1345,9 @@
 			<xsd:element ref="CancelAcknowledgeShippersLetterOfInstruction" id="oagis-id-ba1c636176c9411bbffc1b41efa5dcad" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeSplitWIP" id="oagis-id-ccd3176a28a6436280c15bd6aeb0d5ed" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeSupplierPartyMaster" id="oagis-id-25aeb4c56632427db591ff938f96c298" minOccurs="0"/>
-			
-			<xsd:element ref="CancelAcknowledgeTestMethod" minOccurs="0" id="oagis-id-8f511b24ae794212b84b57009fb14093"/>
-			<xsd:element ref="CancelAcknowledgeTestResults" minOccurs="0" id="oagis-id-ff070c9932d54805aff8f292b9b8cf80"/>
-			<xsd:element ref="CancelAcknowledgeTestSpecification" minOccurs="0" id="oagis-id-3999886201da424cbe59bbe6795bdb8f"/>			
+			<xsd:element ref="CancelAcknowledgeTestMethod" id="oagis-id-8f511b24ae794212b84b57009fb14093" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeTestResults" id="oagis-id-ff070c9932d54805aff8f292b9b8cf80" minOccurs="0"/>
+			<xsd:element ref="CancelAcknowledgeTestSpecification" id="oagis-id-3999886201da424cbe59bbe6795bdb8f" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeWarehouseShippingAdvice" id="oagis-id-4faf3e95333b4e4589048547de26b81f" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeWarehouseShippingOrder" id="oagis-id-d8a68fdd4ce24d2abb3499e0e492a3ad" minOccurs="0"/>
 			<xsd:element ref="CancelAcknowledgeWarrantyClaim" id="oagis-id-9b8ac7892a074987b7a883fa20e6cb42" minOccurs="0"/>
@@ -1347,8 +1380,7 @@
 			<xsd:element ref="CancelFreightInvoice" id="oagis-id-c75889de4e77419dbfeabea65d5c8dfe" minOccurs="0"/>
 			<xsd:element ref="CancelHazardousMaterialShipmentDocument" id="oagis-id-b21c071bf6664e9eadf69261f88f6f4a" minOccurs="0"/>
 			<xsd:element ref="CancelInspectDelivery" id="oagis-id-e542a9a996f84b98ba5ce059bcf2f9e8" minOccurs="0"/>
-			<xsd:element ref="CancelInspectionOrder" minOccurs="0" id="oagis-id-0d6a0171c868469983728c4ea21fbb07"/>			
-			
+			<xsd:element ref="CancelInspectionOrder" id="oagis-id-0d6a0171c868469983728c4ea21fbb07" minOccurs="0"/>
 			<xsd:element ref="CancelInventoryBalance" id="oagis-id-394e8395aac24f6f9246a8a0351737b0" minOccurs="0"/>
 			<xsd:element ref="CancelInventoryConsumption" id="oagis-id-66d6c65e4cd84c9bbda85ca8f9b4b2e4" minOccurs="0"/>
 			<xsd:element ref="CancelInventoryCount" id="oagis-id-bfa59571b0ae4073b07bcaa5ff15417c" minOccurs="0"/>
@@ -1410,11 +1442,9 @@
 			<xsd:element ref="CancelShippersLetterOfInstruction" id="oagis-id-8b039de5ed134caab7107065183fe879" minOccurs="0"/>
 			<xsd:element ref="CancelSplitWIP" id="oagis-id-574e97da37a54c48a794627e108a83e2" minOccurs="0"/>
 			<xsd:element ref="CancelSupplierPartyMaster" id="oagis-id-48769704c189440f8e407f488fdc7f3c" minOccurs="0"/>
-			
-			<xsd:element ref="CancelTestMethod" minOccurs="0" id="oagis-id-3b8890f3c77247759235d3b12afc05cc"/>
-			<xsd:element ref="CancelTestResults" minOccurs="0" id="oagis-id-dad015023b5641d48bc14f3fcad60fe4"/>
-			<xsd:element ref="CancelTestSpecification" minOccurs="0" id="oagis-id-3c927ae9f4674ea68084e726bfc54770"/>
-			
+			<xsd:element ref="CancelTestMethod" id="oagis-id-3b8890f3c77247759235d3b12afc05cc" minOccurs="0"/>
+			<xsd:element ref="CancelTestResults" id="oagis-id-dad015023b5641d48bc14f3fcad60fe4" minOccurs="0"/>
+			<xsd:element ref="CancelTestSpecification" id="oagis-id-3c927ae9f4674ea68084e726bfc54770" minOccurs="0"/>
 			<xsd:element ref="CancelWarehouseShippingAdvice" id="oagis-id-eb6c75df619d4da6912530d4c434c46e" minOccurs="0"/>
 			<xsd:element ref="CancelWarehouseShippingOrder" id="oagis-id-d71de32c54e44423ab129593878371df" minOccurs="0"/>
 			<xsd:element ref="CancelWarrantyClaim" id="oagis-id-0cf35660b1a540f4b048df94e44a6e22" minOccurs="0"/>
@@ -1447,8 +1477,7 @@
 			<xsd:element ref="ChangeAcknowledgeFreightInvoice" id="oagis-id-08873f494bfd48978deb5ead9226d5f3" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeHazardousMaterialShipmentDocument" id="oagis-id-1f1c3a87744e4e1099f54599b3c6ecfc" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeInspectDelivery" id="oagis-id-0a8e822e2f084f34b9a45701c76c3ad4" minOccurs="0"/>
-			
-			<xsd:element ref="ChangeAcknowledgeInspectionOrder" minOccurs="0" id="oagis-id-44011b288e764ac3a2e2b03701791c7a"/>
+			<xsd:element ref="ChangeAcknowledgeInspectionOrder" id="oagis-id-44011b288e764ac3a2e2b03701791c7a" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeInventoryBalance" id="oagis-id-187ea3d02d87477f9f315bae81700595" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeInventoryConsumption" id="oagis-id-969e1d7ebdd34848a6901e6e5af7180e" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeInventoryCount" id="oagis-id-f5dc91897610467aa2c977d096c22484" minOccurs="0"/>
@@ -1510,11 +1539,9 @@
 			<xsd:element ref="ChangeAcknowledgeShippersLetterOfInstruction" id="oagis-id-b9de3d05413741cc85ed53f8f3c83666" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeSplitWIP" id="oagis-id-8d4187924ae6406c895b12f172a39f53" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeSupplierPartyMaster" id="oagis-id-80376e17e89249afa6bc0d18d0583a18" minOccurs="0"/>
-
-			<xsd:element ref="ChangeAcknowledgeTestMethod" minOccurs="0" id="oagis-id-3f3f4aefd084488c954bbd93a7aae965"/>
-<xsd:element ref="ChangeAcknowledgeTestResults" minOccurs="0" id="oagis-id-adf46a8a9dfa45609bb1afed034a2fe5"/>
-<xsd:element ref="ChangeAcknowledgeTestSpecification" minOccurs="0" id="oagis-id-ddaa06c3dac3454e9c8c189e8215ed7d"/>			
-			
+			<xsd:element ref="ChangeAcknowledgeTestMethod" id="oagis-id-3f3f4aefd084488c954bbd93a7aae965" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeTestResults" id="oagis-id-adf46a8a9dfa45609bb1afed034a2fe5" minOccurs="0"/>
+			<xsd:element ref="ChangeAcknowledgeTestSpecification" id="oagis-id-ddaa06c3dac3454e9c8c189e8215ed7d" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeWarehouseShippingAdvice" id="oagis-id-0e37ecaa657443508a76d6eb85ec0bc2" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeWarehouseShippingOrder" id="oagis-id-1ccc45ed51f646e092f176c2f2b2dd22" minOccurs="0"/>
 			<xsd:element ref="ChangeAcknowledgeWarrantyClaim" id="oagis-id-b65b2b75b980494b89c9f8445efa8833" minOccurs="0"/>
@@ -1547,8 +1574,7 @@
 			<xsd:element ref="ChangeFreightInvoice" id="oagis-id-50913b9f6c1c42178465ee7d0ca04571" minOccurs="0"/>
 			<xsd:element ref="ChangeHazardousMaterialShipmentDocument" id="oagis-id-3dda9bcb439c47e1884292db67efa454" minOccurs="0"/>
 			<xsd:element ref="ChangeInspectDelivery" id="oagis-id-a86e8681e6ef4390ac207e143fe7a12a" minOccurs="0"/>
-<xsd:element ref="ChangeInspectionOrder" minOccurs="0" id="oagis-id-8c8d96f75cf5462fa81ee4a80c2c3545"/>
-			
+			<xsd:element ref="ChangeInspectionOrder" id="oagis-id-8c8d96f75cf5462fa81ee4a80c2c3545" minOccurs="0"/>
 			<xsd:element ref="ChangeInventoryBalance" id="oagis-id-da4a506cb2184975b95a670c6469dc9e" minOccurs="0"/>
 			<xsd:element ref="ChangeInventoryConsumption" id="oagis-id-2ebaadf901864b159deaaf06e1e7c631" minOccurs="0"/>
 			<xsd:element ref="ChangeInventoryCount" id="oagis-id-479891114ce545e299bb028411c0d235" minOccurs="0"/>
@@ -1610,10 +1636,9 @@
 			<xsd:element ref="ChangeShippersLetterOfInstruction" id="oagis-id-f6a60d33f02544efaf721dee40fbe016" minOccurs="0"/>
 			<xsd:element ref="ChangeSplitWIP" id="oagis-id-a1e4964d30194f4fa27d91945a80d0dd" minOccurs="0"/>
 			<xsd:element ref="ChangeSupplierPartyMaster" id="oagis-id-8e11699330924b47a0319f0a546d9abc" minOccurs="0"/>
-		<xsd:element ref="ChangeTestMethod" minOccurs="0" id="oagis-id-f1c9c8f023964efe805843e810c2a629"/>
-<xsd:element ref="ChangeTestResults" minOccurs="0" id="oagis-id-e0d486a3135d441bb4ecef940b6934c8"/>
-<xsd:element ref="ChangeTestSpecification" minOccurs="0" id="oagis-id-efff97050e0c4afebcf5263e193a2277"/>
-	
+			<xsd:element ref="ChangeTestMethod" id="oagis-id-f1c9c8f023964efe805843e810c2a629" minOccurs="0"/>
+			<xsd:element ref="ChangeTestResults" id="oagis-id-e0d486a3135d441bb4ecef940b6934c8" minOccurs="0"/>
+			<xsd:element ref="ChangeTestSpecification" id="oagis-id-efff97050e0c4afebcf5263e193a2277" minOccurs="0"/>
 			<xsd:element ref="ChangeWarehouseShippingAdvice" id="oagis-id-76f3ec2447dd4ce098d852b2db327109" minOccurs="0"/>
 			<xsd:element ref="ChangeWarehouseShippingOrder" id="oagis-id-55c02841c51a4879b0f9d5e5c87d8b2a" minOccurs="0"/>
 			<xsd:element ref="ChangeWarrantyClaim" id="oagis-id-89bf4a5bc859470eac247aacfa061bdd" minOccurs="0"/>
@@ -1646,8 +1671,7 @@
 			<xsd:element ref="GetFreightInvoice" id="oagis-id-c37e196631b848969dbdfd538a85dcb5" minOccurs="0"/>
 			<xsd:element ref="GetHazardousMaterialShipmentDocument" id="oagis-id-c4213ee8b8b84f3fbea506048afbfa2c" minOccurs="0"/>
 			<xsd:element ref="GetInspectDelivery" id="oagis-id-e72941c3db6b48d7935f415621514801" minOccurs="0"/>
-			<xsd:element ref="GetInspectionOrder" minOccurs="0" id="oagis-id-3c4020e4efe842ec9bcce72c1ee46e08"/>
-			
+			<xsd:element ref="GetInspectionOrder" id="oagis-id-3c4020e4efe842ec9bcce72c1ee46e08" minOccurs="0"/>
 			<xsd:element ref="GetInventoryBalance" id="oagis-id-b493b3bf5add45f5bebb768704ce06f2" minOccurs="0"/>
 			<xsd:element ref="GetInventoryConsumption" id="oagis-id-6fe3e11e5cfe4c99b7ab2c4d1cb80957" minOccurs="0"/>
 			<xsd:element ref="GetInventoryCount" id="oagis-id-4603cc2de3ac4076a9a3d0917fcfef9f" minOccurs="0"/>
@@ -1709,11 +1733,9 @@
 			<xsd:element ref="GetShippersLetterOfInstruction" id="oagis-id-c1eb166749c046a6b7e8d02d234cb494" minOccurs="0"/>
 			<xsd:element ref="GetSplitWIP" id="oagis-id-d41552fd7dbc437fad9f4390dff120fb" minOccurs="0"/>
 			<xsd:element ref="GetSupplierPartyMaster" id="oagis-id-b3615f7788984cbf919dd9f357267178" minOccurs="0"/>
-			
-			<xsd:element ref="GetTestMethod" minOccurs="0" id="oagis-id-8061151251b64efabeebc140e434660a"/>
-<xsd:element ref="GetTestResults" minOccurs="0" id="oagis-id-62030ae450844e44972f27c18b29690d"/>
-<xsd:element ref="GetTestSpecification" minOccurs="0" id="oagis-id-12a66f722ccc4fcfb962de36303e4a84"/>
-
+			<xsd:element ref="GetTestMethod" id="oagis-id-8061151251b64efabeebc140e434660a" minOccurs="0"/>
+			<xsd:element ref="GetTestResults" id="oagis-id-62030ae450844e44972f27c18b29690d" minOccurs="0"/>
+			<xsd:element ref="GetTestSpecification" id="oagis-id-12a66f722ccc4fcfb962de36303e4a84" minOccurs="0"/>
 			<xsd:element ref="GetWarehouseShippingAdvice" id="oagis-id-0e147f6afad0476c9d1f50b6d385d4b5" minOccurs="0"/>
 			<xsd:element ref="GetWarehouseShippingOrder" id="oagis-id-5148fd60d95f4750bba46e906f996aa5" minOccurs="0"/>
 			<xsd:element ref="GetWarrantyClaim" id="oagis-id-db7dd031d9674e0cbdcad3fe819306d6" minOccurs="0"/>
@@ -1764,7 +1786,7 @@
 			<xsd:element ref="NotifyFreightInvoice" id="oagis-id-810d67cdeade4c4e9364de21fe133bdb" minOccurs="0"/>
 			<xsd:element ref="NotifyHazardousMaterialShipmentDocument" id="oagis-id-62e86d5aa78c4fc290cf5d8916a05eb1" minOccurs="0"/>
 			<xsd:element ref="NotifyInspectDelivery" id="oagis-id-7d39489c96464db8982ccb33fddbd5ea" minOccurs="0"/>
-			<xsd:element ref="NotifyInspectionOrder" minOccurs="0" id="oagis-id-0049d537cbe6410aa5a18b9657dcc5ee"/>
+			<xsd:element ref="NotifyInspectionOrder" id="oagis-id-0049d537cbe6410aa5a18b9657dcc5ee" minOccurs="0"/>
 			<xsd:element ref="NotifyInventoryBalance" id="oagis-id-fb13342ae80d4863827976acf72b3d5c" minOccurs="0"/>
 			<xsd:element ref="NotifyInventoryConsumption" id="oagis-id-d3248e98f113476e907921fb2e5c8dc7" minOccurs="0"/>
 			<xsd:element ref="NotifyInventoryCount" id="oagis-id-f2e52a246c5645569264ca7d03efe689" minOccurs="0"/>
@@ -1826,11 +1848,9 @@
 			<xsd:element ref="NotifyShippersLetterOfInstruction" id="oagis-id-b215c7c2ffcb443caf6238eacfa80e35" minOccurs="0"/>
 			<xsd:element ref="NotifySplitWIP" id="oagis-id-6a11329f32ed4f30b76c79607eb14d74" minOccurs="0"/>
 			<xsd:element ref="NotifySupplierPartyMaster" id="oagis-id-c54c32e88b6f4c9b9945ffac6e979b7b" minOccurs="0"/>
-			
-			<xsd:element ref="NotifyTestMethod" minOccurs="0" id="oagis-id-5e7044caad9b47ed82c5243a57f3021e"/>
-<xsd:element ref="NotifyTestResults" minOccurs="0" id="oagis-id-0c001ae4d07d4995a4c37621746340f1"/>
-<xsd:element ref="NotifyTestSpecification" minOccurs="0" id="oagis-id-bdd390097fcd4c1eaa51f8fdd17e81ba"/>
-
+			<xsd:element ref="NotifyTestMethod" id="oagis-id-5e7044caad9b47ed82c5243a57f3021e" minOccurs="0"/>
+			<xsd:element ref="NotifyTestResults" id="oagis-id-0c001ae4d07d4995a4c37621746340f1" minOccurs="0"/>
+			<xsd:element ref="NotifyTestSpecification" id="oagis-id-bdd390097fcd4c1eaa51f8fdd17e81ba" minOccurs="0"/>
 			<xsd:element ref="NotifyWarehouseShippingAdvice" id="oagis-id-b064e595c978488aaf6a11c3ca74c93c" minOccurs="0"/>
 			<xsd:element ref="NotifyWarehouseShippingOrder" id="oagis-id-f2eefc5ee1104297bafc3bff6558cc80" minOccurs="0"/>
 			<xsd:element ref="NotifyWarrantyClaim" id="oagis-id-a99c2dc33cf349528aa082fbbe09b9d8" minOccurs="0"/>
@@ -1878,10 +1898,8 @@
 			<xsd:element ref="ProcessFreightInvoice" id="oagis-id-7cd8d9ebb9c24ced91cdedc3444f1fb5" minOccurs="0"/>
 			<xsd:element ref="ProcessHazardousMaterialShipmentDocument" id="oagis-id-1d2ed232d4a64ad58f98976665e7a709" minOccurs="0"/>
 			<xsd:element ref="ProcessInspectDelivery" id="oagis-id-fcc197240d35476eb3f927f795738a44" minOccurs="0"/>
-			
-			<xsd:element ref="ProcessInspectionOrder" minOccurs="0" id="oagis-id-9cfa887994f24b01bfbeba2d9973ff6c"/>
+			<xsd:element ref="ProcessInspectionOrder" id="oagis-id-9cfa887994f24b01bfbeba2d9973ff6c" minOccurs="0"/>
 			<xsd:element ref="ProcessInventoryBalance" id="oagis-id-6fd77ee2e8b041dcbd1c5c8e931363c5" minOccurs="0"/>
-			
 			<xsd:element ref="ProcessInventoryConsumption" id="oagis-id-277ca44547584a4cbe2caa969a8135f3" minOccurs="0"/>
 			<xsd:element ref="ProcessInventoryCount" id="oagis-id-44aa0d2a3cd74cfeb47d08afaab1a758" minOccurs="0"/>
 			<xsd:element ref="ProcessInvoice" id="oagis-id-28eef6350d4e48ae95633f2fd010fbc4" minOccurs="0"/>
@@ -1936,11 +1954,9 @@
 			<xsd:element ref="ProcessShippersLetterOfInstruction" id="oagis-id-571e7bcb15b44e80a20b61e69984559b" minOccurs="0"/>
 			<xsd:element ref="ProcessSplitWIP" id="oagis-id-4c7ba92e003e4822b6c63beb6d29e7fd" minOccurs="0"/>
 			<xsd:element ref="ProcessSupplierPartyMaster" id="oagis-id-9962d9978d134fcc8ad2f800cf67e57d" minOccurs="0"/>
-			
-			<xsd:element ref="ProcessTestMethod" minOccurs="0" id="oagis-id-fa9ea3422449404a86fb2dd50fa717f8"/>
-<xsd:element ref="ProcessTestResults" minOccurs="0" id="oagis-id-ab8d534d710240e5a7dfc0fa7740ff30"/>
-<xsd:element ref="ProcessTestSpecification" minOccurs="0" id="oagis-id-89be730622e0449a8d00d2c0827abc34"/>
-			
+			<xsd:element ref="ProcessTestMethod" id="oagis-id-fa9ea3422449404a86fb2dd50fa717f8" minOccurs="0"/>
+			<xsd:element ref="ProcessTestResults" id="oagis-id-ab8d534d710240e5a7dfc0fa7740ff30" minOccurs="0"/>
+			<xsd:element ref="ProcessTestSpecification" id="oagis-id-89be730622e0449a8d00d2c0827abc34" minOccurs="0"/>
 			<xsd:element ref="ProcessWarehouseShippingAdvice" id="oagis-id-a4161647c9514162b4ce3d4752e80fef" minOccurs="0"/>
 			<xsd:element ref="ProcessWarehouseShippingOrder" id="oagis-id-0497f3d494fb43569fbb9f9ab32f2994" minOccurs="0"/>
 			<xsd:element ref="ProcessWarrantyClaim" id="oagis-id-e180eab8433341c48d884dd9792fd9bd" minOccurs="0"/>
@@ -1973,7 +1989,7 @@
 			<xsd:element ref="ShowFreightInvoice" id="oagis-id-32d62ecde2b443beb3bcf47362e2ef82" minOccurs="0"/>
 			<xsd:element ref="ShowHazardousMaterialShipmentDocument" id="oagis-id-7024653c4a4d4c3c88d1b8dcfb160c23" minOccurs="0"/>
 			<xsd:element ref="ShowInspectDelivery" id="oagis-id-4cac3a7c196f459b9dd6931e2597736c" minOccurs="0"/>
-			<xsd:element ref="ShowInspectionOrder" minOccurs="0" id="oagis-id-e320ec61c7294a3399c707da4c18a303"/>
+			<xsd:element ref="ShowInspectionOrder" id="oagis-id-e320ec61c7294a3399c707da4c18a303" minOccurs="0"/>
 			<xsd:element ref="ShowInventoryBalance" id="oagis-id-280df2038a9b43c58381e7eee86e5f9b" minOccurs="0"/>
 			<xsd:element ref="ShowInventoryConsumption" id="oagis-id-527aac191fc642a69a9c5fedf08353d5" minOccurs="0"/>
 			<xsd:element ref="ShowInventoryCount" id="oagis-id-7017f88c9fb74f01a906de73da1f6a40" minOccurs="0"/>
@@ -2035,9 +2051,9 @@
 			<xsd:element ref="ShowShippersLetterOfInstruction" id="oagis-id-3764be4765284fb59bdadbf1f9b6e227" minOccurs="0"/>
 			<xsd:element ref="ShowSplitWIP" id="oagis-id-a506447b823642e6aca28504d21f6881" minOccurs="0"/>
 			<xsd:element ref="ShowSupplierPartyMaster" id="oagis-id-e340f5c79a4c47d7aa6c75fb1180e1e7" minOccurs="0"/>
-			<xsd:element ref="ShowTestMethod" minOccurs="0" id="oagis-id-fcf3b958dfc74e3e809af6219c556cc0"/>
-<xsd:element ref="ShowTestResults" minOccurs="0" id="oagis-id-58d9855eac464071bc2e2e65f6911f59"/>
-<xsd:element ref="ShowTestSpecification" minOccurs="0" id="oagis-id-9aabb930e77e49189886b6258ae9d402"/>
+			<xsd:element ref="ShowTestMethod" id="oagis-id-fcf3b958dfc74e3e809af6219c556cc0" minOccurs="0"/>
+			<xsd:element ref="ShowTestResults" id="oagis-id-58d9855eac464071bc2e2e65f6911f59" minOccurs="0"/>
+			<xsd:element ref="ShowTestSpecification" id="oagis-id-9aabb930e77e49189886b6258ae9d402" minOccurs="0"/>
 			<xsd:element ref="ShowWarehouseShippingAdvice" id="oagis-id-ba836b35b9e040fea559ecbfaba7a06f" minOccurs="0"/>
 			<xsd:element ref="ShowWarehouseShippingOrder" id="oagis-id-7a78be85ac8048c9b4df997061ef8747" minOccurs="0"/>
 			<xsd:element ref="ShowWarrantyClaim" id="oagis-id-4a7130cfab344f4a819431a02a3ee99a" minOccurs="0"/>
@@ -2067,7 +2083,7 @@
 			<xsd:element ref="SyncFreightInvoice" id="oagis-id-1f26c9638ce14c83beaf2d37cd676935" minOccurs="0"/>
 			<xsd:element ref="SyncHazardousMaterialShipmentDocument" id="oagis-id-2f0c888f3db4495ca22dbfa5a88ec9c6" minOccurs="0"/>
 			<xsd:element ref="SyncInspectDelivery" id="oagis-id-3d0b9720d1784ff2ac6fef84c1787824" minOccurs="0"/>
-			<xsd:element ref="SyncInspectionOrder" minOccurs="0" id="oagis-id-c070c2eed68f46b3adb1d5a3e2c84cfb"/>
+			<xsd:element ref="SyncInspectionOrder" id="oagis-id-c070c2eed68f46b3adb1d5a3e2c84cfb" minOccurs="0"/>
 			<xsd:element ref="SyncInventoryBalance" id="oagis-id-54d3fb1a804442de987fe15dbd520c06" minOccurs="0"/>
 			<xsd:element ref="SyncInventoryConsumption" id="oagis-id-f5d0261680a34ad3ad4d0b009168bd2a" minOccurs="0"/>
 			<xsd:element ref="SyncInventoryCount" id="oagis-id-22265db7e9cc41bebb6006035229f0a0" minOccurs="0"/>
@@ -2135,8 +2151,7 @@
 			<xsd:element ref="SyncResponseFreightInvoice" id="oagis-id-742dacde9b5248fea27cb072fbbe7d2e" minOccurs="0"/>
 			<xsd:element ref="SyncResponseHazardousMaterialShipmentDocument" id="oagis-id-fbd65c4c603b4409abbd9ac7a42682cf" minOccurs="0"/>
 			<xsd:element ref="SyncResponseInspectDelivery" id="oagis-id-d1143c7f5f7d4acd81a43b692387b0f7" minOccurs="0"/>
-			
-<xsd:element ref="SyncResponseInspectionOrder" minOccurs="0" id="oagis-id-3be37f407ea6443789186ea3de73ceba"/>
+			<xsd:element ref="SyncResponseInspectionOrder" id="oagis-id-3be37f407ea6443789186ea3de73ceba" minOccurs="0"/>
 			<xsd:element ref="SyncResponseInventoryBalance" id="oagis-id-8a090c058c7b455d9663ef7e2b61405f" minOccurs="0"/>
 			<xsd:element ref="SyncResponseInventoryConsumption" id="oagis-id-5f38b755996e4f609a0979ad9509e308" minOccurs="0"/>
 			<xsd:element ref="SyncResponseInventoryCount" id="oagis-id-c0a65de25a874504961a95baf4cd4ba4" minOccurs="0"/>
@@ -2192,10 +2207,9 @@
 			<xsd:element ref="SyncResponseShippersLetterOfInstruction" id="oagis-id-65bcac6dc24346309e67f7b66e131321" minOccurs="0"/>
 			<xsd:element ref="SyncResponseSplitWIP" id="oagis-id-ab610b5e5f0241c3951c9f34c1f46722" minOccurs="0"/>
 			<xsd:element ref="SyncResponseSupplierPartyMaster" id="oagis-id-4ae9503c507c4735be49b72454e4669e" minOccurs="0"/>
-		<xsd:element ref="SyncResponseTestMethod" minOccurs="0" id="oagis-id-9f06e4be0b0c4da1b0b2b2ec878ab82f"/>
-<xsd:element ref="SyncResponseTestResults" minOccurs="0" id="oagis-id-dd529fe21fdb41ff8c622ba624b15f3f"/>
-<xsd:element ref="SyncResponseTestSpecification" minOccurs="0" id="oagis-id-631b4c8002034950aa7029958f0660d8"/>	
-			
+			<xsd:element ref="SyncResponseTestMethod" id="oagis-id-9f06e4be0b0c4da1b0b2b2ec878ab82f" minOccurs="0"/>
+			<xsd:element ref="SyncResponseTestResults" id="oagis-id-dd529fe21fdb41ff8c622ba624b15f3f" minOccurs="0"/>
+			<xsd:element ref="SyncResponseTestSpecification" id="oagis-id-631b4c8002034950aa7029958f0660d8" minOccurs="0"/>
 			<xsd:element ref="SyncResponseWarehouseShippingAdvice" id="oagis-id-2264ab6a77f04f98b7b389181a638a29" minOccurs="0"/>
 			<xsd:element ref="SyncResponseWarehouseShippingOrder" id="oagis-id-60c99ddf06f24e138c17e3e4d3f41731" minOccurs="0"/>
 			<xsd:element ref="SyncResponseWarrantyClaim" id="oagis-id-1840ae94d70945729b78eb936015d6c8" minOccurs="0"/>
@@ -2213,10 +2227,9 @@
 			<xsd:element ref="SyncShippersLetterOfInstruction" id="oagis-id-0d4363150d984f69a0deb00c55c0a256" minOccurs="0"/>
 			<xsd:element ref="SyncSplitWIP" id="oagis-id-46b525d8cfc745c8b870b3349516697c" minOccurs="0"/>
 			<xsd:element ref="SyncSupplierPartyMaster" id="oagis-id-ced89a85ff7f48df8c7b76f9971fe13e" minOccurs="0"/>
-			
-			<xsd:element ref="SyncTestMethod" minOccurs="0" id="oagis-id-b40c7dc9749942f196ba856a60bc0954"/>
-<xsd:element ref="SyncTestResults" minOccurs="0" id="oagis-id-d4e3d1c145304971add30e14fbbf9fa3"/>
-<xsd:element ref="SyncTestSpecification" minOccurs="0" id="oagis-id-baf0f2ce1a1a4b4f9eb16c94b85a3c50"/>
+			<xsd:element ref="SyncTestMethod" id="oagis-id-b40c7dc9749942f196ba856a60bc0954" minOccurs="0"/>
+			<xsd:element ref="SyncTestResults" id="oagis-id-d4e3d1c145304971add30e14fbbf9fa3" minOccurs="0"/>
+			<xsd:element ref="SyncTestSpecification" id="oagis-id-baf0f2ce1a1a4b4f9eb16c94b85a3c50" minOccurs="0"/>
 			<xsd:element ref="SyncWarehouseShippingAdvice" id="oagis-id-ccc59ddf80b24f0abaa5c7fecf35be27" minOccurs="0"/>
 			<xsd:element ref="SyncWarehouseShippingOrder" id="oagis-id-1ac6102a64774d24a624bf063fc8363e" minOccurs="0"/>
 			<xsd:element ref="SyncWarrantyClaim" id="oagis-id-c3525262143446a3a313eaed65d9daab" minOccurs="0"/>

@@ -18,15 +18,6 @@ public class P_1_2_PopulateCDTandCDTSC {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private NamespaceRepository namespaceRepository;
-
-    @Autowired
-    private ReleaseRepository releaseRepository;
-
-    @Autowired
     private XSDBuiltInTypeRepository xbtRepository;
 
     @Autowired

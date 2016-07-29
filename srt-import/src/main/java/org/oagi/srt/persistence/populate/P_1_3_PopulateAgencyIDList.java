@@ -54,13 +54,13 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private Collection<AgencyIdList> agencyIDList() throws Exception {
-        String filename = "IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
-        Module module = moduleRepository.findByModuleContaining(filename);
+        String moduleName = "IdentifierScheme_AgencyIdentification_3055_D08B";
+        Module module = moduleRepository.findByModuleContaining(moduleName);
         if (module == null) {
-            throw new IllegalStateException("Can't find " + filename + " module. We need to import `module` first perfectly.");
+            throw new IllegalStateException("Can't find " + moduleName + " module. We need to import `module` first perfectly.");
         }
 
-        String path1 = SRTConstants.filepath("AgencyID") + filename;
+        String path1 = SRTConstants.filepath("AgencyID") + moduleName + ".xsd";
         XPathHandler xh = new XPathHandler(path1);
 
         AgencyIdList agencyIdList = new AgencyIdList();

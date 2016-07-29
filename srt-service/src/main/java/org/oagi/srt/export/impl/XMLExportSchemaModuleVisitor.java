@@ -75,7 +75,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         this.document.addContent(schemaElement);
         this.rootElement = schemaElement;
 
-        moduleFile = new File(baseDir, schemaModule.getPath()).getCanonicalFile();
+        moduleFile = new File(baseDir, schemaModule.getPath() + ".xsd").getCanonicalFile();
     }
 
     private Document createDocument() {
@@ -354,10 +354,13 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     @Override
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
-        if (accComplexType.getName().startsWith("OAGIS10")) {
-            processOAGIS10(accComplexType);
-        } else {
-            processACCComplexType(accComplexType);
+        switch (accComplexType.getOagisComponentType()) {
+            case 6:
+            case 7:
+                processOAGIS10(accComplexType);
+                break;
+            default:
+                processACCComplexType(accComplexType);
         }
     }
 
@@ -371,14 +374,25 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         Element sequenceElement = new Element("sequence", XSD_NS);
         complexTypeElement.addContent(sequenceElement);
 
-        String delimiter = name.replace("OAGIS10", "");
+        String delimiter;
+        switch (accComplexType.getOagisComponentType()) {
+            case 6:
+                delimiter = "Nouns";
+                break;
+            case 7:
+                delimiter = "BODs";
+                break;
+            default:
+                throw new IllegalStateException();
+        }
         for (SchemaModule dependedModule : schemaModule.getDependedModules()) {
             String path = dependedModule.getPath();
             if (path.contains(delimiter + File.separator)) {
                 Element element = new Element("element", XSD_NS);
 
-                element.setAttribute("ref", path.substring(path.lastIndexOf(File.separator) + 1, path.length()).replace(".xsd", ""));
-                element.setAttribute("id", Utility.generateGUID());
+                String bodName = path.substring(path.lastIndexOf(File.separator) + 1, path.length());
+                element.setAttribute("ref", bodName);
+                element.setAttribute("id", Utility.generateGUID((name + path).getBytes()));
                 element.setAttribute("minOccurs", "0");
 
                 sequenceElement.addContent(element);
@@ -594,7 +608,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         Path pathBase = Paths.get(this.moduleFile.getParentFile().getCanonicalPath());
         Path pathRelative = pathBase.relativize(pathAbsolute);
 
-        return FilenameUtils.separatorsToUnix(pathRelative.toString());
+        return FilenameUtils.separatorsToUnix(pathRelative.toString()) + ".xsd";
     }
 
     @Override
