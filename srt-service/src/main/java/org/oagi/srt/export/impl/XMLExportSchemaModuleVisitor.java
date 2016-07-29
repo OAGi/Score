@@ -75,7 +75,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         this.document.addContent(schemaElement);
         this.rootElement = schemaElement;
 
-        moduleFile = new File(baseDir, schemaModule.getPath()).getCanonicalFile();
+        moduleFile = new File(baseDir, schemaModule.getPath() + ".xsd").getCanonicalFile();
     }
 
     private Document createDocument() {
