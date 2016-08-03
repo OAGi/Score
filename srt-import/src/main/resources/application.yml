@@ -6,7 +6,7 @@ spring:
 # DataSource
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://docker:3306/oagsrt_revision?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true
+    url: jdbc:mysql://docker:3306/oagsrt_revision?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true&useTimezone=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: root
     password: qwer1234
     platform: mysql
@@ -20,6 +20,7 @@ spring:
 
     continue-on-error: true
     initialize: false
+    auto-commit: false
 
   jpa:
     generate-ddl: false
@@ -51,3 +52,4 @@ spring:
     username: oagi
     password: oagi
     platform: oracle
+    auto-commit: false
