@@ -3,11 +3,14 @@ package org.oagi.srt.service;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.ContextCategoryRepository;
 import org.oagi.srt.repository.ContextSchemeRepository;
-import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.ContextSchemeValueRepository;
 import org.oagi.srt.repository.entity.ContextCategory;
+import org.oagi.srt.repository.entity.ContextScheme;
+import org.oagi.srt.repository.entity.ContextSchemeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +24,41 @@ public class ContextCategoryService {
     @Autowired
     private ContextSchemeRepository contextSchemeRepository;
 
+    @Autowired
+    private ContextSchemeValueRepository contextSchemeValueRepository;
+
     public List<ContextCategory> findAll(Sort.Direction direction, String property) {
         return Collections.unmodifiableList(
                 contextCategoryRepository.findAll(new Sort(new Sort.Order(direction, property)))
         );
+    }
+
+    public List<ContextCategory> findByNameContaining(String name) {
+        name = (name != null) ? name.trim() : null;
+        if (StringUtils.isEmpty(name)) {
+            return Collections.emptyList();
+        }
+        return contextCategoryRepository.findByNameContaining(name);
+    }
+
+    public List<ContextScheme> findByCtxCategoryId(int ctxCategoryId) {
+        return contextSchemeRepository.findByCtxCategoryId(ctxCategoryId);
+    }
+
+    public List<ContextSchemeValue> findByOwnerCtxSchemeId(int ownerCtxSchemeId) {
+        return contextSchemeValueRepository.findByOwnerCtxSchemeId(ownerCtxSchemeId);
+    }
+
+    public ContextCategory findContextCategoryById(int ctxCategoryId) {
+        return contextCategoryRepository.findOne(ctxCategoryId);
+    }
+
+    public ContextScheme findContextSchemeById(int ctxSchemeId) {
+        return contextSchemeRepository.findOne(ctxSchemeId);
+    }
+
+    public ContextSchemeValue findContextSchemeValueById(int ctxSchemeValueId) {
+        return contextSchemeValueRepository.findOne(ctxSchemeValueId);
     }
 
     public ContextCategoryBuilder newContextCategoryBuilder() {
