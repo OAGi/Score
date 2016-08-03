@@ -24,13 +24,13 @@ CREATE TABLE `module` (
   CONSTRAINT `module_namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`)
 ) ENGINE = InnoDB;
 
-DROP TABLE IF EXISTS `MODULE_ID_SEQ`;
+DROP TABLE IF EXISTS `module_id_seq`;
 
-CREATE TABLE `MODULE_ID_SEQ` (
+CREATE TABLE `module_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `MODULE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `module_id_seq` (`next_val`) VALUES (1);
 
 
 # Dump of table module_dep
@@ -49,13 +49,13 @@ CREATE TABLE `module_dep` (
   CONSTRAINT `module_dep_depended_module_id_fk` FOREIGN KEY (`depended_module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE = InnoDB;
 
-DROP TABLE IF EXISTS `MODULE_DEP_ID_SEQ`;
+DROP TABLE IF EXISTS `module_dep_id_seq`;
 
-CREATE TABLE `MODULE_DEP_ID_SEQ` (
+CREATE TABLE `module_dep_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `MODULE_DEP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `module_dep_id_seq` (`next_val`) VALUES (1);
 
 
 # Dump of table bod
@@ -73,13 +73,13 @@ CREATE TABLE `bod` (
   CONSTRAINT `bod_top_level_abie_id_fk` FOREIGN KEY (`top_level_abie_id`) REFERENCES `abie` (`abie_id`)
 ) ENGINE = InnoDB;
 
-DROP TABLE IF EXISTS `BOD_ID_SEQ`;
+DROP TABLE IF EXISTS `bod_id_seq`;
 
-CREATE TABLE `BOD_ID_SEQ` (
+CREATE TABLE `bod_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BOD_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bod_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -116,13 +116,13 @@ CREATE TABLE `abie` (
   CONSTRAINT `abie_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the Business_Context_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which is designated as a "Semantic Group". \n\n';
 
-DROP TABLE IF EXISTS `ABIE_ID_SEQ`;
+DROP TABLE IF EXISTS `abie_id_seq`;
 
-CREATE TABLE `ABIE_ID_SEQ` (
+CREATE TABLE `abie_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `ABIE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `abie_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -175,13 +175,13 @@ CREATE TABLE `acc` (
   CONSTRAINT `acc_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The ACC table hold information about complex data structured concepts. For example, OAGIS''s Components, Nouns, and BODs are captured in the ACC table.\n\nNote that only Extension is supported when deriving ACC from another ACC. (So if there is a restriction needed, maybe that concept should placed higher in the derivation hierarchy rather than lower.)\n\nIn OAGIS, all XSD extensions will be treated as ACC qualification.';
 
-DROP TABLE IF EXISTS `ACC_ID_SEQ`;
+DROP TABLE IF EXISTS `acc_id_seq`;
 
-CREATE TABLE `ACC_ID_SEQ` (
+CREATE TABLE `acc_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `ACC_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `acc_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -209,13 +209,13 @@ CREATE TABLE `agency_id_list` (
   CONSTRAINT `agency_id_list_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `AGENCY_ID_LIST_ID_SEQ`;
+DROP TABLE IF EXISTS `agency_id_list_id_seq`;
 
-CREATE TABLE `AGENCY_ID_LIST_ID_SEQ` (
+CREATE TABLE `agency_id_list_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `AGENCY_ID_LIST_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `agency_id_list_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -235,13 +235,13 @@ CREATE TABLE `agency_id_list_value` (
   CONSTRAINT `ailv_owner_list_id_fk` FOREIGN KEY (`owner_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `AGENCY_ID_LIST_VALUE_ID_SEQ`;
+DROP TABLE IF EXISTS `agency_id_list_value_id_seq`;
 
-CREATE TABLE `AGENCY_ID_LIST_VALUE_ID_SEQ` (
+CREATE TABLE `agency_id_list_value_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `AGENCY_ID_LIST_VALUE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `agency_id_list_value_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -261,13 +261,13 @@ CREATE TABLE `app_user` (
   UNIQUE KEY `app_user_uk1` (`login_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `APP_USER_ID_SEQ`;
+DROP TABLE IF EXISTS `app_user_id_seq`;
 
-CREATE TABLE `APP_USER_ID_SEQ` (
+CREATE TABLE `app_user_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `APP_USER_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `app_user_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -310,13 +310,13 @@ CREATE TABLE `asbie` (
   CONSTRAINT `asbie_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is contextualization of an ASCC.';
 
-DROP TABLE IF EXISTS `ASBIE_ID_SEQ`;
+DROP TABLE IF EXISTS `asbie_id_seq`;
 
-CREATE TABLE `ASBIE_ID_SEQ` (
+CREATE TABLE `asbie_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `ASBIE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `asbie_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -352,13 +352,13 @@ CREATE TABLE `asbiep` (
   CONSTRAINT `asbiep_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP.';
 
-DROP TABLE IF EXISTS `ASBIEP_ID_SEQ`;
+DROP TABLE IF EXISTS `asbiep_id_seq`;
 
-CREATE TABLE `ASBIEP_ID_SEQ` (
+CREATE TABLE `asbiep_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `ASBIEP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `asbiep_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -407,13 +407,13 @@ CREATE TABLE `ascc` (
   CONSTRAINT `ascc_to_asccp_id_fk` FOREIGN KEY (`to_asccp_id`) REFERENCES `asccp` (`asccp_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='An ASCC represents a relationship/association between two ACCs through an ASCCP.';
 
-DROP TABLE IF EXISTS `ASCC_ID_SEQ`;
+DROP TABLE IF EXISTS `ascc_id_seq`;
 
-CREATE TABLE `ASCC_ID_SEQ` (
+CREATE TABLE `ascc_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `ASCC_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `ascc_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -465,13 +465,13 @@ CREATE TABLE `asccp` (
   CONSTRAINT `asccp_role_of_acc` FOREIGN KEY (`role_of_acc_id`) REFERENCES `acc` (`acc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `ASCCP_ID_SEQ`;
+DROP TABLE IF EXISTS `asccp_id_seq`;
 
-CREATE TABLE `ASCCP_ID_SEQ` (
+CREATE TABLE `asccp_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `ASCCP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `asccp_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -523,13 +523,13 @@ CREATE TABLE `bbie` (
   CONSTRAINT `bbie_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `BBIE_ID_SEQ`;
+DROP TABLE IF EXISTS `bbie_id_seq`;
 
-CREATE TABLE `BBIE_ID_SEQ` (
+CREATE TABLE `bbie_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BBIE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bbie_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -569,13 +569,13 @@ CREATE TABLE `bbie_sc` (
   CONSTRAINT `bbie_sc_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `BBIE_SC_ID_SEQ`;
+DROP TABLE IF EXISTS `bbie_sc_id_seq`;
 
-CREATE TABLE `BBIE_SC_ID_SEQ` (
+CREATE TABLE `bbie_sc_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BBIE_SC_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bbie_sc_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -608,13 +608,13 @@ CREATE TABLE `bbiep` (
   CONSTRAINT `bbiep_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `BBIEP_ID_SEQ`;
+DROP TABLE IF EXISTS `bbiep_id_seq`;
 
-CREATE TABLE `BBIEP_ID_SEQ` (
+CREATE TABLE `bbiep_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BBIEP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bbiep_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -666,13 +666,13 @@ CREATE TABLE `bcc` (
   CONSTRAINT `bcc_to_bccp_id_fk` FOREIGN KEY (`to_bccp_id`) REFERENCES `bccp` (`bccp_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `BCC_ID_SEQ`;
+DROP TABLE IF EXISTS `bcc_id_seq`;
 
-CREATE TABLE `BCC_ID_SEQ` (
+CREATE TABLE `bcc_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BCC_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bcc_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -726,13 +726,13 @@ CREATE TABLE `bccp` (
   CONSTRAINT `bccp_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `BCCP_ID_SEQ`;
+DROP TABLE IF EXISTS `bccp_id_seq`;
 
-CREATE TABLE `BCCP_ID_SEQ` (
+CREATE TABLE `bccp_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BCCP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bccp_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -759,13 +759,13 @@ CREATE TABLE `bdt_pri_restri` (
   CONSTRAINT `bpr_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Business rules will ensure that the primitives for BDT are only subset of the CDT or BDT on which it is based.';
 
-DROP TABLE IF EXISTS `BDT_PRI_RESTRI_ID_SEQ`;
+DROP TABLE IF EXISTS `bdt_pri_restri_id_seq`;
 
-CREATE TABLE `BDT_PRI_RESTRI_ID_SEQ` (
+CREATE TABLE `bdt_pri_restri_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BDT_PRI_RESTRI_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bdt_pri_restri_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -792,13 +792,13 @@ CREATE TABLE `bdt_sc_pri_restri` (
   CONSTRAINT `bspr_csapxtm_id_fk` FOREIGN KEY (`cdt_sc_awd_pri_xps_type_map_id`) REFERENCES `cdt_sc_awd_pri_xps_type_map` (`cdt_sc_awd_pri_xps_type_map_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='It should be noted that the table does not store the fact about primitive restriction hierarchical relationships. In other words, if a BDT SC is derived from another BDT SC and the derivative BDT SC applies some primitive restrictions, that relationship will not be explicitly stored. The derivative BDT SC points directly to the CDT_Primitive_Expression_Type_Map key rather than the BDT_SC_Primitive_Restriction key.';
 
-DROP TABLE IF EXISTS `BDT_SC_PRI_RESTRI_ID_SEQ`;
+DROP TABLE IF EXISTS `bdt_sc_pri_restri_id_seq`;
 
-CREATE TABLE `BDT_SC_PRI_RESTRI_ID_SEQ` (
+CREATE TABLE `bdt_sc_pri_restri_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BDT_SC_PRI_RESTRI_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bdt_sc_pri_restri_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -825,13 +825,13 @@ CREATE TABLE `bie_user_ext_revision` (
   CONSTRAINT `buer_user_ext_acc_id_fk` FOREIGN KEY (`user_ext_acc_id`) REFERENCES `acc` (`acc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The Revised_Indicator flag is designed such that a revision of a User Extension can notify by setting this flag to true. The Top_Level_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC.';
 
-DROP TABLE IF EXISTS `BIE_USER_EXT_REVISION_ID_SEQ`;
+DROP TABLE IF EXISTS `bie_user_ext_revision_id_seq`;
 
-CREATE TABLE `BIE_USER_EXT_REVISION_ID_SEQ` (
+CREATE TABLE `bie_user_ext_revision_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BIE_USER_EXT_REVISION_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `bie_user_ext_revision_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -856,13 +856,13 @@ CREATE TABLE `biz_ctx` (
   CONSTRAINT `biz_ctx_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `BIZ_CTX_ID_SEQ`;
+DROP TABLE IF EXISTS `biz_ctx_id_seq`;
 
-CREATE TABLE `BIZ_CTX_ID_SEQ` (
+CREATE TABLE `biz_ctx_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BIZ_CTX_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `biz_ctx_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -882,13 +882,13 @@ CREATE TABLE `biz_ctx_value` (
   CONSTRAINT `biz_ctx_value_csv_id_fk` FOREIGN KEY (`ctx_scheme_value_id`) REFERENCES `ctx_scheme_value` (`ctx_scheme_value_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `BIZ_CTX_VALUE_ID_SEQ`;
+DROP TABLE IF EXISTS `biz_ctx_value_id_seq`;
 
-CREATE TABLE `BIZ_CTX_VALUE_ID_SEQ` (
+CREATE TABLE `biz_ctx_value_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BIZ_CTX_VALUE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `biz_ctx_value_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -909,13 +909,13 @@ CREATE TABLE `blob_content` (
   CONSTRAINT `blob_module_id_fk` FOREIGN KEY (`module_id`) REFERENCES `module` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table stores schemas in Blob.';
 
-DROP TABLE IF EXISTS `BLOB_CONTENT_ID_SEQ`;
+DROP TABLE IF EXISTS `blob_content_id_seq`;
 
-CREATE TABLE `BLOB_CONTENT_ID_SEQ` (
+CREATE TABLE `blob_content_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `BLOB_CONTENT_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `blob_content_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -936,13 +936,13 @@ CREATE TABLE `cdt_awd_pri` (
   CONSTRAINT `cdt_awd_pri_cdt_pri_id_fk` FOREIGN KEY (`cdt_pri_id`) REFERENCES `cdt_pri` (`cdt_pri_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table capture allowed primitives of the CDT’s Content Component.';
 
-DROP TABLE IF EXISTS `CDT_AWD_PRI_ID_SEQ`;
+DROP TABLE IF EXISTS `cdt_awd_pri_id_seq`;
 
-CREATE TABLE `CDT_AWD_PRI_ID_SEQ` (
+CREATE TABLE `cdt_awd_pri_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CDT_AWD_PRI_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `cdt_awd_pri_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -962,13 +962,13 @@ CREATE TABLE `cdt_awd_pri_xps_type_map` (
   CONSTRAINT `capxtm_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table allows for concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. At this point, it is not clear whether a separate table will be needed for each expression. The current table holds the map to XML Schema built-in types. \n\nFor each additional expression columns similar to the xbt_id will need to be added to this table for mapping to data types in another expression.\n\nIf we use a separate table for each expression, then we need binding all the way to BDT (or even BBIE) for every new expression. That would be almost like just store a BDT file. But using columns has no gaurantee that it will work with all kinds of expressions. If the typing in another expression is less finer grain than the XSD built-in types, I think the additional columns will work.';
 
-DROP TABLE IF EXISTS `CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ`;
+DROP TABLE IF EXISTS `cdt_awd_pri_xps_typ_map_id_seq`;
 
-CREATE TABLE `CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ` (
+CREATE TABLE `cdt_awd_pri_xps_typ_map_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `cdt_awd_pri_xps_typ_map_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -984,13 +984,13 @@ CREATE TABLE `cdt_pri` (
   UNIQUE KEY `cdt_pri_uk1` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `CDT_PRI_ID_SEQ`;
+DROP TABLE IF EXISTS `cdt_pri_id_seq`;
 
-CREATE TABLE `CDT_PRI_ID_SEQ` (
+CREATE TABLE `cdt_pri_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CDT_PRI_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `cdt_pri_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1011,13 +1011,13 @@ CREATE TABLE `cdt_sc_awd_pri` (
   CONSTRAINT `cdt_sc_id_fk` FOREIGN KEY (`cdt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table capture the CDT primitives allowed for a particular SC of CDTs. It also store the CDT primitives allowed for a SC of a BDT that extends its base.';
 
-DROP TABLE IF EXISTS `CDT_SC_AWD_PRI_ID_SEQ`;
+DROP TABLE IF EXISTS `cdt_sc_awd_pri_id_seq`;
 
-CREATE TABLE `CDT_SC_AWD_PRI_ID_SEQ` (
+CREATE TABLE `cdt_sc_awd_pri_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CDT_SC_AWD_PRI_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `cdt_sc_awd_pri_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1037,13 +1037,13 @@ CREATE TABLE `cdt_sc_awd_pri_xps_type_map` (
   CONSTRAINT `csapxtm_xbt_id_fk` FOREIGN KEY (`xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `CDT_SC_AW_PR_XPS_TYP_MP_ID_SEQ`;
+DROP TABLE IF EXISTS `cdt_sc_aw_pr_xps_typ_mp_id_seq`;
 
-CREATE TABLE `CDT_SC_AW_PR_XPS_TYP_MP_ID_SEQ` (
+CREATE TABLE `cdt_sc_aw_pr_xps_typ_mp_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CDT_SC_AW_PR_XPS_TYP_MP_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `cdt_sc_aw_pr_xps_typ_mp_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1075,13 +1075,13 @@ CREATE TABLE `classification_ctx_scheme` (
   CONSTRAINT `ctx_scheme_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `CTX_SCHEME_ID_SEQ`;
+DROP TABLE IF EXISTS `ctx_scheme_id_seq`;
 
-CREATE TABLE `CTX_SCHEME_ID_SEQ` (
+CREATE TABLE `ctx_scheme_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CTX_SCHEME_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `ctx_scheme_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1096,13 +1096,13 @@ CREATE TABLE `client` (
   PRIMARY KEY (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `CLIENT_ID_SEQ`;
+DROP TABLE IF EXISTS `client_id_seq`;
 
-CREATE TABLE `CLIENT_ID_SEQ` (
+CREATE TABLE `client_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CLIENT_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `client_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1145,13 +1145,13 @@ CREATE TABLE `code_list` (
   CONSTRAINT `code_list_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='When a code list is derived, the whole set of code values belonging to that code list will be copied.';
 
-DROP TABLE IF EXISTS `CODE_LIST_ID_SEQ`;
+DROP TABLE IF EXISTS `code_list_id_seq`;
 
-CREATE TABLE `CODE_LIST_ID_SEQ` (
+CREATE TABLE `code_list_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CODE_LIST_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `code_list_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1175,13 +1175,13 @@ CREATE TABLE `code_list_value` (
   CONSTRAINT `clv_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `CODE_LIST_VALUE_ID_SEQ`;
+DROP TABLE IF EXISTS `code_list_value_id_seq`;
 
-CREATE TABLE `CODE_LIST_VALUE_ID_SEQ` (
+CREATE TABLE `code_list_value_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CODE_LIST_VALUE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `code_list_value_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1199,13 +1199,13 @@ CREATE TABLE `ctx_category` (
   UNIQUE KEY `ctx_category_uk1` (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `CTX_CATEGORY_ID_SEQ`;
+DROP TABLE IF EXISTS `ctx_category_id_seq`;
 
-CREATE TABLE `CTX_CATEGORY_ID_SEQ` (
+CREATE TABLE `ctx_category_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CTX_CATEGORY_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `ctx_category_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1226,13 +1226,13 @@ CREATE TABLE `ctx_scheme_value` (
   CONSTRAINT `csv_owner_ctx_scheme_id_fk` FOREIGN KEY (`owner_ctx_scheme_id`) REFERENCES `classification_ctx_scheme` (`classification_ctx_scheme_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `CTX_SCHEME_VALUE_ID_SEQ`;
+DROP TABLE IF EXISTS `ctx_scheme_value_id_seq`;
 
-CREATE TABLE `CTX_SCHEME_VALUE_ID_SEQ` (
+CREATE TABLE `ctx_scheme_value_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `CTX_SCHEME_VALUE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `ctx_scheme_value_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1288,13 +1288,13 @@ CREATE TABLE `dt` (
   CONSTRAINT `dt_release_id_fk` FOREIGN KEY (`release_id`) REFERENCES `release` (`release_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `DT_ID_SEQ`;
+DROP TABLE IF EXISTS `dt_id_seq`;
 
-CREATE TABLE `DT_ID_SEQ` (
+CREATE TABLE `dt_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `DT_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `dt_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1321,13 +1321,13 @@ CREATE TABLE `dt_sc` (
   CONSTRAINT `dt_sc_owner_dt_id_fk` FOREIGN KEY (`owner_dt_id`) REFERENCES `dt` (`dt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `DT_SC_ID_SEQ`;
+DROP TABLE IF EXISTS `dt_sc_id_seq`;
 
-CREATE TABLE `DT_SC_ID_SEQ` (
+CREATE TABLE `dt_sc_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `DT_SC_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `dt_sc_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1356,13 +1356,13 @@ CREATE TABLE `namespace` (
   CONSTRAINT `namespace_owner_user_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `app_user` (`app_user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `NAMESPACE_ID_SEQ`;
+DROP TABLE IF EXISTS `namespace_id_seq`;
 
-CREATE TABLE `NAMESPACE_ID_SEQ` (
+CREATE TABLE `namespace_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `NAMESPACE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `namespace_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1381,13 +1381,13 @@ CREATE TABLE `release` (
   CONSTRAINT `namespace_id_fk` FOREIGN KEY (`namespace_id`) REFERENCES `namespace` (`namespace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `RELEASE_ID_SEQ`;
+DROP TABLE IF EXISTS `release_id_seq`;
 
-CREATE TABLE `RELEASE_ID_SEQ` (
+CREATE TABLE `release_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `RELEASE_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `release_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -1408,13 +1408,13 @@ CREATE TABLE `xbt` (
   CONSTRAINT `xbt_subtype_of_xbt_id_fk` FOREIGN KEY (`subtype_of_xbt_id`) REFERENCES `xbt` (`xbt_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `XBT_ID_SEQ`;
+DROP TABLE IF EXISTS `xbt_id_seq`;
 
-CREATE TABLE `XBT_ID_SEQ` (
+CREATE TABLE `xbt_id_seq` (
   `next_val` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `XBT_ID_SEQ` (`next_val`) VALUES (1);
+INSERT INTO `xbt_id_seq` (`next_val`) VALUES (1);
 
 
 
