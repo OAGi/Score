@@ -13,3 +13,10 @@ tmp/*
 docker-compose.yml
 /target/
 logs/*
+
+data/Model
+Dockerfile
+docker-compose.yaml
+*.zip
+~$*
+*schematron*
