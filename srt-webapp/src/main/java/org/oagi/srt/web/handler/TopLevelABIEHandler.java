@@ -802,9 +802,9 @@ public class TopLevelABIEHandler implements Serializable {
             bbie.setCardinalityMax(bcc.getCardinalityMax());
             bbie.setCardinalityMin(bcc.getCardinalityMin());
             bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
-            if (codeListId > 0) {
-                bbie.setCodeListId(codeListId);
-            }
+//            if (codeListId > 0) {
+//                bbie.setCodeListId(codeListId);
+//            }
             bbie.setCreatedBy(userId);
             bbie.setLastUpdatedBy(userId);
             bbie.setSeqKey(seqKey);
@@ -825,9 +825,9 @@ public class TopLevelABIEHandler implements Serializable {
                             bbieSc.setDtScPriRestriId(bdtScPriRestriId);
                         }
                         int codeListId = createBIEContext.getCodeListIdOfBdtScPriRestriId(bdtScId);
-                        if (codeListId > 0) {
-                            bbieSc.setCodeListId(codeListId);
-                        }
+//                        if (codeListId > 0) {
+//                            bbieSc.setCodeListId(codeListId);
+//                        }
                         bbieSc.setMaxCardinality(dtSc.getMaxCardinality());
                         bbieSc.setMinCardinality(dtSc.getMinCardinality());
                         bbieSc.setDefinition(dtSc.getDefinition());
