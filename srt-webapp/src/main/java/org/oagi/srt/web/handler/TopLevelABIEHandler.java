@@ -706,7 +706,113 @@ public class TopLevelABIEHandler implements Serializable {
         av.setColor("orange");
         TreeNode tNode1 = new DefaultTreeNode(av, tNode);
     }
+    private void createNewUserExtensionGroupACC() {
+        //UI implementation is needed.
+        //Delete an existing association
+        //Make edit to details of existing associations
+        //The user should be able to make a new revision or modification
+        //Add an association, Create a new ACC, create a new ASCCP, create a new BCCP
 
+
+        if(true){
+            AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
+            User currentLoginUser = new User(); //need to assign
+            int userId = currentLoginUser.getAppUserId();
+            AggregateCoreComponent ueAcc = new AggregateCoreComponent();
+            ueAcc.setGuid(Utility.generateGUID());
+            ueAcc.setObjectClassTerm(Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm()));
+            ueAcc.setDen((ueAcc.getObjectClassTerm()+". Details"));
+            ueAcc.setDefinition("A system created component containing user extension to the "+eAcc.getObjectClassTerm()+".");
+            ueAcc.setOagisComponentType(4);
+            ueAcc.setCreatedBy(userId);
+            ueAcc.setOwnerUserId(userId);
+            ueAcc.setState(1);
+            ueAcc.setRevisionNum(0);
+            ueAcc.setRevisionTrackingNum(0);
+            accRepository.saveAndFlush(ueAcc);
+
+            AggregateCoreComponent accHistory = new AggregateCoreComponent();
+            accHistory.setGuid(Utility.generateGUID());
+            accHistory.setObjectClassTerm(ueAcc.getObjectClassTerm());
+            accHistory.setDen(ueAcc.getDen());
+            accHistory.setDefinition(ueAcc.getDefinition());
+            accHistory.setOagisComponentType(ueAcc.getOagisComponentType());
+            accHistory.setCreatedBy(ueAcc.getCreatedBy());
+            accHistory.setOwnerUserId(ueAcc.getOwnerUserId());
+            accHistory.setState(ueAcc.getState());
+            accHistory.setRevisionNum(1);
+            accHistory.setRevisionTrackingNum(1);
+            accHistory.setRevisionAction(1);
+            accHistory.setCurrentAccId(ueAcc.getAccId());
+            accRepository.saveAndFlush(accHistory);
+
+            AssociationCoreComponentProperty ueAsccp = new AssociationCoreComponentProperty();
+            ueAsccp.setGuid(Utility.generateGUID());
+            ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
+            ueAsccp.setDefinition("A system created component containing user extension to the "+ eAcc.getObjectClassTerm()+".");
+            ueAsccp.setRoleOfAccId(ueAcc.getAccId());
+            ueAsccp.setDen(ueAsccp.getPropertyTerm()+". "+ueAcc.getObjectClassTerm());
+            ueAsccp.setCreatedBy(userId);
+            ueAsccp.setLastUpdatedBy(userId);
+            ueAsccp.setState(4);
+            ueAsccp.setReusableIndicator(false);
+            ueAsccp.setRevisionNum(0);
+            ueAsccp.setRevisionTrackingNum(0);
+            asccpRepository.saveAndFlush(ueAsccp);
+
+            AssociationCoreComponentProperty asccpHistory = new AssociationCoreComponentProperty();
+            asccpHistory.setGuid(Utility.generateGUID());
+            asccpHistory.setPropertyTerm(ueAsccp.getPropertyTerm());
+            asccpHistory.setDefinition(ueAsccp.getDefinition());
+            asccpHistory.setRoleOfAccId(ueAsccp.getRoleOfAccId());
+            asccpHistory.setDen(ueAsccp.getDen());
+            asccpHistory.setCreatedBy(ueAsccp.getCreatedBy());
+            asccpHistory.setLastUpdatedBy(ueAsccp.getLastUpdatedBy());
+            asccpHistory.setState(ueAsccp.getState());
+            asccpHistory.setReusableIndicator(ueAsccp.isReusableIndicator());
+            asccpHistory.setRevisionNum(1);
+            asccpHistory.setRevisionTrackingNum(1);
+            asccpHistory.setRevisionAction(1);
+            asccpHistory.setCurrentAsccpId(ueAsccp.getAsccpId());
+            asccpRepository.saveAndFlush(asccpHistory);
+
+            AssociationCoreComponent ueAscc = new AssociationCoreComponent();
+            ueAscc.setGuid(Utility.generateGUID());
+            ueAscc.setCardinalityMin(1);
+            ueAscc.setCardinalityMax(1);
+            ueAscc.setSeqKey(1);
+            ueAscc.setFromAccId(eAcc.getAccId());
+            ueAscc.setToAsccpId(ueAsccp.getAsccpId());
+            ueAscc.setDen(eAcc.getObjectClassTerm()+". "+ueAsccp.getDen());
+            ueAscc.setDefinition("System created association to the system created user extension group component - "+ ueAcc.getObjectClassTerm()+".");
+            ueAscc.setCreatedBy(userId);
+            ueAscc.setLastUpdatedBy(userId);
+            ueAscc.setOwnerUserId(userId);
+            ueAscc.setState(4);
+            ueAscc.setRevisionNum(0);
+            ueAscc.setRevisionTrackingNum(0);
+            asccRepository.saveAndFlush(ueAscc);
+
+            AssociationCoreComponent asccHistory = new AssociationCoreComponent();
+            asccHistory.setGuid(Utility.generateGUID());
+            asccHistory.setCardinalityMin(ueAscc.getCardinalityMin());
+            asccHistory.setCardinalityMax(ueAscc.getCardinalityMax());
+            asccHistory.setSeqKey(ueAscc.getSeqKey());
+            asccHistory.setFromAccId(ueAscc.getFromAccId());
+            asccHistory.setToAsccpId(ueAscc.getToAsccpId());
+            asccHistory.setDen(ueAscc.getDen());
+            asccHistory.setDefinition(ueAscc.getDefinition());
+            asccHistory.setCreatedBy(ueAscc.getCreatedBy());
+            asccHistory.setLastUpdatedBy(ueAscc.getLastUpdatedBy());
+            asccHistory.setOwnerUserId(ueAscc.getOwnerUserId());
+            asccHistory.setState(ueAscc.getState());
+            asccHistory.setRevisionNum(1);
+            asccHistory.setRevisionTrackingNum(1);
+            asccHistory.setRevisionAction(1);
+            asccRepository.saveAndFlush(asccHistory);
+        }
+
+    }
     private void editUserExtensionGroupACC() {
         //UI implementation is needed.
         //Delete an existing association
