@@ -1,6 +1,5 @@
 package org.oagi.srt.standalone;
 
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -15,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.util.*;
 import java.util.function.Function;
@@ -93,7 +90,7 @@ public class StandaloneXMLSchema {
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbieScRepository;
 
     @Autowired
-    private BusinessObjectDocumentRepository bodRepository;
+    private TopLevelAbieRepository topLevelAbieRepository;
 
     public String writeXSDFile(Document doc, String filename) throws IOException {
         String filepath = SRTConstants.BOD_FILE_PATH + filename + ".xsd";
@@ -919,7 +916,7 @@ public class StandaloneXMLSchema {
         private List<String> storedCC = new ArrayList();
         private List<String> guidArrayList = new ArrayList();
 
-        public GenerationContext(BusinessObjectDocument bod) {
+        public GenerationContext(TopLevelAbie topLevelAbie) {
             List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findAll();
             findBdtPriRestriByBdtIdAndDefaultIsTrueMap = bdtPriRestriList.stream()
                     .filter(e -> e.isDefault())
@@ -991,30 +988,30 @@ public class StandaloneXMLSchema {
             findAgencyIdListValueByOwnerListIdMap = agencyIdListValues.stream()
                     .collect(Collectors.groupingBy(e -> e.getOwnerListId()));
 
-            List<AggregateBusinessInformationEntity> abieList = abieRepository.findByBodId(bod.getBodId());
+            List<AggregateBusinessInformationEntity> abieList = abieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
             findAbieMap = abieList.stream()
                     .collect(Collectors.toMap(e -> e.getAbieId(), Function.identity()));
 
             List<BasicBusinessInformationEntity> bbieList =
-                    bbieRepository.findByBodIdAndUsedIsTrue(bod.getBodId());
+                    bbieRepository.findByOwnerTopLevelAbieIdAndUsedIsTrue(topLevelAbie.getTopLevelAbieId());
             findBbieByFromAbieIdAndUsedIsTrueMap = bbieList.stream()
                     .filter(e -> e.isUsed())
                     .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
 
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList =
-                    bbieScRepository.findByBodIdAndUsedIsTrue(bod.getBodId());
+                    bbieScRepository.findByOwnerTopLevelAbieIdAndUsedIsTrue(topLevelAbie.getTopLevelAbieId());
             findBbieScByBbieIdAndUsedIsTrueMap = bbieScList.stream()
                     .filter(e -> e.isUsed())
                     .collect(Collectors.groupingBy(e -> e.getBbieId()));
 
             List<AssociationBusinessInformationEntity> asbieList =
-                    asbieRepository.findByBodIdAndUsedIsTrue(bod.getBodId());
+                    asbieRepository.findByOwnerTopLevelAbieIdAndUsedIsTrue(topLevelAbie.getTopLevelAbieId());
             findAsbieByFromAbieIdAndUsedIsTrueMap = asbieList.stream()
                     .filter(e -> e.isUsed())
                     .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
 
             List<AssociationBusinessInformationEntityProperty> asbiepList =
-                    asbiepRepository.findByBodId(bod.getBodId());
+                    asbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
             findASBIEPMap = asbiepList.stream()
                     .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
             findAsbiepByRoleOfAbieIdMap = asbiepList.stream()
@@ -1359,13 +1356,12 @@ public class StandaloneXMLSchema {
         }
     }
 
-    public String generateXMLSchema(List<Integer> bodIds, boolean schema_package_flag) throws Exception {
+    public String generateXMLSchema(List<Integer> topLevelAbieIds, boolean schema_package_flag) throws Exception {
         String filepath = null;
-        for (int bodId : bodIds) {
-            BusinessObjectDocument bod = bodRepository.findOne(bodId);
-            GenerationContext generationContext = new GenerationContext(bod);
-            AggregateBusinessInformationEntity abie =
-                    generationContext.findAbie(bod.getTopLevelAbieId());
+        for (int topLevelAbieId : topLevelAbieIds) {
+            TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+            GenerationContext generationContext = new GenerationContext(topLevelAbie);
+            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
 
             Document doc = new Document();
 

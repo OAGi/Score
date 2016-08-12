@@ -13,7 +13,7 @@ public interface BasicBusinessInformationEntityRepository
     @Query("select b from BasicBusinessInformationEntity b where b.fromAbieId = ?1")
     public List<BasicBusinessInformationEntity> findByFromAbieId(int fromAbieId);
 
-    @Query("select b from BasicBusinessInformationEntity b where b.bodId = ?1 and b.used = true")
-    public List<BasicBusinessInformationEntity> findByBodIdAndUsedIsTrue(int bodId);
+    @Query("select b from BasicBusinessInformationEntity b where b.ownerTopLevelAbieId = ?1 and b.used = true")
+    public List<BasicBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(int ownerTopLevelAbieId);
 
 }

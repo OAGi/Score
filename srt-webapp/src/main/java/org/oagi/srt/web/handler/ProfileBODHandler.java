@@ -4,11 +4,11 @@ import org.oagi.srt.standalone.StandaloneXMLSchema;
 import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BusinessObjectDocumentRepository;
+import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessObjectDocument;
+import org.oagi.srt.repository.entity.TopLevelAbie;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -50,7 +50,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
 
 	@Autowired
-	private BusinessObjectDocumentRepository bodRepository;
+	private TopLevelAbieRepository topLevelAbieRepository;
 
 	@Autowired
 	private StandaloneXMLSchema standaloneXMLSchema;
@@ -107,13 +107,13 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
     }
     
     public List<String> completeInput(String query) {
-		return asccpRepository.findPropertyTermByropertyTermContains(query);
+		return asccpRepository.findPropertyTermByPropertyTermContains(query);
 	}
 	
 	public void search() {
-		List<BusinessObjectDocument> bodList = bodRepository.findAll();
-		for (BusinessObjectDocument bod : bodList) {
-			AggregateBusinessInformationEntity abieVO = abieRepository.findOne(bod.getTopLevelAbieId());
+		List<TopLevelAbie> topLevelAbieList = topLevelAbieRepository.findAll();
+		for (TopLevelAbie topLevelAbie : topLevelAbieList) {
+			AggregateBusinessInformationEntity abieVO = topLevelAbie.getAbie();
 			if (abieVO == null) {
 				continue;
 			}
@@ -131,7 +131,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			if (asccpVO.getPropertyTerm().equals(abieName)) {
 				ABIEView av = applicationContext.getBean(ABIEView.class, asccpVO.getPropertyTerm(), abieVO.getAbieId(), "ASBIE");
 				av.setAsccp(asccpVO);
-				av.setBod(bod);
+				av.setTopLevelAbie(topLevelAbie);
 				av.setAbie(abieVO);
 				av.setAsbiep(asbiepVO);
 				av.setName(asccpVO.getPropertyTerm());
@@ -167,7 +167,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	public void generate() throws Exception {
 		List<Integer> al = new ArrayList<Integer>();
 		for (ABIEView av : abieViewList) {
-			al.add(av.getBod().getBodId());
+			al.add(av.getTopLevelAbie().getTopLevelAbieId());
 		}
 
 		filePath = standaloneXMLSchema.generateXMLSchema(al, true);

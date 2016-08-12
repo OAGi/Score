@@ -13,6 +13,6 @@ public interface AssociationBusinessInformationEntityPropertyRepository
     @Query("select a from AssociationBusinessInformationEntityProperty a where a.roleOfAbieId = ?1")
     public AssociationBusinessInformationEntityProperty findOneByRoleOfAbieId(int roleOfAbieId);
 
-    @Query("select a from AssociationBusinessInformationEntityProperty a where a.bodId = ?1")
-    public List<AssociationBusinessInformationEntityProperty> findByBodId(int bodId);
+    @Query("select a from AssociationBusinessInformationEntityProperty a where a.ownerTopLevelAbieId = ?1")
+    public List<AssociationBusinessInformationEntityProperty> findByOwnerTopLevelAbieId(int ownerTopLevelAbieId);
 }

@@ -67,7 +67,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     private boolean used;
 
     @Column(nullable = false)
-    private int bodId;
+    private int ownerTopLevelAbieId;
 
     @Override
     public int getId() {
@@ -193,12 +193,12 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.used = used;
     }
 
-    public int getBodId() {
-        return bodId;
+    public int getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
     }
 
-    public void setBodId(int bodId) {
-        this.bodId = bodId;
+    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     @Override
@@ -214,7 +214,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         if (minCardinality != that.minCardinality) return false;
         if (maxCardinality != that.maxCardinality) return false;
         if (used != that.used) return false;
-        if (bodId != that.bodId) return false;
+        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
         if (dtScPriRestriId != null ? !dtScPriRestriId.equals(that.dtScPriRestriId) : that.dtScPriRestriId != null)
             return false;
         if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
@@ -244,7 +244,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + bodId;
+        result = 31 * result + ownerTopLevelAbieId;
         return result;
     }
 
@@ -265,7 +265,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", used=" + used +
-                ", bodId=" + bodId +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
     }
 }

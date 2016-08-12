@@ -10,6 +10,6 @@ public interface AggregateBusinessInformationEntityRepository
         extends JpaRepository<AggregateBusinessInformationEntity, Integer>,
         BulkInsertRepository<AggregateBusinessInformationEntity> {
 
-    @Query("select a from AggregateBusinessInformationEntity a where a.bodId = ?1")
-    public List<AggregateBusinessInformationEntity> findByBodId(int bodId);
+    @Query("select a from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
+    public List<AggregateBusinessInformationEntity> findByOwnerTopLevelAbieId(int ownerTopLevelAbieId);
 }

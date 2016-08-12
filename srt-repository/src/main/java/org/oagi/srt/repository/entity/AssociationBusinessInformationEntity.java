@@ -75,7 +75,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     private boolean used;
 
     @Column(nullable = false)
-    private int bodId;
+    private int ownerTopLevelAbieId;
 
     @PrePersist
     public void prePersist() {
@@ -232,12 +232,12 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.used = used;
     }
 
-    public int getBodId() {
-        return bodId;
+    public int getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
     }
 
-    public void setBodId(int bodId) {
-        this.bodId = bodId;
+    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     @Override
@@ -258,7 +258,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
         if (seqKey != that.seqKey) return false;
         if (used != that.used) return false;
-        if (bodId != that.bodId) return false;
+        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
         if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
@@ -286,7 +286,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + seqKey;
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + bodId;
+        result = 31 * result + ownerTopLevelAbieId;
         return result;
     }
 
@@ -309,7 +309,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", seqKey=" + seqKey +
                 ", used=" + used +
-                ", bodId=" + bodId +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
     }
 }

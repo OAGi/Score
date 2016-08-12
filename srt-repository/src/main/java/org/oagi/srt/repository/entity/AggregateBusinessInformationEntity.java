@@ -32,6 +32,9 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     @Column(nullable = false)
     private int basedAccId;
 
+    @Column
+    private int bizCtxId;
+
     @Transient
     private String bizCtxName;
 
@@ -54,6 +57,9 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     private Date lastUpdateTimestamp;
 
     @Column
+    private int state;
+
+    @Column
     private Integer clientId;
 
     @Column(length = 45)
@@ -69,7 +75,7 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     private String bizTerm;
 
     @Column(nullable = false)
-    private int bodId;
+    private int ownerTopLevelAbieId;
 
     @PrePersist
     public void prePersist() {
@@ -116,6 +122,14 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.basedAccId = basedAccId;
     }
 
+    public int getBizCtxId() {
+        return bizCtxId;
+    }
+
+    public void setBizCtxId(int bizCtxId) {
+        this.bizCtxId = bizCtxId;
+    }
+
     public String getBizCtxName() {
         return bizCtxName;
     }
@@ -146,6 +160,14 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
 
     public void setLastUpdatedBy(int lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
     public Date getCreationTimestamp() {
@@ -204,12 +226,12 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.bizTerm = bizTerm;
     }
 
-    public int getBodId() {
-        return bodId;
+    public int getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
     }
 
-    public void setBodId(int bodId) {
-        this.bodId = bodId;
+    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     @Override
@@ -221,9 +243,11 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
 
         if (abieId != that.abieId) return false;
         if (basedAccId != that.basedAccId) return false;
+        if (bizCtxId != that.bizCtxId) return false;
         if (createdBy != that.createdBy) return false;
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (bodId != that.bodId) return false;
+        if (state != that.state) return false;
+        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (bizCtxName != null ? !bizCtxName.equals(that.bizCtxName) : that.bizCtxName != null) return false;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
@@ -244,18 +268,20 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         int result = abieId;
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + basedAccId;
+        result = 31 * result + bizCtxId;
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + createdBy;
         result = 31 * result + lastUpdatedBy;
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + state;
         result = 31 * result + (clientId != null ? clientId.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + bodId;
+        result = 31 * result + ownerTopLevelAbieId;
         return result;
     }
 
@@ -265,18 +291,20 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
                 "abieId=" + abieId +
                 ", guid='" + guid + '\'' +
                 ", basedAccId=" + basedAccId +
+                ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
                 ", definition='" + definition + '\'' +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", state=" + state +
                 ", clientId=" + clientId +
                 ", version='" + version + '\'' +
                 ", status='" + status + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
-                ", bodId=" + bodId +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
     }
 }

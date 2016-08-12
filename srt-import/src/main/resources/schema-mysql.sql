@@ -58,30 +58,6 @@ CREATE TABLE `module_dep_id_seq` (
 INSERT INTO `module_dep_id_seq` (`next_val`) VALUES (1);
 
 
-# Dump of table bod
-# ------------------------------------------------------------
-DROP TABLE IF EXISTS `bod`;
-
-CREATE TABLE `bod` (
-  `bod_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `biz_ctx_id` int(11) unsigned NOT NULL COMMENT 'A foreign key to the Business_Context table. This column stores the business context assigned to an ABIE.',
-  `top_level_abie_id` int(11) unsigned NULL,
-  `state` int(11) DEFAULT NULL COMMENT '2 = Editing, 4 = Published. This column is only used with a top-level ABIE, because that is the only entry point for editing. The state value indicates the visibility of the top-level ABIE to users other than the owner. In the user group environment, a logic can apply that other users in the group can see the top-level ABIE only when it is in the ''Published'' state.',
-  PRIMARY KEY (`bod_id`),
-  KEY `bod_biz_ctx_id_fk` (`biz_ctx_id`),
-  KEY `bod_top_level_abie_id_fk` (`top_level_abie_id`),
-  CONSTRAINT `bod_top_level_abie_id_fk` FOREIGN KEY (`top_level_abie_id`) REFERENCES `abie` (`abie_id`)
-) ENGINE = InnoDB;
-
-DROP TABLE IF EXISTS `bod_id_seq`;
-
-CREATE TABLE `bod_id_seq` (
-  `next_val` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-INSERT INTO `bod_id_seq` (`next_val`) VALUES (1);
-
-
 
 # Dump of table abie
 # ------------------------------------------------------------
@@ -91,29 +67,33 @@ CREATE TABLE `abie` (
   `abie_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an ABIE.',
   `guid` varchar(41) NOT NULL COMMENT 'A globally unique identifier (GUID) of an ABIE. GUID of an ABIE is different from its based ACC. Per OAGIS, a GUID is of the form "oagis-id-" followed by a 32 Hex character sequence.',
   `based_acc_id` int(11) unsigned NOT NULL COMMENT 'A foreign key to the ACC table refering to the ACC, on which the business context has been applied to derive this ABIE.',
+  `biz_ctx_id` int(11) unsigned NOT NULL COMMENT 'A foreign key to the Business_Context table. This column stores the business context assigned to the ABIE.',
   `definition` text COMMENT 'Definition to override the ACC''s Definition. If Null, it means that the definition should be inherited from the based CC.',
   `created_by` int(11) unsigned NOT NULL COMMENT 'A foreign key referring to the user who creates the ABIE. The creator of the ABIE is also its owner by default. ABIEs created as children of another ABIE have the same Created_By_User_ID.',
   `last_updated_by` int(11) unsigned NOT NULL COMMENT 'A foreign key referring to the last user who has updated the ASBIE record. This may be the user who is in the same group as the creator.',
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the ABIE record was first created. ABIEs created as children of another ABIE have the same Creation_Timestamp.',
   `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The timestamp when the ABIE is last updated.',
+  `state` int(11) unsigned DEFAULT NULL COMMENT '2 = Editing, 4 = Published. This column is only used with a top-level ABIE, because that is the only entry point for editing. The state value indicates the visibility of the top-level ABIE to users other than the owner. In the user group environment, a logic can apply that other users in the group can see the top-level ABIE only when it is in the ''Published'' state.',
   `client_id` int(11) unsigned DEFAULT NULL COMMENT 'This is a foreign key to the Client table. The use case associated with this column is to indicate the organizational entity for which the profile BOD is created. For example, Boeing may generate a profile BOD for Boeing civilian or Boeing defense. It is more of the documentation purpose. Only an ABIE which is the top-level ABIE can use this column.',
   `version` varchar(45) DEFAULT NULL COMMENT 'This column hold a version number assigned by the user. This column is only used by the top-level ABIE. No format of version is enforced.',
   `status` varchar(45) DEFAULT NULL COMMENT 'This is different from State which is CRUD life cycle of an entity. The use case for this is to allow the user to indicate the usage status of a top-level ABIE (a profile BOD). An integration architect can use this column. Example values are ‘Prototype’, ‘Test’, and ‘Production’. Only the top-level ABIE can use this field.',
   `remark` varchar(225) DEFAULT NULL COMMENT 'This column allows the user to specify very context-specific usage of the BIE. It is different from the Definition column in that the Definition column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be "Type of BOM should be recognized in the BOM/typeCode."',
   `biz_term` varchar(225) DEFAULT NULL COMMENT 'To indicate what the BIE is called in a particular business context. With this current design, only one business term is allowed per business context.',
-  `bod_id` int(11) unsigned NOT NULL,
+  `owner_top_level_abie_id` int(11) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column.',
   PRIMARY KEY (`abie_id`),
   UNIQUE KEY `abie_uk1` (`guid`),
   KEY `abie_based_acc_id_fk` (`based_acc_id`),
+  KEY `abie_biz_ctx_id_fk` (`biz_ctx_id`),
   KEY `abie_created_by_fk` (`created_by`),
   KEY `abie_last_updated_by_fk` (`last_updated_by`),
   KEY `abie_client_id_fk` (`client_id`),
-  KEY `abie_bod_id_fk` (`bod_id`),
+  KEY `abie_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
   CONSTRAINT `abie_based_acc_id_fk` FOREIGN KEY (`based_acc_id`) REFERENCES `acc` (`acc_id`),
+  CONSTRAINT `abie_biz_ctx_id_fk` FOREIGN KEY (`biz_ctx_id`) REFERENCES `biz_ctx` (`biz_ctx_id`),
   CONSTRAINT `abie_client_id_fk` FOREIGN KEY (`client_id`) REFERENCES `client` (`client_id`),
   CONSTRAINT `abie_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `abie_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
-  CONSTRAINT `abie_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
+  CONSTRAINT `abie_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='ABIE table stores information about an ABIE, which is a contextualized ACC. The context is represented by the Business_Context_ID column that refers to a business context. Each ABIE must have a business context and a based ACC.\n\nIt should be noted that, per design document, there is no corresponding ABIE created for an ACC which is designated as a "Semantic Group". \n\n';
 
 DROP TABLE IF EXISTS `abie_id_seq`;
@@ -123,6 +103,27 @@ CREATE TABLE `abie_id_seq` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `abie_id_seq` (`next_val`) VALUES (1);
+
+
+# Dump of table top_level_abie
+# ------------------------------------------------------------
+DROP TABLE IF EXISTS `top_level_abie`;
+
+CREATE TABLE `top_level_abie` (
+  `top_level_abie_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'A internal, primary database key of an ACC.',
+  `abie_id` int(11) unsigned NULL COMMENT 'Foreign key to the ABIE table pointing to a record which is a top-level ABIE.',
+  PRIMARY KEY (`top_level_abie_id`),
+  KEY `top_level_abie_abie_id_fk` (`abie_id`),
+  CONSTRAINT `top_level_abie_abie_id_fk` FOREIGN KEY (`abie_id`) REFERENCES `abie` (`abie_id`)
+) ENGINE = InnoDB;
+
+DROP TABLE IF EXISTS `top_level_abie_id_seq`;
+
+CREATE TABLE `top_level_abie_id_seq` (
+  `next_val` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `top_level_abie_id_seq` (`next_val`) VALUES (1);
 
 
 
@@ -293,7 +294,7 @@ CREATE TABLE `asbie` (
   `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The timestamp when the ASBIE is last updated.',
   `seq_key` int(11) unsigned NOT NULL COMMENT 'This indicates the order of the associations among other siblings. The Sequencing_Key for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have Sequencing_Key = 1.1, 1.2, 1.3, and so on; and Sequencing_Key of the next abstraction level ACC will have Sequencing_Key = 2.1, 2.2, 2.3 and so on so forth.',
   `is_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.',
-  `bod_id` int(11) unsigned NOT NULL,
+  `owner_top_level_abie_id` int(11) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column.',
   PRIMARY KEY (`asbie_id`),
   UNIQUE KEY `asbie_uk1` (`guid`, `from_abie_id`, `to_asbiep_id`),
   KEY `asbie_from_abie_id` (`from_abie_id`),
@@ -301,13 +302,13 @@ CREATE TABLE `asbie` (
   KEY `asbie_based_ascc_id_fk` (`based_ascc`),
   KEY `asbie_created_by_fk` (`created_by`),
   KEY `asbie_last_updated_by_fk` (`last_updated_by`),
-  KEY `asbie_bod_id_fk` (`bod_id`),
+  KEY `asbie_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
   CONSTRAINT `asbie_based_ascc_id_fk` FOREIGN KEY (`based_ascc`) REFERENCES `ascc` (`ascc_id`),
   CONSTRAINT `asbie_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `asbie_from_abie_id` FOREIGN KEY (`from_abie_id`) REFERENCES `abie` (`abie_id`),
   CONSTRAINT `asbie_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `asbie_to_asbiep_id_fk` FOREIGN KEY (`to_asbiep_id`) REFERENCES `asbiep` (`asbiep_id`),
-  CONSTRAINT `asbie_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
+  CONSTRAINT `asbie_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is contextualization of an ASCC.';
 
 DROP TABLE IF EXISTS `asbie_id_seq`;
@@ -337,19 +338,19 @@ CREATE TABLE `asbiep` (
   `last_updated_by` int(11) unsigned NOT NULL COMMENT 'A foreign key referring to the last user who has updated the ASBIEP record. This may be the user who is in the same group as the creator.',
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the ASBIEP record was first created. ASBIEPs created as children of another ABIE have the same Creation_Timestamp.',
   `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The timestamp when the ASBIEP is last updated.',
-  `bod_id` int(11) unsigned NOT NULL,
+  `owner_top_level_abie_id` int(11) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column.',
   PRIMARY KEY (`asbiep_id`),
   UNIQUE KEY `asbiep_uk1` (`guid`),
   KEY `asbiep_based_asccp_id` (`based_asccp_id`),
   KEY `asbiep_role_of_abie_id` (`role_of_abie_id`),
   KEY `asbiep_created_by_fk` (`created_by`),
   KEY `asbiep_last_updated_by_fk` (`last_updated_by`),
-  KEY `asbiep_bod_id_fk` (`bod_id`),
+  KEY `asbiep_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
   CONSTRAINT `asbiep_based_asccp_id` FOREIGN KEY (`based_asccp_id`) REFERENCES `asccp` (`asccp_id`),
   CONSTRAINT `asbiep_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `asbiep_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `asbiep_role_of_abie_id` FOREIGN KEY (`role_of_abie_id`) REFERENCES `abie` (`abie_id`),
-  CONSTRAINT `asbiep_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
+  CONSTRAINT `asbiep_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='ASBIEP represents a role in a usage of an ABIE. It is a contextualization of an ASCCP.';
 
 DROP TABLE IF EXISTS `asbiep_id_seq`;
@@ -502,7 +503,7 @@ CREATE TABLE `bbie` (
   `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `seq_key` int(11) unsigned NOT NULL,
   `is_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.',
-  `bod_id` int(11) unsigned NOT NULL,
+  `owner_top_level_abie_id` int(11) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column.',
   PRIMARY KEY (`bbie_id`),
   UNIQUE KEY `bbie_uk1` (`guid`, `from_abie_id`, `to_bbiep_id`),
   KEY `bbie_based_bcc_id_fk` (`based_bcc_id`),
@@ -512,7 +513,7 @@ CREATE TABLE `bbie` (
   KEY `bbie_code_list_id_fk` (`code_list_id`),
   KEY `bbie_created_by_fk` (`created_by`),
   KEY `bbie_last_updated_by_fk` (`last_updated_by`),
-  KEY `bbie_bod_id_fk` (`bod_id`),
+  KEY `bbie_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
   CONSTRAINT `bbie_based_bcc_id_fk` FOREIGN KEY (`based_bcc_id`) REFERENCES `bcc` (`bcc_id`),
   CONSTRAINT `bbie_bdt_pri_restri_id_fk` FOREIGN KEY (`bdt_pri_restri_id`) REFERENCES `bdt_pri_restri` (`bdt_pri_restri_id`),
   CONSTRAINT `bbie_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`),
@@ -520,7 +521,7 @@ CREATE TABLE `bbie` (
   CONSTRAINT `bbie_from_abie_id_fk` FOREIGN KEY (`from_abie_id`) REFERENCES `abie` (`abie_id`),
   CONSTRAINT `bbie_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `bbie_to_bbiep_id_fk` FOREIGN KEY (`to_bbiep_id`) REFERENCES `bbiep` (`bbiep_id`),
-  CONSTRAINT `bbie_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
+  CONSTRAINT `bbie_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bbie_id_seq`;
@@ -553,20 +554,20 @@ CREATE TABLE `bbie_sc` (
   `remark` varchar(225) DEFAULT NULL,
   `biz_term` varchar(225) DEFAULT NULL,
   `is_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.',
-  `bod_id` int(11) unsigned NOT NULL,
+  `owner_top_level_abie_id` int(11) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column.',
   PRIMARY KEY (`bbie_sc_id`),
   KEY `bbie_bbie_id_fk` (`bbie_id`),
   KEY `bbie_sc_dt_sc_id_fk` (`dt_sc_id`),
   KEY `bbie_sc_dt_sc_pri_restri_id_fk` (`dt_sc_pri_restri_id`),
   KEY `bbie_sc_code_list_id_fk` (`code_list_id`),
   KEY `bbie_sc_agency_id_list_id_fk` (`agency_id_list_id`),
-  KEY `bbie_sc_bod_id_fk` (`bod_id`),
+  KEY `bbie_sc_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
   CONSTRAINT `bbie_bbie_id_fk` FOREIGN KEY (`bbie_id`) REFERENCES `bbie` (`bbie_id`),
   CONSTRAINT `bbie_sc_agency_id_list_id_fk` FOREIGN KEY (`agency_id_list_id`) REFERENCES `agency_id_list` (`agency_id_list_id`),
   CONSTRAINT `bbie_sc_code_list_id_fk` FOREIGN KEY (`code_list_id`) REFERENCES `code_list` (`code_list_id`),
   CONSTRAINT `bbie_sc_dt_sc_id_fk` FOREIGN KEY (`dt_sc_id`) REFERENCES `dt_sc` (`dt_sc_id`),
   CONSTRAINT `bbie_sc_dt_sc_pri_restri_id_fk` FOREIGN KEY (`dt_sc_pri_restri_id`) REFERENCES `bdt_sc_pri_restri` (`bdt_sc_pri_restri_id`),
-  CONSTRAINT `bbie_sc_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
+  CONSTRAINT `bbie_sc_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `bbie_sc_id_seq`;
@@ -595,17 +596,17 @@ CREATE TABLE `bbiep` (
   `last_updated_by` int(11) unsigned NOT NULL,
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_update_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `bod_id` int(11) unsigned NOT NULL,
+  `owner_top_level_abie_id` int(11) unsigned NOT NULL COMMENT 'This is a foriegn key to the ABIE itself. It specifies the top-level ABIE which owns this ABIE record. For the ABIE that is a top-level ABIE itself, this column will have the same value as the ABIE_ID column.',
   PRIMARY KEY (`bbiep_id`),
   UNIQUE KEY `bbiep_uk1` (`guid`),
   KEY `bbiep_based_bccp_id_fk` (`based_bccp_id`),
   KEY `bbiep_created_by_fk` (`created_by`),
   KEY `bbiep_last_updated_by_fk` (`last_updated_by`),
-  KEY `bbiep_bod_id_fk` (`bod_id`),
+  KEY `bbiep_owner_top_level_abie_id_fk` (`owner_top_level_abie_id`),
   CONSTRAINT `bbiep_based_bccp_id_fk` FOREIGN KEY (`based_bccp_id`) REFERENCES `bccp` (`bccp_id`),
   CONSTRAINT `bbiep_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `app_user` (`app_user_id`),
   CONSTRAINT `bbiep_last_updated_by_fk` FOREIGN KEY (`last_updated_by`) REFERENCES `app_user` (`app_user_id`),
-  CONSTRAINT `bbiep_bod_id_fk` FOREIGN KEY (`bod_id`) REFERENCES `bod` (`bod_id`)
+  CONSTRAINT `bbiep_owner_top_level_abie_id_fk` FOREIGN KEY (`owner_top_level_abie_id`) REFERENCES `top_level_abie` (`top_level_abie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bbiep_id_seq`;
