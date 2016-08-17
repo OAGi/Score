@@ -706,6 +706,61 @@ public class TopLevelABIEHandler implements Serializable {
         av.setColor("orange");
         TreeNode tNode1 = new DefaultTreeNode(av, tNode);
     }
+
+
+    private void extendTopLevelABIE() {
+        AggregateCoreComponent ueAcc = new AggregateCoreComponent(); // need to assign
+        User curUser = new User();// need to assign
+
+        if (ueAcc == null) {
+            createNewUserExtensionGroupACC();
+        } else {
+            if (ueAcc.getState() == 1/*Editing*/ && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #a in designDoc
+                editUserExtensionGroupACC();
+            } else if (ueAcc.getState() == 1 && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #b in designDoc
+                //Show message Owner User Id
+                //Return to page
+            } else if (ueAcc.getState() == 2/*need to check 2 == candidate*/ && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #c in designDoc
+                //do you want to edit this extension?
+                if(true){
+                    //Change state of this ACC and correspondings
+                    editUserExtensionGroupACC();
+                }
+                else {
+                    //Return to page
+                }
+
+            } else if (ueAcc.getState() == 2/*need to check 2 == candidate*/ && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #d in designDoc
+
+            } else if (ueAcc.getState() == 4/*published*/) {//case #e in designDoc
+                //do you want to edit already published one?
+                if(true) {
+                    createNewUserExtensionGroupACCRevision();
+                }
+                else {
+                    //Return to page
+                }
+            }
+        }
+
+    }
+
+    private void createNewUserExtensionGroupACCRevision(){
+        AggregateCoreComponent ueAcc = new AggregateCoreComponent(); //need to assign
+
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(ueAcc.getAccId());
+        List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(ueAcc.getAccId());
+
+        for(AssociationCoreComponent ascc : asccList){
+            ascc.setState(1);//Editing
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            asccp.setState(1);//Editing
+            asccRepository.save(ascc);
+            asccpRepository.save(asccp);
+        }
+
+    }
+
     private void createNewUserExtensionGroupACC() {
         //UI implementation is needed.
         //Delete an existing association
@@ -713,16 +768,15 @@ public class TopLevelABIEHandler implements Serializable {
         //The user should be able to make a new revision or modification
         //Add an association, Create a new ACC, create a new ASCCP, create a new BCCP
 
-
-        if(true){
+        if (true) {
             AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
             User currentLoginUser = new User(); //need to assign
             int userId = currentLoginUser.getAppUserId();
             AggregateCoreComponent ueAcc = new AggregateCoreComponent();
             ueAcc.setGuid(Utility.generateGUID());
             ueAcc.setObjectClassTerm(Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm()));
-            ueAcc.setDen((ueAcc.getObjectClassTerm()+". Details"));
-            ueAcc.setDefinition("A system created component containing user extension to the "+eAcc.getObjectClassTerm()+".");
+            ueAcc.setDen((ueAcc.getObjectClassTerm() + ". Details"));
+            ueAcc.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
             ueAcc.setOagisComponentType(4);
             ueAcc.setCreatedBy(userId);
             ueAcc.setOwnerUserId(userId);
@@ -749,9 +803,9 @@ public class TopLevelABIEHandler implements Serializable {
             AssociationCoreComponentProperty ueAsccp = new AssociationCoreComponentProperty();
             ueAsccp.setGuid(Utility.generateGUID());
             ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
-            ueAsccp.setDefinition("A system created component containing user extension to the "+ eAcc.getObjectClassTerm()+".");
+            ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
             ueAsccp.setRoleOfAccId(ueAcc.getAccId());
-            ueAsccp.setDen(ueAsccp.getPropertyTerm()+". "+ueAcc.getObjectClassTerm());
+            ueAsccp.setDen(ueAsccp.getPropertyTerm() + ". " + ueAcc.getObjectClassTerm());
             ueAsccp.setCreatedBy(userId);
             ueAsccp.setLastUpdatedBy(userId);
             ueAsccp.setState(4);
@@ -783,8 +837,8 @@ public class TopLevelABIEHandler implements Serializable {
             ueAscc.setSeqKey(1);
             ueAscc.setFromAccId(eAcc.getAccId());
             ueAscc.setToAsccpId(ueAsccp.getAsccpId());
-            ueAscc.setDen(eAcc.getObjectClassTerm()+". "+ueAsccp.getDen());
-            ueAscc.setDefinition("System created association to the system created user extension group component - "+ ueAcc.getObjectClassTerm()+".");
+            ueAscc.setDen(eAcc.getObjectClassTerm() + ". " + ueAsccp.getDen());
+            ueAscc.setDefinition("System created association to the system created user extension group component - " + ueAcc.getObjectClassTerm() + ".");
             ueAscc.setCreatedBy(userId);
             ueAscc.setLastUpdatedBy(userId);
             ueAscc.setOwnerUserId(userId);
@@ -813,6 +867,7 @@ public class TopLevelABIEHandler implements Serializable {
         }
 
     }
+
     private void editUserExtensionGroupACC() {
         //UI implementation is needed.
         //Delete an existing association
