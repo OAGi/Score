@@ -1,0 +1,198 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="672705A5-0476-28C8-641A-2FD8E2E9564A" name="BIE_USER_EXT_REVISION">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:07 UTC</createdTime>
+<comment>This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC.</comment>
+<commentInRDBMS>This table is a log of events. It keeps track of the User Extension ACC (the specific revision) used by an Extension ABIE. This can be a named extension (such as ApplicationAreaExtension) or the AllExtension. The REVISED_INDICATOR flag is designed such that a revision of a User Extension can notify the user of a top-level ABIE by setting this flag to true. The TOP_LEVEL_ABIE_ID column makes it more efficient to when opening a top-level ABIE, the user can be notified of any new revision of the extension. A record in this table is created only when there is a user extension to the the OAGIS extension component/ACC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_46</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="BIE_USER_EXT_REVISION_ID" id="367B1EDE-4174-988B-24AD-9B0A54371B00">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="TOP_LEVEL_ABIE_ID" id="2B4F7252-7E35-537E-5504-03FC98C2CE99">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<commentInRDBMS>This is a foreign key pointing to an ABIE record which is a top-level ABIE. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="FD326A38-A024-3811-1ABD-E95866DA8B14" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+</associations>
+</Column>
+<Column name="EXT_ABIE_ID" id="ABAB5E96-8470-5DB9-222A-3510C440554C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<commentInRDBMS>This points to an ABIE record corresponding to the EXTENSION_ACC_ID record. For example, this column can point to the ApplicationAreaExtension ABIE which is based on the ApplicationAreaExtension ACC (referred to by the EXT_ACC_ID column). This column can be NULL only when the extension is the AllExtension because there is no corresponding ABIE for the AllExtension ACC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="616E8CDC-07DC-578F-F682-D8F3D04EF2C6" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+</associations>
+</Column>
+<Column name="EXT_ACC_ID" id="6E6040CC-FEB6-9FE2-E4D2-EC4A5E99C278">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<commentInRDBMS>This points to an extension ACC on which the ABIE indicated by the EXT_ABIE_ID column is based. E.g. It may point to an ApplicationAreaExtension ACC, AllExtension ACC, ActualLedgerExtension ACC, etc. It should be noted that an ACC record pointed to must have the OAGIS_COMPONENT_TYPE = 2 (Extension).</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AEACCEA5-FB97-0381-E241-17CD8E02172B" referredColumn="F9D15F1A-0722-828B-738F-D5C2F57C349C"/>
+</associations>
+</Column>
+<Column name="USER_EXT_ACC_ID" id="484CF64E-1744-4D30-8045-166095B408FC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<commentInRDBMS>This column points to the specific revision of a User Extension ACC (this is an ACC whose OAGIS_COMPONENT_TYPE = 4) currently used by the ABIE as indicated by the EXT_ABIE_ID or the by the TOP_LEVEL_ABIE_ID (in case of the AllExtension). </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="70940943-117A-11D9-6670-D36B628DD20E" referredColumn="F9D15F1A-0722-828B-738F-D5C2F57C349C"/>
+</associations>
+</Column>
+<Column name="REVISED_INDICATOR" id="B744B799-C371-E794-0C3F-DE97C31B0344">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:27 UTC</createdTime>
+<commentInRDBMS>This column is a flag indicating to whether the User Extension ACC (as identified in the USER_EXT_ACC_ID column) has been revised, i.e., there is a newer version of the user extension ACC than the one currently used by the EXT_ABIE_ID. 0 means the USER_EXT_ACC_ID is current, 1 means it is not current.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="B00435D5-581B-BC03-8BA1-5CB523CB87F1" name="BIE_USER_EXT_REVISION_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:22:54 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="367B1EDE-4174-988B-24AD-9B0A54371B00"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="73BC21B2-A867-C72D-5D1D-379C7C8D5EF5" name="BIE_UXR_PK_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="367B1EDE-4174-988B-24AD-9B0A54371B00"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6B8A0BC4-1F0B-A144-8329-1DE5276AAF41" name="BIE_UXR_TLVL_ABIE_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2B4F7252-7E35-537E-5504-03FC98C2CE99"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AA3DE325-2019-C0D3-5F98-DCED4C1685A2" name="BIE_UXR_EXT_ABIE_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="ABAB5E96-8470-5DB9-222A-3510C440554C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="97C74C04-E0D9-825F-17AD-8F8B0EE557E1" name="BIE_UXR_EXT_ACC_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6E6040CC-FEB6-9FE2-E4D2-EC4A5E99C278"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="ABD64E5C-3038-39DD-EE13-88B80297DB0F" name="BIE_UXR_USR_EXT_ACC_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:17:28 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="484CF64E-1744-4D30-8045-166095B408FC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="9A6BD781-7B54-824F-0187-046B52166E4B" name="BUER_TOP_LEVEL_ABIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2B4F7252-7E35-537E-5504-03FC98C2CE99"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2A9228DD-213D-AC6B-1BC9-065001840E26" name="BUER_EXT_ABIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="ABAB5E96-8470-5DB9-222A-3510C440554C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6804B16D-2A05-885E-721A-0F6D351E65F7" name="BUER_EXT_ACC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6E6040CC-FEB6-9FE2-E4D2-EC4A5E99C278"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="864D114F-1F7E-D661-A008-392491733A7C" name="BUER_USER_EXT_ACC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:23:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="484CF64E-1744-4D30-8045-166095B408FC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

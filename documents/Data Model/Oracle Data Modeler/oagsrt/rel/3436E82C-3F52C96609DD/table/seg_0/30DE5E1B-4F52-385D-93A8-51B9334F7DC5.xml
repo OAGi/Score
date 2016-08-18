@@ -1,0 +1,114 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="30DE5E1B-4F52-385D-93A8-51B9334F7DC5" name="MODULE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:32 UTC</createdTime>
+<comment>The module table stores information about a physical file, into which CC components will be generated during the expression generation.</comment>
+<commentInRDBMS>The module table stores information about a physical file, into which CC components will be generated during the expression generation.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_9</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="MODULE_ID" id="E1CA8976-9A33-345E-BCDE-51EAB731E1C7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:01 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MODULE" id="48C46ED6-F256-5D7C-40E9-1404C4271D0A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:01 UTC</createdTime>
+<commentInRDBMS>The is the subdirectory and filename. The format is Windows file path. The starting directory typically is the root folder of all the release content. For example, for OAGIS 10.1 Model, the root directory is Model. If the file shall be directly under the Model directory, then this column should be &apos;Model\filename&apos; without the extension. If the file is under, say, Model\Platform\2_1\Common\Components directory, then the value of this column shall be &apos;Model\Platform\2_1\Common\Components\filenam&apos;. The reason to not including the extension is that the extension maybe dependent on the expression. For XML schema, &apos;.xsd&apos; maybe added; or for JSON, &apos;.json&apos; maybe added as the file extension.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="RELEASE_ID" id="CE02AF55-C5A6-EE07-D799-F3C242C174AF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:01 UTC</createdTime>
+<commentInRDBMS>Foreign key to the RELEASE table. It identifies the release, for which this module is associated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5ABEC3B8-2E30-DA20-9389-E373D8CB269F" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
+</associations>
+</Column>
+<Column name="NAMESPACE_ID" id="6265C3D2-1E56-1BEE-C2F2-5749455281DB">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:01 UTC</createdTime>
+<commentInRDBMS>Note that a release record has a namespace associated. The NAMESPACE_ID, if specified here, overrides the release&apos;s namespace. However, the NAMESPACE_ID associated with the component takes the highest precedence.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="621EEE0E-1B72-7589-DF92-68B10EFFDFCD" referredColumn="D15FD659-BBEC-F525-3E84-220244871286"/>
+</associations>
+</Column>
+<Column name="VERSION_NUM" id="20B1D32E-D858-0622-C156-B495651118FF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:01 UTC</createdTime>
+<commentInRDBMS>This is the version number to be assigned to the schema module.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="14FF8DA6-FC7B-A67D-AE17-AD704DBD63E9" name="MODULE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="297C6B62-C8FE-23DA-AF7A-D90A0B5E65CB" name="MODULE_RELEASE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CE02AF55-C5A6-EE07-D799-F3C242C174AF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="5809F64B-36E6-E8B5-0822-E6EF6D448B25" name="MODULE_NAMESPACE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:13:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6265C3D2-1E56-1BEE-C2F2-5749455281DB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

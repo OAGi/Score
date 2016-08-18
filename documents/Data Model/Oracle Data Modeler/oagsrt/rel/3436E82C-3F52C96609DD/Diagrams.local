@@ -1,0 +1,5 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<oracle.dbtools.crest.model.design.relational.RelationalDesign>
+   <object objectType="main_view" objectID="5C5B7DFD-6D0E-A9E5-FC60-28A3A05AF504" name="oagsrt_revision" visible="true"/>
+   <object objectType="sub_view" objectID="FE76C0D6-1EEE-4977-76BB-6FCF14AC3104" name="oagsrt_revision - General" visible="false"/>
+</oracle.dbtools.crest.model.design.relational.RelationalDesign>

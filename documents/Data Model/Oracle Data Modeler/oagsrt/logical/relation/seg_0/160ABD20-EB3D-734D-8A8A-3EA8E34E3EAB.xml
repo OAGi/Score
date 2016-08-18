@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="NAMESPACE_OWNER_USER_ID_FK" directorySegmentName="seg_0" id="160ABD20-EB3D-734D-8A8A-3EA8E34E3EAB">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>9A2A16EF-652B-1A36-6F9D-1ECC19962ED3</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<sourcePk>AE4AD747-2DDB-ABE3-E332-0E675EDC702C</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>D562A472-FCAC-4AB3-7953-64F5DD7B4E68</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>AF834D4A-8BCB-A87C-4836-4F7D3D88F5AB</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

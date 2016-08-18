@@ -1,0 +1,191 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="BD9DA06C-5E2F-8EBB-5794-8479EBBA27E7" name="BDT_PRI_RESTRI">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:30:38 UTC</createdTime>
+<comment>This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.</comment>
+<commentInRDBMS>This table captures the allowed primitives for a BDT. The allowed primitives are captured by three columns the CDT_AWD_PRI_XPS_TYPE_MAP_ID, CODE_LIST_ID, and AGENCY_ID_LIST_ID. The first column specifies the primitive by the built-in type of an expression language such as the XML Schema built-in type. The second specifies the primitive, which is a code list, while the last one specifies the primitive which is an agency identification list. Only one column among the three can have a value in a particular record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_31</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="BDT_PRI_RESTRI_ID" id="E93CA0B2-79D7-C7C2-B8E1-FB41781335D8">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:01 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BDT_ID" id="BB37F50F-FAA2-BA29-F3E4-FF3B5C884768">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:01 UTC</createdTime>
+<commentInRDBMS>Foreign key to the DT table. It shall point to only DT that is a BDT (not a CDT).</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="EB22E170-B5BA-2A29-6AA9-4CBF20BFF193" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</associations>
+</Column>
+<Column name="CDT_AWD_PRI_XPS_TYPE_MAP_ID" id="7DA71C6E-CE8A-AD9B-F118-9CE4FDA15BDE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:01 UTC</createdTime>
+<commentInRDBMS>This is a foreign key to the CDT_AWD_PRI_XPS_TYPE_MAP table.  It allows for a primitive restriction based on a built-in type of schema expressions.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="EE2CA748-FA71-79C0-315F-41C5E25CADD2" referredColumn="5521BF1A-9B7F-16A0-7F1D-AED486AB6B91"/>
+</associations>
+</Column>
+<Column name="CODE_LIST_ID" id="4727F60C-35C1-9F50-9271-EA46F51D3560">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:01 UTC</createdTime>
+<commentInRDBMS>Foreign key to the CODE_LIST table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DD3EE110-0FBB-A452-E1B8-E4A35BD052DE" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</associations>
+</Column>
+<Column name="IS_DEFAULT" id="02C505F8-B909-9BB2-EB8D-F54F8C02AE49">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:01 UTC</createdTime>
+<commentInRDBMS>This allows overriding the default primitive assigned in the CDT_AWD_PRI_XPS_TYPE_MAP table. It typically indicates the most generic primtive for the data type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="AGENCY_ID_LIST_ID" id="C4F7AD34-EA75-B017-F4F1-53A4D5BFA556">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:01 UTC</createdTime>
+<commentInRDBMS>This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="696AA7CA-0AE1-A619-6F39-E8AFCF9B551F" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="EDA6A4DE-0D45-FDDA-D799-BDDB93F7963C" name="BPR_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:31:30 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E93CA0B2-79D7-C7C2-B8E1-FB41781335D8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="118F6AEF-E38B-1B92-1F0C-23B1A38E2C21" name="BDT_PR_PK_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:12:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E93CA0B2-79D7-C7C2-B8E1-FB41781335D8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8DB4862B-B5FF-9978-B4D6-F7CF2109E146" name="BDT_PR_CAPXTM_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:12:48 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7DA71C6E-CE8A-AD9B-F118-9CE4FDA15BDE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4177B3A8-233A-F88D-5542-78994F41E9A3" name="BDT_PR_CODE_LIST_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:13:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4727F60C-35C1-9F50-9271-EA46F51D3560"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C27C384E-8D46-2A12-3076-6E7EC6CEA31A" name="BDT_PR_AGENCY_ID_LIST_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:13:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C4F7AD34-EA75-B017-F4F1-53A4D5BFA556"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BF21EF98-159A-399A-D270-B8CEF06AAB8E" name="BPR_BDT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:32:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BB37F50F-FAA2-BA29-F3E4-FF3B5C884768"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="932FA735-1026-3361-286C-39143CCC486D" name="BPR_CAPXTM_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:32:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7DA71C6E-CE8A-AD9B-F118-9CE4FDA15BDE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="706EFA4F-3939-3443-A8C5-E95086C829C8" name="BPR_CODE_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:32:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4727F60C-35C1-9F50-9271-EA46F51D3560"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E95AB7C0-5425-25B6-AA85-92D1C645930E" name="BPR_AGENCY_ID_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:32:29 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C4F7AD34-EA75-B017-F4F1-53A4D5BFA556"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

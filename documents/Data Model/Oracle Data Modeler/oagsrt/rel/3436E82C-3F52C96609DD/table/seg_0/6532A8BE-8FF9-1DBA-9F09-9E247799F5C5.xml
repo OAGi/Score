@@ -1,0 +1,176 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="6532A8BE-8FF9-1DBA-9F09-9E247799F5C5" name="DT_SC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:48:25 UTC</createdTime>
+<comment>This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. </comment>
+<commentInRDBMS>This table represents the supplementary component (SC) of a DT. Revision is not tracked at the supplementary component. It is considered intrinsic part of the DT. In other words, when a new revision of a DT is created a new set of supplementary components is created along with it. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_17</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="DT_SC_ID" id="C1694137-A9B8-4328-34A3-A254EE56582B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>Internal, primary database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="448DF4AB-ADDF-2996-C6BD-2509523A67AD">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>A globally unique identifier (GUID) of an SC. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence. Note that each SC is considered intrinsic to each DT, so a SC has a different GUID from the based SC, i.e., SC inherited from the based DT has a new, different GUID.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="PROPERTY_TERM" id="D68FDDCE-0712-D5BF-20CD-341A8F579B76">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>Property term of the SC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>60 CHAR</dataTypeSize>
+<ownDataTypeParameters>60 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REPRESENTATION_TERM" id="0D1C37B9-8125-6CAC-2F0A-32AF0B0C70FC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>Representation of the supplementary component.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="52642323-5559-307A-8896-24F30DB2CC6D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>Description of the supplementary component.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OWNER_DT_ID" id="03073B13-6419-111B-CD15-4E431C55F5A3">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>Foreigned key to the DT table indicating the data type, to which this supplementary component belongs.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="A7FB6309-0AD1-F1E5-9BD3-306857E46B92" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</associations>
+</Column>
+<Column name="MIN_CARDINALITY" id="8B274F9E-34AB-06A1-92D4-5004A291F6D1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>The minimum occurrence constraint associated with the supplementary component. The valid values zero or one.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MAX_CARDINALITY" id="A005CDE8-ED14-DD08-B6D5-6BC2F42E1CDC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>The maximum occurrence constraint associated with the supplementary component. The valid values are zero or one. Zero is used when the SC is restricted from an instantiation in the data type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BASED_DT_SC_ID" id="18123DEA-45AE-5B4C-388C-C3FD50AA1491">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<commentInRDBMS>Foreign key to the DT_SC table itself. This column is used when the SC is derived from the based DT.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="735A75CB-AA8F-1B11-EC90-B983A681AE0A" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="15F6A14B-7912-56FA-A16A-E0CC84D3F7EC" name="DT_SC_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C1694137-A9B8-4328-34A3-A254EE56582B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3F66BDEA-C554-81D2-D94D-ACB9AF26F294" name="DT_SC_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:51:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="448DF4AB-ADDF-2996-C6BD-2509523A67AD"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="81E07D34-8E98-2762-A1E5-4C101216FF58" name="DT_SC_OWNER_DT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:18 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="03073B13-6419-111B-CD15-4E431C55F5A3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D840D5D7-BD69-90D9-C7C4-4EBFB26DDCDA" name="DT_SC_BASED_DT_SC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:50:40 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="18123DEA-45AE-5B4C-388C-C3FD50AA1491"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

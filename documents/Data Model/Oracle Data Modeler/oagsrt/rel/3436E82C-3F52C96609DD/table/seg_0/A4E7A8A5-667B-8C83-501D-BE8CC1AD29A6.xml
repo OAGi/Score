@@ -1,0 +1,332 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="A4E7A8A5-667B-8C83-501D-BE8CC1AD29A6" name="ASBIE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:56:20 UTC</createdTime>
+<comment>An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is a contextualization of an ASCC.</comment>
+<commentInRDBMS>An ASBIE represents a relationship/association between two ABIEs through an ASBIEP. It is a contextualization of an ASCC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_38</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ASBIE_ID" id="C31F2E9E-8473-96BF-90D0-F96ACC1CE325">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>A internal, primary database key of an ASBIE.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="44C03230-EB50-7DAD-EE44-8ABBB75D5825">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>A globally unique identifier (GUID) of an ASBIE. GUID of an ASBIE is different from its based ASCC. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FROM_ABIE_ID" id="E550759B-72EC-9CF0-28F1-E73EC0AFF917">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>A foreign key pointing to the ABIE table. FROM_ABIE_ID is basically  a parent data element (type) of the TO_ASBIEP_ID. FROM_ABIE_ID must be based on the FROM_ACC_ID in the BASED_ASCC except when the FROM_ACC_ID refers to an SEMANTIC_GROUP ACC or USER_EXTENSION_GROUP ACC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="7127DCC5-3888-11E8-8906-64DFE16BDC4A" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+</associations>
+</Column>
+<Column name="TO_ASBIEP_ID" id="6B6C766F-015C-0463-63BD-9B407C3BF833">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>A foreign key to the ASBIEP table. TO_ASBIEP_ID is basically a child data element of the FROM_ABIE_ID. TO_ASBIEP_ID must be based on the TO_ASCCP_ID in the BASED_ASCC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="ED206EE1-846B-0846-BD7B-CB3027AF612E" referredColumn="DED39440-6579-847B-FCCE-72A73CB3A55D"/>
+</associations>
+</Column>
+<Column name="BASED_ASCC" id="FD247C6D-BEAE-AB54-19CB-579DF63B76AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>The BASED_ASCC column refers to the ASCC record, which this ASBIE contextualizes.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5F218D46-3EEC-A969-1F49-AE309AD8908C" referredColumn="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1"/>
+</associations>
+</Column>
+<Column name="DEFINITION" id="8291D9E9-DE60-5FA0-3F7D-5D51AF6624B1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>Definition to override the ASCC definition. If NULL, it means that the definition should be derived from the based CC on the UI, expression generation, and any API.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CARDINALITY_MIN" id="5AC31830-F89D-29A8-6055-EBD2E04B40F1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>Minimum occurence constraint of the TO_ASBIEP_ID. A valid value is a non-negative integer.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CARDINALITY_MAX" id="DF9875BD-3CE2-AAA1-6E35-A10FA7E66608">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>Maximum occurrence constraint of the TO_ASBIEP_ID. A valid value is an integer from -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_NILLABLE" id="FCA5D35B-8C3E-3D55-BE44-D02924F44A39">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>Indicate whether the TO_ASBIEP is allowed to be null.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REMARK" id="B10C9055-EE07-EA73-9622-309ACC51B6F3">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>This column allows the user to specify very context-specific usage of the BIE. It is different from the DEFINITION column in that the DEFINITION column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. For example, BOM BOD, as an ACC, is a generic BOM structure. In a particular context, a BOM ABIE can be a Super BOM. Explanation of the Super BOM concept should be captured in the Definition of the ABIE. A remark about that ABIE may be &quot;Type of BOM should be recognized in the BOM/typeCode.&quot;</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>225 CHAR</dataTypeSize>
+<ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CREATED_BY" id="AF9E0DCC-1EFE-C2D8-BE0A-483FF222E206">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>A foreign key referring to the user who creates the ASBIE. The creator of the ASBIE is also its owner by default. ASBIEs created as children of another ABIE have the same CREATED_BY.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8643C47A-20FB-5EE7-16FB-22877D88D251" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="F90BBC75-D54D-BE44-EF19-FF485D7887A5">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>A foreign key referring to the user who has last updated the ASBIE record. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9CB12AA6-FA67-5182-3C92-8E15ACBBD07A" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="FFED77BA-5524-5530-F91D-3962E819EBD4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>Timestamp when the ASBIE record was first created. ASBIEs created as children of another ABIE have the same CREATION_TIMESTAMP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="C75B1E39-2619-FA7D-0AAE-74F23556E18C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>The timestamp when the ASBIE was last updated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SEQ_KEY" id="2D2D088A-ACFC-192E-05AD-6DAF975BF893">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>This indicates the order of the associations among other siblings. The SEQ_KEY for BIEs is decimal in order to accomodate the removal of inheritance hierarchy and group. For example, children of the most abstract ACC will have SEQ_KEY = 1.1, 1.2, 1.3, and so on; and SEQ_KEY of the next abstraction level ACC will have SEQ_KEY = 2.1, 2.2, 2.3 and so on so forth.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<ownDataTypeParameters>,10,2</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_USED" id="0534E6A7-23F1-7BC2-DF2B-90C9F9345E59">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:04 UTC</createdTime>
+<commentInRDBMS>Flag to indicate whether the field/component is used in the content model. It signifies whether the field/component should be generated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OWNER_TOP_LEVEL_ABIE_ID" id="EED998B7-B8D5-6D15-C5BC-7D3F3DC7C68B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:11:09 UTC</createdTime>
+<commentInRDBMS>This is a foriegn key to the ABIE table. It specifies the top-level ABIE which owns this ASBIE record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9C472DB2-B912-40C6-E9D8-619CFBC64A6C" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="AA7C6033-E2A9-84C7-3C25-8F6ADA8BDBF7" name="ASBIE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:57:14 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C31F2E9E-8473-96BF-90D0-F96ACC1CE325"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="EACE1F42-C057-9C03-BC2B-4F96EB6FE825" name="ASBIE_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:59:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="44C03230-EB50-7DAD-EE44-8ABBB75D5825"/>
+<colUsage columnID="E550759B-72EC-9CF0-28F1-E73EC0AFF917"/>
+<colUsage columnID="6B6C766F-015C-0463-63BD-9B407C3BF833"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="701E42CE-8AEC-F09F-8450-98E068396272" name="ASBIE_OWNER_TLVL_ABIE_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:09:13 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EED998B7-B8D5-6D15-C5BC-7D3F3DC7C68B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7DB4E05B-9935-958A-9885-0E40908C3C54" name="ASBIE_FROM_ABIE_ID">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:59:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E550759B-72EC-9CF0-28F1-E73EC0AFF917"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="21E711FF-6E7E-275A-B43E-6548BC3D8F82" name="ASBIE_TO_ASBIEP_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:59:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6B6C766F-015C-0463-63BD-9B407C3BF833"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C08E93F7-4FAC-6202-9B88-3B2B2A81185B" name="ASBIE_BASED_ASCC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:59:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="FD247C6D-BEAE-AB54-19CB-579DF63B76AC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D4D99E5D-84F1-59EB-CB84-DCA75555161F" name="ASBIE_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:59:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AF9E0DCC-1EFE-C2D8-BE0A-483FF222E206"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BD52F578-0A53-3770-7F9A-75097B4981BE" name="ASBIE_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:59:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F90BBC75-D54D-BE44-EF19-FF485D7887A5"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3B7460CB-70AD-9817-A5E4-6EC75B50C013" name="ASBIE_TOP_LEVEL_ABIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:11:25 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EED998B7-B8D5-6D15-C5BC-7D3F3DC7C68B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,65 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableProxyOraclev10g" name="AGENCY_ID_LIST_VALUE" directorySegmentName="seg_0" id="C6909D6F-B0B3-E413-0B07-E9CB598AAEA4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:22:55 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="AGENCY_ID_LIST_VALUE_ID" id="166E2644-631C-ABAE-F0C1-4E3A8A71AD0B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:23:17 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="OWNER_LIST_ID" id="913D62BF-4646-AEAC-B608-5CAEE74298A7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:23:17 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="VALUE" id="987A0336-B14C-3BAB-C7E0-91ED41E981D4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:23:17 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NAME" id="CE05E25C-ED1D-1753-FA20-53F5F0A7A24C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:23:17 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEFINITION" id="F625D51C-A767-48FE-D334-D1D37A4A6524">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:23:17 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="AILV_PK_IDX" id="06243031-E221-F974-E3CE-1A26E60250FE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:08:18 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="AILV_OWNER_LIST_ID_IDX" id="9A870121-16A4-DC9D-C572-3B6D7AFFCEF1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:08:43 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="AILV_AGENCY_ID_LIST_FK" id="4BA9FF76-893F-DD70-5787-DB0193609F45">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:24:03 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="AGENCY_ID_LIST_VALUE_PK" id="CBA4C7C7-EB70-DDB9-7BC8-F64205D82D98">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:23:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev10g>

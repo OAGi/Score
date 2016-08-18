@@ -1,0 +1,117 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="373E7CEE-909E-09BC-840B-433CF18E0C5B" name="CDT_SC_AWD_PRI_XPS_TYPE_MAP">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:37:35 UTC</createdTime>
+<comment>The purpose of this table is the same as that of the CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It allows for the concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. </comment>
+<commentInRDBMS>The purpose of this table is the same as that of the CDT_AWD_PRI_XPS_TYPE_MAP, but it is for the supplementary component (SC). It allows for the concrete mapping between the CDT Primitives and types in a particular expression such as XML Schema, JSON. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_33</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CDT_SC_AWD_PRI_XPS_TYPE_MAP_ID" id="9C70EF52-F75C-53B9-ED43-F861AB1ADB15">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:38:08 UTC</createdTime>
+<commentInRDBMS>Internal, primary database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CDT_SC_AWD_PRI" id="C6383ECC-8C93-E9AA-5116-BFE00510C5ED">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:38:08 UTC</createdTime>
+<commentInRDBMS>Foreign key to the CDT_SC_AWD_PRI table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="B557E3A2-D5C4-160E-B004-08E858898B6B" referredColumn="A35CF947-883C-9067-FB85-9436FDE1643C"/>
+</associations>
+</Column>
+<Column name="XBT_ID" id="4DD4CF4E-08C1-F220-61D9-8D44037BC9B2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:38:08 UTC</createdTime>
+<commentInRDBMS>Foreign key to the XBT table. It identifies an XML schema built-in type that maps to the CDT SC Allowed Primitive identified in the CDT_SC_AWD_PRI column.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8E9D349A-136D-4C95-A770-A2F7D40A1493" referredColumn="4A95D01F-E877-E0DC-220C-F82AD8677B6F"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="5CF56C28-5351-210A-E719-AAC0BC425EB2" name="CSAPXTM_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:38:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9C70EF52-F75C-53B9-ED43-F861AB1ADB15"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8ABB971E-F3A5-A93F-7944-20274B4A88BC" name="CSAPXTM_PK_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:20:24 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9C70EF52-F75C-53B9-ED43-F861AB1ADB15"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8B73DD91-42AF-7890-960C-B4FB04D56C06" name="CSAPXTM_CSAP_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:21:20 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C6383ECC-8C93-E9AA-5116-BFE00510C5ED"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="198E3846-55AE-8EF0-DFDE-4C854EF41F67" name="CSAPXTM_XBT_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:21:20 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4DD4CF4E-08C1-F220-61D9-8D44037BC9B2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F7A6DDB7-5124-EB1F-787F-8713B4633242" name="CSAPXTM_CSAP_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:38:26 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C6383ECC-8C93-E9AA-5116-BFE00510C5ED"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="22AEB16B-B159-C091-F7F3-7D780CFAAFF0" name="CSAPXTM_XBT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:38:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4DD4CF4E-08C1-F220-61D9-8D44037BC9B2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

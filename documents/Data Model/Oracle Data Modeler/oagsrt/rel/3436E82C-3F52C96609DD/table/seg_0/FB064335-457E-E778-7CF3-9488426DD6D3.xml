@@ -1,0 +1,89 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="FB064335-457E-E778-7CF3-9488426DD6D3" name="RELEASE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:09:53 UTC</createdTime>
+<comment>The is table store the release information.</comment>
+<commentInRDBMS>The is table store the release information.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_6</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="RELEASE_ID" id="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:13 UTC</createdTime>
+<commentInRDBMS>RELEASE_ID must be an incremental integer. RELEASE_ID that is more than another RELEASE_ID is interpreted to be released later than the other.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="RELEASE_NUM" id="F39FFB99-141E-90FA-F4B4-DC49400D7CA0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:13 UTC</createdTime>
+<commentInRDBMS>Release number such has 10.0, 10.1, etc. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="RELEASE_NOTE" id="69EB6DC7-3321-AE4C-5F14-95626A3CD603">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:13 UTC</createdTime>
+<commentInRDBMS>Description or note associated with the release.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAMESPACE_ID" id="115E4871-BE79-40D7-A93C-B8442DE2A213">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:13 UTC</createdTime>
+<commentInRDBMS>Foreign key to the NAMESPACE table. It identifies the namespace used with the release. It is particularly useful for a library that uses a single namespace such like the OAGIS 10.x. A library that uses multiple namespace but has a main namespace may also use this column as a specific namespace can be override at the module level.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6FDF3BF2-DD0B-B794-2DCE-D4F4803CF823" referredColumn="D15FD659-BBEC-F525-3E84-220244871286"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="EDDBBA5B-8572-C4D8-FCEF-47742BBA7C1E" name="RELEASE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:13 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0C508243-D310-A93E-8FFF-BE3010DCD91B" name="RELEASE_NAMESPACE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:11:13 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="115E4871-BE79-40D7-A93C-B8442DE2A213"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
