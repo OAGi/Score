@@ -453,9 +453,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     class ValueComparator implements Comparator<BusinessInformationEntity> {
 
-        Map<BusinessInformationEntity, Integer> base;
+        Map<BusinessInformationEntity, Double> base;
 
-        public ValueComparator(Map<BusinessInformationEntity, Integer> base) {
+        public ValueComparator(Map<BusinessInformationEntity, Double> base) {
             this.base = base;
         }
 
@@ -867,12 +867,12 @@ public class TopLevelABIEHandler implements Serializable {
         List<BasicBusinessInformationEntity> list_01 = bbieRepository.findByFromAbieId(abieId);
         List<AssociationBusinessInformationEntity> list_02 = asbieRepository.findByFromAbieId(abieId);
 
-        Map<BusinessInformationEntity, Integer> sequence = new HashMap();
+        Map<BusinessInformationEntity, Double> sequence = new HashMap();
         ValueComparator bvc = new ValueComparator(sequence);
-        TreeMap<BusinessInformationEntity, Integer> ordered_sequence = new TreeMap(bvc);
+        TreeMap<BusinessInformationEntity, Double> ordered_sequence = new TreeMap(bvc);
 
         for (BasicBusinessInformationEntity bbieVO : list_01) {
-            int sk = bbieVO.getSeqKey();
+            double sk = bbieVO.getSeqKey();
             if (getEntityType(bbieVO.getBasedBccId()) == 0)
                 showBBIETree(bbieVO, tNode);
             else
@@ -880,7 +880,7 @@ public class TopLevelABIEHandler implements Serializable {
         }
 
         for (AssociationBusinessInformationEntity asbieVO : list_02) {
-            int sk = asbieVO.getSeqKey();
+            double sk = asbieVO.getSeqKey();
             sequence.put(asbieVO, sk);
         }
 

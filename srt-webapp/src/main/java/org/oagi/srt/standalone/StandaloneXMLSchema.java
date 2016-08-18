@@ -895,9 +895,9 @@ public class StandaloneXMLSchema {
 
     class ValueComparator implements Comparator<BusinessInformationEntity> {
 
-        Map<BusinessInformationEntity, Integer> base;
+        Map<BusinessInformationEntity, Double> base;
 
-        public ValueComparator(Map<BusinessInformationEntity, Integer> base) {
+        public ValueComparator(Map<BusinessInformationEntity, Double> base) {
             this.base = base;
         }
 
@@ -1217,9 +1217,9 @@ public class StandaloneXMLSchema {
         // Get only Child BIEs whose is_used flag is true
         public List<BusinessInformationEntity> queryChildBIEs(AggregateBusinessInformationEntity gABIE) {
             List<BusinessInformationEntity> result;
-            Map<BusinessInformationEntity, Integer> sequence = new HashMap();
+            Map<BusinessInformationEntity, Double> sequence = new HashMap();
             ValueComparator bvc = new ValueComparator(sequence);
-            Map<BusinessInformationEntity, Integer> ordered_sequence = new TreeMap(bvc);
+            Map<BusinessInformationEntity, Double> ordered_sequence = new TreeMap(bvc);
 
             List<AssociationBusinessInformationEntity> asbievo = findAsbieByFromAbieIdAndUsedIsTrue(gABIE.getAbieId());
             List<BasicBusinessInformationEntity> bbievo = findBbieByFromAbieIdAndUsedIsTrue(gABIE.getAbieId());

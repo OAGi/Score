@@ -69,7 +69,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int seqKey;
+    private double seqKey;
 
     @Column(name = "is_used", nullable = false)
     private boolean used;
@@ -216,11 +216,11 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getSeqKey() {
+    public double getSeqKey() {
         return seqKey;
     }
 
-    public void setSeqKey(int seqKey) {
+    public void setSeqKey(double seqKey) {
         this.seqKey = seqKey;
     }
 
@@ -256,7 +256,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         if (nillable != that.nillable) return false;
         if (createdBy != that.createdBy) return false;
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (seqKey != that.seqKey) return false;
+        if (Double.compare(that.seqKey, seqKey) != 0) return false;
         if (used != that.used) return false;
         if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
@@ -270,7 +270,9 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
 
     @Override
     public int hashCode() {
-        int result = asbieId;
+        int result;
+        long temp;
+        result = asbieId;
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + fromAbieId;
         result = 31 * result + toAsbiepId;
@@ -284,7 +286,8 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         result = 31 * result + lastUpdatedBy;
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + seqKey;
+        temp = Double.doubleToLongBits(seqKey);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (used ? 1 : 0);
         result = 31 * result + ownerTopLevelAbieId;
         return result;
