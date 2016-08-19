@@ -125,7 +125,7 @@
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
-<ind_PK_UK id="6F3A7EF7-56EB-B8B5-1C46-2C126D2DF836" name="CODE_LIST_VALUE_PK">
+<ind_PK_UK id="6F3A7EF7-56EB-B8B5-1C46-2C126D2DF836" name="CLV_PK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:01:51 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

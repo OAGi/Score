@@ -256,7 +256,7 @@
 <colUsage columnID="81AD63DE-18AA-CA8E-81BD-803E54143AD4"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="A9B253E1-9023-5A30-988E-7F3B01FF138C" name="BBIE_BBIE_ID_FK">
+<ind_PK_UK id="A9B253E1-9023-5A30-988E-7F3B01FF138C" name="BBIE_SC_BBIE_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:21:51 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

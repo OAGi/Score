@@ -97,7 +97,7 @@
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
-<ind_PK_UK id="B00435D5-581B-BC03-8BA1-5CB523CB87F1" name="BIE_USER_EXT_REVISION_PK">
+<ind_PK_UK id="B00435D5-581B-BC03-8BA1-5CB523CB87F1" name="BUER_PK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:22:54 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

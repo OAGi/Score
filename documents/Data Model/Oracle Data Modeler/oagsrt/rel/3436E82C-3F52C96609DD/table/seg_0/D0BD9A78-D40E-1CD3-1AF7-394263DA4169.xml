@@ -203,7 +203,7 @@
 <colUsage columnID="87AE10D5-BD69-AA4D-8881-EDAC41D02527"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="BE34DC31-C1B0-9E73-C212-E7045021AB87" name="ASBIEP_BASED_ASCCP_ID">
+<ind_PK_UK id="BE34DC31-C1B0-9E73-C212-E7045021AB87" name="ASBIEP_BASED_ASCCP_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

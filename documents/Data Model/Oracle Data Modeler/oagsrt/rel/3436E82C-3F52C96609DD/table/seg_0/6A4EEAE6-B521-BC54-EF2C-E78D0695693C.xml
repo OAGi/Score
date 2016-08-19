@@ -87,7 +87,7 @@
 <colUsage columnID="A35CF947-883C-9067-FB85-9436FDE1643C"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="4099C304-A0A9-D518-629F-DBA3316AF536" name="CDT_SC_ID_FK">
+<ind_PK_UK id="4099C304-A0A9-D518-629F-DBA3316AF536" name="CDT_SC_AWD_PRI_CDT_SC_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:52:22 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -97,7 +97,7 @@
 <colUsage columnID="05A0F3D6-B3EF-BD90-0F5E-1AFA37205EE4"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="BAB57F51-F419-4CE0-14DA-153354455200" name="CDT_PRI_ID_FK">
+<ind_PK_UK id="BAB57F51-F419-4CE0-14DA-153354455200" name="CDT_SC_AWD_PRI_CDT_PRI_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:52:33 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
