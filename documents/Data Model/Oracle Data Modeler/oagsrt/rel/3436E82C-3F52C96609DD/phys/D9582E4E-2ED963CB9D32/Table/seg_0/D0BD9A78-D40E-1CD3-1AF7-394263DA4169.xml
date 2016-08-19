@@ -98,7 +98,7 @@
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
-<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ASBIEP_BASED_ASCCP_ID" id="BE34DC31-C1B0-9E73-C212-E7045021AB87">
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ASBIEP_BASED_ASCCP_ID_FK" id="BE34DC31-C1B0-9E73-C212-E7045021AB87">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:51:27 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

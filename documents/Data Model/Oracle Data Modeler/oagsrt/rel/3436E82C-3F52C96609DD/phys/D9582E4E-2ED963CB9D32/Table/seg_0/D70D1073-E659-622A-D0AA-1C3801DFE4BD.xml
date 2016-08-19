@@ -55,7 +55,7 @@
 </ForeignKey>
 </foreignKeys>
 <primaryKeys>
-<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CDT_AWD_PRI_XPS_TYPE_MAP_PK" id="EFE93421-F152-77C7-F143-32D4F55A4722">
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CAPXTM_PK" id="EFE93421-F152-77C7-F143-32D4F55A4722">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:47:10 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

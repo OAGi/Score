@@ -38,12 +38,12 @@
 </IndexProxy>
 </indexProxies>
 <foreignKeys>
-<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CDT_SC_ID_FK" id="4099C304-A0A9-D518-629F-DBA3316AF536">
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CDT_SC_AWD_PRI_CDT_SC_ID_FK" id="4099C304-A0A9-D518-629F-DBA3316AF536">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:52:22 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ForeignKey>
-<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CDT_PRI_ID_FK" id="BAB57F51-F419-4CE0-14DA-153354455200">
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="CDT_SC_AWD_PRI_CDT_PRI_ID_FK" id="BAB57F51-F419-4CE0-14DA-153354455200">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:52:33 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

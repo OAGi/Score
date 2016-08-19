@@ -90,7 +90,7 @@
 </ForeignKey>
 </foreignKeys>
 <primaryKeys>
-<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="BIE_USER_EXT_REVISION_PK" id="B00435D5-581B-BC03-8BA1-5CB523CB87F1">
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="BUER_PK" id="B00435D5-581B-BC03-8BA1-5CB523CB87F1">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:22:54 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
