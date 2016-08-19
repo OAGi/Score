@@ -1,0 +1,118 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="55F396E3-4E56-F71F-3780-8D2F0C16AA70" name="MODULE_DEP">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:14:01 UTC</createdTime>
+<comment>This table carries the dependency between modules in the MODULE table.</comment>
+<commentInRDBMS>This table carries the dependency between modules in the MODULE table.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_11</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="MODULE_DEP_ID" id="530E1452-67FC-FEA8-D19F-6DD2EE87F65C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEPENDENCY_TYPE" id="91346E84-023D-9C5D-92D3-B9C1499C54E4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<commentInRDBMS>This is a code list. The value tells the expression generator what to do based on this dependency type. 0 = xsd:include, 1 = xsd:import. There could be other values supporting other expressions/syntaxes.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEPENDING_MODULE_ID" id="E2BAF32D-FF97-178C-55E1-7D2229A003E9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<commentInRDBMS>Foreign key to the MODULE table. It identifies a depending module. For example, in XML schema if module A imports or includes module B, then module A is a depending module.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="26F1BE73-CAFA-B3DB-98D0-A9C0F79256EA" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
+</associations>
+</Column>
+<Column name="DEPENDED_MODULE_ID" id="5DEE7D02-1728-D30E-A2EE-7B313D7E10F6">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<commentInRDBMS>Foreign key to the MODULE table. It identifies a depended module counterpart of the depending module. For example, in XML schema if module A imports or includes module B, then module B is a depended module.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5F6A6ACA-9D7E-0A34-ADA6-DB1456B85480" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="20A77E1E-28E9-257F-5517-7423A08E67AB" name="MODULE_DEP_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="530E1452-67FC-FEA8-D19F-6DD2EE87F65C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="638E6661-456A-50F5-5A8D-DED7E79F99BC" name="MODULE_DEP_DEPENDING_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 20:45:19 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E2BAF32D-FF97-178C-55E1-7D2229A003E9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="1496E4A4-085F-DE82-38F6-443B4979475A" name="MODULE_DEP_DEPENDED_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 20:45:19 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5DEE7D02-1728-D30E-A2EE-7B313D7E10F6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="00169EF0-561F-E8CC-829C-59F9BE661F21" name="MODULE_DEPENDING_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E2BAF32D-FF97-178C-55E1-7D2229A003E9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6EA25367-9FDC-9E4D-470E-D2BA2F16620F" name="MODULE_DEPENDED_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:15:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5DEE7D02-1728-D30E-A2EE-7B313D7E10F6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,320 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="93CFF133-69F1-6F89-F552-E650F0EF1D46" name="BBIE_SC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:06 UTC</createdTime>
+<comment>Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT&apos;s SCs. </comment>
+<commentInRDBMS>Because there is no single table that is a contextualized counterpart of the DT table (which stores both CDT and BDT), The context specific constraints associated with the DT are stored in the BBIE table, while this table stores the constraints associated with the DT&apos;s SCs. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_45</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="BBIE_SC_ID" id="6F09C621-162D-D77A-96C3-4FAE20F78B26">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>A internal, primary database key of a BBIE_SC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="D27D3BA3-0CCE-FC0B-7E79-66BDCA184ACC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:33:34 UTC</createdTime>
+<commentInRDBMS>A globally unique identifier (GUID). It is different from the GUID fo the SC on the CC side. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BBIE_ID" id="5FAEF807-6E36-E241-66CE-284DA878B195">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>The BBIE this BBIE_SC applies to.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="1E6B64F7-ABB6-484B-A5F7-C43022D66CC7" referredColumn="2C7ADB03-0523-5076-F3AB-BB20525308D9"/>
+</associations>
+</Column>
+<Column name="DT_SC_ID" id="D3EC65DC-8471-72C3-0009-3FDCDEB2FF3C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>Foreign key to the DT_SC table. This should correspond to the DT_SC of the BDT of the based BCC and BCCP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E9AC9EC4-BDDF-D2CA-B62F-52CB54D11F6D" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
+</associations>
+</Column>
+<Column name="DT_SC_PRI_RESTRI_ID" id="32757495-7DFD-1911-BE39-AA2608E62D18">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This must be one of the allowed primitive/code list as specified in the corresponding SC of the based BCC of the BBIE (referred to by the BBIE_ID column).&lt;br/&gt;&lt;br/&gt;It is the foreign key to the BDT_SC_PRI_RESTRI table. It indicates the primitive assigned to the BBIE (or also can be viewed as assigned to the BBIEP for this specific association). This is assigned by the user who authors the BIE. The assignment would override the default from the CC side.&lt;br/&gt;&lt;br/&gt;This column, the CODE_LIST_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="16FE4E32-3E3C-A61C-F264-0B38A66716ED" referredColumn="E26B5231-05C5-B154-F69D-4EE8B9753BEA"/>
+</associations>
+</Column>
+<Column name="CODE_LIST_ID" id="1BC826AA-628C-B007-B8DB-F76682937F43">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This is a foreign key to the CODE_LIST table. If a code list is assigned to the BBIE SC (or also can be viewed as assigned to the BBIEP SC for this association), then this column stores the assigned code list. It should be noted that one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID column may also be a code list. So this column is typically used when the user wants to assign another code list different from the one permissible by the CC model.&lt;br/&gt;&lt;br/&gt;This column is, the DT_SC_PRI_RESTRI_ID column, and AGENCY_ID_LIST_ID column cannot have a value at the same time.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="584DB53E-3D85-3971-D4FB-298CBDAFDBCD" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</associations>
+</Column>
+<Column name="AGENCY_ID_LIST_ID" id="5E93EF19-50DD-0AF0-1D16-7A2F36B8842B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This is a foreign key to the AGENCY_ID_LIST table. If a agency ID list is assigned to the BBIE SC (or also can be viewed as assigned to the BBIEP SC for this association), then this column stores the assigned Agency ID list. It should be noted that one of the possible primitives assignable to the DT_SC_PRI_RESTRI_ID column may also be an Agency ID list. So this column is typically used only when the user wants to assign another Agency ID list different from the one permissible by the CC model.&lt;br/&gt;&lt;br/&gt;This column, the DT_SC_PRI_RESTRI_ID column, and CODE_LIST_ID column cannot have a value at the same time.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E2B290EA-A808-DD77-FFF7-1C9E319747B2" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
+</associations>
+</Column>
+<Column name="CARDINALITY_MIN" id="ACDFCBEF-DB20-432F-4822-786CA99CC4C9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>The minimum occurrence constraint for the BBIE SC. A valid value is 0 or 1.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CARDINALITY_MAX" id="32E34D11-4118-88A8-5A8A-AA9806D623A0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>Maximum occurence constraint of the BBIE SC. A valid value is 0 or 1.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFAULT_VALUE" id="F1810A1A-5719-4E44-08AA-8C003368EB3F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This column specifies the default value constraint. Default and fixed value constraints cannot be used at the same time.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FIXED_VALUE" id="5760CAB0-CF86-4A9F-423C-8313713351AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This column captures the fixed value constraint. Default and fixed value constraints cannot be used at the same time.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="33AB3A3A-A48E-FEE8-CCB3-76D99B4158AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>Description to override the BDT SC definition. If NULL, it means that the definition should be inherited from the based BDT SC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REMARK" id="6E001D2D-1884-8316-6E16-B6E563C62E16">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This column allows the user to specify a very context-specific usage of the BBIE SC. It is different from the Definition column in that the Definition column is a description conveying the meaning of the associated concept. Remarks may be a very implementation specific instruction or others. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>225 CHAR</dataTypeSize>
+<ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BIZ_TERM" id="AB05F261-1884-A6FC-1412-D80AF2F19501">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>Business term to indicate what the BBIE SC is called in a particular business context. With this current design, only one business term is allowed per business context.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>225 CHAR</dataTypeSize>
+<ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_USED" id="9F7F3D21-8F78-99E1-84B4-3B9EB43A6A8D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OWNER_TOP_LEVEL_ABIE_ID" id="81AD63DE-18AA-CA8E-81BD-803E54143AD4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:12:01 UTC</createdTime>
+<commentInRDBMS>This is a foriegn key to the ABIE. It specifies the top-level ABIE, which owns this BBIE_SC record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="C072F655-1588-BE29-1974-7C19BBBC8A9F" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F5BE8DA9-6FF7-86C4-3A13-765430994EE0" name="BBIE_SC_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6F09C621-162D-D77A-96C3-4FAE20F78B26"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C92F3E78-53B2-2CD9-6FE8-77AF54A6651E" name="BBIE_SC_DT_SC_PRI_RESTR_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:11:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="32757495-7DFD-1911-BE39-AA2608E62D18"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C0020B50-D0A6-C792-ADC6-B5E2949C412B" name="BBIE_SC_OWNER_TLVL_ABIE_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:11:26 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="81AD63DE-18AA-CA8E-81BD-803E54143AD4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A9B253E1-9023-5A30-988E-7F3B01FF138C" name="BBIE_SC_BBIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5FAEF807-6E36-E241-66CE-284DA878B195"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A05D366F-B12D-2A71-FE14-AA9C257817D2" name="BBIE_SC_DT_SC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D3EC65DC-8471-72C3-0009-3FDCDEB2FF3C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7A5A9E4A-5FC4-2AF9-EF96-D7563CFE414C" name="BBIE_SC_DT_SC_PRI_RESTRI_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="32757495-7DFD-1911-BE39-AA2608E62D18"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0D4D8F6A-187A-AD09-7943-2D10B19382A7" name="BBIE_SC_CODE_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1BC826AA-628C-B007-B8DB-F76682937F43"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="44C9EBE0-D828-A9CA-DD50-660BF633CAC4" name="BBIE_SC_AGENCY_ID_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5E93EF19-50DD-0AF0-1D16-7A2F36B8842B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2F5F31C8-A10C-F29B-744A-7DE1AAEF136D" name="BBIE_SC_TOP_LEVEL_ABIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:12:01 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="81AD63DE-18AA-CA8E-81BD-803E54143AD4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

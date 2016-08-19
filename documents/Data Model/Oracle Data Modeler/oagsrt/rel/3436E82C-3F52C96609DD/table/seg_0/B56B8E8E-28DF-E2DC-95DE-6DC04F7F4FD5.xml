@@ -1,0 +1,52 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="B56B8E8E-28DF-E2DC-95DE-6DC04F7F4FD5" name="CLIENT">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:12:23 UTC</createdTime>
+<comment>This table captures a client organization. It is used, for example, to indicate the customer, for which the BIE was generated.</comment>
+<commentInRDBMS>This table captures a client organization. It is used, for example, to indicate the customer, for which the BIE was generated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_24</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CLIENT_ID" id="C1B0BC21-F6D6-9F4F-5DA1-E401C8F38620">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:12:51 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAME" id="F36EC2E7-7FFD-E45F-C619-ABAEA54F4A0E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:12:51 UTC</createdTime>
+<commentInRDBMS>Pretty print name of the client.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200</dataTypeSize>
+<ownDataTypeParameters>200,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="AA4A9A0F-BCE7-646C-EADB-BBD97C046129" name="CLIENT_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:12:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C1B0BC21-F6D6-9F4F-5DA1-E401C8F38620"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

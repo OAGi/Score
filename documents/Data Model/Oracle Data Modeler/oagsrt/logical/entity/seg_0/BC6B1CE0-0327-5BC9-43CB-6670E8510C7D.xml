@@ -1,0 +1,93 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="BC6B1CE0-0327-5BC9-43CB-6670E8510C7D" name="RELEASE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>FB064335-457E-E778-7CF3-9488426DD6D3</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="RELEASE ID" id="2C45762D-1B45-2CD7-6BEE-8D163A472940">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>61EC25A9-2D77-E657-DCA9-0A16AD8CC65B</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="RELEASE NUM" id="33078AAE-A660-52A2-4289-2BAB242DB538">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>F39FFB99-141E-90FA-F4B4-DC49400D7CA0</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="RELEASE NOTE" id="110679EA-23FD-D5CB-21DB-995A9880B860">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>69EB6DC7-3321-AE4C-5F14-95626A3CD603</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="NAMESPACE ID" id="CD17AD5B-01F4-D247-51DE-CF10BBE40D28">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>596AC5C4-FF9A-A1BC-C483-277C43177556</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<referedAttribute>F9C80DC8-9772-7533-CC84-E5E091893399</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="EAA88CAB-43BF-548B-1EE6-20C04C30FAFF" name="RELEASE PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>EDDBBA5B-8572-C4D8-FCEF-47742BBA7C1E</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>2C45762D-1B45-2CD7-6BEE-8D163A472940</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

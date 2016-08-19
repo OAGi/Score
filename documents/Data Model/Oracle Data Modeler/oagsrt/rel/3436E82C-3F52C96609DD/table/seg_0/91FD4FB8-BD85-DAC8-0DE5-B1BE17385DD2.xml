@@ -1,0 +1,111 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="91FD4FB8-BD85-DAC8-0DE5-B1BE17385DD2" name="XBT">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:39:32 UTC</createdTime>
+<comment>This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.</comment>
+<commentInRDBMS>This table stores XML schema built-in types and OAGIS built-in types. OAGIS built-in types are those types defined in the XMLSchemaBuiltinType and the XMLSchemaBuiltinType Patterns schemas.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_13</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="XBT_ID" id="4A95D01F-E877-E0DC-220C-F82AD8677B6F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NAME" id="D86F3CB2-4054-DBE4-938E-016FEEB54457">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<commentInRDBMS>Human understandable name of the built-in type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BUILTIN_TYPE" id="71EABBE3-1AFD-2500-88D6-CF0FF743F378">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<commentInRDBMS>Built-in type as it should appear in the XML schema including the namespace prefix. Namespace prefix for the XML schema namespace is assumed to be &apos;xsd&apos; and a default prefix for the OAGIS built-int type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SUBTYPE_OF_XBT_ID" id="DF5262D9-1BBE-A3D5-2014-8D548EF9788F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<commentInRDBMS>Foreign key to the XBT table itself. It indicates a super type of this XSD built-in type.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="030A3F7D-6971-4DB1-8640-3B6AC8E1FA3D" referredColumn="4A95D01F-E877-E0DC-220C-F82AD8677B6F"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="447F2E09-415B-AC07-0117-D50390B6ABFF" name="XBT_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4A95D01F-E877-E0DC-220C-F82AD8677B6F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="81B971F8-0F77-325C-7989-CEFE533C5C88" name="XBT_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:41:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D86F3CB2-4054-DBE4-938E-016FEEB54457"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E8EAFEBA-EEC6-D735-498B-B34EA3C659A9" name="XBT_UK2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:41:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="71EABBE3-1AFD-2500-88D6-CF0FF743F378"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B16D3E01-C4B9-8AF6-05B9-6692A1E23D4D" name="XBT_SUBTYPE_OF_XBT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DF5262D9-1BBE-A3D5-2014-8D548EF9788F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

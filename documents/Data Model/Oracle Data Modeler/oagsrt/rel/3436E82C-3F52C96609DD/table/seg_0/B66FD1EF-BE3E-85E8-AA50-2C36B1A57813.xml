@@ -1,0 +1,75 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="B66FD1EF-BE3E-85E8-AA50-2C36B1A57813" name="TOP_LEVEL_ABIE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:04:23 UTC</createdTime>
+<comment>This table indexes the ABIE which is a top-level ABIE. This table and the owner_top_level_abie_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions.</comment>
+<commentInRDBMS>This table indexes the ABIE which is a top-level ABIE. This table and the owner_top_level_abie_id column in all BIE tables allow all related BIEs to be retrieved all at once speeding up the profile BOD transactions.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_39</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="TOP_LEVEL_ABIE_ID" id="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:05:09 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ABIE_ID" id="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:05:09 UTC</createdTime>
+<commentInRDBMS>Foreign key to the ABIE table pointing to a record which is a top-level ABIE.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="636F2D66-BBFA-B0D5-0282-7E474A140BED" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="0DCAF93A-849A-A2B1-C075-8AA7CDA840F7" name="TOP_LEVEL_ABIE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:05:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D9A4A078-189F-069E-0522-A6F317B3BA28" name="TOP_LEVEL_ABIE_PK_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 19:25:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D8981E67-31C8-981B-F9EF-B9F1BD814F9F" name="TOP_LEVEL_ABIE_ABIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:05:54 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

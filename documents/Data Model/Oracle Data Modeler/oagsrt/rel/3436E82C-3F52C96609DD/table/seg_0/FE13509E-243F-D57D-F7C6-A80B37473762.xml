@@ -1,0 +1,187 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="FE13509E-243F-D57D-F7C6-A80B37473762" name="NAMESPACE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:59:03 UTC</createdTime>
+<comment>This table stores information about a namespace. Namespace is the namespace as in the XML schema specification.</comment>
+<commentInRDBMS>This table stores information about a namespace. Namespace is the namespace as in the XML schema specification.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_4</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="NAMESPACE_ID" id="D15FD659-BBEC-F525-3E84-220244871286">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>Primary, internal database key.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="URI" id="2AC7D405-885B-F648-AE9D-AF782C935293">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>This is the URI of the namespace.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="PREFIX" id="F57B4B1D-993D-6608-F73E-152B1ADF8BA3">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>This is a default short name to represent the URI. It may be overridden during the expression generation. Null or empty means the same thing like the default prefix in an XML schema.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DESCRIPTION" id="A4F25B22-14BE-B0E1-A1DB-84DB994D813D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>Description or explanation about the namespace or use of the namespace.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT040</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_STD_NMSP" id="C3723D51-9208-8EFA-4083-C2510118108D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>This indicates whether the namespace is reserved for standard used (i.e., whether it is an OAGIS namespace). If it is true, then end users cannot user the namespace for the end user CCs.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OWNER_USER_ID" id="CFBD13BD-8C26-53CA-D383-D0190F27B6E2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>Foreign key to the APP_USER table identifying the user who can update or delete the record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9A2A16EF-652B-1A36-6F9D-1ECC19962ED3" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATED_BY" id="F959D911-EEDE-DECF-5CFC-322E1DF4D132">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>Foreign key to the APP_USER table identifying user who created the namespace.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="7B91CDCD-59A1-B09F-1D11-02618F629D2C" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="0662EFE2-6A0A-19F8-3B20-870FD0416917">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>Foreign key to the APP_USER table identifying the user who last updated the record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="07ECC5B2-531D-CFFA-F5D2-0B46695CEE05" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="11706480-9EFC-9726-6D3D-BB44C521706D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>The timestamp when the record was first created.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="4678750B-A43E-060B-E040-09B33C0FCA66">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:03:05 UTC</createdTime>
+<commentInRDBMS>The timestamp when the record was last updated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F7349D8B-48F4-2E4E-1731-D676A0D94BF0" name="NAMESPACE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:06:11 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D15FD659-BBEC-F525-3E84-220244871286"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C7CA4812-07E8-08E4-12AB-7BE348923EAE" name="NAMESPACE_OWNER_USER_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:08:07 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CFBD13BD-8C26-53CA-D383-D0190F27B6E2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6A3004EA-ABC7-FBAA-8DE1-9FA9AF3324A4" name="NAMESPACE_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:09:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F959D911-EEDE-DECF-5CFC-322E1DF4D132"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F11322BB-419F-8DE7-6DA3-7FFD9160342C" name="NAMESPACE_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:09:08 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0662EFE2-6A0A-19F8-3B20-870FD0416917"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
