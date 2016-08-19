@@ -49,7 +49,7 @@
 				</h:panelGrid>
 	            <p:dataTable id="tbl1" var="contextScheme" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
 					paginator="true" rows="5" style="width:550px; margin-bottom:20px"
-	            	value="#{businessContextHandler.contextSchemes}" selection="#{businessContextHandler.selected1}" rowKey="#{contextScheme.classificationCtxSchemeId}" selectionMode="single">
+	            	value="#{businessContextHandler.contextSchemes}" selection="#{businessContextHandler.selected1}" rowKey="#{contextScheme.ctxSchemeId}" selectionMode="single">
 					<p:ajax event="rowSelect" listener="#{businessContextHandler.onRowSelect1}" update=":form:tbl2" />
         			<p:ajax event="rowUnselect" listener="#{businessContextHandler.onRowUnselect1}" />
 	                <p:column style="width:100px">

@@ -129,7 +129,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 
 	public void onCSChosen(SelectEvent event) {
         ContextScheme aContextScheme = (ContextScheme) event.getObject();
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "ContextScheme Selected", "Id:" + aContextScheme.getClassificationCtxSchemeId());
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "ContextScheme Selected", "Id:" + aContextScheme.getCtxSchemeId());
          
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
@@ -232,11 +232,11 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
     
     public void onRowSelect1(SelectEvent event) {
 		ContextScheme contextScheme = (ContextScheme) event.getObject();
-        FacesMessage msg = new FacesMessage(contextScheme.getSchemeName(), String.valueOf(contextScheme.getClassificationCtxSchemeId()));
+        FacesMessage msg = new FacesMessage(contextScheme.getSchemeName(), String.valueOf(contextScheme.getCtxSchemeId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
 
 		selected1 = contextScheme;
-		contextValues = contextCategoryService.findByOwnerCtxSchemeId(contextScheme.getClassificationCtxSchemeId());
+		contextValues = contextCategoryService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId());
     }
     
     public void onRowUnselect1(UnselectEvent event) {

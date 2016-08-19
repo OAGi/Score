@@ -38,7 +38,7 @@ public class P_1_3_PopulateAgencyIDListTestCase extends AbstractTransactionalJUn
 
         assertNotNull(agencyIdList);
         assertEquals("oagis-id-68a3c03a4ea84562bd783fe2dc8f5487", agencyIdList.getEnumTypeGuid());
-        assertEquals(agencyIdListValueRepository.findOneByValue("6").getAgencyIdListValueId(), agencyIdList.getAgencyId());
+        assertEquals(agencyIdListValueRepository.findOneByValue("6").getAgencyIdListValueId(), agencyIdList.getAgencyIdListValueId());
         assertEquals("clm63055D08B_AgencyIdentification", agencyIdList.getName());
         Module module = agencyIdList.getModule();
         assertNotNull(module);

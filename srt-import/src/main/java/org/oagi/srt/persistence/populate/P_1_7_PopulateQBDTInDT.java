@@ -35,7 +35,6 @@ import java.io.File;
 import java.util.*;
 
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
-import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 
 /**
@@ -250,7 +249,7 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> getCdtSCAPMap(int cdtSCAllowedPrimitiveId) throws Exception {
-        return cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(cdtSCAllowedPrimitiveId);
+        return cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(cdtSCAllowedPrimitiveId);
     }
 
     private void insertDTwithoutElement() throws Exception {
@@ -626,8 +625,8 @@ public class P_1_7_PopulateQBDTInDT {
                 dtSc.setDefinition(definition);
                 dtSc.setOwnerDtId(ownerDtId);
 
-                dtSc.setMinCardinality(min_cardinality);
-                dtSc.setMaxCardinality(max_cardinality);
+                dtSc.setCardinalityMin(min_cardinality);
+                dtSc.setCardinalityMax(max_cardinality);
 
 //				Both based dtsc and target dtsc have listAgencyID
 //				target dtsc inherits all attrs from the base
@@ -674,7 +673,7 @@ public class P_1_7_PopulateQBDTInDT {
                         for (String xbt : xbtList) {
                             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
                                     new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
-                            cdtScAwdPriXpsTypeMap.setCdtScAwdPri(cdtScAwdPriId);
+                            cdtScAwdPriXpsTypeMap.setCdtScAwdPriId(cdtScAwdPriId);
                             int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
                             cdtScAwdPriXpsTypeMap.setXbtId(xdtBuiltTypeId);
                             cdtScAwdPriXpsTypeMapRepository.save(cdtScAwdPriXpsTypeMap);
@@ -700,8 +699,8 @@ public class P_1_7_PopulateQBDTInDT {
 
             if(duplicate==null) {
 
-                inheritedDtSc.setMinCardinality(baseDtsc.getMinCardinality());
-                inheritedDtSc.setMaxCardinality(baseDtsc.getMaxCardinality());
+                inheritedDtSc.setCardinalityMin(baseDtsc.getCardinalityMin());
+                inheritedDtSc.setCardinalityMax(baseDtsc.getCardinalityMax());
                 inheritedDtSc.setBasedDtScId(baseDtsc.getDtScId());
 
                 dtScRepository.saveAndFlush(inheritedDtSc);
@@ -901,8 +900,8 @@ public class P_1_7_PopulateQBDTInDT {
             vo.setRepresentationTerm(dtsc_vo.getRepresentationTerm());
             vo.setOwnerDtId(owner_dT_iD);
             vo.setDefinition(dtsc_vo.getDefinition());
-            vo.setMinCardinality(dtsc_vo.getMinCardinality());
-            vo.setMaxCardinality(0);
+            vo.setCardinalityMin(dtsc_vo.getCardinalityMin());
+            vo.setCardinalityMax(0);
             vo.setBasedDtScId(dtsc_vo.getDtScId());
 
             dtScRepository.saveAndFlush(vo);

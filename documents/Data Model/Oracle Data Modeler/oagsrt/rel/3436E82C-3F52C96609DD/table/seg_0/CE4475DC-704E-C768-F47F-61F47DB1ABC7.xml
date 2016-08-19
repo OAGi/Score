@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="CE4475DC-704E-C768-F47F-61F47DB1ABC7" name="CLASSIFICATION_CTX_SCHEME">
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="CE4475DC-704E-C768-F47F-61F47DB1ABC7" name="CTX_SCHEME">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:03:24 UTC</createdTime>
 <comment>This table represents a classification scheme for a context category.</comment>
@@ -10,7 +10,7 @@
 <existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
-<Column name="CLASSIFICATION_CTX_SCHEME_ID" id="56F2441F-0547-29EE-4E9E-29D73C6AB59B">
+<Column name="CTX_SCHEME_ID" id="56F2441F-0547-29EE-4E9E-29D73C6AB59B">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:04:00 UTC</createdTime>
 <commentInRDBMS>Internal, primary, database key.</commentInRDBMS>

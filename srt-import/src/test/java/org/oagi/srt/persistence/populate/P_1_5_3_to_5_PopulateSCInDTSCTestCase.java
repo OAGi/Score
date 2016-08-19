@@ -157,20 +157,20 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
 
                                 switch (predefinedDtSc.getUse()) {
                                     case "optional":
-                                        expectedDtSc.setMinCardinality(0);
-                                        expectedDtSc.setMaxCardinality(1);
+                                        expectedDtSc.setCardinalityMin(0);
+                                        expectedDtSc.setCardinalityMax(1);
                                         break;
                                     case "required":
-                                        expectedDtSc.setMinCardinality(1);
-                                        expectedDtSc.setMaxCardinality(1);
+                                        expectedDtSc.setCardinalityMin(1);
+                                        expectedDtSc.setCardinalityMax(1);
                                         break;
                                     case "prohibited":
-                                        expectedDtSc.setMinCardinality(0);
-                                        expectedDtSc.setMaxCardinality(0);
+                                        expectedDtSc.setCardinalityMin(0);
+                                        expectedDtSc.setCardinalityMax(0);
                                         break;
                                     default:
-                                        expectedDtSc.setMinCardinality(0);
-                                        expectedDtSc.setMaxCardinality(1);
+                                        expectedDtSc.setCardinalityMin(0);
+                                        expectedDtSc.setCardinalityMax(1);
                                         break;
                                 }
                             }
@@ -184,8 +184,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
                  */
                 else {
                     expectedDtScList.forEach(expectedDtSc -> {
-                        expectedDtSc.setMinCardinality(0);
-                        expectedDtSc.setMaxCardinality(0);
+                        expectedDtSc.setCardinalityMin(0);
+                        expectedDtSc.setCardinalityMax(0);
                     });
                 }
             } else {
@@ -233,9 +233,9 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
                 DataTypeSupplementaryComponent actualDtSc = actualDtScMap.get(expectedDtSc.getPropertyTerm());
 
                 assertEquals("Data Type[id: " + dt.getDtId() + "]'s min cardinality is different.",
-                        expectedDtSc.getMinCardinality(), actualDtSc.getMinCardinality());
+                        expectedDtSc.getCardinalityMin(), actualDtSc.getCardinalityMin());
                 assertEquals("Data Type[id: " + dt.getDtId() + "]'s max cardinality is different.",
-                        expectedDtSc.getMaxCardinality(), actualDtSc.getMaxCardinality());
+                        expectedDtSc.getCardinalityMax(), actualDtSc.getCardinalityMax());
 
                 if (isDefaultBDT) {
                     if (predefinedDtScListForDefaultBDT.containsKey(dt.getDen())) {
@@ -287,7 +287,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
                         );
 
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> actualCdtScAwdPriXpsTypeMapList =
-                        cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                        cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                                 actualCdtScAwdPriList.stream()
                                         .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                                         .boxed()

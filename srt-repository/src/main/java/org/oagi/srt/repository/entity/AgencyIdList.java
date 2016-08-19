@@ -38,7 +38,7 @@ public class AgencyIdList implements Serializable {
     private String listId;
 
     @Column
-    private Integer agencyId = null;
+    private Integer agencyIdListValueId = null;
 
     @Column(length = 10)
     private String versionId;
@@ -91,12 +91,12 @@ public class AgencyIdList implements Serializable {
         this.listId = listId;
     }
 
-    public int getAgencyId() {
-        return (agencyId == null) ? 0 : agencyId;
+    public int getAgencyIdListValueId() {
+        return (agencyIdListValueId == null) ? 0 : agencyIdListValueId;
     }
 
-    public void setAgencyId(int agencyId) {
-        this.agencyId = agencyId;
+    public void setAgencyIdListValueId(int agencyIdListValueId) {
+        this.agencyIdListValueId = agencyIdListValueId;
     }
 
     public String getVersionId() {
@@ -135,7 +135,7 @@ public class AgencyIdList implements Serializable {
         if (enumTypeGuid != null ? !enumTypeGuid.equals(that.enumTypeGuid) : that.enumTypeGuid != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (listId != null ? !listId.equals(that.listId) : that.listId != null) return false;
-        if (agencyId != null ? !agencyId.equals(that.agencyId) : that.agencyId != null) return false;
+        if (agencyIdListValueId != null ? !agencyIdListValueId.equals(that.agencyIdListValueId) : that.agencyIdListValueId != null) return false;
         if (versionId != null ? !versionId.equals(that.versionId) : that.versionId != null) return false;
         if (module != null ? !module.equals(that.module) : that.module != null) return false;
         return definition != null ? definition.equals(that.definition) : that.definition == null;
@@ -149,7 +149,7 @@ public class AgencyIdList implements Serializable {
         result = 31 * result + (enumTypeGuid != null ? enumTypeGuid.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (listId != null ? listId.hashCode() : 0);
-        result = 31 * result + (agencyId != null ? agencyId.hashCode() : 0);
+        result = 31 * result + (agencyIdListValueId != null ? agencyIdListValueId.hashCode() : 0);
         result = 31 * result + (versionId != null ? versionId.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
@@ -164,7 +164,7 @@ public class AgencyIdList implements Serializable {
                 ", enumTypeGuid='" + enumTypeGuid + '\'' +
                 ", name='" + name + '\'' +
                 ", listId='" + listId + '\'' +
-                ", agencyId=" + agencyId +
+                ", agencyIdListValueId=" + agencyIdListValueId +
                 ", versionId='" + versionId + '\'' +
                 ", module=" + module +
                 ", definition='" + definition + '\'' +

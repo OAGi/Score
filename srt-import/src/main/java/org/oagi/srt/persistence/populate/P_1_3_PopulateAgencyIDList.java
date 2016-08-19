@@ -128,7 +128,7 @@ public class P_1_3_PopulateAgencyIDList {
     private void updateAgencyIDList() throws Exception {
         AgencyIdListValue agencyIdListValue = agencyIdListValueRepository.findOneByValue("6");
         agencyIdListRepository.findAll().forEach(e -> {
-            e.setAgencyId(agencyIdListValue.getAgencyIdListValueId());
+            e.setAgencyIdListValueId(agencyIdListValue.getAgencyIdListValueId());
             agencyIdListRepository.save(e);
         });
     }

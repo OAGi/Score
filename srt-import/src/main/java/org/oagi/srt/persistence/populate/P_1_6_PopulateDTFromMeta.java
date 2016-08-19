@@ -17,11 +17,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 
 /**
  * Created by tnk11 on 6/27/2016.
@@ -207,8 +204,8 @@ public class P_1_6_PopulateDTFromMeta {
                 max_cardinality = 0;
             }
 
-            vo.setMinCardinality(min_cardinality);
-            vo.setMaxCardinality(max_cardinality);
+            vo.setCardinalityMin(min_cardinality);
+            vo.setCardinalityMax(max_cardinality);
 
             String propertyTerm = "";
             String representationTerm = "";
@@ -246,8 +243,8 @@ public class P_1_6_PopulateDTFromMeta {
         vo.setBasedDtScId(languageCodeSC.getDtScId());
         vo.setDefinition(languageCodeSC.getDefinition());
         vo.setGuid(Utility.generateGUID());
-        vo.setMaxCardinality(0);
-        vo.setMinCardinality(0);
+        vo.setCardinalityMax(0);
+        vo.setCardinalityMin(0);
         vo.setOwnerDtId(dt.getDtId());
         vo.setPropertyTerm(languageCodeSC.getPropertyTerm());
         vo.setRepresentationTerm(languageCodeSC.getRepresentationTerm());
@@ -277,7 +274,7 @@ public class P_1_6_PopulateDTFromMeta {
         cdtScAwdPriRepository.save(cdtSCAP);
         cdtSCAPId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtsc.getDtScId(), NormalizedStringCDTPrimitiveId).getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
-        cdtSCAPXTypeMap.setCdtScAwdPri(cdtSCAPId);
+        cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(NormalizedStringXBTId);
         cdtScAwdPriXpsTypeMapRepository.save(cdtSCAPXTypeMap);
 
@@ -289,7 +286,7 @@ public class P_1_6_PopulateDTFromMeta {
         cdtScAwdPriRepository.save(cdtSCAP);
         cdtSCAPId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtsc.getDtScId(), StringCDTPrimitiveId).getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
-        cdtSCAPXTypeMap.setCdtScAwdPri(cdtSCAPId);
+        cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(StringXBTId);
         cdtScAwdPriXpsTypeMapRepository.save(cdtSCAPXTypeMap);
 
@@ -306,7 +303,7 @@ public class P_1_6_PopulateDTFromMeta {
         cdtScAwdPriRepository.save(cdtSCAP);
         cdtSCAPId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtsc.getDtScId(), TokenCDTPrimitiveId).getCdtScAwdPriId();
         cdtSCAPXTypeMap = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
-        cdtSCAPXTypeMap.setCdtScAwdPri(cdtSCAPId);
+        cdtSCAPXTypeMap.setCdtScAwdPriId(cdtSCAPId);
         cdtSCAPXTypeMap.setXbtId(TokenXBTId);
         cdtScAwdPriXpsTypeMapRepository.save(cdtSCAPXTypeMap);
     }
@@ -393,7 +390,7 @@ public class P_1_6_PopulateDTFromMeta {
                 xbtId = TokenXBTId;
             }
 
-            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAwdPriXpsTypeMap = cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(cdtSCAwdPriList.get(i).getCdtScAwdPriId(), xbtId);
+            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtSCAwdPriXpsTypeMap = cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAwdPriList.get(i).getCdtScAwdPriId(), xbtId);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(cdtSCAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId());
             bdtScPriRestriRepository.save(bdtSCPri);
         }

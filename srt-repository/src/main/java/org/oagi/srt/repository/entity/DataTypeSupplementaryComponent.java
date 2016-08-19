@@ -42,10 +42,10 @@ public class DataTypeSupplementaryComponent implements Serializable {
     private int ownerDtId;
 
     @Column(nullable = false)
-    private int minCardinality;
+    private int cardinalityMin;
 
     @Column
-    private int maxCardinality;
+    private int cardinalityMax;
 
     @Column
     private Integer basedDtScId;
@@ -98,20 +98,20 @@ public class DataTypeSupplementaryComponent implements Serializable {
         this.ownerDtId = ownerDtId;
     }
 
-    public int getMinCardinality() {
-        return minCardinality;
+    public int getCardinalityMin() {
+        return cardinalityMin;
     }
 
-    public void setMinCardinality(int minCardinality) {
-        this.minCardinality = minCardinality;
+    public void setCardinalityMin(int cardinalityMin) {
+        this.cardinalityMin = cardinalityMin;
     }
 
-    public int getMaxCardinality() {
-        return maxCardinality;
+    public int getCardinalityMax() {
+        return cardinalityMax;
     }
 
-    public void setMaxCardinality(int maxCardinality) {
-        this.maxCardinality = maxCardinality;
+    public void setCardinalityMax(int cardinalityMax) {
+        this.cardinalityMax = cardinalityMax;
     }
 
     public int getBasedDtScId() {
@@ -131,8 +131,8 @@ public class DataTypeSupplementaryComponent implements Serializable {
 
         if (dtScId != that.dtScId) return false;
         if (ownerDtId != that.ownerDtId) return false;
-        if (minCardinality != that.minCardinality) return false;
-        if (maxCardinality != that.maxCardinality) return false;
+        if (cardinalityMin != that.cardinalityMin) return false;
+        if (cardinalityMax != that.cardinalityMax) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
         if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
@@ -150,8 +150,8 @@ public class DataTypeSupplementaryComponent implements Serializable {
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + ownerDtId;
-        result = 31 * result + minCardinality;
-        result = 31 * result + maxCardinality;
+        result = 31 * result + cardinalityMin;
+        result = 31 * result + cardinalityMax;
         result = 31 * result + (basedDtScId != null ? basedDtScId.hashCode() : 0);
         return result;
     }
@@ -165,8 +165,8 @@ public class DataTypeSupplementaryComponent implements Serializable {
                 ", representationTerm='" + representationTerm + '\'' +
                 ", definition='" + definition + '\'' +
                 ", ownerDtId=" + ownerDtId +
-                ", minCardinality=" + minCardinality +
-                ", maxCardinality=" + maxCardinality +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
                 ", basedDtScId=" + basedDtScId +
                 '}';
     }

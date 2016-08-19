@@ -588,7 +588,7 @@ public class BusinessInformationEntityService {
         private void createBBIESC(CreateBIEContext createBIEContext, int bdtId) {
             bbieScList = createBIEContext.findByOwnerDtId(bdtId)
                     .stream()
-                    .filter(dtSc -> dtSc.getMaxCardinality() != 0)
+                    .filter(dtSc -> dtSc.getCardinalityMax() != 0)
                     .map(dtSc -> {
                         BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                                 new BasicBusinessInformationEntitySupplementaryComponent();
@@ -604,8 +604,8 @@ public class BusinessInformationEntityService {
 //                        if (codeListId > 0) {
 //                            bbieSc.setCodeListId(codeListId);
 //                        }
-                        bbieSc.setMaxCardinality(dtSc.getMaxCardinality());
-                        bbieSc.setMinCardinality(dtSc.getMinCardinality());
+                        bbieSc.setCardinalityMax(dtSc.getCardinalityMax());
+                        bbieSc.setCardinalityMin(dtSc.getCardinalityMin());
                         bbieSc.setDefinition(dtSc.getDefinition());
                         return bbieSc;
                     })
@@ -667,7 +667,7 @@ public class BusinessInformationEntityService {
             asbie.setGuid(Utility.generateGUID());
             // asbie.setFromAbieId(fromAbieId);
             // asbie.setToAsbiepId(asbiep);
-            asbie.setBasedAscc(ascc.getAsccId());
+            asbie.setBasedAsccId(ascc.getAsccId());
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
             asbie.setDefinition(ascc.getDefinition());

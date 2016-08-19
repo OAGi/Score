@@ -727,7 +727,7 @@ public class StandaloneXMLSchema {
         }
 
 
-        if (aBBIESC.getMinCardinality() >= 1) {
+        if (aBBIESC.getCardinalityMin() >= 1) {
             aNode.setAttribute("use", "required");
         } else {
             aNode.setAttribute("use", "optional");
@@ -801,7 +801,7 @@ public class StandaloneXMLSchema {
         //here
         for (int i = 0; i < gSCs.size(); i++) {
             BasicBusinessInformationEntitySupplementaryComponent aBBIESC = gSCs.get(i);
-            if (aBBIESC.getMaxCardinality() == 0)
+            if (aBBIESC.getCardinalityMax() == 0)
                 continue;
             Element aNode = newElement("attribute");
             aNode = handleBBIESCvalue(generationContext, aBBIESC, aNode); //Generate a DOM Element Node, handle values
@@ -852,7 +852,7 @@ public class StandaloneXMLSchema {
     }
 
     public String getAgencyListTypeName(AgencyIdList gAL) {
-        String AgencyListTypeName = "clm" + gAL.getAgencyId() + gAL.getListId() + gAL.getVersionId() + "_" + Utility.toCamelCase(gAL.getName()) + "ContentType";
+        String AgencyListTypeName = "clm" + gAL.getAgencyIdListValueId() + gAL.getListId() + gAL.getVersionId() + "_" + Utility.toCamelCase(gAL.getName()) + "ContentType";
         AgencyListTypeName = AgencyListTypeName.replaceAll(" ", "");
         return AgencyListTypeName;
     }
@@ -1269,7 +1269,7 @@ public class StandaloneXMLSchema {
         }
 
         public AssociationCoreComponent queryBasedASCC(AssociationBusinessInformationEntity gASBIE) {
-            AssociationCoreComponent gASCC = findASCC(gASBIE.getBasedAscc());
+            AssociationCoreComponent gASCC = findASCC(gASBIE.getBasedAsccId());
             return gASCC;
         }
 

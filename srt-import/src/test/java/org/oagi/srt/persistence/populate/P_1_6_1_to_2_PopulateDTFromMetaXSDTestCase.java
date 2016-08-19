@@ -292,8 +292,8 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
             assertEquals(dtScOfTextDefaultBDT.getPropertyTerm(), actualLanguageCodeDtSc.getPropertyTerm());
             assertEquals(dtScOfTextDefaultBDT.getRepresentationTerm(), actualLanguageCodeDtSc.getRepresentationTerm());
             assertEquals(dtScOfTextDefaultBDT.getDefinition(), actualLanguageCodeDtSc.getDefinition());
-            assertEquals(dtScOfTextDefaultBDT.getMinCardinality(), actualLanguageCodeDtSc.getMinCardinality());
-            assertEquals(0, actualLanguageCodeDtSc.getMaxCardinality());
+            assertEquals(dtScOfTextDefaultBDT.getCardinalityMin(), actualLanguageCodeDtSc.getCardinalityMin());
+            assertEquals(0, actualLanguageCodeDtSc.getCardinalityMax());
 
             List<DataTypeSupplementaryComponent> actualDtScList = dtScRepository.findByOwnerDtId(dataType.getDtId());
             switch (dataType.getDen()) {
@@ -367,16 +367,16 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
 
         switch (expectedUse) {
             case "optional":
-                assertEquals(0, actualDtSc.getMinCardinality());
-                assertEquals(1, actualDtSc.getMaxCardinality());
+                assertEquals(0, actualDtSc.getCardinalityMin());
+                assertEquals(1, actualDtSc.getCardinalityMax());
                 break;
             case "required":
-                assertEquals(1, actualDtSc.getMinCardinality());
-                assertEquals(1, actualDtSc.getMaxCardinality());
+                assertEquals(1, actualDtSc.getCardinalityMin());
+                assertEquals(1, actualDtSc.getCardinalityMax());
                 break;
             case "prohibited":
-                assertEquals(0, actualDtSc.getMinCardinality());
-                assertEquals(0, actualDtSc.getMaxCardinality());
+                assertEquals(0, actualDtSc.getCardinalityMin());
+                assertEquals(0, actualDtSc.getCardinalityMax());
                 break;
         }
 
@@ -444,7 +444,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     public void test_Populate_cdt_sc_awd_pri_xps_type_map_Table() {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList = retrieveActualCdtScAwdPriList();
         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> actualCdtScAwdPriXpsTypeMapList =
-                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                         actualCdtScAwdPriList.stream()
                                 .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                                 .boxed()
@@ -554,7 +554,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                                 .collect(Collectors.toList())
                 );
         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> targetCdtScAwdPriXpsTypeMapListForExpressionLanguage =
-                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                 targetCdtScAwdPriListForExpressionLanguage.stream()
                         .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                         .boxed()
@@ -611,7 +611,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                                 .collect(Collectors.toList())
                 );
         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> targetCdtScAwdPriXpsTypeMapListForActionCode =
-                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIn(
+                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                 targetCdtScAwdPriListForActionCode.stream()
                         .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                         .boxed()

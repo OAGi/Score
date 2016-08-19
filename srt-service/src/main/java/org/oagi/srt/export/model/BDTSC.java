@@ -93,11 +93,11 @@ public class BDTSC implements Component {
     }
 
     public int getMinCardinality() {
-        return dtSc.getMinCardinality();
+        return dtSc.getCardinalityMin();
     }
 
     public int getMaxCardinality() {
-        return dtSc.getMaxCardinality();
+        return dtSc.getCardinalityMax();
     }
 
     public boolean hasBasedBDTSC() {

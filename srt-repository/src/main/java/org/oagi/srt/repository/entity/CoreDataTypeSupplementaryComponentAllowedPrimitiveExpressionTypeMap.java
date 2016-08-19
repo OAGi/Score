@@ -26,7 +26,7 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
     private int cdtScAwdPriXpsTypeMapId;
 
     @Column(nullable = false)
-    private int cdtScAwdPri;
+    private int cdtScAwdPriId;
 
     @Column(nullable = false)
     private int xbtId;
@@ -39,12 +39,12 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
         this.cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMapId;
     }
 
-    public int getCdtScAwdPri() {
-        return cdtScAwdPri;
+    public int getCdtScAwdPriId() {
+        return cdtScAwdPriId;
     }
 
-    public void setCdtScAwdPri(int cdtScAwdPri) {
-        this.cdtScAwdPri = cdtScAwdPri;
+    public void setCdtScAwdPriId(int cdtScAwdPriId) {
+        this.cdtScAwdPriId = cdtScAwdPriId;
     }
 
     public int getXbtId() {
@@ -63,7 +63,7 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap that = (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap) o;
 
         if (cdtScAwdPriXpsTypeMapId != that.cdtScAwdPriXpsTypeMapId) return false;
-        if (cdtScAwdPri != that.cdtScAwdPri) return false;
+        if (cdtScAwdPriId != that.cdtScAwdPriId) return false;
         return xbtId == that.xbtId;
 
     }
@@ -71,7 +71,7 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
     @Override
     public int hashCode() {
         int result = cdtScAwdPriXpsTypeMapId;
-        result = 31 * result + cdtScAwdPri;
+        result = 31 * result + cdtScAwdPriId;
         result = 31 * result + xbtId;
         return result;
     }
@@ -80,7 +80,7 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
     public String toString() {
         return "CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap{" +
                 "cdtScAwdPriXpsTypeMapId=" + cdtScAwdPriXpsTypeMapId +
-                ", cdtScAwdPri=" + cdtScAwdPri +
+                ", cdtScAwdPriId=" + cdtScAwdPriId +
                 ", xbtId=" + xbtId +
                 '}';
     }

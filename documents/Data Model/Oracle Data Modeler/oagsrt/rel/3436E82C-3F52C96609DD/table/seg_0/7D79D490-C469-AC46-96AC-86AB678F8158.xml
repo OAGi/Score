@@ -2,8 +2,8 @@
 <Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="7D79D490-C469-AC46-96AC-86AB678F8158" name="CTX_SCHEME_VALUE">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:15:54 UTC</createdTime>
-<comment>This table stores the context scheme values for a particular context classification scheme in the CLASSIFICATION_CTX_SCHEME table.</comment>
-<commentInRDBMS>This table stores the context scheme values for a particular context classification scheme in the CLASSIFICATION_CTX_SCHEME table.</commentInRDBMS>
+<comment>This table stores the context scheme values for a particular context classification scheme in the CTX_SCHEME table.</comment>
+<commentInRDBMS>This table stores the context scheme values for a particular context classification scheme in the CTX_SCHEME table.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <ordsAlias>table_43</ordsAlias>
 <allowColumnReorder>false</allowColumnReorder>
@@ -61,7 +61,7 @@
 <Column name="OWNER_CTX_SCHEME_ID" id="188A6F27-39AB-2E48-1811-D23F4E6D0B54">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:16:16 UTC</createdTime>
-<commentInRDBMS>Foreign key to the CLASSIFICATION_CTX_SCHEME table. It identifies the classification scheme, to which this scheme value belongs.</commentInRDBMS>
+<commentInRDBMS>Foreign key to the CTX_SCHEME table. It identifies the classification scheme, to which this scheme value belongs.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>

@@ -309,8 +309,8 @@ public class P_1_2_PopulateCDTandCDTSC {
         dtSc.setPropertyTerm(propertyTerm);
         dtSc.setRepresentationTerm(representationTerm);
         dtSc.setDefinition(definition);
-        dtSc.setMinCardinality(0);
-        dtSc.setMaxCardinality(1);
+        dtSc.setCardinalityMin(0);
+        dtSc.setCardinalityMax(1);
         dtSc.setOwnerDtId(
                 dataTypeRepository.findOneByDataTypeTermAndType(cdtTerm, 0).getDtId()
         );
@@ -556,7 +556,7 @@ public class P_1_2_PopulateCDTandCDTSC {
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
                 new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
 
-        cdtScAwdPriXpsTypeMap.setCdtScAwdPri(
+        cdtScAwdPriXpsTypeMap.setCdtScAwdPriId(
                 cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(
                         dtScRepository.findOneByOwnerDataTypeTermAndPropertyTerm(cdtTerm, dtScPropertyTerm).getDtScId(),
                         cdtPriRepository.findOneByName(cdtPriName).getCdtPriId()

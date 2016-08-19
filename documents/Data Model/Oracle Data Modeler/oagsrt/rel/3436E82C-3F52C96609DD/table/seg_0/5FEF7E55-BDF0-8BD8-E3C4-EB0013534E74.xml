@@ -73,7 +73,7 @@
 <ownDataTypeParameters>10 CHAR,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="AGENCY_ID" id="58AD5285-C7CE-3CC1-C4D6-6C8295BEC943">
+<Column name="AGENCY_ID_LIST_VALUE_ID" id="58AD5285-C7CE-3CC1-C4D6-6C8295BEC943">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:21:16 UTC</createdTime>
 <commentInRDBMS>This is the identification of the agency or organization which developed and/or maintains the list. Theoretically, this can be modeled as a self-reference foreign key, but it is not implemented at this point.</commentInRDBMS>
@@ -170,6 +170,15 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E111EE96-A50A-F111-EDC4-5D625C880886" name="AGENCY_ID_LIST_AILV_ID_IDX">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-19 20:13:58 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="58AD5285-C7CE-3CC1-C4D6-6C8295BEC943"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="892CE31A-23BC-EDF5-4646-59D83806ADF4" name="AGENCY_ID_LIST_MODULE_ID_FK">

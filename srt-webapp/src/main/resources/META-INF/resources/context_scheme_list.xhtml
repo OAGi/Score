@@ -36,7 +36,7 @@
 
 				<p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeHandler.contextSchemes}"
 							 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-							 paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.classificationCtxSchemeId}">
+							 paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.ctxSchemeId}">
 					<p:column selectionMode="single" style="width:16px;text-align:center"/>
 
 					<p:column style="width:200px">
@@ -127,7 +127,7 @@
 					</h:panelGrid>
 					<h:panelGrid columns="2" cellpadding="5">
 						<p:commandButton value="Cancel" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
-						<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.delete(contextSchemeHandler.selectedScheme.classificationCtxSchemeId)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
+						<p:commandButton value="Confirm" update=":listForm:tbl1" actionListener="#{contextSchemeHandler.delete(contextSchemeHandler.selectedScheme.ctxSchemeId)}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('ccDelete').hide()"/>
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>

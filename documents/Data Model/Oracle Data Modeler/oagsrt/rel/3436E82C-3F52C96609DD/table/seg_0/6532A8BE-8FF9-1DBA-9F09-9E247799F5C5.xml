@@ -88,7 +88,7 @@
 <colAssociation fkAssociation="A7FB6309-0AD1-F1E5-9BD3-306857E46B92" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
 </associations>
 </Column>
-<Column name="MIN_CARDINALITY" id="8B274F9E-34AB-06A1-92D4-5004A291F6D1">
+<Column name="CARDINALITY_MIN" id="8B274F9E-34AB-06A1-92D4-5004A291F6D1">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
 <commentInRDBMS>The minimum occurrence constraint associated with the supplementary component. The valid values zero or one.</commentInRDBMS>
@@ -100,7 +100,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="MAX_CARDINALITY" id="A005CDE8-ED14-DD08-B6D5-6BC2F42E1CDC">
+<Column name="CARDINALITY_MAX" id="A005CDE8-ED14-DD08-B6D5-6BC2F42E1CDC">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
 <commentInRDBMS>The maximum occurrence constraint associated with the supplementary component. The valid values are zero or one. Zero is used when the SC is restricted from an instantiation in the data type.</commentInRDBMS>

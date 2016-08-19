@@ -34,12 +34,12 @@
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="MIN_CARDINALITY" id="8B274F9E-34AB-06A1-92D4-5004A291F6D1">
+<ColumnProxy name="CARDINALITY_MIN" id="8B274F9E-34AB-06A1-92D4-5004A291F6D1">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="MAX_CARDINALITY" id="A005CDE8-ED14-DD08-B6D5-6BC2F42E1CDC">
+<ColumnProxy name="CARDINALITY_MAX" id="A005CDE8-ED14-DD08-B6D5-6BC2F42E1CDC">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 18:50:02 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>

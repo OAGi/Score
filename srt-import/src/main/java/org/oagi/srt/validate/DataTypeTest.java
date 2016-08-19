@@ -1182,11 +1182,11 @@ public class DataTypeTest {
             String thisDTSCStr = "";
 
             fromBaseDTSCStr = fromBaseDTSCStr + basedtsc_vo.getGuid() + basedtsc_vo.getPropertyTerm()
-                    + basedtsc_vo.getRepresentationTerm() + basedtsc_vo.getDefinition() + basedtsc_vo.getMinCardinality() + "0"//max card = 0 for contentType
+                    + basedtsc_vo.getRepresentationTerm() + basedtsc_vo.getDefinition() + basedtsc_vo.getCardinalityMin() + "0"//max card = 0 for contentType
                     + basedtsc_vo.getDtScId();//Based_dt_sc_id is dt_sc_id of base 
 
             thisDTSCStr = thisDTSCStr + thisdtsc_vo.getGuid() + thisdtsc_vo.getPropertyTerm()
-                    + thisdtsc_vo.getRepresentationTerm() + thisdtsc_vo.getDefinition() + thisdtsc_vo.getMinCardinality() + thisdtsc_vo.getMaxCardinality()
+                    + thisdtsc_vo.getRepresentationTerm() + thisdtsc_vo.getDefinition() + thisdtsc_vo.getCardinalityMin() + thisdtsc_vo.getCardinalityMax()
                     + thisdtsc_vo.getBasedDtScId();
 
             if (!fromBaseDTSCStr.equals(thisDTSCStr)) {
@@ -1293,8 +1293,8 @@ public class DataTypeTest {
                 vo.setDefinition(definition);
                 vo.setOwnerDtId(owner_dT_iD);
 
-                vo.setMinCardinality(min_cardinality);
-                vo.setMaxCardinality(max_cardinality);
+                vo.setCardinalityMin(min_cardinality);
+                vo.setCardinalityMax(max_cardinality);
 
                 DataTypeSupplementaryComponent duplicate = checkDuplicate(vo);
                 if (duplicate != null) {
@@ -1320,7 +1320,7 @@ public class DataTypeTest {
                             int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
 
                             try {
-                                cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(cdtSCAllowedPrimitiveId, xdtBuiltTypeId);
+                                cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAllowedPrimitiveId, xdtBuiltTypeId);
                             } catch (EmptyResultDataAccessException e) {
                                 System.err.println("Error!" + new Exception().getStackTrace()[0].getLineNumber());
                             }
@@ -1336,7 +1336,7 @@ public class DataTypeTest {
     }
 
     private List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> getCdtSCAPMap(int cdtSCAllowedPrimitiveId) {
-        return cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(cdtSCAllowedPrimitiveId);
+        return cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(cdtSCAllowedPrimitiveId);
     }
 
     private DataTypeSupplementaryComponent checkDuplicate(DataTypeSupplementaryComponent dtVO) {

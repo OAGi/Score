@@ -176,7 +176,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPris = cdtScAwdPriRepository.findByCdtScId(aDataTypeSupplementaryComponent.getDtScId());
 
                         for (int i = 0; i < cdtSCAwdPris.size(); i++) {
-                            List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtSCMaps = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(cdtSCAwdPris.get(i).getCdtScAwdPriId());
+                            List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtSCMaps = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(cdtSCAwdPris.get(i).getCdtScAwdPriId());
 
                             for (int j = 0; j < cdtSCMaps.size(); j++) {
                                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -214,7 +214,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPris = cdtScAwdPriRepository.findByCdtScId(aDataTypeSupplementaryComponent.getDtScId());
 
                         for (int i = 0; i < cdtSCAwdPris.size(); i++) {
-                            List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtSCMaps = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(cdtSCAwdPris.get(i).getCdtScAwdPriId());
+                            List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtSCMaps = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(cdtSCAwdPris.get(i).getCdtScAwdPriId());
 
                             for (int j = 0; j < cdtSCMaps.size(); j++) {
                                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -271,7 +271,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     int CDTSCAllowedPrimitiveExpressionTypeMapID = 0;
                     if (cdt_sc_awd_pri_id > 0) {
                         CDTSCAllowedPrimitiveExpressionTypeMapID = cdtScAwdPriXpsTypeMapRepository.
-                                findOneByCdtScAwdPriAndXbtId(cdt_sc_awd_pri_id, xbt_id).getCdtScAwdPriXpsTypeMapId();
+                                findOneByCdtScAwdPriIdAndXbtId(cdt_sc_awd_pri_id, xbt_id).getCdtScAwdPriXpsTypeMapId();
                     }
 
                     BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO1 = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
@@ -309,7 +309,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
 
                     for (CoreDataTypeSupplementaryComponentAllowedPrimitive aCDTSCAllowedPrimitiveVO : al3) {//Loop retrieved cdt_sc_awd_pri\
                         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> al4 =
-                                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(aCDTSCAllowedPrimitiveVO.getCdtScAwdPriId());
+                                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(aCDTSCAllowedPrimitiveVO.getCdtScAwdPriId());
                         for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExVO : al4) {
                             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                             bVO.setBdtScId(aDataTypeSupplementaryComponent.getDtScId());

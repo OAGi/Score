@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "classification_ctx_scheme")
+@Table(name = "ctx_scheme")
 public class ContextScheme implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_SCHEME_ID_SEQ";
@@ -24,7 +24,7 @@ public class ContextScheme implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int classificationCtxSchemeId;
+    private int ctxSchemeId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -73,12 +73,12 @@ public class ContextScheme implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getClassificationCtxSchemeId() {
-        return classificationCtxSchemeId;
+    public int getCtxSchemeId() {
+        return ctxSchemeId;
     }
 
-    public void setClassificationCtxSchemeId(int classificationCtxSchemeId) {
-        this.classificationCtxSchemeId = classificationCtxSchemeId;
+    public void setCtxSchemeId(int ctxSchemeId) {
+        this.ctxSchemeId = ctxSchemeId;
     }
 
     public String getGuid() {
@@ -176,7 +176,7 @@ public class ContextScheme implements Serializable {
 
         ContextScheme that = (ContextScheme) o;
 
-        if (classificationCtxSchemeId != that.classificationCtxSchemeId) return false;
+        if (ctxSchemeId != that.ctxSchemeId) return false;
         if (ctxCategoryId != that.ctxCategoryId) return false;
         if (createdBy != that.createdBy) return false;
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
@@ -196,7 +196,7 @@ public class ContextScheme implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = classificationCtxSchemeId;
+        int result = ctxSchemeId;
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (schemeId != null ? schemeId.hashCode() : 0);
         result = 31 * result + (schemeName != null ? schemeName.hashCode() : 0);
@@ -214,7 +214,7 @@ public class ContextScheme implements Serializable {
     @Override
     public String toString() {
         return "ContextScheme{" +
-                "classificationCtxSchemeId=" + classificationCtxSchemeId +
+                "ctxSchemeId=" + ctxSchemeId +
                 ", guid='" + guid + '\'' +
                 ", schemeId='" + schemeId + '\'' +
                 ", schemeName='" + schemeName + '\'' +

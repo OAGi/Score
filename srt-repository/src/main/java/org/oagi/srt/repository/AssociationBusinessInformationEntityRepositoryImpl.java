@@ -33,7 +33,7 @@ public class AssociationBusinessInformationEntityRepositoryImpl
     @Override
     protected void prepare(Dialect dialect, AssociationBusinessInformationEntity entity, List<Object> args) {
         entity.prePersist();
-        args.add(entity.getBasedAscc());
+        args.add(entity.getBasedAsccId());
         args.add(entity.getCardinalityMax());
         args.add(entity.getCardinalityMin());
         args.add(entity.getCreatedBy());

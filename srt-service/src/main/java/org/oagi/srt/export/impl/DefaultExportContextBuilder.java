@@ -144,7 +144,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
             SchemaModule schemaModule = moduleMap.get(bdt.getModule().getModuleId());
             List<DataTypeSupplementaryComponent> dtScList =
                     importedDataProvider.findDtScByOwnerDtId(bdt.getDtId()).stream()
-                            .filter(e -> e.getMaxCardinality() > 0).collect(Collectors.toList());
+                            .filter(e -> e.getCardinalityMax() > 0).collect(Collectors.toList());
 
             BDTSimple bdtSimple;
             if (dtScList.isEmpty()) {

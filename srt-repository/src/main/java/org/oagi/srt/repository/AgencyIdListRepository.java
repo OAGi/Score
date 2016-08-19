@@ -14,6 +14,6 @@ public interface AgencyIdListRepository extends JpaRepository<AgencyIdList, Inte
     public AgencyIdList findOneByName(String name);
 
     @Modifying
-    @Query("update AgencyIdList a set a.agencyId = ?1")
+    @Query("update AgencyIdList a set a.agencyIdListId = ?1")
     public void updateAgencyId(int agencyIdListValue);
 }

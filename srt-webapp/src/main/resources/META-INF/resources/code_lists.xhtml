@@ -46,7 +46,7 @@
 						<f:facet name="header">
 							<h:outputText value="Agency Id" />
 						</f:facet>
-						<h:outputText value="#{cVO.agencyId}" />
+						<h:outputText value="#{cVO.agencyIdListValueId}" />
 					</p:column>
 					
 					<p:column style="width:100px">
@@ -96,7 +96,7 @@
 						<h:outputText value="#{codeListHandler.selected.listId}" />
 						
 						<h:outputText value="Agency Id: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{codeListHandler.selected.agencyId}" />
+						<h:outputText value="#{codeListHandler.selected.agencyIdListValueId}" />
 						
 						<h:outputText value="Version: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{codeListHandler.selected.versionId}" />
@@ -176,8 +176,8 @@
 						<p:inputText id="listId" value="#{codeListHandler.codeList.listId}"
 							label="List Id" />
 						
-						<h:outputLabel for="agencyId" rows="10" value="Agency Id:" style="font-weight:bold" />
-						<p:inputText id="agencyId" value="#{codeListHandler.codeList.agencyId}"
+						<h:outputLabel for="agencyIdListValueId" rows="10" value="Agency Id:" style="font-weight:bold" />
+						<p:inputText id="agencyIdListValueId" value="#{codeListHandler.codeList.agencyIdListValueId}"
 							label="Agency Id" />
 						
 						<h:outputLabel for="version" rows="10" value="Version:" style="font-weight:bold" />

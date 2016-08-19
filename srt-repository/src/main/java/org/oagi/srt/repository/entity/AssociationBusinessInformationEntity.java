@@ -36,7 +36,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     private int toAsbiepId;
 
     @Column(nullable = false)
-    private int basedAscc;
+    private int basedAsccId;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -130,12 +130,12 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.toAsbiepId = toAsbiepId;
     }
 
-    public int getBasedAscc() {
-        return basedAscc;
+    public int getBasedAsccId() {
+        return basedAsccId;
     }
 
-    public void setBasedAscc(int basedAscc) {
-        this.basedAscc = basedAscc;
+    public void setBasedAsccId(int basedAsccId) {
+        this.basedAsccId = basedAsccId;
     }
 
     public String getDefinition() {
@@ -250,7 +250,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         if (asbieId != that.asbieId) return false;
         if (fromAbieId != that.fromAbieId) return false;
         if (toAsbiepId != that.toAsbiepId) return false;
-        if (basedAscc != that.basedAscc) return false;
+        if (basedAsccId != that.basedAsccId) return false;
         if (cardinalityMin != that.cardinalityMin) return false;
         if (cardinalityMax != that.cardinalityMax) return false;
         if (nillable != that.nillable) return false;
@@ -276,7 +276,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + fromAbieId;
         result = 31 * result + toAsbiepId;
-        result = 31 * result + basedAscc;
+        result = 31 * result + basedAsccId;
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
@@ -300,7 +300,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
                 ", guid='" + guid + '\'' +
                 ", fromAbieId=" + fromAbieId +
                 ", toAsbiepId=" + toAsbiepId +
-                ", basedAscc=" + basedAscc +
+                ", basedAsccId=" + basedAsccId +
                 ", definition='" + definition + '\'' +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +

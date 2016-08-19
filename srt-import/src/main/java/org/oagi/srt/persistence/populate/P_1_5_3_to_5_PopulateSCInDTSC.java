@@ -115,8 +115,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         max_cardinality = 0;
                     }
 
-                    vo.setMinCardinality(min_cardinality);
-                    vo.setMaxCardinality(max_cardinality);
+                    vo.setCardinalityMin(min_cardinality);
+                    vo.setCardinalityMax(max_cardinality);
 
                     int baseInd = -1;
                     for (int j = 0; j < cdtSCList.size(); j++) {
@@ -183,8 +183,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     //we already know it doesn't have attributes
                     //so according to design doc,
                     //min_cardinality = 0, max_cardinality = 0
-                    vo.setMinCardinality(0);
-                    vo.setMaxCardinality(0);
+                    vo.setCardinalityMin(0);
+                    vo.setCardinalityMax(0);
                     vo.setBasedDtScId(baseCDTSC.getDtScId());
                     logger.debug("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
                     dtScRepository.save(vo);
@@ -285,8 +285,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                             fromDBStr = fromDBStr + adtsc.getPropertyTerm();
                             fromDBStr = fromDBStr + adtsc.getRepresentationTerm();
                             fromDBStr = fromDBStr + adtsc.getDefinition();
-                            fromDBStr = fromDBStr + adtsc.getMinCardinality();
-                            fromDBStr = fromDBStr + adtsc.getMaxCardinality();
+                            fromDBStr = fromDBStr + adtsc.getCardinalityMin();
+                            fromDBStr = fromDBStr + adtsc.getCardinalityMax();
                         }
 
                         if (!fromDBStr.equals(aStrFromXSDwAttr)) {
@@ -322,28 +322,28 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                             if (attrCheckNode != null) {
                                 Element ele = (Element) attrCheckNode;
                                 if (ele.getAttribute("use") == null) {
-                                    if (bdtsc.getMinCardinality() == 0 && bdtsc.getMaxCardinality() == 1) {
+                                    if (bdtsc.getCardinalityMin() == 0 && bdtsc.getCardinalityMax() == 1) {
                                         CDTSCs.remove(i);
                                         break;
                                     }
                                 } else if (ele.getAttribute("use").equalsIgnoreCase("optional")) {
-                                    if (bdtsc.getMinCardinality() == 0 && bdtsc.getMaxCardinality() == 1) {
+                                    if (bdtsc.getCardinalityMin() == 0 && bdtsc.getCardinalityMax() == 1) {
                                         CDTSCs.remove(i);
                                         break;
                                     }
                                 } else if (ele.getAttribute("use").equalsIgnoreCase("required")) {
-                                    if (bdtsc.getMinCardinality() == 1 && bdtsc.getMaxCardinality() == 1) {
+                                    if (bdtsc.getCardinalityMin() == 1 && bdtsc.getCardinalityMax() == 1) {
                                         CDTSCs.remove(i);
                                         break;
                                     }
                                 } else if (ele.getAttribute("use").equalsIgnoreCase("prohibited")) {
-                                    if (bdtsc.getMinCardinality() == 0 && bdtsc.getMaxCardinality() == 0) {
+                                    if (bdtsc.getCardinalityMin() == 0 && bdtsc.getCardinalityMax() == 0) {
                                         CDTSCs.remove(i);
                                         break;
                                     }
                                 }
                             } else {
-                                if (bdtsc.getMinCardinality() == 0 && bdtsc.getMaxCardinality() == 0) {
+                                if (bdtsc.getCardinalityMin() == 0 && bdtsc.getCardinalityMax() == 0) {
                                     CDTSCs.remove(i);
                                     break;
                                 }
@@ -426,8 +426,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         max_cardinality = 0;
                     }
 
-                    vo.setMinCardinality(min_cardinality);
-                    vo.setMaxCardinality(max_cardinality);
+                    vo.setCardinalityMin(min_cardinality);
+                    vo.setCardinalityMax(max_cardinality);
 
 
                     int baseInd = -1;
@@ -531,7 +531,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                         CoreDataTypeAllowedPrimitiveExpressionTypeMap thisAPXTmap = cdtAPXTMs.get(m);
                                         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                                         tmp.setXbtId(thisAPXTmap.getXbtId());
-                                        tmp.setCdtScAwdPri(insertedCDTSCAP.getCdtScAwdPriId());
+                                        tmp.setCdtScAwdPriId(insertedCDTSCAP.getCdtScAwdPriId());
                                         cdtScAwdPriXpsTypeMapRepository.save(tmp);
                                     }
                                 }
@@ -555,8 +555,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     //we already know it doesn't have attributes
                     //so according to design doc,
                     //inherit the values of default BDT sc's min_cardinality, max_cardinality
-                    vo.setMinCardinality(baseDefaultBDTSC.getMinCardinality());
-                    vo.setMaxCardinality(baseDefaultBDTSC.getMaxCardinality());
+                    vo.setCardinalityMin(baseDefaultBDTSC.getCardinalityMin());
+                    vo.setCardinalityMax(baseDefaultBDTSC.getCardinalityMax());
                     vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
                     logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
                     dtScRepository.save(vo);
@@ -667,8 +667,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                         fromDB = fromDB + dtsc.getPropertyTerm();
                         fromDB = fromDB + dtsc.getRepresentationTerm();
                         fromDB = fromDB + dtsc.getDefinition();
-                        fromDB = fromDB + dtsc.getMinCardinality();
-                        fromDB = fromDB + dtsc.getMaxCardinality();
+                        fromDB = fromDB + dtsc.getCardinalityMin();
+                        fromDB = fromDB + dtsc.getCardinalityMax();
 
                         if (!fromXSD.equals(fromDB)) {
                             logger.debug("@@@@ DTSC from Attributes has different values! Check DTSC (guid=" + dtsc.getGuid() + ")");
@@ -732,7 +732,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                     CoreDataTypeAllowedPrimitiveExpressionTypeMap thisAPXTmap = cdtAPXTMs.get(m);
                                     CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                                     tmp.setXbtId(thisAPXTmap.getXbtId());
-                                    tmp.setCdtScAwdPri(insertedCDTSCAP.getCdtScAwdPriId());
+                                    tmp.setCdtScAwdPriId(insertedCDTSCAP.getCdtScAwdPriId());
 
                                     XSDBuiltInType xbt = xbtRepository.findOne(tmp.getXbtId());
 
@@ -774,24 +774,24 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                                 Element ele = (Element) attribute;
 
                                 if (ele.getAttribute("use").equalsIgnoreCase("required")) {
-                                    if (unqualifiedDTSC.getMinCardinality() == 1 && unqualifiedDTSC.getMaxCardinality() == 1) {
+                                    if (unqualifiedDTSC.getCardinalityMin() == 1 && unqualifiedDTSC.getCardinalityMax() == 1) {
                                         baseDefaultDTSCs.remove(i);
                                         break;
                                     }
                                 } else if (ele.getAttribute("use").equalsIgnoreCase("optional")) {
-                                    if (unqualifiedDTSC.getMinCardinality() == 0 && unqualifiedDTSC.getMaxCardinality() == 1) {
+                                    if (unqualifiedDTSC.getCardinalityMin() == 0 && unqualifiedDTSC.getCardinalityMax() == 1) {
                                         baseDefaultDTSCs.remove(i);
                                         break;
                                     }
                                 } else if (ele.getAttribute("use").equalsIgnoreCase("prohibited")) {
-                                    if (unqualifiedDTSC.getMinCardinality() == 0 && unqualifiedDTSC.getMaxCardinality() == 0) {
+                                    if (unqualifiedDTSC.getCardinalityMin() == 0 && unqualifiedDTSC.getCardinalityMax() == 0) {
                                         baseDefaultDTSCs.remove(i);
                                         break;
                                     }
                                 }
                             } else {
-                                if (baseDefaultDTSC.getMinCardinality() == unqualifiedDTSC.getMinCardinality()
-                                        && baseDefaultDTSC.getMaxCardinality() == unqualifiedDTSC.getMaxCardinality()) {
+                                if (baseDefaultDTSC.getCardinalityMin() == unqualifiedDTSC.getCardinalityMin()
+                                        && baseDefaultDTSC.getCardinalityMax() == unqualifiedDTSC.getCardinalityMax()) {
                                     baseDefaultDTSCs.remove(i);
                                     break;
                                 }

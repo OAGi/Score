@@ -21,7 +21,6 @@ import org.w3c.dom.NodeList;
 import java.util.List;
 
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
-import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 
 /**
  * Created by tnk11 on 6/24/2016.
@@ -758,8 +757,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 max_cardinality = 0;
             }
 
-            vo.setMinCardinality(min_cardinality);
-            vo.setMaxCardinality(max_cardinality);
+            vo.setCardinalityMin(min_cardinality);
+            vo.setCardinalityMax(max_cardinality);
 
             int baseInd = -1;
             for (int j = 0; j < cdtSCList.size(); j++) {
@@ -830,8 +829,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             //we already know it doesn't have attributes
             //so according to design doc,
             //min_cardinality = 0, max_cardinality = 0
-            dtSc.setMinCardinality(0);
-            dtSc.setMaxCardinality(0);
+            dtSc.setCardinalityMin(0);
+            dtSc.setCardinalityMax(0);
             dtSc.setBasedDtScId(baseCDTSC.getDtScId());
             logger.debug("~~~ " + baseCDTSC.getPropertyTerm() + " " + baseCDTSC.getRepresentationTerm() + ". This SC owned by default BDT is inherited from Base!");
             dtScRepository.save(dtSc);
@@ -898,8 +897,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 max_cardinality = 0;
             }
 
-            vo.setMinCardinality(min_cardinality);
-            vo.setMaxCardinality(max_cardinality);
+            vo.setCardinalityMin(min_cardinality);
+            vo.setCardinalityMax(max_cardinality);
 
             int baseInd = -1;
 
@@ -989,7 +988,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                                 CoreDataTypeAllowedPrimitiveExpressionTypeMap thisAPXTmap = cdtAPXTMs.get(m);
                                 CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap tmp = new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                                 tmp.setXbtId(thisAPXTmap.getXbtId());
-                                tmp.setCdtScAwdPri(insertedCDTSCAP.getCdtScAwdPriId());
+                                tmp.setCdtScAwdPriId(insertedCDTSCAP.getCdtScAwdPriId());
                                 cdtScAwdPriXpsTypeMapRepository.save(tmp);
                             }
                         }
@@ -1014,8 +1013,8 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             //we already know it doesn't have attributes
             //so according to design doc,
             //inherit the values of default BDT sc's min_cardinality, max_cardinality
-            vo.setMinCardinality(baseDefaultBDTSC.getMinCardinality());
-            vo.setMaxCardinality(baseDefaultBDTSC.getMaxCardinality());
+            vo.setCardinalityMin(baseDefaultBDTSC.getCardinalityMin());
+            vo.setCardinalityMax(baseDefaultBDTSC.getCardinalityMax());
             vo.setBasedDtScId(baseDefaultBDTSC.getDtScId());
             logger.debug("~~~" + vo.getPropertyTerm() + " " + vo.getRepresentationTerm() + ". This SC owned by unqualified BDT is inherited from Base!");
             dtScRepository.save(vo);
@@ -1060,7 +1059,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
             for (CoreDataTypeSupplementaryComponentAllowedPrimitive aCDTSCAllowedPrimitiveVO : al3) {//Loop retrieved cdt_sc_awd_pri\
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> al4 =
-                        cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(aCDTSCAllowedPrimitiveVO.getCdtScAwdPriId());
+                        cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(aCDTSCAllowedPrimitiveVO.getCdtScAwdPriId());
                 for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExVO : al4) {
                     BusinessDataTypeSupplementaryComponentPrimitiveRestriction bVO = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                     bVO.setBdtScId(dtSc.getDtScId());
@@ -1095,7 +1094,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                 isDefaultCDTPri = false;
             }
 
-            List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtScAwdPriXpsTypeMapList = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPri(baseCDTSCPriList.get(i).getCdtScAwdPriId());
+            List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtScAwdPriXpsTypeMapList = cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(baseCDTSCPriList.get(i).getCdtScAwdPriId());
             for (int j = 0; j < cdtScAwdPriXpsTypeMapList.size(); j++) {
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction inputBDTSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
                 inputBDTSCPri.setBdtScId(dtSc.getDtScId());
@@ -1138,7 +1137,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri =
                 cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPri.getCdtPriId());
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap map =
-                cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(cdtSCAwdPri.getCdtScAwdPriId(), xbt.getXbtId());
+                cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAwdPri.getCdtScAwdPriId(), xbt.getXbtId());
 
         return map.getCdtScAwdPriXpsTypeMapId();
     }

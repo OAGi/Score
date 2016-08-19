@@ -112,7 +112,7 @@
 <colAssociation fkAssociation="E2B290EA-A808-DD77-FFF7-1C9E319747B2" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
 </associations>
 </Column>
-<Column name="MIN_CARDINALITY" id="ACDFCBEF-DB20-432F-4822-786CA99CC4C9">
+<Column name="CARDINALITY_MIN" id="ACDFCBEF-DB20-432F-4822-786CA99CC4C9">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:19:52 UTC</createdTime>
 <commentInRDBMS>The minimum occurrence constraint for the BBIE SC. A valid value is 0 or 1.</commentInRDBMS>
@@ -124,7 +124,7 @@
 <ownDataTypeParameters>,10,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="MAX_CARDINALITY" id="32E34D11-4118-88A8-5A8A-AA9806D623A0">
+<Column name="CARDINALITY_MAX" id="32E34D11-4118-88A8-5A8A-AA9806D623A0">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:19:52 UTC</createdTime>
 <commentInRDBMS>Maximum occurence constraint of the BBIE SC. A valid value is 0 or 1.</commentInRDBMS>

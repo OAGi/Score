@@ -617,8 +617,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                                     e.getPropertyTerm().hashCode() +
                                             e.getRepresentationTerm().hashCode() +
                                             e.getDefinition().hashCode() +
-                                            e.getMinCardinality() +
-                                            e.getMaxCardinality() +
+                                            e.getCardinalityMin() +
+                                            e.getCardinalityMax() +
                                             e.getDtScId()
                             ).sum(),
                     actualDtScList.stream()
@@ -626,8 +626,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                                     e.getPropertyTerm().hashCode() +
                                             e.getRepresentationTerm().hashCode() +
                                             e.getDefinition().hashCode() +
-                                            e.getMinCardinality() +
-                                            e.getMaxCardinality() +
+                                            e.getCardinalityMin() +
+                                            e.getCardinalityMax() +
                                             e.getBasedDtScId()
                             ).sum());
         });
@@ -858,7 +858,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         CoreDataTypeSupplementaryComponentAllowedPrimitive a =
                 cdtSCAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtSc.getDtScId(), cdtPriId);
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap map =
-                cdtSCAwdXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(a.getCdtScAwdPriId(), xbtId);
+                cdtSCAwdXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(a.getCdtScAwdPriId(), xbtId);
         return map.getCdtScAwdPriXpsTypeMapId();
     }
 
@@ -1068,21 +1068,21 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 DataTypeSupplementaryComponent baseDtSc = dtScRepository.findOne(actualInheritDtScList.get(i).getBasedDtScId());
                 DataType baseDT = dtRepository.getOne(baseDtSc.getOwnerDtId());
                 if (!baseDT.getDen().contains("_ Code Content. Type")) {
-                    assertEquals(baseDtSc.getMinCardinality(), actualInheritDtScList.get(i).getMinCardinality());
-                    assertEquals(baseDtSc.getMaxCardinality(), actualInheritDtScList.get(i).getMaxCardinality());
+                    assertEquals(baseDtSc.getCardinalityMin(), actualInheritDtScList.get(i).getCardinalityMin());
+                    assertEquals(baseDtSc.getCardinalityMax(), actualInheritDtScList.get(i).getCardinalityMax());
                 }
             } else if (use.equalsIgnoreCase("optional")) {
-                assertEquals(0, actualInheritDtScList.get(i).getMinCardinality());
-                assertEquals(1, actualInheritDtScList.get(i).getMaxCardinality());
+                assertEquals(0, actualInheritDtScList.get(i).getCardinalityMin());
+                assertEquals(1, actualInheritDtScList.get(i).getCardinalityMax());
             } else if (use.equalsIgnoreCase("required")) {
-                assertEquals(1, actualInheritDtScList.get(i).getMinCardinality());
-                assertEquals(1, actualInheritDtScList.get(i).getMaxCardinality());
+                assertEquals(1, actualInheritDtScList.get(i).getCardinalityMin());
+                assertEquals(1, actualInheritDtScList.get(i).getCardinalityMax());
             } else if (use.equalsIgnoreCase("prohibited")) {
-                assertEquals(0, actualInheritDtScList.get(i).getMinCardinality());
-                assertEquals(0, actualInheritDtScList.get(i).getMaxCardinality());
+                assertEquals(0, actualInheritDtScList.get(i).getCardinalityMin());
+                assertEquals(0, actualInheritDtScList.get(i).getCardinalityMax());
             } else if (use.equalsIgnoreCase("")) {
-                assertEquals(0, actualInheritDtScList.get(i).getMinCardinality());
-                assertEquals(1, actualInheritDtScList.get(i).getMaxCardinality());
+                assertEquals(0, actualInheritDtScList.get(i).getCardinalityMin());
+                assertEquals(1, actualInheritDtScList.get(i).getCardinalityMax());
             }
         }
     }

@@ -601,7 +601,7 @@ public class TopLevelABIEHandler implements Serializable {
         asbieVO.setGuid(Utility.generateGUID());
         asbieVO.setFromAbieId(abieid);
         asbieVO.setToAsbiepId(asbiepid);
-        asbieVO.setBasedAscc(oasbieVO.getBasedAscc());
+        asbieVO.setBasedAsccId(oasbieVO.getBasedAsccId());
         asbieVO.setCardinalityMax(oasbieVO.getCardinalityMax());
         asbieVO.setCardinalityMin(oasbieVO.getCardinalityMin());
         asbieVO.setDefinition(oasbieVO.getDefinition());
@@ -677,8 +677,8 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiescVO.setDtScPriRestriId(obbiescvo.getDtScPriRestriId());
         nbbiescVO.setCodeListId(obbiescvo.getCodeListId());
         nbbiescVO.setAgencyIdListId(obbiescvo.getAgencyIdListId());
-        nbbiescVO.setMaxCardinality(obbiescvo.getMaxCardinality());
-        nbbiescVO.setMinCardinality(obbiescvo.getMinCardinality());
+        nbbiescVO.setCardinalityMax(obbiescvo.getCardinalityMax());
+        nbbiescVO.setCardinalityMin(obbiescvo.getCardinalityMin());
         nbbiescVO.setDefaultValue(obbiescvo.getDefaultValue());
         nbbiescVO.setFixedValue(obbiescvo.getFixedValue());
         nbbiescVO.setDefinition(obbiescvo.getDefinition());
@@ -917,7 +917,7 @@ public class TopLevelABIEHandler implements Serializable {
     private void showASBIETree(AssociationBusinessInformationEntity asbieVO, TreeNode tNode) {
         AssociationBusinessInformationEntityProperty asbiepVO = asbiepRepository.findOne(asbieVO.getToAsbiepId());
         AssociationCoreComponentProperty asccpVO = asccpRepository.findOne(asbiepVO.getBasedAsccpId());
-        AssociationCoreComponent asccVO = asccRepository.findOne(asbieVO.getBasedAscc());
+        AssociationCoreComponent asccVO = asccRepository.findOne(asbieVO.getBasedAsccId());
         AggregateBusinessInformationEntity abieVO = abieRepository.findOne(asbiepVO.getRoleOfAbieId());
         AggregateCoreComponent accVO = accRepository.findOne(abieVO.getBasedAccId());
 

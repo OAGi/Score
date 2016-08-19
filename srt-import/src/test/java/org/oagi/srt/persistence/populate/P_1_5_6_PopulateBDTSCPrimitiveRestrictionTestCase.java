@@ -274,7 +274,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
 
         int cdtSCAwdPriId = cdtSCAwdPrimitiveRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPriId).getCdtScAwdPriId();
 
-        return cdtSCAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriAndXbtId(cdtSCAwdPriId, xbtId).getCdtScAwdPriXpsTypeMapId();
+        return cdtSCAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAwdPriId, xbtId).getCdtScAwdPriXpsTypeMapId();
     }
 
     public int getCDTSCId(int dtSCId) {

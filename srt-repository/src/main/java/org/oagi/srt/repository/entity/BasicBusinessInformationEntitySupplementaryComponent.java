@@ -45,10 +45,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     private Integer agencyIdListId;
 
     @Column(nullable = false)
-    private int minCardinality;
+    private int cardinalityMin;
 
     @Column
-    private int maxCardinality;
+    private int cardinalityMax;
 
     @Column
     private String defaultValue;
@@ -138,20 +138,20 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.agencyIdListId = agencyIdListId;
     }
 
-    public int getMinCardinality() {
-        return minCardinality;
+    public int getCardinalityMin() {
+        return cardinalityMin;
     }
 
-    public void setMinCardinality(int minCardinality) {
-        this.minCardinality = minCardinality;
+    public void setCardinalityMin(int cardinalityMin) {
+        this.cardinalityMin = cardinalityMin;
     }
 
-    public int getMaxCardinality() {
-        return maxCardinality;
+    public int getCardinalityMax() {
+        return cardinalityMax;
     }
 
-    public void setMaxCardinality(int maxCardinality) {
-        this.maxCardinality = maxCardinality;
+    public void setCardinalityMax(int cardinalityMax) {
+        this.cardinalityMax = cardinalityMax;
     }
 
     public String getDefaultValue() {
@@ -222,8 +222,8 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         if (bbieScId != that.bbieScId) return false;
         if (bbieId != that.bbieId) return false;
         if (dtScId != that.dtScId) return false;
-        if (minCardinality != that.minCardinality) return false;
-        if (maxCardinality != that.maxCardinality) return false;
+        if (cardinalityMin != that.cardinalityMin) return false;
+        if (cardinalityMax != that.cardinalityMax) return false;
         if (used != that.used) return false;
         if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
@@ -249,8 +249,8 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
         result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
         result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
-        result = 31 * result + minCardinality;
-        result = 31 * result + maxCardinality;
+        result = 31 * result + cardinalityMin;
+        result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
         result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
@@ -271,8 +271,8 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", dtScPriRestriId=" + dtScPriRestriId +
                 ", codeListId=" + codeListId +
                 ", agencyIdListId=" + agencyIdListId +
-                ", minCardinality=" + minCardinality +
-                ", maxCardinality=" + maxCardinality +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
                 ", fixedValue='" + fixedValue + '\'' +
                 ", definition='" + definition + '\'' +

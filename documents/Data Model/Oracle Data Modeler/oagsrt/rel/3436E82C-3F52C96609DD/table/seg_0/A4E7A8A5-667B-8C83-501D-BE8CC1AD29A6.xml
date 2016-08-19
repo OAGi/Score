@@ -64,10 +64,10 @@
 <colAssociation fkAssociation="ED206EE1-846B-0846-BD7B-CB3027AF612E" referredColumn="DED39440-6579-847B-FCCE-72A73CB3A55D"/>
 </associations>
 </Column>
-<Column name="BASED_ASCC" id="FD247C6D-BEAE-AB54-19CB-579DF63B76AC">
+<Column name="BASED_ASCC_ID" id="FD247C6D-BEAE-AB54-19CB-579DF63B76AC">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 20:57:04 UTC</createdTime>
-<commentInRDBMS>The BASED_ASCC column refers to the ASCC record, which this ASBIE contextualizes.</commentInRDBMS>
+<commentInRDBMS>The BASED_ASCC_ID column refers to the ASCC record, which this ASBIE contextualizes.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>

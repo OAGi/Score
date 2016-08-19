@@ -71,7 +71,7 @@ public class ContextSchemeHandler {
 	public List<ContextSchemeValue> getSelectedCSValues() {
 		if (selectedScheme != null) {
 			selectedCSValues = contextSchemeValueRepository.findByOwnerCtxSchemeId(
-					selectedScheme.getClassificationCtxSchemeId());
+					selectedScheme.getCtxSchemeId());
 		}
 		return selectedCSValues;
 	}
@@ -169,7 +169,7 @@ public class ContextSchemeHandler {
     	schemeAgencyID = contextScheme.getSchemeAgencyId();
     	schemeVersion = contextScheme.getSchemeVersionId();
     	contextCategoryID = contextScheme.getCtxCategoryId();
-    	id = contextScheme.getClassificationCtxSchemeId();
+    	id = contextScheme.getCtxSchemeId();
     	schemeName = contextScheme.getSchemeName();
     	guid = contextScheme.getGuid();
     	schemeId = contextScheme.getSchemeId();
@@ -185,7 +185,7 @@ public class ContextSchemeHandler {
 		contextScheme.setSchemeAgencyId(schemeAgencyID);
 		contextScheme.setSchemeVersionId(schemeVersion);
 		contextScheme.setCtxCategoryId(contextCategoryID);
-		contextScheme.setClassificationCtxSchemeId(id);
+		contextScheme.setCtxSchemeId(id);
 		contextScheme.setSchemeName(schemeName);
 		contextScheme.setGuid(guid);
 		contextScheme.setSchemeId(schemeId);
@@ -196,7 +196,7 @@ public class ContextSchemeHandler {
 		contextSchemes = contextSchemeRepository.findAll();
 
 		List<ContextSchemeValue> contextSchemeValues =
-				contextSchemeValueRepository.findByOwnerCtxSchemeId(contextScheme.getClassificationCtxSchemeId());
+				contextSchemeValueRepository.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId());
 		for (ContextSchemeValue source : contextSchemeValues) {
 			boolean deleted = true;
 			for (ContextSchemeValue target : csValues) {
@@ -219,7 +219,7 @@ public class ContextSchemeHandler {
 				}
 			}
 			if (newItem) {
-				source.setOwnerCtxSchemeId(contextScheme.getClassificationCtxSchemeId());
+				source.setOwnerCtxSchemeId(contextScheme.getCtxSchemeId());
 				contextSchemeValueRepository.save(source);
 			}
 		}
@@ -279,7 +279,7 @@ public class ContextSchemeHandler {
 		contextSchemeRepository.save(contextScheme);
 
 		for (ContextSchemeValue contextSchemeValue : csValues) {
-			contextSchemeValue.setOwnerCtxSchemeId(contextScheme.getClassificationCtxSchemeId());
+			contextSchemeValue.setOwnerCtxSchemeId(contextScheme.getCtxSchemeId());
 			contextSchemeValueRepository.save(contextSchemeValue);
 		}
 	}
@@ -303,7 +303,7 @@ public class ContextSchemeHandler {
 	@Transactional(rollbackFor = Throwable.class)
 	public void delete(int contextSchemeId) {
     	ContextScheme contextScheme = new ContextScheme();
-		contextScheme.setClassificationCtxSchemeId(contextSchemeId);
+		contextScheme.setCtxSchemeId(contextSchemeId);
 		setValue("");
 		setMeaning("");
 
@@ -324,7 +324,7 @@ public class ContextSchemeHandler {
 		for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
 			contextSchemeValueRepository.deleteByOwnerCtxSchemeId(contextSchemeValue.getCtxSchemeValueId());
 		}
-		contextSchemeRepository.delete(contextScheme.getClassificationCtxSchemeId());
+		contextSchemeRepository.delete(contextScheme.getCtxSchemeId());
 		contextSchemes = contextSchemeRepository.findAll();
     }
 
