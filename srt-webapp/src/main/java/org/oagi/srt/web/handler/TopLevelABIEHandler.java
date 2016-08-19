@@ -672,6 +672,7 @@ public class TopLevelABIEHandler implements Serializable {
     private void copyBBIESC(BasicBusinessInformationEntitySupplementaryComponent obbiescvo,
                             int bbie, TreeNode tNode, TopLevelAbie topLevelAbie) {
         BasicBusinessInformationEntitySupplementaryComponent nbbiescVO = new BasicBusinessInformationEntitySupplementaryComponent();
+        nbbiescVO.setGuid(Utility.generateGUID());
         nbbiescVO.setDtScId(obbiescvo.getDtScId());
         nbbiescVO.setDtScPriRestriId(obbiescvo.getDtScPriRestriId());
         nbbiescVO.setCodeListId(obbiescvo.getCodeListId());

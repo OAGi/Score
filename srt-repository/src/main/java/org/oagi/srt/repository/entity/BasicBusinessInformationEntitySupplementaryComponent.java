@@ -26,6 +26,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     )
     private int bbieScId;
 
+    @Column(nullable = false, length = 41)
+    private String guid;
+
     @Column(nullable = false)
     private int bbieId;
 
@@ -85,6 +88,14 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setBbieScId(int bbieScId) {
         this.bbieScId = bbieScId;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public int getBbieId() {
@@ -215,6 +226,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         if (maxCardinality != that.maxCardinality) return false;
         if (used != that.used) return false;
         if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (dtScPriRestriId != null ? !dtScPriRestriId.equals(that.dtScPriRestriId) : that.dtScPriRestriId != null)
             return false;
         if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
@@ -231,6 +243,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Override
     public int hashCode() {
         int result = bbieScId;
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + bbieId;
         result = 31 * result + dtScId;
         result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
@@ -252,6 +265,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     public String toString() {
         return "BasicBusinessInformationEntitySupplementaryComponent{" +
                 "bbieScId=" + bbieScId +
+                ", guid='" + guid + '\'' +
                 ", bbieId=" + bbieId +
                 ", dtScId=" + dtScId +
                 ", dtScPriRestriId=" + dtScPriRestriId +
