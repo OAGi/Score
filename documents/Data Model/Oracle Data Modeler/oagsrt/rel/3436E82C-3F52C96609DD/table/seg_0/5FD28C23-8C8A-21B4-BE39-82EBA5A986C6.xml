@@ -18,8 +18,8 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>10</dataTypePrecision>
-<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="BDT_SC_ID" id="B2B96640-B00D-FAAF-8561-392F0556A738">
@@ -30,8 +30,8 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>10</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="B904E1B5-CD83-97DE-E49A-2657A207EC52" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
@@ -46,8 +46,8 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>10</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="B929892F-6B01-0CA3-A75F-12C76FCF0AD3" referredColumn="9C70EF52-F75C-53B9-ED43-F861AB1ADB15"/>
@@ -62,11 +62,27 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>10</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="80FB40F3-2152-9D72-FE57-2A096EDD0E7C" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</associations>
+</Column>
+<Column name="AGENCY_ID_LIST_ID" id="68B9AE7A-E167-B5A5-B648-0D73F5196955">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:40:15 UTC</createdTime>
+<commentInRDBMS>Foreign key to identify an agency identification list. It allows for a primitive restriction based on such list of values.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>19</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="08BEFC46-A0EC-CFCA-1186-B4D30DECA32F" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
 </associations>
 </Column>
 <Column name="IS_DEFAULT" id="8FA94D07-91D6-3613-1DD1-C873FDDF62CC">
@@ -80,22 +96,6 @@
 <dataTypeSize>1</dataTypeSize>
 <ownDataTypeParameters>1,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
-</Column>
-<Column name="AGENCY_ID_LIST_ID" id="68B9AE7A-E167-B5A5-B648-0D73F5196955">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:40:15 UTC</createdTime>
-<commentInRDBMS>Foreign key to identify an agency identification list. It allows for a primitive restriction based on such list of values.</commentInRDBMS>
-<ownerDesignName>oagsrt</ownerDesignName>
-<nullsAllowed>true</nullsAllowed>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>10</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="08BEFC46-A0EC-CFCA-1186-B4D30DECA32F" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
-</associations>
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
