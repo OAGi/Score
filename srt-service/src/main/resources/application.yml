@@ -5,18 +5,11 @@ spring:
 
 # DataSource
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://docker:3306/oagsrt_revision?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true
-    username: root
-    password: qwer1234
-    platform: mysql
-
-#  datasource:
-#    driver-class-name: oracle.jdbc.driver.OracleDriver
-#    url: jdbc:oracle:thin:@docker:1521/xe
-#    username: oagi
-#    password: oagi
-#    platform: oracle
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe
+    username: oagi
+    password: oagi
+    platform: oracle
 
     continue-on-error: true
     initialize: false
@@ -25,9 +18,6 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
 
   batch:
     initializer:

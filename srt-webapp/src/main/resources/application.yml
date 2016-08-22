@@ -33,16 +33,11 @@ spring:
 
 # DataSource
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://docker:3306/oagsrt_revision?rewriteBatchedStatements=true&useCompression=true&allowMultiQueries=true
-    username: root
-    password: qwer1234
-    platform: mysql
-
-  jpa:
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe
+    username: oagi
+    password: oagi
+    platform: oracle
 
 logging:
   level:
@@ -51,7 +46,7 @@ logging:
     org.hibernate.SQL: DEBUG
 
 jsf:
-  project-stage: Developement
+  project-stage: Development
 
 # Staging environment
 ---
