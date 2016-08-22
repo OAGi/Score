@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+
 /**
  * @author Jaehun Lee
  * @version 1.0
@@ -47,6 +49,8 @@ public class P_1_3_PopulateAgencyIDList {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.3 Start");
+        printTitle("Populate Identifier Scheme");
+
         Collection<AgencyIdList> agencyIdLists = agencyIDList();
         agencyIDListValue(agencyIdLists);
         updateAgencyIDList();

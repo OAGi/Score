@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.oagi.srt.common.SRTConstants.CODELIST_CHARACTER_SET_CODE_IANA_FILENAME;
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 /**
  * @author Jaehun Lee
@@ -52,6 +53,7 @@ public class P_1_4_PopulateCodeList {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.4 Start");
+        printTitle("Populate Code Lists");
 
         String tt[][] = {
                 {"CodeList_ConditionTypeCode_1", "314"},

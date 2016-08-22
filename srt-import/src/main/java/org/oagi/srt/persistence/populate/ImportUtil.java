@@ -20,26 +20,26 @@ public class ImportUtil {
     @Autowired
     private NamespaceRepository namespaceRepository;
 
-    private int userId;
-    private int releaseId;
-    private int namespaceId;
+    private long userId;
+    private long releaseId;
+    private long namespaceId;
 
-    public int getUserId() {
-        if (userId == 0) {
+    public long getUserId() {
+        if (userId == 0L) {
             userId = userRepository.findAppUserIdByLoginId("oagis");
         }
         return userId;
     }
 
-    public int getReleaseId() {
-        if (releaseId == 0) {
+    public long getReleaseId() {
+        if (releaseId == 0L) {
             releaseId = releaseRepository.findReleaseIdByReleaseNum(OAGIS_VERSION);
         }
         return releaseId;
     }
 
-    public int getNamespaceId() {
-        if (namespaceId == 0) {
+    public long getNamespaceId() {
+        if (namespaceId == 0L) {
             namespaceId = namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10");
         }
         return namespaceId;

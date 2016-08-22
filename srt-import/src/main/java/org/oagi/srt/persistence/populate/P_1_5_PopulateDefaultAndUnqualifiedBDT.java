@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 import java.util.List;
 
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 /**
  * Created by tnk11 on 6/24/2016.
@@ -82,6 +83,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.5 Start");
+        printTitle("Populate default and unqualified BDTs");
 
         for (int i = 0; i < Types.dataTypeList.length; i++) {
             importDataTypeList(Types.dataTypeList[i]);

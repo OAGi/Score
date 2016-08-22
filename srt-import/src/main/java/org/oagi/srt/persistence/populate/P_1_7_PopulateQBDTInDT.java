@@ -36,6 +36,7 @@ import java.util.*;
 
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
 import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 /**
  * @author Yunsu Lee
@@ -913,6 +914,7 @@ public class P_1_7_PopulateQBDTInDT {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.7 Start");
+        printTitle("Populate Qualified BDTs");
 
         populate();
 

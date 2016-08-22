@@ -39,10 +39,14 @@ public class BlobContent implements Serializable {
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
 
+    @Transient
+    private File file;
+
     public BlobContent() {
     }
 
     public BlobContent(File file) throws IOException {
+        this.file = file;
         setContent(FileUtils.readFileToByteArray(file));
     }
 

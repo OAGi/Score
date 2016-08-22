@@ -3,7 +3,9 @@ package org.oagi.srt.persistence.populate;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
+import org.oagi.srt.repository.DataTypeRepository;
+import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.entity.Module;
@@ -21,8 +23,6 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 
 /**
  * @author Jaehun Lee

@@ -20,6 +20,8 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+
 /**
  * Created by tnk11 on 6/27/2016.
  */
@@ -76,6 +78,8 @@ public class P_1_6_PopulateDTFromMeta {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.6. Start");
+        printTitle("Populate additional BDTs");
+
         NormalizedStringCDTPrimitiveId = cdtPriRepository.findOneByName("NormalizedString").getCdtPriId();
         StringCDTPrimitiveId = cdtPriRepository.findOneByName("String").getCdtPriId();
         TokenCDTPrimitiveId = cdtPriRepository.findOneByName("Token").getCdtPriId();

@@ -5,7 +5,6 @@ import com.sun.xml.internal.xsom.parser.XSOMParser;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.OAGiNamespaceContext;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.persistence.populate.P_1_8_1_PopulateAccAsccpBccAscc;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.Module;
 import org.w3c.dom.Document;
@@ -24,7 +23,10 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class Context {

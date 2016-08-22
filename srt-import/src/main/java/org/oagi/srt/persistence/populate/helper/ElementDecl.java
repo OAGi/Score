@@ -2,7 +2,6 @@ package org.oagi.srt.persistence.populate.helper;
 
 import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSType;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 public class ElementDecl extends AbstractDeclaration {

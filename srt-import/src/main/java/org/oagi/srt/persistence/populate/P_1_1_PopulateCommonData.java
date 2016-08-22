@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 
 import static org.oagi.srt.common.SRTConstants.OAGIS_RELEASE_NOTE;
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 @Component
 public class P_1_1_PopulateCommonData {
@@ -63,6 +64,8 @@ public class P_1_1_PopulateCommonData {
     }
 
     private User populateUser() {
+        printTitle("Populate OAGIS user");
+
         User user = new User();
         user.setLoginId("oagis");
         user.setPassword("oagis");
@@ -71,10 +74,13 @@ public class P_1_1_PopulateCommonData {
         user.setOagisDeveloperIndicator(true);
 
         userRepository.saveAndFlush(user);
+
         return user;
     }
 
     private Namespace populateNamespace(User user) throws ParseException {
+        printTitle("Populate OAGIS release 10 namespace");
+
         Namespace namespace = new Namespace();
         namespace.setUri("http://www.openapplications.org/oagis/10");
         namespace.setPrefix("");
@@ -92,6 +98,8 @@ public class P_1_1_PopulateCommonData {
     }
 
     private Release populateRelease(Namespace namespace) {
+        printTitle("Populate OAGIS release " + OAGIS_VERSION);
+
         Release release = new Release();
         release.setReleaseNum(OAGIS_VERSION);
         release.setNamespaceId(namespace.getNamespaceId());
@@ -134,6 +142,8 @@ public class P_1_1_PopulateCommonData {
     }
 
     private void populateXbt() {
+        printTitle("Populate XSD Built-In Types");
+
         XSDBuiltInType anyType =
                 xbtName("any type").builtInType("xsd:anyType").build();
         XSDBuiltInType anySimpleType =
@@ -176,6 +186,8 @@ public class P_1_1_PopulateCommonData {
     }
 
     public void populateCdtPri() {
+        printTitle("Populate CDT Primitive");
+
         cdtPriRepository.save(cdtPri("Binary"));
         cdtPriRepository.save(cdtPri("Boolean"));
         cdtPriRepository.save(cdtPri("Decimal"));
@@ -196,6 +208,8 @@ public class P_1_1_PopulateCommonData {
     }
 
     public void populateCdt(User user, Release release) {
+        printTitle("Populate CDT");
+
         new CDTBuilder(user, release).dataTypeTerm("Amount").den("Amount. Type")
                 .contentComponentDen("Amount. Content")
                 .definition("CDT V3.1. An amount is a number of monetary units specified in a currency.")

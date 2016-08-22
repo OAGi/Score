@@ -19,8 +19,6 @@ import org.w3c.dom.NodeList;
 
 import java.util.List;
 
-import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
-
 /**
  * @author Nasif Sikder
  * @author Jaehun Lee

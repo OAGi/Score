@@ -10,12 +10,10 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -31,7 +29,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.oagi.srt.common.SRTConstants.*;
+import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
+import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 @Component
 public class P_1_8_1_PopulateAccAsccpBccAscc {
@@ -76,8 +76,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.8 Start");
 
+        printTitle("Populate ACCs, ASCCPs, BCCPs, BCCs and ASCCs top down from BODs");
         populateForAny();
         populate();
+
+        printTitle("Populate other ACCs, ASCCPs, BCCPs, BCCs, and ASCCs unused by BODs");
         populateUnused();
 
         logger.info("### 1.8 End");

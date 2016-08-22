@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 @Component
 public class PopulateModules {
@@ -67,6 +68,7 @@ public class PopulateModules {
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### Module population Start");
+        printTitle("Schemas not considered for import and import them as blobs");
 
         release = releaseRepository.findOneByReleaseNum(OAGIS_VERSION);
         namespace = namespaceRepository.findByUri("http://www.openapplications.org/oagis/10");

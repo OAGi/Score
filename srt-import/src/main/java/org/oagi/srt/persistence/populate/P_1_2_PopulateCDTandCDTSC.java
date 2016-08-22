@@ -12,6 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+
 @Component
 public class P_1_2_PopulateCDTandCDTSC {
 
@@ -62,6 +64,8 @@ public class P_1_2_PopulateCDTandCDTSC {
     }
 
     public void populateCdtAwdPri() {
+        printTitle("Populate CDT Allowed Primitive");
+
         cdtAwdPri("Amount", "Decimal", true);
         cdtAwdPri("Amount", "Double", false);
         cdtAwdPri("Amount", "Float", false);
@@ -135,6 +139,8 @@ public class P_1_2_PopulateCDTandCDTSC {
     }
 
     public void populateCdtAwdPriXpsTypeMap() {
+        printTitle("Populate CDT Allowed Primitive Expression Type Map");
+
         cdtAwdPriXpsTypeMap("Amount", "Decimal", "xsd:decimal");
         cdtAwdPriXpsTypeMap("Amount", "Double", "xsd:double");
         cdtAwdPriXpsTypeMap("Amount", "Double", "xsd:float");
@@ -263,6 +269,8 @@ public class P_1_2_PopulateCDTandCDTSC {
     }
 
     public void populateDtSc() {
+        printTitle("Populate CDT Supplementary Components");
+
         dtSc("Currency", "Code", "The currency of the amount", "Amount");
         dtSc("MIME", "Code", "The Multipurpose Internet Mail Extensions(MIME) media type of the binary object", "Binary Object");
         dtSc("Character Set", "Code", "The character set of the binary object if the Multipurpose Internet Mail Extensions (MIME) type is text", "Binary Object");
@@ -320,6 +328,8 @@ public class P_1_2_PopulateCDTandCDTSC {
     }
 
     public void populateCdtScAwdPri() {
+        printTitle("Populate CDT Supplementary Component Allowed Primitive");
+
         cdtScAwdPri("Amount", "Currency", "NormalizedString", false);
         cdtScAwdPri("Amount", "Currency", "String", false);
         cdtScAwdPri("Amount", "Currency", "Token", true);
@@ -441,6 +451,8 @@ public class P_1_2_PopulateCDTandCDTSC {
     }
 
     public void populateCdtScAwdPriXpsTypeMap() {
+        printTitle("Populate CDT Supplementary Component Allowed Primitive Expression Type Map");
+
         cdtScAwdPriXpsTypeMap("Amount", "Currency", "NormalizedString", "normalized string");
         cdtScAwdPriXpsTypeMap("Amount", "Currency", "String", "string");
         cdtScAwdPriXpsTypeMap("Amount", "Currency", "Token", "token");
