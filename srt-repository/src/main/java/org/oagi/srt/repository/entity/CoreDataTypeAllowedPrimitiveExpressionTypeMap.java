@@ -23,35 +23,35 @@ public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializab
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int cdtAwdPriXpsTypeMapId;
+    private long cdtAwdPriXpsTypeMapId;
 
     @Column(nullable = false)
-    private int cdtAwdPriId;
+    private long cdtAwdPriId;
 
     @Column(nullable = false)
-    private int xbtId;
+    private long xbtId;
 
-    public int getCdtAwdPriXpsTypeMapId() {
+    public long getCdtAwdPriXpsTypeMapId() {
         return cdtAwdPriXpsTypeMapId;
     }
 
-    public void setCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId) {
+    public void setCdtAwdPriXpsTypeMapId(long cdtAwdPriXpsTypeMapId) {
         this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
     }
 
-    public int getCdtAwdPriId() {
+    public long getCdtAwdPriId() {
         return cdtAwdPriId;
     }
 
-    public void setCdtAwdPriId(int cdtAwdPriId) {
+    public void setCdtAwdPriId(long cdtAwdPriId) {
         this.cdtAwdPriId = cdtAwdPriId;
     }
 
-    public int getXbtId() {
+    public long getXbtId() {
         return xbtId;
     }
 
-    public void setXbtId(int xbtId) {
+    public void setXbtId(long xbtId) {
         this.xbtId = xbtId;
     }
 
@@ -70,9 +70,9 @@ public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializab
 
     @Override
     public int hashCode() {
-        int result = cdtAwdPriXpsTypeMapId;
-        result = 31 * result + cdtAwdPriId;
-        result = 31 * result + xbtId;
+        int result = (int) (cdtAwdPriXpsTypeMapId ^ (cdtAwdPriXpsTypeMapId >>> 32));
+        result = 31 * result + (int) (cdtAwdPriId ^ (cdtAwdPriId >>> 32));
+        result = 31 * result + (int) (xbtId ^ (xbtId >>> 32));
         return result;
     }
 

@@ -23,35 +23,35 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int cdtScAwdPriXpsTypeMapId;
+    private long cdtScAwdPriXpsTypeMapId;
 
     @Column(nullable = false)
-    private int cdtScAwdPriId;
+    private long cdtScAwdPriId;
 
     @Column(nullable = false)
-    private int xbtId;
+    private long xbtId;
 
-    public int getCdtScAwdPriXpsTypeMapId() {
+    public long getCdtScAwdPriXpsTypeMapId() {
         return cdtScAwdPriXpsTypeMapId;
     }
 
-    public void setCdtScAwdPriXpsTypeMapId(int cdtScAwdPriXpsTypeMapId) {
+    public void setCdtScAwdPriXpsTypeMapId(long cdtScAwdPriXpsTypeMapId) {
         this.cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMapId;
     }
 
-    public int getCdtScAwdPriId() {
+    public long getCdtScAwdPriId() {
         return cdtScAwdPriId;
     }
 
-    public void setCdtScAwdPriId(int cdtScAwdPriId) {
+    public void setCdtScAwdPriId(long cdtScAwdPriId) {
         this.cdtScAwdPriId = cdtScAwdPriId;
     }
 
-    public int getXbtId() {
+    public long getXbtId() {
         return xbtId;
     }
 
-    public void setXbtId(int xbtId) {
+    public void setXbtId(long xbtId) {
         this.xbtId = xbtId;
     }
 
@@ -70,9 +70,9 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
 
     @Override
     public int hashCode() {
-        int result = cdtScAwdPriXpsTypeMapId;
-        result = 31 * result + cdtScAwdPriId;
-        result = 31 * result + xbtId;
+        int result = (int) (cdtScAwdPriXpsTypeMapId ^ (cdtScAwdPriXpsTypeMapId >>> 32));
+        result = 31 * result + (int) (cdtScAwdPriId ^ (cdtScAwdPriId >>> 32));
+        result = 31 * result + (int) (xbtId ^ (xbtId >>> 32));
         return result;
     }
 

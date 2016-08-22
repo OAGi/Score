@@ -24,7 +24,7 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int asccId;
+    private long asccId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -39,10 +39,10 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
     private int seqKey;
 
     @Column(nullable = false)
-    private int fromAccId;
+    private long fromAccId;
 
     @Column(nullable = false)
-    private int toAsccpId;
+    private long toAsccpId;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -55,13 +55,13 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
     private boolean deprecated;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -84,10 +84,10 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
     private Integer revisionAction;
 
     @Column
-    private Integer releaseId;
+    private Long releaseId;
 
     @Column
-    private Integer currentAsccId;
+    private Long currentAsccId;
 
     @PrePersist
     public void prePersist() {
@@ -100,11 +100,11 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getAsccId() {
+    public long getAsccId() {
         return asccId;
     }
 
-    public void setAsccId(int asccId) {
+    public void setAsccId(long asccId) {
         this.asccId = asccId;
     }
 
@@ -146,21 +146,21 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         this.seqKey = seqKey;
     }
 
-    public int getFromAccId() {
+    public long getFromAccId() {
         return fromAccId;
     }
 
-    public void setFromAccId(int fromAccId) {
+    public void setFromAccId(long fromAccId) {
         if (fromAccId > 0) {
             this.fromAccId = fromAccId;
         }
     }
 
-    public int getToAsccpId() {
+    public long getToAsccpId() {
         return toAsccpId;
     }
 
-    public void setToAsccpId(int toAsccpId) {
+    public void setToAsccpId(long toAsccpId) {
         if (toAsccpId > 0) {
             this.toAsccpId = toAsccpId;
         }
@@ -190,27 +190,27 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         this.deprecated = deprecated;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -262,19 +262,19 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         this.revisionAction = revisionAction;
     }
 
-    public int getReleaseId() {
-        return (releaseId == null) ? 0 : releaseId;
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
-    public int getCurrentAsccId() {
-        return (currentAsccId == null) ? 0 : currentAsccId;
+    public long getCurrentAsccId() {
+        return (currentAsccId == null) ? 0L : currentAsccId;
     }
 
-    public void setCurrentAsccId(int currentAsccId) {
+    public void setCurrentAsccId(long currentAsccId) {
         this.currentAsccId = currentAsccId;
     }
 
@@ -314,19 +314,19 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
 
     @Override
     public int hashCode() {
-        int result = asccId;
+        int result = (int) (asccId ^ (asccId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + seqKey;
-        result = 31 * result + fromAccId;
-        result = 31 * result + toAsccpId;
+        result = 31 * result + (int) (fromAccId ^ (fromAccId >>> 32));
+        result = 31 * result + (int) (toAsccpId ^ (toAsccpId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + state;

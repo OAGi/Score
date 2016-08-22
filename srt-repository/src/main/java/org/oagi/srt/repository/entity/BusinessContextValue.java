@@ -23,35 +23,35 @@ public class BusinessContextValue implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int bizCtxValueId;
+    private long bizCtxValueId;
 
     @Column(nullable = false)
-    private int bizCtxId;
+    private long bizCtxId;
 
     @Column(nullable = false)
-    private int ctxSchemeValueId;
+    private long ctxSchemeValueId;
 
-    public int getBizCtxValueId() {
+    public long getBizCtxValueId() {
         return bizCtxValueId;
     }
 
-    public void setBizCtxValueId(int bizCtxValueId) {
+    public void setBizCtxValueId(long bizCtxValueId) {
         this.bizCtxValueId = bizCtxValueId;
     }
 
-    public int getBizCtxId() {
+    public long getBizCtxId() {
         return bizCtxId;
     }
 
-    public void setBizCtxId(int bizCtxId) {
+    public void setBizCtxId(long bizCtxId) {
         this.bizCtxId = bizCtxId;
     }
 
-    public int getCtxSchemeValueId() {
+    public long getCtxSchemeValueId() {
         return ctxSchemeValueId;
     }
 
-    public void setCtxSchemeValueId(int ctxSchemeValueId) {
+    public void setCtxSchemeValueId(long ctxSchemeValueId) {
         this.ctxSchemeValueId = ctxSchemeValueId;
     }
 
@@ -70,9 +70,9 @@ public class BusinessContextValue implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = bizCtxValueId;
-        result = 31 * result + bizCtxId;
-        result = 31 * result + ctxSchemeValueId;
+        int result = (int) (bizCtxValueId ^ (bizCtxValueId >>> 32));
+        result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
+        result = 31 * result + (int) (ctxSchemeValueId ^ (ctxSchemeValueId >>> 32));
         return result;
     }
 

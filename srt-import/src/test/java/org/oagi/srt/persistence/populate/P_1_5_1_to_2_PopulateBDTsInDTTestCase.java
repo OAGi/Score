@@ -267,7 +267,7 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
             List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> expectedCdtAwdPriXpsTypeMapList =
                     cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriIdIn(
                             cdtAwdPriRepository.findByCdtId(cdt.getDtId()).stream()
-                                    .mapToInt(CoreDataTypeAllowedPrimitive::getCdtAwdPriId)
+                                    .mapToLong(CoreDataTypeAllowedPrimitive::getCdtAwdPriId)
                                     .boxed()
                                     .collect(Collectors.toList())
                     );
@@ -278,8 +278,8 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                     isTimePoint = true;
                 }
                 String defaultXSDBuiltInType = expectedDataType.getDefaultXSDBuiltInType();
-                int xsdTokenId = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
-                int defaultXBTId = xbtRepository.findOneByBuiltInType(defaultXSDBuiltInType).getXbtId();
+                long xsdTokenId = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
+                long defaultXBTId = xbtRepository.findOneByBuiltInType(defaultXSDBuiltInType).getXbtId();
 
                 for (int i = expectedCdtAwdPriXpsTypeMapList.size() - 1; i > -1; i--) {
                     boolean checkRemove = true;
@@ -305,10 +305,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
                     bdtPriRestriRepository.findByBdtId(bdt.getDtId());
             assertEquals(expectedCdtAwdPriXpsTypeMapList.size(), actualBdtPriRestriList.size());
             assertEquals(expectedCdtAwdPriXpsTypeMapList.stream()
-                            .mapToInt(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getCdtAwdPriXpsTypeMapId)
+                            .mapToLong(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getCdtAwdPriXpsTypeMapId)
                             .sum(),
                     actualBdtPriRestriList.stream()
-                            .mapToInt(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
+                            .mapToLong(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
                             .sum());
 
             String defaultXSDBuiltInType = expectedDataType.getDefaultXSDBuiltInType();
@@ -351,10 +351,10 @@ public class P_1_5_1_to_2_PopulateBDTsInDTTestCase extends AbstractTransactional
 
             assertEquals(expectedBdtPriRestriList.size(), actualBdtPriRestriList.size());
             assertEquals(expectedBdtPriRestriList.stream()
-                            .mapToInt(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
+                            .mapToLong(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
                             .sum(),
                     actualBdtPriRestriList.stream()
-                            .mapToInt(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
+                            .mapToLong(BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId)
                             .sum());
 
             String defaultXSDBuiltInType = expectedDataType.getDefaultXSDBuiltInType();

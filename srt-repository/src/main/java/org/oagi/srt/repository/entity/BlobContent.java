@@ -27,13 +27,13 @@ public class BlobContent implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int blobContentId;
+    private long blobContentId;
 
     @Column(nullable = false)
     private byte[] content;
 
     @Column(nullable = false)
-    private int releaseId;
+    private long releaseId;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id", nullable = false)
@@ -46,11 +46,11 @@ public class BlobContent implements Serializable {
         setContent(FileUtils.readFileToByteArray(file));
     }
 
-    public int getBlobContentId() {
+    public long getBlobContentId() {
         return blobContentId;
     }
 
-    public void setBlobContentId(int blobContentId) {
+    public void setBlobContentId(long blobContentId) {
         this.blobContentId = blobContentId;
     }
 
@@ -62,11 +62,11 @@ public class BlobContent implements Serializable {
         this.content = content;
     }
 
-    public int getReleaseId() {
+    public long getReleaseId() {
         return releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
@@ -94,9 +94,9 @@ public class BlobContent implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = blobContentId;
+        int result = (int) (blobContentId ^ (blobContentId >>> 32));
         result = 31 * result + Arrays.hashCode(content);
-        result = 31 * result + releaseId;
+        result = 31 * result + (int) (releaseId ^ (releaseId >>> 32));
         result = 31 * result + (module != null ? module.hashCode() : 0);
         return result;
     }

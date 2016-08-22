@@ -25,7 +25,7 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int bccId;
+    private long bccId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -37,10 +37,10 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
     private int cardinalityMax;
 
     @Column(nullable = false)
-    private int toBccpId;
+    private long fromAccId;
 
     @Column(nullable = false)
-    private int fromAccId;
+    private long toBccpId;
 
     @Column
     private int seqKey;
@@ -56,13 +56,13 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
     private String definition;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -85,10 +85,10 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
     private Integer revisionAction;
 
     @Column
-    private Integer releaseId;
+    private Long releaseId;
 
     @Column
-    private Integer currentBccId;
+    private Long currentBccId;
 
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
@@ -110,11 +110,11 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getBccId() {
+    public long getBccId() {
         return bccId;
     }
 
-    public void setBccId(int bccId) {
+    public void setBccId(long bccId) {
         this.bccId = bccId;
     }
 
@@ -148,23 +148,23 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         this.cardinalityMax = cardinalityMax;
     }
 
-    public int getToBccpId() {
-        return toBccpId;
-    }
-
-    public void setToBccpId(int toBccpId) {
-        if (toBccpId > 0) {
-            this.toBccpId = toBccpId;
-        }
-    }
-
-    public int getFromAccId() {
+    public long getFromAccId() {
         return fromAccId;
     }
 
-    public void setFromAccId(int fromAccId) {
+    public void setFromAccId(long fromAccId) {
         if (fromAccId > 0) {
             this.fromAccId = fromAccId;
+        }
+    }
+
+    public long getToBccpId() {
+        return toBccpId;
+    }
+
+    public void setToBccpId(long toBccpId) {
+        if (toBccpId > 0) {
+            this.toBccpId = toBccpId;
         }
     }
 
@@ -202,27 +202,27 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         }
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -274,19 +274,19 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         this.revisionAction = revisionAction;
     }
 
-    public int getReleaseId() {
-        return (releaseId == null) ? 0 : releaseId;
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
-    public int getCurrentBccId() {
-        return (currentBccId == null) ? 0 : currentBccId;
+    public long getCurrentBccId() {
+        return (currentBccId == null) ? 0L : currentBccId;
     }
 
-    public void setCurrentBccId(int currentBccId) {
+    public void setCurrentBccId(long currentBccId) {
         this.currentBccId = currentBccId;
     }
 
@@ -324,8 +324,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         if (bccId != that.bccId) return false;
         if (cardinalityMin != that.cardinalityMin) return false;
         if (cardinalityMax != that.cardinalityMax) return false;
-        if (toBccpId != that.toBccpId) return false;
         if (fromAccId != that.fromAccId) return false;
+        if (toBccpId != that.toBccpId) return false;
         if (seqKey != that.seqKey) return false;
         if (entityType != that.entityType) return false;
         if (createdBy != that.createdBy) return false;
@@ -353,19 +353,19 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
 
     @Override
     public int hashCode() {
-        int result = bccId;
+        int result = (int) (bccId ^ (bccId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
-        result = 31 * result + toBccpId;
-        result = 31 * result + fromAccId;
+        result = 31 * result + (int) (fromAccId ^ (fromAccId >>> 32));
+        result = 31 * result + (int) (toBccpId ^ (toBccpId >>> 32));
         result = 31 * result + seqKey;
         result = 31 * result + entityType;
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + state;
@@ -387,8 +387,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
                 ", guid='" + guid + '\'' +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
-                ", toBccpId=" + toBccpId +
                 ", fromAccId=" + fromAccId +
+                ", toBccpId=" + toBccpId +
                 ", seqKey=" + seqKey +
                 ", entityType=" + entityType +
                 ", den='" + den + '\'' +

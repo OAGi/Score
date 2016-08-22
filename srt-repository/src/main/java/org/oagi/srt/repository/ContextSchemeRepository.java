@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ContextSchemeRepository extends JpaRepository<ContextScheme, Integer> {
+public interface ContextSchemeRepository extends JpaRepository<ContextScheme, Long> {
 
     @Query("select c from ContextScheme c where c.ctxCategoryId = ?1")
-    public List<ContextScheme> findByCtxCategoryId(int ctxCategoryId);
+    public List<ContextScheme> findByCtxCategoryId(long ctxCategoryId);
 }

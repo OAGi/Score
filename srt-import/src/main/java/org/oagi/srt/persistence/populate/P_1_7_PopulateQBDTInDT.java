@@ -462,7 +462,7 @@ public class P_1_7_PopulateQBDTInDT {
         if (base.endsWith("CodeContentType") && base.startsWith("oacl")) {
             BusinessDataTypePrimitiveRestriction bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
             bdtPriRestri.setBdtId(dataType.getDtId());
-            int codeListId = getCodeListId(base.substring(0, base.indexOf("CodeContentType")));
+            long codeListId = getCodeListId(base.substring(0, base.indexOf("CodeContentType")));
             bdtPriRestri.setCodeListId(codeListId);
             bdtPriRestri.setDefault(false);
             bdtPriRestriListForSaving.add(bdtPriRestri); //for CodeList
@@ -535,7 +535,7 @@ public class P_1_7_PopulateQBDTInDT {
     private void addToDTSC(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
 
         // inherit from the base BDT
-        int ownerDtId = qbdtVO.getDtId();
+        long ownerDtId = qbdtVO.getDtId();
 
         List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
 
@@ -664,7 +664,7 @@ public class P_1_7_PopulateQBDTInDT {
                         cdtScAwdPriRepository.save(cdtScAwdPri);
 
                         // populate CDT_SC_Allowed_Primitive_Expression_Type_Map
-                        int cdtScAwdPriId =
+                        long cdtScAwdPriId =
                                 cdtScAwdPriRepository
                                         .findOneByCdtScIdAndCdtPriId(cdtScAwdPri.getCdtScId(), cdtScAwdPri.getCdtPriId())
                                         .getCdtScAwdPriId();
@@ -674,7 +674,7 @@ public class P_1_7_PopulateQBDTInDT {
                             CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
                                     new CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap();
                             cdtScAwdPriXpsTypeMap.setCdtScAwdPriId(cdtScAwdPriId);
-                            int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
+                            long xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
                             cdtScAwdPriXpsTypeMap.setXbtId(xdtBuiltTypeId);
                             cdtScAwdPriXpsTypeMapRepository.save(cdtScAwdPriXpsTypeMap);
                         }
@@ -716,10 +716,10 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
 
-    public int getCodeListId(String codeName) throws Exception {
+    public long getCodeListId(String codeName) throws Exception {
         List<CodeList> al = codeListRepository.findByNameContaining(codeName.trim());
         int minStrLen = Integer.MAX_VALUE;
-        int minInd = -1;
+        long minInd = -1L;
         for (CodeList codelistVO : al) {
             if (minStrLen > codelistVO.getName().length()) {
                 minStrLen = codelistVO.getName().length();
@@ -729,7 +729,7 @@ public class P_1_7_PopulateQBDTInDT {
         return minInd;
     }
 
-    public int getAgencyListID() throws Exception {
+    public long getAgencyListID() throws Exception {
         return agencyIdListRepository.findOneByName(AGENCY_ID_LIST_NAME).getAgencyIdListId();
     }
 
@@ -737,13 +737,13 @@ public class P_1_7_PopulateQBDTInDT {
         return dtScRepository.findOneByGuid(guid);
     }
 
-    public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, int ownerId) throws Exception {
+    public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, long ownerId) throws Exception {
         return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
-    public int getDtId(String DataTypeTerm) throws Exception {
+    public long getDtId(String DataTypeTerm) throws Exception {
         DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
-        int id = dtVO.getDtId();
+        long id = dtVO.getDtId();
         return id;
     }
 
@@ -753,20 +753,20 @@ public class P_1_7_PopulateQBDTInDT {
         return term;
     }
 
-    public String getPrimitiveName(int CdtPriId) throws Exception {
+    public String getPrimitiveName(long CdtPriId) throws Exception {
         return cdtPriRepository.findOne(CdtPriId).getName();
     }
 
 
-    public int getCdtPriId(String name) throws Exception {
+    public long getCdtPriId(String name) throws Exception {
         return cdtPriRepository.findOneByName(name).getCdtPriId();
     }
 
-    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(int cdt_id) throws Exception {
+    public List<CoreDataTypeAllowedPrimitive> getCdtAwdPriList(long cdt_id) throws Exception {
         return cdtAwdPriRepository.findByCdtId(cdt_id);
     }
 
-    public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) throws Exception {
+    public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(long dt_sc_id) throws Exception {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
             DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
@@ -775,11 +775,11 @@ public class P_1_7_PopulateQBDTInDT {
         return res;
     }
 
-    public int getXbtId(String BuiltIntype) throws Exception {
+    public long getXbtId(String BuiltIntype) throws Exception {
         return xbtRepository.findOneByBuiltInType(BuiltIntype).getXbtId();
     }
 
-    public boolean checkTokenofXBT(int cdt_awd_pri_xps_type_map_id) throws Exception {
+    public boolean checkTokenofXBT(long cdt_awd_pri_xps_type_map_id) throws Exception {
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
                 cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
         XSDBuiltInType aXSDBuiltInType = xbtRepository.findOne(
@@ -890,7 +890,7 @@ public class P_1_7_PopulateQBDTInDT {
     private void addToDTSCForContentType(XPathHandler xHandler, String typeName, DataType qbdtVO) throws Exception {
 
         // inherit from the base BDT
-        int owner_dT_iD = qbdtVO.getDtId();
+        long owner_dT_iD = qbdtVO.getDtId();
 
         List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent dtsc_vo : dtsc_vos) {

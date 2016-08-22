@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface AgencyIdListRepository extends JpaRepository<AgencyIdList, Integer> {
+public interface AgencyIdListRepository extends JpaRepository<AgencyIdList, Long> {
 
     @Query("select a from AgencyIdList a where a.guid = ?1")
     public AgencyIdList findOneByGuid(String guid);
@@ -15,5 +15,5 @@ public interface AgencyIdListRepository extends JpaRepository<AgencyIdList, Inte
 
     @Modifying
     @Query("update AgencyIdList a set a.agencyIdListId = ?1")
-    public void updateAgencyId(int agencyIdListValue);
+    public void updateAgencyId(long agencyIdListValue);
 }

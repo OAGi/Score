@@ -16,7 +16,7 @@ public class CoreComponentService {
     @Autowired
     private CoreComponentProvider coreComponentProvider;
 
-    public List<CoreComponent> getCoreComponents(int accId) {
+    public List<CoreComponent> getCoreComponents(long accId) {
         return getCoreComponents(accId, coreComponentProvider);
     }
 
@@ -26,12 +26,12 @@ public class CoreComponentService {
 
     public List<CoreComponent> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
-        int accId = acc.getAccId();
+        long accId = acc.getAccId();
         return getCoreComponents(accId, coreComponentProvider);
     }
 
     public List<CoreComponent> getCoreComponents(
-            int accId, CoreComponentProvider coreComponentProvider) {
+            long accId, CoreComponentProvider coreComponentProvider) {
         List<BasicCoreComponent> bcc_tmp_assoc = coreComponentProvider.getBCCs(accId);
         List<AssociationCoreComponent> ascc_tmp_assoc = coreComponentProvider.getASCCs(accId);
 
@@ -41,12 +41,12 @@ public class CoreComponentService {
 
     public List<CoreComponent> getCoreComponentsWithoutAttributes(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
-        int accId = acc.getAccId();
+        long accId = acc.getAccId();
         return getCoreComponentsWithoutAttributes(accId, coreComponentProvider);
     }
 
     public List<CoreComponent> getCoreComponentsWithoutAttributes(
-            int accId, CoreComponentProvider coreComponentProvider) {
+            long accId, CoreComponentProvider coreComponentProvider) {
         List<BasicCoreComponent> bcc_tmp_assoc = coreComponentProvider.getBCCsWithoutAttributes(accId);
         List<AssociationCoreComponent> ascc_tmp_assoc = coreComponentProvider.getASCCs(accId);
 

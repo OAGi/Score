@@ -23,7 +23,7 @@ public class ContextCategory implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int ctxCategoryId;
+    private long ctxCategoryId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -35,11 +35,11 @@ public class ContextCategory implements Serializable {
     @Column(length = 10 * 1024)
     private String description;
 
-    public int getCtxCategoryId() {
+    public long getCtxCategoryId() {
         return ctxCategoryId;
     }
 
-    public void setCtxCategoryId(int ctxCategoryId) {
+    public void setCtxCategoryId(long ctxCategoryId) {
         this.ctxCategoryId = ctxCategoryId;
     }
 
@@ -83,7 +83,7 @@ public class ContextCategory implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = ctxCategoryId;
+        int result = (int) (ctxCategoryId ^ (ctxCategoryId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);

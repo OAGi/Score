@@ -165,7 +165,7 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 	}
 
 	public void generate() throws Exception {
-		List<Integer> al = new ArrayList<Integer>();
+		List<Long> al = new ArrayList();
 		for (ABIEView av : abieViewList) {
 			al.add(av.getTopLevelAbie().getTopLevelAbieId());
 		}

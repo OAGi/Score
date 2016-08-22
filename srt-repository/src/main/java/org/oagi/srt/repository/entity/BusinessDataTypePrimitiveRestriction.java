@@ -23,22 +23,22 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int bdtPriRestriId;
+    private long bdtPriRestriId;
 
     @Column(nullable = false)
-    private int bdtId;
+    private long bdtId;
 
     @Column
-    private Integer cdtAwdPriXpsTypeMapId;
+    private Long cdtAwdPriXpsTypeMapId;
 
     @Column
-    private Integer codeListId;
+    private Long codeListId;
+
+    @Column
+    private Long agencyIdListId;
 
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
-
-    @Column
-    private Integer agencyIdListId;
 
     public BusinessDataTypePrimitiveRestriction() {}
 
@@ -46,39 +46,49 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
         this.bdtPriRestriId = bdtPriRestriId;
     }
 
-    public int getBdtPriRestriId() {
+    public long getBdtPriRestriId() {
         return bdtPriRestriId;
     }
 
-    public void setBdtPriRestriId(int bdtPriRestriId) {
+    public void setBdtPriRestriId(long bdtPriRestriId) {
         this.bdtPriRestriId = bdtPriRestriId;
     }
 
-    public int getBdtId() {
+    public long getBdtId() {
         return bdtId;
     }
 
-    public void setBdtId(int bdtId) {
+    public void setBdtId(long bdtId) {
         this.bdtId = bdtId;
     }
 
-    public int getCdtAwdPriXpsTypeMapId() {
-        return (cdtAwdPriXpsTypeMapId == null) ? 0 : cdtAwdPriXpsTypeMapId;
+    public long getCdtAwdPriXpsTypeMapId() {
+        return (cdtAwdPriXpsTypeMapId == null) ? 0L : cdtAwdPriXpsTypeMapId;
     }
 
-    public void setCdtAwdPriXpsTypeMapId(int cdtAwdPriXpsTypeMapId) {
+    public void setCdtAwdPriXpsTypeMapId(long cdtAwdPriXpsTypeMapId) {
         if (cdtAwdPriXpsTypeMapId > 0) {
             this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
         }
     }
 
-    public int getCodeListId() {
-        return (codeListId == null) ? 0 : codeListId;
+    public long getCodeListId() {
+        return (codeListId == null) ? 0L : codeListId;
     }
 
-    public void setCodeListId(int codeListId) {
+    public void setCodeListId(long codeListId) {
         if (codeListId > 0) {
             this.codeListId = codeListId;
+        }
+    }
+
+    public long getAgencyIdListId() {
+        return (agencyIdListId == null) ? 0L : agencyIdListId;
+    }
+
+    public void setAgencyIdListId(long agencyIdListId) {
+        if (agencyIdListId > 0) {
+            this.agencyIdListId = agencyIdListId;
         }
     }
 
@@ -88,16 +98,6 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
-    }
-
-    public int getAgencyIdListId() {
-        return (agencyIdListId == null) ? 0 : agencyIdListId;
-    }
-
-    public void setAgencyIdListId(int agencyIdListId) {
-        if (agencyIdListId > 0) {
-            this.agencyIdListId = agencyIdListId;
-        }
     }
 
     @Override
@@ -119,12 +119,12 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = bdtPriRestriId;
-        result = 31 * result + bdtId;
+        int result = (int) (bdtPriRestriId ^ (bdtPriRestriId >>> 32));
+        result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (cdtAwdPriXpsTypeMapId != null ? cdtAwdPriXpsTypeMapId.hashCode() : 0);
         result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
-        result = 31 * result + (isDefault ? 1 : 0);
         result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        result = 31 * result + (isDefault ? 1 : 0);
         return result;
     }
 
@@ -135,8 +135,8 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
                 ", bdtId=" + bdtId +
                 ", cdtAwdPriXpsTypeMapId=" + cdtAwdPriXpsTypeMapId +
                 ", codeListId=" + codeListId +
-                ", isDefault=" + isDefault +
                 ", agencyIdListId=" + agencyIdListId +
+                ", isDefault=" + isDefault +
                 '}';
     }
 }

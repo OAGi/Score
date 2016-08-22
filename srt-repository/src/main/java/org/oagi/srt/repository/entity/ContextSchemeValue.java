@@ -23,7 +23,7 @@ public class ContextSchemeValue implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int ctxSchemeValueId;
+    private long ctxSchemeValueId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -36,13 +36,13 @@ public class ContextSchemeValue implements Serializable {
     private String meaning;
 
     @Column
-    private Integer ownerCtxSchemeId;
+    private Long ownerCtxSchemeId;
 
-    public int getCtxSchemeValueId() {
+    public long getCtxSchemeValueId() {
         return ctxSchemeValueId;
     }
 
-    public void setCtxSchemeValueId(int ctxSchemeValueId) {
+    public void setCtxSchemeValueId(long ctxSchemeValueId) {
         this.ctxSchemeValueId = ctxSchemeValueId;
     }
 
@@ -70,11 +70,11 @@ public class ContextSchemeValue implements Serializable {
         this.meaning = meaning;
     }
 
-    public int getOwnerCtxSchemeId() {
-        return (ownerCtxSchemeId == null) ? 0 : ownerCtxSchemeId;
+    public long getOwnerCtxSchemeId() {
+        return (ownerCtxSchemeId == null) ? 0L : ownerCtxSchemeId;
     }
 
-    public void setOwnerCtxSchemeId(int ownerCtxSchemeId) {
+    public void setOwnerCtxSchemeId(long ownerCtxSchemeId) {
         this.ownerCtxSchemeId = ownerCtxSchemeId;
     }
 
@@ -95,7 +95,7 @@ public class ContextSchemeValue implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = ctxSchemeValueId;
+        int result = (int) (ctxSchemeValueId ^ (ctxSchemeValueId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (meaning != null ? meaning.hashCode() : 0);

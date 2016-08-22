@@ -55,7 +55,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
     @Autowired
     private CoreDataTypeSupplementaryComponentAllowedPrimitiveRepository cdtScAwdPriRepository;
 
-    private int agencyIdListId;
+    private long agencyIdListId;
 
     @Transactional(rollbackFor = Throwable.class)
     public void run(ApplicationContext applicationContext) throws Exception {
@@ -97,7 +97,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     result = xh2.getNode("//xsd:attribute[@id='" + aDataTypeSupplementaryComponent.getGuid() + "']");
                     tmp_guid = aDataTypeSupplementaryComponent.getGuid();
 
-                    if (aDataTypeSupplementaryComponent.getBasedDtScId() != 0 && result == null) {
+                    if (aDataTypeSupplementaryComponent.getBasedDtScId() != 0L && result == null) {
                         DataTypeSupplementaryComponent dtscVO = getDTSC(aDataTypeSupplementaryComponent.getBasedDtScId());
                         result = xh.getNode("//xsd:attribute[@id='" + dtscVO.getGuid() + "']");
                         tmp_guid = dtscVO.getGuid();
@@ -109,7 +109,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                 }
 
                 Element ele = (Element) result;
-                int codeListId = 0;
+                long codeListId = 0L;
                 String ele_name = "";
 
                 System.out.print("***** " + aDataTypeSupplementaryComponent.getPropertyTerm() + "_" + aDataTypeSupplementaryComponent.getRepresentationTerm() + " Start! " + aDataTypeSupplementaryComponent.getGuid());
@@ -121,7 +121,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     if (codeList != null) {
                         codeListId = codeList.getCodeListId();
                     } else {
-                        codeListId = 0;
+                        codeListId = 0L;
                     }
                     ele_name = ele.getAttribute("name");
                     logger.debug(" attrTypeName= " + attrTypeName + " codelist=" + codeListId);
@@ -248,28 +248,28 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                     //logger.debug("Populating bdt sc primitive restriction for bdt sc = "+aDataTypeSupplementaryComponent.getPropertyTerm()+aDataTypeSupplementaryComponent.getRepresentationTerm()+" owner dt den = "+getDen(aDataTypeSupplementaryComponent.getOwnerDtId())+" code list id = "+bVO.getCodeListId()+" agency id list id = "+bVO.getAgencyIDListID()+ " is default = "+bVO.isDefault());
                     bdtScPriRestriRepository.save(bVO);
 
-                    int CDT_Primitive_id = cdtPriRepository.findOneByName("Token").getCdtPriId();
+                    long CDT_Primitive_id = cdtPriRepository.findOneByName("Token").getCdtPriId();
 
-                    int xbt_id = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
+                    long xbt_id = xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
 
-                    int cdt_id = 0;
+                    long cdt_id = 0L;
                     DataTypeSupplementaryComponent stscVO = dtScRepository.findOne(aDataTypeSupplementaryComponent.getBasedDtScId());
                     if (stscVO == null) {
                         stscVO = new DataTypeSupplementaryComponent();
                     }
-                    if (stscVO.getBasedDtScId() < 1) {
+                    if (stscVO.getBasedDtScId() < 1L) {
                         cdt_id = aDataTypeSupplementaryComponent.getBasedDtScId();
                     } else {
                         cdt_id = stscVO.getBasedDtScId();
                     }
 
-                    int cdt_sc_awd_pri_id = 0;
-                    if (cdt_id > 0) {
+                    long cdt_sc_awd_pri_id = 0L;
+                    if (cdt_id > 0L) {
                         cdt_sc_awd_pri_id = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdt_id, CDT_Primitive_id).getCdtScAwdPriId();
                     }
 
-                    int CDTSCAllowedPrimitiveExpressionTypeMapID = 0;
-                    if (cdt_sc_awd_pri_id > 0) {
+                    long CDTSCAllowedPrimitiveExpressionTypeMapID = 0L;
+                    if (cdt_sc_awd_pri_id > 0L) {
                         CDTSCAllowedPrimitiveExpressionTypeMapID = cdtScAwdPriXpsTypeMapRepository.
                                 findOneByCdtScAwdPriIdAndXbtId(cdt_sc_awd_pri_id, xbt_id).getCdtScAwdPriXpsTypeMapId();
                     }
@@ -319,7 +319,7 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
                             XSDBuiltInType xbtVO = getXbtId(aCDTSCAllowedPrimitiveExVO.getXbtId());
                             String xdtName = xbtVO.getBuiltInType();
 
-                            int cdtPrimitiveId = aCDTSCAllowedPrimitiveVO.getCdtPriId();
+                            long cdtPrimitiveId = aCDTSCAllowedPrimitiveVO.getCdtPriId();
 
                             String representationTerm = aDataTypeSupplementaryComponent.getRepresentationTerm();
                             if (representationTerm.equalsIgnoreCase("Code") && xdtName.equalsIgnoreCase("xsd:token") && "Token".equalsIgnoreCase(getCDTPrimitiveName(cdtPrimitiveId))) {
@@ -368,15 +368,15 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         }
     }
 
-    public DataTypeSupplementaryComponent getDTSC(int id) throws Exception {
+    public DataTypeSupplementaryComponent getDTSC(long id) throws Exception {
         return dtScRepository.findOne(id);
     }
 
-    public String getDen(int id) throws Exception {
+    public String getDen(long id) throws Exception {
         return dataTypeRepository.findOne(id).getDen();
     }
 
-    public boolean isBDTSC(int id) throws Exception {
+    public boolean isBDTSC(long id) throws Exception {
         DataType tmp = dataTypeRepository.findOne(id);
 
         if (tmp != null && tmp.getType() == 1)
@@ -384,11 +384,11 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         return false;
     }
 
-    public String getCDTPrimitiveName(int id) throws Exception {
+    public String getCDTPrimitiveName(long id) throws Exception {
         return cdtPriRepository.findOne(id).getName();
     }
 
-    public XSDBuiltInType getXbtId(int id) throws Exception {
+    public XSDBuiltInType getXbtId(long id) throws Exception {
         return xbtRepository.findOne(id);
     }
 

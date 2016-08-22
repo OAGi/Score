@@ -186,7 +186,7 @@ public class P_1_4_PopulateCodeList {
         return null;
     }
 
-    private int getAgencyID(int value) {
+    private long getAgencyID(int value) {
         return agencyIdListValueRepository.findOneByValue(String.valueOf(value)).getAgencyIdListValueId();
     }
 

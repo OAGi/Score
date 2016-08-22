@@ -42,7 +42,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         DefaultExportContext context = new DefaultExportContext();
 
         List<Module> moduleList = moduleRepository.findAll();
-        Map<Integer, SchemaModule> moduleMap = moduleList.stream()
+        Map<Long, SchemaModule> moduleMap = moduleList.stream()
                 .collect(Collectors.toMap(Module::getModuleId, module -> new SchemaModule(module)));
 
         createSchemaModules(context, moduleMap);
@@ -58,7 +58,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         return context;
     }
 
-    private void createSchemaModules(DefaultExportContext context, Map<Integer, SchemaModule> moduleMap) {
+    private void createSchemaModules(DefaultExportContext context, Map<Long, SchemaModule> moduleMap) {
         for (SchemaModule schemaModule : moduleMap.values()) {
             context.addSchemaModule(schemaModule);
         }
@@ -81,7 +81,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
     }
 
-    private void createAgencyIdList(Map<Integer, SchemaModule> moduleMap) {
+    private void createAgencyIdList(Map<Long, SchemaModule> moduleMap) {
         for (AgencyIdList agencyIdList : importedDataProvider.findAgencyIdList()) {
             List<AgencyIdListValue> agencyIdListValues =
                     importedDataProvider.findAgencyIdListValueByOwnerListId(agencyIdList.getAgencyIdListId());
@@ -91,9 +91,9 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
     }
 
-    private void createCodeLists(Map<Integer, SchemaModule> moduleMap) {
+    private void createCodeLists(Map<Long, SchemaModule> moduleMap) {
         List<CodeList> codeLists = importedDataProvider.findCodeList();
-        Map<Integer, SchemaCodeList> schemaCodeListMap = new HashMap();
+        Map<Long, SchemaCodeList> schemaCodeListMap = new HashMap();
         for (CodeList codeList : codeLists) {
             SchemaCodeList schemaCodeList = new SchemaCodeList();
             schemaCodeList.setGuid(codeList.getGuid());
@@ -128,7 +128,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         return new BdtsBlob(blobContent.getContent());
     }
 
-    private void createBDT(BdtsBlob bdtsBlob, Map<Integer, SchemaModule> moduleMap) {
+    private void createBDT(BdtsBlob bdtsBlob, Map<Long, SchemaModule> moduleMap) {
         List<DataType> bdtList = importedDataProvider.findDT().stream()
                 .filter(e -> e.getType() == 1).collect(Collectors.toList());
         for (DataType bdt : bdtList) {
@@ -156,7 +156,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
     }
 
-    private void createBCCP(Map<Integer, SchemaModule> moduleMap) {
+    private void createBCCP(Map<Long, SchemaModule> moduleMap) {
         for (BasicCoreComponentProperty bccp : importedDataProvider.findBCCP()) {
 
             List<BasicCoreComponent> bccList = importedDataProvider.findBCCByToBccpId(bccp.getBccpId());
@@ -182,7 +182,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         return sumOfEntityTypes != 0;
     }
 
-    private void createACC(Map<Integer, SchemaModule> moduleMap) {
+    private void createACC(Map<Long, SchemaModule> moduleMap) {
         for (AggregateCoreComponent acc : importedDataProvider.findACC()) {
             Module module = acc.getModule();
             if (module == null) {
@@ -193,7 +193,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
     }
 
-    private void createASCCP(Map<Integer, SchemaModule> moduleMap) {
+    private void createASCCP(Map<Long, SchemaModule> moduleMap) {
         for (AssociationCoreComponentProperty asccp :
                 importedDataProvider.findASCCP().stream()
                         .filter(e -> e.isReusableIndicator()).collect(Collectors.toList())) {
@@ -207,7 +207,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
     }
 
-    private void createBlobContents(Map<Integer, SchemaModule> moduleMap) {
+    private void createBlobContents(Map<Long, SchemaModule> moduleMap) {
         for (BlobContent blobContent : blobContentRepository.findAll()) {
 
             SchemaModule schemaModule = moduleMap.get(blobContent.getModule().getModuleId());

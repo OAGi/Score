@@ -24,25 +24,25 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "2000"),
             }
     )
-    private int bbieId;
+    private long bbieId;
 
     @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
-    private int basedBccId;
+    private long basedBccId;
 
     @Column(nullable = false)
-    private int fromAbieId;
+    private long fromAbieId;
 
     @Column(nullable = false)
-    private int toBbiepId;
+    private long toBbiepId;
 
     @Column
-    private Integer bdtPriRestriId;
+    private Long bdtPriRestriId;
 
     @Column
-    private Integer codeListId;
+    private Long codeListId;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -70,10 +70,10 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     private String remark;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -90,7 +90,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     private boolean used;
 
     @Column(nullable = false)
-    private int ownerTopLevelAbieId;
+    private long ownerTopLevelAbieId;
 
     @PrePersist
     public void prePersist() {
@@ -104,20 +104,20 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return getBbieId();
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(long id) {
         setBbieId(id);
     }
 
-    public int getBbieId() {
+    public long getBbieId() {
         return bbieId;
     }
 
-    public void setBbieId(int bbieId) {
+    public void setBbieId(long bbieId) {
         this.bbieId = bbieId;
     }
 
@@ -129,43 +129,43 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.guid = guid;
     }
 
-    public int getBasedBccId() {
+    public long getBasedBccId() {
         return basedBccId;
     }
 
-    public void setBasedBccId(int basedBccId) {
+    public void setBasedBccId(long basedBccId) {
         this.basedBccId = basedBccId;
     }
 
-    public int getFromAbieId() {
+    public long getFromAbieId() {
         return fromAbieId;
     }
 
-    public void setFromAbieId(int fromAbieId) {
+    public void setFromAbieId(long fromAbieId) {
         this.fromAbieId = fromAbieId;
     }
 
-    public int getToBbiepId() {
+    public long getToBbiepId() {
         return toBbiepId;
     }
 
-    public void setToBbiepId(int toBbiepId) {
+    public void setToBbiepId(long toBbiepId) {
         this.toBbiepId = toBbiepId;
     }
 
-    public int getBdtPriRestriId() {
-        return (bdtPriRestriId == null) ? 0 : bdtPriRestriId;
+    public long getBdtPriRestriId() {
+        return (bdtPriRestriId == null) ? 0L : bdtPriRestriId;
     }
 
-    public void setBdtPriRestriId(Integer bdtPriRestriId) {
+    public void setBdtPriRestriId(Long bdtPriRestriId) {
         this.bdtPriRestriId = bdtPriRestriId;
     }
 
-    public int getCodeListId() {
-        return (codeListId == null) ? 0 : codeListId;
+    public long getCodeListId() {
+        return (codeListId == null) ? 0L : codeListId;
     }
 
-    public void setCodeListId(Integer codeListId) {
+    public void setCodeListId(Long codeListId) {
         this.codeListId = codeListId;
     }
 
@@ -239,19 +239,19 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.remark = remark;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -287,11 +287,11 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.used = used;
     }
 
-    public int getOwnerTopLevelAbieId() {
+    public long getOwnerTopLevelAbieId() {
         return ownerTopLevelAbieId;
     }
 
-    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
@@ -333,11 +333,11 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     public int hashCode() {
         int result;
         long temp;
-        result = bbieId;
+        result = (int) (bbieId ^ (bbieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + basedBccId;
-        result = 31 * result + fromAbieId;
-        result = 31 * result + toBbiepId;
+        result = 31 * result + (int) (basedBccId ^ (basedBccId >>> 32));
+        result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
+        result = 31 * result + (int) (toBbiepId ^ (toBbiepId >>> 32));
         result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
         result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
@@ -348,14 +348,14 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         result = 31 * result + (nill ? 1 : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         temp = Double.doubleToLongBits(seqKey);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + ownerTopLevelAbieId;
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 

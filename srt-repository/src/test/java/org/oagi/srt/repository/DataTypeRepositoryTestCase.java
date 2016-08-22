@@ -25,7 +25,7 @@ public class DataTypeRepositoryTestCase extends AbstractTransactionalJUnit4Sprin
 
     @Test
     public void test_findOneByDtId() {
-        int dtId = 1;
+        long dtId = 1L;
         String expectedGuid = "oagis-id-3bfbbc07cffc47a886496961b0f6b292";
         DataType dataType = dataTypeRepository.findOne(dtId);
         String actualGuid = dataType.getGuid();
@@ -41,7 +41,7 @@ public class DataTypeRepositoryTestCase extends AbstractTransactionalJUnit4Sprin
         expectedDataType.setDen("Test. Type");
 
         Module module = new Module();
-        module.setModuleId(1);
+        module.setModuleId(1L);
         module.setModule("Model\\BODs\\AcknowledgeAllocateResource.xsd");
         module.setNamespace(new Namespace());
         module.setRelease(new Release());

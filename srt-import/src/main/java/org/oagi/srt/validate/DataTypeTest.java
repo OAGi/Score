@@ -118,7 +118,7 @@ public class DataTypeTest {
                     Element ccDefinitionElement = (Element) ccDefinitionNode;
 
                     Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
-                    int defaultId = -1;
+                    long defaultId = -1L;
 
                     if (union != null) {
                         defaultId = xbtRepository.findOneByName("token").getXbtId();
@@ -187,7 +187,7 @@ public class DataTypeTest {
         Element aElementBDT = (Element) aNodeBDT;
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
-        int defaultId = -1;
+        long defaultId = -1L;
         if (union != null) {
             defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
@@ -277,7 +277,7 @@ public class DataTypeTest {
         Element aElementBDT = (Element) aNodeBDT;
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
-        int defaultId = -1;
+        long defaultId = -1L;
         if (union != null) {
             defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
@@ -346,7 +346,7 @@ public class DataTypeTest {
         Element aElementBDT = (Element) aNodeBDT;
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
-        int defaultId = -1;
+        long defaultId = -1L;
         if (union != null) {
             defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
@@ -383,7 +383,7 @@ public class DataTypeTest {
         }
     }
 
-    private void validateInsertBDTPrimitiveRestriction(int cdtID, int bdtID, int defaultId) {
+    private void validateInsertBDTPrimitiveRestriction(long cdtID, long bdtID, long defaultId) {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
 
         for (CoreDataTypeAllowedPrimitive aCoreDataTypeAllowedPrimitive : al3) {
@@ -427,12 +427,12 @@ public class DataTypeTest {
         }
     }
 
-    private void validateInsertBDTPrimitiveRestriction(int basedBdtId, int bdtId) {
+    private void validateInsertBDTPrimitiveRestriction(long basedBdtId, long bdtId) {
         List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(basedBdtId);
 
         for (BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction : al) {
-            int cdtAwdPriXpsTypeMapId = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
-            int codeListId = aBusinessDataTypePrimitiveRestriction.getCodeListId();
+            long cdtAwdPriXpsTypeMapId = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
+            long codeListId = aBusinessDataTypePrimitiveRestriction.getCodeListId();
 
             Object result = null;
             if (cdtAwdPriXpsTypeMapId != 0 && codeListId != 0) {
@@ -1172,7 +1172,7 @@ public class DataTypeTest {
         if (!qbdtVO.getDen().contains("_"))
             qbdtVO = getDataType(qbdtVO.getBasedDtId());
 
-        int owner_dT_iD = qbdtVO.getDtId();
+        long owner_dT_iD = qbdtVO.getDtId();
 
         List<DataTypeSupplementaryComponent> basedtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent basedtsc_vo : basedtsc_vos) {
@@ -1203,7 +1203,7 @@ public class DataTypeTest {
         if (!qbdtVO.getDen().contains("_"))
             qbdtVO = getDataType(qbdtVO.getBasedDtId());
 
-        int owner_dT_iD = qbdtVO.getDtId();
+        long owner_dT_iD = qbdtVO.getDtId();
 
         List<DataTypeSupplementaryComponent> dtsc_vos = dtScRepository.findByOwnerDtId(qbdtVO.getBasedDtId());
         for (DataTypeSupplementaryComponent dtsc_vo : dtsc_vos) {
@@ -1314,10 +1314,10 @@ public class DataTypeTest {
                         else
                             ;//System.out.println("Success!!");
 
-                        int cdtSCAllowedPrimitiveId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAllowedVO.getCdtScId(), cdtSCAllowedVO.getCdtPriId()).getCdtScAwdPriId();
+                        long cdtSCAllowedPrimitiveId = cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCAllowedVO.getCdtScId(), cdtSCAllowedVO.getCdtPriId()).getCdtScAwdPriId();
                         List<String> xsdbs = Types.getCorrespondingXSDBuiltType(getPrimitiveName(cdtSCAllowedVO.getCdtPriId()));
                         for (String xbt : xsdbs) {
-                            int xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
+                            long xdtBuiltTypeId = xbtRepository.findOneByBuiltInType(xbt).getXbtId();
 
                             try {
                                 cdtScAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAllowedPrimitiveId, xdtBuiltTypeId);
@@ -1335,7 +1335,7 @@ public class DataTypeTest {
         }
     }
 
-    private List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> getCdtSCAPMap(int cdtSCAllowedPrimitiveId) {
+    private List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> getCdtSCAPMap(long cdtSCAllowedPrimitiveId) {
         return cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriId(cdtSCAllowedPrimitiveId);
     }
 
@@ -1343,12 +1343,12 @@ public class DataTypeTest {
         return dtScRepository.findOneByOwnerDtIdAndPropertyTermAndRepresentationTerm(dtVO.getOwnerDtId(), dtVO.getPropertyTerm(), dtVO.getRepresentationTerm());
     }
 
-    public int getCodeListId(String codeName) {
+    public long getCodeListId(String codeName) {
         CodeList codelistVO = codeListRepository.findByNameContaining(codeName.trim()).get(0);
         return codelistVO.getCodeListId();
     }
 
-    public int getAgencyListID() {
+    public long getAgencyListID() {
         AgencyIdList agencyidlistVO = agencyIdListRepository.findOneByName("Agency Identification");
         return agencyidlistVO.getAgencyIdListId();
     }
@@ -1357,20 +1357,20 @@ public class DataTypeTest {
         return dtScRepository.findOneByGuid(guid);
     }
 
-    public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, int ownerId) {
+    public DataTypeSupplementaryComponent getDataTypeSupplementaryComponent(String guid, long ownerId) {
         return dtScRepository.findOneByGuidAndOwnerDtId(guid, ownerId);
     }
 
-    public int getDtId(String DataTypeTerm) {
+    public long getDtId(String DataTypeTerm) {
         DataType dtVO = dataTypeRepository.findOneByDataTypeTermAndType(DataTypeTerm, 0);
-        int id = dtVO.getDtId();
+        long id = dtVO.getDtId();
         return id;
     }
 
-    public int getCdtScId(int DtScId) {
+    public long getCdtScId(int DtScId) {
         CoreDataTypeSupplementaryComponentAllowedPrimitive cdtVO =
                 cdtScAwdPriRepository.findByCdtScId(DtScId).get(0);
-        int id = cdtVO.getCdtScId();
+        long id = cdtVO.getCdtScId();
         return id;
     }
 
@@ -1380,15 +1380,15 @@ public class DataTypeTest {
         return term;
     }
 
-    public String getPrimitiveName(int CDTPrimitiveID) {
+    public String getPrimitiveName(long CDTPrimitiveID) {
         return cdtPriRepository.findOne(CDTPrimitiveID).getName();
     }
 
-    public List<CoreDataTypeAllowedPrimitive> getCDTAllowedPrimitiveIDs(int cdt_id) {
+    public List<CoreDataTypeAllowedPrimitive> getCDTAllowedPrimitiveIDs(long cdt_id) {
         return cdtAwdPriRepository.findByCdtId(cdt_id);
     }
 
-    public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(int dt_sc_id) {
+    public List<CoreDataTypeSupplementaryComponentAllowedPrimitive> getCdtSCAllowedPrimitiveID(long dt_sc_id) {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> res = cdtScAwdPriRepository.findByCdtScId(dt_sc_id);
         if (res.isEmpty()) {
             DataTypeSupplementaryComponent dtscVO = dtScRepository.findOne(dt_sc_id);
@@ -1397,7 +1397,7 @@ public class DataTypeTest {
         return res;
     }
 
-    public int getXSDBuiltInTypeID(String BuiltIntype) {
+    public long getXSDBuiltInTypeID(String BuiltIntype) {
         return xbtRepository.findOneByBuiltInType(BuiltIntype).getXbtId();
     }
 
@@ -1414,13 +1414,13 @@ public class DataTypeTest {
         return dataTypeRepository.findOneByDataTypeTermAndType(representationTerm, 0);
     }
 
-    private DataType getDataType(int dtid) {
+    private DataType getDataType(long dtid) {
         return dataTypeRepository.findOne(dtid);
     }
 
     private void validate_bdt_pri_resti(String datatype) {
         DataType dataType = dataTypeRepository.findByDen(Utility.typeToDen(datatype)).get(0);
-        int bdt_id = dataType.getDtId();
+        long bdt_id = dataType.getDtId();
 
         List<BusinessDataTypePrimitiveRestriction> bdt_pri_resti_list = bdtPriRestriRepository.findByBdtId(bdt_id);
 
@@ -1506,23 +1506,23 @@ public class DataTypeTest {
         String cdtPriTerm;
         String xsdBuiltInType;
 
-        public BdtPriResti(int id) {
+        public BdtPriResti(long id) {
             List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
                     bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(id);
             BusinessDataTypePrimitiveRestriction aBusinessDataTypePrimitiveRestriction = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
-            int bdt_id = aBusinessDataTypePrimitiveRestriction.getBdtId();
+            long bdt_id = aBusinessDataTypePrimitiveRestriction.getBdtId();
 
             DataType aDataType = dataTypeRepository.findOne(bdt_id);
 
             bdtDen = aDataType.getDen();
 
-            int cdt_awd_pri_xps_type_map_id = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
+            long cdt_awd_pri_xps_type_map_id = aBusinessDataTypePrimitiveRestriction.getCdtAwdPriXpsTypeMapId();
 
             CoreDataTypeAllowedPrimitiveExpressionTypeMap aCoreDataTypeAllowedPrimitiveExpressionTypeMap =
                     cdtAwdPriXpsTypeMapRepository.findOne(cdt_awd_pri_xps_type_map_id);
 
-            int cdt_awd_pri_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriId();
-            int xbt_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId();
+            long cdt_awd_pri_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getCdtAwdPriId();
+            long xbt_id = aCoreDataTypeAllowedPrimitiveExpressionTypeMap.getXbtId();
 
             CoreDataTypeAllowedPrimitive cdtAllowedPrimitiveVO = cdtAwdPriRepository.findOne(cdt_awd_pri_id);
 
@@ -1556,7 +1556,7 @@ public class DataTypeTest {
             DataTypeSupplementaryComponent dtscvo = DTSC;
             if (dtscvo.getBasedDtScId() == 0)
                 continue;
-            int dt_id = dtscvo.getOwnerDtId();
+            long dt_id = dtscvo.getOwnerDtId();
 
             DataType ownerDT = dataTypeRepository.findOne(dt_id);
             if (ownerDT.getDen().contains("_")) {// if BDT is default BDT

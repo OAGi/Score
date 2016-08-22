@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface CoreComponentProvider {
 
-    public List<BasicCoreComponent> getBCCs(int accId);
+    public List<BasicCoreComponent> getBCCs(long accId);
 
-    public List<BasicCoreComponent> getBCCsWithoutAttributes(int accId);
+    public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId);
 
-    public List<AssociationCoreComponent> getASCCs(int accId);
+    public List<AssociationCoreComponent> getASCCs(long accId);
 
 }

@@ -393,7 +393,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     baseNode = xh.getNode("//xsd:simpleType[@name = '" + base + "']");
 
                 DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
-                int based_dt_id = basedDt.getDtId();
+                long based_dt_id = basedDt.getDtId();
                 List<DataTypeSupplementaryComponent> baseDefaultDTSCs = dtScRepository.findByOwnerDtId(based_dt_id);
 
                 //adding additional SCs for attributes
@@ -596,7 +596,7 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
                     baseNode = xh.getNode("//xsd:simpleType[@name = '" + base + "']");
 
                 DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
-                int based_dt_id = basedDt.getDtId();
+                long based_dt_id = basedDt.getDtId();
                 List<DataTypeSupplementaryComponent> baseDefaultDTSCs = dtScRepository.findByOwnerDtId(based_dt_id);
 
                 //adding additional SCs for attributes

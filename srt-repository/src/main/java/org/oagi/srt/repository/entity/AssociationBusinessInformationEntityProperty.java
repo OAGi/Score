@@ -24,16 +24,16 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "2000"),
             }
     )
-    private int asbiepId;
+    private long asbiepId;
 
     @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
-    private int basedAsccpId;
+    private long basedAsccpId;
 
     @Column(nullable = false)
-    private int roleOfAbieId;
+    private long roleOfAbieId;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -46,10 +46,10 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     private String bizTerm;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -60,7 +60,7 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int ownerTopLevelAbieId;
+    private long ownerTopLevelAbieId;
 
     @PrePersist
     public void prePersist() {
@@ -74,20 +74,20 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return getAsbiepId();
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(long id) {
         setAsbiepId(id);
     }
 
-    public int getAsbiepId() {
+    public long getAsbiepId() {
         return asbiepId;
     }
 
-    public void setAsbiepId(int asbiepId) {
+    public void setAsbiepId(long asbiepId) {
         this.asbiepId = asbiepId;
     }
 
@@ -99,19 +99,19 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
         this.guid = guid;
     }
 
-    public int getBasedAsccpId() {
+    public long getBasedAsccpId() {
         return basedAsccpId;
     }
 
-    public void setBasedAsccpId(int basedAsccpId) {
+    public void setBasedAsccpId(long basedAsccpId) {
         this.basedAsccpId = basedAsccpId;
     }
 
-    public int getRoleOfAbieId() {
+    public long getRoleOfAbieId() {
         return roleOfAbieId;
     }
 
-    public void setRoleOfAbieId(int roleOfAbieId) {
+    public void setRoleOfAbieId(long roleOfAbieId) {
         this.roleOfAbieId = roleOfAbieId;
     }
 
@@ -139,19 +139,19 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
         this.bizTerm = bizTerm;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -171,11 +171,11 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getOwnerTopLevelAbieId() {
+    public long getOwnerTopLevelAbieId() {
         return ownerTopLevelAbieId;
     }
 
-    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
@@ -204,18 +204,18 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
 
     @Override
     public int hashCode() {
-        int result = asbiepId;
+        int result = (int) (asbiepId ^ (asbiepId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + basedAsccpId;
-        result = 31 * result + roleOfAbieId;
+        result = 31 * result + (int) (basedAsccpId ^ (basedAsccpId >>> 32));
+        result = 31 * result + (int) (roleOfAbieId ^ (roleOfAbieId >>> 32));
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + ownerTopLevelAbieId;
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 

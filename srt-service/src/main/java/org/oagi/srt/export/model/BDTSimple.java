@@ -2,7 +2,7 @@ package org.oagi.srt.export.model;
 
 public interface BDTSimple {
 
-    public int getBdtId();
+    public long getBdtId();
 
     public String getName();
 

@@ -46,7 +46,7 @@ public abstract class ACC implements Component {
         }
     }
 
-    public int getRawId() {
+    public long getRawId() {
         return acc.getAccId();
     }
 

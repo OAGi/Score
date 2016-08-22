@@ -15,7 +15,7 @@ public class BDTSimpleType implements BDTSimple {
     }
 
     @Override
-    public int getBdtId() {
+    public long getBdtId() {
         return dataType.getDtId();
     }
 

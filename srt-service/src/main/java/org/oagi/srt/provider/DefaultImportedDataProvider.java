@@ -138,17 +138,17 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return Collections.unmodifiableList(findAgencyIdListList);
     }
 
-    private Map<Integer, AgencyIdList> findAgencyIdListMap;
+    private Map<Long, AgencyIdList> findAgencyIdListMap;
 
     @Override
-    public AgencyIdList findAgencyIdList(int agencyIdListId) {
+    public AgencyIdList findAgencyIdList(long agencyIdListId) {
         return findAgencyIdListMap.get(agencyIdListId);
     }
 
-    private Map<Integer, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
+    private Map<Long, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
 
     @Override
-    public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(int ownerListId) {
+    public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(long ownerListId) {
         return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ? findAgencyIdListValueByOwnerListIdMap.get(ownerListId) : Collections.emptyList();
     }
 
@@ -159,17 +159,17 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return Collections.unmodifiableList(findCodeListList);
     }
 
-    private Map<Integer, CodeList> findCodeListMap;
+    private Map<Long, CodeList> findCodeListMap;
 
     @Override
-    public CodeList findCodeList(int codeListId) {
+    public CodeList findCodeList(long codeListId) {
         return findCodeListMap.get(codeListId);
     }
 
-    private Map<Integer, List<CodeListValue>> findCodeListValueByCodeListIdMap;
+    private Map<Long, List<CodeListValue>> findCodeListValueByCodeListIdMap;
 
     @Override
-    public List<CodeListValue> findCodeListValueByCodeListId(int codeListId) {
+    public List<CodeListValue> findCodeListValueByCodeListId(long codeListId) {
         return (findCodeListValueByCodeListIdMap.containsKey(codeListId)) ? findCodeListValueByCodeListIdMap.get(codeListId) : Collections.emptyList();
     }
 
@@ -180,45 +180,45 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return Collections.unmodifiableList(findDtList);
     }
 
-    private Map<Integer, DataType> findDtMap;
+    private Map<Long, DataType> findDtMap;
 
     @Override
-    public DataType findDT(int dtId) {
+    public DataType findDT(long dtId) {
         return findDtMap.get(dtId);
     }
 
-    private Map<Integer, List<DataTypeSupplementaryComponent>> findDtScByOwnerDtIdMap;
+    private Map<Long, List<DataTypeSupplementaryComponent>> findDtScByOwnerDtIdMap;
 
     @Override
-    public List<DataTypeSupplementaryComponent> findDtScByOwnerDtId(int ownerDtId) {
+    public List<DataTypeSupplementaryComponent> findDtScByOwnerDtId(long ownerDtId) {
         return (findDtScByOwnerDtIdMap.containsKey(ownerDtId)) ? findDtScByOwnerDtIdMap.get(ownerDtId) : Collections.emptyList();
     }
 
-    private Map<Integer, List<BusinessDataTypePrimitiveRestriction>> findBdtPriRestriListByDtIdMap;
+    private Map<Long, List<BusinessDataTypePrimitiveRestriction>> findBdtPriRestriListByDtIdMap;
 
     @Override
-    public List<BusinessDataTypePrimitiveRestriction> findBdtPriRestriListByDtId(int dtId) {
+    public List<BusinessDataTypePrimitiveRestriction> findBdtPriRestriListByDtId(long dtId) {
         return (findBdtPriRestriListByDtIdMap.containsKey(dtId)) ? findBdtPriRestriListByDtIdMap.get(dtId) : Collections.emptyList();
     }
 
-    private Map<Integer, List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction>> findBdtScPriRestriListByDtScIdMap;
+    private Map<Long, List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction>> findBdtScPriRestriListByDtScIdMap;
 
     @Override
-    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriListByDtScId(int dtScId) {
+    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriListByDtScId(long dtScId) {
         return (findBdtScPriRestriListByDtScIdMap.containsKey(dtScId)) ? findBdtScPriRestriListByDtScIdMap.get(dtScId) : Collections.emptyList();
     }
 
-    private Map<Integer, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findCdtScAwdPriXpsTypeMapMap;
+    private Map<Long, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findCdtScAwdPriXpsTypeMapMap;
 
     @Override
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(int cdtScAwdPriXpsTypeMapId) {
+    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(long cdtScAwdPriXpsTypeMapId) {
         return findCdtScAwdPriXpsTypeMapMap.get(cdtScAwdPriXpsTypeMapId);
     }
 
-    private Map<Integer, XSDBuiltInType> findXbtMap;
+    private Map<Long, XSDBuiltInType> findXbtMap;
 
     @Override
-    public XSDBuiltInType findXbt(int xbtId) {
+    public XSDBuiltInType findXbt(long xbtId) {
         return findXbtMap.get(xbtId);
     }
 
@@ -229,10 +229,10 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return Collections.unmodifiableList(findACCList);
     }
 
-    private Map<Integer, AggregateCoreComponent> findAccMap;
+    private Map<Long, AggregateCoreComponent> findAccMap;
 
     @Override
-    public AggregateCoreComponent findACC(int accId) {
+    public AggregateCoreComponent findACC(long accId) {
         return findAccMap.get(accId);
     }
 
@@ -243,10 +243,10 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return Collections.unmodifiableList(findASCCPList);
     }
 
-    private Map<Integer, AssociationCoreComponentProperty> findAsccpMap;
+    private Map<Long, AssociationCoreComponentProperty> findAsccpMap;
 
     @Override
-    public AssociationCoreComponentProperty findASCCP(int asccpId) {
+    public AssociationCoreComponentProperty findASCCP(long asccpId) {
         return findAsccpMap.get(asccpId);
     }
 
@@ -264,31 +264,31 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         return Collections.unmodifiableList(findBCCPList);
     }
 
-    private Map<Integer, BasicCoreComponentProperty> findBccpMap;
+    private Map<Long, BasicCoreComponentProperty> findBccpMap;
 
     @Override
-    public BasicCoreComponentProperty findBCCP(int bccpId) {
+    public BasicCoreComponentProperty findBCCP(long bccpId) {
         return findBccpMap.get(bccpId);
     }
 
-    private Map<Integer, List<BasicCoreComponent>> findBCCByToBccpIdMap;
+    private Map<Long, List<BasicCoreComponent>> findBCCByToBccpIdMap;
 
     @Override
-    public List<BasicCoreComponent> findBCCByToBccpId(int toBccpId) {
+    public List<BasicCoreComponent> findBCCByToBccpId(long toBccpId) {
         return (findBCCByToBccpIdMap.containsKey(toBccpId)) ? findBCCByToBccpIdMap.get(toBccpId) : Collections.emptyList();
     }
 
-    private Map<Integer, List<BasicCoreComponent>> findBccByFromAccIdMap;
+    private Map<Long, List<BasicCoreComponent>> findBccByFromAccIdMap;
 
     @Override
-    public List<BasicCoreComponent> findBCCByFromAccId(int fromAccId) {
+    public List<BasicCoreComponent> findBCCByFromAccId(long fromAccId) {
         return (findBccByFromAccIdMap.containsKey(fromAccId)) ? findBccByFromAccIdMap.get(fromAccId) : Collections.emptyList();
     }
 
-    private Map<Integer, List<AssociationCoreComponent>> findAsccByFromAccIdMap;
+    private Map<Long, List<AssociationCoreComponent>> findAsccByFromAccIdMap;
 
     @Override
-    public List<AssociationCoreComponent> findASCCByFromAccId(int fromAccId) {
+    public List<AssociationCoreComponent> findASCCByFromAccId(long fromAccId) {
         return (findAsccByFromAccIdMap.containsKey(fromAccId)) ? findAsccByFromAccIdMap.get(fromAccId) : Collections.emptyList();
     }
 }

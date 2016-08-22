@@ -8,34 +8,34 @@ import java.util.Collection;
 import java.util.List;
 
 public interface BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository extends
-        JpaRepository<BusinessDataTypeSupplementaryComponentPrimitiveRestriction, Integer> {
+        JpaRepository<BusinessDataTypeSupplementaryComponentPrimitiveRestriction, Long> {
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1")
-    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScId(int bdtScId);
+    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScId(long bdtScId);
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId in ?1")
-    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScIdIn(Collection<Integer> bdtScIds);
+    public List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findByBdtScIdIn(Collection<Long> bdtScIds);
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1 and b.isDefault = ?2")
-    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndDefault(int bdtScId, boolean isDefault);
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndDefault(long bdtScId, boolean isDefault);
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1 and b.cdtScAwdPriXpsTypeMapId = ?2")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapId(
-            int bdtScId, int cdtScAwdPriXpsTypeMapId
+            long bdtScId, long cdtScAwdPriXpsTypeMapId
     );
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1 and b.codeListId = ?2")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCodeListId(
-            int bdtScId, int codeListId
+            long bdtScId, long codeListId
     );
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1 and b.agencyIdListId = ?2")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndAgencyIdListId(
-            int bdtScId, int agencyIdListId
+            long bdtScId, long agencyIdListId
     );
 
     @Query("select b from BusinessDataTypeSupplementaryComponentPrimitiveRestriction b where b.bdtScId = ?1 and b.cdtScAwdPriXpsTypeMapId = ?2 and b.codeListId = ?3 and b.agencyIdListId = ?4")
     public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findOneByBdtScIdAndCdtScAwdPriXpsTypeMapIdAndCodeListIdAndAgencyIdListId(
-            int bdtScId, int cdtScAwdPriXpsTypeMapId, int codeListId, int agencyIdListId
+            long bdtScId, long cdtScAwdPriXpsTypeMapId, long codeListId, long agencyIdListId
     );
 }

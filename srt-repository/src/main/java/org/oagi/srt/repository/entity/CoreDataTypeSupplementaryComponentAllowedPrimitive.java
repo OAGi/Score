@@ -23,38 +23,38 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitive implements Seria
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int cdtScAwdPriId;
+    private long cdtScAwdPriId;
 
     @Column(nullable = false)
-    private int cdtScId;
+    private long cdtScId;
 
     @Column(nullable = false)
-    private int cdtPriId;
+    private long cdtPriId;
 
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    public int getCdtScAwdPriId() {
+    public long getCdtScAwdPriId() {
         return cdtScAwdPriId;
     }
 
-    public void setCdtScAwdPriId(int cdtScAwdPriId) {
+    public void setCdtScAwdPriId(long cdtScAwdPriId) {
         this.cdtScAwdPriId = cdtScAwdPriId;
     }
 
-    public int getCdtScId() {
+    public long getCdtScId() {
         return cdtScId;
     }
 
-    public void setCdtScId(int cdtScId) {
+    public void setCdtScId(long cdtScId) {
         this.cdtScId = cdtScId;
     }
 
-    public int getCdtPriId() {
+    public long getCdtPriId() {
         return cdtPriId;
     }
 
-    public void setCdtPriId(int cdtPriId) {
+    public void setCdtPriId(long cdtPriId) {
         this.cdtPriId = cdtPriId;
     }
 
@@ -82,9 +82,9 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitive implements Seria
 
     @Override
     public int hashCode() {
-        int result = cdtScAwdPriId;
-        result = 31 * result + cdtScId;
-        result = 31 * result + cdtPriId;
+        int result = (int) (cdtScAwdPriId ^ (cdtScAwdPriId >>> 32));
+        result = 31 * result + (int) (cdtScId ^ (cdtScId >>> 32));
+        result = 31 * result + (int) (cdtPriId ^ (cdtPriId >>> 32));
         result = 31 * result + (isDefault ? 1 : 0);
         return result;
     }

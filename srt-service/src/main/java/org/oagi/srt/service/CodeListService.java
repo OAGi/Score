@@ -30,8 +30,8 @@ public class CodeListService {
     }
 
     public List<CodeListValue> findByCodeList(CodeList codeList) {
-        int codeListId = (codeList != null) ? codeList.getCodeListId() : 0;
-        if (codeListId > 0) {
+        long codeListId = (codeList != null) ? codeList.getCodeListId() : 0L;
+        if (codeListId > 0L) {
             return Collections.unmodifiableList(
                     codeListValueRepository.findByCodeListId(codeListId)
             );

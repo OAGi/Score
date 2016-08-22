@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TopLevelAbieRepository
-        extends JpaRepository<TopLevelAbie, Integer> {
+        extends JpaRepository<TopLevelAbie, Long> {
 
     @Query("select t from TopLevelAbie t where t.abie.abieId = ?1")
-    public TopLevelAbie findByAbieId(int abieId);
+    public TopLevelAbie findByAbieId(long abieId);
 }

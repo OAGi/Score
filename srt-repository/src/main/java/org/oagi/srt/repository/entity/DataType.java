@@ -25,7 +25,7 @@ public class DataType implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int dtId;
+    private long dtId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -37,7 +37,7 @@ public class DataType implements Serializable {
     private String versionNum;
 
     @Column
-    private Integer previousVersionDtId;
+    private Long previousVersionDtId;
 
     @Column(length = 45)
     private String dataTypeTerm;
@@ -46,7 +46,7 @@ public class DataType implements Serializable {
     private String qualifier;
 
     @Column
-    private Integer basedDtId;
+    private Long basedDtId;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -74,13 +74,13 @@ public class DataType implements Serializable {
     private int state;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -100,17 +100,17 @@ public class DataType implements Serializable {
     private Integer revisionAction;
 
     @Column
-    private Integer releaseId;
+    private Long releaseId;
 
     @Column
-    private Integer currentBdtId;
+    private Long currentBdtId;
 
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
     public DataType() {}
 
-    public DataType(int dtId, String dataTypeTerm) {
+    public DataType(long dtId, String dataTypeTerm) {
         this.dtId = dtId;
         this.dataTypeTerm = dataTypeTerm;
     }
@@ -126,11 +126,11 @@ public class DataType implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getDtId() {
+    public long getDtId() {
         return dtId;
     }
 
-    public void setDtId(int dtId) {
+    public void setDtId(long dtId) {
         this.dtId = dtId;
     }
 
@@ -158,11 +158,11 @@ public class DataType implements Serializable {
         this.versionNum = versionNum;
     }
 
-    public int getPreviousVersionDtId() {
-        return (previousVersionDtId == null) ? 0 : previousVersionDtId;
+    public long getPreviousVersionDtId() {
+        return (previousVersionDtId == null) ? 0L : previousVersionDtId;
     }
 
-    public void setPreviousVersionDtId(int previousVersionDtId) {
+    public void setPreviousVersionDtId(long previousVersionDtId) {
         this.previousVersionDtId = previousVersionDtId;
     }
 
@@ -182,11 +182,11 @@ public class DataType implements Serializable {
         this.qualifier = qualifier;
     }
 
-    public int getBasedDtId() {
-        return (basedDtId == null) ? 0 : basedDtId;
+    public long getBasedDtId() {
+        return (basedDtId == null) ? 0L : basedDtId;
     }
 
-    public void setBasedDtId(int basedDtId) {
+    public void setBasedDtId(long basedDtId) {
         this.basedDtId = basedDtId;
     }
 
@@ -248,27 +248,27 @@ public class DataType implements Serializable {
         this.state = state;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -312,19 +312,19 @@ public class DataType implements Serializable {
         this.revisionAction = revisionAction;
     }
 
-    public int getReleaseId() {
-        return (releaseId == null) ? 0 : releaseId;
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
-    public int getCurrentBdtId() {
-        return (currentBdtId == null) ? 0 : currentBdtId;
+    public long getCurrentBdtId() {
+        return (currentBdtId == null) ? 0L : currentBdtId;
     }
 
-    public void setCurrentBdtId(int currentBdtId) {
+    public void setCurrentBdtId(long currentBdtId) {
         this.currentBdtId = currentBdtId;
     }
 
@@ -382,7 +382,7 @@ public class DataType implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = dtId;
+        int result = (int) (dtId ^ (dtId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + type;
         result = 31 * result + (versionNum != null ? versionNum.hashCode() : 0);
@@ -397,9 +397,9 @@ public class DataType implements Serializable {
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + state;
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + revisionNum;

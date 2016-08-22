@@ -30,7 +30,7 @@ public class ContextCategoryHandler extends UIHandler {
     private String name;
     private String description;
     private String GUID;
-    private int id;
+    private long id;
 
     private List<ContextCategory> contextCategories;
     private ContextCategory selectedCategory;
@@ -53,11 +53,11 @@ public class ContextCategoryHandler extends UIHandler {
         this.GUID = GUID;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

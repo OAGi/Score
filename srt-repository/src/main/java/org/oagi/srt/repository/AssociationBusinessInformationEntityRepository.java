@@ -11,8 +11,8 @@ public interface AssociationBusinessInformationEntityRepository
         BulkInsertRepository<AssociationBusinessInformationEntity> {
 
     @Query("select a from AssociationBusinessInformationEntity a where a.fromAbieId = ?1")
-    public List<AssociationBusinessInformationEntity> findByFromAbieId(int fromAbieId);
+    public List<AssociationBusinessInformationEntity> findByFromAbieId(long fromAbieId);
 
     @Query("select a from AssociationBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1 and a.used = true")
-    public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(int ownerTopLevelAbieId);
+    public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 }

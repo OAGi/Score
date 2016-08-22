@@ -17,19 +17,19 @@ public class DefaultCoreComponentProvider implements CoreComponentProvider {
     private ImportedDataProvider importedDataProvider;
 
     @Override
-    public List<BasicCoreComponent> getBCCs(int accId) {
+    public List<BasicCoreComponent> getBCCs(long accId) {
         return importedDataProvider.findBCCByFromAccId(accId);
     }
 
     @Override
-    public List<BasicCoreComponent> getBCCsWithoutAttributes(int accId) {
+    public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId) {
         return getBCCs(accId).stream()
                 .filter(e -> e.getSeqKey() != 0)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<AssociationCoreComponent> getASCCs(int accId) {
+    public List<AssociationCoreComponent> getASCCs(long accId) {
         return importedDataProvider.findASCCByFromAccId(accId);
     }
 }

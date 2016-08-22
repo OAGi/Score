@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface AssociationCoreComponentRepository extends JpaRepository<AssociationCoreComponent, Integer> {
+public interface AssociationCoreComponentRepository extends JpaRepository<AssociationCoreComponent, Long> {
 
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1")
-    public List<AssociationCoreComponent> findByFromAccId(int fromAccId);
+    public List<AssociationCoreComponent> findByFromAccId(long fromAccId);
 
     @Query("select a from AssociationCoreComponent a where a.definition = ?1")
     public List<AssociationCoreComponent> findByDefinition(String definition);
@@ -21,8 +21,8 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     public List<AssociationCoreComponent> findByDenContaining(String den);
 
     @Query("select a from AssociationCoreComponent a where a.guid = ?1 and a.fromAccId = ?2 and a.toAsccpId = ?3")
-    public AssociationCoreComponent findOneByGuidAndFromAccIdAndToAsccpId(String guid, int fromAccId, int toAsccpId);
+    public AssociationCoreComponent findOneByGuidAndFromAccIdAndToAsccpId(String guid, long fromAccId, long toAsccpId);
 
     @Query("select case when count(a) > 0 then true else false end from AssociationCoreComponent a where a.guid = ?1 and a.fromAccId = ?2 and a.toAsccpId = ?3")
-    public boolean existsByGuidAndFromAccIdAndToAsccpId(String guid, int fromAccId, int toAsccpId);
+    public boolean existsByGuidAndFromAccIdAndToAsccpId(String guid, long fromAccId, long toAsccpId);
 }

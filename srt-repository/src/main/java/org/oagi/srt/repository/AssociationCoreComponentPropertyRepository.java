@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
 
-public interface AssociationCoreComponentPropertyRepository extends JpaRepository<AssociationCoreComponentProperty, Integer> {
+public interface AssociationCoreComponentPropertyRepository extends JpaRepository<AssociationCoreComponentProperty, Long> {
 
     @Query("select a from AssociationCoreComponentProperty a order by a.propertyTerm asc")
     public List<AssociationCoreComponentProperty> findAllOrderByPropertyTermAsc();
@@ -17,14 +17,14 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     public List<AssociationCoreComponentProperty> findByPropertyTermContaining(String propertyTerm);
 
     @Query("select a from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2")
-    public AssociationCoreComponentProperty findOneByAsccpIdAndRevisionNum(int asccpId, int revisionNum);
+    public AssociationCoreComponentProperty findOneByAsccpIdAndRevisionNum(long asccpId, int revisionNum);
 
     @Query("select new AssociationCoreComponentProperty(a.asccpId, a.roleOfAccId, a.definition) " +
             "from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2")
-    public AssociationCoreComponentProperty findAsccpIdAndRoleOfAccIdAndDefinitionByAsccpIdAndRevisionNum(int asccpId, int revisionNum);
+    public AssociationCoreComponentProperty findAsccpIdAndRoleOfAccIdAndDefinitionByAsccpIdAndRevisionNum(long asccpId, int revisionNum);
 
     @Query("select a from AssociationCoreComponentProperty a where a.roleOfAccId = ?1")
-    public AssociationCoreComponentProperty findOneByRoleOfAccId(int roleOfAccId);
+    public AssociationCoreComponentProperty findOneByRoleOfAccId(long roleOfAccId);
 
     @Query("select a from AssociationCoreComponentProperty a where a.guid = ?1")
     public AssociationCoreComponentProperty findOneByGuid(String guid);

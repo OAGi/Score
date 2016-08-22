@@ -23,7 +23,7 @@ public class AgencyIdList implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int agencyIdListId;
+    private long agencyIdListId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -38,7 +38,7 @@ public class AgencyIdList implements Serializable {
     private String listId;
 
     @Column
-    private Integer agencyIdListValueId = null;
+    private Long agencyIdListValueId = null;
 
     @Column(length = 10)
     private String versionId;
@@ -51,11 +51,11 @@ public class AgencyIdList implements Serializable {
     @Column(length = 10 * 1024)
     private String definition;
 
-    public int getAgencyIdListId() {
+    public long getAgencyIdListId() {
         return agencyIdListId;
     }
 
-    public void setAgencyIdListId(int agencyIdListId) {
+    public void setAgencyIdListId(long agencyIdListId) {
         this.agencyIdListId = agencyIdListId;
     }
 
@@ -91,11 +91,11 @@ public class AgencyIdList implements Serializable {
         this.listId = listId;
     }
 
-    public int getAgencyIdListValueId() {
-        return (agencyIdListValueId == null) ? 0 : agencyIdListValueId;
+    public long getAgencyIdListValueId() {
+        return (agencyIdListValueId == null) ? 0L : agencyIdListValueId;
     }
 
-    public void setAgencyIdListValueId(int agencyIdListValueId) {
+    public void setAgencyIdListValueId(long agencyIdListValueId) {
         this.agencyIdListValueId = agencyIdListValueId;
     }
 
@@ -135,7 +135,8 @@ public class AgencyIdList implements Serializable {
         if (enumTypeGuid != null ? !enumTypeGuid.equals(that.enumTypeGuid) : that.enumTypeGuid != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (listId != null ? !listId.equals(that.listId) : that.listId != null) return false;
-        if (agencyIdListValueId != null ? !agencyIdListValueId.equals(that.agencyIdListValueId) : that.agencyIdListValueId != null) return false;
+        if (agencyIdListValueId != null ? !agencyIdListValueId.equals(that.agencyIdListValueId) : that.agencyIdListValueId != null)
+            return false;
         if (versionId != null ? !versionId.equals(that.versionId) : that.versionId != null) return false;
         if (module != null ? !module.equals(that.module) : that.module != null) return false;
         return definition != null ? definition.equals(that.definition) : that.definition == null;
@@ -144,7 +145,7 @@ public class AgencyIdList implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = agencyIdListId;
+        int result = (int) (agencyIdListId ^ (agencyIdListId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (enumTypeGuid != null ? enumTypeGuid.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);

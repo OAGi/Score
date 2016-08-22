@@ -47,7 +47,7 @@ public abstract class AbstractBulkInsertRepository<T extends IdEntity>
     protected abstract String getSequenceName();
 
     @Override
-    public void saveBulk(JpaRepository<T, Integer> jpaRepository, Collection<T> entities) {
+    public void saveBulk(JpaRepository<T, Long> jpaRepository, Collection<T> entities) {
         Dialect dialect = getDialect();
         if (dialect.toString().contains("MySQL")) {
             int count = 0;

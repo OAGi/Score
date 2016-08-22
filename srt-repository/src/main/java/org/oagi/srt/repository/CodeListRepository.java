@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CodeListRepository extends JpaRepository<CodeList, Integer> {
+public interface CodeListRepository extends JpaRepository<CodeList, Long> {
 
     public List<CodeList> findByNameContaining(String name);
 
@@ -25,5 +25,5 @@ public interface CodeListRepository extends JpaRepository<CodeList, Integer> {
     public CodeList findOneByName(String name);
 
     @Query("update CodeList c set c.state = ?1 where c.codeListId = ?2")
-    public void updateStateByCodeListId(String state, int codeListId);
+    public void updateStateByCodeListId(String state, long codeListId);
 }

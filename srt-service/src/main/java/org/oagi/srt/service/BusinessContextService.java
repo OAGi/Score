@@ -28,7 +28,7 @@ public class BusinessContextService {
         );
     }
 
-    public List<BusinessContextValue> findByBizCtxId(int bizCtxId) {
+    public List<BusinessContextValue> findByBizCtxId(long bizCtxId) {
         return businessContextValueRepository.findByBizCtxId(bizCtxId);
     }
 
@@ -41,20 +41,20 @@ public class BusinessContextService {
         }
 
         private String name;
-        private int userId;
-        private List<Integer> ctxSchemeValueIds;
+        private long userId;
+        private List<Long> ctxSchemeValueIds;
 
         public BusinessContextBuilder name(String name) {
             this.name = name;
             return this;
         }
 
-        public BusinessContextBuilder userId(int userId) {
+        public BusinessContextBuilder userId(long userId) {
             this.userId = userId;
             return this;
         }
 
-        public BusinessContextBuilder ctxSchemeValueIds(List<Integer> ctxSchemeValueIds) {
+        public BusinessContextBuilder ctxSchemeValueIds(List<Long> ctxSchemeValueIds) {
             this.ctxSchemeValueIds = ctxSchemeValueIds;
             return this;
         }
@@ -78,7 +78,7 @@ public class BusinessContextService {
             businessContext = businessContextRepository.saveAndFlush(businessContext);
 
             if (ctxSchemeValueIds != null && !ctxSchemeValueIds.isEmpty()) {
-                for (int ctxSchemeValueId : ctxSchemeValueIds) {
+                for (long ctxSchemeValueId : ctxSchemeValueIds) {
                     BusinessContextValue businessContextValue = new BusinessContextValue();
                     businessContextValue.setBizCtxId(businessContext.getBizCtxId());
                     businessContextValue.setCtxSchemeValueId(ctxSchemeValueId);

@@ -24,7 +24,7 @@ public class BasicCoreComponentProperty implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int bccpId;
+    private long bccpId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -36,7 +36,7 @@ public class BasicCoreComponentProperty implements Serializable {
     private String representationTerm;
 
     @Column(nullable = false)
-    private int bdtId;
+    private long bdtId;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -50,19 +50,19 @@ public class BasicCoreComponentProperty implements Serializable {
     private Module module;
 
     @Column
-    private Integer namespaceId;
+    private Long namespaceId;
 
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -85,10 +85,10 @@ public class BasicCoreComponentProperty implements Serializable {
     private int revisionAction = 1;
 
     @Column
-    private Integer releaseId;
+    private Long releaseId;
 
     @Column
-    private Integer currentBccpId;
+    private Long currentBccpId;
 
     @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
@@ -98,12 +98,12 @@ public class BasicCoreComponentProperty implements Serializable {
 
     public BasicCoreComponentProperty() {}
 
-    public BasicCoreComponentProperty(int bccpId, String den) {
+    public BasicCoreComponentProperty(long bccpId, String den) {
         this.bccpId = bccpId;
         this.den = den;
     }
 
-    public BasicCoreComponentProperty(int bccpId, int bdtId, String definition) {
+    public BasicCoreComponentProperty(long bccpId, long bdtId, String definition) {
         this.bccpId = bccpId;
         this.bdtId = bdtId;
         this.definition = definition;
@@ -120,11 +120,11 @@ public class BasicCoreComponentProperty implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getBccpId() {
+    public long getBccpId() {
         return bccpId;
     }
 
-    public void setBccpId(int bccpId) {
+    public void setBccpId(long bccpId) {
         this.bccpId = bccpId;
     }
 
@@ -152,11 +152,11 @@ public class BasicCoreComponentProperty implements Serializable {
         this.representationTerm = representationTerm;
     }
 
-    public int getBdtId() {
+    public long getBdtId() {
         return bdtId;
     }
 
-    public void setBdtId(int bdtId) {
+    public void setBdtId(long bdtId) {
         this.bdtId = bdtId;
     }
 
@@ -184,11 +184,11 @@ public class BasicCoreComponentProperty implements Serializable {
         this.module = module;
     }
 
-    public int getNamespaceId() {
-        return (namespaceId == null) ? 0 : namespaceId;
+    public long getNamespaceId() {
+        return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(int namespaceId) {
+    public void setNamespaceId(long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -200,27 +200,27 @@ public class BasicCoreComponentProperty implements Serializable {
         this.deprecated = deprecated;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -272,19 +272,19 @@ public class BasicCoreComponentProperty implements Serializable {
         this.revisionAction = revisionAction;
     }
 
-    public int getReleaseId() {
-        return (releaseId == null) ? 0 : releaseId;
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
-    public int getCurrentBccpId() {
-        return (currentBccpId == null) ? 0 : currentBccpId;
+    public long getCurrentBccpId() {
+        return (currentBccpId == null) ? 0L : currentBccpId;
     }
 
-    public void setCurrentBccpId(int currentBccpId) {
+    public void setCurrentBccpId(long currentBccpId) {
         this.currentBccpId = currentBccpId;
     }
 
@@ -343,19 +343,19 @@ public class BasicCoreComponentProperty implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = bccpId;
+        int result = (int) (bccpId ^ (bccpId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
-        result = 31 * result + bdtId;
+        result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (deprecated ? 1 : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + state;

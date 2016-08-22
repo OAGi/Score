@@ -53,14 +53,14 @@ public class ContextSchemeHandler {
 	private String description;
 	private String schemeAgencyID;
 	private String schemeVersion;
-	private int contextCategoryID;
-	private int id;
+	private long contextCategoryID;
+	private long id;
 	private String contextCategoryNameDesc; 
 	private ContextScheme selectedScheme;
 	private String schemeName;
 	private String guid;
 	private String schemeId;
-	private int userId;
+	private long userId;
 
 	private List<ContextSchemeValue> csValues = new ArrayList();
 	private List<ContextSchemeValue> selectedCSValues = Collections.emptyList();
@@ -84,11 +84,11 @@ public class ContextSchemeHandler {
     	this.selectedScheme = null;
     }
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -330,12 +330,12 @@ public class ContextSchemeHandler {
 
 	private String partResult(List<BusinessContextValue> businessContextValues) {
 		StringBuffer sb = new StringBuffer();
-		HashMap<Integer, String> hm = new HashMap<Integer, String>();
+		HashMap<Long, String> hm = new HashMap();
 		for (BusinessContextValue businessContextValue : businessContextValues) {
 			hm.put(businessContextValue.getBizCtxId(), null);
 		}
 
-		for (int businessContextId : hm.keySet()) {
+		for (long businessContextId : hm.keySet()) {
 			BusinessContext businessContext =
 					businessContextRepository.findOne(businessContextId);
 			sb.append(businessContext.getName() + ", ");
@@ -376,11 +376,11 @@ public class ContextSchemeHandler {
 		this.schemeVersion = schemeVersion;
 	}
 
-	public int getContextCategoryID() {
+	public long getContextCategoryID() {
 		return contextCategoryID;
 	}
 
-	public void setContextCategoryID(int contextCategoryID) {
+	public void setContextCategoryID(long contextCategoryID) {
 		this.contextCategoryID = contextCategoryID;
 	}
 

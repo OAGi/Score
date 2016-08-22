@@ -23,17 +23,17 @@ public class TopLevelAbie implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int topLevelAbieId;
+    private long topLevelAbieId;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "abie_id")
     private AggregateBusinessInformationEntity abie;
 
-    public int getTopLevelAbieId() {
+    public long getTopLevelAbieId() {
         return topLevelAbieId;
     }
 
-    public void setTopLevelAbieId(int topLevelAbieId) {
+    public void setTopLevelAbieId(long topLevelAbieId) {
         this.topLevelAbieId = topLevelAbieId;
     }
 
@@ -59,7 +59,7 @@ public class TopLevelAbie implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = topLevelAbieId;
+        int result = (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
         result = 31 * result + (abie != null ? abie.hashCode() : 0);
         return result;
     }

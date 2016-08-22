@@ -24,13 +24,13 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "2000"),
             }
     )
-    private int bbiepId;
+    private long bbiepId;
 
     @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
-    private int basedBccpId;
+    private long basedBccpId;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -43,10 +43,10 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     private String bizTerm;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -57,7 +57,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int ownerTopLevelAbieId;
+    private long ownerTopLevelAbieId;
 
     @PrePersist
     public void prePersist() {
@@ -71,20 +71,20 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return getBbiepId();
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(long id) {
         setBbiepId(id);
     }
 
-    public int getBbiepId() {
+    public long getBbiepId() {
         return bbiepId;
     }
 
-    public void setBbiepId(int bbiepId) {
+    public void setBbiepId(long bbiepId) {
         this.bbiepId = bbiepId;
     }
 
@@ -96,11 +96,11 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
         this.guid = guid;
     }
 
-    public int getBasedBccpId() {
+    public long getBasedBccpId() {
         return basedBccpId;
     }
 
-    public void setBasedBccpId(int basedBccpId) {
+    public void setBasedBccpId(long basedBccpId) {
         this.basedBccpId = basedBccpId;
     }
 
@@ -128,19 +128,19 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
         this.bizTerm = bizTerm;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -160,11 +160,11 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getOwnerTopLevelAbieId() {
+    public long getOwnerTopLevelAbieId() {
         return ownerTopLevelAbieId;
     }
 
-    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
@@ -192,17 +192,17 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
 
     @Override
     public int hashCode() {
-        int result = bbiepId;
+        int result = (int) (bbiepId ^ (bbiepId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + basedBccpId;
+        result = 31 * result + (int) (basedBccpId ^ (basedBccpId >>> 32));
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + ownerTopLevelAbieId;
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 

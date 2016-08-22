@@ -23,16 +23,16 @@ public class CoreDataTypePrimitive implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int cdtPriId;
+    private long cdtPriId;
 
     @Column(nullable = false, length = 45)
     private String name;
 
-    public int getCdtPriId() {
+    public long getCdtPriId() {
         return cdtPriId;
     }
 
-    public void setCdtPriId(int cdtPriId) {
+    public void setCdtPriId(long cdtPriId) {
         this.cdtPriId = cdtPriId;
     }
 
@@ -58,7 +58,7 @@ public class CoreDataTypePrimitive implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = cdtPriId;
+        int result = (int) (cdtPriId ^ (cdtPriId >>> 32));
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }

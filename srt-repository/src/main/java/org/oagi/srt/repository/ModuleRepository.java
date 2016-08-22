@@ -4,7 +4,7 @@ import org.oagi.srt.repository.entity.Module;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface ModuleRepository extends JpaRepository<Module, Integer> {
+public interface ModuleRepository extends JpaRepository<Module, Long> {
 
     @Query("select m from Module m where m.module = ?1")
     public Module findByModule(String module);

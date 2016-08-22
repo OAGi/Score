@@ -83,40 +83,40 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
     private List<ExpectedOtherQBDT> expectedOtherQBDTs;
     private Map<String, ExpectedQBDTSCPriRestri> qbdtScPriRestriMap;
 
-    private int CDTPriBooleanId;
-    private int xbtBooleanTrueFalseTypeId;
+    private long CDTPriBooleanId;
+    private long xbtBooleanTrueFalseTypeId;
 
-    private int CDTPriDecimalId;
-    private int xsdDecimalId;
+    private long CDTPriDecimalId;
+    private long xsdDecimalId;
 
-    private int CDTPriDoubleId;
-    private int xsdDoubleId;
-    private int CDTPriFloatId;
-    private int xsdFloatId;
+    private long CDTPriDoubleId;
+    private long xsdDoubleId;
+    private long CDTPriFloatId;
+    private long xsdFloatId;
 
-    private int CDTPriIntegerId;
-    private int xsdIntegerId;
-    private int xsdNonNegativeIntegerId;
-    private int xsdPositiveInteger;
+    private long CDTPriIntegerId;
+    private long xsdIntegerId;
+    private long xsdNonNegativeIntegerId;
+    private long xsdPositiveInteger;
 
-    private int CDTPriNormalizedStringId;
-    private int xsdNormalizedStringId;
+    private long CDTPriNormalizedStringId;
+    private long xsdNormalizedStringId;
 
-    private int CDTPriStringId;
-    private int xsdStringId;
+    private long CDTPriStringId;
+    private long xsdStringId;
 
-    private int CDTPriTokenId;
-    private int xsdTokenId;
+    private long CDTPriTokenId;
+    private long xsdTokenId;
 
-    private int CDTPriTimePointId;
-    private int xsdDateTimeId;
-    private int xsdDateId;
-    private int xsdTimeId;
-    private int xsdGYearMonthId;
-    private int xsdGYearId;
-    private int xsdGMonthDayId;
-    private int xsdGDayId;
-    private int xsdGMonthId;
+    private long CDTPriTimePointId;
+    private long xsdDateTimeId;
+    private long xsdDateId;
+    private long xsdTimeId;
+    private long xsdGYearMonthId;
+    private long xsdGYearId;
+    private long xsdGMonthDayId;
+    private long xsdGDayId;
+    private long xsdGMonthId;
 
 
     @Before
@@ -567,18 +567,18 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
             assertEquals(expectedBdtPriRestriCount, actualBasedBdtPriRestri.size());
 
             assertEquals(expectedBasedBdtPriRestri.stream()
-                            .mapToInt(e -> e.getCdtAwdPriXpsTypeMapId())
+                            .mapToLong(e -> e.getCdtAwdPriXpsTypeMapId())
                             .sum(),
                     actualBasedBdtPriRestri.stream()
                             .filter(e -> e.getCdtAwdPriXpsTypeMapId() != 0)
-                            .mapToInt(e -> e.getCdtAwdPriXpsTypeMapId())
+                            .mapToLong(e -> e.getCdtAwdPriXpsTypeMapId())
                             .sum());
 
             if (expectedCodeList != null) {
                 assertEquals(expectedCodeList.getCodeListId(),
                         actualBasedBdtPriRestri.stream()
                                 .filter(e -> e.getCodeListId() != 0)
-                                .mapToInt(e -> e.getCodeListId())
+                                .mapToLong(e -> e.getCodeListId())
                                 .sum());
             }
 
@@ -586,7 +586,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 assertEquals(expectedAgencyIdList.getAgencyIdListId(),
                         actualBasedBdtPriRestri.stream()
                                 .filter(e -> e.getAgencyIdListId() != 0)
-                                .mapToInt(e -> e.getAgencyIdListId())
+                                .mapToLong(e -> e.getAgencyIdListId())
                                 .sum());
             }
         });
@@ -613,7 +613,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
             assertEquals(expectedDtScList.size(), actualDtScList.size());
             assertEquals(expectedDtScList.stream()
-                            .mapToInt(e ->
+                            .mapToLong(e ->
                                     e.getPropertyTerm().hashCode() +
                                             e.getRepresentationTerm().hashCode() +
                                             e.getDefinition().hashCode() +
@@ -622,7 +622,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                                             e.getDtScId()
                             ).sum(),
                     actualDtScList.stream()
-                            .mapToInt(e ->
+                            .mapToLong(e ->
                                     e.getPropertyTerm().hashCode() +
                                             e.getRepresentationTerm().hashCode() +
                                             e.getDefinition().hashCode() +
@@ -645,8 +645,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
     public class ExpectedQBDTSCPriRestri {
         private String attributeName;
         private String attributeType;
-        private int codeListId;
-        private int agencyIdListId;
+        private long codeListId;
+        private long agencyIdListId;
         private String use;
 
         public ExpectedQBDTSCPriRestri(String attName, String attType, String codeListName, String agencyIdListName, String use) {
@@ -686,13 +686,13 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                 ExpectedQBDTSCPriRestri expectedQBDTScPri = qbdtScPriRestriMap.get(actualDtSc.getGuid());
                 assertTrue(expectedQBDTScPri != null);
 
-                int actualCodeListId = 0;
-                int actualAgencyIdListId = 0;
-                int actualMapIdSum = 0;
-                int actualDefaultMapId = 0;
-                int actualDefaultCount = 0;
+                long actualCodeListId = 0;
+                long actualAgencyIdListId = 0;
+                long actualMapIdSum = 0;
+                long actualDefaultMapId = 0;
+                long actualDefaultCount = 0;
 
-                int expectedMapIdSum = 0;
+                long expectedMapIdSum = 0;
                 List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBDTScPris =
                         bdtScPriRestriRepository.findByBdtScId(actualDtSc.getDtScId());
 
@@ -719,7 +719,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                     expectedMapIdSum = getMapIdSum(actualDtSc, expectedQBDTScPri.attributeType, false);
                 }
 
-                    int expectedDefaultMapId = getDefaultMapId(actualDtSc, expectedQBDTScPri.attributeType);
+                    long expectedDefaultMapId = getDefaultMapId(actualDtSc, expectedQBDTScPri.attributeType);
                     assertEquals(expectedQBDTScPri.codeListId, actualCodeListId);
                     assertEquals(expectedQBDTScPri.agencyIdListId, actualAgencyIdListId);
                     assertEquals("The following dt_sc has an incorrect default in bdt_sc_pri_restri: " + actualDtSc,
@@ -737,21 +737,21 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                         bdtScPriRestriRepository.findByBdtScId(actualDtScList.get(i).getDtScId());
                 assertEquals(expectedBdtScPriRestriList.size(), actualBdtScPriRestriList.size());
                 assertEquals(expectedBdtScPriRestriList.stream()
-                                .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                                .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                                 .sum(),
                         actualBdtScPriRestriList.stream()
-                                .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                                .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                                 .sum());
 
 
                 // 'is_default' value check
                 assertEquals(expectedBdtScPriRestriList.stream()
                                 .filter(e -> e.isDefault())
-                                .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                                .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                                 .sum(),
                         actualBdtScPriRestriList.stream()
                                 .filter(e -> e.isDefault())
-                                .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                                .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                                 .sum());
 
                 actualBdtScPriRestriList.stream()
@@ -761,7 +761,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                             assertEquals("The summation of 'is_default' value is always be 1. bdt_sc_id: " + bdtScId,
                                     1,
                                     bdtScPriRestriList.stream()
-                                            .mapToInt(e -> e.isDefault() ? 1 : 0)
+                                            .mapToLong(e -> e.isDefault() ? 1 : 0)
                                             .sum());
                         }));
 
@@ -769,22 +769,22 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         }
     }
 
-    public int getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
-        if (dtsc.getBasedDtScId() > 0) {
+    public long getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
+        if (dtsc.getBasedDtScId() > 0L) {
             DataTypeSupplementaryComponent baseDTSC = dtScRepository.findOne(dtsc.getBasedDtScId());
             return getCDTSCAncestor(baseDTSC);
         }
         return dtsc.getDtScId();
     }
 
-    public int getMapIdSum(DataTypeSupplementaryComponent dtSc, String type, boolean hasCodeListOrAgencyIdList) {
+    public long getMapIdSum(DataTypeSupplementaryComponent dtSc, String type, boolean hasCodeListOrAgencyIdList) {
 
         DataTypeSupplementaryComponent ancestorDtSc = dtScRepository.getOne(getCDTSCAncestor(dtSc));
         if (dtSc.getRepresentationTerm().equals("Value")) {
             int sum = 0;
 
-            List<Integer> cdtPris = Arrays.asList(CDTPriDecimalId, CDTPriDoubleId, CDTPriDoubleId, CDTPriFloatId, CDTPriIntegerId, CDTPriIntegerId, CDTPriIntegerId, CDTPriNormalizedStringId, CDTPriStringId, CDTPriTokenId);
-            List<Integer> xbts = Arrays.asList(xsdDecimalId, xsdDoubleId, xsdFloatId, xsdFloatId, xsdIntegerId, xsdNonNegativeIntegerId, xsdPositiveInteger, xsdNormalizedStringId, xsdStringId, xsdTokenId);
+            List<Long> cdtPris = Arrays.asList(CDTPriDecimalId, CDTPriDoubleId, CDTPriDoubleId, CDTPriFloatId, CDTPriIntegerId, CDTPriIntegerId, CDTPriIntegerId, CDTPriNormalizedStringId, CDTPriStringId, CDTPriTokenId);
+            List<Long> xbts = Arrays.asList(xsdDecimalId, xsdDoubleId, xsdFloatId, xsdFloatId, xsdIntegerId, xsdNonNegativeIntegerId, xsdPositiveInteger, xsdNormalizedStringId, xsdStringId, xsdTokenId);
 
             for (int i = 0; i < cdtPris.size(); i++) {
                 sum += getCdtScAwdPriXpsTypeMapId(ancestorDtSc, cdtPris.get(i), xbts.get(i));
@@ -796,8 +796,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         } else if (dtSc.getRepresentationTerm().equals("Date Time") && "xsd:token".equals(type)) {
             int sum = 0;
 
-            List<Integer> cdtPris = Arrays.asList(CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId);
-            List<Integer> xbts = Arrays.asList(xsdTokenId, xsdDateTimeId, xsdDateId, xsdTimeId, xsdGYearMonthId, xsdGYearId, xsdGMonthDayId, xsdGDayId, xsdGMonthId);
+            List<Long> cdtPris = Arrays.asList(CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId, CDTPriTimePointId);
+            List<Long> xbts = Arrays.asList(xsdTokenId, xsdDateTimeId, xsdDateId, xsdTimeId, xsdGYearMonthId, xsdGYearId, xsdGMonthDayId, xsdGDayId, xsdGMonthId);
 
             for (int i = 0; i < cdtPris.size(); i++) {
                 sum += getCdtScAwdPriXpsTypeMapId(ancestorDtSc, cdtPris.get(i), xbts.get(i));
@@ -809,8 +809,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         } else if ("xsd:decimal".equals(type)) {
             int sum = 0;
 
-            List<Integer> cdtPris = Arrays.asList(CDTPriDecimalId, CDTPriDoubleId, CDTPriDoubleId, CDTPriFloatId, CDTPriIntegerId, CDTPriIntegerId, CDTPriIntegerId);
-            List<Integer> xbts = Arrays.asList(xsdDecimalId, xsdDoubleId, xsdFloatId, xsdFloatId, xsdIntegerId, xsdNonNegativeIntegerId, xsdPositiveInteger);
+            List<Long> cdtPris = Arrays.asList(CDTPriDecimalId, CDTPriDoubleId, CDTPriDoubleId, CDTPriFloatId, CDTPriIntegerId, CDTPriIntegerId, CDTPriIntegerId);
+            List<Long> xbts = Arrays.asList(xsdDecimalId, xsdDoubleId, xsdFloatId, xsdFloatId, xsdIntegerId, xsdNonNegativeIntegerId, xsdPositiveInteger);
 
             for (int i = 0; i < cdtPris.size(); i++) {
                 sum += getCdtScAwdPriXpsTypeMapId(ancestorDtSc, cdtPris.get(i), xbts.get(i));
@@ -820,8 +820,8 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         } else if ("xsd:normalizedString".equals(type) || "xsd:token".equals(type) || "xsd:string".equals(type)) {
             int sum = 0;
 
-            List<Integer> cdtPris = Arrays.asList(CDTPriNormalizedStringId, CDTPriStringId, CDTPriTokenId);
-            List<Integer> xbts = Arrays.asList(xsdNormalizedStringId, xsdStringId, xsdTokenId);
+            List<Long> cdtPris = Arrays.asList(CDTPriNormalizedStringId, CDTPriStringId, CDTPriTokenId);
+            List<Long> xbts = Arrays.asList(xsdNormalizedStringId, xsdStringId, xsdTokenId);
 
             for (int i = 0; i < cdtPris.size(); i++) {
                 sum += getCdtScAwdPriXpsTypeMapId(ancestorDtSc, cdtPris.get(i), xbts.get(i));
@@ -833,7 +833,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         return -1;
     }
 
-    public int getDefaultMapId(DataTypeSupplementaryComponent dtSc, String type) {
+    public long getDefaultMapId(DataTypeSupplementaryComponent dtSc, String type) {
         // Assume that we only take new SC from attribute
         DataTypeSupplementaryComponent ancestorDtSc = dtScRepository.getOne(getCDTSCAncestor(dtSc));
 
@@ -851,10 +851,10 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
             return getCdtScAwdPriXpsTypeMapId(ancestorDtSc, CDTPriStringId, xsdStringId);
         }
 
-        return -1;
+        return -1L;
     }
 
-    private int getCdtScAwdPriXpsTypeMapId(DataTypeSupplementaryComponent dtSc, int cdtPriId, int xbtId) {
+    private long getCdtScAwdPriXpsTypeMapId(DataTypeSupplementaryComponent dtSc, long cdtPriId, long xbtId) {
         CoreDataTypeSupplementaryComponentAllowedPrimitive a =
                 cdtSCAwdPriRepository.findOneByCdtScIdAndCdtPriId(dtSc.getDtScId(), cdtPriId);
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap map =
@@ -866,7 +866,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> expectedBdtScPriRestriList =
                 bdtScPriRestriRepository.findByBdtScIdIn(
                         dtScRepository.findByOwnerDtId(expectedBasedDt.getDtId()).stream()
-                                .mapToInt(e -> e.getDtScId())
+                                .mapToLong(e -> e.getDtScId())
                                 .boxed()
                                 .collect(Collectors.toList())
                 );
@@ -878,7 +878,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
             List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriList =
                     bdtScPriRestriRepository.findByBdtScIdIn(
                             dtScRepository.findByOwnerDtId(actualDataType.getDtId()).stream()
-                                    .mapToInt(e -> e.getDtScId())
+                                    .mapToLong(e -> e.getDtScId())
                                     .boxed()
                                     .collect(Collectors.toList())
                     );
@@ -887,20 +887,20 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
             // 'cdt_sc_awd_pri_xps_type_map_id', 'code_list_id' and 'agency_id_list_id' values check
             assertEquals(expectedBdtScPriRestriList.stream()
-                            .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                            .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                             .sum(),
                     actualBdtScPriRestriList.stream()
-                            .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                            .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                             .sum());
 
             // 'is_default' value check
             assertEquals(expectedBdtScPriRestriList.stream()
                             .filter(e -> e.isDefault())
-                            .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                            .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                             .sum(),
                     actualBdtScPriRestriList.stream()
                             .filter(e -> e.isDefault())
-                            .mapToInt(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
+                            .mapToLong(e -> e.getCdtScAwdPriXpsTypeMapId() + e.getCodeListId() + e.getAgencyIdListId())
                             .sum());
 
             actualBdtScPriRestriList.stream()
@@ -910,7 +910,7 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
                         assertEquals("The summation of 'is_default' value is always be 1. bdt_sc_id: " + bdtScId,
                                 1,
                                 bdtScPriRestriList.stream()
-                                        .mapToInt(e -> e.isDefault() ? 1 : 0)
+                                        .mapToLong(e -> e.isDefault() ? 1 : 0)
                                         .sum());
                     }));
         });
@@ -1044,14 +1044,14 @@ public class P_1_7_PopulateQBDTInDTTestCase extends AbstractTransactionalJUnit4S
 
         assertEquals(expectedQBDT.getGuid(), expectedDtScList.size(), actualInheritDtScList.size());
         assertEquals(expectedQBDT.getGuid(), expectedDtScList.stream()
-                        .mapToInt(e ->
+                        .mapToLong(e ->
                                 e.getPropertyTerm().hashCode() +
                                         e.getRepresentationTerm().hashCode() +
                                         //e.getDefinition().hashCode() +
                                         e.getDtScId()
                         ).sum(),
                 actualInheritDtScList.stream()
-                        .mapToInt(e ->
+                        .mapToLong(e ->
                                 e.getPropertyTerm().hashCode() +
                                         e.getRepresentationTerm().hashCode() +
                                         //e.getDefinition().hashCode() +

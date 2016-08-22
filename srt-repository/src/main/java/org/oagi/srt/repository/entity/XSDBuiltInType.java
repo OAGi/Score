@@ -23,7 +23,7 @@ public class XSDBuiltInType implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int xbtId;
+    private long xbtId;
 
     @Column(length = 45)
     private String name;
@@ -32,13 +32,13 @@ public class XSDBuiltInType implements Serializable {
     private String builtInType;
 
     @Column
-    private Integer subtypeOfXbtId;
+    private Long subtypeOfXbtId;
 
-    public int getXbtId() {
+    public long getXbtId() {
         return xbtId;
     }
 
-    public void setXbtId(int xbtId) {
+    public void setXbtId(long xbtId) {
         this.xbtId = xbtId;
     }
 
@@ -58,11 +58,11 @@ public class XSDBuiltInType implements Serializable {
         this.builtInType = builtInType;
     }
 
-    public int getSubtypeOfXbtId() {
-        return (subtypeOfXbtId == null) ? 0 : subtypeOfXbtId;
+    public long getSubtypeOfXbtId() {
+        return (subtypeOfXbtId == null) ? 0L : subtypeOfXbtId;
     }
 
-    public void setSubtypeOfXbtId(int subtypeOfXbtId) {
+    public void setSubtypeOfXbtId(long subtypeOfXbtId) {
         this.subtypeOfXbtId = subtypeOfXbtId;
     }
 
@@ -82,7 +82,7 @@ public class XSDBuiltInType implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = xbtId;
+        int result = (int) (xbtId ^ (xbtId >>> 32));
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (builtInType != null ? builtInType.hashCode() : 0);
         result = 31 * result + (subtypeOfXbtId != null ? subtypeOfXbtId.hashCode() : 0);

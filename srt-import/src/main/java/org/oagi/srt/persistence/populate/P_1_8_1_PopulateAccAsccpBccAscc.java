@@ -350,7 +350,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         if (acc == null) {
             throw new IllegalStateException();
         }
-        int roleOfAccId = acc.getAccId();
+        long roleOfAccId = acc.getAccId();
 
         String den;
         if (declaration.isGroup()) {
@@ -518,8 +518,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                                                 AssociationCoreComponentProperty toAsccp,
                                                 Declaration declaration, int sequenceKey) {
         String guid = declaration.getId();
-        int fromAccId = fromAcc.getAccId();
-        int toAsccpId = toAsccp.getAsccpId();
+        long fromAccId = fromAcc.getAccId();
+        long toAsccpId = toAsccp.getAsccpId();
 
         AssociationCoreComponent ascc =
                 asccRepository.findOneByGuidAndFromAccIdAndToAsccpId(guid, fromAccId, toAsccpId);
@@ -569,8 +569,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                               BasicCoreComponentProperty toBccp,
                               Declaration declaration, int sequenceKey, int entityType) {
         String guid = declaration.getId();
-        int fromAccId = fromAcc.getAccId();
-        int toBccpId = toBccp.getBccpId();
+        long fromAccId = fromAcc.getAccId();
+        long toBccpId = toBccp.getBccpId();
 
         BasicCoreComponent bcc =
                 bccRepository.findOneByGuidAndFromAccIdAndToBccpId(guid, fromAccId, toBccpId);
@@ -640,7 +640,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             throw new IllegalStateException("Could not find DataType by guid: " + typeGuid + " for " + name);
         }
 
-        int bdtId = dt.getDtId();
+        long bdtId = dt.getDtId();
 
         BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByPropertyTermAndBdtId(propertyTerm, bdtId);
         if (bccp != null) {

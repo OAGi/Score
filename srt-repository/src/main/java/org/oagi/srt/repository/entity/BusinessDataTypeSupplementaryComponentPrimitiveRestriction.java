@@ -23,56 +23,66 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int bdtScPriRestriId;
+    private long bdtScPriRestriId;
 
     @Column(nullable = false)
-    private int bdtScId;
+    private long bdtScId;
 
     @Column
-    private Integer cdtScAwdPriXpsTypeMapId;
+    private Long cdtScAwdPriXpsTypeMapId;
 
     @Column
-    private Integer codeListId;
+    private Long codeListId;
+
+    @Column
+    private Long agencyIdListId;
 
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    @Column
-    private Integer agencyIdListId;
-
-    public int getBdtScPriRestriId() {
+    public long getBdtScPriRestriId() {
         return bdtScPriRestriId;
     }
 
-    public void setBdtScPriRestriId(int bdtScPriRestriId) {
+    public void setBdtScPriRestriId(long bdtScPriRestriId) {
         this.bdtScPriRestriId = bdtScPriRestriId;
     }
 
-    public int getBdtScId() {
+    public long getBdtScId() {
         return bdtScId;
     }
 
-    public void setBdtScId(int bdtScId) {
+    public void setBdtScId(long bdtScId) {
         this.bdtScId = bdtScId;
     }
 
-    public int getCdtScAwdPriXpsTypeMapId() {
-        return (cdtScAwdPriXpsTypeMapId == null) ? 0 : cdtScAwdPriXpsTypeMapId;
+    public long getCdtScAwdPriXpsTypeMapId() {
+        return (cdtScAwdPriXpsTypeMapId == null) ? 0L : cdtScAwdPriXpsTypeMapId;
     }
 
-    public void setCdtScAwdPriXpsTypeMapId(int cdtScAwdPriXpsTypeMapId) {
+    public void setCdtScAwdPriXpsTypeMapId(long cdtScAwdPriXpsTypeMapId) {
         if (cdtScAwdPriXpsTypeMapId > 0) {
             this.cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMapId;
         }
     }
 
-    public int getCodeListId() {
-        return (codeListId == null) ? 0 : codeListId;
+    public long getCodeListId() {
+        return (codeListId == null) ? 0L : codeListId;
     }
 
-    public void setCodeListId(int codeListId) {
+    public void setCodeListId(long codeListId) {
         if (codeListId > 0) {
             this.codeListId = codeListId;
+        }
+    }
+
+    public long getAgencyIdListId() {
+        return (agencyIdListId == null) ? 0L : agencyIdListId;
+    }
+
+    public void setAgencyIdListId(long agencyIdListId) {
+        if (agencyIdListId > 0) {
+            this.agencyIdListId = agencyIdListId;
         }
     }
 
@@ -82,16 +92,6 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
 
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
-    }
-
-    public int getAgencyIdListId() {
-        return (agencyIdListId == null) ? 0 : agencyIdListId;
-    }
-
-    public void setAgencyIdListId(int agencyIdListId) {
-        if (agencyIdListId > 0) {
-            this.agencyIdListId = agencyIdListId;
-        }
     }
 
     @Override
@@ -113,12 +113,12 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
 
     @Override
     public int hashCode() {
-        int result = bdtScPriRestriId;
-        result = 31 * result + bdtScId;
+        int result = (int) (bdtScPriRestriId ^ (bdtScPriRestriId >>> 32));
+        result = 31 * result + (int) (bdtScId ^ (bdtScId >>> 32));
         result = 31 * result + (cdtScAwdPriXpsTypeMapId != null ? cdtScAwdPriXpsTypeMapId.hashCode() : 0);
         result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
-        result = 31 * result + (isDefault ? 1 : 0);
         result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        result = 31 * result + (isDefault ? 1 : 0);
         return result;
     }
 
@@ -129,8 +129,8 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
                 ", bdtScId=" + bdtScId +
                 ", cdtScAwdPriXpsTypeMapId=" + cdtScAwdPriXpsTypeMapId +
                 ", codeListId=" + codeListId +
-                ", isDefault=" + isDefault +
                 ", agencyIdListId=" + agencyIdListId +
+                ", isDefault=" + isDefault +
                 '}';
     }
 }

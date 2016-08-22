@@ -169,7 +169,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         Element aElementBDT = (Element) aNodeBDT;
 
         Node union = businessDataType_xsd.getNode("//xsd:" + type + "Type[@name = '" + typeName + "']/xsd:union");
-        int defaultId = -1;
+        long defaultId = -1L;
         if (union != null) {
             defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
@@ -218,7 +218,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         if (basedDT == null) {
             throw new IllegalStateException("Can't find based CDT by '" + dataTypeTerm + "'");
         }
-        int basedDTID = basedDT.getDtId();
+        long basedDTID = basedDT.getDtId();
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
             logger.debug("Inserting default bdt whose name is " + typeName);
@@ -252,7 +252,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         return dtVO;
     }
 
-    private void insertBDTPrimitiveRestriction(int cdtId, int bdtID, int defaultId) throws Exception {
+    private void insertBDTPrimitiveRestriction(long cdtId, long bdtID, long defaultId) throws Exception {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtId);
         DataType bdt = dataTypeRepository.findOne(bdtID);
 
@@ -290,13 +290,13 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
     }
 
-    private String getXsdBuiltinType(int id) {
+    private String getXsdBuiltinType(long id) {
         return xbtRepository.findOne(id).getBuiltInType();
     }
 
     public DataType insertUnqualified_BDTStatement(String typeName, String dataTypeTerm,
                                                    String id, String defaultGUID, Module module) throws Exception {
-        int basedDTID = dataTypeRepository.findOneByGuid(defaultGUID).getDtId();
+        long basedDTID = dataTypeRepository.findOneByGuid(defaultGUID).getDtId();
 
         DataType dtVO = dataTypeRepository.findOneByGuid(id);
         if (dtVO == null) {
@@ -365,7 +365,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         Element aElementBDT = (Element) aNodeBDT;
 
         Node union = businessDataType_xsd.getNode(expressionPrefix + "/xsd:union");
-        int defaultId = -1;
+        long defaultId = -1L;
         if (union != null) {
             defaultId = xbtRepository.findOneByName("token").getXbtId();
         } else {
@@ -495,7 +495,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             Element aElementBDT = (Element) aNodeBDT;
 
             Node union = businessDataType_xsd.getNode(expressionPrefix + "/xsd:union");
-            int defaultId = -1;
+            long defaultId = -1L;
 
             if (union != null) {
                 defaultId = xbtRepository.findOneByName("token").getXbtId();
@@ -548,7 +548,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         }
     }
 
-    private void insertBDTPrimitiveRestrictionForExceptionalBDT(int cdtID, int bdtID, int defaultId) throws Exception {
+    private void insertBDTPrimitiveRestrictionForExceptionalBDT(long cdtID, long bdtID, long defaultId) throws Exception {
         List<CoreDataTypeAllowedPrimitive> al3 = cdtAwdPriRepository.findByCdtId(cdtID);
 
         DataType bdt = dataTypeRepository.findOne(bdtID);
@@ -568,7 +568,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
                         cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriId(aCDTAllowedPrimitiveVO.getCdtAwdPriId());
 
                 for (CoreDataTypeAllowedPrimitiveExpressionTypeMap aCDTAllowedPrimitiveExpressionTypeMapVO : al4) {
-                    int idOfXsdToken = getXSDBuiltInTypeId("xsd:token");
+                    long idOfXsdToken = getXSDBuiltInTypeId("xsd:token");
 
                     if (defaultId == aCDTAllowedPrimitiveExpressionTypeMapVO.getXbtId()) { // default
                         BusinessDataTypePrimitiveRestriction aBDT_Primitive_RestrictionVO = new BusinessDataTypePrimitiveRestriction();
@@ -614,7 +614,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         String baseDataTypeTerm;
         String baseGUID;
         String id;
-        int defaultId = -1;
+        long defaultId = -1L;
 
         XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
@@ -673,7 +673,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         String baseDataTypeTerm;
         String baseGUID;
         String id;
-        int defaultId = -1;
+        long defaultId = -1L;
 
         XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
         XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
@@ -864,7 +864,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             baseNode = xh.getNode("//xsd:simpleType[@name = '" + base + "']");
 
         DataType basedDt = dataTypeRepository.findOneByGuid(((Element) baseNode).getAttribute("id"));
-        int based_dt_id = basedDt.getDtId();
+        long based_dt_id = basedDt.getDtId();
         List<DataTypeSupplementaryComponent> baseDefaultDTSCs = dtScRepository.findByOwnerDtId(based_dt_id);
 
         //adding additional SCs for attributes
@@ -1034,7 +1034,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtSc.getDtScId());
-            int mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
+            long mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
@@ -1050,7 +1050,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
             bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
             bdtSCPri.setBdtScId(dtSc.getDtScId());
-            int mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
+            long mapId = getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId("Token", "xsd:token", dtSc);
             bdtSCPri.setCdtScAwdPriXpsTypeMapId(mapId);
             bdtSCPri.setDefault(true);
             bdtScPriRestriRepository.save(bdtSCPri);
@@ -1128,11 +1128,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
     }
 
 
-    public int getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId(
+    public long getCDTSCAllowedExpressionTypeMapByCDTPrimitiveAndBuiltInTypeAndCDTId(
             String cdtPrimitiveName, String builtInType, DataTypeSupplementaryComponent dtsc) {
 
         CoreDataTypePrimitive cdtPri = cdtPriRepository.findOneByName(cdtPrimitiveName);
-        int cdtSCId = getCDTSCAncestor(dtsc);
+        long cdtSCId = getCDTSCAncestor(dtsc);
         XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(builtInType);
         CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAwdPri =
                 cdtScAwdPriRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPri.getCdtPriId());
@@ -1142,17 +1142,17 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         return map.getCdtScAwdPriXpsTypeMapId();
     }
 
-    public int getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
-        if (dtsc.getBasedDtScId() > 0) {
+    public long getCDTSCAncestor(DataTypeSupplementaryComponent dtsc) {
+        if (dtsc.getBasedDtScId() > 0L) {
             DataTypeSupplementaryComponent baseDTSC = dtScRepository.findOne(dtsc.getBasedDtScId());
             return getCDTSCAncestor(baseDTSC);
         }
         return dtsc.getDtScId();
     }
 
-    private int getXSDBuiltInTypeId(String xsd_buitintype) {
+    private long getXSDBuiltInTypeId(String xsd_buitintype) {
         XSDBuiltInType xbt = xbtRepository.findOneByBuiltInType(xsd_buitintype);
-        return (xbt != null) ? xbt.getXbtId() : 0;
+        return (xbt != null) ? xbt.getXbtId() : 0L;
     }
 
 }

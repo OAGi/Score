@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Collection;
 import java.util.List;
 
-public interface DataTypeRepository extends JpaRepository<DataType, Integer> {
+public interface DataTypeRepository extends JpaRepository<DataType, Long> {
 
     @Query("select count(d) from DataType d where d.type = ?1")
     public long countByType(int type);

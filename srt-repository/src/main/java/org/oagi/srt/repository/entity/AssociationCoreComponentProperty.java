@@ -25,7 +25,7 @@ public class AssociationCoreComponentProperty implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int asccpId;
+    private long asccpId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -38,19 +38,19 @@ public class AssociationCoreComponentProperty implements Serializable {
     private String definition;
 
     @Column(nullable = false)
-    private int roleOfAccId;
+    private long roleOfAccId;
 
     @Column(nullable = false, length = 200)
     private String den;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -68,7 +68,7 @@ public class AssociationCoreComponentProperty implements Serializable {
     private Module module;
 
     @Column(nullable = false)
-    private int namespaceId;
+    private long namespaceId;
 
     @Column(nullable = false)
     private boolean reusableIndicator;
@@ -86,22 +86,22 @@ public class AssociationCoreComponentProperty implements Serializable {
     private Integer revisionAction;
 
     @Column
-    private Integer releaseId;
+    private Long releaseId;
 
     @Column
-    private Integer currentAsccpId;
+    private Long currentAsccpId;
 
     @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
 
     public AssociationCoreComponentProperty() {}
 
-    public AssociationCoreComponentProperty(int asccpId, String den) {
+    public AssociationCoreComponentProperty(long asccpId, String den) {
         this.asccpId = asccpId;
         this.den = den;
     }
 
-    public AssociationCoreComponentProperty(int asccpId, int roleOfAccId, String definition) {
+    public AssociationCoreComponentProperty(long asccpId, long roleOfAccId, String definition) {
         this.asccpId = asccpId;
         this.roleOfAccId = roleOfAccId;
         this.definition = definition;
@@ -118,11 +118,11 @@ public class AssociationCoreComponentProperty implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getAsccpId() {
+    public long getAsccpId() {
         return asccpId;
     }
 
-    public void setAsccpId(int asccpId) {
+    public void setAsccpId(long asccpId) {
         this.asccpId = asccpId;
     }
 
@@ -152,11 +152,11 @@ public class AssociationCoreComponentProperty implements Serializable {
         }
     }
 
-    public int getRoleOfAccId() {
+    public long getRoleOfAccId() {
         return roleOfAccId;
     }
 
-    public void setRoleOfAccId(int roleOfAccId) {
+    public void setRoleOfAccId(long roleOfAccId) {
         this.roleOfAccId = roleOfAccId;
     }
 
@@ -168,27 +168,27 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.den = den;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -224,11 +224,11 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.module = module;
     }
 
-    public int getNamespaceId() {
+    public long getNamespaceId() {
         return namespaceId;
     }
 
-    public void setNamespaceId(int namespaceId) {
+    public void setNamespaceId(long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -272,19 +272,19 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.revisionAction = revisionAction;
     }
 
-    public int getReleaseId() {
-        return (releaseId == null) ? 0 : releaseId;
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
-    public int getCurrentAsccpId() {
-        return (currentAsccpId == null) ? 0 : currentAsccpId;
+    public long getCurrentAsccpId() {
+        return (currentAsccpId == null) ? 0L : currentAsccpId;
     }
 
-    public void setCurrentAsccpId(int currentAsccpId) {
+    public void setCurrentAsccpId(long currentAsccpId) {
         this.currentAsccpId = currentAsccpId;
     }
 
@@ -333,20 +333,20 @@ public class AssociationCoreComponentProperty implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = asccpId;
+        int result = (int) (asccpId ^ (asccpId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + roleOfAccId;
+        result = 31 * result + (int) (roleOfAccId ^ (roleOfAccId >>> 32));
         result = 31 * result + (den != null ? den.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + state;
         result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + namespaceId;
+        result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
         result = 31 * result + (reusableIndicator ? 1 : 0);
         result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + revisionNum;

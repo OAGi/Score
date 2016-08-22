@@ -24,7 +24,7 @@ public class AggregateCoreComponent implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int accId;
+    private long accId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -40,7 +40,7 @@ public class AggregateCoreComponent implements Serializable {
     private String definition;
 
     @Column
-    private Integer basedAccId;
+    private Long basedAccId;
 
     @Column(length = 100)
     private String objectClassQualifier;
@@ -53,16 +53,16 @@ public class AggregateCoreComponent implements Serializable {
     private Module module;
 
     @Column
-    private Integer namespaceId;
+    private Long namespaceId;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -85,10 +85,10 @@ public class AggregateCoreComponent implements Serializable {
     private Integer revisionAction;
 
     @Column
-    private Integer releaseId;
+    private Long releaseId;
 
     @Column
-    private Integer currentAccId;
+    private Long currentAccId;
 
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
@@ -98,12 +98,12 @@ public class AggregateCoreComponent implements Serializable {
 
     public AggregateCoreComponent() {}
 
-    public AggregateCoreComponent(int accId, String den) {
+    public AggregateCoreComponent(long accId, String den) {
         this.accId = accId;
         this.den = den;
     }
 
-    public AggregateCoreComponent(int accId, Integer basedAccId, String definition) {
+    public AggregateCoreComponent(long accId, Long basedAccId, String definition) {
         this.accId = accId;
         if (basedAccId != null) {
 
@@ -123,11 +123,11 @@ public class AggregateCoreComponent implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getAccId() {
+    public long getAccId() {
         return accId;
     }
 
-    public void setAccId(int accId) {
+    public void setAccId(long accId) {
         this.accId = accId;
     }
 
@@ -163,11 +163,11 @@ public class AggregateCoreComponent implements Serializable {
         this.definition = definition;
     }
 
-    public int getBasedAccId() {
-        return (basedAccId == null) ? 0 : basedAccId;
+    public long getBasedAccId() {
+        return (basedAccId == null) ? 0L : basedAccId;
     }
 
-    public void setBasedAccId(int basedAccId) {
+    public void setBasedAccId(long basedAccId) {
         if (basedAccId > 0) {
             this.basedAccId = basedAccId;
         }
@@ -197,35 +197,35 @@ public class AggregateCoreComponent implements Serializable {
         this.module = module;
     }
 
-    public int getNamespaceId() {
-        return (namespaceId == null) ? 0 : namespaceId;
+    public long getNamespaceId() {
+        return (namespaceId == null) ? 0L : namespaceId;
     }
 
-    public void setNamespaceId(int namespaceId) {
+    public void setNamespaceId(long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -277,19 +277,19 @@ public class AggregateCoreComponent implements Serializable {
         this.revisionAction = revisionAction;
     }
 
-    public int getReleaseId() {
-        return (releaseId == null) ? 0 : releaseId;
+    public long getReleaseId() {
+        return (releaseId == null) ? 0L : releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
-    public int getCurrentAccId() {
-        return (currentAccId == null) ? 0 : currentAccId;
+    public long getCurrentAccId() {
+        return (currentAccId == null) ? 0L : currentAccId;
     }
 
-    public void setCurrentAccId(int currentAccId) {
+    public void setCurrentAccId(long currentAccId) {
         this.currentAccId = currentAccId;
     }
 
@@ -349,7 +349,7 @@ public class AggregateCoreComponent implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = accId;
+        int result = (int) (accId ^ (accId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (objectClassTerm != null ? objectClassTerm.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
@@ -359,9 +359,9 @@ public class AggregateCoreComponent implements Serializable {
         result = 31 * result + oagisComponentType;
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + state;

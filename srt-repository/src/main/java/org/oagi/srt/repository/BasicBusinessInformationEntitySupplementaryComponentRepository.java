@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BasicBusinessInformationEntitySupplementaryComponentRepository
-        extends JpaRepository<BasicBusinessInformationEntitySupplementaryComponent, Integer>,
+        extends JpaRepository<BasicBusinessInformationEntitySupplementaryComponent, Long>,
         BulkInsertRepository<BasicBusinessInformationEntitySupplementaryComponent> {
 
     @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1")
-    public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(int bbieId);
+    public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(long bbieId);
 
     @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.ownerTopLevelAbieId = ?1 and b.used = true")
-    public List<BasicBusinessInformationEntitySupplementaryComponent> findByOwnerTopLevelAbieIdAndUsedIsTrue(int ownerTopLevelAbieId);
+    public List<BasicBusinessInformationEntitySupplementaryComponent> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 }

@@ -46,31 +46,31 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
     private DataTypeSupplementaryComponent dtsc;
     private BasicBusinessInformationEntitySupplementaryComponent bbiesc;
 
-    private Map<String, Integer> bdtPrimitiveRestrictions = new HashMap<String, Integer>();
+    private Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
     private String bdtName;
     private String name;
-    private int id;
+    private long id;
     private String color;
     private String type;
     private String primitiveType;
-    private int bdtPrimitiveRestrictionId;
-    private int codeListId;
+    private long bdtPrimitiveRestrictionId;
+    private long codeListId;
     private String restrictionType;
 
     public ABIEView() {
     }
 
-    public ABIEView(String name, int id, String type) {
+    public ABIEView(String name, long id, String type) {
         this.name = name;
         this.id = id;
         this.type = type;
     }
 
-    public int getCodeListId() {
+    public long getCodeListId() {
         return codeListId;
     }
 
-    public void setCodeListId(int codeListId) {
+    public void setCodeListId(long codeListId) {
         this.codeListId = codeListId;
     }
 
@@ -86,11 +86,11 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
         System.out.println(bdtPrimitiveRestrictionId);
     }
 
-    public int getBdtPrimitiveRestrictionId() {
+    public long getBdtPrimitiveRestrictionId() {
         return bdtPrimitiveRestrictionId;
     }
 
-    public void setBdtPrimitiveRestrictionId(int bdtPrimitiveRestrictionId) {
+    public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId) {
         this.bdtPrimitiveRestrictionId = bdtPrimitiveRestrictionId;
     }
 
@@ -102,14 +102,14 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
         this.primitiveType = primitiveType;
     }
 
-    public Map<String, Integer> getBdtPrimitiveRestrictions() {
+    public Map<String, Long> getBdtPrimitiveRestrictions() {
         List<BusinessDataTypePrimitiveRestriction> ccs = bdtPriRestriRepository.findByBdtId(bccp.getBdtId());
         // Implicitly declaration. Why does it need to be here?
         // Because of this code, Add 'setBccpVO_BbieVO' method.
         // TODO: Fix me.
         bdtPrimitiveRestrictionId = bbie.getBdtPriRestriId();
         for (BusinessDataTypePrimitiveRestriction cc : ccs) {
-            if (cc.getCdtAwdPriXpsTypeMapId() > 0) {
+            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
                 primitiveType = "XSD Builtin Type";
 
                 CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
@@ -128,7 +128,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
         return bdtPrimitiveRestrictions;
     }
 
-    public void setBdtPrimitiveRestrictions(Map<String, Integer> bdtPrimitiveRestrictions) {
+    public void setBdtPrimitiveRestrictions(Map<String, Long> bdtPrimitiveRestrictions) {
         this.bdtPrimitiveRestrictions = bdtPrimitiveRestrictions;
     }
 
@@ -251,11 +251,11 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
         this.bbiesc = bbiesc;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

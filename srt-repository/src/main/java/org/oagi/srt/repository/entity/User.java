@@ -23,7 +23,7 @@ public class User implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int appUserId;
+    private long appUserId;
 
     @Column(nullable = false, length = 45)
     private String loginId;
@@ -40,11 +40,11 @@ public class User implements Serializable {
     @Column(nullable = false)
     private boolean oagisDeveloperIndicator;
 
-    public int getAppUserId() {
+    public long getAppUserId() {
         return appUserId;
     }
 
-    public void setAppUserId(int appUserId) {
+    public void setAppUserId(long appUserId) {
         this.appUserId = appUserId;
     }
 
@@ -106,7 +106,7 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = appUserId;
+        int result = (int) (appUserId ^ (appUserId >>> 32));
         result = 31 * result + (loginId != null ? loginId.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);

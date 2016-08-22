@@ -23,7 +23,7 @@ public class Release implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int releaseId;
+    private long releaseId;
 
     @Column(nullable = false, length = 45)
     private String releaseNum;
@@ -33,13 +33,13 @@ public class Release implements Serializable {
     private String releaseNote;
 
     @Column(nullable = false)
-    private int namespaceId;
+    private long namespaceId;
 
-    public int getReleaseId() {
+    public long getReleaseId() {
         return releaseId;
     }
 
-    public void setReleaseId(int releaseId) {
+    public void setReleaseId(long releaseId) {
         this.releaseId = releaseId;
     }
 
@@ -59,11 +59,11 @@ public class Release implements Serializable {
         this.releaseNote = releaseNote;
     }
 
-    public int getNamespaceId() {
+    public long getNamespaceId() {
         return namespaceId;
     }
 
-    public void setNamespaceId(int namespaceId) {
+    public void setNamespaceId(long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -83,10 +83,10 @@ public class Release implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = releaseId;
+        int result = (int) (releaseId ^ (releaseId >>> 32));
         result = 31 * result + (releaseNum != null ? releaseNum.hashCode() : 0);
         result = 31 * result + (releaseNote != null ? releaseNote.hashCode() : 0);
-        result = 31 * result + namespaceId;
+        result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
         return result;
     }
 

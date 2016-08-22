@@ -24,7 +24,7 @@ public class BusinessContext implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int bizCtxId;
+    private long bizCtxId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -33,10 +33,10 @@ public class BusinessContext implements Serializable {
     private String name;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -57,11 +57,11 @@ public class BusinessContext implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getBizCtxId() {
+    public long getBizCtxId() {
         return bizCtxId;
     }
 
-    public void setBizCtxId(int bizCtxId) {
+    public void setBizCtxId(long bizCtxId) {
         this.bizCtxId = bizCtxId;
     }
 
@@ -81,19 +81,19 @@ public class BusinessContext implements Serializable {
         this.name = name;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -133,11 +133,11 @@ public class BusinessContext implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = bizCtxId;
+        int result = (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         return result;

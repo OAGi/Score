@@ -83,12 +83,12 @@ public class BusinessInformationEntityService {
         private int bbiepCount = 0;
         private int bbieCount = 0;
 
-        private int userId;
+        private long userId;
         private AssociationCoreComponentProperty asccp;
         private AggregateCoreComponent acc;
         private TopLevelAbie topLevelAbie;
 
-        private CreateBIEsResult(int userId, AssociationCoreComponentProperty asccp,
+        private CreateBIEsResult(long userId, AssociationCoreComponentProperty asccp,
                                  AggregateCoreComponent acc, TopLevelAbie topLevelAbie) {
             this.userId = userId;
             this.asccp = asccp;
@@ -131,8 +131,8 @@ public class BusinessInformationEntityService {
 
     @Transactional(rollbackFor = Throwable.class)
     public CreateBIEsResult createBIEs(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
-        int userId = userRepository.findAppUserIdByLoginId("oagis");
-        int roleOfAccId = asccp.getRoleOfAccId();
+        long userId = userRepository.findAppUserIdByLoginId("oagis");
+        long roleOfAccId = asccp.getRoleOfAccId();
         AggregateCoreComponent acc = accRepository.findOne(roleOfAccId);
         TopLevelAbie topLevelAbie = createTopLevelAbie(bizCtx);
         CreateBIEsResult createBIEsResult = new CreateBIEsResult(userId, asccp, acc, topLevelAbie);
@@ -153,7 +153,7 @@ public class BusinessInformationEntityService {
         return topLevelAbieRepository.saveAndFlush(topLevelAbie);
     }
 
-    private AggregateBusinessInformationEntity createABIE(int userId, AggregateCoreComponent acc,
+    private AggregateBusinessInformationEntity createABIE(long userId, AggregateCoreComponent acc,
                                                           TopLevelAbie topLevelAbie, BusinessContext bizCtx,
                                                           CreateBIEsResult createBIEsResult) {
 
@@ -179,7 +179,7 @@ public class BusinessInformationEntityService {
         topLevelAbieRepository.save(topLevelAbie);
     }
 
-    private AssociationBusinessInformationEntityProperty createASBIEP(int userId,
+    private AssociationBusinessInformationEntityProperty createASBIEP(long userId,
                                                                       AssociationCoreComponentProperty asccp,
                                                                       TopLevelAbie topLevelAbie,
                                                                       CreateBIEsResult createBIEsResult) {
@@ -199,7 +199,7 @@ public class BusinessInformationEntityService {
         return asbiep;
     }
 
-    public void createBIEs(CreateBIEContext createBIEContext, int accId, AggregateBusinessInformationEntity abie) {
+    public void createBIEs(CreateBIEContext createBIEContext, long accId, AggregateBusinessInformationEntity abie) {
         LinkedList<AggregateCoreComponent> accList = new LinkedList();
         AggregateCoreComponent aggregateCoreComponent = createBIEContext.getACC(accId);
         accList.add(aggregateCoreComponent);
@@ -311,17 +311,17 @@ public class BusinessInformationEntityService {
         private BBIETreeTaskHolder bbieTreeTaskHolder;
         private ASBIETreeTaskHolder asbieTreeTaskHolder;
 
-        private Map<Integer, AggregateCoreComponent> aggregateCoreComponentMap;
-        private Map<Integer, AssociationCoreComponentProperty> associationCoreComponentPropertyMap;
-        private Map<Integer, BasicCoreComponentProperty> basicCoreComponentPropertyMap;
+        private Map<Long, AggregateCoreComponent> aggregateCoreComponentMap;
+        private Map<Long, AssociationCoreComponentProperty> associationCoreComponentPropertyMap;
+        private Map<Long, BasicCoreComponentProperty> basicCoreComponentPropertyMap;
 
-        private Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriDefaultMap;
-        private Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriCodeListMap;
+        private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriDefaultMap;
+        private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriCodeListMap;
 
-        private Map<Integer, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriDefaultMap;
-        private Map<Integer, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriCodeListMap;
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriDefaultMap;
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriCodeListMap;
 
-        private int userId;
+        private long userId;
         private TopLevelAbie topLevelAbie;
         private CreateBIEsResult createBIEsResult;
 
@@ -329,7 +329,7 @@ public class BusinessInformationEntityService {
         private List<AssociationCoreComponent> associationCoreComponents;
         private List<DataTypeSupplementaryComponent> dataTypeSupplementaryComponents;
 
-        public CreateBIEContext(int userId, TopLevelAbie topLevelAbie, CreateBIEsResult createBIEsResult) {
+        public CreateBIEContext(long userId, TopLevelAbie topLevelAbie, CreateBIEsResult createBIEsResult) {
             abieTaskHolder = new ABIETaskHolder();
             bbieTreeTaskHolder = new BBIETreeTaskHolder();
             asbieTreeTaskHolder = new ASBIETreeTaskHolder();
@@ -371,7 +371,7 @@ public class BusinessInformationEntityService {
                     .collect(Collectors.toMap(bdtScPriRestri -> bdtScPriRestri.getBdtScId(), Function.identity()));
         }
 
-        public int getUserId() {
+        public long getUserId() {
             return userId;
         }
 
@@ -379,11 +379,11 @@ public class BusinessInformationEntityService {
             return topLevelAbie;
         }
 
-        public AggregateCoreComponent getACC(int accId) {
+        public AggregateCoreComponent getACC(long accId) {
             return aggregateCoreComponentMap.get(accId);
         }
 
-        public AssociationCoreComponentProperty getASCCP(int asccpId) {
+        public AssociationCoreComponentProperty getASCCP(long asccpId) {
             return associationCoreComponentPropertyMap.get(asccpId);
         }
 
@@ -400,50 +400,50 @@ public class BusinessInformationEntityService {
         }
 
         @Override
-        public List<BasicCoreComponent> getBCCs(int fromAccId) {
+        public List<BasicCoreComponent> getBCCs(long fromAccId) {
             return basicCoreComponents.stream()
                     .filter(bcc -> bcc.getFromAccId() == fromAccId)
                     .collect(Collectors.toList());
         }
 
         @Override
-        public List<BasicCoreComponent> getBCCsWithoutAttributes(int accId) {
+        public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId) {
             return getBCCs(accId).stream()
                     .filter(e -> e.getSeqKey() != 0)
                     .collect(Collectors.toList());
         }
 
         @Override
-        public List<AssociationCoreComponent> getASCCs(int fromAccId) {
+        public List<AssociationCoreComponent> getASCCs(long fromAccId) {
             return associationCoreComponents.stream()
                     .filter(acc -> acc.getFromAccId() == fromAccId)
                     .collect(Collectors.toList());
         }
 
-        public BasicCoreComponentProperty getBCCP(int toBccpId) {
+        public BasicCoreComponentProperty getBCCP(long toBccpId) {
             return basicCoreComponentPropertyMap.get(toBccpId);
         }
 
-        public int getDefaultBdtPriRestriId(int bdtId) {
+        public long getDefaultBdtPriRestriId(long bdtId) {
             return bdtPriRestriDefaultMap.get(bdtId).getBdtPriRestriId();
         }
 
-        public int getCodeListIdOfBdtPriRestriId(int bdtId) {
+        public long getCodeListIdOfBdtPriRestriId(long bdtId) {
             BusinessDataTypePrimitiveRestriction e = bdtPriRestriCodeListMap.get(bdtId);
-            return (e != null) ? e.getCodeListId() : 0;
+            return (e != null) ? e.getCodeListId() : 0L;
         }
 
-        public int getDefaultBdtScPriRestriId(int bdtScId) {
+        public long getDefaultBdtScPriRestriId(long bdtScId) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriDefaultMap.get(bdtScId);
-            return (e != null) ? e.getBdtScPriRestriId() : 0;
+            return (e != null) ? e.getBdtScPriRestriId() : 0L;
         }
 
-        public int getCodeListIdOfBdtScPriRestriId(int bdtScId) {
+        public long getCodeListIdOfBdtScPriRestriId(long bdtScId) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriCodeListMap.get(bdtScId);
-            return (e != null) ? e.getCodeListId() : 0;
+            return (e != null) ? e.getCodeListId() : 0L;
         }
 
-        public List<DataTypeSupplementaryComponent> findByOwnerDtId(int ownerDtId) {
+        public List<DataTypeSupplementaryComponent> findByOwnerDtId(long ownerDtId) {
             return dataTypeSupplementaryComponents.stream()
                     .filter(dtSc -> dtSc.getOwnerDtId() == ownerDtId)
                     .collect(Collectors.toList());
@@ -460,7 +460,7 @@ public class BusinessInformationEntityService {
 
         private List<AggregateBusinessInformationEntity> aggregateBusinessInformationEntitys = new ArrayList();
 
-        public AggregateBusinessInformationEntity createABIE(int userId, AggregateCoreComponent acc, int bizCtxId) {
+        public AggregateBusinessInformationEntity createABIE(long userId, AggregateCoreComponent acc, long bizCtxId) {
             AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
             String abieGuid = Utility.generateGUID();
             abie.setGuid(abieGuid);
@@ -549,16 +549,16 @@ public class BusinessInformationEntityService {
             this.seqKey = seqKey;
 
             BasicCoreComponentProperty bccp = createBIEContext.getBCCP(bcc.getToBccpId());
-            int bdtId = bccp.getBdtId();
-            int bdtPrimitiveRestrictionId = createBIEContext.getDefaultBdtPriRestriId(bdtId);
-            int codeListId = createBIEContext.getCodeListIdOfBdtPriRestriId(bdtId);
+            long bdtId = bccp.getBdtId();
+            long bdtPrimitiveRestrictionId = createBIEContext.getDefaultBdtPriRestriId(bdtId);
+            long codeListId = createBIEContext.getCodeListIdOfBdtPriRestriId(bdtId);
 
             createBBIEP(createBIEContext.getUserId(), bccp);
             createBBIE(createBIEContext.getUserId(), bdtPrimitiveRestrictionId, codeListId);
             createBBIESC(createBIEContext, bdtId);
         }
 
-        private void createBBIEP(int userId, BasicCoreComponentProperty bccp) {
+        private void createBBIEP(long userId, BasicCoreComponentProperty bccp) {
             bbiep = new BasicBusinessInformationEntityProperty();
             bbiep.setGuid(Utility.generateGUID());
             bbiep.setBasedBccpId(bccp.getBccpId());
@@ -567,7 +567,7 @@ public class BusinessInformationEntityService {
             bbiep.setDefinition(bccp.getDefinition());
         }
 
-        private void createBBIE(int userId, int bdtPrimitiveRestrictionId, int codeListId) {
+        private void createBBIE(long userId, long bdtPrimitiveRestrictionId, long codeListId) {
             bbie = new BasicBusinessInformationEntity();
             bbie.setGuid(Utility.generateGUID());
             bbie.setBasedBccId(bcc.getBccId());
@@ -585,7 +585,7 @@ public class BusinessInformationEntityService {
             bbie.setSeqKey(seqKey);
         }
 
-        private void createBBIESC(CreateBIEContext createBIEContext, int bdtId) {
+        private void createBBIESC(CreateBIEContext createBIEContext, long bdtId) {
             bbieScList = createBIEContext.findByOwnerDtId(bdtId)
                     .stream()
                     .filter(dtSc -> dtSc.getCardinalityMax() != 0)
@@ -593,14 +593,14 @@ public class BusinessInformationEntityService {
                         BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                                 new BasicBusinessInformationEntitySupplementaryComponent();
                         // bbieSc.setBbieId(bbieId);
-                        int bdtScId = dtSc.getDtScId();
+                        long bdtScId = dtSc.getDtScId();
                         bbieSc.setDtScId(bdtScId);
                         bbieSc.setGuid(Utility.generateGUID());
-                        int bdtScPriRestriId = createBIEContext.getDefaultBdtScPriRestriId(bdtScId);
-                        if (bdtScPriRestriId > 0) {
+                        long bdtScPriRestriId = createBIEContext.getDefaultBdtScPriRestriId(bdtScId);
+                        if (bdtScPriRestriId > 0L) {
                             bbieSc.setDtScPriRestriId(bdtScPriRestriId);
                         }
-                        int codeListId = createBIEContext.getCodeListIdOfBdtScPriRestriId(bdtScId);
+                        long codeListId = createBIEContext.getCodeListIdOfBdtScPriRestriId(bdtScId);
 //                        if (codeListId > 0) {
 //                            bbieSc.setCodeListId(codeListId);
 //                        }
@@ -640,7 +640,7 @@ public class BusinessInformationEntityService {
         private AssociationBusinessInformationEntityProperty asbiep;
         private AssociationBusinessInformationEntity asbie;
 
-        public CreateASBIETreeTask(int userId, AssociationCoreComponentProperty asccp, AggregateBusinessInformationEntity roleOfAbie,
+        public CreateASBIETreeTask(long userId, AssociationCoreComponentProperty asccp, AggregateBusinessInformationEntity roleOfAbie,
                                    AssociationCoreComponent ascc, AggregateBusinessInformationEntity fromAbie, int seqKey) {
             this.asccp = asccp;
             this.roleOfAbie = roleOfAbie;
@@ -652,7 +652,7 @@ public class BusinessInformationEntityService {
             createASBIE(userId);
         }
 
-        public void createASBIEP(int userId) {
+        public void createASBIEP(long userId) {
             asbiep = new AssociationBusinessInformationEntityProperty();
             asbiep.setGuid(Utility.generateGUID());
             asbiep.setBasedAsccpId(asccp.getAsccpId());
@@ -662,7 +662,7 @@ public class BusinessInformationEntityService {
             asbiep.setDefinition(asccp.getDefinition());
         }
 
-        public void createASBIE(int userId) {
+        public void createASBIE(long userId) {
             asbie = new AssociationBusinessInformationEntity();
             asbie.setGuid(Utility.generateGUID());
             // asbie.setFromAbieId(fromAbieId);
@@ -749,7 +749,7 @@ public class BusinessInformationEntityService {
     }
 
     private AggregateCoreComponent createACCForExtension(AggregateCoreComponent eAcc, User currentLoginUser) {
-        int userId = currentLoginUser.getAppUserId();
+        long userId = currentLoginUser.getAppUserId();
         AggregateCoreComponent ueAcc = new AggregateCoreComponent();
         ueAcc.setGuid(Utility.generateGUID());
         ueAcc.setObjectClassTerm(Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm()));
@@ -784,7 +784,7 @@ public class BusinessInformationEntityService {
     private AssociationCoreComponentProperty createASCCPForExtension(AggregateCoreComponent eAcc,
                                                                      User currentLoginUser,
                                                                      AggregateCoreComponent ueAcc) {
-        int userId = currentLoginUser.getAppUserId();
+        long userId = currentLoginUser.getAppUserId();
         AssociationCoreComponentProperty ueAsccp = new AssociationCoreComponentProperty();
         ueAsccp.setGuid(Utility.generateGUID());
         ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
@@ -822,7 +822,7 @@ public class BusinessInformationEntityService {
                                                             User currentLoginUser,
                                                             AggregateCoreComponent ueAcc,
                                                             AssociationCoreComponentProperty ueAsccp) {
-        int userId = currentLoginUser.getAppUserId();
+        long userId = currentLoginUser.getAppUserId();
         AssociationCoreComponent ueAscc = new AssociationCoreComponent();
         ueAscc.setGuid(Utility.generateGUID());
         ueAscc.setCardinalityMin(1);

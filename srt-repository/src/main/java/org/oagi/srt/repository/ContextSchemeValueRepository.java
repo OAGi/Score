@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ContextSchemeValueRepository extends JpaRepository<ContextSchemeValue, Integer> {
+public interface ContextSchemeValueRepository extends JpaRepository<ContextSchemeValue, Long> {
 
     @Query("select c from ContextSchemeValue c where c.ownerCtxSchemeId = ?1")
-    public List<ContextSchemeValue> findByOwnerCtxSchemeId(int ownerCtxSchemeId);
+    public List<ContextSchemeValue> findByOwnerCtxSchemeId(long ownerCtxSchemeId);
 
     @Query("delete from ContextSchemeValue c where c.ownerCtxSchemeId = ?1")
-    public void deleteByOwnerCtxSchemeId(int ownerCtxSchemeId);
+    public void deleteByOwnerCtxSchemeId(long ownerCtxSchemeId);
 }

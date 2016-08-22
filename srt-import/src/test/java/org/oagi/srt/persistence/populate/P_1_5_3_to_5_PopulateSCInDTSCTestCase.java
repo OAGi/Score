@@ -210,21 +210,21 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
             assertEquals(
                     expectedDtScList.stream()
                             .map(DataTypeSupplementaryComponent::getPropertyTerm)
-                            .mapToInt(String::hashCode)
+                            .mapToLong(String::hashCode)
                             .sum(),
                     actualDtScList.stream()
                             .map(DataTypeSupplementaryComponent::getPropertyTerm)
-                            .mapToInt(String::hashCode)
+                            .mapToLong(String::hashCode)
                             .sum()
             );
             assertEquals(
                     expectedDtScList.stream()
                             .map(DataTypeSupplementaryComponent::getRepresentationTerm)
-                            .mapToInt(String::hashCode)
+                            .mapToLong(String::hashCode)
                             .sum(),
                     actualDtScList.stream()
                             .map(DataTypeSupplementaryComponent::getRepresentationTerm)
-                            .mapToInt(String::hashCode)
+                            .mapToLong(String::hashCode)
                             .sum()
             );
 
@@ -271,17 +271,17 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
 
                 assertEquals(expectedCdtAwdPriList.size(), actualCdtScAwdPriList.size());
                 assertEquals(expectedCdtAwdPriList.stream()
-                                .mapToInt(CoreDataTypeAllowedPrimitive::getCdtPriId)
+                                .mapToLong(CoreDataTypeAllowedPrimitive::getCdtPriId)
                                 .sum(),
                         actualCdtScAwdPriList.stream()
-                                .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtPriId)
+                                .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtPriId)
                                 .sum());
 
                 // cdt_sc_awd_pri_xps_type_map
                 List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> expectedCdtAwdPriXpsTypeMapList =
                         cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriIdIn(
                                 expectedCdtAwdPriList.stream()
-                                        .mapToInt(CoreDataTypeAllowedPrimitive::getCdtAwdPriId)
+                                        .mapToLong(CoreDataTypeAllowedPrimitive::getCdtAwdPriId)
                                         .boxed()
                                         .collect(Collectors.toList())
                         );
@@ -289,17 +289,17 @@ public class P_1_5_3_to_5_PopulateSCInDTSCTestCase extends AbstractTransactional
                 List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> actualCdtScAwdPriXpsTypeMapList =
                         cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                                 actualCdtScAwdPriList.stream()
-                                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                                        .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                                         .boxed()
                                         .collect(Collectors.toList())
                         );
 
                 assertEquals(expectedCdtAwdPriXpsTypeMapList.size(), actualCdtScAwdPriXpsTypeMapList.size());
                 assertEquals(expectedCdtAwdPriXpsTypeMapList.stream()
-                                .mapToInt(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getXbtId)
+                                .mapToLong(CoreDataTypeAllowedPrimitiveExpressionTypeMap::getXbtId)
                                 .sum(),
                         actualCdtScAwdPriXpsTypeMapList.stream()
-                                .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getXbtId)
+                                .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getXbtId)
                                 .sum());
             });
         });

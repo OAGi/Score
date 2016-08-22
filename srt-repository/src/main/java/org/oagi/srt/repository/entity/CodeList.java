@@ -31,7 +31,7 @@ public class CodeList implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int codeListId;
+    private long codeListId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -46,7 +46,7 @@ public class CodeList implements Serializable {
     private String listId;
 
     @Column
-    private Integer agencyId;
+    private Long agencyId;
 
     @Column(nullable = false, length = 10)
     private String versionId;
@@ -62,7 +62,7 @@ public class CodeList implements Serializable {
     private String definitionSource;
 
     @Column
-    private Integer basedCodeListId;
+    private Long basedCodeListId;
 
     @Column(nullable = false)
     private boolean extensibleIndicator;
@@ -72,14 +72,14 @@ public class CodeList implements Serializable {
     private Module module;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTimestamp;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -109,11 +109,11 @@ public class CodeList implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getCodeListId() {
+    public long getCodeListId() {
         return codeListId;
     }
 
-    public void setCodeListId(int codeListId) {
+    public void setCodeListId(long codeListId) {
         this.codeListId = codeListId;
     }
 
@@ -149,11 +149,11 @@ public class CodeList implements Serializable {
         this.listId = listId;
     }
 
-    public int getAgencyId() {
-        return (agencyId == null) ? 0 : agencyId;
+    public long getAgencyId() {
+        return (agencyId == null) ? 0L : agencyId;
     }
 
-    public void setAgencyId(int agencyId) {
+    public void setAgencyId(long agencyId) {
         if (agencyId > 0) {
             this.agencyId = agencyId;
         }
@@ -191,11 +191,11 @@ public class CodeList implements Serializable {
         this.definitionSource = definitionSource;
     }
 
-    public int getBasedCodeListId() {
-        return (basedCodeListId == null) ? 0 : basedCodeListId;
+    public long getBasedCodeListId() {
+        return (basedCodeListId == null) ? 0L : basedCodeListId;
     }
 
-    public void setBasedCodeListId(int basedCodeListId) {
+    public void setBasedCodeListId(long basedCodeListId) {
         this.basedCodeListId = basedCodeListId;
     }
 
@@ -215,11 +215,11 @@ public class CodeList implements Serializable {
         this.module = module;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -231,11 +231,11 @@ public class CodeList implements Serializable {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -334,7 +334,7 @@ public class CodeList implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = codeListId;
+        int result = (int) (codeListId ^ (codeListId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (enumTypeGuid != null ? enumTypeGuid.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
@@ -347,9 +347,9 @@ public class CodeList implements Serializable {
         result = 31 * result + (basedCodeListId != null ? basedCodeListId.hashCode() : 0);
         result = 31 * result + (extensibleIndicator ? 1 : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + createdBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (editDisabled ? 1 : 0);

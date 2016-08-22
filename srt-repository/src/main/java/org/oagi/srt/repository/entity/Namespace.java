@@ -24,7 +24,7 @@ public class Namespace implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int namespaceId;
+    private long namespaceId;
 
     @Column(nullable = false, length = 100)
     private String uri;
@@ -39,13 +39,13 @@ public class Namespace implements Serializable {
     private boolean stdNmsp;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int ownerUserId;
+    private long ownerUserId;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -70,11 +70,11 @@ public class Namespace implements Serializable {
         lastUpdateTimestamp = new Date();
     }
 
-    public int getNamespaceId() {
+    public long getNamespaceId() {
         return namespaceId;
     }
 
-    public void setNamespaceId(int namespaceId) {
+    public void setNamespaceId(long namespaceId) {
         this.namespaceId = namespaceId;
     }
 
@@ -110,27 +110,27 @@ public class Namespace implements Serializable {
         this.stdNmsp = stdNmsp;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(int ownerUserId) {
+    public void setOwnerUserId(long ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -174,14 +174,14 @@ public class Namespace implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = namespaceId;
+        int result = (int) (namespaceId ^ (namespaceId >>> 32));
         result = 31 * result + (uri != null ? uri.hashCode() : 0);
         result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (stdNmsp ? 1 : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + ownerUserId;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         return result;

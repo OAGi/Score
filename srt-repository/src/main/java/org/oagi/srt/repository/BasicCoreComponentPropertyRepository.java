@@ -4,10 +4,10 @@ import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface BasicCoreComponentPropertyRepository extends JpaRepository<BasicCoreComponentProperty, Integer> {
+public interface BasicCoreComponentPropertyRepository extends JpaRepository<BasicCoreComponentProperty, Long> {
 
     @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.propertyTerm = ?1 and b.bdtId = ?2")
-    public BasicCoreComponentProperty findBccpIdAndDenByPropertyTermAndBdtId(String propertyTerm, int bdtId);
+    public BasicCoreComponentProperty findBccpIdAndDenByPropertyTermAndBdtId(String propertyTerm, long bdtId);
 
     @Query("select b from BasicCoreComponentProperty b where b.guid = ?1")
     public BasicCoreComponentProperty findOneByGuid(String guid);

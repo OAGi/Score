@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BusinessContextValueRepository extends JpaRepository<BusinessContextValue, Integer> {
+public interface BusinessContextValueRepository extends JpaRepository<BusinessContextValue, Long> {
 
     @Query("select b from BusinessContextValue b where b.ctxSchemeValueId = ?1")
-    public List<BusinessContextValue> findByCtxSchemeValueId(int ctxSchemeValueId);
+    public List<BusinessContextValue> findByCtxSchemeValueId(long ctxSchemeValueId);
 
     @Query("select b from BusinessContextValue b where b.bizCtxId = ?1")
-    public List<BusinessContextValue> findByBizCtxId(int bizCtxId);
+    public List<BusinessContextValue> findByBizCtxId(long bizCtxId);
 }

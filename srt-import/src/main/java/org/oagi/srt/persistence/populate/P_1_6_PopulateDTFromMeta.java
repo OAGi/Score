@@ -64,12 +64,12 @@ public class P_1_6_PopulateDTFromMeta {
     @Autowired
     private ImportUtil importUtil;
 
-    private int NormalizedStringCDTPrimitiveId;
-    private int StringCDTPrimitiveId;
-    private int TokenCDTPrimitiveId;
-    private int NormalizedStringXBTId;
-    private int StringXBTId;
-    private int TokenXBTId;
+    private long NormalizedStringCDTPrimitiveId;
+    private long StringCDTPrimitiveId;
+    private long TokenCDTPrimitiveId;
+    private long NormalizedStringXBTId;
+    private long StringXBTId;
+    private long TokenXBTId;
 
     private XPathHandler meta_xsd;
 
@@ -148,7 +148,7 @@ public class P_1_6_PopulateDTFromMeta {
     }
 
     private List<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(
-            int basedBdtId, int bdtId) throws Exception {
+            long basedBdtId, long bdtId) throws Exception {
         List<BusinessDataTypePrimitiveRestriction> result = new ArrayList();
         List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(basedBdtId);
 
@@ -257,7 +257,7 @@ public class P_1_6_PopulateDTFromMeta {
     }
 
     public void populateCDTSCAwdPri(DataTypeSupplementaryComponent dtsc){
-        int cdtSCAPId = -1;
+        long cdtSCAPId = -1L;
 
         //For NormalizedString Primitive
         CoreDataTypeSupplementaryComponentAllowedPrimitive cdtSCAP = new CoreDataTypeSupplementaryComponentAllowedPrimitive();
@@ -310,7 +310,7 @@ public class P_1_6_PopulateDTFromMeta {
 
 
     public void populateBDTSCPrimitiveRestriction(DataTypeSupplementaryComponent dtsc){
-        int dtscId = dtsc.getDtScId();
+        long dtscId = dtsc.getDtScId();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
 
         if(dtsc.getPropertyTerm().equals("Language")){
@@ -364,7 +364,7 @@ public class P_1_6_PopulateDTFromMeta {
         }
     }
 
-    public void populateBDTSCPrimitiveFromCDTSC(int dtscId, int defaultCDTPriIndex){
+    public void populateBDTSCPrimitiveFromCDTSC(long dtscId, long defaultCDTPriIndex){
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtSCAwdPriList = cdtScAwdPriRepository.findByCdtScId(dtscId);
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
 
@@ -379,7 +379,7 @@ public class P_1_6_PopulateDTFromMeta {
                 bdtSCPri.setDefault(false);
             }
 
-            int xbtId = -1;
+            long xbtId = -1L;
             if(cdtSCAwdPriList.get(i).getCdtPriId()==NormalizedStringCDTPrimitiveId){
                 xbtId = NormalizedStringXBTId;
             }

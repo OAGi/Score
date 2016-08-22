@@ -92,20 +92,20 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
 
         targetTextCDTPriList = cdtPriRepository.findByCdtPriIdIn(
                 targetTextCDTAwdPriList.stream()
-                        .mapToInt(CoreDataTypeAllowedPrimitive::getCdtPriId)
+                        .mapToLong(CoreDataTypeAllowedPrimitive::getCdtPriId)
                         .boxed()
                         .collect(Collectors.toList())
         );
-        
+
         defaultTextBDTPriList = bdtPriRestriRepository.findByBdtId(defaultTextBDT.getDtId());
         assertEquals(1, defaultTextBDTPriList.size());
-        
+
         defaultTextBDTCDTAwdPriXpsTypeMap = cdtAwdPriXpsTypeMapRepository.findOne(defaultTextBDTPriList.get(0).getCdtAwdPriXpsTypeMapId());
-        
+
         defaultTextBDTCDTAwdPri = cdtAwdPriRepository.findOne(defaultTextBDTCDTAwdPriXpsTypeMap.getCdtAwdPriId());
-        
+
         defaultTextBDTCDTPrimitive = cdtPriRepository.findOne(defaultTextBDTCDTAwdPri.getCdtPriId());
-        
+
         assertEquals("Token",defaultTextBDTCDTPrimitive.getName());
 
         List<String> targetTextCDTPriNameList =
@@ -208,22 +208,22 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     }
 
     private class ExpectedBusinessDataTypePrimitiveRestriction {
-        private int bdtId;
-        private int cdtAwdPriXpsTypeMapId;
+        private long bdtId;
+        private long cdtAwdPriXpsTypeMapId;
         private boolean isDefault;
 
         public ExpectedBusinessDataTypePrimitiveRestriction(
-                int bdtId, int cdtAwdPriXpsTypeMapId, boolean isDefault) {
+                long bdtId, long cdtAwdPriXpsTypeMapId, boolean isDefault) {
             this.bdtId = bdtId;
             this.cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMapId;
             this.isDefault = isDefault;
         }
 
-        public int getBdtId() {
+        public long getBdtId() {
             return bdtId;
         }
 
-        public int getCdtAwdPriXpsTypeMapId() {
+        public long getCdtAwdPriXpsTypeMapId() {
             return cdtAwdPriXpsTypeMapId;
         }
 
@@ -238,7 +238,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                 bdtPriRestriRepository.findByBdtId(defaultTextBDT.getDtId());
         assertEquals(1, basedBdtPriRestri.size());
 
-        Map<Integer, BusinessDataTypePrimitiveRestriction> bdtPriRestriListMap = basedBdtPriRestri.stream()
+        Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriListMap = basedBdtPriRestri.stream()
                 .collect(Collectors.toMap(
                         BusinessDataTypePrimitiveRestriction::getCdtAwdPriXpsTypeMapId,
                         Function.identity()));
@@ -387,7 +387,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
     public void test_Populate_cdt_sc_awd_pri_Table() {
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList = retrieveActualCdtScAwdPriList();
         actualCdtScAwdPriList.forEach(cdtScAwdPri -> {
-        	
+
         	DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(cdtScAwdPri.getCdtScId());
         	if(dtsc.getPropertyTerm().equals("Language") || dtsc.getPropertyTerm().equals("Action")){
         		if (cdtScAwdPri.isDefault()) {
@@ -408,15 +408,15 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         	else {
         		assertTrue(false);
         	}
-            
+
         });
     }
 
     private List<CoreDataTypeSupplementaryComponentAllowedPrimitive> retrieveActualCdtScAwdPriList() {
         int expectedDtScSize = 8; // it determines from the above testing, 'test_PopulateSCinThe_dt_sc_Table'
-        List<Integer> targetDtIds =
+        List<Long> targetDtIds =
                 dtRepository.findByGuidIn(targetGuids).stream()
-                        .mapToInt(DataType::getDtId).boxed().collect(Collectors.toList());
+                        .mapToLong(DataType::getDtId).boxed().collect(Collectors.toList());
         List<DataTypeSupplementaryComponent> actualDtScList = dtScRepository.findByOwnerDtIdIn(targetDtIds);
         assertEquals(expectedDtScSize, actualDtScList.size());
 
@@ -429,7 +429,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> actualCdtScAwdPriList =
                 cdtScAwdPriRepository.findByCdtScIdIn(
                         targetDtScList.stream()
-                                .mapToInt(DataTypeSupplementaryComponent::getDtScId)
+                                .mapToLong(DataTypeSupplementaryComponent::getDtScId)
                                 .boxed()
                                 .collect(Collectors.toList())
                 );
@@ -446,14 +446,14 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> actualCdtScAwdPriXpsTypeMapList =
                 cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                         actualCdtScAwdPriList.stream()
-                                .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                                .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                                 .boxed()
                                 .collect(Collectors.toList())
                 );
 
         List<XSDBuiltInType> actualXbtList = xbtRepository.findByXbtIdIn(
                 actualCdtScAwdPriXpsTypeMapList.stream()
-                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getXbtId)
+                        .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap::getXbtId)
                         .boxed()
                         .collect(Collectors.toList())
         );
@@ -468,17 +468,17 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         List<DataType> targetDtList = dtRepository.findByGuidIn(targetGuids);
         List<DataTypeSupplementaryComponent> targetDtScList = dtScRepository.findByOwnerDtIdIn(
                 targetDtList.stream()
-                        .mapToInt(DataType::getDtId)
+                        .mapToLong(DataType::getDtId)
                         .boxed()
                         .collect(Collectors.toList())
         );
-        Map<Integer, DataTypeSupplementaryComponent> targetDtScMap =
+        Map<Long, DataTypeSupplementaryComponent> targetDtScMap =
                 targetDtScList.stream().collect(Collectors.toMap(DataTypeSupplementaryComponent::getDtScId, Function.identity()));
 
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriList =
                 bdtScPriRestriRepository.findByBdtScIdIn(
                         targetDtScList.stream()
-                                .mapToInt(DataTypeSupplementaryComponent::getDtScId)
+                                .mapToLong(DataTypeSupplementaryComponent::getDtScId)
                                 .boxed()
                                 .collect(Collectors.toList())
                 );
@@ -503,18 +503,18 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                 actualBdtScPriRestriListForLanguageCode.size());
 
         // check rows of value
-        int expectedSumValueForLanguageCode = (expectedInheritedBdtScPriRestriListForLanguageCode.stream()
-                .mapToInt(bdtScPriRestri ->
+        long expectedSumValueForLanguageCode = (expectedInheritedBdtScPriRestriListForLanguageCode.stream()
+                .mapToLong(bdtScPriRestri ->
                         (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() +
-                                bdtScPriRestri.getCodeListId() + (bdtScPriRestri.isDefault() ? 1 : 0))
+                                bdtScPriRestri.getCodeListId() + (bdtScPriRestri.isDefault() ? 1L : 0L))
                 )
                 .sum() + expectedCodeListOfBdtScPriRestriForLanguageCode.getCodeListId()) * targetGuids.size();
 
-        int actualSumValueForLanguageCode = actualBdtScPriRestriListForLanguageCode
+        long actualSumValueForLanguageCode = actualBdtScPriRestriListForLanguageCode
                 .stream()
-                .mapToInt(bdtScPriRestri ->
+                .mapToLong(bdtScPriRestri ->
                         (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() +
-                                bdtScPriRestri.getCodeListId() + (bdtScPriRestri.isDefault() ? 1 : 0))
+                                bdtScPriRestri.getCodeListId() + (bdtScPriRestri.isDefault() ? 1L : 0L))
                 )
                 .sum();
 
@@ -539,7 +539,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         /*
          * 'Expression Language' Part
          */
-        
+
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> actualBdtScPriRestriListForExpressionLanguage =
                 actualBdtScPriRestriList.stream().filter(bdtScPriRestri -> {
                     DataTypeSupplementaryComponent actualDtSc = targetDtScMap.get(bdtScPriRestri.getBdtScId());
@@ -549,14 +549,14 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> targetCdtScAwdPriListForExpressionLanguage =
                 cdtScAwdPriRepository.findByCdtScIdIn(
                         actualBdtScPriRestriListForExpressionLanguage.stream()
-                                .mapToInt(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId)
+                                .mapToLong(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId)
                                 .boxed()
                                 .collect(Collectors.toList())
                 );
         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> targetCdtScAwdPriXpsTypeMapListForExpressionLanguage =
                 cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                 targetCdtScAwdPriListForExpressionLanguage.stream()
-                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                        .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                         .boxed()
                         .collect(Collectors.toList())
         );
@@ -564,15 +564,15 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         assertEquals(targetCdtScAwdPriXpsTypeMapListForExpressionLanguage.size(), actualBdtScPriRestriListForExpressionLanguage.size());
 
         // check rows of value
-        int actualSumValueForExpressionLanguage = actualBdtScPriRestriListForExpressionLanguage.stream()
-                .mapToInt(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
+        long actualSumValueForExpressionLanguage = actualBdtScPriRestriListForExpressionLanguage.stream()
+                .mapToLong(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
                 .sum();
-       
-        int expectedSumValueForExpressionLanguage = targetCdtScAwdPriXpsTypeMapListForExpressionLanguage.stream()
-                .mapToInt(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
+
+        long expectedSumValueForExpressionLanguage = targetCdtScAwdPriXpsTypeMapListForExpressionLanguage.stream()
+                .mapToLong(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
                 .sum() ;
         assertEquals(expectedSumValueForExpressionLanguage, actualSumValueForExpressionLanguage);
-        
+
         actualBdtScPriRestriListForExpressionLanguage.forEach(bdtScPriRestri -> {
             if (bdtScPriRestri.isDefault()) {
                 assertEquals("xsd:normalizedString",
@@ -593,7 +593,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
          */
         CodeList expectedCodeListOfBdtScPriRestriForActionCodeForActionExpression =
                 codeListRepository.findOneByName("oacl_ActionCode");
-        
+
         CodeList expectedCodeListOfBdtScPriRestriForActionCodeForResponseActionExpression =
                 codeListRepository.findOneByName("oacl_ResponseActionCode");
 
@@ -606,35 +606,35 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
         List<CoreDataTypeSupplementaryComponentAllowedPrimitive> targetCdtScAwdPriListForActionCode =
                 cdtScAwdPriRepository.findByCdtScIdIn(
                         actualBdtScPriRestriListForActionCode.stream()
-                                .mapToInt(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId)
+                                .mapToLong(BusinessDataTypeSupplementaryComponentPrimitiveRestriction::getBdtScId)
                                 .boxed()
                                 .collect(Collectors.toList())
                 );
         List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> targetCdtScAwdPriXpsTypeMapListForActionCode =
                 cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
                 targetCdtScAwdPriListForActionCode.stream()
-                        .mapToInt(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
+                        .mapToLong(CoreDataTypeSupplementaryComponentAllowedPrimitive::getCdtScAwdPriId)
                         .boxed()
                         .collect(Collectors.toList())
                 );
-        
+
         // check rows of count
         assertEquals(targetCdtScAwdPriXpsTypeMapListForActionCode.size()+2, actualBdtScPriRestriListForActionCode.size());
 
         // check rows of value
-        int actualSumValueForActionCode = actualBdtScPriRestriListForActionCode.stream()
-                .mapToInt(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
+        long actualSumValueForActionCode = actualBdtScPriRestriListForActionCode.stream()
+                .mapToLong(bdtScPriRestri -> (bdtScPriRestri.getCdtScAwdPriXpsTypeMapId() + bdtScPriRestri.getCodeListId()))
                 .sum();
-       
-        int expectedSumValueForActionCode = targetCdtScAwdPriXpsTypeMapListForActionCode.stream()
-                .mapToInt(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
-                .sum() 
-                + expectedCodeListOfBdtScPriRestriForActionCodeForActionExpression.getCodeListId() 
+
+        long expectedSumValueForActionCode = targetCdtScAwdPriXpsTypeMapListForActionCode.stream()
+                .mapToLong(cdtScAwdPriXpsTypeMap -> cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId())
+                .sum()
+                + expectedCodeListOfBdtScPriRestriForActionCodeForActionExpression.getCodeListId()
                 + expectedCodeListOfBdtScPriRestriForActionCodeForResponseActionExpression.getCodeListId();
-        
+
         assertEquals(expectedSumValueForActionCode, actualSumValueForActionCode);
 
-        int expectedCodeListSum=0;
+        long expectedCodeListSum=0L;
         actualBdtScPriRestriListForActionCode.forEach(bdtScPriRestri -> {
             if (bdtScPriRestri.isDefault()) {
                 assertEquals("xsd:token",
@@ -647,10 +647,10 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSDTestCase extends AbstractTransact
                                 cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()).getXbtId()
                         ).getBuiltInType())
                 );
-            } 
+            }
         });
-        
+
     }
-        
-        
+
+
 }

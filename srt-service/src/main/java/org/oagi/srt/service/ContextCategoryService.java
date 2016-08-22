@@ -41,23 +41,23 @@ public class ContextCategoryService {
         return contextCategoryRepository.findByNameContaining(name);
     }
 
-    public List<ContextScheme> findByCtxCategoryId(int ctxCategoryId) {
+    public List<ContextScheme> findByCtxCategoryId(long ctxCategoryId) {
         return contextSchemeRepository.findByCtxCategoryId(ctxCategoryId);
     }
 
-    public List<ContextSchemeValue> findByOwnerCtxSchemeId(int ownerCtxSchemeId) {
+    public List<ContextSchemeValue> findByOwnerCtxSchemeId(long ownerCtxSchemeId) {
         return contextSchemeValueRepository.findByOwnerCtxSchemeId(ownerCtxSchemeId);
     }
 
-    public ContextCategory findContextCategoryById(int ctxCategoryId) {
+    public ContextCategory findContextCategoryById(long ctxCategoryId) {
         return contextCategoryRepository.findOne(ctxCategoryId);
     }
 
-    public ContextScheme findContextSchemeById(int ctxSchemeId) {
+    public ContextScheme findContextSchemeById(long ctxSchemeId) {
         return contextSchemeRepository.findOne(ctxSchemeId);
     }
 
-    public ContextSchemeValue findContextSchemeValueById(int ctxSchemeValueId) {
+    public ContextSchemeValue findContextSchemeValueById(long ctxSchemeValueId) {
         return contextSchemeValueRepository.findOne(ctxSchemeValueId);
     }
 
@@ -69,7 +69,7 @@ public class ContextCategoryService {
         contextCategoryRepository.save(contextCategory);
     }
 
-    public void deleteById(int ctxCategoryId) {
+    public void deleteById(long ctxCategoryId) {
         contextCategoryRepository.delete(ctxCategoryId);
     }
 

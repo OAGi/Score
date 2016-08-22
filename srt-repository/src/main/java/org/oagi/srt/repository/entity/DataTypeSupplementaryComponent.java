@@ -23,7 +23,7 @@ public class DataTypeSupplementaryComponent implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int dtScId;
+    private long dtScId;
 
     @Column(nullable = false, length = 41)
     private String guid;
@@ -39,7 +39,7 @@ public class DataTypeSupplementaryComponent implements Serializable {
     private String definition;
 
     @Column(nullable = false)
-    private int ownerDtId;
+    private long ownerDtId;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -48,13 +48,13 @@ public class DataTypeSupplementaryComponent implements Serializable {
     private int cardinalityMax;
 
     @Column
-    private Integer basedDtScId;
+    private Long basedDtScId;
 
-    public int getDtScId() {
+    public long getDtScId() {
         return dtScId;
     }
 
-    public void setDtScId(int dtScId) {
+    public void setDtScId(long dtScId) {
         this.dtScId = dtScId;
     }
 
@@ -90,11 +90,11 @@ public class DataTypeSupplementaryComponent implements Serializable {
         this.definition = definition;
     }
 
-    public int getOwnerDtId() {
+    public long getOwnerDtId() {
         return ownerDtId;
     }
 
-    public void setOwnerDtId(int ownerDtId) {
+    public void setOwnerDtId(long ownerDtId) {
         this.ownerDtId = ownerDtId;
     }
 
@@ -114,11 +114,11 @@ public class DataTypeSupplementaryComponent implements Serializable {
         this.cardinalityMax = cardinalityMax;
     }
 
-    public int getBasedDtScId() {
-        return (basedDtScId == null) ? 0 : basedDtScId;
+    public long getBasedDtScId() {
+        return (basedDtScId == null) ? 0L : basedDtScId;
     }
 
-    public void setBasedDtScId(int basedDtScId) {
+    public void setBasedDtScId(long basedDtScId) {
         this.basedDtScId = basedDtScId;
     }
 
@@ -144,12 +144,12 @@ public class DataTypeSupplementaryComponent implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = dtScId;
+        int result = (int) (dtScId ^ (dtScId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (representationTerm != null ? representationTerm.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + ownerDtId;
+        result = 31 * result + (int) (ownerDtId ^ (ownerDtId >>> 32));
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (basedDtScId != null ? basedDtScId.hashCode() : 0);

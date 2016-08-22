@@ -23,10 +23,10 @@ public class CodeListValue implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int codeListValueId;
+    private long codeListValueId;
 
     @Column
-    private int codeListId;
+    private long codeListId;
 
     @Column(nullable = false, length = 100)
     private String value;
@@ -56,19 +56,19 @@ public class CodeListValue implements Serializable {
     @Transient
     private boolean disabled;
 
-    public int getCodeListValueId() {
+    public long getCodeListValueId() {
         return codeListValueId;
     }
 
-    public void setCodeListValueId(int codeListValueId) {
+    public void setCodeListValueId(long codeListValueId) {
         this.codeListValueId = codeListValueId;
     }
 
-    public int getCodeListId() {
+    public long getCodeListId() {
         return codeListId;
     }
 
-    public void setCodeListId(int codeListId) {
+    public void setCodeListId(long codeListId) {
         this.codeListId = codeListId;
     }
 
@@ -168,8 +168,8 @@ public class CodeListValue implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = codeListValueId;
-        result = 31 * result + codeListId;
+        int result = (int) (codeListValueId ^ (codeListValueId >>> 32));
+        result = 31 * result + (int) (codeListId ^ (codeListId >>> 32));
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);

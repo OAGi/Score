@@ -23,7 +23,7 @@ public class Module implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int moduleId;
+    private long moduleId;
 
     @Column(length = 100, nullable = false)
     private String module;
@@ -39,11 +39,11 @@ public class Module implements Serializable {
     @Column(length = 45)
     private String versionNum;
 
-    public int getModuleId() {
+    public long getModuleId() {
         return moduleId;
     }
 
-    public void setModuleId(int moduleId) {
+    public void setModuleId(long moduleId) {
         this.moduleId = moduleId;
     }
 
@@ -96,7 +96,7 @@ public class Module implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = moduleId;
+        int result = (int) (moduleId ^ (moduleId >>> 32));
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (release != null ? release.hashCode() : 0);
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);

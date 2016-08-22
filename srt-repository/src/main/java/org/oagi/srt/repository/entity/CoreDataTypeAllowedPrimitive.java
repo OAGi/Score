@@ -23,38 +23,38 @@ public class CoreDataTypeAllowedPrimitive implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int cdtAwdPriId;
+    private long cdtAwdPriId;
 
     @Column(nullable = false)
-    private int cdtId;
+    private long cdtId;
 
     @Column(nullable = false)
-    private int cdtPriId;
+    private long cdtPriId;
 
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    public int getCdtAwdPriId() {
+    public long getCdtAwdPriId() {
         return cdtAwdPriId;
     }
 
-    public void setCdtAwdPriId(int cdtAwdPriId) {
+    public void setCdtAwdPriId(long cdtAwdPriId) {
         this.cdtAwdPriId = cdtAwdPriId;
     }
 
-    public int getCdtId() {
+    public long getCdtId() {
         return cdtId;
     }
 
-    public void setCdtId(int cdtId) {
+    public void setCdtId(long cdtId) {
         this.cdtId = cdtId;
     }
 
-    public int getCdtPriId() {
+    public long getCdtPriId() {
         return cdtPriId;
     }
 
-    public void setCdtPriId(int cdtPriId) {
+    public void setCdtPriId(long cdtPriId) {
         this.cdtPriId = cdtPriId;
     }
 
@@ -82,9 +82,9 @@ public class CoreDataTypeAllowedPrimitive implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = cdtAwdPriId;
-        result = 31 * result + cdtId;
-        result = 31 * result + cdtPriId;
+        int result = (int) (cdtAwdPriId ^ (cdtAwdPriId >>> 32));
+        result = 31 * result + (int) (cdtId ^ (cdtId >>> 32));
+        result = 31 * result + (int) (cdtPriId ^ (cdtPriId >>> 32));
         result = 31 * result + (isDefault ? 1 : 0);
         return result;
     }

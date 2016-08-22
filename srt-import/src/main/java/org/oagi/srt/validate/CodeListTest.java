@@ -64,10 +64,10 @@ public class CodeListTest {
                     continue;
                 }
 
-                int codelist_id = getCodeListId(contentTypeGuid, enumTypeGuid, name);
+                long codelist_id = getCodeListId(contentTypeGuid, enumTypeGuid, name);
                 for (int j = 0; j < enumList.getLength(); j++) {
                     Element codelistvalue = (Element) enumList.item(j);
-                    int codelistvalue_id = getCodeListValueID(codelist_id, codelistvalue.getAttribute("value"));
+                    long codelistvalue_id = getCodeListValueID(codelist_id, codelistvalue.getAttribute("value"));
                     if (codelist_id == 0 || codelistvalue_id == 0)
                         System.out.println("### Codelist value Error : code_list_id = " + codelist_id + "  enum_type_guid = " + enumTypeGuid + "  name = " + name + "  enum_value = " + codelistvalue.getAttribute("value"));
                 }
@@ -76,7 +76,7 @@ public class CodeListTest {
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
         NodeList union = xh.getNodeList("//xsd:simpleType[xsd:union]");
-        List<Integer> unionInt = new ArrayList<Integer>();
+        List<Long> unionInt = new ArrayList();
         for (int i = 0; i < result.getLength(); i++) {
             Element tmp = (Element) result.item(i);
             Node union_check = xh.getNode("//xsd:simpleType[@name = '" + tmp.getAttribute("name") + "']//xsd:union");
@@ -102,11 +102,11 @@ public class CodeListTest {
         return userRepository.findAppUserIdByLoginId(userName);
     }
 
-    public int getCodeListId(String codelistGuid, String enumTypeguid, String name) {
+    public long getCodeListId(String codelistGuid, String enumTypeguid, String name) {
         return codeListRepository.findOneByGuidAndEnumTypeGuidAndName(codelistGuid, enumTypeguid, name).getCodeListId();
     }
 
-    public int getCodeListValueID(int codelist_id, String value) {
+    public long getCodeListValueID(long codelist_id, String value) {
         return codeListValueRepository.findOneByCodeListIdAndValue(codelist_id, value).getCodeListValueId();
     }
 

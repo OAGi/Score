@@ -48,7 +48,7 @@ public class ModuleDep implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int moduleDepId;
+    private long moduleDepId;
 
     @Column(nullable = false)
     @Convert(attributeName = "dependencyType", converter = DependencyTypeConverter.class)
@@ -62,11 +62,11 @@ public class ModuleDep implements Serializable {
     @JoinColumn(name="depended_module_id", nullable = false)
     private Module dependedModule;
 
-    public int getModuleDepId() {
+    public long getModuleDepId() {
         return moduleDepId;
     }
 
-    public void setModuleDepId(int moduleDepId) {
+    public void setModuleDepId(long moduleDepId) {
         this.moduleDepId = moduleDepId;
     }
 
@@ -111,7 +111,7 @@ public class ModuleDep implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = moduleDepId;
+        int result = (int) (moduleDepId ^ (moduleDepId >>> 32));
         result = 31 * result + (dependencyType != null ? dependencyType.hashCode() : 0);
         result = 31 * result + (dependingModule != null ? dependingModule.hashCode() : 0);
         result = 31 * result + (dependedModule != null ? dependedModule.hashCode() : 0);

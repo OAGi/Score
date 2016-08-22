@@ -822,8 +822,8 @@ public class StandaloneXMLSchema {
                 }
 
                 if (aAL == null) { //aAL = null?
-                    int primRestriction = aBBIESC.getDtScPriRestriId();
-                    if (primRestriction == 0)
+                    long primRestriction = aBBIESC.getDtScPriRestriId();
+                    if (primRestriction == 0L)
                         aNode = setBBIESCType(generationContext, aBBIESC, aNode);
                     else
                         aNode = setBBIESCType2(generationContext, aBBIESC, aNode);
@@ -1019,158 +1019,158 @@ public class StandaloneXMLSchema {
         }
 
         // Prepared Datas
-        private Map<Integer, BusinessDataTypePrimitiveRestriction> findBdtPriRestriByBdtIdAndDefaultIsTrueMap;
+        private Map<Long, BusinessDataTypePrimitiveRestriction> findBdtPriRestriByBdtIdAndDefaultIsTrueMap;
 
-        public BusinessDataTypePrimitiveRestriction findBdtPriRestriByBdtIdAndDefaultIsTrue(int bdtId) {
+        public BusinessDataTypePrimitiveRestriction findBdtPriRestriByBdtIdAndDefaultIsTrue(long bdtId) {
             return findBdtPriRestriByBdtIdAndDefaultIsTrueMap.get(bdtId);
         }
 
-        private Map<Integer, BusinessDataTypePrimitiveRestriction> findBdtPriRestriMap;
+        private Map<Long, BusinessDataTypePrimitiveRestriction> findBdtPriRestriMap;
 
-        public BusinessDataTypePrimitiveRestriction findBdtPriRestri(int bdtPriRestriId) {
+        public BusinessDataTypePrimitiveRestriction findBdtPriRestri(long bdtPriRestriId) {
             return findBdtPriRestriMap.get(bdtPriRestriId);
         }
 
-        private Map<Integer, CoreDataTypeAllowedPrimitiveExpressionTypeMap> findCdtAwdPriXpsTypeMapMap;
+        private Map<Long, CoreDataTypeAllowedPrimitiveExpressionTypeMap> findCdtAwdPriXpsTypeMapMap;
 
-        public CoreDataTypeAllowedPrimitiveExpressionTypeMap findCdtAwdPriXpsTypeMap(int cdtAwdPriXpsTypeMapId) {
+        public CoreDataTypeAllowedPrimitiveExpressionTypeMap findCdtAwdPriXpsTypeMap(long cdtAwdPriXpsTypeMapId) {
             return findCdtAwdPriXpsTypeMapMap.get(cdtAwdPriXpsTypeMapId);
         }
 
-        private Map<Integer, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriByBdtIdAndDefaultIsTrueMap;
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriByBdtIdAndDefaultIsTrueMap;
 
-        public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findBdtScPriRestriByBdtScIdAndDefaultIsTrue(int bdtScId) {
+        public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findBdtScPriRestriByBdtScIdAndDefaultIsTrue(long bdtScId) {
             return findBdtScPriRestriByBdtIdAndDefaultIsTrueMap.get(bdtScId);
         }
 
-        private Map<Integer, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriMap;
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> findBdtScPriRestriMap;
 
-        public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findBdtScPriRestri(int bdtScPriRestriId) {
+        public BusinessDataTypeSupplementaryComponentPrimitiveRestriction findBdtScPriRestri(long bdtScPriRestriId) {
             return findBdtScPriRestriMap.get(bdtScPriRestriId);
         }
 
-        private Map<Integer, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findCdtScAwdPriXpsTypeMapMap;
+        private Map<Long, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findCdtScAwdPriXpsTypeMapMap;
 
-        public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(int cdtScAwdPriXpsTypeMapId) {
+        public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findCdtScAwdPriXpsTypeMap(long cdtScAwdPriXpsTypeMapId) {
             return findCdtScAwdPriXpsTypeMapMap.get(cdtScAwdPriXpsTypeMapId);
         }
 
-        private Map<Integer, XSDBuiltInType> findXSDBuiltInTypeMap;
+        private Map<Long, XSDBuiltInType> findXSDBuiltInTypeMap;
 
-        public XSDBuiltInType findXSDBuiltInType(int xbtId) {
+        public XSDBuiltInType findXSDBuiltInType(long xbtId) {
             return findXSDBuiltInTypeMap.get(xbtId);
         }
 
-        private Map<Integer, CodeList> findCodeListMap;
+        private Map<Long, CodeList> findCodeListMap;
 
-        public CodeList findCodeList(int codeListId) {
+        public CodeList findCodeList(long codeListId) {
             return findCodeListMap.get(codeListId);
         }
 
-        private Map<Integer, List<CodeListValue>> findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap;
+        private Map<Long, List<CodeListValue>> findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap;
 
-        public List<CodeListValue> findCodeListValueByCodeListIdAndUsedIndicatorIsTrue(int codeListId) {
+        public List<CodeListValue> findCodeListValueByCodeListIdAndUsedIndicatorIsTrue(long codeListId) {
             return findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap.containsKey(codeListId) ?
                     findCodeListValueByCodeListIdAndUsedIndicatorIsTrueMap.get(codeListId) :
                     Collections.emptyList();
         }
 
-        private Map<Integer, AggregateCoreComponent> findACCMap;
+        private Map<Long, AggregateCoreComponent> findACCMap;
 
-        public AggregateCoreComponent findACC(int accId) {
+        public AggregateCoreComponent findACC(long accId) {
             return findACCMap.get(accId);
         }
 
-        private Map<Integer, BasicCoreComponent> findBCCMap;
+        private Map<Long, BasicCoreComponent> findBCCMap;
 
-        public BasicCoreComponent findBCC(int bccId) {
+        public BasicCoreComponent findBCC(long bccId) {
             return findBCCMap.get(bccId);
         }
 
-        private Map<Integer, BasicCoreComponentProperty> findBCCPMap;
+        private Map<Long, BasicCoreComponentProperty> findBCCPMap;
 
-        public BasicCoreComponentProperty findBCCP(int bccpId) {
+        public BasicCoreComponentProperty findBCCP(long bccpId) {
             return findBCCPMap.get(bccpId);
         }
 
-        private Map<Integer, AssociationCoreComponent> findASCCMap;
+        private Map<Long, AssociationCoreComponent> findASCCMap;
 
-        public AssociationCoreComponent findASCC(int asccId) {
+        public AssociationCoreComponent findASCC(long asccId) {
             return findASCCMap.get(asccId);
         }
 
-        private Map<Integer, AssociationCoreComponentProperty> findASCCPMap;
+        private Map<Long, AssociationCoreComponentProperty> findASCCPMap;
 
-        public AssociationCoreComponentProperty findASCCP(int asccpId) {
+        public AssociationCoreComponentProperty findASCCP(long asccpId) {
             return findASCCPMap.get(asccpId);
         }
 
-        private Map<Integer, DataType> findDTMap;
+        private Map<Long, DataType> findDTMap;
 
-        public DataType findDT(int dtId) {
+        public DataType findDT(long dtId) {
             return findDTMap.get(dtId);
         }
 
-        private Map<Integer, DataTypeSupplementaryComponent> findDtScMap;
+        private Map<Long, DataTypeSupplementaryComponent> findDtScMap;
 
-        public DataTypeSupplementaryComponent findDtSc(int dtScId) {
+        public DataTypeSupplementaryComponent findDtSc(long dtScId) {
             return findDtScMap.get(dtScId);
         }
 
-        private Map<Integer, AgencyIdList> findAgencyIdListMap;
+        private Map<Long, AgencyIdList> findAgencyIdListMap;
 
-        public AgencyIdList findAgencyIdList(int agencyIdListId) {
+        public AgencyIdList findAgencyIdList(long agencyIdListId) {
             return findAgencyIdListMap.get(agencyIdListId);
         }
 
-        private Map<Integer, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
+        private Map<Long, List<AgencyIdListValue>> findAgencyIdListValueByOwnerListIdMap;
 
-        public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(int ownerListId) {
+        public List<AgencyIdListValue> findAgencyIdListValueByOwnerListId(long ownerListId) {
             return findAgencyIdListValueByOwnerListIdMap.containsKey(ownerListId) ?
                     findAgencyIdListValueByOwnerListIdMap.get(ownerListId) :
                     Collections.emptyList();
         }
 
-        private Map<Integer, AggregateBusinessInformationEntity> findAbieMap;
+        private Map<Long, AggregateBusinessInformationEntity> findAbieMap;
 
-        public AggregateBusinessInformationEntity findAbie(int abieId) {
+        public AggregateBusinessInformationEntity findAbie(long abieId) {
             return findAbieMap.get(abieId);
         }
 
-        private Map<Integer, List<BasicBusinessInformationEntity>> findBbieByFromAbieIdAndUsedIsTrueMap;
+        private Map<Long, List<BasicBusinessInformationEntity>> findBbieByFromAbieIdAndUsedIsTrueMap;
 
-        public List<BasicBusinessInformationEntity> findBbieByFromAbieIdAndUsedIsTrue(int fromAbieId) {
+        public List<BasicBusinessInformationEntity> findBbieByFromAbieIdAndUsedIsTrue(long fromAbieId) {
             return findBbieByFromAbieIdAndUsedIsTrueMap.containsKey(fromAbieId) ?
                     findBbieByFromAbieIdAndUsedIsTrueMap.get(fromAbieId) :
                     Collections.emptyList();
         }
 
-        private Map<Integer, List<BasicBusinessInformationEntitySupplementaryComponent>>
+        private Map<Long, List<BasicBusinessInformationEntitySupplementaryComponent>>
                 findBbieScByBbieIdAndUsedIsTrueMap;
 
-        public List<BasicBusinessInformationEntitySupplementaryComponent> findBbieScByBbieIdAndUsedIsTrue(int bbieId) {
+        public List<BasicBusinessInformationEntitySupplementaryComponent> findBbieScByBbieIdAndUsedIsTrue(long bbieId) {
             return findBbieScByBbieIdAndUsedIsTrueMap.containsKey(bbieId) ?
                     findBbieScByBbieIdAndUsedIsTrueMap.get(bbieId) :
                     Collections.emptyList();
         }
 
-        private Map<Integer, List<AssociationBusinessInformationEntity>> findAsbieByFromAbieIdAndUsedIsTrueMap;
+        private Map<Long, List<AssociationBusinessInformationEntity>> findAsbieByFromAbieIdAndUsedIsTrueMap;
 
-        public List<AssociationBusinessInformationEntity> findAsbieByFromAbieIdAndUsedIsTrue(int fromAbieId) {
+        public List<AssociationBusinessInformationEntity> findAsbieByFromAbieIdAndUsedIsTrue(long fromAbieId) {
             return findAsbieByFromAbieIdAndUsedIsTrueMap.containsKey(fromAbieId) ?
                     findAsbieByFromAbieIdAndUsedIsTrueMap.get(fromAbieId) :
                     Collections.emptyList();
         }
 
-        private Map<Integer, AssociationBusinessInformationEntityProperty> findASBIEPMap;
+        private Map<Long, AssociationBusinessInformationEntityProperty> findASBIEPMap;
 
-        public AssociationBusinessInformationEntityProperty findASBIEP(int asbiepId) {
+        public AssociationBusinessInformationEntityProperty findASBIEP(long asbiepId) {
             return findASBIEPMap.get(asbiepId);
         }
 
-        private Map<Integer, AssociationBusinessInformationEntityProperty> findAsbiepByRoleOfAbieIdMap;
+        private Map<Long, AssociationBusinessInformationEntityProperty> findAsbiepByRoleOfAbieIdMap;
 
-        public AssociationBusinessInformationEntityProperty findAsbiepByRoleOfAbieId(int roleOfAbieId) {
+        public AssociationBusinessInformationEntityProperty findAsbiepByRoleOfAbieId(long roleOfAbieId) {
             return findAsbiepByRoleOfAbieIdMap.get(roleOfAbieId);
         }
 
@@ -1210,7 +1210,7 @@ public class StandaloneXMLSchema {
         }
 
         public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity gABIE) {
-            int basedAccId = gABIE.getBasedAccId();
+            long basedAccId = gABIE.getBasedAccId();
             return findACC(basedAccId);
         }
 
@@ -1248,11 +1248,11 @@ public class StandaloneXMLSchema {
 
         // Get only SCs whose is_used is true.
         public List<BasicBusinessInformationEntitySupplementaryComponent> queryBBIESCs(BasicBusinessInformationEntity gBBIE) {
-            int bbieId = gBBIE.getBbieId();
+            long bbieId = gBBIE.getBbieId();
             return findBbieScByBbieIdAndUsedIsTrue(bbieId);
         }
 
-        public AssociationBusinessInformationEntityProperty receiveASBIEP(int abieId) {
+        public AssociationBusinessInformationEntityProperty receiveASBIEP(long abieId) {
             return findAsbiepByRoleOfAbieId(abieId);
         }
 
@@ -1356,9 +1356,9 @@ public class StandaloneXMLSchema {
         }
     }
 
-    public String generateXMLSchema(List<Integer> topLevelAbieIds, boolean schema_package_flag) throws Exception {
+    public String generateXMLSchema(List<Long> topLevelAbieIds, boolean schema_package_flag) throws Exception {
         String filepath = null;
-        for (int topLevelAbieId : topLevelAbieIds) {
+        for (long topLevelAbieId : topLevelAbieIds) {
             TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
             GenerationContext generationContext = new GenerationContext(topLevelAbie);
             AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();

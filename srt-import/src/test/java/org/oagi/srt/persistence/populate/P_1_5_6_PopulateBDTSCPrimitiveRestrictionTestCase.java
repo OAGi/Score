@@ -174,17 +174,17 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
             assertTrue(dtsc != null);
             List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtSCPris = bdtSCPrimitiveRepository.findByBdtScId(dtsc.getDtScId());
 
-            int expectedMapIdSum = 0;
-            int expectedCodeListId = 0;
-            int expectedAgencyIdListId = 0;
-            int expectedDefaultMapId = 0;
+            long expectedMapIdSum = 0L;
+            long expectedCodeListId = 0L;
+            long expectedAgencyIdListId = 0L;
+            long expectedDefaultMapId = 0L;
 
             expectedCodeListId = getCodeListId(value.codeListName);
             expectedAgencyIdListId = getAgencyIdListId(value.agencyIDListName);
 
             for (int i = 0; i < value.maps.size(); i++) {
                 String map = value.maps.get(i);
-                int cdtSCAwdPriXpsTypeId = getCDTSCAwdPriXpsTypeMapId(dtsc, map);
+                long cdtSCAwdPriXpsTypeId = getCDTSCAwdPriXpsTypeMapId(dtsc, map);
                 expectedMapIdSum += cdtSCAwdPriXpsTypeId;
 
                 if (i == value.defaultIndex) {
@@ -193,10 +193,10 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
             }
 
 
-            int actualMapIdSum = 0;
-            int actualCodeListId = 0;
-            int actualAgencyIdListId = 0;
-            int actualDefaultMapId = 0;
+            long actualMapIdSum = 0L;
+            long actualCodeListId = 0L;
+            long actualAgencyIdListId = 0L;
+            long actualDefaultMapId = 0L;
 
             for (int i = 0; i < bdtSCPris.size(); i++) {
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtSCPri = bdtSCPris.get(i);
@@ -215,21 +215,21 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
         }
     }
 
-    public int getCodeListId(String codeListName) {
+    public long getCodeListId(String codeListName) {
         CodeList cdl = codeListRepository.findOneByName(codeListName);
         if (cdl != null) {
             return cdl.getCodeListId();
         } else {
-            return 0;
+            return 0L;
         }
     }
 
-    public int getAgencyIdListId(String agencyIdListName) {
+    public long getAgencyIdListId(String agencyIdListName) {
         AgencyIdList agl = agencyIdListRepository.findOneByName(agencyIdListName);
         if (agl != null) {
             return agl.getAgencyIdListId();
         } else {
-            return 0;
+            return 0L;
         }
     }
 
@@ -259,8 +259,8 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
         return representationTerm;
     }
 
-    public int getCDTSCAwdPriXpsTypeMapId(DataTypeSupplementaryComponent dtsc, String map) {
-        int cdtSCId = getCDTSCId(dtsc.getDtScId());
+    public long getCDTSCAwdPriXpsTypeMapId(DataTypeSupplementaryComponent dtsc, String map) {
+        long cdtSCId = getCDTSCId(dtsc.getDtScId());
         String cdtPriName;
         String xsdBuiltInType;
 
@@ -269,18 +269,18 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestrictionTestCase extends AbstractT
         cdtPriName = map.substring(0, posSeparator);
         xsdBuiltInType = map.substring(posSeparator + 1);
 
-        int xbtId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdBuiltInType).getXbtId();
-        int cdtPriId = coreDataTypePrimitiveRepository.findOneByName(cdtPriName).getCdtPriId();
+        long xbtId = xsdBuiltInTypeRepository.findOneByBuiltInType(xsdBuiltInType).getXbtId();
+        long cdtPriId = coreDataTypePrimitiveRepository.findOneByName(cdtPriName).getCdtPriId();
 
-        int cdtSCAwdPriId = cdtSCAwdPrimitiveRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPriId).getCdtScAwdPriId();
+        long cdtSCAwdPriId = cdtSCAwdPrimitiveRepository.findOneByCdtScIdAndCdtPriId(cdtSCId, cdtPriId).getCdtScAwdPriId();
 
         return cdtSCAwdPriXpsTypeMapRepository.findOneByCdtScAwdPriIdAndXbtId(cdtSCAwdPriId, xbtId).getCdtScAwdPriXpsTypeMapId();
     }
 
-    public int getCDTSCId(int dtSCId) {
+    public long getCDTSCId(long dtSCId) {
         DataTypeSupplementaryComponent dtsc = dataTypeSupplementaryComponentRepository.findOne(dtSCId);
 
-        if (dtsc.getBasedDtScId() == 0) {
+        if (dtsc.getBasedDtScId() == 0L) {
             return dtSCId;
         } else {
             return getCDTSCId(dtsc.getBasedDtScId());

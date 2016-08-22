@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ContextCategoryRepository extends JpaRepository<ContextCategory, Integer> {
+public interface ContextCategoryRepository extends JpaRepository<ContextCategory, Long> {
 
     @Query("select c from ContextCategory c where c.name like %?1%")
     public List<ContextCategory> findByNameContaining(String name);

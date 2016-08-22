@@ -7,5 +7,5 @@ import java.util.Collection;
 
 public interface BulkInsertRepository<T extends IdEntity> {
 
-    public void saveBulk(JpaRepository<T, Integer> jpaRepository, Collection<T> entities);
+    public void saveBulk(JpaRepository<T, Long> jpaRepository, Collection<T> entities);
 }

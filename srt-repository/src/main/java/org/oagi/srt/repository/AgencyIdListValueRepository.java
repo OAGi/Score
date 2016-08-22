@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface AgencyIdListValueRepository extends JpaRepository<AgencyIdListValue, Integer> {
+public interface AgencyIdListValueRepository extends JpaRepository<AgencyIdListValue, Long> {
 
     @Query("select a from AgencyIdListValue a where a.ownerListId = ?1")
-    public List<AgencyIdListValue> findByOwnerListId(int ownerListId);
+    public List<AgencyIdListValue> findByOwnerListId(long ownerListId);
 
     @Query("select a from AgencyIdListValue a where a.value = ?1")
     public AgencyIdListValue findOneByValue(String value);

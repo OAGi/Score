@@ -105,7 +105,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     }
 
     private List<BusinessDataTypePrimitiveRestriction> loadBDTPrimitiveRestrictions(
-            int basedBdtId, int bdtId) throws Exception {
+            long basedBdtId, long bdtId) throws Exception {
         List<BusinessDataTypePrimitiveRestriction> result = new ArrayList();
         List<BusinessDataTypePrimitiveRestriction> al = bdtPriRestriRepository.findByBdtId(basedBdtId);
 

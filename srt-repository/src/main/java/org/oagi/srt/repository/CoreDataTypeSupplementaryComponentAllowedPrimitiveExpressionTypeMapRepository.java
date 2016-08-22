@@ -8,14 +8,14 @@ import java.util.Collection;
 import java.util.List;
 
 public interface CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMapRepository
-        extends JpaRepository<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap, Integer> {
+        extends JpaRepository<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap, Long> {
 
     @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap c where c.cdtScAwdPriId = ?1")
-    public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findByCdtScAwdPriId(int cdtScAwdPriId);
+    public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findByCdtScAwdPriId(long cdtScAwdPriId);
 
     @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap c where c.cdtScAwdPriId in ?1")
-    public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findByCdtScAwdPriIdIn(Collection<Integer> cdtScAwdPriIds);
+    public List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> findByCdtScAwdPriIdIn(Collection<Long> cdtScAwdPriIds);
 
     @Query("select c from CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap c where c.cdtScAwdPriId = ?1 and c.xbtId = ?2")
-    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findOneByCdtScAwdPriIdAndXbtId(int cdtScAwdPriId, int xbtId);
+    public CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap findOneByCdtScAwdPriIdAndXbtId(long cdtScAwdPriId, long xbtId);
 }

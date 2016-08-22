@@ -24,19 +24,19 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "2000"),
             }
     )
-    private int asbieId;
+    private long asbieId;
 
     @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
-    private int fromAbieId;
+    private long fromAbieId;
 
     @Column(nullable = false)
-    private int toAsbiepId;
+    private long toAsbiepId;
 
     @Column(nullable = false)
-    private int basedAsccId;
+    private long basedAsccId;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -55,10 +55,10 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     private String remark;
 
     @Column(nullable = false, updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @Column(nullable = false)
-    private int lastUpdatedBy;
+    private long lastUpdatedBy;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -75,7 +75,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     private boolean used;
 
     @Column(nullable = false)
-    private int ownerTopLevelAbieId;
+    private long ownerTopLevelAbieId;
 
     @PrePersist
     public void prePersist() {
@@ -89,20 +89,20 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return getAsbieId();
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(long id) {
         setAsbieId(id);
     }
 
-    public int getAsbieId() {
+    public long getAsbieId() {
         return asbieId;
     }
 
-    public void setAsbieId(int asbieId) {
+    public void setAsbieId(long asbieId) {
         this.asbieId = asbieId;
     }
 
@@ -114,27 +114,27 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.guid = guid;
     }
 
-    public int getFromAbieId() {
+    public long getFromAbieId() {
         return fromAbieId;
     }
 
-    public void setFromAbieId(int fromAbieId) {
+    public void setFromAbieId(long fromAbieId) {
         this.fromAbieId = fromAbieId;
     }
 
-    public int getToAsbiepId() {
+    public long getToAsbiepId() {
         return toAsbiepId;
     }
 
-    public void setToAsbiepId(int toAsbiepId) {
+    public void setToAsbiepId(long toAsbiepId) {
         this.toAsbiepId = toAsbiepId;
     }
 
-    public int getBasedAsccId() {
+    public long getBasedAsccId() {
         return basedAsccId;
     }
 
-    public void setBasedAsccId(int basedAsccId) {
+    public void setBasedAsccId(long basedAsccId) {
         this.basedAsccId = basedAsccId;
     }
 
@@ -184,19 +184,19 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.remark = remark;
     }
 
-    public int getCreatedBy() {
+    public long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(int createdBy) {
+    public void setCreatedBy(long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public int getLastUpdatedBy() {
+    public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
 
-    public void setLastUpdatedBy(int lastUpdatedBy) {
+    public void setLastUpdatedBy(long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
@@ -232,11 +232,11 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.used = used;
     }
 
-    public int getOwnerTopLevelAbieId() {
+    public long getOwnerTopLevelAbieId() {
         return ownerTopLevelAbieId;
     }
 
-    public void setOwnerTopLevelAbieId(int ownerTopLevelAbieId) {
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
@@ -272,24 +272,24 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     public int hashCode() {
         int result;
         long temp;
-        result = asbieId;
+        result = (int) (asbieId ^ (asbieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + fromAbieId;
-        result = 31 * result + toAsbiepId;
-        result = 31 * result + basedAsccId;
+        result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
+        result = 31 * result + (int) (toAsbiepId ^ (toAsbiepId >>> 32));
+        result = 31 * result + (int) (basedAsccId ^ (basedAsccId >>> 32));
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (nillable ? 1 : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
-        result = 31 * result + createdBy;
-        result = 31 * result + lastUpdatedBy;
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         temp = Double.doubleToLongBits(seqKey);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + ownerTopLevelAbieId;
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 

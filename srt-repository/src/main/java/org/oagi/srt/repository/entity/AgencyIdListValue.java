@@ -23,7 +23,7 @@ public class AgencyIdListValue implements Serializable {
                     @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
             }
     )
-    private int agencyIdListValueId;
+    private long agencyIdListValueId;
 
     @Column(nullable = false, length = 150)
     private String value;
@@ -36,13 +36,13 @@ public class AgencyIdListValue implements Serializable {
     private String definition;
 
     @Column(nullable = false)
-    private int ownerListId;
+    private long ownerListId;
 
-    public int getAgencyIdListValueId() {
+    public long getAgencyIdListValueId() {
         return agencyIdListValueId;
     }
 
-    public void setAgencyIdListValueId(int agencyIdListValueId) {
+    public void setAgencyIdListValueId(long agencyIdListValueId) {
         this.agencyIdListValueId = agencyIdListValueId;
     }
 
@@ -70,11 +70,11 @@ public class AgencyIdListValue implements Serializable {
         this.definition = definition;
     }
 
-    public int getOwnerListId() {
+    public long getOwnerListId() {
         return ownerListId;
     }
 
-    public void setOwnerListId(int ownerListId) {
+    public void setOwnerListId(long ownerListId) {
         this.ownerListId = ownerListId;
     }
 
@@ -95,11 +95,11 @@ public class AgencyIdListValue implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = agencyIdListValueId;
+        int result = (int) (agencyIdListValueId ^ (agencyIdListValueId >>> 32));
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + ownerListId;
+        result = 31 * result + (int) (ownerListId ^ (ownerListId >>> 32));
         return result;
     }
 

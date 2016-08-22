@@ -38,7 +38,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 	
 	private String name;
 	private String ccName;
-	private int bcId;
+	private long bcId;
 	protected BusinessContext bcDetail;
 	protected ContextCategory selected;
 	protected ContextScheme selected1;
