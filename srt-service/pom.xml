@@ -24,20 +24,17 @@
 	</properties>
 
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/in.jlibs/jlibs-xml -->
 		<dependency>
 			<groupId>in.jlibs</groupId>
 			<artifactId>jlibs-xml</artifactId>
 			<version>2.1</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/in.jlibs/jlibs-xsd -->
 		<dependency>
 			<groupId>in.jlibs</groupId>
 			<artifactId>jlibs-xsd</artifactId>
 			<version>2.2.1</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
@@ -92,7 +89,7 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>9.7.0-6</version>
+			<version>9.7.0-7</version>
 		</dependency>
 
 		<dependency>
