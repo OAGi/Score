@@ -1,5 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
+import com.google.common.base.Splitter;
 import org.apache.commons.io.FilenameUtils;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.*;
@@ -17,6 +18,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.print;
 
@@ -160,16 +163,20 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
     }
 
     private void propertyNameSet(Object entity, String[] propertyNames, Type[] types, StringBuilder sb, int i) {
+        sb.append(getColumnName(entity, propertyNames, types, i));
+    }
+
+    private String getColumnName(Object entity, String[] propertyNames, Type[] types, int i) {
         String propertyName = convertPropertyNameForDB(getPropertyName(entity, propertyNames[i])).toUpperCase();
         Type type = types[i];
         if (type.isAssociationType()) {
-            sb.append(propertyName).append("_ID");
+            return propertyName + "_ID";
         } else {
-            sb.append(propertyName);
+            return propertyName;
         }
     }
 
-    private void valueSet(
+    private String valueSet(
             Object entity,
             Object[] state,
             Type[] types,
@@ -182,7 +189,7 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
             sb.append((booleanValue) ? "1" : "0");
         } else if (type == StringType.INSTANCE || type == ClobType.INSTANCE || type == MaterializedClobType.INSTANCE) {
             if (StringUtils.isEmpty(value)) {
-                sb.append("NULL");
+                sb.append("null");
             } else {
                 sb.append("'").append(escape((String) value)).append("'");
             }
@@ -191,10 +198,8 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         } else if (type == TimestampType.INSTANCE) {
             sb.append("CURRENT_TIMESTAMP");
         } else if (type == BinaryType.INSTANCE || type == BlobType.INSTANCE || type == MaterializedBlobType.INSTANCE) {
-            File file = getFile(entity);
-            if (file != null) {
-                sb.append("utl_raw.cast_to_raw('").append(getRelativePath(file)).append("')");
-            }
+            sb.append("EMPTY_BLOB()");
+            return toHex((byte[]) value);
         } else if (type.getClass() == AttributeConverterTypeAdapter.class) {
             sb.append(getEnumValue(value));
         } else if (type.getClass() == CustomType.class) {  // EnumType
@@ -205,6 +210,44 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
             } else {
                 sb.append(value);
             }
+        }
+        return null;
+    }
+
+    private class HexValueResolver {
+        private String hexValue;
+        private String hexColumnName;
+        private Object entity;
+        private Serializable id;
+
+        public HexValueResolver(String hexValue,
+                                String hexColumnName,
+                                Object entity,
+                                Serializable id) {
+            this.hexValue = hexValue;
+            this.hexColumnName = hexColumnName;
+            this.entity = entity;
+            this.id = id;
+        }
+
+        public void resolve() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("DECLARE\n" +
+                    "  buf BLOB; \n" +
+                    "BEGIN\n" +
+                    "  dbms_lob.createtemporary(buf, FALSE);\n");
+
+            for (String splittedValue : Splitter.fixedLength(2000).split(hexValue)) {
+                sb.append("  dbms_lob.append(buf, HEXTORAW('" + splittedValue + "'));\n");
+            }
+
+            sb.append("  UPDATE " + getTableName(entity) + "\n" +
+                    "     SET " + hexColumnName + " = buf\n" +
+                    "   WHERE " + getIdentifierName(entity) + " = " + id + ";\n" +
+                    "END;\n" +
+                    "/");
+
+            print(sb.toString());
         }
     }
 
@@ -230,8 +273,14 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         }
 
         sb.append(id).append(", ");
+
+        List<HexValueResolver> hexValueResolverList = new ArrayList();
         for (int i = 0, len = state.length; i < len; ++i) {
-            valueSet(entity, state, types, sb, i);
+            String hexValue = valueSet(entity, state, types, sb, i);
+            if (hexValue != null) {
+                String hexColumnName = getColumnName(entity, propertyNames, types, i);
+                hexValueResolverList.add(new HexValueResolver(hexValue, hexColumnName, entity, id));
+            }
 
             if (i + 1 == len) {
                 sb.append(");");
@@ -241,6 +290,10 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         }
 
         print(sb.toString());
+
+        for (HexValueResolver hexValueResolver : hexValueResolverList) {
+            hexValueResolver.resolve();
+        }
 
         return false;
     }
