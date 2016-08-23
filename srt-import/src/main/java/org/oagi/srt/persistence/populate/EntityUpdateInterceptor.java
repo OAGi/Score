@@ -191,7 +191,13 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
             if (StringUtils.isEmpty(value)) {
                 sb.append("null");
             } else {
-                sb.append("'").append(escape((String) value)).append("'");
+                String str = (String) value;
+                if (str.length() > 4000) {
+                    sb.append("EMPTY_CLOB()");
+                    return escape(str);
+                } else {
+                    sb.append("'").append(escape(str)).append("'");
+                }
             }
         } else if (type == LongType.INSTANCE || type == IntegerType.INSTANCE) {
             sb.append(value);
@@ -214,18 +220,21 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         return null;
     }
 
-    private class HexValueResolver {
-        private String hexValue;
-        private String hexColumnName;
+    private class LobValueResolver {
+        private String dbType;
+        private String lobValue;
+        private String lobColumnName;
         private Object entity;
         private Serializable id;
 
-        public HexValueResolver(String hexValue,
-                                String hexColumnName,
+        public LobValueResolver(String lobType,
+                                String lobValue,
+                                String lobColumnName,
                                 Object entity,
                                 Serializable id) {
-            this.hexValue = hexValue;
-            this.hexColumnName = hexColumnName;
+            this.dbType = lobType;
+            this.lobValue = lobValue;
+            this.lobColumnName = lobColumnName;
             this.entity = entity;
             this.id = id;
         }
@@ -233,16 +242,24 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         public void resolve() {
             StringBuilder sb = new StringBuilder();
             sb.append("DECLARE\n" +
-                    "  buf BLOB; \n" +
+                    "  buf " + dbType + "; \n" +
                     "BEGIN\n" +
                     "  dbms_lob.createtemporary(buf, FALSE);\n");
 
-            for (String splittedValue : Splitter.fixedLength(2000).split(hexValue)) {
-                sb.append("  dbms_lob.append(buf, HEXTORAW('" + splittedValue + "'));\n");
+            for (String splittedValue : Splitter.fixedLength(2000).split(lobValue)) {
+                switch (dbType.toUpperCase()) {
+                    case "BLOB":
+                        sb.append("  dbms_lob.append(buf, HEXTORAW('" + splittedValue + "'));\n");
+                        break;
+                    case "CLOB":
+                        sb.append("  dbms_lob.append(buf, '" + splittedValue + "');\n");
+                        break;
+                }
+
             }
 
             sb.append("  UPDATE " + getTableName(entity) + "\n" +
-                    "     SET " + hexColumnName + " = buf\n" +
+                    "     SET " + lobColumnName + " = buf\n" +
                     "   WHERE " + getIdentifierName(entity) + " = " + id + ";\n" +
                     "END;\n" +
                     "/");
@@ -274,12 +291,19 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
 
         sb.append(id).append(", ");
 
-        List<HexValueResolver> hexValueResolverList = new ArrayList();
+        List<LobValueResolver> lobValueResolverList = new ArrayList();
         for (int i = 0, len = state.length; i < len; ++i) {
-            String hexValue = valueSet(entity, state, types, sb, i);
-            if (hexValue != null) {
-                String hexColumnName = getColumnName(entity, propertyNames, types, i);
-                hexValueResolverList.add(new HexValueResolver(hexValue, hexColumnName, entity, id));
+            String lobValue = valueSet(entity, state, types, sb, i);
+            if (lobValue != null) {
+                String lobColumnName = getColumnName(entity, propertyNames, types, i);
+                Type type = types[i];
+                String lobType;
+                if (type == BinaryType.INSTANCE || type == BlobType.INSTANCE || type == MaterializedBlobType.INSTANCE) {
+                    lobType = "BLOB";
+                } else {
+                    lobType = "CLOB";
+                }
+                lobValueResolverList.add(new LobValueResolver(lobType, lobValue, lobColumnName, entity, id));
             }
 
             if (i + 1 == len) {
@@ -291,8 +315,8 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
 
         print(sb.toString());
 
-        for (HexValueResolver hexValueResolver : hexValueResolverList) {
-            hexValueResolver.resolve();
+        for (LobValueResolver lobValueResolver : lobValueResolverList) {
+            lobValueResolver.resolve();
         }
 
         return false;
