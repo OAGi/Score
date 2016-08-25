@@ -20,3 +20,4 @@ docker-compose.yaml
 *.zip
 ~$*
 *schematron*
+*.bak
