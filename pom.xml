@@ -13,6 +13,7 @@
 		<module>srt-import</module>
 		<module>srt-service</module>
 		<module>srt-webapp</module>
+		<module>srt-webapp-with-primeface</module>
 	</modules>
 
 	<name>oagi-srt</name>

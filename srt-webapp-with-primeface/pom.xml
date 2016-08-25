@@ -4,11 +4,11 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.oagi</groupId>
-	<artifactId>srt-webapp</artifactId>
+	<artifactId>srt-webapp-with-primeface</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>oagi-srt-webapp</name>
+	<name>oagi-srt-webapp-with-primeface</name>
 	<url>https://github.com/OAGi/OAGi-Semantic-Refinement-and-Tooling</url>
 	<description>OAGi Semantic Refinement and Tooling</description>
 
@@ -31,12 +31,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-freemarker</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional>
+			<groupId>org.joinfaces</groupId>
+			<artifactId>jsf-spring-boot-starter</artifactId>
+			<version>2.1.3</version>
 		</dependency>
 
 		<dependency>
@@ -133,69 +133,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<fork>true</fork>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.0</version>
-
-				<configuration>
-					<workingDirectory>src/main/frontend</workingDirectory>
-					<nodeVersion>v6.4.0</nodeVersion>
-					<npmVersion>3.10.6</npmVersion>
-					<nodeDownloadRoot>https://nodejs.org/nodejs/dist/</nodeDownloadRoot>
-					<npmDownloadRoot>https://registry.npmjs.org/npm/-/</npmDownloadRoot>
-					<installDirectory>target</installDirectory>
-				</configuration>
-
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<phase>generate-resources</phase>
-					</execution>
-					<execution>
-						<id>bower install</id>
-						<goals>
-							<goal>bower</goal>
-						</goals>
-
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>jspm install</id>
-						<goals>
-							<goal>jspm</goal>
-						</goals>
-
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>gulp build</id>
-						<goals>
-							<goal>gulp</goal>
-						</goals>
-
-						<phase>generate-resources</phase>
-
-						<configuration>
-							<arguments>build</arguments>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
