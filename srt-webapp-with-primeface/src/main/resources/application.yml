@@ -10,6 +10,9 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
 
   batch:
     initializer:
@@ -34,7 +37,7 @@ spring:
 # DataSource
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@docker:1521/xe
+    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
     username: oagi
     password: oagi
     platform: oracle

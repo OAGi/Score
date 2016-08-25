@@ -70,10 +70,10 @@
 
 		<dependency>
 			<groupId>oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
+			<artifactId>ojdbc7</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/../Libraries/ojdbc6.jar</systemPath>
+			<systemPath>${project.basedir}/../Libraries/ojdbc7.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>

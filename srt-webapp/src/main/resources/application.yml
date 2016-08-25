@@ -1,16 +1,8 @@
-# AOP
 spring:
   aop:
     proxy-target-class: true
 
-# DataSource
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
-    username: oagi
-    password: oagi
-    platform: oracle
-
     continue-on-error: true
     initialize: false
 
@@ -26,11 +18,30 @@ spring:
     initializer:
       enabled: false
 
+  freemarker:
+    suffix: .ftl
+
 logging:
   level:
-    org.oagi.srt: INFO
+    org.oagi.srt: DEBUG
     org.springframework: INFO
-    org.hibernate.SQL: INFO
+    org.hibernate.SQL: DEBUG
+
+# Development environment
+---
+spring:
+  profiles: development
+
+# DataSource
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
+    username: oagi
+    password: oagi
+    platform: oracle
+
+  freemarker:
+    cache: false
 
 # Staging environment
 ---
@@ -44,3 +55,6 @@ spring:
     username: oagi
     password: oagi
     platform: oracle
+
+  freemarker:
+    cache: true

@@ -36,7 +36,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>springloaded</artifactId>
+			<version>${spring.loaded.version}</version>
 		</dependency>
 
 		<dependency>
@@ -65,10 +69,10 @@
 
 		<dependency>
 			<groupId>oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
+			<artifactId>ojdbc7</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/../Libraries/ojdbc6.jar</systemPath>
+			<systemPath>${project.basedir}/../Libraries/ojdbc7.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
@@ -133,69 +137,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>1.4.0.RELEASE</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>springloaded</artifactId>
+						<version>${spring.loaded.version}</version>
+					</dependency>
+				</dependencies>
 				<configuration>
 					<fork>true</fork>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.0</version>
-
-				<configuration>
-					<workingDirectory>src/main/frontend</workingDirectory>
-					<nodeVersion>v6.4.0</nodeVersion>
-					<npmVersion>3.10.6</npmVersion>
-					<nodeDownloadRoot>https://nodejs.org/nodejs/dist/</nodeDownloadRoot>
-					<npmDownloadRoot>https://registry.npmjs.org/npm/-/</npmDownloadRoot>
-					<installDirectory>target</installDirectory>
-				</configuration>
-
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<phase>generate-resources</phase>
-					</execution>
-					<execution>
-						<id>bower install</id>
-						<goals>
-							<goal>bower</goal>
-						</goals>
-
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>jspm install</id>
-						<goals>
-							<goal>jspm</goal>
-						</goals>
-
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>gulp build</id>
-						<goals>
-							<goal>gulp</goal>
-						</goals>
-
-						<phase>generate-resources</phase>
-
-						<configuration>
-							<arguments>build</arguments>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
