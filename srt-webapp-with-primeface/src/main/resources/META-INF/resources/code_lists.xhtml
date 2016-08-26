@@ -46,7 +46,7 @@
 						<f:facet name="header">
 							<h:outputText value="Agency Id" />
 						</f:facet>
-						<h:outputText value="#{cVO.agencyIdListValueId}" />
+						<h:outputText value="#{cVO.agencyId}" />
 					</p:column>
 					
 					<p:column style="width:100px">
@@ -96,7 +96,7 @@
 						<h:outputText value="#{codeListHandler.selected.listId}" />
 						
 						<h:outputText value="Agency Id: " style="font-weight:bold; color:blue" />
-						<h:outputText value="#{codeListHandler.selected.agencyIdListValueId}" />
+						<h:outputText value="#{codeListHandler.selected.agencyId}" />
 						
 						<h:outputText value="Version: " style="font-weight:bold; color:blue" />
 						<h:outputText value="#{codeListHandler.selected.versionId}" />
@@ -177,7 +177,7 @@
 							label="List Id" />
 						
 						<h:outputLabel for="agencyIdListValueId" rows="10" value="Agency Id:" style="font-weight:bold" />
-						<p:inputText id="agencyIdListValueId" value="#{codeListHandler.codeList.agencyIdListValueId}"
+						<p:inputText id="agencyIdListValueId" value="#{codeListHandler.codeList.agencyId}"
 							label="Agency Id" />
 						
 						<h:outputLabel for="version" rows="10" value="Version:" style="font-weight:bold" />
@@ -235,8 +235,8 @@
 						
 						<p:commandButton ajax="true" update=":form:clDetailid, :form:tbl" style="width:100px" icon="ui-icon-search" value="Publish" actionListener="#{codeListHandler.updatePublish()}" oncomplete="PF('clEdit').hide(); PF('clDetail').show(); "/>
 						
-			        	<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').show(); PF('clEdit').hide();"/>
-			        </h:panelGrid>
+				        <p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').show(); PF('clEdit').hide();"/>
+					</h:panelGrid>
 				</p:outputPanel>
 		    </p:dialog>
 		</h:form>
