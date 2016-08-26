@@ -1,0 +1,244 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="template.xhtml">
+
+	<ui:define name="side_menu">
+		<h:form>
+			<p:growl id="messages" showDetail="false" />
+
+			<p:menu>
+				<p:submenu style="width: 180px !important;" label="Code List">
+					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
+					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
+				</p:submenu>
+			</p:menu>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages1" showDetail="true"/>
+			<p:panel header="Search Code List">
+				<p:messages autoUpdate="true" />
+				<h:panelGrid id="grid" columns="5" cellpadding="5">
+					<h:outputLabel for="ccName" value="Based Code List:" style="font-weight:bold" />
+					<p:autoComplete id="ccName" value="#{codeListHandler.basedCodeListName}" completeMethod="#{codeListHandler.completeInput}" />
+					<p:commandButton value="Search" ajax="true" actionListener="#{codeListHandler.search}" update="tbl" icon="ui-icon-search" />
+				</h:panelGrid>
+			</p:panel>
+			<p:panel header="Code List">
+				<p:dataTable id="tbl" var="cVO" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" rows="20" style="width:920px; margin-bottom:20px"
+	            	value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{cVO.codeListId}" selectionMode="single">
+					<p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}" />
+        			<p:ajax event="rowUnselect" listener="#{codeListHandler.onRowUnselect}" />
+	                <p:column style="width:400px">
+						<f:facet name="header">
+							<h:outputText value="Name" />
+						</f:facet>
+						<h:outputText value="#{cVO.name}" />
+					</p:column>
+	
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Agency Id" />
+						</f:facet>
+						<h:outputText value="#{cVO.agencyIdListValueId}" />
+					</p:column>
+					
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Version" />
+						</f:facet>
+						<h:outputText value="#{cVO.versionId}" />
+					</p:column>
+					
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="Extensible" />
+						</f:facet>
+						<h:outputText value="#{cVO.extensibleIndicator}" />
+					</p:column>
+					
+					<p:column style="width:100px">
+						<f:facet name="header">
+							<h:outputText value="State" />
+						</f:facet>
+						<h:outputText value="#{cVO.state}" />
+					</p:column>
+	            </p:dataTable>
+	            <p:commandButton process="tbl" update=":form:clDetailid" icon="ui-icon-search" value="Detail" oncomplete="PF('clDetail').show()" />
+			</p:panel>
+			<p:dialog header="Code List Detail" widgetVar="clDetail" showEffect="clip" hideEffect="clip" closable="true" scrollable="true" resizable="true" draggable="true" width="800" height="700">
+        		<p:outputPanel id="clDetailid">
+        			<h:panelGrid id="grid6" cellpadding="5">
+						<p:row>
+	        				<p:column style="width:800px"> 
+								<h:outputLabel value="Code List Detail" style="font-weight:bold; color:red" />
+							</p:column> 
+						</p:row>
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="2" cellpadding="3">
+						<h:outputText value="Name: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.name}" />
+						
+						<h:outputText value="Definition: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.definition}" />
+						
+						<h:outputText value="Definition Source: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.definitionSource}" />
+						
+						<h:outputText value="List Id: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.listId}" />
+						
+						<h:outputText value="Agency Id: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.agencyIdListValueId}" />
+						
+						<h:outputText value="Version: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.versionId}" />
+						
+						<h:outputText value="Remark: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.remark}" />
+						
+						<h:outputText value="State: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.state}" style="font-weight:bold; color:red" />
+						
+						<h:outputText value="Extensible: " style="font-weight:bold; color:blue" />
+						<h:outputText value="#{codeListHandler.selected.extensibleIndicator}" style="font-weight:bold; color:red" />
+
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="2" cellpadding="5">
+						<p:dataTable id="tbl1" var="codeListValue" value="#{codeListHandler.codeListValues}"
+							style="width:600px; margin-bottom:20px;" > 
+							<p:column style="width:100px">
+								<f:facet name="header">
+									<h:outputText value="Code" />
+								</f:facet>
+								<h:outputText value="#{codeListValue.value}" style="font-weight:bold; color:#{codeListValue.color};"/>
+							</p:column>
+			
+							<p:column style="width:100px">
+								<f:facet name="header">
+									<h:outputText value="Short Name" />
+								</f:facet>
+								<h:outputText value="#{codeListValue.name}" style="font-weight:bold; color:#{codeListValue.color};"/>
+							</p:column>
+			
+							<p:column style="width:400px">
+								<f:facet name="header">
+									<h:outputText value="Definition" />
+								</f:facet>
+								<h:outputText value="#{codeListValue.definition}" style="color:#{codeListValue.color};"/>
+							</p:column>
+						</p:dataTable>
+					</h:panelGrid>
+					<p:separator />
+			        <h:panelGrid id="grid3" cellpadding="5">
+			        </h:panelGrid>
+					<h:panelGrid id="grid4" columns="4" cellpadding="5">
+			        	<p:commandButton value="Edit" disabled="#{codeListHandler.selected.editDisabled}" ajax="true" actionListener="#{codeListHandler.onEdit(codeListHandler.selected)}" update=":form:clEditid" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').hide(); PF('clEdit').show();"/>
+			        	<p:commandButton value="Discard" disabled="#{codeListHandler.selected.discardDisabled}" ajax="true" actionListener="#{codeListHandler.onDiscard(codeListHandler.selected)}" update=":form:tbl" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').hide();"/>
+			        	<p:commandButton value="Delete" disabled="#{codeListHandler.selected.deleteDisabled}" ajax="true" actionListener="#{codeListHandler.onDelete(codeListHandler.selected)}" update=":form:tbl" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').hide();"/>
+			        	<p:commandButton value="Close" update=":form:tbl" actionListener="#{codeListHandler.cancel()}" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').hide()"/>
+			        </h:panelGrid>
+				</p:outputPanel>
+		    </p:dialog>
+		    
+			<p:dialog header="Edit Code List" widgetVar="clEdit" showEffect="clip" hideEffect="clip" closable="true" resizable="true" draggable="true" width="800" height="700">
+        		<p:outputPanel id="clEditid">
+        			<h:panelGrid id="grid7" cellpadding="5">
+						<p:row>
+	        				<p:column style="width:400px"> 
+								<h:outputLabel value="Edit Code List" style="font-weight:bold; color:red" />
+							</p:column> 
+						</p:row>
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="4" cellpadding="5">
+						<h:outputLabel for="name" rows="10" value="Name:" style="font-weight:bold" />
+						<p:inputText id="name" value="#{codeListHandler.codeList.name}"
+							label="Name" />
+						
+						<h:outputLabel for="definition" rows="10" value="Definition:" style="font-weight:bold" />
+						<p:inputText id="definition" value="#{codeListHandler.codeList.definition}"
+							label="Definition" />
+						
+						<h:outputLabel for="definitionSource" rows="10" value="Definition Source:" style="font-weight:bold" />
+						<p:inputText id="definitionSource" value="#{codeListHandler.codeList.definitionSource}"
+							label="Definition Source" />
+	
+						<h:outputLabel for="listId" rows="10" value="List Id:" style="font-weight:bold" />
+						<p:inputText id="listId" value="#{codeListHandler.codeList.listId}"
+							label="List Id" />
+						
+						<h:outputLabel for="agencyIdListValueId" rows="10" value="Agency Id:" style="font-weight:bold" />
+						<p:inputText id="agencyIdListValueId" value="#{codeListHandler.codeList.agencyIdListValueId}"
+							label="Agency Id" />
+						
+						<h:outputLabel for="version" rows="10" value="Version:" style="font-weight:bold" />
+						<p:inputText id="version" value="#{codeListHandler.codeList.versionId}"
+							label="Version" />
+							
+						<h:outputLabel for="remark" rows="10" value="Remark:" style="font-weight:bold" />
+						<p:inputText id="remark" value="#{codeListHandler.codeList.remark}"
+							label="Remark" />
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid id="grid44" columns="1" cellpadding="5">
+						<p:dataTable id="tbl2" var="codeListValue" value="#{codeListHandler.codeListValues}"
+							style="width:600px; margin-bottom:20px;" > 
+							<p:column style="width:65px">
+								<f:facet name="header">
+									<h:outputText value="Select" />
+								</f:facet>
+								<p:selectBooleanButton id="value2" value="#{codeListValue.usedIndicator}" disabled="#{codeListValue.disabled}" onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:65px">
+						            <p:ajax update="tbl2" listener="#{codeListHandler.updateCodeListValue(codeListValue.codeListValueId)}" />
+						        </p:selectBooleanButton>
+							</p:column>
+							
+							<p:column style="width:100px">
+								<f:facet name="header">
+									<h:outputText value="Code" />
+								</f:facet>
+								<h:outputText value="#{codeListValue.value}" style="font-weight:bold; color:#{codeListValue.color};"/>
+							</p:column>
+			
+							<p:column style="width:100px">
+								<f:facet name="header">
+									<h:outputText value="Short Name" />
+								</f:facet>
+								<h:outputText value="#{codeListValue.name}" style="font-weight:bold; color:#{codeListValue.color};"/>
+							</p:column>
+			
+							<p:column style="width:335px">
+								<f:facet name="header">
+									<h:outputText value="Definition" />
+								</f:facet>
+								<h:outputText value="#{codeListValue.definition}" style="color:#{codeListValue.color};"/>
+							</p:column>
+						</p:dataTable>
+					</h:panelGrid>
+			        <h:panelGrid columns="2" cellpadding="5">
+						<h:outputText style="font-weight:bold; color:blue" value="Add new Code List Value: " />
+						<p:commandButton value="Add" icon="ui-icon-extlink" actionListener="#{codeListHandler.addCodeListValue()}">
+					        <p:ajax event="dialogReturn" listener="#{codeListHandler.onCodeListValueAdded}" update=":form:tbl2" />
+					    </p:commandButton>
+					</h:panelGrid>
+					<p:separator />
+			        <h:panelGrid id="grid9" columns="3" cellpadding="5">
+			        	<p:commandButton ajax="true" update=":form:clDetailid, :form:tbl" style="width:100px" icon="ui-icon-search" value="Save" actionListener="#{codeListHandler.updateSave()}" oncomplete="PF('clEdit').hide(); PF('clDetail').show(); "/>
+						
+						<p:commandButton ajax="true" update=":form:clDetailid, :form:tbl" style="width:100px" icon="ui-icon-search" value="Publish" actionListener="#{codeListHandler.updatePublish()}" oncomplete="PF('clEdit').hide(); PF('clDetail').show(); "/>
+						
+			        	<p:commandButton value="Cancel" style="width: 100px !important;" icon="ui-icon-check" oncomplete="PF('clDetail').show(); PF('clEdit').hide();"/>
+			        </h:panelGrid>
+				</p:outputPanel>
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

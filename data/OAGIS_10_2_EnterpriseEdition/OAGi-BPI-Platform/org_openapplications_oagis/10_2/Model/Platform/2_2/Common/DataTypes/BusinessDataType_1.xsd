@@ -545,15 +545,15 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:simpleType name="CodeType_1E7368" id="oagis-id-d2f721a297684b538e7dbb88cf5526bc">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">
-                <ccts_UniqueID>1E7368</ccts_UniqueID>
-                <ccts_VersionID>1.0</ccts_VersionID>
-                <ccts_DictionaryEntryName>Code. Type</ccts_DictionaryEntryName>
-                <ccts_Definition>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values</ccts_Definition>
-                <ccts_DataTypeTermName>Code</ccts_DataTypeTermName>
-            </xsd:documentation>
-        </xsd:annotation>
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				<ccts_UniqueID>1E7368</ccts_UniqueID>
+				<ccts_VersionID>1.0</ccts_VersionID>
+				<ccts_DictionaryEntryName>Code. Type</ccts_DictionaryEntryName>
+				<ccts_Definition>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values</ccts_Definition>
+				<ccts_DataTypeTermName>Code</ccts_DataTypeTermName>
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:restriction base="xsd:token"/>
 	</xsd:simpleType>
 	<!-- =================================================================== -->
@@ -10184,7 +10184,7 @@
 			<xsd:extension base="IDType_B3F14E">
 				<xsd:attribute name="schemeID" type="xsd:normalizedString" id="oagis-id-bea33b7085a64218aa665f9bbed37d4e"/>
 				<xsd:attribute name="schemeName" type="xsd:string" id="oagis-id-f9f6c1b67450453aa2409830271726e8"/>
-				<xsd:attribute name="schemeAgencyID" id="oagis-id-e4e592cb40874cc28caec843d3c93edc"/>
+				<xsd:attribute name="schemeAgencyID" type="clm63055D08B_AgencyIdentificationContentType" id="oagis-id-e4e592cb40874cc28caec843d3c93edc"/>
 				<xsd:attribute name="schemeAgencyName" type="xsd:string" id="oagis-id-1d92acc1d5034eb09e9b09fcaa15e92d"/>
 				<xsd:attribute name="schemeVersionID" type="xsd:normalizedString" id="oagis-id-78db998d9e514ae4939368182a0f601f"/>
 				<xsd:attribute name="schemeDataURI" type="xsd:anyURI" id="oagis-id-1d1e5a6638fc4dbf9cad0b923f543f59"/>
@@ -10193,27 +10193,27 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:simpleType name="IDType_B3F14E" id="oagis-id-ff84535456d44233b6f0976d993b442d">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">
-                <ccts_UniqueID>B3F14E</ccts_UniqueID>
-                <ccts_VersionID>1.0</ccts_VersionID>
-                <ccts_DictionaryEntryName>Identifier. Type</ccts_DictionaryEntryName>
-                <ccts_Definition>An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency</ccts_Definition>
-                <ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:normalizedString">
-            <xsd:annotation>
-                <xsd:documentation source="http://www.openapplications.org/oagis/10">
-                    <ccts_ContentComponentValueDomain>
-                        <ccts_Definition>A character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency</ccts_Definition>
-                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
-                        <ccts_PrimitiveTypeName>NormalizedString</ccts_PrimitiveTypeName>
-                    </ccts_ContentComponentValueDomain>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:restriction>
-    </xsd:simpleType>
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				<ccts_UniqueID>B3F14E</ccts_UniqueID>
+				<ccts_VersionID>1.0</ccts_VersionID>
+				<ccts_DictionaryEntryName>Identifier. Type</ccts_DictionaryEntryName>
+				<ccts_Definition>An identifier is a character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency</ccts_Definition>
+				<ccts_DataTypeTermName>Identifier</ccts_DataTypeTermName>
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:annotation>
+				<xsd:documentation source="http://www.openapplications.org/oagis/10">
+					<ccts_ContentComponentValueDomain>
+						<ccts_Definition>A character string used to uniquely identify one instance of an object within an identification scheme that is managed by an agency</ccts_Definition>
+						<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+						<ccts_PrimitiveTypeName>NormalizedString</ccts_PrimitiveTypeName>
+					</ccts_ContentComponentValueDomain>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:restriction>
+	</xsd:simpleType>
 	<!-- =================================================================== -->
 	<xsd:complexType name="IDType_9054A1" id="oagis-id-fbfa4b045eb24af687bd3c6a8ca83a18">
 		<xsd:annotation>
@@ -22517,73 +22517,72 @@
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-
-    <xsd:simpleType name="TextType_62S0C1" id="oagis-id-89be97039be04d6f9cfda107d75926b5">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">
-                <ccts_UniqueID>62S0C1</ccts_UniqueID>
-                <ccts_VersionID>1.0</ccts_VersionID>
-                <ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
-                <ccts_Definition>Text is a character string such as a finite set of characters generally in  the form of words of a language</ccts_Definition>
-                <ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation source="http://www.openapplications.org/oagis/10">
-                    <ccts_ContentComponentValueDomain>
-                        <ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
-                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
-                        <ccts_PrimitiveTypeName>String</ccts_PrimitiveTypeName>
-                    </ccts_ContentComponentValueDomain>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:simpleType name="TextType_0VCBZ5" id="oagis-id-42a03ed19450453da6c87fe8eadabfa4">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">
-                <ccts_UniqueID>0VCBZ5</ccts_UniqueID>
-                <ccts_VersionID>1.0</ccts_VersionID>
-                <ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
-                <ccts_Definition>A text is a character string such as a finite set of characters generally in the form of words of a language</ccts_Definition>
-                <ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:normalizedString">
-            <xsd:annotation>
-                <xsd:documentation source="http://www.openapplications.org/oagis/10">
-                    <ccts_ContentComponentValueDomain>
-                        <ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
-                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
-                        <ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
-                    </ccts_ContentComponentValueDomain>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:simpleType name="TextType_0F0ZX1" id="oagis-id-d5cb8551edf041389893fee25a496395">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">
-                <ccts_UniqueID>0F0ZX1</ccts_UniqueID>
-                <ccts_VersionID>1.0</ccts_VersionID>
-                <ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
-                <ccts_Definition>A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept</ccts_Definition>
-                <ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:restriction base="xsd:token">
-            <xsd:annotation>
-                <xsd:documentation source="http://www.openapplications.org/oagis/10">
-                    <ccts_ContentComponentValueDomain>
-                        <ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
-                        <ccts_DefaultIndicator>False</ccts_DefaultIndicator>
-                        <ccts_PrimitiveTypeName>Token</ccts_PrimitiveTypeName>
-                    </ccts_ContentComponentValueDomain>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:restriction>
-    </xsd:simpleType>
+	<xsd:simpleType name="TextType_62S0C1" id="oagis-id-89be97039be04d6f9cfda107d75926b5">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				<ccts_UniqueID>62S0C1</ccts_UniqueID>
+				<ccts_VersionID>1.0</ccts_VersionID>
+				<ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
+				<ccts_Definition>Text is a character string such as a finite set of characters generally in  the form of words of a language</ccts_Definition>
+				<ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation source="http://www.openapplications.org/oagis/10">
+					<ccts_ContentComponentValueDomain>
+						<ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
+						<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+						<ccts_PrimitiveTypeName>String</ccts_PrimitiveTypeName>
+					</ccts_ContentComponentValueDomain>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TextType_0VCBZ5" id="oagis-id-42a03ed19450453da6c87fe8eadabfa4">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				<ccts_UniqueID>0VCBZ5</ccts_UniqueID>
+				<ccts_VersionID>1.0</ccts_VersionID>
+				<ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
+				<ccts_Definition>A text is a character string such as a finite set of characters generally in the form of words of a language</ccts_Definition>
+				<ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:annotation>
+				<xsd:documentation source="http://www.openapplications.org/oagis/10">
+					<ccts_ContentComponentValueDomain>
+						<ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
+						<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+						<ccts_PrimitiveTypeName>Normalized String</ccts_PrimitiveTypeName>
+					</ccts_ContentComponentValueDomain>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TextType_0F0ZX1" id="oagis-id-d5cb8551edf041389893fee25a496395">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				<ccts_UniqueID>0F0ZX1</ccts_UniqueID>
+				<ccts_VersionID>1.0</ccts_VersionID>
+				<ccts_DictionaryEntryName>Text. Type</ccts_DictionaryEntryName>
+				<ccts_Definition>A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept</ccts_Definition>
+				<ccts_DataTypeTermName>Text</ccts_DataTypeTermName>
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:annotation>
+				<xsd:documentation source="http://www.openapplications.org/oagis/10">
+					<ccts_ContentComponentValueDomain>
+						<ccts_Definition>A character string generally in the form of words of a language</ccts_Definition>
+						<ccts_DefaultIndicator>False</ccts_DefaultIndicator>
+						<ccts_PrimitiveTypeName>Token</ccts_PrimitiveTypeName>
+					</ccts_ContentComponentValueDomain>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:restriction>
+	</xsd:simpleType>
 	<!-- =================================================================== -->
 	<!-- =====                                          Time Type                                                                 ===== -->
 	<!-- =====       Use when the time format is fixed at design time                                      ===== -->

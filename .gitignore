@@ -1,7 +1,8 @@
 .idea/*
 *.iml
 *.class
-target/*
+target
+target/**
 build/*
 bin/*
 tmp/*
@@ -11,5 +12,11 @@ tmp/*
 .project
 docker-compose.yml
 /target/
-data/*
 logs/*
+
+data/Model
+Dockerfile
+docker-compose.yaml
+*.zip
+~$*
+*schematron*

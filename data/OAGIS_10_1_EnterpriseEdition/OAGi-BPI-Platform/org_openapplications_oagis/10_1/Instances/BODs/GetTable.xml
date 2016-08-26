@@ -1,0 +1,276 @@
+<GetTable releaseID="string" versionID="string" systemEnvironmentCode="Production" languageCode="en-US" xmlns="http://www.openapplications.org/oagis/10">
+  <ApplicationArea>
+    
+    <Sender typeCode="token" partyRoleCode="token">
+      
+      <LogicalID schemeID="string" schemeVersionID="string" schemeAgencyID="304">string</LogicalID>
+      
+      <ComponentID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</ComponentID>
+      
+      <TaskID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</TaskID>
+      
+      <ReferenceID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</ReferenceID>
+      
+      <ConfirmationCodes>
+        
+        <ProcessingConfirmationCode listID="string" listAgencyID="token" listVersionID="string">string</ProcessingConfirmationCode>
+        
+        <ConfirmationCode>OnError</ConfirmationCode>
+      </ConfirmationCodes>
+      
+      <AuthorizationID schemeID="string" schemeVersionID="string" schemeAgencyID="37">string</AuthorizationID>
+    </Sender>
+    
+    <Receiver typeCode="token" partyRoleCode="token">
+      
+      <LogicalID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</LogicalID>
+      
+      <ComponentID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</ComponentID>
+      
+      <ID schemeID="string" schemeVersionID="string" schemeAgencyID="96" typeCode="token">string</ID>
+    </Receiver>
+    <CreationDateTime>token</CreationDateTime>
+    
+    <Signature qualifyingAgencyId="string">
+      
+      <AnyElement/>
+    </Signature>
+    
+    <ScenarioID schemeID="string" schemeVersionID="string" schemeAgencyID="186">string</ScenarioID>
+    
+    <CorrelationID schemeID="string" schemeVersionID="string" schemeAgencyID="345">string</CorrelationID>
+    
+    <BODID schemeID="string" schemeVersionID="string" schemeAgencyID="token">string</BODID>
+    
+    <Extension typeCode="token" actionCode="Rejected" sequenceNumber="100">
+      
+      <AnyExtension>
+        
+        <AnyElement/>
+      </AnyExtension>
+      
+      <Amount currencyCode="token" typeCode="token">1000.00</Amount>
+      
+      <Code listID="string" listAgencyID="token" listVersionID="string" typeCode="token">string</Code>
+      
+      <DateTime typeCode="token">token</DateTime>
+      
+      <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+      
+      <Indicator typeCode="token">true</Indicator>
+      
+      <Measure unitCode="string" typeCode="token">1000.00</Measure>
+      
+      <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+      
+      <Number typeCode="token">1000.00</Number>
+      
+      <Quantity unitCode="token" typeCode="token">1000.00</Quantity>
+      
+      <Text languageCode="string" typeCode="token">string</Text>
+      
+      <Time typeCode="token">04:15:53-04:00</Time>
+      
+      <ValueText formatCode="token" typeCode="token">string</ValueText>
+    </Extension>
+  </ApplicationArea>
+  <DataArea>
+    <Get uniqueIndicator="false" maxItems="201" recordSetSaveIndicator="false" recordSetStartNumber="201" recordSetReferenceID="string">
+      <!--1 or more repetitio-->
+      <Expression expressionLanguage="token">token</Expression>
+    </Get>
+    <!--1 or more repetitio-->
+    <Table typeCode="token" actionCode="token">
+      
+      <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+      
+      <IDSet schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">
+        <!--1 or more repetitio-->
+        <ID schemeID="string" schemeVersionID="string" schemeAgencyID="66" typeCode="token">string</ID>
+      </IDSet>
+      
+      <RevisionID schemeID="string" schemeVersionID="string" schemeAgencyID="221">string</RevisionID>
+      
+      <AgencyID schemeID="string" schemeVersionID="string" schemeAgencyID="8">string</AgencyID>
+      
+      <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+      
+      <Description languageCode="string" typeCode="string">string</Description>
+      
+      <FieldNumber unitCode="token">1000.00</FieldNumber>
+      
+      <RecordNumber unitCode="token">1000.00</RecordNumber>
+      
+      <EffectiveTimePeriod>
+        
+        <InclusiveIndicator>true</InclusiveIndicator>
+        
+        <StartDateTime>token</StartDateTime>
+        
+        <StartTime>token</StartTime>
+        
+        <Duration>P1Y4DT12H44M37S</Duration>
+        
+        <EndDateTime>token</EndDateTime>
+        
+        <EndTime>token</EndTime>
+      </EffectiveTimePeriod>
+      
+      <CreationDateTime>token</CreationDateTime>
+      
+      <LastModificationDateTime>token</LastModificationDateTime>
+      
+      <TableHeader>
+        
+        <FieldHeader typeCode="token" actionCode="token">
+          
+          <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+          
+          <IDSet schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">
+            <!--1 or more repetitio-->
+            <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+          </IDSet>
+          
+          <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+          
+          <Description languageCode="string" typeCode="string">string</Description>
+          
+          <PrimaryKeyFieldIndicator>true</PrimaryKeyFieldIndicator>
+          
+          <DataTypeCode listID="string" listAgencyID="195" listVersionID="string">string</DataTypeCode>
+          
+          <UnitCode listID="string" listAgencyID="199" listVersionID="string">string</UnitCode>
+          
+          <MaximumSizeQuantity unitCode="token">1000.00</MaximumSizeQuantity>
+          
+          <SequenceNumber>201</SequenceNumber>
+          
+          <Extension typeCode="token" actionCode="Delete" sequenceNumber="100">
+            
+            <AnyExtension>
+              
+              <AnyElement/>
+            </AnyExtension>
+            
+            <Amount currencyCode="token" typeCode="token">1000.00</Amount>
+            
+            <Code listID="string" listAgencyID="72" listVersionID="string" typeCode="token">string</Code>
+            
+            <DateTime typeCode="token">token</DateTime>
+            
+            <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+            
+            <Indicator typeCode="token">true</Indicator>
+            
+            <Measure unitCode="string" typeCode="token">1000.00</Measure>
+            
+            <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+            
+            <Number typeCode="token">1000.00</Number>
+            
+            <Quantity unitCode="token" typeCode="token">1000.00</Quantity>
+            
+            <Text languageCode="string" typeCode="token">string</Text>
+            
+            <Time typeCode="token">token</Time>
+            
+            <ValueText formatCode="token" typeCode="token">string</ValueText>
+          </Extension>
+        </FieldHeader>
+      </TableHeader>
+      
+      <Record typeCode="token" actionCode="Replace">
+        
+        <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+        
+        <IDSet schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">
+          <!--1 or more repetitio-->
+          <ID schemeID="string" schemeVersionID="string" schemeAgencyID="37" typeCode="token">string</ID>
+        </IDSet>
+        
+        <SequenceNumber>201</SequenceNumber>
+        
+        <RecordFieldValue formatCode="token">string</RecordFieldValue>
+        
+        <EffectiveTimePeriod>
+          
+          <InclusiveIndicator>false</InclusiveIndicator>
+          
+          <StartDateTime>token</StartDateTime>
+          
+          <StartTime>token</StartTime>
+          
+          <Duration>P1Y6DT15H28M7S</Duration>
+          
+          <EndDateTime>token</EndDateTime>
+          
+          <EndTime>token</EndTime>
+        </EffectiveTimePeriod>
+        
+        <Extension typeCode="token" actionCode="Replace" sequenceNumber="100">
+          
+          <AnyExtension>
+            
+            <AnyElement/>
+          </AnyExtension>
+          
+          <Amount currencyCode="token" typeCode="token">1000.00</Amount>
+          
+          <Code listID="string" listAgencyID="token" listVersionID="string" typeCode="token">string</Code>
+          
+          <DateTime typeCode="token">token</DateTime>
+          
+          <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+          
+          <Indicator typeCode="token">false</Indicator>
+          
+          <Measure unitCode="string" typeCode="token">1000.00</Measure>
+          
+          <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+          
+          <Number typeCode="token">1000.00</Number>
+          
+          <Quantity unitCode="token" typeCode="token">1000.00</Quantity>
+          
+          <Text languageCode="string" typeCode="token">string</Text>
+          
+          <Time typeCode="token">23:54:29</Time>
+          
+          <ValueText formatCode="token" typeCode="token">string</ValueText>
+        </Extension>
+      </Record>
+      
+      <Extension typeCode="token" actionCode="token" sequenceNumber="100">
+        
+        <AnyExtension>
+          
+          <AnyElement/>
+        </AnyExtension>
+        
+        <Amount currencyCode="token" typeCode="token">1000.00</Amount>
+        
+        <Code listID="string" listAgencyID="token" listVersionID="string" typeCode="token">string</Code>
+        
+        <DateTime typeCode="token">token</DateTime>
+        
+        <ID schemeID="string" schemeVersionID="string" schemeAgencyID="token" typeCode="token">string</ID>
+        
+        <Indicator typeCode="token">true</Indicator>
+        
+        <Measure unitCode="string" typeCode="token">1000.00</Measure>
+        
+        <Name languageCode="string" sequenceNumber="100" typeCode="token">string</Name>
+        
+        <Number typeCode="token">1000.00</Number>
+        
+        <Quantity unitCode="token" typeCode="token">1000.00</Quantity>
+        
+        <Text languageCode="string" typeCode="token">string</Text>
+        
+        <Time typeCode="token">token</Time>
+        
+        <ValueText formatCode="token" typeCode="token">string</ValueText>
+      </Extension>
+    </Table>
+  </DataArea>
+</GetTable>

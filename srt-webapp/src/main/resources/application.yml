@@ -1,0 +1,65 @@
+spring:
+  aop:
+    proxy-target-class: true
+
+  datasource:
+    continue-on-error: true
+    initialize: false
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+  batch:
+    initializer:
+      enabled: false
+
+jsf:
+  state-saving-method: server
+  datetimeconverter-default-timezone-is-system-timezone: true
+
+  primefaces:
+    theme: home
+    uploader: common
+    client-side-validation: true
+    public-captcha-key: 6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu
+    private-captcha-key: 6LfwZwoAAAAAAEhRyntKF1PBzysAJLzqp2v-GMRR
+
+# Development environment
+---
+spring:
+  profiles: development
+
+# DataSource
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@docker:1521/xe
+    username: oagi
+    password: oagi
+    platform: oracle
+
+logging:
+  level:
+    org.oagi.srt: DEBUG
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+jsf:
+  project-stage: Development
+
+# Staging environment
+---
+spring:
+  profiles: staging
+
+# DataSource
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521/OAGISRTDB
+    username: oagi
+    password: oagi
+    platform: oracle
+
+jsf:
+  project-stage: Production
