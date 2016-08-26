@@ -21,6 +21,9 @@ spring:
   freemarker:
     suffix: .ftl
 
+  resources:
+    static-locations: classpath:/static
+
 logging:
   level:
     org.oagi.srt: DEBUG
