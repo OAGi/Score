@@ -21,3 +21,4 @@ docker-compose.yaml
 ~$*
 *schematron*
 *.bak
+*-mysql.sql
