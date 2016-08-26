@@ -17,6 +17,10 @@ body {
     height: 50px;
 }
 
+#content {
+    min-height: 600px;
+}
+
 .content-header {
     opacity: .4;
     padding-top: 50px;

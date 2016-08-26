@@ -78,7 +78,8 @@ public class ContextCategoryService {
         private String name;
         private String description;
 
-        private ContextCategoryBuilder() {}
+        private ContextCategoryBuilder() {
+        }
 
         public ContextCategoryBuilder name(String name) {
             this.name = name;

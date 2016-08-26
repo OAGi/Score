@@ -30,7 +30,7 @@
                            aria-expanded="false">Business Context <i class="fa fa-angle-down"
                                                                      aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">Business Context List</a></li>
+                            <li><a href="/business/context/list">Business Context List</a></li>
                             <li><a href="#">Create Business Context</a></li>
                         </ul>
                     </li>
@@ -39,7 +39,7 @@
                            aria-expanded="false">Context Category <i class="fa fa-angle-down"
                                                                      aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">Context Category List</a></li>
+                            <li><a href="/context/category/list">Context Category List</a></li>
                             <li><a href="#">Create Context Category</a></li>
                         </ul>
                     </li>
@@ -47,7 +47,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">Context Scheme <i class="fa fa-angle-down" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">Context Scheme List</a></li>
+                            <li><a href="/context/scheme/list">Context Scheme List</a></li>
                             <li><a href="#">Create Context Scheme</a></li>
                         </ul>
                     </li>
