@@ -507,7 +507,7 @@
 									<f:facet name="header">
 										<h:outputText value="Agency Id" />
 									</f:facet>
-									<h:outputText value="#{cVO.agencyIdListValueId}" />
+									<h:outputText value="#{cVO.agencyId}" />
 								</p:column>
 							</p:dataTable>
 							<p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('derivedCodeList').hide()" />
@@ -539,7 +539,7 @@
 									<f:facet name="header">
 										<h:outputText value="Agency Id" />
 									</f:facet>
-									<h:outputText value="#{cVO.agencyIdListValueId}" />
+									<h:outputText value="#{cVO.agencyId}" />
 								</p:column>
 							</p:dataTable>
 							<p:commandButton ajax="true" update=":form:codeSelected" icon="ui-icon-search" value="Select" oncomplete="PF('codeList').hide()" />
