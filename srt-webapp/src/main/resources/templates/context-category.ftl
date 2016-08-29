@@ -7,7 +7,7 @@
                 <h2>Context Category</h2>
             </div>
             <div class="x_content">
-                <table class="table table-hover table-bordered">
+                <table id="td-context-category" class="table table-hover table-bordered">
                     <thead>
                     <tr>
                         <th>GUID</th>
@@ -16,21 +16,13 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <#if contextCategories?has_content>
+                        <#list contextCategories as contextCategory>
                         <tr>
-                            <#list contextCategories as contextCategory>
-                            <tr>
-                                <td>${contextCategory.guid}</td>
-                                <td>${contextCategory.name}</td>
-                                <td>${contextCategory.description}</td>
-                            </tr>
-                            </#list>
+                            <td>${contextCategory.guid}</td>
+                            <td>${contextCategory.name}</td>
+                            <td>${contextCategory.description}</td>
                         </tr>
-                        <#else>
-                        <tr>
-                            <td colspan="3" style="text-align: center;">No context category defined</td>
-                        </tr>
-                        </#if>
+                        </#list>
                     </tbody>
                 </table>
 
@@ -38,4 +30,5 @@
         </div>
     </div>
 </div>
+<script src="/static/srt/js/context-category.js"></script>
 </@layout.content>

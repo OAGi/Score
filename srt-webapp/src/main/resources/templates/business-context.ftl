@@ -7,28 +7,24 @@
                 <h2>Business Context</h2>
             </div>
             <div class="x_content">
-                <table class="table table-hover table-bordered">
+                <table id="td-business-context" class="table table-hover table-bordered">
                     <thead>
                     <tr>
                         <th>GUID</th>
                         <th>Name</th>
+                        <th>Creation Date</th>
+                        <th>Last Update Date</th>
                     </tr>
                     </thead>
                     <tbody>
-                        <#if businessContexts?has_content>
+                        <#list businessContexts as businessContext>
                         <tr>
-                            <#list businessContexts as businessContext>
-                            <tr>
-                                <td>${businessContext.guid}</td>
-                                <td>${businessContext.name}</td>
-                            </tr>
-                            </#list>
+                            <td>${businessContext.guid}</td>
+                            <td>${businessContext.name}</td>
+                            <td>${businessContext.creationTimestamp}</td>
+                            <td>${businessContext.lastUpdateTimestamp}</td>
                         </tr>
-                        <#else>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">No business context defined</td>
-                        </tr>
-                        </#if>
+                        </#list>
                     </tbody>
                 </table>
 
@@ -36,4 +32,5 @@
         </div>
     </div>
 </div>
+<script src="/static/srt/js/business-context.js"></script>
 </@layout.content>

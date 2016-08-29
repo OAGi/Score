@@ -7,30 +7,26 @@
                 <h2>Context Scheme</h2>
             </div>
             <div class="x_content">
-                <table class="table table-hover table-bordered">
+                <table id="td-context-scheme" class="table table-hover table-bordered">
                     <thead>
                     <tr>
                         <th>GUID</th>
                         <th>Description</th>
                         <th>Version</th>
+                        <th>Creation Date</th>
+                        <th>Last Update Date</th>
                     </tr>
                     </thead>
                     <tbody>
-                        <#if contextSchemes?has_content>
+                        <#list contextSchemes as contextScheme>
                         <tr>
-                            <#list contextSchemes as contextScheme>
-                            <tr>
-                                <td>${contextScheme.guid}</td>
-                                <td>${contextScheme.description}</td>
-                                <td>${contextScheme.version}</td>
-                            </tr>
-                            </#list>
+                            <td>${contextScheme.guid}</td>
+                            <td>${contextScheme.description}</td>
+                            <td>${contextScheme.version}</td>
+                            <td>${contextScheme.creationTimestamp}</td>
+                            <td>${contextScheme.lastUpdateTimestamp}</td>
                         </tr>
-                        <#else>
-                        <tr>
-                            <td colspan="3" style="text-align: center;">No context scheme defined</td>
-                        </tr>
-                        </#if>
+                        </#list>
                     </tbody>
                 </table>
 
@@ -38,4 +34,5 @@
         </div>
     </div>
 </div>
+<script src="/static/srt/js/context-scheme.js"></script>
 </@layout.content>

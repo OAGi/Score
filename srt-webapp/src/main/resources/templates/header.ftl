@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="/">
-                    <img src="/static/images/oagi.png"/>
+                    <img src="/static/srt/images/oagi.png"/>
                 </a>
             </div>
 

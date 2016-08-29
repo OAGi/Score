@@ -1,10 +1,14 @@
-<script src="/static/js/jquery-3.1.0.min.js"></script>
+<script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
 
-<link rel="stylesheet" href="/static/css/bootstrap-3.3.7.min.css">
-<link rel="stylesheet" href="/static/css/bootstrap-theme-3.3.7.min.css">
-<script src="/static/js/bootstrap-3.3.7.min.js"></script>
+<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+<script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
-<link rel="stylesheet" href="/static/css/font-awesome-4.6.3.min.css">
+<link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
 
-<link rel="stylesheet" href="/static/css/srt.css">
-<script src="/static/js/srt.js"></script>
+<link rel="stylesheet" href="/static/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+<script src="/static/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/static/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="/static/srt/css/srt.css">
+<script src="/static/srt/js/srt.js"></script>
