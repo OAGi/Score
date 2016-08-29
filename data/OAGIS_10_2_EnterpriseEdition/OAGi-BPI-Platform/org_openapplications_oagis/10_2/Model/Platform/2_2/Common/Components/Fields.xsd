@@ -2730,7 +2730,7 @@ Number of units of a chemical in a barrel</xsd:documentation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">Number of Records.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="SequenceNumber" type="PositiveIntegerNumberType" nillable="true" id="oagis-id-d586562414c24f0bb59c8f63fc4d36e4">
+	<xsd:element name="SequenceNumber" type="NumberType_B98233" nillable="true" id="oagis-id-d586562414c24f0bb59c8f63fc4d36e4">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A value expressing the value of a Sequence.</xsd:documentation>
 		</xsd:annotation>
