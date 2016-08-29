@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by Michael Rowell (Open Applications Group) --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
+<!--
 
 
 
@@ -23,7 +25,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Nouns/EngineeringWorkDocument.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="../Platform/2_2/Common/Components/Components.xsd"/>
 	<xsd:element name="EngineeringWorkDocument" type="EngineeringWorkDocumentType" id="oagis-id-066f0e689d014bd39297b377348b1d1b">
 		<xsd:annotation>
@@ -143,7 +146,7 @@
 					</xsd:element>
 					<xsd:element ref="ItemDesignReference" id="oagis-id-0e938165c50240e391053e3745e29106" minOccurs="0"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="EngineeringWorkRequestCodeContentType" id="oagis-id-391c1e270b9442b6b6302284ea9afcc8"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-391c1e270b9442b6b6302284ea9afcc8"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-9b08c730455f4c95809db3b5d196a96a"/>
 				<xsd:attribute name="status" type="EngineeringWorkRequestStatusCodeContentType" id="oagis-id-14fba4bb07f84efb9a384e3b7271b33a">
 					<xsd:annotation>
@@ -390,7 +393,7 @@ In most cases there is one SupplierParty per transaction. i.e. one SupplierParty
 				<xsd:sequence>
 					<xsd:element ref="ItemDesignReference" id="oagis-id-8c967ff37fa84fb38513236ec5ec57f4" minOccurs="0"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="EngineeringWorkRequestCodeContentType" id="oagis-id-ca5ad8da9dde48ea893eb95eb734515e"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-ca5ad8da9dde48ea893eb95eb734515e"/>
 				<xsd:attribute name="actionCode" type="ActionCodeContentType" id="oagis-id-2d679f4524164abd857f64f40da980d5"/>
 			</xsd:extension>
 		</xsd:complexContent>
