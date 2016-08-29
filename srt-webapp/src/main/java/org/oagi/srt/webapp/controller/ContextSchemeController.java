@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
 @Controller
-@RequestMapping("/context/scheme")
+@RequestMapping("/context-scheme")
 public class ContextSchemeController {
 
     @Autowired
@@ -19,9 +19,18 @@ public class ContextSchemeController {
 
     @RequestMapping("/list")
     public ModelAndView list() {
-        ModelAndView modelAndView = new ModelAndView("context-scheme");
+        ModelAndView modelAndView = new ModelAndView("context_scheme/list");
         List<ContextScheme> contextSchemes =
-                contextSchemeService.findAll(Sort.Direction.DESC, "ctxSchemeId");
+                contextSchemeService.findAll(Sort.Direction.DESC, "lastUpdateTimestamp");
+        modelAndView.addObject("contextSchemes", contextSchemes);
+        return modelAndView;
+    }
+
+    @RequestMapping("/create")
+    public ModelAndView create() {
+        ModelAndView modelAndView = new ModelAndView("context_scheme/create");
+        List<ContextScheme> contextSchemes =
+                contextSchemeService.findAll(Sort.Direction.DESC, "lastUpdateTimestamp");
         modelAndView.addObject("contextSchemes", contextSchemes);
         return modelAndView;
     }

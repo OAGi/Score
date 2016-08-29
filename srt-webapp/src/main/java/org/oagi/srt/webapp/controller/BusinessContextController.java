@@ -13,7 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
 @Controller
-@RequestMapping("/business/context")
+@RequestMapping("/business-context")
 public class BusinessContextController {
 
     @Autowired
@@ -21,9 +21,18 @@ public class BusinessContextController {
 
     @RequestMapping("/list")
     public ModelAndView list() {
-        ModelAndView modelAndView = new ModelAndView("business-context");
+        ModelAndView modelAndView = new ModelAndView("business_context/list");
         List<BusinessContext> businessContexts =
-                businessContextService.findAll(Sort.Direction.DESC, "bizCtxId");
+                businessContextService.findAll(Sort.Direction.DESC, "lastUpdateTimestamp");
+        modelAndView.addObject("businessContexts", businessContexts);
+        return modelAndView;
+    }
+
+    @RequestMapping("/create")
+    public ModelAndView create() {
+        ModelAndView modelAndView = new ModelAndView("business_context/create");
+        List<BusinessContext> businessContexts =
+                businessContextService.findAll(Sort.Direction.DESC, "lastUpdateTimestamp");
         modelAndView.addObject("businessContexts", businessContexts);
         return modelAndView;
     }

@@ -1,19 +1,19 @@
-<#import "default-layout.ftl" as layout>
+<#import "../default-layout.ftl" as layout>
 <@layout.content>
 <div id="content">
     <div class="col-md-12 col-sm-12 col-xs-12">
-        <div class="x_panel">
-            <div class="x_title">
-                <h2>Business Context</h2>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3>Business Context</h3>
             </div>
-            <div class="x_content">
+            <div class="panel-body">
                 <table id="td-business-context" class="table table-hover table-bordered">
                     <thead>
                     <tr>
                         <th>GUID</th>
                         <th>Name</th>
-                        <th>Creation Date</th>
-                        <th>Last Update Date</th>
+                        <th>Created Date</th>
+                        <th>Last Updated Date</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -21,8 +21,8 @@
                         <tr>
                             <td>${businessContext.guid}</td>
                             <td>${businessContext.name}</td>
-                            <td>${businessContext.creationTimestamp}</td>
-                            <td>${businessContext.lastUpdateTimestamp}</td>
+                            <td>${businessContext.creationTimestamp?string["yyyy-MM-dd hh:mm:ss a"]}</td>
+                            <td>${businessContext.lastUpdateTimestamp?string["yyyy-MM-dd hh:mm:ss a"]}</td>
                         </tr>
                         </#list>
                     </tbody>
@@ -32,5 +32,5 @@
         </div>
     </div>
 </div>
-<script src="/static/srt/js/business-context.js"></script>
+<script src="/static/srt/js/business_context/list.js"></script>
 </@layout.content>
