@@ -14,7 +14,8 @@
                       data-toggle="validator" role="form">
                     <div class="form-group">
                         <label for="name">Name :</label>
-                        <input type="text" id="name" name="name" class="form-control" placeholder="Name" required>
+                        <input type="text" id="name" name="name" class="form-control" required
+                               data-remote="/context-category/validate-name">
                         <div class="help-block with-errors"></div>
                     </div>
 

@@ -40,7 +40,7 @@ public class ContextCategoryController {
                 .description(description)
                 .build();
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/edit/{ctxCategoryId}", method = RequestMethod.GET)
@@ -59,6 +59,16 @@ public class ContextCategoryController {
         contextCategory.setDescription(description);
         contextCategoryService.update(contextCategory);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/validate-name", method = RequestMethod.GET)
+    public ResponseEntity validateForName(@RequestParam String name) {
+        List<ContextCategory> contextCategories = contextCategoryService.findByName(name);
+        if (contextCategories.isEmpty()) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().body("'" + name + "' context category is exists.");
+        }
     }
 }

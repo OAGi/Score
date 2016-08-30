@@ -33,6 +33,14 @@ public class ContextCategoryService {
         );
     }
 
+    public List<ContextCategory> findByName(String name) {
+        name = (name != null) ? name.trim() : null;
+        if (StringUtils.isEmpty(name)) {
+            return Collections.emptyList();
+        }
+        return contextCategoryRepository.findByName(name);
+    }
+
     public List<ContextCategory> findByNameContaining(String name) {
         name = (name != null) ? name.trim() : null;
         if (StringUtils.isEmpty(name)) {
