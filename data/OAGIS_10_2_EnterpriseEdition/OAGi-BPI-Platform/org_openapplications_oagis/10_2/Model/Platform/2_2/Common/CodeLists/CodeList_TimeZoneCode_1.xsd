@@ -1,4 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- ====================================================================== --><!-- =====  OAGi Time Zone Code - Code List XML Schema File                            ===== --><!-- ====================================================================== --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== -->
+<!-- =====  OAGi Time Zone Code - Code List XML Schema File                            ===== -->
+<!-- ====================================================================== -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
@@ -20,7 +24,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_platform/2rc3-RC/Common/Codelists/CodeList_TimeZoneCode_1.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
 	<!-- ====================================================================== -->
 	<!-- =====  Element Declarations				      ===== -->
 	<!-- ====================================================================== -->
@@ -36,8 +41,6 @@
 	<!-- ====================================================================== -->
 	<xsd:simpleType name="clm6TimeZoneCode1_TimeZoneCodeContentType" id="oagis-id-44ec8e62b49c44a997637034a5be4f2e">
 		<xsd:restriction base="xsd:token">
-			<xsd:minLength value="1"/>
-			<xsd:maxLength value="10"/>
 			<xsd:enumeration value="M0100">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10">

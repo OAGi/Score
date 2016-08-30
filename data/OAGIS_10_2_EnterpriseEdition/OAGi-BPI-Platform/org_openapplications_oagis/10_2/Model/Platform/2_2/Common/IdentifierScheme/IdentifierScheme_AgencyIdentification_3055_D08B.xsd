@@ -45,8 +45,6 @@
 	</xsd:simpleType>
 	<xsd:simpleType name="clm63055D08B_AgencyIdentificationContentEnumerationType" id="oagis-id-68a3c03a4ea84562bd783fe2dc8f5487">
 		<xsd:restriction base="xsd:token">
-			<xsd:minLength value="1"/>
-			<xsd:maxLength value="3"/>
 			<xsd:enumeration value="1">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10">
