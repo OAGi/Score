@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var asccpListDT = $('#td-asccp-list').DataTable({
+    var dataTable = $('#td-asccp-list').DataTable({
         "order": [[0, "asc"]],
         "pagingType": "full_numbers",
         "language": {
@@ -12,11 +12,11 @@ $(document).ready(function () {
             $(this).removeClass('bg-info');
         }
         else {
-            asccpListDT.$('tr.bg-info').removeClass('bg-info');
+            dataTable.$('tr.bg-info').removeClass('bg-info');
             $(this).addClass('bg-info');
 
-            var selectedASCCPId = $(this).data('id');
-            if (selectedASCCPId > 0) {
+            var id = $(this).data('id');
+            if (id > 0) {
 
             }
         }

@@ -6,15 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/context-category")
 public class ContextCategoryController {
 
@@ -33,9 +30,6 @@ public class ContextCategoryController {
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public ModelAndView createView() {
         ModelAndView modelAndView = new ModelAndView("context_category/create");
-        List<ContextCategory> contextCategories =
-                contextCategoryService.findAll(Sort.Direction.ASC, "name");
-        modelAndView.addObject("contextCategories", contextCategories);
         return modelAndView;
     }
 
@@ -45,6 +39,25 @@ public class ContextCategoryController {
                 .name(name)
                 .description(description)
                 .build();
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/edit/{ctxCategoryId}", method = RequestMethod.GET)
+    public ModelAndView editView(@PathVariable Long ctxCategoryId) {
+        ModelAndView modelAndView = new ModelAndView("context_category/edit");
+        ContextCategory contextCategory = contextCategoryService.findById(ctxCategoryId);
+        modelAndView.addObject("contextCategory", contextCategory);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/edit/{ctxCategoryId}", method = RequestMethod.POST)
+    public ResponseEntity edit(@PathVariable Long ctxCategoryId,
+                               @RequestParam String name, @RequestParam String description) {
+        ContextCategory contextCategory = contextCategoryService.findById(ctxCategoryId);
+        contextCategory.setName(name);
+        contextCategory.setDescription(description);
+        contextCategoryService.update(contextCategory);
 
         return new ResponseEntity(HttpStatus.OK);
     }

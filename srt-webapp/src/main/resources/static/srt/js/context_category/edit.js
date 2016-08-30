@@ -42,4 +42,8 @@ $(document).ready(function () {
             e.preventDefault();
         }
     });
+
+    $('#delete').on('click', function (e) {
+
+    });
 });

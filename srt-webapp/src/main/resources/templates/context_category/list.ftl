@@ -17,9 +17,9 @@
                     </thead>
                     <tbody>
                         <#list contextCategories as contextCategory>
-                        <tr>
+                        <tr class="clickable-row" data-id="${contextCategory.ctxCategoryId}">
                             <td>${contextCategory.guid}</td>
-                            <td>${contextCategory.name}</td>
+                            <td><#if contextCategory.name??>${contextCategory.name}</#if></td>
                             <td><#if contextCategory.description??>${contextCategory.description}</#if></td>
                         </tr>
                         </#list>
