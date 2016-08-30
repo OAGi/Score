@@ -2511,11 +2511,6 @@ In other words if a given Option is choosen another Option out of the same Optio
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Indicates if the item is a serialized item i.e. unique instances of the item are identified by unique serial numbers. Valid values are 0 for no, and 1 for yes</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ServiceIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-a5b1b40484384067bc016846de70ff3b">
-		<xsd:annotation>
-			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies if the Item is a Service</xsd:documentation>
-		</xsd:annotation>
-	</xsd:element>
 	<xsd:element name="ShipperAdjustmentAllowedIndicator" type="OpenIndicatorType" id="oagis-id-6e391677909d47089d612947c22d3dbe"/>
 	<xsd:element name="SignificantProcessIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-7468380bbe6d41f4b87202649f44c623"/>
 	<xsd:element name="SplitOperationsIndicator" type="OpenIndicatorType" nillable="true" id="oagis-id-d27b447dfee34f7d8cbe121dabd84982">
@@ -2735,7 +2730,7 @@ Number of units of a chemical in a barrel</xsd:documentation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">Number of Records.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="SequenceNumber" type="PositiveIntegerNumberType" nillable="true" id="oagis-id-d586562414c24f0bb59c8f63fc4d36e4">
+	<xsd:element name="SequenceNumber" type="NumberType_B98233" nillable="true" id="oagis-id-d586562414c24f0bb59c8f63fc4d36e4">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">A value expressing the value of a Sequence.</xsd:documentation>
 		</xsd:annotation>

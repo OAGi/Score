@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 
    Schema agency: 	Open Applications Group 
@@ -1860,7 +1859,11 @@ Note: The UPC here is the UPC of the packaging for a given item.</xsd:documentat
 					<xsd:element ref="ManufacturingParty" id="oagis-id-124d85e9013f446fb908a15462436273" minOccurs="0"/>
 					<xsd:element ref="Party" id="oagis-id-484bd412325247cc98802d38fd336201" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
-				<xsd:attribute name="serviceIndicator" type="IndicatorType" id="oagis-id-5cbb59db3ae94a019d64a895356d9543"/>
+				<xsd:attribute name="serviceIndicator" type="IndicatorType" id="oagis-id-5cbb59db3ae94a019d64a895356d9543">
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies if the item is a service.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -2008,7 +2011,11 @@ Note: The UPC here is the UPC of the packaging for a given item.</xsd:documentat
 					<xsd:element ref="Party" id="oagis-id-c17234c98d564adcaffbfc932641e709" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element ref="Facility" id="oagis-id-8b0e0ff9665649b4ae418ea717e5a9c8" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
-				<xsd:attribute name="serviceIndicator" type="IndicatorType" id="oagis-id-eaaad396e2ca4a4081085b0372b907e4"/>
+				<xsd:attribute name="serviceIndicator" type="IndicatorType" id="oagis-id-eaaad396e2ca4a4081085b0372b907e4">					
+					<xsd:annotation>
+						<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies if the item instance is a service.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -6390,9 +6397,9 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:complexType name="NamedIDsType" abstract="false" id="oagis-id-a8e649deeb074d118d71949f831cc76f" mixed="false">
-        <xsd:sequence>
-		    <xsd:group ref="NamedIDsGroup" id="oagis-id-54db3d59f147427aa552e9b6064d5939" minOccurs="1" maxOccurs="1"/>
-        </xsd:sequence>
+		<xsd:sequence>
+			<xsd:group ref="NamedIDsGroup" id="oagis-id-54db3d59f147427aa552e9b6064d5939" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:group name="SequencedIDsGroup" id="oagis-id-1865b226967e48f1824883eb0e881f92">
 		<xsd:annotation>
@@ -6406,9 +6413,9 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Contains the sequenced identifier for the associated component or noun.</xsd:documentation>
 		</xsd:annotation>
-        <xsd:sequence>
-		    <xsd:group ref="SequencedIDsGroup" id="oagis-id-005c96018e9f4a018b2ca39c2b8af29e" minOccurs="1" maxOccurs="1"/>
-        </xsd:sequence>
+		<xsd:sequence>
+			<xsd:group ref="SequencedIDsGroup" id="oagis-id-005c96018e9f4a018b2ca39c2b8af29e" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="LotIDs" type="SequencedIDsType" abstract="false" nillable="false" id="oagis-id-8a24154b8d28492eb7424e4ee118aa4d">
 		<xsd:annotation>
@@ -6592,7 +6599,7 @@ Possible values:
 		</xsd:sequence>
 	</xsd:group>
 	<!---->
-    <!--
+	<!--
 	<xsd:complexType name="EMailType" abstract="false" id="oagis-id-e9002e73d32244fbab0724e062f0f7ea" mixed="false">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Provides the email address to be associated with a given element.</xsd:documentation>
@@ -7953,7 +7960,7 @@ Synonyms are Vendor Consignment ID, Supplier Consignment ID</xsd:documentation>
 					<xsd:element ref="GuarenteeDate" id="oagis-id-8d39303ce7ce42edaff0b17b227ed41c" minOccurs="0"/>
 					<xsd:element ref="GuarnteeAmount" id="oagis-id-2087af1b8087410eb0175fb018c36ca0" minOccurs="0"/>
 				</xsd:sequence>
-				<xsd:attribute name="typeCode" type="StringType" id="oagis-id-ae0502b7cc464b7497b2b7df8a4538f0"/>
+				<xsd:attribute name="typeCode" type="CodeType_1E7368" id="oagis-id-ae0502b7cc464b7497b2b7df8a4538f0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -13833,7 +13840,7 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:element ref="UpperLimit" id="oagis-id-c52cd84b942a49ef89d0078ac79498cd" minOccurs="0"/>
 			<xsd:element ref="LowerLimit" id="oagis-id-9590f69cc0ed450cad020ffeada240ff" minOccurs="0"/>
 		</xsd:sequence>
-		<xsd:attribute name="typeCode" type="NormalizedStringType" use="optional" id="oagis-id-5ee2f83a9ff84459972a827524b92991">
+		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-5ee2f83a9ff84459972a827524b92991">
 			<xsd:annotation>
 				<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Is the type of the information being passed in the NameValue.</xsd:documentation>
 			</xsd:annotation>
@@ -13844,8 +13851,8 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 			<xsd:documentation source="http://www.openapplications.org/oagis/10">A representation of some limits usually expressed as a high and low limit</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-    <xsd:element name="UpperLimit" type="NameValuePairValueType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
-    <xsd:element name="LowerLimit" type="NameValuePairValueType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
+	<xsd:element name="UpperLimit" type="NameValuePairValueType" id="oagis-id-ad8319869cac4eefb6d799825fed56ab"/>
+	<xsd:element name="LowerLimit" type="NameValuePairValueType" id="oagis-id-9f5610b0b52a49df808d18f3876d5dab"/>
 	<!---->
 	<xsd:complexType name="LogisticEquipmentBaseType" id="oagis-id-becfd5c4010b44f9a5733c5584140fb9">
 		<xsd:complexContent>
@@ -13925,8 +13932,8 @@ In most cases the unitCode of the PerQuantity is the same as the unitCode of the
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="ChargeAmountRange" type="AmountRangeType" id="oagis-id-0efcf5e2066c40e5bb5a14706c240915"/>
-    <xsd:element name="MinimumAmount" type="OpenAmountType" id="oagis-id-6d1c7ec5b7d84e80b190825b1782c147"/>
-    <xsd:element name="MaximumAmount" type="OpenAmountType" id="oagis-id-f12b0a09c0b345b1a959ee10a4fcd364"/>
+	<xsd:element name="MinimumAmount" type="OpenAmountType" id="oagis-id-6d1c7ec5b7d84e80b190825b1782c147"/>
+	<xsd:element name="MaximumAmount" type="OpenAmountType" id="oagis-id-f12b0a09c0b345b1a959ee10a4fcd364"/>
 	<!---->
 	<xsd:complexType name="QuantityRangeType" id="oagis-id-c37df60530554ecdb0af52f5fa983aba">
 		<xsd:sequence>
@@ -14619,13 +14626,13 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!---->
-    <xsd:element name="ValueSet" type="ValueSetType" id="oagis-id-b2cfc8f4c9c24648a092a6e99fc14b69"/>
+	<xsd:element name="ValueSet" type="ValueSetType" id="oagis-id-b2cfc8f4c9c24648a092a6e99fc14b69"/>
 	<xsd:complexType name="ValueSetType" id="oagis-id-7431801f4045466499b199ac0487cd77">
-        <xsd:sequence>
-            <xsd:element ref="Value" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82ea" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
+		<xsd:sequence>
+			<xsd:element ref="Value" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82ea" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
 	</xsd:complexType>
-    <xsd:element name="Value" type="ValueType" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9"/>
+	<xsd:element name="Value" type="ValueType" id="oagis-id-bc8ee29d01834efd825eb2e7e0ca82e9"/>
 	<!---->
 	<xsd:complexType name="ProcedureStepBaseType" id="oagis-id-d345ff934a3f416e82226399931af4c7">
 		<xsd:complexContent>
@@ -14976,16 +14983,16 @@ Causes and/or remedies could be reported against a failure in a multi-level hier
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:element name="InspectorQualification" type="ProfessionalQualificationType" id="oagis-id-db191d9d8cf343339dc4b1c749a6f39c"/>
-    <xsd:element name="Door" type="TextType" id="oagis-id-d5cf91586ae34aa1a2db37ddef6e86dd"/>
-    <xsd:element name="OrganizationUnitID" type="IDType" id="oagis-id-f55ff9f88e824ce4aca1652de4e2960b"/>
-    <xsd:element name="PurposeCode" type="CodeType" id="oagis-id-153c772c244644e1af1ec038a241d111"/>
-    <xsd:element name="ResultName" type="NameType" id="oagis-id-8264b83fb73244f4825421ffefe866cd"/>
-    <xsd:element name="ValuePrimitiveCode" type="OpenCodeType" id="oagis-id-225b6dcae4134aaa949fa606ad8404e9"/>
-    <xsd:element name="EquipmentCollaborationRequirement" type="EquipmentCollaborationRequirementType" id="oagis-id-ff62477c2ab442959351597ec5a493aa"/>
-    <xsd:complexType name="EquipmentCollaborationRequirementType" id="oagis-id-00fd0de1f1124560809fb3a3bd37a1b5">
-        <xsd:sequence>
-            <xsd:element ref="Measure" id="oagis-id-144d44ec22cb4b5ca4ad5abb1481405e" minOccurs="0"/>
-            <xsd:element ref="ValueRange" id="oagis-id-8ffe7bb46943492eb68d1e0f26bf8fdc" minOccurs="0"/>
-        </xsd:sequence>
-    </xsd:complexType>
+	<xsd:element name="Door" type="TextType" id="oagis-id-d5cf91586ae34aa1a2db37ddef6e86dd"/>
+	<xsd:element name="OrganizationUnitID" type="IDType" id="oagis-id-f55ff9f88e824ce4aca1652de4e2960b"/>
+	<xsd:element name="PurposeCode" type="CodeType" id="oagis-id-153c772c244644e1af1ec038a241d111"/>
+	<xsd:element name="ResultName" type="NameType" id="oagis-id-8264b83fb73244f4825421ffefe866cd"/>
+	<xsd:element name="ValuePrimitiveCode" type="OpenCodeType" id="oagis-id-225b6dcae4134aaa949fa606ad8404e9"/>
+	<xsd:element name="EquipmentCollaborationRequirement" type="EquipmentCollaborationRequirementType" id="oagis-id-ff62477c2ab442959351597ec5a493aa"/>
+	<xsd:complexType name="EquipmentCollaborationRequirementType" id="oagis-id-00fd0de1f1124560809fb3a3bd37a1b5">
+		<xsd:sequence>
+			<xsd:element ref="Measure" id="oagis-id-144d44ec22cb4b5ca4ad5abb1481405e" minOccurs="0"/>
+			<xsd:element ref="ValueRange" id="oagis-id-8ffe7bb46943492eb68d1e0f26bf8fdc" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema>
