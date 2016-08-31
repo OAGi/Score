@@ -109,6 +109,34 @@ public class BasicCoreComponentProperty implements Serializable {
         this.definition = definition;
     }
 
+    /*
+     * Copy constructor
+     */
+    public BasicCoreComponentProperty(BasicCoreComponentProperty bccp) {
+        this.guid = bccp.getGuid();
+        this.propertyTerm = bccp.getPropertyTerm();
+        this.representationTerm = bccp.getRepresentationTerm();
+        this.bdtId = bccp.getBdtId();
+        this.den = bccp.getDen();
+        this.definition = bccp.getDefinition();
+        this.module = bccp.getModule();
+        this.namespaceId = bccp.getNamespaceId();
+        this.deprecated = bccp.isDeprecated();
+        this.createdBy = bccp.getCreatedBy();
+        this.ownerUserId = bccp.getOwnerUserId();
+        this.lastUpdatedBy = bccp.getLastUpdatedBy();
+        this.creationTimestamp = bccp.getCreationTimestamp();
+        this.lastUpdateTimestamp = bccp.getLastUpdateTimestamp();
+        this.state = bccp.getState();
+        this.revisionNum = bccp.getRevisionNum();
+        this.revisionTrackingNum = bccp.getRevisionTrackingNum();
+        this.revisionAction = bccp.getRevisionAction();
+        this.releaseId = bccp.getReleaseId();
+        this.currentBccpId = bccp.getCurrentBccpId();
+        this.nillable = bccp.isNillable();
+        this.defaultValue = bccp.getDefaultValue();
+    }
+
     @PrePersist
     public void prePersist() {
         creationTimestamp = new Date();

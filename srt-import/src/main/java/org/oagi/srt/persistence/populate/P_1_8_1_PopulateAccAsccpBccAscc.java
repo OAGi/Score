@@ -605,7 +605,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bcc.setLastUpdatedBy(importUtil.getUserId());
         bcc.setOwnerUserId(importUtil.getUserId());
         bcc.setNillable(declaration.isNillable());
-        bcc.setDefaultValue(declaration.getDefaultValue());
+        String defaultValue = declaration.getDefaultValue();
+        if (StringUtils.isEmpty(defaultValue)) {
+            defaultValue = toBccp.getDefaultValue();
+        }
+        bcc.setDefaultValue(defaultValue);
         bccRepository.saveAndFlush(bcc);
 
         return true;
@@ -668,11 +672,16 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setDeprecated(false);
             bccp.setReleaseId(importUtil.getReleaseId());
             bccp.setNamespaceId(importUtil.getNamespaceId());
-            Module module = declaration.getModule();
-            bccp.setModule(module);
             bccp.setNillable(declaration.isNillable());
-            bccp.setDefaultValue(declaration.getDefaultValue());
             bccpRepository.saveAndFlush(bccp);
+
+            /*
+             * Issue #98
+             *
+             * BCCP's default value moves to BCC
+             */
+            bccp = new BasicCoreComponentProperty(bccp);
+            bccp.setDefaultValue(declaration.getDefaultValue());
             return bccp;
         } else {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
