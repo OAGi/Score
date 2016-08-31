@@ -113,6 +113,7 @@ public class BasicCoreComponentProperty implements Serializable {
      * Copy constructor
      */
     public BasicCoreComponentProperty(BasicCoreComponentProperty bccp) {
+        this.bccpId = bccp.getBccpId();
         this.guid = bccp.getGuid();
         this.propertyTerm = bccp.getPropertyTerm();
         this.representationTerm = bccp.getRepresentationTerm();
