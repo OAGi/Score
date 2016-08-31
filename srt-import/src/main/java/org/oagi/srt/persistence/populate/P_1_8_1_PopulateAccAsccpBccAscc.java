@@ -651,10 +651,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByPropertyTermAndBdtId(propertyTerm, bdtId);
         if (bccp != null) {
-            return bccp;
-        }
 
-        if (createIfAbsent) {
+        } else if (createIfAbsent) {
             String representationTerm = dt.getDataTypeTerm();
             String den = Utility.firstToUpperCase(propertyTerm) + ". " + representationTerm;
 
@@ -674,17 +672,17 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setNamespaceId(importUtil.getNamespaceId());
             bccp.setNillable(declaration.isNillable());
             bccpRepository.saveAndFlush(bccp);
-
-            /*
-             * Issue #98
-             *
-             * BCCP's default value moves to BCC
-             */
-            bccp = new BasicCoreComponentProperty(bccp);
-            bccp.setDefaultValue(declaration.getDefaultValue());
-            return bccp;
         } else {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
         }
+
+        /*
+         * Issue #98
+         *
+         * BCCP's default value moves to BCC
+         */
+        bccp = new BasicCoreComponentProperty(bccp); // To prevent unexpected update data by Hibernate
+        bccp.setDefaultValue(declaration.getDefaultValue());
+        return bccp;
     }
 }
