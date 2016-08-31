@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 sp2 (x64) (http://www.altova.com) by Serm Kulvatunyou (NIST) -->
+<!--
 
    Schema agency: 	Open Applications Group 
    OAGIS® Revision:    OAGIS 10_2 Platform 2_2 
@@ -18,7 +20,8 @@
    XML Schema 
      
     Name: /OAGi-BPI-Platform/org_openapplications_oagis/10_2/Model/Platform/2_2/Common/Components/Meta.xsd
---><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.openapplications.org/oagis/10" targetNamespace="http://www.openapplications.org/oagis/10" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:include schemaLocation="Fields.xsd"/>
 	<xsd:include schemaLocation="../../Extension/Extensions.xsd"/>
 	<xsd:complexType name="BusinessObjectDocumentType" id="oagis-id-2783857358f145e799471461f5192fa7">
@@ -60,7 +63,7 @@
 					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies characteristics and control identifiers that relate to the application that created the Business Object Document.  The sender area can indicate the logical location of the application and/or database server, the application, and the task that was processing to create the BOD.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="Intermediary" minOccurs="0" maxOccurs="unbounded" id="oagis-id-28898d2beaef4954a8a699bd78128712"/>
+			<xsd:element ref="Intermediary" id="oagis-id-28898d2beaef4954a8a699bd78128712" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element ref="Receiver" id="oagis-id-31efc0d156c04aa4b1fa73d5447abcfd" minOccurs="0" maxOccurs="unbounded">
 				<xsd:annotation>
 					<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Identifies the intended receiver of the given BOD instance.</xsd:documentation>
@@ -208,11 +211,11 @@ The Open Applications Group has not constructed the list of valid Component name
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="ReceivedDateTime" id="oagis-id-283add1a257b4b138a791f8995c99b04" minOccurs="0"/>
-			<xsd:element ref="SentDateTime" minOccurs="0" id="oagis-id-852605e24dd94216adb72de48df43690"/>
+			<xsd:element ref="SentDateTime" id="oagis-id-852605e24dd94216adb72de48df43690" minOccurs="0"/>
 		</xsd:sequence>
 		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-548010f95bde4302876807d244d8f35c"/>
 		<xsd:attribute name="partyRoleCode" type="CodeType_1E7368" id="oagis-id-dd9ee4dc0a6c43a99e557e5d241ecc50"/>
-		<xsd:attribute name="sequenceNumber" type="NumberType" id="oagis-id-4cd9d762a08145478b6ffd966f1bb923"/>
+		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-4cd9d762a08145478b6ffd966f1bb923"/>
 	</xsd:complexType>
 	<xsd:complexType name="ReceiverType" id="oagis-id-a5f02fcd8be34cd2a9652b17fc6381c8">
 		<xsd:annotation>
@@ -248,14 +251,14 @@ The Open Applications Group has not constructed the list of valid Component name
 		</xsd:sequence>
 		<xsd:attribute name="typeCode" type="CodeType_1E7368" use="optional" id="oagis-id-48e40844c75443c3a546d04a86e9f302"/>
 		<xsd:attribute name="partyRoleCode" type="CodeType_1E7368" id="oagis-id-6ba8e7b0137149fda62faba545e4a693"/>
-		<xsd:attribute name="sequenceNumber" type="NumberType" id="oagis-id-dcd2b9fd07b4410a8c8b5a22d978340f"/>
+		<xsd:attribute name="sequenceNumber" type="NumberType_B98233" id="oagis-id-dcd2b9fd07b4410a8c8b5a22d978340f"/>
 	</xsd:complexType>
 	<xsd:complexType name="SignatureType" id="oagis-id-39f8794875974287b462ef4e501d1561">
 		<xsd:annotation>
 			<xsd:documentation source="http://www.openapplications.org/oagis/10/platform/2">Allows any digital Signatures to be added to the Instance of the BOD Instance in order to sign for any portion of the BOD content.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:any namespace="##any" minOccurs="0" id="oagis-id-44622f35a5b547da899fea2d7753bf96"/>
+			<xsd:any namespace="##any" id="oagis-id-44622f35a5b547da899fea2d7753bf96" minOccurs="0"/>
 		</xsd:sequence>
 		<xsd:attribute name="qualifyingAgencyId" type="NormalizedStringType" use="optional" id="oagis-id-329bb34257c141368a9dd472862fd4c0"/>
 	</xsd:complexType>
