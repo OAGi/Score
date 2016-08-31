@@ -150,16 +150,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
         restrictionElement.setAttribute("base", "xsd:token");
 
-        Element minLengthElement = new Element("minLength", XSD_NS);
-        restrictionElement.addContent(minLengthElement);
-
-        minLengthElement.setAttribute("value", "" + agencyId.getMinLengthOfValues());
-
-        Element maxLengthElement = new Element("maxLength", XSD_NS);
-        restrictionElement.addContent(maxLengthElement);
-
-        maxLengthElement.setAttribute("value", "" + agencyId.getMaxLengthOfValues());
-
         for (AgencyIdValue value : agencyId.getValues()) {
             Element enumerationElement = new Element("enumeration", XSD_NS);
             restrictionElement.addContent(enumerationElement);
