@@ -79,6 +79,8 @@ public class SRTConstants {
 	public static final String MODEL_FOLDER_PATH = BASE_DATA_PATH + "/Model";
 	public static final String BOD_FILE_PATH_01 = MODEL_FOLDER_PATH + PLATFORM_PATH + "/BODs/";
 	public static final String BOD_FILE_PATH_02 = MODEL_FOLDER_PATH + "/BODs/";
+	public static final String NOUN_FILE_PATH_01 = MODEL_FOLDER_PATH + "/Nouns/";
+	public static final String NOUN_FILE_PATH_02 = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Nouns/";
 
 	public static final String FIELDS_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Fields.xsd";
 	public static final String META_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Meta.xsd";

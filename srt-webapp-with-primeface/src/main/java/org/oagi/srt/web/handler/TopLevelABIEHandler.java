@@ -28,6 +28,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -348,10 +349,124 @@ public class TopLevelABIEHandler implements Serializable {
             // TODO if go back from the confirmation page? avoid that situation
 
             createBIEs();
+            //createNounBIEs(bCSelected);
+            //createVerbBIEs(bCSelected);
+
+
             createBarModel();
         }
 
         return event.getNewStep();
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void createVerbBIEs(BusinessContext businessContext) {
+        ArrayList<String> verbList = new ArrayList<>();
+        verbList.addAll(Arrays.asList(
+                "Acknowledge",
+                "Cancel Acknowledge",
+                "Cancel",
+                "Change Acknowledge",
+                "Change",
+                "Get",
+                "Load",
+                "Notify",
+                "Post Acknowledge",
+                "Post",
+                "Process",
+                "Show",
+                "Sync",
+                "Sync Response"
+        ));
+        for(int i=0; i<verbList.size(); i++) {
+            List<AssociationCoreComponentProperty> asccpList= asccpRepository.findByPropertyTermContaining(verbList.get(i));
+            AssociationCoreComponentProperty asccp = asccpList.get(0);
+            System.out.print("Start Creating BIEs from Verb "+verbList.get(i));
+            BusinessInformationEntityService.CreateBIEsResult createBIEsResult = bieService.createBIEs(asccp, businessContext);
+
+            abieCount = createBIEsResult.getAbieCount();
+            bbiescCount = createBIEsResult.getBbiescCount();
+            asbiepCount = createBIEsResult.getAsbiepCount();
+            asbieCount = createBIEsResult.getAsbieCount();
+            bbiepCount = createBIEsResult.getBbiepCount();
+            bbieCount = createBIEsResult.getBbieCount();
+
+            topAbieVO = createBIEsResult.getTopLevelAbie().getAbie();
+            long abieId = topAbieVO.getAbieId();
+
+            ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
+            rootABIEView.setTopLevelAbie(createBIEsResult.getTopLevelAbie());
+            rootABIEView.setAbie(topAbieVO);
+            root = new DefaultTreeNode(rootABIEView, null);
+
+            aABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
+            aABIEView.setTopLevelAbie(createBIEsResult.getTopLevelAbie());
+            aABIEView.setAbie(topAbieVO);
+            aABIEView.setColor("blue");
+            aABIEView.setAcc(createBIEsResult.getAcc());
+            aABIEView.setAsbiep(asbiepVO);
+
+            TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
+            createBIEChildren(abieId, toplevelNode);
+            System.out.println("... Done");
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void createNounBIEs(BusinessContext businessContext) {
+        ArrayList<String> nounList = new ArrayList<>();
+        File dir1 = new File(SRTConstants.NOUN_FILE_PATH_01);
+        File dir2 = new File(SRTConstants.NOUN_FILE_PATH_02);
+        File[] listOfNouns1 = dir1.listFiles();
+        File[] listOfNouns2 = dir2.listFiles();
+
+        for(int i=0; i<listOfNouns1.length; i++){
+            String name = listOfNouns1[i].getName().replace(".xsd","");
+            String pTerm = Utility.getPropertyTerm(name);
+            if(!pTerm.endsWith(" IST")){
+                nounList.add(pTerm);
+            }
+        }
+        for(int i=0; i<listOfNouns2.length; i++){
+            String name = listOfNouns2[i].getName().replace(".xsd","");
+            String pTerm = Utility.getPropertyTerm(name);
+            if(!pTerm.endsWith(" IST")){
+                nounList.add(pTerm);
+            }
+        }
+
+        for(int i=0; i<nounList.size(); i++) {
+            List<AssociationCoreComponentProperty> asccpList= asccpRepository.findByPropertyTermContaining(nounList.get(i));
+            AssociationCoreComponentProperty asccp = asccpList.get(0);
+            System.out.print("Start Creating BIEs from Noun "+nounList.get(i));
+            BusinessInformationEntityService.CreateBIEsResult createBIEsResult = bieService.createBIEs(asccp, businessContext);
+
+            abieCount = createBIEsResult.getAbieCount();
+            bbiescCount = createBIEsResult.getBbiescCount();
+            asbiepCount = createBIEsResult.getAsbiepCount();
+            asbieCount = createBIEsResult.getAsbieCount();
+            bbiepCount = createBIEsResult.getBbiepCount();
+            bbieCount = createBIEsResult.getBbieCount();
+
+            topAbieVO = createBIEsResult.getTopLevelAbie().getAbie();
+            long abieId = topAbieVO.getAbieId();
+
+            ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
+            rootABIEView.setTopLevelAbie(createBIEsResult.getTopLevelAbie());
+            rootABIEView.setAbie(topAbieVO);
+            root = new DefaultTreeNode(rootABIEView, null);
+
+            aABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
+            aABIEView.setTopLevelAbie(createBIEsResult.getTopLevelAbie());
+            aABIEView.setAbie(topAbieVO);
+            aABIEView.setColor("blue");
+            aABIEView.setAcc(createBIEsResult.getAcc());
+            aABIEView.setAsbiep(asbiepVO);
+
+            TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
+            createBIEChildren(abieId, toplevelNode);
+            System.out.println("... Done");
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
