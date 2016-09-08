@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.oagi.srt.repository.entity.converter.DependencyTypeConverter;
 
 import javax.persistence.*;
@@ -38,16 +37,7 @@ public class ModuleDep implements Serializable {
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @GenericGenerator(
-            name = SEQUENCE_NAME,
-            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-            parameters = {
-                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = SEQUENCE_NAME),
-                    @org.hibernate.annotations.Parameter(name = "optimizer", value = "pooled-lo"),
-                    @org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
-                    @org.hibernate.annotations.Parameter(name = "increment_size", value = "1"),
-            }
-    )
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
     private long moduleDepId;
 
     @Column(nullable = false)
