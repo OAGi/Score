@@ -277,7 +277,12 @@
 									<p:separator />
 								</ui:fragment>
 								<p:commandButton value="Save" icon="ui-icon-extlink" actionListener="#{topLevelABIEHandler.saveChanges}" />
-
+								<p:commandButton rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE' and topLevelABIEHandler.aABIEView.name eq 'Extension'}"
+												 value="Create ABIE Extension Locally" icon="ui-icon-extlink"
+												 actionListener="#{topLevelABIEHandler.createABIEExtensionLocally}" />
+								<p:commandButton rendered="#{topLevelABIEHandler.aABIEView.type eq 'ASBIE' and topLevelABIEHandler.aABIEView.name eq 'Extension'}"
+												 value="Create ABIE Extension Globally" icon="ui-icon-extlink"
+												 actionListener="#{topLevelABIEHandler.createABIEExtensionGlobally}" />
 							</p:panel>
 						</p:layoutUnit>
 					</p:layout>

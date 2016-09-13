@@ -6,6 +6,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.service.ExtensionService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -118,6 +119,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Autowired
     private CoreComponentService coreComponentService;
+
+    @Autowired
+    private ExtensionService extensionService;
 
     private int abieCount = 0;
     private int bbiescCount = 0;
@@ -352,9 +356,9 @@ public class TopLevelABIEHandler implements Serializable {
         } else if (event.getNewStep().equals(SRTConstants.TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE)) {
             // TODO if go back from the confirmation page? avoid that situation
 
-            //createBIEs();
-            createNounBIEs(bCSelected);
-            createVerbBIEs(bCSelected);
+            createBIEs();
+            //createNounBIEs(bCSelected);
+            //createVerbBIEs(bCSelected);
 
             createBarModel();
         }
@@ -362,7 +366,6 @@ public class TopLevelABIEHandler implements Serializable {
         return event.getNewStep();
     }
 
-    @Transactional(rollbackFor = Throwable.class)
     public void createVerbBIEs(BusinessContext businessContext) {
         ArrayList<String> verbList = new ArrayList<>();
         verbList.addAll(Arrays.asList(
@@ -428,7 +431,6 @@ public class TopLevelABIEHandler implements Serializable {
         System.out.println("... Done");
     }
 
-    @Transactional(rollbackFor = Throwable.class)
     public void createNounBIEs(BusinessContext businessContext) {
         ArrayList<String> nounList = new ArrayList<>();
         File dir1 = new File(SRTConstants.NOUN_FILE_PATH_01);
@@ -1430,6 +1432,14 @@ public class TopLevelABIEHandler implements Serializable {
     private void saveABIEChanges(ABIEView aABIEView) {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
         abieRepository.saveAndFlush(abieVO);
+    }
+
+    public void createABIEExtensionLocally() {
+        extensionService.createABIEExtensionLocally();
+    }
+
+    public void createABIEExtensionGlobally() {
+        extensionService.createABIEExtensionGlobally();
     }
 
 }
