@@ -21,6 +21,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.Oracle12cDialect
+        id:
+          new_generator_mappings: true
 
   batch:
     initializer:
