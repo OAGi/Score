@@ -6,7 +6,6 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
-import org.oagi.srt.service.ExtensionService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -119,9 +118,6 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Autowired
     private CoreComponentService coreComponentService;
-
-    @Autowired
-    private ExtensionService extensionService;
 
     private int abieCount = 0;
     private int bbiescCount = 0;
@@ -894,7 +890,7 @@ public class TopLevelABIEHandler implements Serializable {
             AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
             User currentLoginUser = new User(); //need to assign
 
-            bieService.createNewUserExtensionGroupACC(eAcc, currentLoginUser);
+            bieService.createNewUserExtensionGroupACC(eAcc, currentLoginUser, false);
         }
     }
 
@@ -1086,6 +1082,7 @@ public class TopLevelABIEHandler implements Serializable {
     private HashSet<Long> openedNodes = new HashSet();
 
     public void expand(NodeSelectEvent event) {
+        TreeNode selectedTreeNode = getSelectedTreeNode();
         ABIEView abieView = (ABIEView) selectedTreeNode.getData();
         if (!openedNodes.contains(abieView.getId())) {
             openedNodes.add(abieView.getId());
@@ -1435,11 +1432,17 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void createABIEExtensionLocally() {
-        extensionService.createABIEExtensionLocally();
+        User currentLoginUser = getCurrentLoginUser();
+        bieService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser, false);
     }
 
     public void createABIEExtensionGlobally() {
-        extensionService.createABIEExtensionGlobally();
+        User currentLoginUser = getCurrentLoginUser();
+        bieService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser, true);
+    }
+
+    private User getCurrentLoginUser() {
+        return userRepository.findOneByLoginId("oagis");
     }
 
 }

@@ -69,6 +69,9 @@ public class BusinessInformationEntityService {
     private UserRepository userRepository;
 
     @Autowired
+    private NamespaceRepository namespaceRepository;
+
+    @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
     @Autowired
@@ -735,7 +738,9 @@ public class BusinessInformationEntityService {
         }
     }
 
-    public AggregateCoreComponent createNewUserExtensionGroupACC(AggregateCoreComponent eAcc, User currentLoginUser) {
+    @Transactional(rollbackFor = Throwable.class)
+    public AggregateCoreComponent createNewUserExtensionGroupACC(
+            AggregateCoreComponent eAcc, User currentLoginUser, boolean isGlobally) {
         AggregateCoreComponent ueAcc = createACCForExtension(eAcc, currentLoginUser);
         createACCHistoryForExtension(ueAcc);
 
@@ -757,10 +762,12 @@ public class BusinessInformationEntityService {
         ueAcc.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAcc.setOagisComponentType(4);
         ueAcc.setCreatedBy(userId);
+        ueAcc.setLastUpdatedBy(userId);
         ueAcc.setOwnerUserId(userId);
         ueAcc.setState(1);
         ueAcc.setRevisionNum(0);
         ueAcc.setRevisionTrackingNum(0);
+        ueAcc.setNamespaceId(namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10"));
         return accRepository.saveAndFlush(ueAcc);
     }
 
@@ -772,12 +779,14 @@ public class BusinessInformationEntityService {
         accHistory.setDefinition(ueAcc.getDefinition());
         accHistory.setOagisComponentType(ueAcc.getOagisComponentType());
         accHistory.setCreatedBy(ueAcc.getCreatedBy());
+        accHistory.setLastUpdatedBy(ueAcc.getLastUpdatedBy());
         accHistory.setOwnerUserId(ueAcc.getOwnerUserId());
         accHistory.setState(ueAcc.getState());
         accHistory.setRevisionNum(1);
         accHistory.setRevisionTrackingNum(1);
         accHistory.setRevisionAction(1);
         accHistory.setCurrentAccId(ueAcc.getAccId());
+        accHistory.setNamespaceId(ueAcc.getNamespaceId());
         accRepository.saveAndFlush(accHistory);
     }
 
@@ -793,10 +802,12 @@ public class BusinessInformationEntityService {
         ueAsccp.setDen(ueAsccp.getPropertyTerm() + ". " + ueAcc.getObjectClassTerm());
         ueAsccp.setCreatedBy(userId);
         ueAsccp.setLastUpdatedBy(userId);
+        ueAsccp.setOwnerUserId(userId);
         ueAsccp.setState(4);
         ueAsccp.setReusableIndicator(false);
         ueAsccp.setRevisionNum(0);
         ueAsccp.setRevisionTrackingNum(0);
+        ueAsccp.setNamespaceId(ueAcc.getNamespaceId());
         return asccpRepository.saveAndFlush(ueAsccp);
     }
 
@@ -809,12 +820,14 @@ public class BusinessInformationEntityService {
         asccpHistory.setDen(ueAsccp.getDen());
         asccpHistory.setCreatedBy(ueAsccp.getCreatedBy());
         asccpHistory.setLastUpdatedBy(ueAsccp.getLastUpdatedBy());
+        asccpHistory.setOwnerUserId(ueAsccp.getOwnerUserId());
         asccpHistory.setState(ueAsccp.getState());
         asccpHistory.setReusableIndicator(ueAsccp.isReusableIndicator());
         asccpHistory.setRevisionNum(1);
         asccpHistory.setRevisionTrackingNum(1);
         asccpHistory.setRevisionAction(1);
         asccpHistory.setCurrentAsccpId(ueAsccp.getAsccpId());
+        asccpHistory.setNamespaceId(ueAsccp.getNamespaceId());
         asccpRepository.saveAndFlush(asccpHistory);
     }
 
