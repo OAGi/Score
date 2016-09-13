@@ -12,7 +12,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bbieId;
 
     @Column(nullable = false, length = 41)

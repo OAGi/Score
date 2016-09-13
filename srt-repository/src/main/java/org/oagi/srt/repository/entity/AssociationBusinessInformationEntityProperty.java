@@ -12,7 +12,7 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long asbiepId;
 
     @Column(nullable = false, length = 41)

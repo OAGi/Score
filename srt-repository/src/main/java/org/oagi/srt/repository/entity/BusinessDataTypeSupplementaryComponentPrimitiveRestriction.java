@@ -11,7 +11,7 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bdtScPriRestriId;
 
     @Column(nullable = false)
