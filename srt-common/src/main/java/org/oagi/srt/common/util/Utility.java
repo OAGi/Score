@@ -2,6 +2,8 @@ package org.oagi.srt.common.util;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -222,33 +224,7 @@ public class Utility {
             return "MIME Code";
         }
 
-        StringBuffer sb = new StringBuffer();
-        boolean appendOnly = false;
-        for (int i = 0; i < str.length(); i++) {
-            if (Character.isUpperCase(str.charAt(i)) && i != 0 && !appendOnly) {
-                if (Character.isUpperCase(str.charAt(i - 1)))
-                    if (i < str.length() - 1 && Character.isLowerCase(str.charAt(i + 1)) && (str.charAt(i) != 'D' && str.charAt(i - 1) != 'I'))
-                        sb.append(" " + str.charAt(i));
-                    else
-                        sb.append(str.charAt(i));
-                else
-                    sb.append(" " + str.charAt(i));
-            } else if (Character.isLowerCase(str.charAt(i)) && i == 0 && !appendOnly) {
-                sb.append(String.valueOf(str.charAt(i)).toUpperCase());
-            } else if (str.charAt(i) == '_' && !appendOnly) {
-                appendOnly = true;
-                sb.append(str.charAt(i));
-            } else {
-                sb.append(str.charAt(i));
-            }
-        }
-        String result = sb.toString();
-        if (result.endsWith(" Code Type"))
-            result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
-        result = result.replace("  ", " ");
-
-        result = IDtoIdentifier(result);
-
+        String result = sparcing(str);
         return result;
     }
 
@@ -258,7 +234,19 @@ public class Utility {
             str = str.substring(0, pos);
         }
 
-        StringBuffer sb = new StringBuffer();
+        String result = sparcing(str);
+        return result;
+    }
+
+    private static final List<String> ABBR_LIST = Arrays.asList("BOM", "UOM", "WIP", "RFQ", "UPC", "BOD", "IST");
+
+    private static String sparcing(String str) {
+        for (String abbr : ABBR_LIST) {
+            if (str.contains(abbr)) {
+                str = str.replace(abbr, abbr + " ");
+            }
+        }
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             if (Character.isUpperCase(str.charAt(i)) && i != 0) {
                 if (Character.isUpperCase(str.charAt(i - 1)))
@@ -277,10 +265,9 @@ public class Utility {
         String result = sb.toString();
         if (result.endsWith(" Code Type"))
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
-        result = result.replace("  ", " ");
+        result = result.replaceAll("\\s{2,}", " ");
         result = IDtoIdentifier(result);
-        result = result.trim();
-        return result;
+        return result.trim();
     }
 
     public static String IDtoIdentifier(String space_separated_str) {
@@ -557,6 +544,5 @@ public class Utility {
         System.out.println(denToTypeName(str));
 
         System.out.println(qualifier("TypedSequencedTextType", "Sequenced_ Open_ Text. Type", "Text"));
-
     }
 }
