@@ -1,25 +1,25 @@
 package org.oagi.srt.api.model;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 
-@JsonRootName("ASCCP")
-public class ASCCPDetailsResponse extends ResourceSupportResponse {
+@JsonRootName("BCCP")
+public class BCCPResponse extends ResourceSupportResponse implements CCPResponse {
 
     private String guid;
 
     private String propertyTerm;
 
-    private String definition;
+    private String representationTerm;
 
     private String den;
 
-    public ASCCPDetailsResponse(AssociationCoreComponentProperty asccp) {
-        super("ASCCP");
-        this.guid = asccp.getGuid();
-        this.propertyTerm = asccp.getPropertyTerm();
-        this.definition = asccp.getDefinition();
-        this.den = asccp.getDen();
+    public BCCPResponse(BasicCoreComponentProperty bccp) {
+        super("BCCP");
+        this.guid = bccp.getGuid();
+        this.propertyTerm = bccp.getPropertyTerm();
+        this.representationTerm = bccp.getRepresentationTerm();
+        this.den = bccp.getDen();
     }
 
     public String getGuid() {
@@ -38,12 +38,12 @@ public class ASCCPDetailsResponse extends ResourceSupportResponse {
         this.propertyTerm = propertyTerm;
     }
 
-    public String getDefinition() {
-        return definition;
+    public String getRepresentationTerm() {
+        return representationTerm;
     }
 
-    public void setDefinition(String definition) {
-        this.definition = definition;
+    public void setRepresentationTerm(String representationTerm) {
+        this.representationTerm = representationTerm;
     }
 
     public String getDen() {
@@ -56,10 +56,10 @@ public class ASCCPDetailsResponse extends ResourceSupportResponse {
 
     @Override
     public String toString() {
-        return "ASCCPDetailsResponse{" +
+        return "BCCPResponse{" +
                 "guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
-                ", definition='" + definition + '\'' +
+                ", representationTerm='" + representationTerm + '\'' +
                 ", den='" + den + '\'' +
                 '}';
     }

@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bccp")
-public class BasicCoreComponentProperty implements Serializable {
+public class BasicCoreComponentProperty implements CoreComponentProperty, Serializable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 

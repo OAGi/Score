@@ -1,11 +1,18 @@
 package org.oagi.srt.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.springframework.hateoas.ResourceSupport;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
+import org.springframework.hateoas.Link;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonRootName("ACC")
-public class ACCDetailsResponse extends ResourceSupport {
+public class ACCDetailsResponse extends ResourceSupportResponse {
 
     private String guid;
 
@@ -17,9 +24,12 @@ public class ACCDetailsResponse extends ResourceSupport {
 
     private String objectClassQualifier;
 
-    public ACCDetailsResponse() {}
+    @JsonProperty("sequences")
+    @JsonInclude
+    private List<CCPResponse> sequences = new ArrayList();
 
     public ACCDetailsResponse(AggregateCoreComponent acc) {
+        super("ACC");
         this.guid = acc.getGuid();
         this.objectClassTerm = acc.getObjectClassTerm();
         this.den = acc.getDen();
@@ -67,6 +77,18 @@ public class ACCDetailsResponse extends ResourceSupport {
         this.objectClassQualifier = objectClassQualifier;
     }
 
+    public void append(BasicCoreComponentProperty bccp, Link selfLink) {
+        BCCPResponse bccpResponse = new BCCPResponse(bccp);
+        bccpResponse.add(selfLink);
+        sequences.add(bccpResponse);
+    }
+
+    public void append(AssociationCoreComponentProperty asccp, Link selfLink) {
+        ASCCPResponse asccpResponse = new ASCCPResponse(asccp);
+        asccpResponse.add(selfLink);
+        sequences.add(asccpResponse);
+    }
+
     @Override
     public String toString() {
         return "ACCDetailsResponse{" +
@@ -75,6 +97,7 @@ public class ACCDetailsResponse extends ResourceSupport {
                 ", den='" + den + '\'' +
                 ", definition='" + definition + '\'' +
                 ", objectClassQualifier='" + objectClassQualifier + '\'' +
+                ", sequences=" + sequences +
                 '}';
     }
 }

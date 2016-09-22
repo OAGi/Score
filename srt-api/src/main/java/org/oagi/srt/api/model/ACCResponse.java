@@ -2,11 +2,9 @@ package org.oagi.srt.api.model;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.springframework.hateoas.ResourceSupport;
 
 @JsonRootName("ACC")
-public class ACCResponse extends ResourceSupport {
+public class ACCResponse extends ResourceSupportResponse {
 
     private String guid;
 
@@ -14,9 +12,8 @@ public class ACCResponse extends ResourceSupport {
 
     private String den;
 
-    public ACCResponse() {}
-
     public ACCResponse(AggregateCoreComponent acc) {
+        super("ACC");
         this.guid = acc.getGuid();
         this.objectClassTerm = acc.getObjectClassTerm();
         this.den = acc.getDen();

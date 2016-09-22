@@ -3,8 +3,10 @@ package org.oagi.srt.api.controller;
 import org.oagi.srt.api.model.ACCDetailsResponse;
 import org.oagi.srt.api.model.ACCResponse;
 import org.oagi.srt.api.model.ASCCPResponse;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.ACCService;
+import org.oagi.srt.service.ASCCPService;
+import org.oagi.srt.service.BCCPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
@@ -26,6 +28,12 @@ public class ACCController {
     @Autowired
     private ACCService accService;
 
+    @Autowired
+    private BCCPService bccpService;
+
+    @Autowired
+    private ASCCPService asccpService;
+
     @RequestMapping(method = RequestMethod.GET, produces = {"application/json"})
     public PagedResources<ASCCPResponse> showAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -42,7 +50,6 @@ public class ACCController {
                     return accResponse;
                 })
                 .collect(Collectors.toList());
-
 
         int totalPages = pageResponse.getTotalPages();
         Link previous = (page - 1) < 0 ? null : linkTo(methodOn.showAll((page - 1), size))
@@ -61,6 +68,23 @@ public class ACCController {
             @PathVariable("guid") String guid) {
         AggregateCoreComponent acc = accService.findByGuid(guid);
         ACCDetailsResponse accDetailsResponse = new ACCDetailsResponse(acc);
+
+        List<CoreComponent> coreComponents = accService.getCoreComponents(acc);
+        for (CoreComponent coreComponent : coreComponents) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                BasicCoreComponent bcc = (BasicCoreComponent) coreComponent;
+                BasicCoreComponentProperty bccp = bccpService.findByBCC(bcc);
+                BCCPController methodOn = methodOn(BCCPController.class);
+                Link self = linkTo(methodOn.showDetails(bccp.getGuid())).withSelfRel();
+                accDetailsResponse.append(bccp, self);
+            } else {
+                AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
+                AssociationCoreComponentProperty asccp = asccpService.findByASCC(ascc);
+                ASCCPController methodOn = methodOn(ASCCPController.class);
+                Link self = linkTo(methodOn.showDetails(asccp.getGuid())).withSelfRel();
+                accDetailsResponse.append(asccp, self);
+            }
+        }
 
         ACCController methodOn = methodOn(ACCController.class);
         Link self = linkTo(methodOn.showDetails(acc.getGuid())).withSelfRel();

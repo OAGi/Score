@@ -2,10 +2,9 @@ package org.oagi.srt.api.model;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.springframework.hateoas.ResourceSupport;
 
 @JsonRootName("ASCCP")
-public class ASCCPResponse extends ResourceSupport {
+public class ASCCPResponse extends ResourceSupportResponse implements CCPResponse {
 
     private String guid;
 
@@ -13,9 +12,8 @@ public class ASCCPResponse extends ResourceSupport {
 
     private String den;
 
-    public ASCCPResponse() {}
-
     public ASCCPResponse(AssociationCoreComponentProperty asccp) {
+        super("ASCCP");
         this.guid = asccp.getGuid();
         this.propertyTerm = asccp.getPropertyTerm();
         this.den = asccp.getDen();

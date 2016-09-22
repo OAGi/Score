@@ -1,11 +1,9 @@
 package org.oagi.srt.api.controller;
 
-import org.oagi.srt.api.model.ASCCPDetailsResponse;
-import org.oagi.srt.api.model.ASCCPResponse;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.service.ACCService;
-import org.oagi.srt.service.ASCCPService;
+import org.oagi.srt.api.model.BCCPDetailsResponse;
+import org.oagi.srt.api.model.BCCPResponse;
+import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
+import org.oagi.srt.service.BCCPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
@@ -21,32 +19,28 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/v1/ASCCPs")
-public class ASCCPController {
+@RequestMapping("/v1/BCCPs")
+public class BCCPController {
 
     @Autowired
-    private ASCCPService asccpService;
-
-    @Autowired
-    private ACCService accService;
+    private BCCPService bccpService;
 
     @RequestMapping(method = RequestMethod.GET, produces = {"application/json"})
-    public PagedResources<ASCCPResponse> showAll(
+    public PagedResources<BCCPResponse> showAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {
 
-        Page<AssociationCoreComponentProperty> pageResponse = asccpService.findAll(page, size);
-        ASCCPController methodOn = methodOn(ASCCPController.class);
+        Page<BasicCoreComponentProperty> pageResponse = bccpService.findAll(page, size);
+        BCCPController methodOn = methodOn(BCCPController.class);
 
-        List<ASCCPResponse> contents = pageResponse.getContent().stream()
-                .map(asccp -> {
-                    ASCCPResponse asccpResponse = new ASCCPResponse(asccp);
-                    Link self = linkTo(methodOn.showDetails(asccp.getGuid())).withSelfRel();
-                    asccpResponse.add(self);
-                    return asccpResponse;
+        List<BCCPResponse> contents = pageResponse.getContent().stream()
+                .map(bccp -> {
+                    BCCPResponse bccpResponse = new BCCPResponse(bccp);
+                    Link self = linkTo(methodOn.showDetails(bccp.getGuid())).withSelfRel();
+                    bccpResponse.add(self);
+                    return bccpResponse;
                 })
                 .collect(Collectors.toList());
-
 
         int totalPages = pageResponse.getTotalPages();
         Link previous = (page - 1) < 0 ? null : linkTo(methodOn.showAll((page - 1), size))
@@ -61,17 +55,17 @@ public class ASCCPController {
     }
 
     @RequestMapping(path = "/{guid}", method = RequestMethod.GET, produces = {"application/json"})
-    public ASCCPDetailsResponse showDetails(
+    public BCCPDetailsResponse showDetails(
             @PathVariable("guid") String guid) {
-        AssociationCoreComponentProperty asccp = asccpService.findByGuid(guid);
-        ASCCPDetailsResponse asccpDetailsResponse = new ASCCPDetailsResponse(asccp);
+        BasicCoreComponentProperty bccp = bccpService.findByGuid(guid);
+        BCCPDetailsResponse bccpDetailsResponse = new BCCPDetailsResponse(bccp);
 
-        ASCCPController methodOn = methodOn(ASCCPController.class);
-        Link self = linkTo(methodOn.showDetails(asccp.getGuid())).withSelfRel();
-        AggregateCoreComponent acc = accService.findById(asccp.getRoleOfAccId());
-        Link accLink = linkTo(methodOn(ACCController.class).showDetails(acc.getGuid())).withRel("ACC");
-        asccpDetailsResponse.add(links(self, accLink));
+        BCCPController methodOn = methodOn(BCCPController.class);
+        Link self = linkTo(methodOn.showDetails(bccp.getGuid())).withSelfRel();
+        bccpDetailsResponse.add(links(self));
 
-        return asccpDetailsResponse;
+        return bccpDetailsResponse;
     }
+
+
 }
