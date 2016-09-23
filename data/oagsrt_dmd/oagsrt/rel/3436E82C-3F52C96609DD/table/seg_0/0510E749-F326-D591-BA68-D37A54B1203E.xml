@@ -1,0 +1,448 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="0510E749-F326-D591-BA68-D37A54B1203E" name="DT">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:29:54 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_12</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="DT_ID" id="08904BA1-A718-1898-F78F-2B214A95D392">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="F87B2607-5EB7-FC12-2F13-231C09B14BB7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="TYPE" id="48D2D063-E1C8-15FD-E57E-CAFAFFBF73F0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>List value: 0 = CDT, 1 = BDT.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="VERSION_NUM" id="D55FB530-DABC-BA42-9B5F-2B6A98E77375">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Format X.Y.Z where all of them are integer with no leading zero allowed. X means major version number, Y means minor version number and Z means patch version number.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="PREVIOUS_VERSION_DT_ID" id="D05CE940-FF27-6382-5E0F-5EFD8C06E3F4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="A144692D-AE8C-4237-D83C-053F462368EC" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</associations>
+</Column>
+<Column name="DATA_TYPE_TERM" id="7DE02BE7-F28D-979A-387E-BE3BF9A0149D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This column is derived from the Based_DT_ID when the column is not blank. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="QUALIFIER" id="8018D781-A1D1-06F3-2AE7-4740D11C4829">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This column should be blank when the DT_Type is CDT. When the DT_Type is BDT, this is optional - if blank that the row is a unqualified BDT, if not blank it is a qualified BDT.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BASED_DT_ID" id="1D9FC5A0-6CD7-EFB4-6643-B7C57B95E3BE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Foreign key pointing to itself. This column must be blank when the DT_Type is CDT. This column must not be blank when the DT_Type is BDT.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="C9F1DB45-BEC7-740B-CD9B-C8F9F9291C08" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</associations>
+</Column>
+<Column name="DEN" id="F9839CFF-3246-6181-9A1F-1326AB4F9649">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This column should be automatically derived.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200 CHAR</dataTypeSize>
+<ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CONTENT_COMPONENT_DEN" id="1677E1A7-9FB6-3F26-83F0-A21FEB361405">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>When the DT_Type is CDT this column is automatically derived from Data_Type_Term as &quot;&lt;Data_Type_Term&gt;. Content&quot;, where Content is called property term of the content component according to CCTS. When the DT_Type is BDT this column is automaticlaly derived from the Based_DT_ID.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200 CHAR</dataTypeSize>
+<ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="2DC2783F-D4A7-80F7-8B7F-52566CEC1E9B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CONTENT_COMPONENT_DEFINITION" id="B9C2BCF0-D468-1DC6-4D81-60272BC1F1A6">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_DOC" id="E58D77CC-FA64-A422-C9E1-DFDCA2243A11">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This is for documenting about the revision.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STATE" id="2FB2DC18-107D-50C9-A7BA-75B10512675E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>1 = Editing, 2 = Candidate, 3 = Published. This the revision life cycle state of the entity.&lt;br/&gt;&lt;br/&gt;State change can&apos;t be undone. But the history record can still keep the records of when the state was changed.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MODULE_ID" id="1EDD6706-7554-720A-4BA3-0CF67F857789">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Foreign key to the module table indicating physical file where the DT shall belong to when generating it.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="7D93D711-E98C-B77D-1DB7-6B9725B19077" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>
+</associations>
+</Column>
+<Column name="CREATED_BY" id="B583CC47-ED1E-B955-0E05-9705E1A0EFCA">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9DF05911-6408-C4E2-A9BE-7F170BA293F9" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="OWNER_USER_ID" id="3F052C9F-7BC1-8806-6E64-E9D2E22BCFB7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.&lt;br/&gt;&lt;br/&gt;The ownership can change throughout the history, but undoing shouldn&apos;t rollback the ownership. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="3046D12D-901E-EE64-5827-3EEFFB2B4E13" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="4FBA9E8C-BE84-A46E-880E-D35EDCF17D8B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5A8EBDB8-7CFA-16F7-260E-71B9B9C2EC4D" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="25E2DB98-2B19-7D15-127B-48057108AD2A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="6ED26A18-5EE1-EE94-4F50-5ADAF08E213F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_NUM" id="329280EC-2AD8-6F3D-516B-E6A4238F10D7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Revision_Number is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 0, 1, 2, and so on. A record with zero revision number reflects the current record of the component (the identity of a component in this case is its GUID or the primary key).</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_TRACKING_NUM" id="8838A18E-E4C8-1AB0-89CE-397E5E78CF13">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Revision_Tracking_Number supports the ability to undo changes during a revision (life cycle of a revision is from the component&apos;s Editing state to Published state). Once the component has transitioned into the Published state for its particular revision, all revision tracking records are deleted except the latest one. Revision_Tracking_Number can be 0, 1, 2, and so on. The zero value is assign to the record with Revision_Number = 0 as a default.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_ACTION" id="F19A93C4-2CD8-D45C-DC0F-F1F1876E0E1E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This indicates the action associated with the record. The action can be 1 = insert, 2 = update, and 3 = delete. This column is null for the current record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>3</dataTypePrecision>
+<ownDataTypeParameters>,3,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="RELEASE_ID" id="9A81A27B-2DA7-78D8-8F98-6C2EE9416CA7">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Release_ID is an incremental integer. It is an unformatted counter part of the Release_Number in the Release table. Release_ID can be 1, 2, 3, and so on. Release ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the Revision_Action column).&lt;br/&gt;&lt;br/&gt;Not all component revisions have an associated Release_ID because some revisions may never be released.&lt;br/&gt;&lt;br/&gt;Unpublished components cannot be released.&lt;br/&gt;&lt;br/&gt;This column is null for the current record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DB4F2CE5-71EC-3619-4EBF-EACC1B88330C" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
+</associations>
+</Column>
+<Column name="CURRENT_BDT_ID" id="7F7A4D40-6035-59E9-73BA-D3C9E1FB116B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the record whose Revision_Number is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.&lt;br/&gt;&lt;br/&gt;It is noted that although this is a foreign key by definition, we don&apos;t specify a foreign key in the data model. This is because when an entity is deleted the current record won&apos;t exist anymore.&lt;br/&gt;&lt;br/&gt;The value of this column for the current record should be left NULL.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="88C357BA-A514-D3F0-D384-B484CE977AA5" referredColumn="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</associations>
+</Column>
+<Column name="IS_DEPRECATED" id="DF8A79BC-C654-21CD-C602-06CB13328AF2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<commentInRDBMS>Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="6E1AA30D-1202-A8AA-F28D-9D6C6B3ABF93" name="DT_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:33:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="08904BA1-A718-1898-F78F-2B214A95D392"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AE314A04-D1A1-4EB5-619E-08F4B26FCE6C" name="DT_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:39:24 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F87B2607-5EB7-FC12-2F13-231C09B14BB7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8AC69A8D-A3FB-8229-9DA9-65A210475EBF" name="DT_PREVIOUS_VERSION_DT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:36:56 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D05CE940-FF27-6382-5E0F-5EFD8C06E3F4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8260CC80-549A-39BF-B235-CF7D7345F524" name="DT_BASED_DT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:36:56 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1D9FC5A0-6CD7-EFB4-6643-B7C57B95E3BE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7708CA82-B122-8D9B-A853-BDE4F70972CE" name="DT_MODULE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:37:13 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1EDD6706-7554-720A-4BA3-0CF67F857789"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2E86408F-9525-C95B-C875-643C028683A6" name="DT_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:37:25 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B583CC47-ED1E-B955-0E05-9705E1A0EFCA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3E2EB519-2CBC-ED0D-C09E-C0D5BAD4DC2E" name="DT_OWNER_USER_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:37:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3F052C9F-7BC1-8806-6E64-E9D2E22BCFB7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="313648F4-804E-BB9D-C7B8-D7D15EF33491" name="DT_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:37:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4FBA9E8C-BE84-A46E-880E-D35EDCF17D8B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3269B851-0218-406C-E9BE-25229124FA9E" name="DT_RELEASE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:38:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9A81A27B-2DA7-78D8-8F98-6C2EE9416CA7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BBD73485-C1CF-32E8-2607-D81382974CF8" name="DT_CURRENT_BDT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:38:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7F7A4D40-6035-59E9-73BA-D3C9E1FB116B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

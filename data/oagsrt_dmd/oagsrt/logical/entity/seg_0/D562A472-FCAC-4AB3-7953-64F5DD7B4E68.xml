@@ -1,0 +1,133 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="D562A472-FCAC-4AB3-7953-64F5DD7B4E68" name="APP USER">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>629839AE-F8C3-6544-3090-0E21DF98F56A</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="APP USER ID" id="3613FC60-9712-404E-8E4D-82B21D0F5976">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>0F407506-2FE3-AC47-2F58-3B1949647DAD</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="LOGIN ID" id="84FB87B7-0F4D-6499-BB70-96F933F602F3">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>651FA698-F3F8-3D21-D3C0-518C3F8BF129</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="PASSWORD" id="156ADE17-9C69-D07F-574C-F11A721E920F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>407F1B8D-0D40-8E04-8F63-056D3FA86A17</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="NAME" id="D945184A-A62C-F8A4-E697-BB33B2D28306">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>1232C853-4D5B-F9FA-027A-A058A7677D88</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ORGANIZATION" id="94D7B17D-9BEF-CE93-C153-50ACDE8FB015">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>791DFCC6-8783-2B0E-032F-FBEAA375B256</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100 CHAR</dataTypeSize>
+<ownDataTypeParameters>100 CHAR,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="OAGIS DEVELOPER INDICATOR" id="48235A7F-6A7E-7808-C48A-17EE3076C673">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>2A655C40-C4A8-A17C-9ABD-FC4561E9E235</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="AE4AD747-2DDB-ABE3-E332-0E675EDC702C" name="APP USER PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>5B77DA46-5F43-A0AA-6527-00937076EE5C</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>3613FC60-9712-404E-8E4D-82B21D0F5976</attributeRef>
+</usedAttributes>
+</identifier>
+<identifier id="42C43BE8-E1B2-3683-7CB7-3D1B4CB8733B" name="APP USER UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:20:14 UTC</createdTime>
+<generatorID>199215DA-E444-CE97-64BD-AB768C24EAEB</generatorID>
+<ownerDesignName>oagsrt</ownerDesignName>
+<engineerTo>
+<item key="3436E82C-36FA-5CB1-6173-3F52C96609DD" value="true"/>
+</engineerTo>
+<usedAttributes>
+<attributeRef>84FB87B7-0F4D-6499-BB70-96F933F602F3</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

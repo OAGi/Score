@@ -1,0 +1,381 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="CE0404D0-B6D4-9C3B-DCC0-D5F0A09AA0C3" name="ASCC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:51:54 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_37</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ASCC_ID" id="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>A internal, primary database key of an ASCC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="657C8250-0F04-E6F0-B213-AD1AA6F51AF8">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>A globally unique identifier (GUID) of an ASCC. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CARDINALITY_MIN" id="F243D60E-227F-6810-658F-719339A9A0C9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Minimum cardinality of the Assoc_To_ASCCP_ID. The valid values are non-negative integer.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CARDINALITY_MAX" id="C22A8D97-F891-B185-E793-D263ECF38865">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Maximum cardinality of the Assoc_To_ASCCP_ID. The valid values are integer -1 and up. Specifically, -1 means unbounded. 0 means prohibited or not to use.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SEQ_KEY" id="249A591B-2B21-17AA-6C39-EE0BEACD9764">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>This indicates the order of the associations among other siblings. The valid values are positive integer. The Sequencing_Key at the CC side is localized. In other words, if an ACC is based on another ACC, Sequencing_Key of ASCCs or BCCs of the former ACC starts at 1 again. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FROM_ACC_ID" id="16D7FECE-BF51-6D74-013D-7EAFC0637A1E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Assoc_From_ACC_ID is a foreign key pointing to an ACC record. It is basically pointing to a parent data element (type) of the Assoc_To_ASCCP_ID. &lt;br/&gt;&lt;br/&gt;Note that for the ASCC history records, this column always points to the ACC_ID of the current record of an ACC.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="D0B30827-CCBC-9CAA-2158-C66BD217EEFE" referredColumn="F9D15F1A-0722-828B-738F-D5C2F57C349C"/>
+</associations>
+</Column>
+<Column name="TO_ASCCP_ID" id="40863F32-E864-4957-35F6-9B1E8694181B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Assoc_To_ASCCP_ID is a foreign key to an ASCCP table record. It is basically pointing to a child data element of the Assoc_From_ACC_ID. &lt;br/&gt;&lt;br/&gt;Note that for the ASCC history records, this column always points to the ASCCP_ID of the current record of an ASCCP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="C4CC9721-2630-BAE0-B4B3-AFDE289EF1E9" referredColumn="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42"/>
+</associations>
+</Column>
+<Column name="DEN" id="9E670FD5-71CD-7F13-A93F-F5B7D97809BF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>DEN (dictionary entry name) of the ASCC. This column can be derived from Object_Class_Term of the Assoc_From_ACC_ID and DEN of the Assoc_To_ASCCP_ID as Object_Class_Term + &quot;. &quot; + DEN. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200 CHAR</dataTypeSize>
+<ownDataTypeParameters>200 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="256F2B33-3088-E1A4-40D0-DE7CE671CAA0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>This is a documentation or description of the ASCC. Since ASCC is business context independent, this is a business context independent description of the ASCC. Since there are Definitions also in the ASCCP (as referenced by Assoc_To_ASCCP_ID column) and the ACC under that ASCCP, Definition in the ASCC is a specific description about the relationship between the ACC (as in Assoc_From_ACC_ID) and the ASCCP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_DEPRECATED" id="FFA0E473-3515-79F3-B615-3CECC17C8DF6">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Indicates whether the CC is deprecated and should not be reused (i.e., no new reference to this record should be created).</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CREATED_BY" id="7E79C6A6-2979-400A-D227-EFC70825DDBA">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>A foreign key referring to the user who creates the entity.&lt;br/&gt;&lt;br/&gt;This column never change between the history and the current record. The history record should have the same value as that of its current record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="49599FDD-22CF-5FBA-7913-FEAA0E55F62D" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="OWNER_USER_ID" id="58DACEE8-C5DB-9749-70DB-32068E1F146E">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>This is the user who owns the entity, is allowed to edit the entity, and who can transfer the ownership to another user.&lt;br/&gt;&lt;br/&gt;The ownership can change throughout the history, but undoing shouldn&apos;t rollback the ownership. </commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DC129B99-E25F-5F57-0EBB-5025F0AE291B" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="0740058B-245B-FE55-2363-C66C38CFBFBF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>A foreign key referring to the last user who has updated the record. &lt;br/&gt;&lt;br/&gt;In the history record, this should always be the user who is editing the entity.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="96F1DE2F-12AC-BF06-2FAB-FE226885986B" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="16202FBC-D411-6A1F-6E81-60659977029A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Timestamp when the revision of the ASCC was created. &lt;br/&gt;&lt;br/&gt;This never change for a revision.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="35BF1983-FD3F-E181-93AF-29798B784534">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>The timestamp when the record was last updated.&lt;br/&gt;&lt;br/&gt;The value of this column in the latest history record should be the same as that of the current record. This column keeps the record of when the revision has occurred.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STATE" id="E6309572-6E63-93BE-2B34-7E2C9977CC20">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>1 = Editing, 2 = Candidate, 3 = Published. This the revision life cycle state of the entity.&lt;br/&gt;&lt;br/&gt;State change can&apos;t be undone. But the history record can still keep the records of when the state was changed.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_NUM" id="9FDBB976-49AD-9FCD-DE83-01247B350F36">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Revision_Number is an incremental integer. It tracks changes in each component. If a change is made to a component after it has been published, the component receives a new revision number. Revision number can be 0, 1, 2, and so on. A record with zero revision number reflects the current record of the component (the identity of a component in this case is its GUID or the primary key).</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_TRACKING_NUM" id="29E0B803-496A-35AB-6152-CBA77AC77EBF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Revision_Tracking_Number supports the ability to undo changes during a revision (life cycle of a revision is from the component&apos;s Editing state to Published state). Once the component has transitioned into the Published state for its particular revision, all revision tracking records are deleted except the latest one. Revision_Tracking_Number can be 0, 1, 2, and so on. The zero value is assign to the record with Revision_Number = 0 as a default.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REVISION_ACTION" id="E7831BE4-3792-5432-3ED0-52DBA5A4A40C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>This indicates the action associated with the record. The action can be 1 = insert, 2 = update, and 3 = delete. This column is null for the current record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>3</dataTypePrecision>
+<ownDataTypeParameters>,3,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="RELEASE_ID" id="E7DC5EBD-3813-FDDE-FCE3-7A4431221B16">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>Release_ID is an incremental integer. It is an unformatted counter part of the Release_Number in the Release table. Release_ID can be 1, 2, 3, and so on. Release ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the Revision_Action column).&lt;br/&gt;&lt;br/&gt;Not all component revisions have an associated Release_ID because some revisions may never be released.&lt;br/&gt;&lt;br/&gt;Unpublished components cannot be released.&lt;br/&gt;&lt;br/&gt;This column is null for the current record.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6D2512A8-5D43-1C9B-0ACD-CAA771510C89" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>
+</associations>
+</Column>
+<Column name="CURRENT_ASCC_ID" id="4C73C675-5ED4-1228-1B54-FC8AB76D60A1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:52:52 UTC</createdTime>
+<commentInRDBMS>This is a self-foreign-key. It points from a revised record to the current record. The current record is denoted by the the record whose Revision_Number is 0. Revised records (a.k.a. history records) and their current record must have the same GUID.&lt;br/&gt;&lt;br/&gt;It is noted that although this is a foreign key by definition, we don&apos;t specify a foreign key in the data model. This is because when an entity is deleted the current record won&apos;t exist anymore.&lt;br/&gt;&lt;br/&gt;The value of this column for the current record should be left NULL.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E9A1D9AC-EFBE-32EF-1DD9-8810449C6B23" referredColumn="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="E3F6B632-0986-66E6-BEB1-4DFDB607D5F2" name="ASCC_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:54:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F84D8AF6-1A9B-E5CC-7894-55108AABE0D1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="309A8EDF-80A7-BBB3-ACDA-8E322FEC5F17" name="ASCC_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:56:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="657C8250-0F04-E6F0-B213-AD1AA6F51AF8"/>
+<colUsage columnID="16D7FECE-BF51-6D74-013D-7EAFC0637A1E"/>
+<colUsage columnID="40863F32-E864-4957-35F6-9B1E8694181B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3F79586A-E0E0-4361-E506-0961B74FEB85" name="ASCC_FROM_ACC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="16D7FECE-BF51-6D74-013D-7EAFC0637A1E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="225E4CFA-3433-6D07-FB70-C5AFCC6FE51C" name="ASCC_TO_ASCCP_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="40863F32-E864-4957-35F6-9B1E8694181B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6E33819C-765F-E5D8-1BE7-A83C30A1880B" name="ASCC_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7E79C6A6-2979-400A-D227-EFC70825DDBA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="225F1155-A08C-7E48-4B22-4AE2A66C0B0D" name="ASCC_OWNER_USER_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="58DACEE8-C5DB-9749-70DB-32068E1F146E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A2442AB4-A157-AC17-8FE4-33B6559CA6DF" name="ASCC_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="0740058B-245B-FE55-2363-C66C38CFBFBF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3B276588-B0EC-8EDE-05B4-9CBB340CF7B8" name="ASCC_RELEASE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E7DC5EBD-3813-FDDE-FCE3-7A4431221B16"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="5F9ED838-1076-F7D5-DA6B-BE99C355AB57" name="ASCC_CURRENT_ASCC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:55:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4C73C675-5ED4-1228-1B54-FC8AB76D60A1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="oagsrt" id="CAE2E6CC-D821-9844-4F9F-965E013B4B2A" version="3.5">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 17:42:12 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>CAE2E6CC-D821-9844-4F9F-965E013B4B2A</designId>
+</OSDM_Design>

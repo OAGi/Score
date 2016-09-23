@@ -1,0 +1,14 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_1" id="B929892F-6B01-0CA3-A75F-12C76FCF0AD3" containerWithKeyObject="5FD28C23-8C8A-21B4-BE39-82EBA5A986C6" localFKIndex="AC8B2F32-9808-9E36-157F-366179EEBB45" name="BSPR_CSAPXTM_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 20:40:59 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>373E7CEE-909E-09BC-840B-433CF18E0C5B</referredTableID>
+<keyObject>5CF56C28-5351-210A-E719-AAC0BC425EB2</keyObject>
+<referredKeyID>5CF56C28-5351-210A-E719-AAC0BC425EB2</referredKeyID>
+<mandatory>true</mandatory>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

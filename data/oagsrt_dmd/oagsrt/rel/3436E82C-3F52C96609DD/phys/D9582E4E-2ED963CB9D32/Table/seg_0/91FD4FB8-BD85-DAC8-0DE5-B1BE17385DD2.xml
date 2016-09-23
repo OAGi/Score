@@ -1,0 +1,62 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableProxyOraclev10g" name="XBT" directorySegmentName="seg_0" id="91FD4FB8-BD85-DAC8-0DE5-B1BE17385DD2">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:39:32 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="XBT_ID" id="4A95D01F-E877-E0DC-220C-F82AD8677B6F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="BUILTIN_TYPE" id="71EABBE3-1AFD-2500-88D6-CF0FF743F378">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NAME" id="D86F3CB2-4054-DBE4-938E-016FEEB54457">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SUBTYPE_OF_XBT_ID" id="DF5262D9-1BBE-A3D5-2014-8D548EF9788F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="XBT_SUBTYPE_OF_XBT_ID_FK" id="B16D3E01-C4B9-8AF6-05B9-6692A1E23D4D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="XBT_PK" id="447F2E09-415B-AC07-0117-D50390B6ABFF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:40:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="XBT_UK1" id="81B971F8-0F77-325C-7989-CEFE533C5C88">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:41:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="XBT_UK2" id="E8EAFEBA-EEC6-D735-498B-B34EA3C659A9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:41:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev10g>
