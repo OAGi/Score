@@ -1,0 +1,249 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="93CFF133-69F1-6F89-F552-E650F0EF1D46" name="BBIE_SC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:06 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_45</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="BBIE_SC_ID" id="6F09C621-162D-D77A-96C3-4FAE20F78B26">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BBIE_ID" id="5FAEF807-6E36-E241-66CE-284DA878B195">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="1E6B64F7-ABB6-484B-A5F7-C43022D66CC7" referredColumn="2C7ADB03-0523-5076-F3AB-BB20525308D9"/>
+</associations>
+</Column>
+<Column name="DT_SC_ID" id="D3EC65DC-8471-72C3-0009-3FDCDEB2FF3C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This should correspond to the DT_SC of the BDT of the based BCC and BCCP.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E9AC9EC4-BDDF-D2CA-B62F-52CB54D11F6D" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
+</associations>
+</Column>
+<Column name="DT_SC_PRI_RESTRI_ID" id="32757495-7DFD-1911-BE39-AA2608E62D18">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>This must be one of the allowed primitive/code list as specified in the corresponding SC of the based BCC of the BBIE.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="16FE4E32-3E3C-A61C-F264-0B38A66716ED" referredColumn="E26B5231-05C5-B154-F69D-4EE8B9753BEA"/>
+</associations>
+</Column>
+<Column name="CODE_LIST_ID" id="1BC826AA-628C-B007-B8DB-F76682937F43">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="584DB53E-3D85-3971-D4FB-298CBDAFDBCD" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
+</associations>
+</Column>
+<Column name="AGENCY_ID_LIST_ID" id="5E93EF19-50DD-0AF0-1D16-7A2F36B8842B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E2B290EA-A808-DD77-FFF7-1C9E319747B2" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
+</associations>
+</Column>
+<Column name="MIN_CARDINALITY" id="ACDFCBEF-DB20-432F-4822-786CA99CC4C9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MAX_CARDINALITY" id="32E34D11-4118-88A8-5A8A-AA9806D623A0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFAULT_VALUE" id="F1810A1A-5719-4E44-08AA-8C003368EB3F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FIXED_VALUE" id="5760CAB0-CF86-4A9F-423C-8313713351AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFINITION" id="33AB3A3A-A48E-FEE8-CCB3-76D99B4158AC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="REMARK" id="6E001D2D-1884-8316-6E16-B6E563C62E16">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>225 CHAR</dataTypeSize>
+<ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="BIZ_TERM" id="AB05F261-1884-A6FC-1412-D80AF2F19501">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>225 CHAR</dataTypeSize>
+<ownDataTypeParameters>225 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="IS_USED" id="9F7F3D21-8F78-99E1-84B4-3B9EB43A6A8D">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<commentInRDBMS>Flag to indicate whether the field/component is used in the content model. It indicates whether the field/component should be generated.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F5BE8DA9-6FF7-86C4-3A13-765430994EE0" name="BBIE_SC_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:19:52 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6F09C621-162D-D77A-96C3-4FAE20F78B26"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A9B253E1-9023-5A30-988E-7F3B01FF138C" name="BBIE_BBIE_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5FAEF807-6E36-E241-66CE-284DA878B195"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A05D366F-B12D-2A71-FE14-AA9C257817D2" name="BBIE_SC_DT_SC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D3EC65DC-8471-72C3-0009-3FDCDEB2FF3C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7A5A9E4A-5FC4-2AF9-EF96-D7563CFE414C" name="BBIE_SC_DT_SC_PRI_RESTRI_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="32757495-7DFD-1911-BE39-AA2608E62D18"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0D4D8F6A-187A-AD09-7943-2D10B19382A7" name="BBIE_SC_CODE_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1BC826AA-628C-B007-B8DB-F76682937F43"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="44C9EBE0-D828-A9CA-DD50-660BF633CAC4" name="BBIE_SC_AGENCY_ID_LIST_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:21:51 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5E93EF19-50DD-0AF0-1D16-7A2F36B8842B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

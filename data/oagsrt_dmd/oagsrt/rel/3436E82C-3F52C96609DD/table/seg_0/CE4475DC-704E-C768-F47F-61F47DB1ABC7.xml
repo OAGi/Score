@@ -1,0 +1,209 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="CE4475DC-704E-C768-F47F-61F47DB1ABC7" name="CLASSIFICATION_CTX_SCHEME">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:03:24 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_42</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CLASSIFICATION_CTX_SCHEME_ID" id="56F2441F-0547-29EE-4E9E-29D73C6AB59B">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<commentInRDBMS>External identification of the scheme.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="9056F459-3815-EC29-0091-55C10D026CA6">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SCHEME_ID" id="A3271DB4-9A1F-441D-D83F-8E686729C1D0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<commentInRDBMS>External identification of the scheme.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SCHEME_NAME" id="14F569DC-35B6-6BD8-50D1-25C5A2AEEDFA">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>255 CHAR</dataTypeSize>
+<ownDataTypeParameters>255 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DESCRIPTION" id="1188E690-28E6-4610-B90B-5BFA85573CBF">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SCHEME_AGENCY_ID" id="42752C20-2454-2D5F-0A90-DA926510C1E0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SCHEME_VERSION_ID" id="B635F10A-B464-446A-6824-68C1CB23D8A8">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CTX_CATEGORY_ID" id="BDFCC157-254E-A5C4-6527-51729A7DEAE9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="ADD55A79-229C-15A8-951A-F4959D847F1A" referredColumn="744E4380-A845-ADA1-A484-553049703FEA"/>
+</associations>
+</Column>
+<Column name="CREATED_BY" id="AAC3CA0B-76EF-32FA-863E-44C99E2B3D04">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6D34BDC6-51C9-D583-DA42-135249C9587C" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="LAST_UPDATED_BY" id="699F45A2-0F52-B118-73FA-35FFECED1EFC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E2B14F9D-DD72-A8AE-205B-5837194F59F4" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
+</associations>
+</Column>
+<Column name="CREATION_TIMESTAMP" id="41FC5702-F5F6-1B25-B827-59B1F7CFC7A9">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LAST_UPDATE_TIMESTAMP" id="CEA0929A-4DDC-2C90-9250-60AB8F079188">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:04:00 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<ownDataTypeParameters>,6,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="7E6DC314-309E-80A6-D110-3AA32E25DAB7" name="CTX_SCHEME_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:05:21 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="56F2441F-0547-29EE-4E9E-29D73C6AB59B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6CA402C9-9E5C-072C-98CA-26498D1E9119" name="CTX_SCHEME_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:15:36 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9056F459-3815-EC29-0091-55C10D026CA6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B6682EF0-70AD-CBBE-1237-3386F41769C2" name="CTX_SCHEME_CTX_CAT_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:15:25 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BDFCC157-254E-A5C4-6527-51729A7DEAE9"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7BB2D7F4-A2DD-87A6-158B-47ED2398985D" name="CTX_SCHEME_CREATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:15:25 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AAC3CA0B-76EF-32FA-863E-44C99E2B3D04"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B6BF8C4E-6944-1A64-0531-50BB9BB4484A" name="CTX_SCHEME_LAST_UPDATED_BY_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:15:25 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="699F45A2-0F52-B118-73FA-35FFECED1EFC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

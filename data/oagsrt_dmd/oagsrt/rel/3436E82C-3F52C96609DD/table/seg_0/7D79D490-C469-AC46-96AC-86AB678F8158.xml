@@ -1,0 +1,103 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="7D79D490-C469-AC46-96AC-86AB678F8158" name="CTX_SCHEME_VALUE">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:15:54 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_43</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CTX_SCHEME_VALUE_ID" id="C0CA9967-95A0-9E20-CEE6-ED12E3FA67CB">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="GUID" id="FBD0D41F-4ED9-B507-D79D-F6492369595F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="VALUE" id="90BFF2C7-FE98-8A7B-3D25-595EA3559632">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>45 CHAR</dataTypeSize>
+<ownDataTypeParameters>45 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MEANING" id="26A02234-D01D-C460-12AD-0749B2260A96">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="OWNER_CTX_SCHEME_ID" id="188A6F27-39AB-2E48-1811-D23F4E6D0B54">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:16 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="0E4AB17C-0A19-7977-D259-75641BD61926" referredColumn="56F2441F-0547-29EE-4E9E-29D73C6AB59B"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A751016B-1FA8-65C6-265C-2E17B33ED9DE" name="CTX_SCHEME_VALUE_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C0CA9967-95A0-9E20-CEE6-ED12E3FA67CB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8D707992-06D1-B0C4-B7B1-04A126DE1918" name="CTX_SCHEME_VALUE_UK1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:17:07 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="FBD0D41F-4ED9-B507-D79D-F6492369595F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D61E999D-3E3C-C4C6-9667-9BCD93323EBA" name="CSV_OWNER_CTX_SCHEME_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 21:16:56 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="188A6F27-39AB-2E48-1811-D23F4E6D0B54"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

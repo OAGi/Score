@@ -1,0 +1,96 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="6A4EEAE6-B521-BC54-EF2C-E78D0695693C" name="CDT_SC_AWD_PRI">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:51:09 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>table_18</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="CDT_SC_AWD_PRI_ID" id="A35CF947-883C-9067-FB85-9436FDE1643C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="CDT_SC_ID" id="05A0F3D6-B3EF-BD90-0F5E-1AFA37205EE4">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="A0F7E33C-39D9-CE58-B1BF-D84F54A501C7" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
+</associations>
+</Column>
+<Column name="CDT_PRI_ID" id="3C675BC9-9CF3-0B0E-90AA-C307C23FB8C0">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E2BF4A1A-85F3-25CB-3147-507CFE831A63" referredColumn="9D7E3571-8C3F-81A3-CD3F-C3EF175F9025"/>
+</associations>
+</Column>
+<Column name="IS_DEFAULT" id="AD6E0F07-6FEE-8D01-E0F8-DBDEFCF61A2A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:05 UTC</createdTime>
+<commentInRDBMS>Indicating whether the primitive is the default primitive of the supplementary component.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="C11F8A9E-4DC9-5ED6-1BD3-0D796837369E" name="CDT_SC_AWD_PRI_PK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:05 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A35CF947-883C-9067-FB85-9436FDE1643C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4099C304-A0A9-D518-629F-DBA3316AF536" name="CDT_SC_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:22 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="05A0F3D6-B3EF-BD90-0F5E-1AFA37205EE4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BAB57F51-F419-4CE0-14DA-153354455200" name="CDT_PRI_ID_FK">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-08 18:52:33 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3C675BC9-9CF3-0B0E-90AA-C307C23FB8C0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
