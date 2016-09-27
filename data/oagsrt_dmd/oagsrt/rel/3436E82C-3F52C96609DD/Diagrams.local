@@ -1,7 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<oracle.dbtools.crest.model.design.relational.RelationalDesign>
-   <object objectType="sub_view" objectID="3A307D79-EE4D-F23B-9A5C-81F399736E7F" name="ACC" visible="true"/>
-   <object objectType="main_view" objectID="5C5B7DFD-6D0E-A9E5-FC60-28A3A05AF504" name="oagsrt_revision" visible="true"/>
-   <object objectType="sub_view" objectID="77E08922-6E8C-2892-E896-1F5BA26F03C0" name="oagsrt_revision - SubView_1v2" visible="true"/>
-   <object objectType="sub_view" objectID="FE76C0D6-1EEE-4977-76BB-6FCF14AC3104" name="oagsrt_revision - General" visible="false"/>
-</oracle.dbtools.crest.model.design.relational.RelationalDesign>
