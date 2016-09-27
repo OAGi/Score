@@ -83,7 +83,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="81249057-3705-6C91-6101-F32F3BFAC06F" referredColumn="166E2644-631C-ABAE-F0C1-4E3A8A71AD0B"/>
@@ -107,11 +107,12 @@
 <createdTime>2016-08-08 20:21:16 UTC</createdTime>
 <commentInRDBMS>Foreign key to the module table indicating the physical schema the MODULE belongs to.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="6B8E17F1-73E0-B7F5-0392-0FFD811D7B55" referredColumn="E1CA8976-9A33-345E-BCDE-51EAB731E1C7"/>

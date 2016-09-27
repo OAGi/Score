@@ -68,7 +68,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="E61A8456-156B-EDBC-240F-E5578A02BF53" referredColumn="2820686A-A020-3DC6-EF01-78792C666327"/>
@@ -260,14 +260,14 @@
 <Column name="RELEASE_ID" id="FE1A50F5-66DF-0D25-026D-B023E0242A59">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 19:29:27 UTC</createdTime>
-<commentInRDBMS>RELEASE_ID is an incremental integer. It is an unformatted counterpart of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. RELEASE_ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).&lt;br/&gt;&lt;br/&gt;Not all component revisions have an associated RELEASE_ID because some revisions may never be released.&lt;br/&gt;&lt;br/&gt;Unpublished components cannot be released.&lt;br/&gt;&lt;br/&gt;This column is NULLl for the current record.</commentInRDBMS>
+<commentInRDBMS>RELEASE_ID is an incremental integer. It is an unformatted counterpart of the RELEASE_NUMBER in the RELEASE table. RELEASE_ID can be 1, 2, 3, and so on. RELEASE_ID indicates the release point when a particular component revision is released. A component revision is only released once and assumed to be included in the subsequent releases unless it has been deleted (as indicated by the REVISION_ACTION column).&lt;br/&gt;&lt;br/&gt;Not all component revisions have an associated RELEASE_ID because some revisions may never be released.&lt;br/&gt;&lt;br/&gt;Unpublished components cannot be released.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="2CBF0ABD-B99C-92B6-B819-6CC93B39A04C" referredColumn="61EC25A9-2D77-E657-DCA9-0A16AD8CC65B"/>

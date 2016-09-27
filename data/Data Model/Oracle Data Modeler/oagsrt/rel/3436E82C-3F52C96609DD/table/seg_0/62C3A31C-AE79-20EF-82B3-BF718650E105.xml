@@ -96,7 +96,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="4232FC8A-F042-EE24-CDBA-7D0BA5E2B0E7" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -111,7 +111,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="266165BF-6FF9-F6C0-482B-B33B7581FCC5" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
