@@ -43,7 +43,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="0F4F795D-9E2B-3443-F95C-3B906D6A364F" referredColumn="6E215D1D-333A-D2D4-4E12-57C38E41DD9B"/>
@@ -58,7 +58,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="500EC9A3-4BCA-1532-3047-F5EAD1AC8875" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
@@ -73,7 +73,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="6B775616-A44F-49CD-1FEF-E641B1F57061" referredColumn="41CF0414-D5DF-91F3-717A-4B119F9BC9F4"/>
@@ -89,7 +89,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="DE489AED-18C6-4442-D5F2-49AC5D21CB10" referredColumn="E93CA0B2-79D7-C7C2-B8E1-FB41781335D8"/>
@@ -105,7 +105,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="DFB351A7-7033-B05C-31F6-ABCA9AC1BE78" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
@@ -116,11 +116,12 @@
 <createdTime>2016-08-18 18:30:09 UTC</createdTime>
 <commentInRDBMS>This is a foreign key to the AGENCY_ID_LIST table. It is used in the case that the BDT content can be restricted to an agency identification.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="CF4308CA-BC94-A8F8-28A6-1EBFE781E57D" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
@@ -233,7 +234,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="B1A04D75-8AD5-3B89-9CA7-871672CF20C8" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -248,7 +249,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="3ECF90B6-523B-D22E-2102-2EB9750FA411" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -314,7 +315,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,19,</ownDataTypeParameters>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="BEC7F27C-290E-E10C-7583-859DF1092249" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
@@ -434,7 +435,7 @@
 <colUsage columnID="85240B23-7DEA-10AD-E7DD-CF197E7D2943"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="5F31F21A-00C4-2DBA-E1FC-221AFCFD2017" name="BBIE_AGENCY_ID_LIST_FK">
+<ind_PK_UK id="5F31F21A-00C4-2DBA-E1FC-221AFCFD2017" name="BBIE_AGENCY_ID_LIST_ID_FK">
 <createdBy>bnk1</createdBy>
 <createdTime>2016-09-26 19:27:41 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
