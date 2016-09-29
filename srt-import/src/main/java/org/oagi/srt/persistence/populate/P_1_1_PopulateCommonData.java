@@ -68,7 +68,7 @@ public class P_1_1_PopulateCommonData {
 
         User user = new User();
         user.setLoginId("oagis");
-        user.setPassword("oagis");
+        user.setPassword("$2a$10$pp.KvtaKOMjsKtH407o9o.csMj.JXsysm.VBuxC6bYQzq20OFerdS");
         user.setName("Open Applications Group Developer");
         user.setOrganization("Open Applications Group");
         user.setOagisDeveloperIndicator(true);
