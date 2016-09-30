@@ -43,7 +43,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/login.xhtml");
 
         http.authorizeRequests()
-                .antMatchers("/", "/index.xhtml").permitAll()
                 .antMatchers("/javax.faces.resource/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
