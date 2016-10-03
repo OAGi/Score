@@ -13,8 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -29,13 +27,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().sameOrigin();
+
         http.logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .invalidateHttpSession(true)
@@ -46,12 +46,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/javax.faces.resource/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                    .formLogin()
-                    .usernameParameter("username")
-                    .passwordParameter("password")
-                    .loginPage("/login.xhtml").permitAll()
+                .formLogin()
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .loginPage("/login.xhtml").permitAll()
                 .and()
-                    .logout().permitAll();
+                .logout().permitAll();
     }
 
 }

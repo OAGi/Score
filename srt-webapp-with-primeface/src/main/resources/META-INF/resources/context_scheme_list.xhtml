@@ -12,7 +12,6 @@
 				<p:submenu style="width: 180px !important;" label="Context Category">
 					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
 					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
-					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
 				</p:submenu>
 			</p:menu>
 		</h:form>
@@ -36,7 +35,7 @@
 
 				<p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeHandler.contextSchemes}"
 							 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-							 paginator="true" rows="10" style="width:800px; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.ctxSchemeId}">
+							 paginator="true" rows="10" style="width: 100%; margin-bottom:20px" selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.ctxSchemeId}">
 					<p:column selectionMode="single" style="width:16px;text-align:center"/>
 
 					<p:column style="width:200px">

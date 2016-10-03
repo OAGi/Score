@@ -12,7 +12,6 @@
 				<p:submenu style="width: 180px !important;" label="Context Category">
 					<p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create" />
 					<p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create" />
-					<p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search" />
 				</p:submenu>
 			</p:menu>
 		</h:form>
@@ -34,7 +33,7 @@
 			<p:panel header="Context Category List">
 				<p:dataTable id="tbl1" var="contextCategory" value="#{contextCategoryHandler.contextCategories}"
 					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:1100px; margin-bottom:20px" selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategory.guid}">
+					paginator="true" rows="10" style="width: 100%; margin-bottom:20px" selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategory.guid}">
 			        <p:column selectionMode="single" style="width:16px;text-align:center"/>
 					<p:column style="width:350px">
 						<f:facet name="header">

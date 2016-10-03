@@ -69,23 +69,21 @@
                             </p:submenu>
 
                             <p:submenu label="Business Context" icon="ui-icon-star">
-                                <p:menuitem value="Create business context" url="/business_context_create.xhtml"/>
+                                <p:menuitem value="Business Context List" url="/business_context_list.xhtml"/>
                                 <p:separator/>
-                                <p:menuitem value="Business context list" url="/business_context_list.xhtml"/>
+                                <p:menuitem value="Create Business Context" url="/business_context_create.xhtml"/>
                             </p:submenu>
 
                             <p:submenu label="Context Category" icon="ui-icon-calculator">
-                                <p:menuitem value="Context category List" url="/context_category_list.xhtml"/>
+                                <p:menuitem value="Context Category List" url="/context_category_list.xhtml"/>
                                 <p:separator/>
-                                <p:menuitem value="Create context category" url="/context_category_create.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Search context category" url="/context_category_search.xhtml"/>
+                                <p:menuitem value="Create Context Category" url="/context_category_create.xhtml"/>
                             </p:submenu>
 
                             <p:submenu label="Context Scheme" icon="ui-icon-suitcase">
-                                <p:menuitem value="Create new context scheme" url="/context_scheme_create.xhtml"/>
+                                <p:menuitem value="Context Scheme List" url="/context_scheme_list.xhtml"/>
                                 <p:separator/>
-                                <p:menuitem value="Context scheme list" url="/context_scheme_list.xhtml"/>
+                                <p:menuitem value="Create Context Scheme" url="/context_scheme_create.xhtml"/>
                             </p:submenu>
 
                             <p:submenu label="Code List" icon="ui-icon-flag">
@@ -95,22 +93,6 @@
                                 <p:separator/>
                                 <p:menuitem value="Create Code List from another"
                                             url="/code_list_create_from_another.xhtml"/>
-                            </p:submenu>
-
-                            <p:submenu label="Help" icon="ui-icon-help">
-                                <p:menuitem value="Ask to Serm" url="#"/>
-                                <p:separator/>
-                                <p:menuitem value="Ask to Mike" url="#"/>
-                                <p:separator/>
-                                <p:menuitem value="Don't ask to Yunsu" url="#"/>
-                            </p:submenu>
-
-                            <p:submenu label="Admin" icon="ui-icon-person">
-                                <p:menuitem value="Config Menu String" url="menu_string_configuration.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="User List" url="#"/>
-                                <p:separator/>
-                                <p:menuitem value="Anything else?" url="#"/>
                             </p:submenu>
 
                             <f:facet name="options">
@@ -124,17 +106,6 @@
                 </p:layoutUnit>
             </p:layout>
         </p:layoutUnit>
-
-        <p:layoutUnit position="west" size="200" header="Left"
-                      resizable="false" closable="false" collapsible="true" effect="drop">
-            <ui:insert name="side_menu"/>
-        </p:layoutUnit>
-
-        <!-- 		<p:layoutUnit position="east" size="200" header="Right"
-                    resizable="false" closable="false" collapsible="true" effect="drop">
-                    <p:graphicImage name="images/#{str['pic']}.jpg" width="150" height="150" style="border:0; margin:0; padding:0;"/> <br/>
-                    <h:outputText value="What can I help you?" />
-                </p:layoutUnit> -->
 
         <p:layoutUnit position="center">
             <ui:insert name="content"/>
@@ -150,18 +121,5 @@
         </p:layoutUnit>
 
     </p:layout>
-    <!--
-     <ui:insert name="status">
-        <p:ajaxStatus style="width:64px;height:64px;position:fixed;right:5px;bottom:5px">
-            <f:facet name="start">
-                <p:graphicImage name="images/loader.gif" />
-            </f:facet>
-
-            <f:facet name="success">
-                <h:outputText value="" />
-            </f:facet>
-        </p:ajaxStatus>
-    </ui:insert>
-     -->
 </h:body>
 </html>
