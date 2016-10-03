@@ -40,32 +40,32 @@
                     </p:panel>
                     <p:panel header="Top-level Concept List">
                         <p:dataTable id="tbl" var="aSCCP" value="#{topLevelABIEHandler.asccpVOs}"
-                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
                                      paginator="true" rows="20" style="width: 100%; margin-bottom:20px"
                                      selection="#{topLevelABIEHandler.selected}" rowKey="#{aSCCP.asccpId}"
                                      selectionMode="single">
                             <p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onRowSelect}"/>
                             <p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onRowUnselect}"/>
-                            <p:column style="width:350px">
+                            <p:column style="width: 40%">
                                 <f:facet name="header">
                                     <h:outputText value="ASCCP Property Term"/>
                                 </f:facet>
                                 <h:outputText value="#{aSCCP.propertyTerm}"/>
                             </p:column>
 
-                            <p:column style="width:300px">
+                            <p:column style="width: 40%">
                                 <f:facet name="header">
                                     <h:outputText value="Module"/>
                                 </f:facet>
                                 <h:outputText value="#{aSCCP.module.module}"/>
                             </p:column>
 
-                            <p:column style="width:180px">
+                            <p:column style="width: 20%; text-align: center;">
                                 <f:facet name="header">
                                     <h:outputText value="Last Updated Time"/>
                                 </f:facet>
                                 <h:outputText value="#{aSCCP.lastUpdateTimestamp}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
 
@@ -87,7 +87,7 @@
 
                             <p:column headerText="Last Updated Time">
                                 <h:outputText value="#{aSCCP.lastUpdateTimestamp}">
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
                         </p:dataTable>
@@ -106,7 +106,7 @@
                                          paginator="true" rows="10" style="width: 100%; margin-bottom:20px"
                                          selection="#{businessContextHandler.bcDetail}"
                                          rowKey="#{businessContext.bizCtxId}">
-                                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                                <p:column selectionMode="single" style="width: 30px;text-align:center"/>
                                 <p:column style="width:200px">
                                     <f:facet name="header">
                                         <h:outputText value="Name"/>

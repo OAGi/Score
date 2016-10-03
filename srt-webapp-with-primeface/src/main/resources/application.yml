@@ -21,6 +21,7 @@ spring:
       enabled: false
 
 jsf:
+  facelets-libraries: /META-INF/springsecurity.taglib.xml
   state-saving-method: server
   datetimeconverter-default-timezone-is-system-timezone: true
 

@@ -18,11 +18,29 @@
     </f:facet>
     <link rel="shortcut icon" type="image/png" href="images/oagi.png"/>
     <title>OAGi Semantic Refinement Project</title>
+
+    <h:outputStylesheet library="css" name="bootstrap-3.3.7.min.css"/>
+    <h:outputStylesheet library="css" name="bootstrap-theme-3.3.7.min.css"/>
+    <h:outputScript library="js" name="bootstrap-3.3.7.min.js"></h:outputScript>
+    <h:outputStylesheet library="css" name="font-awesome-4.6.3.min.css"/>
     <h:outputStylesheet name="css/sr.css"/>
 
     <ui:insert name="head"/>
 
     <style type="text/css">
+        .ui-widget {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-size: 14px;
+        }
+
+        .ui-widget-content {
+            background-color: #f9f9f9;
+        }
+
+        .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
         .ui-layout-north {
             z-index: 20 !important;
             overflow: visible !important;;
@@ -37,89 +55,275 @@
             width: auto !important;
         }
 
+        .ui-layout-resizer {
+            display: none;
+            visibility: hidden;
+        }
+
+        .ui-clock {
+            color: #222222;
+            font-weight: normal;
+        }
+
+        .header {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 10px;
+        }
+
+        .main {
+            margin-bottom: 10px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
+            word-wrap: break-word;
+        }
+
+        .copyright {
+            line-height: 16px;
+            font-size: 12px;
+        }
+
+        .navbar {
+            min-height: inherit;
+            margin-bottom: 0;
+            border: 0;
+        }
+
+        .navbar-nav > li > a {
+            display: block;
+            padding: 4px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 20px;
+            color: #333;
+        }
+
+        .dropdown-menu > li > a {
+            display: block;
+            padding: 4px 10px 4px 15px;
+            overflow: hidden;
+            color: #333;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .header-nav-link {
+            display: block;
+            padding: 4px 10px 4px 15px;
+            overflow: hidden;
+            color: #333;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .navbar-brand {
+            height: inherit;
+            padding: 0;
+        }
+
+        .nav > li > a:focus, .nav > li > a:hover, .nav > li > a:active {
+            color: #4078c0;
+            text-decoration: none;
+            background-color: #f5f5f5;
+            background-image: none;
+        }
+
+        .nav .open > a, .nav .open > a:focus, .nav .open > a:hover {
+            background-color: inherit;
+        }
+
+        .dropdown-menu > li > a:hover {
+            color: #fff;
+            text-decoration: none;
+            background-color: #4078c0;
+            background-image: none;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 8px 1px;
+            background-color: #e5e5e5;
+        }
+
+        .footer {
+            position: relative;
+            padding-top: 20px;
+            padding-bottom: 40px;
+            margin-top: 40px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #767676;
+            border-top: 1px solid #eee;
+        }
+
+        a {
+            color: #4078c0;
+            text-decoration: none;
+        }
+
+        a:hover, a:active {
+            text-decoration: underline;
+        }
+
+        a:active, a:hover {
+            outline-width: 0;
+        }
+
+        .markdown-body h2 {
+            font-size: 2em;
+            border-bottom: 1px solid #eee;
+        }
+
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            margin: 1em 0 15px;
+            padding: 0;
+            font-weight: bold;
+            line-height: 1.7;
+            cursor: text;
+            position: relative;
+        }
+
+        .markdown-body p, .markdown-body blockquote, .markdown-body ul, .markdown-body ol, .markdown-body dl, .markdown-body table, .markdown-body pre {
+            margin: 15px 0;
+        }
+
+        label, .ui-widget {
+            margin-right: 5px;
+        }
+
+        .ui-clock {
+            background-color: #ffffff;
+        }
+
+        .ui-panel {
+            margin-bottom: 10px;
+        }
     </style>
 </h:head>
 
 <h:body>
-    <p:layout fullPage="true">
-        <p:layoutUnit position="north" size="50" style="border:0; margin:0; padding:0;">
-            <p:layout>
-                <p:layoutUnit position="west" size="200" resizable="false" closable="false"
-                              style="border:0; margin:0; padding:0;text-align:center">
-                    <h:outputLink value="index.xhtml">
-                        <p:graphicImage name="images/oagi.png" width="200" height="50"
-                                        style="border:0; margin:10; padding:10; !important"/>
-                    </h:outputLink>
-                </p:layoutUnit>
-                <p:layoutUnit position="center" style="border:0; margin:0; padding:0;">
-                    <!-- Header Menu-->
-                    <h:form>
-                        <p:growl id="messages"/>
-                        <p:menubar>
-                            <p:submenu label="#{str['BIEs']}" icon="ui-icon-document">
-                                <p:menuitem value="#{str['Create_top-level_ABIE']}" url="/top_level_abie_create.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Profile BOD List" url="/top_level_abie_list.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="#{str['Copy_top-level_ABIE']}" url="/top_level_abie_copy.xhtml"/>
-                            </p:submenu>
+    <div class="header" role="banner">
+        <div class="container">
+            <nav class="navbar">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                data-target="#navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/">
+                            <p:graphicImage name="images/oagi.png" width="126" height="38"
+                                            style="border: 0; padding: 0; margin: -4px 0 0 15px; !important"/>
+                        </a>
+                    </div>
 
-                            <p:submenu label="Profile OAGIS" icon="ui-icon-disk">
-                                <p:menuitem value="Generate OAGIS expression" url="/oagis_expression_generate.xhtml"/>
-                            </p:submenu>
+                    <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown" style="margin-left: 15px;">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">BODs <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="header-nav-link"
+                                           href="/top_level_abie_create.xhtml">#{str['Create_top-level_ABIE']}</a>
+                                    </li>
+                                    <li><a href="/top_level_abie_list.xhtml">Profile BOD List</a></li>
+                                    <li><a href="/top_level_abie_copy.xhtml">#{str['Copy_top-level_ABIE']}</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">Profile OAGIS <span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/oagis_expression_generate.xhtml">Generate OAGIS Expression</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">Business Context <span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/business_context_list.xhtml">Business Context List</a></li>
+                                    <li><a href="/business_context_create.xhtml">Create Business Context</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">Context Category <span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/context_category_list.xhtml">Context Category List</a></li>
+                                    <li><a href="/context_category_create.xhtml">Create Context Category</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">Context Scheme <span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/context_scheme_list.xhtml">Context Scheme List</a></li>
+                                    <li><a href="/context_scheme_create.xhtml">Create Context Scheme</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">Code List <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/code_lists.xhtml">View Code List</a></li>
+                                    <li><a href="/code_list_create_wo_base.xhtml">Create Code List w/o base</a></li>
+                                    <li>
+                                        <a href="/code_list_create_from_another.xhtml">Create Code List from another</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">#{request.userPrincipal.name} <span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/logout">Sign out</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
 
-                            <p:submenu label="Business Context" icon="ui-icon-star">
-                                <p:menuitem value="Business Context List" url="/business_context_list.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Create Business Context" url="/business_context_create.xhtml"/>
-                            </p:submenu>
+    <div class="row">
+        <div class="container">
+            <div class="col-lg-12">
+                <div class="main">
+                    <ui:insert name="content"/>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                            <p:submenu label="Context Category" icon="ui-icon-calculator">
-                                <p:menuitem value="Context Category List" url="/context_category_list.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Create Context Category" url="/context_category_create.xhtml"/>
-                            </p:submenu>
-
-                            <p:submenu label="Context Scheme" icon="ui-icon-suitcase">
-                                <p:menuitem value="Context Scheme List" url="/context_scheme_list.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Create Context Scheme" url="/context_scheme_create.xhtml"/>
-                            </p:submenu>
-
-                            <p:submenu label="Code List" icon="ui-icon-flag">
-                                <p:menuitem value="View Code List" url="/code_lists.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Create Code List w/o base" url="/code_list_create_wo_base.xhtml"/>
-                                <p:separator/>
-                                <p:menuitem value="Create Code List from another"
-                                            url="/code_list_create_from_another.xhtml"/>
-                            </p:submenu>
-
-                            <f:facet name="options">
-                                <a href="/logout">
-                                    <p:commandButton type="button" value="Logout" icon="ui-icon-extlink">
-                                    </p:commandButton>
-                                </a>
-                            </f:facet>
-                        </p:menubar>
-                    </h:form>
-                </p:layoutUnit>
-            </p:layout>
-        </p:layoutUnit>
-
-        <p:layoutUnit position="center">
-            <ui:insert name="content"/>
-        </p:layoutUnit>
-
-        <p:layoutUnit position="south" size="50" resizable="true"
-                      closable="true" collapsible="true">
-			<span class="fontSize14 blue"><a
-                    href="http://www.oagi.org">Open Application Group</a> &copy; 2015, Some rights reserved.</span>
-            <span class="floatRight fontSize14 blue">
-				<p:clock/>
-			</span>
-        </p:layoutUnit>
-
-    </p:layout>
+    <div class="row">
+        <div class="container">
+            <div class="col-lg-12">
+                <div class="footer">
+                    <span class="copyright">© 2015-16 <a href="http://www.oagi.org">Open Application Group.</a> All rights reserved.</span>
+                    <span class="floatRight"><p:clock/></span>
+                </div>
+            </div>
+        </div>
+    </div>
 </h:body>
 </html>
