@@ -25,6 +25,7 @@
     <h:outputStylesheet library="css" name="font-awesome-4.6.3.min.css"/>
     <h:outputStylesheet library="css" name="sr.css"/>
     <h:outputStylesheet library="css" name="srt.css"/>
+    <h:outputScript library="js" name="srt.js"></h:outputScript>
 
     <ui:insert name="head"/>
 </h:head>
@@ -147,10 +148,7 @@
     </div>
     <script>
         $(document).ready(function() {
-            $('.ui-icon-seek-first').text('First');
-            $('.ui-icon-seek-prev').text('Previous');
-            $('.ui-icon-seek-next').text('Next');
-            $('.ui-icon-seek-end').text('Last');
+            initDataTablePaginator();
         });
     </script>
 </h:body>
