@@ -23,7 +23,7 @@
                 <p:messages autoUpdate="true"/>
                 <h:panelGrid id="grid0" columns="6" cellpadding="5">
                     <h:outputLabel for="desc" value="Based Code List"
-                                   style="font-weight:bold; color:blue;"/>
+                                   styleClass="search-label" style="font-weight:bold; color: #4078c0;"/>
                     <p:commandButton value="Search" icon="ui-icon-extlink"
                                      actionListener="#{codeListHandler.chooseBasedCode}">
                         <p:ajax event="dialogReturn" listener="#{codeListHandler.onBasedCodeChosen}"
@@ -31,38 +31,38 @@
                     </p:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="grid" columns="6" cellpadding="5">
-                    <h:outputLabel for="name" rows="10" value="Name:" style="font-weight:bold"/>
+                    <h:outputLabel for="name" rows="10" value="Name:" styleClass="search-label"/>
                     <p:inputText id="name" value="#{codeListHandler.codeList.name}"
                                  label="Name"/>
 
-                    <h:outputLabel for="definition" rows="10" value="Definition:" style="font-weight:bold"/>
+                    <h:outputLabel for="definition" rows="10" value="Definition:" styleClass="search-label"/>
                     <p:inputText id="definition" value="#{codeListHandler.codeList.definition}"
                                  label="Definition"/>
 
                     <h:outputLabel for="definitionSource" rows="10" value="Definition Source:"
-                                   style="font-weight:bold"/>
+                                   styleClass="search-label"/>
                     <p:inputText id="definitionSource" value="#{codeListHandler.codeList.definitionSource}"
                                  label="Definition Source"/>
 
-                    <h:outputLabel for="listId" rows="10" value="List Id:" style="font-weight:bold"/>
+                    <h:outputLabel for="listId" rows="10" value="List Id:" styleClass="search-label"/>
                     <p:inputText id="listId" value="#{codeListHandler.codeList.listId}"
                                  label="List Id"/>
 
-                    <h:outputLabel for="agencyIdListValueId" rows="10" value="Agency Id:" style="font-weight:bold"/>
+                    <h:outputLabel for="agencyIdListValueId" rows="10" value="Agency Id:" styleClass="search-label"/>
                     <p:inputText id="agencyIdListValueId" value="#{codeListHandler.codeList.agencyId}"
                                  label="Agency Id"/>
 
-                    <h:outputLabel for="version" rows="10" value="Version:" style="font-weight:bold"/>
+                    <h:outputLabel for="version" rows="10" value="Version:" styleClass="search-label"/>
                     <p:inputText id="version" value="#{codeListHandler.codeList.versionId}"
                                  label="Version"/>
 
-                    <h:outputLabel for="remark" rows="10" value="Remark:" style="font-weight:bold"/>
+                    <h:outputLabel for="remark" rows="10" value="Remark:" styleClass="search-label"/>
                     <p:inputText id="remark" value="#{codeListHandler.codeList.remark}"
                                  label="Remark"/>
 
                 </h:panelGrid>
                 <h:panelGrid columns="2" cellpadding="5">
-                    <h:outputText style="font-weight:bold; color:red" value="Extensible? "/>
+                    <h:outputText style="font-weight:bold; color: #bd2c00;" value="Extensible? "/>
                     <p:selectBooleanCheckbox value="#{codeListHandler.extensible}"/>
                 </h:panelGrid>
             </p:panel>
@@ -115,7 +115,7 @@
                     </p:dataTable>
                 </h:panelGrid>
                 <h:panelGrid columns="2" cellpadding="5">
-                    <h:outputText style="font-weight:bold; color:blue" value="Add new Code List Value: "/>
+                    <h:outputText styleClass="search-label" style="font-weight:bold; color: #4078c0" value="Add new Code List Value: "/>
                     <p:commandButton value="Add" icon="ui-icon-extlink"
                                      actionListener="#{codeListHandler.addCodeListValue}">
                         <p:ajax event="dialogReturn" listener="#{codeListHandler.onCodeListValueAdded}"

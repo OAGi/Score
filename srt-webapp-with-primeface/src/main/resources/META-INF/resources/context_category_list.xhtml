@@ -23,10 +23,10 @@
             <p:panel header="Search Context Category">
                 <p:messages autoUpdate="true"/>
                 <h:panelGrid id="grid" columns="5" cellpadding="5">
-                    <h:outputLabel for="name" value="Name:" style="font-weight:bold"/>
+                    <h:outputLabel for="name" value="Name:" styleClass="search-label"/>
                     <p:autoComplete id="name" value="#{contextCategoryHandler.name}"
                                     completeMethod="#{contextCategoryHandler.completeInput}"/>
-                    <h:outputLabel for="description" value="Description:" style="font-weight:bold"/>
+                    <h:outputLabel for="description" value="Description:" styleClass="search-label"/>
                     <p:autoComplete id="description" value="#{contextCategoryHandler.description}"
                                     completeMethod="#{contextCategoryHandler.completeDescription}"/>
                     <p:commandButton value="Search" ajax="true" actionListener="#{contextCategoryHandler.search}"
@@ -35,8 +35,8 @@
             </p:panel>
             <p:panel header="Context Category List">
                 <p:dataTable id="tbl1" var="contextCategory" value="#{contextCategoryHandler.contextCategories}"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                             paginator="true" rows="10" style="width: 100%; margin-bottom:20px"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
                              selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategory.guid}">
                     <p:column selectionMode="single" style="width: 36px; text-align:center"/>
                     <p:column style="width: 35%">
@@ -82,22 +82,22 @@
                         <p:row>
                             <p:column style="width:400px">
                                 <h:outputLabel value="Do you really want to delete the following item?"
-                                               style="font-weight:bold; color:red"/>
+                                               style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Id: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Id: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.ctxCategoryId}"/>
 
-                        <h:outputText value="GUID: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="GUID: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.guid}"/>
 
-                        <h:outputText value="Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Name: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.name}"/>
 
-                        <h:outputText value="Description: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Description: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.description}"/>
 
                     </h:panelGrid>
@@ -123,22 +123,22 @@
                     <h:panelGrid id="grid6" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Context Category Detail" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Context Category Detail" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Id: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Id: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.ctxCategoryId}"/>
 
-                        <h:outputText value="GUID: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="GUID: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.guid}"/>
 
-                        <h:outputText value="Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Name: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.name}"/>
 
-                        <h:outputText value="Description: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Description: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextCategoryHandler.selectedCategory.description}"/>
                     </h:panelGrid>
                     <p:separator/>
@@ -164,23 +164,23 @@
                         <p:row>
                             <p:column style="width:400px">
                                 <h:outputLabel value="Edit Context Category (You can edit Name and Description)"
-                                               style="font-weight:bold; color:red"/>
+                                               style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Id: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Id: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText id="id" disabled="true" value="#{contextCategoryHandler.id}" label="Id"/>
 
-                        <h:outputText value="GUID: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="GUID: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText id="guid" style="width:400px" disabled="true"
                                      value="#{contextCategoryHandler.GUID}" label="Guid"/>
 
-                        <h:outputText value="Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Name: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText id="name1" value="#{contextCategoryHandler.name}" label="Name"/>
 
-                        <h:outputText value="Description: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Description: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputTextarea id="desc" rows="5" cols="40" autoResize="false"
                                          value="#{contextCategoryHandler.description}"
                                          label="Description">

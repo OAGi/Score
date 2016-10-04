@@ -27,8 +27,8 @@
                                  icon="ui-icon-search"/>
             </h:panelGrid>
             <p:dataTable id="tbl" var="abieView"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                         paginator="true" rows="10" style="width:565px; margin-bottom:20px"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                         paginator="true" paginatorPosition="bottom" rows="10" style="width:565px; margin-bottom:20px"
                          value="#{profileBODHandler.abieViewListForSelection}" selection="#{profileBODHandler.selected}"
                          rowKey="#{abieView.id}" selectionMode="single">
                 <p:ajax event="rowSelect" listener="#{profileBODHandler.onRowSelect}"/>

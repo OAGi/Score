@@ -21,8 +21,8 @@
             <p:growl id="messages1"/>
             <p:panel header="Business Context List">
                 <p:dataTable id="tbl" var="businessContext" value="#{businessContextHandler.businessContexts}"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                             paginator="true" rows="10" style="width: 100%; margin-bottom:20px"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
                              selection="#{businessContextHandler.bcDetail}" rowKey="#{businessContext.bizCtxId}">
                     <p:column selectionMode="single" style="width: 36px; text-align:center"/>
                     <p:column style="width: 30%">
@@ -39,7 +39,7 @@
                     </p:column>
 
                 </p:dataTable>
-                <p:commandButton process="tbl" update=":form:bcDetailid" icon="ui-icon-search" value="Detail"
+                <p:commandButton styleClass="btn btn-primary" process="tbl" update=":form:bcDetailid" icon="ui-icon-search" value="Detail"
                                  oncomplete="PF('bcDetail').show()"/>
 
             </p:panel>

@@ -24,10 +24,10 @@
                 <p:messages autoUpdate="true"/>
 
                 <h:panelGrid id="grid" columns="5" cellpadding="5">
-                    <h:outputLabel for="name" value="Name:" style="font-weight:bold"/>
+                    <h:outputLabel for="name" value="Name:" styleClass="search-label"/>
                     <p:autoComplete id="name" value="#{contextSchemeHandler.name}"
                                     completeMethod="#{contextSchemeHandler.completeInput}"/>
-                    <h:outputLabel for="description" value="Description:" style="font-weight:bold"/>
+                    <h:outputLabel for="description" value="Description:" styleClass="search-label"/>
                     <p:autoComplete id="description" value="#{contextSchemeHandler.description}"
                                     completeMethod="#{contextSchemeHandler.completeDescription}"/>
                     <p:commandButton value="Search" ajax="true" actionListener="#{contextSchemeHandler.search}"
@@ -37,8 +37,9 @@
             <p:panel header="Context Scheme List">
 
                 <p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeHandler.contextSchemes}"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                             paginator="true" rows="10" style="width: 100%; margin-bottom:20px"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom:20px"
                              selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.ctxSchemeId}">
                     <p:column selectionMode="single" style="width: 36px; text-align:center"/>
 
@@ -76,30 +77,30 @@
                         <p:row>
                             <p:column style="width:400px">
                                 <h:outputLabel value="Do you really want to delete the following item?"
-                                               style="font-weight:bold; color:red"/>
+                                               style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Scheme Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Name: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeName}"/>
 
-                        <h:outputText value="Description: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Description: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.description}"/>
 
                         <!--
-                        <h:outputText value="Scheme Agency Name: " style="font-weight:bold; color:blue" />
+                        <h:outputText value="Scheme Agency Name: " style="font-weight:bold; color: #4078c0" />
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyName}" />
                         -->
 
-                        <h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Agency ID: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyId}"/>
 
-                        <h:outputText value="Scheme Version: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Version: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersionId}"/>
 
-                        <h:outputText value="Context Category: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Context Category: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.ctxCategoryId}"/>
 
                     </h:panelGrid>
@@ -107,7 +108,7 @@
                     <h:panelGrid id="grid12" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Context Scheme Values" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Context Scheme Values" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
@@ -152,32 +153,32 @@
                     <h:panelGrid id="grid6" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Context Scheme Detail" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Context Scheme Detail" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Scheme Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Name: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeName}"/>
 
-                        <h:outputText value="Description: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Description: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.description}"/>
 
-                        <h:outputText value="Schema Agency ID: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Schema Agency ID: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeAgencyId}"/>
 
-                        <h:outputText value="Schema Version: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Schema Version: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.schemeVersionId}"/>
 
-                        <h:outputText value="Context Category: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Context Category: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{contextSchemeHandler.selectedScheme.ctxCategoryId}"/>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid id="grid10" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Context Scheme Values" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Context Scheme Values" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
@@ -221,37 +222,37 @@
                     <h:panelGrid id="grid17" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Edit Context Scheme" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Edit Context Scheme" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Scheme Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Name: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText value="#{contextSchemeHandler.schemeName}"/>
 
-                        <h:outputText value="Description: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Description: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputTextarea id="desc" rows="5" cols="40" autoResize="false"
                                          value="#{contextSchemeHandler.description}"
                                          label="Description">
                         </p:inputTextarea>
 
-                        <h:outputText value="Scheme Agency ID: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Agency ID: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText value="#{contextSchemeHandler.schemeAgencyID}"/>
 
-                        <h:outputText value="Scheme Version: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Scheme Version: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText value="#{contextSchemeHandler.schemeVersion}"/>
 
-                        <h:outputText value="Context Category: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Context Category: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText value="#{contextSchemeHandler.contextCategoryID}"/>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid id="grid11" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel for="desc" value="Scheme Value: " style="font-weight:bold; color: red"/>
+                                <h:outputLabel for="desc" value="Scheme Value: " style="font-weight:bold; color: #bd2c00"/>
                                 <h:outputLabel for="desc" value="(Click 'Add' button to add new Scheme Value) "
-                                               style="font-weight:bold; color: blue"/>
+                                               style="font-weight:bold; color: #4078c0"/>
                             </p:column>
                             <p:column>
                                 <p:commandButton process="tbl3" update=":listForm:addSVid" icon="ui-icon-search"
@@ -312,16 +313,16 @@
                     <h:panelGrid id="grid7" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Add new Scheme Value" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Add new Scheme Value" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText value="Value: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Value: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText id="value" value="#{contextSchemeHandler.value}" label="Name"/>
 
-                        <h:outputText value="Meaning: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Meaning: " style="font-weight:bold; color: #4078c0"/>
                         <p:inputText id="meaning" value="#{contextSchemeHandler.meaning}" label="Meaning"
                                      style="width: 400px !important;"/>
 

@@ -20,11 +20,9 @@
 
     <ui:define name="content">
         <h:form id="form">
-            <p:growl id="messages1" showDetail="true"/>
             <p:panel header="Search Code List">
-                <p:messages autoUpdate="true"/>
                 <h:panelGrid id="grid" columns="5" cellpadding="5">
-                    <h:outputLabel for="ccName" value="Based Code List:" style="font-weight:bold"/>
+                    <h:outputLabel for="ccName" value="Based Code List:" styleClass="search-label"/>
                     <p:autoComplete id="ccName" value="#{codeListHandler.basedCodeListName}"
                                     completeMethod="#{codeListHandler.completeInput}"/>
                     <p:commandButton value="Search" ajax="true" actionListener="#{codeListHandler.search}" update="tbl"
@@ -33,8 +31,8 @@
             </p:panel>
             <p:panel header="Code List">
                 <p:dataTable id="tbl" var="cVO"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                             paginator="true" rows="20" style="width: 100%; margin-bottom:20px"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
                              value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}"
                              rowKey="#{cVO.codeListId}" selectionMode="single">
                     <p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}"/>
@@ -83,39 +81,39 @@
                     <h:panelGrid id="grid6" cellpadding="5">
                         <p:row>
                             <p:column style="width:800px">
-                                <h:outputLabel value="Code List Detail" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Code List Detail" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
                     <p:separator/>
                     <h:panelGrid columns="2" cellpadding="3">
-                        <h:outputText value="Name: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Name: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.name}"/>
 
-                        <h:outputText value="Definition: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Definition: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.definition}"/>
 
-                        <h:outputText value="Definition Source: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Definition Source: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.definitionSource}"/>
 
-                        <h:outputText value="List Id: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="List Id: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.listId}"/>
 
-                        <h:outputText value="Agency Id: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Agency Id: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.agencyId}"/>
 
-                        <h:outputText value="Version: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Version: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.versionId}"/>
 
-                        <h:outputText value="Remark: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Remark: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.remark}"/>
 
-                        <h:outputText value="State: " style="font-weight:bold; color:blue"/>
-                        <h:outputText value="#{codeListHandler.selected.state}" style="font-weight:bold; color:red"/>
+                        <h:outputText value="State: " style="font-weight:bold; color: #4078c0"/>
+                        <h:outputText value="#{codeListHandler.selected.state}" style="font-weight:bold; color: #bd2c00"/>
 
-                        <h:outputText value="Extensible: " style="font-weight:bold; color:blue"/>
+                        <h:outputText value="Extensible: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.extensibleIndicator}"
-                                      style="font-weight:bold; color:red"/>
+                                      style="font-weight:bold; color: #bd2c00"/>
 
                     </h:panelGrid>
                     <p:separator/>
@@ -178,7 +176,7 @@
                     <h:panelGrid id="grid7" cellpadding="5">
                         <p:row>
                             <p:column style="width:400px">
-                                <h:outputLabel value="Edit Code List" style="font-weight:bold; color:red"/>
+                                <h:outputLabel value="Edit Code List" style="font-weight:bold; color: #bd2c00"/>
                             </p:column>
                         </p:row>
                     </h:panelGrid>
@@ -256,7 +254,7 @@
                         </p:dataTable>
                     </h:panelGrid>
                     <h:panelGrid columns="2" cellpadding="5">
-                        <h:outputText style="font-weight:bold; color:blue" value="Add new Code List Value: "/>
+                        <h:outputText style="font-weight:bold; color: #4078c0" value="Add new Code List Value: "/>
                         <p:commandButton value="Add" icon="ui-icon-extlink"
                                          actionListener="#{codeListHandler.addCodeListValue()}">
                             <p:ajax event="dialogReturn" listener="#{codeListHandler.onCodeListValueAdded}"

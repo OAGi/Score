@@ -23,8 +23,8 @@
             <p:growl id="messages1" showDetail="true"/>
             <p:panel header="Profile BOD List">
                 <p:dataTable id="tbl" var="abieView"
-                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                             paginator="true" rows="20" style="width: 100%; margin-bottom:20px"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
                              value="#{topLevelABIEHandler.bodList}" selection="#{topLevelABIEHandler.selectedBod}"
                              rowKey="#{abieView.id}" selectionMode="single">
                     <p:ajax event="rowSelect" update=":form:detailList"
@@ -61,7 +61,7 @@
                                  oncomplete="PF('tbDetail').show()"/>
             </p:panel>
             <p:dialog header="Edit Profile BOD" widgetVar="tbDetail" showEffect="clip" hideEffect="clip" closable="true"
-                      scrollable="true" resizable="true" draggable="true" width="80%" height="700px">
+                      position="left top" scrollable="true" resizable="true" draggable="true" width="80%" height="700px">
                 <p:growl id="messages2"/>
                 <p:outputPanel id="tbDetailid">
                     <p:messages autoUpdate="true"/>
@@ -96,12 +96,12 @@
                                     <h:panelGrid columns="2" cellpadding="5">
                                         <h:outputLabel rows="10" value="Name: " style="font-weight:bold;"/>
                                         <h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}"
-                                                       style="font-weight:bold; color:blue"/>
+                                                       style="font-weight:bold; color: #4078c0"/>
                                     </h:panelGrid>
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
                                         <h:outputLabel rows="10" value="Top-level BIE Info: "
-                                                       style="font-weight:bold; color:red"/>
+                                                       style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Biz Term" style="font-weight:bold"/>
@@ -122,7 +122,7 @@
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Name: " style="font-weight:bold;"/>
                                         <h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.name}"
-                                                       style="font-weight:bold; color:blue"/>
+                                                       style="font-weight:bold; color: #4078c0"/>
 
                                         <h:outputLabel rows="10" value="Used: " style="font-weight:bold;"/>
                                         <h:selectBooleanCheckbox rows="10"
@@ -130,7 +130,7 @@
                                     </h:panelGrid>
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
-                                        <h:outputLabel rows="10" value="ASBIE: " style="font-weight:bold; color:red"/>
+                                        <h:outputLabel rows="10" value="ASBIE: " style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Min:" style="font-weight:bold"/>
@@ -153,7 +153,7 @@
                                     </h:panelGrid>
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
-                                        <h:outputLabel rows="10" value="ASBIEP" style="font-weight:bold; color:red"/>
+                                        <h:outputLabel rows="10" value="ASBIEP" style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Remark:" style="font-weight:bold"/>
@@ -172,7 +172,7 @@
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
                                         <h:outputLabel rows="10" value="Target ABIE"
-                                                       style="font-weight:bold; color:red"/>
+                                                       style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="2" cellpadding="5">
                                         <h:outputLabel rows="10" value="Biz Term:" style="font-weight:bold"/>
@@ -203,7 +203,7 @@
                                     </h:panelGrid>
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
-                                        <h:outputLabel rows="10" value="BBIE" style="font-weight:bold; color:red"/>
+                                        <h:outputLabel rows="10" value="BBIE" style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Min:" style="font-weight:bold"/>
@@ -228,7 +228,7 @@
                                     </h:panelGrid>
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
-                                        <h:outputLabel rows="10" value="BBIEP" style="font-weight:bold; color:red"/>
+                                        <h:outputLabel rows="10" value="BBIEP" style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Remark:" style="font-weight:bold"/>
@@ -246,12 +246,12 @@
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
                                         <h:outputLabel rows="10" value="BDT Primitive Restriction"
-                                                       style="font-weight:bold; color:red"/>
+                                                       style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="2" cellpadding="5">
                                         <h:outputLabel rows="10" value="BDT Name:" style="font-weight:bold"/>
                                         <h:outputLabel rows="10" value="#{topLevelABIEHandler.aABIEView.bdtName}"
-                                                       style="font-weight:bold; color: blue;"/>
+                                                       style="font-weight:bold; color: #4078c0;"/>
                                     </h:panelGrid>
                                     <h:panelGrid columns="4" cellpadding="5">
                                         <p:radioButton id="opt1" for="customRadio" itemIndex="0" selected="true"/>
@@ -272,7 +272,7 @@
                                         <h:outputLabel rows="10" value="Code List: " style="font-weight:bold"/>
                                         <h:outputLabel id="codeSelected" rows="10"
                                                        value="#{topLevelABIEHandler.codeList.name}  "
-                                                       style="font-weight:bold; color: blue;"/>
+                                                       style="font-weight:bold; color: #4078c0;"/>
 
                                         <p:commandButton process="tbl" update=":form:codeListId" value="Code List"
                                                          icon="ui-icon-extlink" oncomplete="PF('codeList').show()"
@@ -300,7 +300,7 @@
                                     </h:panelGrid>
                                     <p:separator/>
                                     <h:panelGrid columns="1" cellpadding="5">
-                                        <h:outputLabel rows="10" value="BBIE SC" style="font-weight:bold; color:red"/>
+                                        <h:outputLabel rows="10" value="BBIE SC" style="font-weight:bold; color: #bd2c00"/>
                                     </h:panelGrid>
                                     <h:panelGrid id="bbiesc" columns="4" cellpadding="5">
                                         <h:outputLabel rows="10" value="Max:" style="font-weight:bold"/>
@@ -346,7 +346,7 @@
                         <h:panelGrid id="grid6" cellpadding="5">
                             <p:row>
                                 <p:column style="width:800px">
-                                    <h:outputLabel value="Derived Code List" style="font-weight:bold; color:red"/>
+                                    <h:outputLabel value="Derived Code List" style="font-weight:bold; color: #bd2c00"/>
                                 </p:column>
                             </p:row>
                         </h:panelGrid>
@@ -354,8 +354,8 @@
                         <p:messages autoUpdate="true"/>
 
                         <p:dataTable id="tbl_01" var="c"
-                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                                     paginator="true" rows="10" style="width:550px; margin-bottom:20px"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                     paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
                                      value="#{topLevelABIEHandler.codeLists}"
                                      selection="#{topLevelABIEHandler.codeList}" rowKey="#{c.codeListID}"
                                      selectionMode="single">
@@ -394,8 +394,8 @@
                                              icon="ui-icon-search"/>
                         </h:panelGrid>
                         <p:dataTable id="tbl02" var="c"
-                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                                     paginator="true" rows="10" style="width:550px; margin-bottom:20px"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                     paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
                                      value="#{topLevelABIEHandler.codeLists2}"
                                      selection="#{topLevelABIEHandler.codeList}" rowKey="#{c.codeListID}"
                                      selectionMode="single">

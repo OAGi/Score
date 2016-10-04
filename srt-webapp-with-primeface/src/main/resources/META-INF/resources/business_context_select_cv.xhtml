@@ -27,8 +27,8 @@
                                  update="tbl" icon="ui-icon-search"/>
             </h:panelGrid>
             <p:dataTable id="tbl" var="contextCategory"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-                         paginator="true" rows="5" style="width: 100%; margin-bottom:20px"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                         paginator="true" paginatorPosition="bottom" rows="5" style="width: 100%; margin-bottom:20px"
                          value="#{businessContextHandler.contextCategories}"
                          selection="#{businessContextHandler.selected}" rowKey="#{contextCategory.ctxCategoryId}"
                          selectionMode="single">
@@ -53,7 +53,7 @@
                 <h:outputLabel value="Context Scheme:" style="font-weight:bold"/>
             </h:panelGrid>
             <p:dataTable id="tbl1" var="contextScheme"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
                          paginator="true" rows="5" style="width: 100%; margin-bottom:20px"
                          value="#{businessContextHandler.contextSchemes}"
                          selection="#{businessContextHandler.selected1}" rowKey="#{contextScheme.ctxSchemeId}"
@@ -78,7 +78,7 @@
                 <h:outputLabel value="Context Value:" style="font-weight:bold"/>
             </h:panelGrid>
             <p:dataTable id="tbl2" var="contextSchemeValue"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
                          paginator="true" rows="5" style="width: 100%; margin-bottom:20px"
                          value="#{businessContextHandler.contextValues}" selection="#{businessContextHandler.selected2}"
                          rowKey="#{contextSchemeValue.ctxSchemeValueId}" selectionMode="multiple">

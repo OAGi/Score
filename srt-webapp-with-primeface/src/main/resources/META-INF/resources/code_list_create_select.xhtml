@@ -7,11 +7,6 @@
     
     <h:head>
         <title>Search and Select Code List</title>
-                <style type="text/css">
-            .ui-widget {
-                font-size: 90%;
-            }
-        </style>
     </h:head>
      
     <h:body>
@@ -25,8 +20,8 @@
 					<p:autoComplete id="ccName" value="#{codeListHandler.basedCodeListName}" completeMethod="#{codeListHandler.completeInput}" />
 					<p:commandButton value="Search" ajax="true" actionListener="#{codeListHandler.search}" update="tbl" icon="ui-icon-search" />
 				</h:panelGrid>
-	            <p:dataTable id="tbl" var="codeList" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
-					paginator="true" rows="10" style="width:550px; margin-bottom:20px"
+	            <p:dataTable id="tbl" var="codeList" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+					paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
 	            	value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{codeList.codeListId}" selectionMode="single">
 					<p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}" />
         			<p:ajax event="rowUnselect" listener="#{codeListHandler.onRowUnselect}" />
