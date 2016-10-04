@@ -595,7 +595,6 @@ public class BusinessInformationEntityService {
                         // bbieSc.setBbieId(bbieId);
                         long bdtScId = dtSc.getDtScId();
                         bbieSc.setDtScId(bdtScId);
-                        bbieSc.setGuid(Utility.generateGUID());
                         long bdtScPriRestriId = createBIEContext.getDefaultBdtScPriRestriId(bdtScId);
                         if (bdtScPriRestriId > 0L) {
                             bbieSc.setDtScPriRestriId(bdtScPriRestriId);

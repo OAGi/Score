@@ -74,11 +74,6 @@
 <createdTime>2016-08-08 21:19:52 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 </ColumnProxy>
-<ColumnProxy name="GUID" id="D27D3BA3-0CCE-FC0B-7E79-66BDCA184ACC">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-18 18:33:34 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-</ColumnProxy>
 <ColumnProxy name="DT_SC_ID" id="D3EC65DC-8471-72C3-0009-3FDCDEB2FF3C">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:19:52 UTC</createdTime>
