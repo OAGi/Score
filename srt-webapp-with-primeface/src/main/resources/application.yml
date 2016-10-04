@@ -20,6 +20,10 @@ spring:
     initializer:
       enabled: false
 
+  mvc:
+    favicon:
+      enabled: false
+
 jsf:
   state-saving-method: server
   datetimeconverter-default-timezone-is-system-timezone: true
