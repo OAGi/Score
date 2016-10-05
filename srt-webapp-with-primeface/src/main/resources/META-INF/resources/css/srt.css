@@ -448,3 +448,7 @@ tr {
     border: 0;
     font-size: 12px;
 }
+
+.ui-datatable-empty-message > td {
+    text-align: center;
+}
