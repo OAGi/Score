@@ -32,7 +32,7 @@ public class SRTDataTableRenderer extends DataTableRenderer {
         String paginatorPosition = table.getPaginatorPosition();
         int frozenColumns = table.getFrozenColumns();
         boolean hasFrozenColumns = (frozenColumns != 0);
-        boolean hasData = table.getRowCount() > 0;
+        boolean hasData = table.getRowCount() > 0 && table.getPageCount() > 1;
 
         //style class
         String containerClass = scrollable ? DataTable.CONTAINER_CLASS + " " + DataTable.SCROLLABLE_CONTAINER_CLASS : DataTable.CONTAINER_CLASS;

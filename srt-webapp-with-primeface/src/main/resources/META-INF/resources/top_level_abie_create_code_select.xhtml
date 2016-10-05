@@ -25,7 +25,7 @@
 				<p:autoComplete id="ccName" value="#{codeListHandler.basedCodeListName}" completeMethod="#{codeListHandler.completeInput}" />
 				<p:commandButton value="Search" ajax="true" actionListener="#{codeListHandler.search}" update="tbl" icon="ui-icon-search" />
 			</h:panelGrid>
-			<p:dataTable id="tbl" var="cVO" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+			<p:dataTable id="tbl" var="cVO" paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
 						 paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
 						 value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}" rowKey="#{cVO.codeListId}" selectionMode="single">
 				<p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}" />

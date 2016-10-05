@@ -15,7 +15,7 @@
 
 .ui-layout-north {
     z-index: 20 !important;
-    overflow: visible !important;;
+    overflow: visible !important;
 }
 
 .ui-layout-north .ui-layout-unit-content {
@@ -225,12 +225,12 @@ a:active, a:hover {
 
 .ui-datatable-tablewrapper th {
     border: 1px solid #e5e5e5 !important;
+    font-weight: 600 !important;
 }
 
 .ui-state-default {
     border: 0 !important;
     background: #f5f5f5 !important;
-    font-weight: 600 !important;
     color: #333 !important;
     position: relative;
 }
@@ -274,6 +274,8 @@ tr {
 
 .ui-paginator {
     margin-top: 20px !important;
+    display: inline-block;
+    width: 100%;
 }
 
 .ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-pages, .ui-paginator .ui-paginator-next, .ui-paginator .ui-paginator-last, .ui-paginator .ui-paginator-first, .ui-paginator .ui-paginator-prev, .ui-paginator .ui-paginator-current {
@@ -286,27 +288,6 @@ tr {
     border: 0;
 }
 
-.ui-paginator-current, .ui-paginator-first, .ui-paginator-prev, .ui-paginator-next, .ui-paginator-last {
-    color: #4078c0 !important;
-    padding: 0 !important;
-}
-
-.ui-paginator-current, .ui-paginator-prev, .ui-paginator-next, .ui-paginator-last {
-    margin-left: -1px !important;
-}
-
-.ui-paginator > a > span {
-    color: #4078c0 !important;
-    width: auto;
-    text-indent: 0;
-    background-color: #ffffff;
-    padding: 7px 12px;
-    font-size: 13px !important;
-    font-style: normal !important;
-    font-weight: 600 !important;
-    color: #4078c0 !important;
-}
-
 .ui-paginator > a > span:hover {
     z-index: 2;
     text-decoration: none;
@@ -315,7 +296,7 @@ tr {
 }
 
 .ui-paginator > a > span.ui-icon {
-    background-image: none; !important;
+    background-image: none !important;
     border: 1px solid #e5e5e5 !important;
 }
 
@@ -324,46 +305,62 @@ tr {
     margin: 0 !important;
 }
 
-.ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-pages, .ui-paginator .ui-paginator-next, .ui-paginator .ui-paginator-last, .ui-paginator .ui-paginator-first, .ui-paginator .ui-paginator-prev, .ui-paginator .ui-paginator-current {
-    margin-bottom: 1px !important;
-}
-
-.ui-paginator-page {
-    position: relative !important;
-    padding: 7px 16px !important;
-    font-size: 13px !important;
-    font-style: normal !important;
-    font-weight: 600 !important;
-    color: #4078c0 !important;
-    white-space: nowrap !important;
-    vertical-align: middle !important;
-    cursor: pointer !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-    background: #fff !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 0;
-}
-
-.ui-state-hover, .ui-state-focus, .ui-paginator > a > span:hover {
+.ui-state-focus, .ui-paginator a.ui-state-active, .ui-paginator a:hover {
     z-index: 3 !important;
     color: #fff !important;
     background-color: #4078c0 !important;
     border-color: #4078c0 !important;
     box-shadow: none !important;
+    border: 1px solid #e5e5e5 !important;
+}
+
+.ui-paginator a {
+    position: relative;
+    padding: 7px 16px !important;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 600;
+    color: #4078c0 !important;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background: #fff !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.ui-paginator a:first-child {
+    margin-left: 0;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.ui-paginator a:last-child {
+    margin-left: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.ui-paginator a.ui-state-disabled {
+    color: #d3d3d3 !important;
+    cursor: default !important;
+    background-color: #fafafa !important;
+    opacity: 1.00 !important;
+}
+
+.ui-state-focus {
+    box-shadow: none !important;
 }
 
 .ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
     background: #f2f8fa !important;
-}
-
-.ui-state-active {
-    z-index: 3 !important;
-    color: #fff !important;
-    background-color: #4078c0 !important;
-    border-color: #4078c0 !important;
+    color: #333 !important;
+    box-shadow: none !important;
 }
 
 .ui-inputfield {
@@ -380,6 +377,12 @@ tr {
     border-radius: 3px !important;
     outline: none !important;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.075) !important;
+}
+
+input.ui-state-focus {
+    border-color: #51a7e8 !important;
+    outline: none !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.075),0 0 5px rgba(81,167,232,0.5) !important;
 }
 
 .ui-widget-content > table {
@@ -434,6 +437,8 @@ tr {
 
 .search-label {
     line-height: 30px;
+    margin-left: 10px;
+    font-weight: normal !important;
 }
 
 .ui-treetable .ui-treetable-header {

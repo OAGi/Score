@@ -16,14 +16,11 @@ public class PageLinkRenderer {
         writer.writeAttribute("href", "#", null);
         writer.writeAttribute("class", styleClass, null);
         writer.writeAttribute("aria-label", ariaLabel, null);
-        if(!disabled) {
+        if (!disabled) {
             writer.writeAttribute("tabindex", 0, null);
         }
 
-        writer.startElement("span", null);
-        writer.writeAttribute("class", iconClass, null);
         writer.writeText(text, null);
-        writer.endElement("span");
 
         writer.endElement("a");
     }

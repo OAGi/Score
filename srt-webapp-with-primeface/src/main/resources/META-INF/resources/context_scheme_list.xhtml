@@ -37,7 +37,7 @@
             <p:panel header="Context Scheme List">
 
                 <p:dataTable id="tbl1" var="contextScheme" value="#{contextSchemeHandler.contextSchemes}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px"
                              selection="#{contextSchemeHandler.selectedScheme}" rowKey="#{contextScheme.ctxSchemeId}">

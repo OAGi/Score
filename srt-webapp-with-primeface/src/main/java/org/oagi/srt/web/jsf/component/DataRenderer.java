@@ -1,7 +1,10 @@
 package org.oagi.srt.web.jsf.component;
 
 import org.primefaces.component.api.UIData;
-import org.primefaces.component.paginator.*;
+import org.primefaces.component.paginator.CurrentPageReportRenderer;
+import org.primefaces.component.paginator.JumpToPageDropdownRenderer;
+import org.primefaces.component.paginator.PaginatorElementRenderer;
+import org.primefaces.component.paginator.RowsPerPageDropdownRenderer;
 import org.primefaces.renderkit.CoreRenderer;
 import org.primefaces.util.MessageFactory;
 import org.primefaces.util.WidgetBuilder;
@@ -24,7 +27,7 @@ public class DataRenderer extends CoreRenderer {
         PAGINATOR_ELEMENTS.put("{PreviousPageLink}", new org.oagi.srt.web.jsf.component.PrevPageLinkRenderer());
         PAGINATOR_ELEMENTS.put("{NextPageLink}", new org.oagi.srt.web.jsf.component.NextPageLinkRenderer());
         PAGINATOR_ELEMENTS.put("{LastPageLink}", new org.oagi.srt.web.jsf.component.LastPageLinkRenderer());
-        PAGINATOR_ELEMENTS.put("{PageLinks}", new PageLinksRenderer());
+        PAGINATOR_ELEMENTS.put("{PageLinks}", new org.oagi.srt.web.jsf.component.PageLinksRenderer());
         PAGINATOR_ELEMENTS.put("{RowsPerPageDropdown}", new RowsPerPageDropdownRenderer());
         PAGINATOR_ELEMENTS.put("{JumpToPageDropdown}", new JumpToPageDropdownRenderer());
     }

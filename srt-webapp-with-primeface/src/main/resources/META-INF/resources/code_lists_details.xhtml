@@ -4,20 +4,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui" template="template.xhtml">
 
-    <ui:define name="side_menu">
-        <h:form>
-            <p:growl id="messages" showDetail="false"/>
-
-            <p:menu>
-                <p:submenu style="width: 180px !important;" label="Code List">
-                    <p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create"/>
-                    <p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create"/>
-                    <p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search"/>
-                </p:submenu>
-            </p:menu>
-        </h:form>
-    </ui:define>
-
     <ui:define name="content">
         <h:form id="form">
             <p:panel header="Search Code List">
@@ -31,7 +17,7 @@
             </p:panel>
             <p:panel header="Code List">
                 <p:dataTable id="tbl" var="cVO"
-                             paginatorTemplate="{PreviousPageLink} {PageLinks} {LastPageLink}"
+                             paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
                              value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}"
                              rowKey="#{cVO.codeListId}" selectionMode="single">

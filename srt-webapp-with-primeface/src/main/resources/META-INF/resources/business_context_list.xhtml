@@ -21,7 +21,7 @@
             <p:growl id="messages1"/>
             <p:panel header="Business Context List">
                 <p:dataTable id="tbl" var="businessContext" value="#{businessContextHandler.businessContexts}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
                              selection="#{businessContextHandler.bcDetail}" rowKey="#{businessContext.bizCtxId}">
                     <p:column selectionMode="single" style="width: 36px; text-align:center"/>

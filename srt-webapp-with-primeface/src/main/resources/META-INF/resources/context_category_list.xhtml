@@ -35,7 +35,7 @@
             </p:panel>
             <p:panel header="Context Category List">
                 <p:dataTable id="tbl1" var="contextCategory" value="#{contextCategoryHandler.contextCategories}"
-                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                             paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
                              selection="#{contextCategoryHandler.selectedCategory}" rowKey="#{contextCategory.guid}">
                     <p:column selectionMode="single" style="width: 36px; text-align:center"/>

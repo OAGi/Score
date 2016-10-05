@@ -38,7 +38,7 @@
                     </p:panel>
                     <p:panel header="Top-level Concept List">
                         <p:dataTable id="tbl" var="aSCCP" value="#{topLevelABIEHandler.asccpVOs}"
-                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                     paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                                      paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
                                      selection="#{topLevelABIEHandler.selected}" rowKey="#{aSCCP.asccpId}"
                                      selectionMode="single">
@@ -100,7 +100,7 @@
                         <h:panelGrid columns="1" columnClasses="label, value">
                             <p:dataTable id="tbl1" var="businessContext"
                                          value="#{businessContextHandler.businessContexts}"
-                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                         paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                                          paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
                                          selection="#{businessContextHandler.bcDetail}"
                                          rowKey="#{businessContext.bizCtxId}">
@@ -581,7 +581,7 @@
                             <p:separator/>
 
                             <p:dataTable id="tbl_01" var="cVO"
-                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                         paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                                          paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
                                          value="#{topLevelABIEHandler.codeLists}"
                                          selection="#{topLevelABIEHandler.codeList}" rowKey="#{cVO.codeListId}"
@@ -622,7 +622,7 @@
                                                  icon="ui-icon-search"/>
                             </h:panelGrid>
                             <p:dataTable id="tbl02" var="cVO"
-                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} "
+                                         paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
                                          paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
                                          value="#{topLevelABIEHandler.codeLists2}"
                                          selection="#{topLevelABIEHandler.codeList}" rowKey="#{cVO.codeListId}"
