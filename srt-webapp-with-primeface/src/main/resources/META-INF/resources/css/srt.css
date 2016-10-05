@@ -223,6 +223,10 @@ a:active, a:hover {
     border-radius: 3px;
 }
 
+.ui-datatable-tablewrapper th {
+    border: 1px solid #e5e5e5 !important;
+}
+
 .ui-state-default {
     border: 0 !important;
     background: #f5f5f5 !important;
@@ -320,6 +324,10 @@ tr {
     margin: 0 !important;
 }
 
+.ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-pages, .ui-paginator .ui-paginator-next, .ui-paginator .ui-paginator-last, .ui-paginator .ui-paginator-first, .ui-paginator .ui-paginator-prev, .ui-paginator .ui-paginator-current {
+    margin-bottom: 1px !important;
+}
+
 .ui-paginator-page {
     position: relative !important;
     padding: 7px 16px !important;
@@ -356,10 +364,6 @@ tr {
     color: #fff !important;
     background-color: #4078c0 !important;
     border-color: #4078c0 !important;
-}
-
-.ui-paginator .ui-paginator-page, .ui-paginator .ui-paginator-next .ui-icon, .ui-paginator .ui-paginator-prev .ui-icon, .ui-paginator .ui-paginator-first .ui-icon, .ui-paginator .ui-paginator-last .ui-icon {
-    height: 36px !important;
 }
 
 .ui-inputfield {
