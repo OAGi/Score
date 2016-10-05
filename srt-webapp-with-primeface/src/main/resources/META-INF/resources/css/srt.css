@@ -119,6 +119,19 @@ body {
     background-image: none;
 }
 
+.dropdown-menu > li > span {
+    display: block;
+    padding: 4px 10px 4px 15px;
+    overflow: hidden;
+    color: #333;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-menu > li > span.disabled {
+    color: #767676;
+}
+
 .divider {
     height: 1px;
     margin: 8px 1px;
@@ -174,7 +187,7 @@ a:active, a:hover {
 .ui-panel {
     position: relative;
     border-radius: 3px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     padding: 0 !important;
 }
 
@@ -460,4 +473,67 @@ input.ui-state-focus {
 
 .ui-datatable-empty-message > td {
     text-align: center;
+}
+
+.boxed-group-inner {
+    padding: 10px;
+    color: #666;
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.boxed-group-inner tbody {
+    padding: 10px;
+}
+
+.boxed-group-inner tr {
+    border: 0 !important;
+}
+
+.boxed-group-inner td {
+    padding: 10px;
+}
+
+table.boxed-group-inner {
+    border-collapse: inherit;
+}
+
+.form-control {
+    width: 440px;
+    max-width: 100%;
+    margin-right: 5px !important;
+    background-color: #fafafa !important;
+}
+
+.boxed-group-inner label {
+    margin-bottom: -3px;
+}
+
+.boxed-group-inner input {
+    margin-bottom: 10px;
+}
+
+span.ui-button-text {
+    padding: 6px 12px !important;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px !important;
+}
+
+.danger .ui-panel-title {
+    color: #fff;
+    text-shadow: 0 -1px 0 #900;
+    background-color: #df3e3e;
+    border: 1px solid #a00;
+}
+
+.danger .ui-button-text {
+    color: #900 !important;
+    background-color: #eee !important;
+    background-image: -webkit-linear-gradient(#fcfcfc, #eee) !important;
+    background-image: linear-gradient(#fcfcfc, #eee) !important;
+    border: 1px solid #d5d5d5 !important;
+    border-radius: 3px;
 }

@@ -116,6 +116,9 @@
                                    aria-haspopup="true" aria-expanded="false">#{request.userPrincipal.name} <span
                                         class="caret"></span></a>
                                 <ul class="dropdown-menu">
+                                    <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="/settings.xhtml">Settings</a></li>
                                     <li><a href="/logout">Sign out</a></li>
                                 </ul>
                             </li>
