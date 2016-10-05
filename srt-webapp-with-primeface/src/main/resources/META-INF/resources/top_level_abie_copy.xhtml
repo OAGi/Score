@@ -27,7 +27,7 @@
                     <p:growl id="messages1" showDetail="true"/>
                     <p:panel header="Profile BOD List">
                         <p:dataTable id="tbl" var="abieView"
-                                     paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                      paginator="true" paginatorPosition="bottom" rows="20"
                                      style="width: 100%; margin-bottom:20px"
                                      value="#{topLevelABIEHandler.bodList}"
@@ -73,7 +73,7 @@
                         <p:panel header="Select Business Context">
                             <p:dataTable id="tbl_bc2" var="businessContext"
                                          value="#{businessContextHandler.businessContexts}"
-                                         paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                          paginator="true" paginatorPosition="bottom" rows="10"
                                          style="width:700px; margin-bottom:20px"
                                          selection="#{businessContextHandler.bcDetail}"
@@ -472,7 +472,7 @@
                             <p:separator/>
 
                             <p:dataTable id="tbl_01" var="cVO"
-                                         paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                          paginator="true" paginatorPosition="bottom" rows="10"
                                          style="width:550px; margin-bottom:20px"
                                          value="#{topLevelABIEHandler.codeLists}"
@@ -519,7 +519,7 @@
                                                  update="tbl02" icon="ui-icon-search"/>
                             </h:panelGrid>
                             <p:dataTable id="tbl02" var="cVO"
-                                         paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                          paginator="true" paginatorPosition="bottom" rows="10"
                                          style="width:550px; margin-bottom:20px"
                                          value="#{topLevelABIEHandler.codeLists2}"

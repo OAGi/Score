@@ -23,7 +23,7 @@
             <p:growl id="messages1" showDetail="true"/>
             <p:panel header="Profile BOD List">
                 <p:dataTable id="tbl" var="abieView"
-                             paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
                              value="#{topLevelABIEHandler.bodList}" selection="#{topLevelABIEHandler.selectedBod}"
                              rowKey="#{abieView.id}" selectionMode="single">
@@ -354,7 +354,7 @@
                         <p:messages autoUpdate="true"/>
 
                         <p:dataTable id="tbl_01" var="c"
-                                     paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                      paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
                                      value="#{topLevelABIEHandler.codeLists}"
                                      selection="#{topLevelABIEHandler.codeList}" rowKey="#{c.codeListID}"
@@ -394,7 +394,7 @@
                                              icon="ui-icon-search"/>
                         </h:panelGrid>
                         <p:dataTable id="tbl02" var="c"
-                                     paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                      paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
                                      value="#{topLevelABIEHandler.codeLists2}"
                                      selection="#{topLevelABIEHandler.codeList}" rowKey="#{c.codeListID}"

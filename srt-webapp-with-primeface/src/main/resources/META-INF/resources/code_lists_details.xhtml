@@ -17,7 +17,7 @@
             </p:panel>
             <p:panel header="Code List">
                 <p:dataTable id="tbl" var="cVO"
-                             paginatorTemplate="{FirstPageLink} {PageLinks} {LastPageLink}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
                              value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}"
                              rowKey="#{cVO.codeListId}" selectionMode="single">
