@@ -46,6 +46,7 @@
 			</p:dataTable>
 			<p:commandButton ajax="true" icon="ui-icon-search" value="Select" actionListener="#{codeListHandler.closeDialog}" />
 		</p:panel>
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 	</h:form>
 </h:body>
 

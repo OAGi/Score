@@ -40,6 +40,7 @@
 		        	<p:commandButton ajax="true" icon="ui-icon-search" value="Add" actionListener="#{contextSchemeHandler.addCSV}" />
 		        </h:panelGrid>
 			</p:outputPanel>
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
     </h:body>
      
