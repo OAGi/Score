@@ -22,6 +22,18 @@
 <ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="GUID" id="D27D3BA3-0CCE-FC0B-7E79-66BDCA184ACC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-08-18 18:33:34 UTC</createdTime>
+<commentInRDBMS>A globally unique identifier (GUID). It is different from the GUID fo the SC on the CC side. Per OAGIS, a GUID is of the form &quot;oagis-id-&quot; followed by a 32 Hex character sequence.</commentInRDBMS>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>41 CHAR</dataTypeSize>
+<ownDataTypeParameters>41 CHAR,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 <Column name="BBIE_ID" id="5FAEF807-6E36-E241-66CE-284DA878B195">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-08 21:19:52 UTC</createdTime>
@@ -31,7 +43,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="1E6B64F7-ABB6-484B-A5F7-C43022D66CC7" referredColumn="2C7ADB03-0523-5076-F3AB-BB20525308D9"/>
@@ -46,7 +58,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="E9AC9EC4-BDDF-D2CA-B62F-52CB54D11F6D" referredColumn="C1694137-A9B8-4328-34A3-A254EE56582B"/>
@@ -62,7 +74,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="16FE4E32-3E3C-A61C-F264-0B38A66716ED" referredColumn="E26B5231-05C5-B154-F69D-4EE8B9753BEA"/>
@@ -78,7 +90,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="584DB53E-3D85-3971-D4FB-298CBDAFDBCD" referredColumn="2ACD6D8F-BE6B-A6C8-0F31-60CC7D04311D"/>
@@ -94,7 +106,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="E2B290EA-A808-DD77-FFF7-1C9E319747B2" referredColumn="B6074C52-4EE7-1E0C-5F3F-1029DEE7FABA"/>
@@ -207,7 +219,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="C072F655-1588-BE29-1974-7C19BBBC8A9F" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>

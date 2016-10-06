@@ -1,6 +1,5 @@
 package org.oagi.srt.repository.entity;
 
-import org.oagi.srt.common.util.Utility;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -16,6 +15,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bbieScId;
+
+    @Column(nullable = false, length = 41)
+    private String guid;
 
     @Column(nullable = false)
     private long bbieId;
@@ -79,7 +81,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public String getGuid() {
-        return Utility.generateGUID();
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public long getBbieId() {
@@ -210,6 +216,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         if (cardinalityMax != that.cardinalityMax) return false;
         if (used != that.used) return false;
         if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (dtScPriRestriId != null ? !dtScPriRestriId.equals(that.dtScPriRestriId) : that.dtScPriRestriId != null)
             return false;
         if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
@@ -226,6 +233,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Override
     public int hashCode() {
         int result = (int) (bbieScId ^ (bbieScId >>> 32));
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (bbieId ^ (bbieId >>> 32));
         result = 31 * result + (int) (dtScId ^ (dtScId >>> 32));
         result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
@@ -247,6 +255,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     public String toString() {
         return "BasicBusinessInformationEntitySupplementaryComponent{" +
                 "bbieScId=" + bbieScId +
+                ", guid='" + guid + '\'' +
                 ", bbieId=" + bbieId +
                 ", dtScId=" + dtScId +
                 ", dtScPriRestriId=" + dtScPriRestriId +
