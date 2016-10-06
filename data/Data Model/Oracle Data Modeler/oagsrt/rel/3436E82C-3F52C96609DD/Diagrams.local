@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <oracle.dbtools.crest.model.design.relational.RelationalDesign>
-   <object objectType="main_view" objectID="5C5B7DFD-6D0E-A9E5-FC60-28A3A05AF504" name="oagsrt_revision" visible="true"/>
+   <object objectType="main_view" objectID="5C5B7DFD-6D0E-A9E5-FC60-28A3A05AF504" name="oagsrt_revision" visible="false"/>
    <object objectType="sub_view" objectID="7EB47418-691D-2A5E-F6F3-97BE953915FA" name="00 - Core Data Type (CDT)" visible="false"/>
    <object objectType="sub_view" objectID="3C7F7CDB-AF97-2FED-2C30-F3B48477BF13" name="01 - CDT Supplementary Component" visible="false"/>
    <object objectType="sub_view" objectID="1C1892FF-54C9-62E3-742F-169E07C67963" name="02 - Value List" visible="false"/>
