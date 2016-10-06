@@ -24,17 +24,13 @@ public class CodeListService {
     private CodeListValueRepository codeListValueRepository;
 
     public List<CodeList> findAll(Sort.Direction direction, String property) {
-        return Collections.unmodifiableList(
-                codeListRepository.findAll(new Sort(new Sort.Order(direction, property)))
-        );
+        return codeListRepository.findAll(new Sort(new Sort.Order(direction, property)));
     }
 
     public List<CodeListValue> findByCodeList(CodeList codeList) {
         long codeListId = (codeList != null) ? codeList.getCodeListId() : 0L;
         if (codeListId > 0L) {
-            return Collections.unmodifiableList(
-                    codeListValueRepository.findByCodeListId(codeListId)
-            );
+            return codeListValueRepository.findByCodeListId(codeListId);
         } else {
             return Collections.emptyList();
         }
@@ -53,11 +49,10 @@ public class CodeListService {
             return Collections.emptyList();
         }
         List<CodeList> codeLists = codeListRepository.findByNameContaining(name);
-        return Collections.unmodifiableList(codeLists.stream()
+        return codeLists.stream()
                 .map(codeList -> codeList.getName())
                 .distinct()
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.toList());
     }
 
     public List<CodeList> findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(String name) {
@@ -65,9 +60,7 @@ public class CodeListService {
         if (StringUtils.isEmpty(name)) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList(
-                codeListRepository.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(name)
-        );
+        return codeListRepository.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(name);
     }
 
     public void update(CodeList codeList) {

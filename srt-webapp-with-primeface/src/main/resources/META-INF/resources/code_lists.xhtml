@@ -2,7 +2,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" template="template.xhtml">
+                xmlns:p="http://primefaces.org/ui"
+                template="template.xhtml">
 
     <ui:define name="side_menu">
         <h:form>
@@ -32,44 +33,30 @@
             <p:panel header="Code List">
                 <p:dataTable id="tbl" var="cVO"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
-                             value="#{codeListHandler.codeLists}" selection="#{codeListHandler.selected}"
-                             rowKey="#{cVO.codeListId}" selectionMode="single">
+                             paginator="true" paginatorPosition="bottom" rows="20"
+                             style="width: 100%; margin-bottom: 20px;"
+                             value="#{codeListHandler.codeLists}" rowKey="#{cVO.codeListId}">
                     <p:ajax event="rowSelect" listener="#{codeListHandler.onRowSelect}"/>
                     <p:ajax event="rowUnselect" listener="#{codeListHandler.onRowUnselect}"/>
-                    <p:column style="width:400px">
-                        <f:facet name="header">
-                            <h:outputText value="Name"/>
-                        </f:facet>
+                    <p:column style="width: 100%" headerText="Name" sortBy="#{cVO.name}">
                         <h:outputText value="#{cVO.name}"/>
                     </p:column>
-
-                    <p:column style="width:100px">
-                        <f:facet name="header">
-                            <h:outputText value="Agency Id"/>
-                        </f:facet>
-                        <h:outputText value="#{cVO.agencyId}"/>
+                    <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
+                        <h:outputText value="#{cVO.agencyId}" style="float: right;"/>
                     </p:column>
-
-                    <p:column style="width:100px">
-                        <f:facet name="header">
-                            <h:outputText value="Version"/>
-                        </f:facet>
-                        <h:outputText value="#{cVO.versionId}"/>
+                    <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
+                        <h:outputText value="#{cVO.versionId}" style="float: right;"/>
                     </p:column>
-
-                    <p:column style="width:100px">
-                        <f:facet name="header">
-                            <h:outputText value="Extensible"/>
-                        </f:facet>
-                        <h:outputText value="#{cVO.extensibleIndicator}"/>
+                    <p:column style="width: 100px; text-align: center;" headerText="Extensible">
+                        <h:panelGroup rendered="#{cVO.extensibleIndicator}">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!cVO.extensibleIndicator}">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </h:panelGroup>
                     </p:column>
-
-                    <p:column style="width:100px">
-                        <f:facet name="header">
-                            <h:outputText value="State"/>
-                        </f:facet>
-                        <h:outputText value="#{cVO.state}"/>
+                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{cVO.state}">
+                        <span class="badge">#{cVO.state}</span>
                     </p:column>
                 </p:dataTable>
                 <p:commandButton process="tbl" update=":form:clDetailid" icon="ui-icon-search" value="Detail"
@@ -109,7 +96,8 @@
                         <h:outputText value="#{codeListHandler.selected.remark}"/>
 
                         <h:outputText value="State: " style="font-weight:bold; color: #4078c0"/>
-                        <h:outputText value="#{codeListHandler.selected.state}" style="font-weight:bold; color: #bd2c00"/>
+                        <h:outputText value="#{codeListHandler.selected.state}"
+                                      style="font-weight:bold; color: #bd2c00"/>
 
                         <h:outputText value="Extensible: " style="font-weight:bold; color: #4078c0"/>
                         <h:outputText value="#{codeListHandler.selected.extensibleIndicator}"
