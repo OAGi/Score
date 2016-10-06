@@ -6,6 +6,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.web.jsf.beans.codelist.CodeListBean;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -1368,8 +1369,8 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void onCodeListChosen(SelectEvent event) {
-        CodeListHandler ch = (CodeListHandler) event.getObject();
-        codeList = ch.getSelected();
+        CodeListBean ch = (CodeListBean) event.getObject();
+        //codeList = ch.getSelected();
         logger.debug(codeList.getName());
     }
 

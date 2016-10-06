@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,10 @@ public class CodeListService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    public CodeList findOne(long codeListId) {
+        return codeListRepository.findOne(codeListId);
     }
 
     public void updateState(CodeList codeList, CodeList.State state) {
@@ -67,6 +72,10 @@ public class CodeListService {
         codeListRepository.save(codeList);
     }
 
+    public void delete(Collection<CodeListValue> codeListValues) {
+        codeListValueRepository.delete(codeListValues);
+    }
+
     public CodeListBuilder newCodeListBuilder(CodeList codeList) {
         return new CodeListBuilder(codeList);
     }
@@ -74,16 +83,17 @@ public class CodeListService {
     public class CodeListBuilder {
 
         private CodeList codeList;
-        private int userId;
+        private long userId;
         private CodeList.State state = CodeList.State.Editing;
         private boolean extensibleIndicator;
         private CodeList basedCodeList;
 
         private CodeListBuilder(CodeList codeList) {
             this.codeList = codeList;
+            this.extensibleIndicator = codeList.isExtensibleIndicator();
         }
 
-        public CodeListBuilder userId(int userId) {
+        public CodeListBuilder userId(long userId) {
             this.userId = userId;
             return this;
         }
@@ -106,13 +116,19 @@ public class CodeListService {
         public CodeList build() {
             CodeList codeList = (this.codeList != null) ? this.codeList : new CodeList();
             codeList.setExtensibleIndicator(extensibleIndicator);
-            codeList.setGuid(Utility.generateGUID());
-            codeList.setEnumTypeGuid(Utility.generateGUID());
+            if (StringUtils.isEmpty(codeList.getGuid())) {
+                codeList.setGuid(Utility.generateGUID());
+            }
+            if (StringUtils.isEmpty(codeList.getEnumTypeGuid())) {
+                codeList.setEnumTypeGuid(Utility.generateGUID());
+            }
             if (basedCodeList != null) {
                 codeList.setBasedCodeListId(basedCodeList.getCodeListId());
             }
             codeList.setState(state);
-            codeList.setCreatedBy(userId);
+            if (codeList.getCreatedBy() == 0L) {
+                codeList.setCreatedBy(userId);
+            }
             codeList.setLastUpdatedBy(userId);
 
             codeListRepository.save(codeList);
@@ -135,6 +151,9 @@ public class CodeListService {
 
         private CodeListValueBuilder(CodeListValue codeListValue) {
             this.codeListValue = codeListValue;
+            this.usedIndicator = codeListValue.isUsedIndicator();
+            this.lockedIndicator = codeListValue.isLockedIndicator();
+            this.extensionIndicator = codeListValue.isExtensionIndicator();
         }
 
         public CodeListValueBuilder codeList(CodeList codeList) {

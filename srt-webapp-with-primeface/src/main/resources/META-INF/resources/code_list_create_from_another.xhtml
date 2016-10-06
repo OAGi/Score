@@ -4,71 +4,63 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui" template="template.xhtml">
 
-    <ui:define name="side_menu">
-        <h:form>
-            <p:growl id="messages" showDetail="false"/>
-
-            <p:menu>
-                <p:submenu style="width: 180px !important;" label="Context Category">
-                    <p:menuitem value="List" url="context_scheme_list.xhtml" icon="ui-icon-create"/>
-                    <p:menuitem value="Create" url="context_scheme_create.xhtml" icon="ui-icon-create"/>
-                </p:submenu>
-            </p:menu>
-        </h:form>
-    </ui:define>
-
     <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Create a code list from another</h2>
+            </div>
+        </div>
         <h:form id="form">
-            <p:panel header="Create a code list from another">
+            <p:panel>
                 <p:messages autoUpdate="true"/>
                 <h:panelGrid id="grid0" columns="6" cellpadding="5">
                     <h:outputLabel for="desc" value="Based Code List"
                                    styleClass="search-label" style="font-weight:bold; color: #4078c0;"/>
                     <p:commandButton value="Search" icon="ui-icon-extlink"
-                                     actionListener="#{codeListHandler.chooseBasedCode}">
-                        <p:ajax event="dialogReturn" listener="#{codeListHandler.onBasedCodeChosen}"
+                                     actionListener="#{codeListCreateFromAnotherBean.chooseBasedCode}">
+                        <p:ajax event="dialogReturn" listener="#{codeListCreateFromAnotherBean.onBasedCodeChosen}"
                                 update=":form:tbl"/>
                     </p:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="grid" columns="6" cellpadding="5">
-                    <h:outputLabel for="name" rows="10" value="Name:" styleClass="search-label"/>
-                    <p:inputText id="name" value="#{codeListHandler.codeList.name}"
+                    <h:outputLabel for="name" value="Name:" styleClass="search-label"/>
+                    <p:inputText id="name" value="#{codeListCreateFromAnotherBean.codeList.name}"
                                  label="Name"/>
 
-                    <h:outputLabel for="definition" rows="10" value="Definition:" styleClass="search-label"/>
-                    <p:inputText id="definition" value="#{codeListHandler.codeList.definition}"
+                    <h:outputLabel for="definition" value="Definition:" styleClass="search-label"/>
+                    <p:inputText id="definition" value="#{codeListCreateFromAnotherBean.codeList.definition}"
                                  label="Definition"/>
 
-                    <h:outputLabel for="definitionSource" rows="10" value="Definition Source:"
+                    <h:outputLabel for="definitionSource" value="Definition Source:"
                                    styleClass="search-label"/>
-                    <p:inputText id="definitionSource" value="#{codeListHandler.codeList.definitionSource}"
+                    <p:inputText id="definitionSource" value="#{codeListCreateFromAnotherBean.codeList.definitionSource}"
                                  label="Definition Source"/>
 
-                    <h:outputLabel for="listId" rows="10" value="List Id:" styleClass="search-label"/>
-                    <p:inputText id="listId" value="#{codeListHandler.codeList.listId}"
+                    <h:outputLabel for="listId" value="List Id:" styleClass="search-label"/>
+                    <p:inputText id="listId" value="#{codeListCreateFromAnotherBean.codeList.listId}"
                                  label="List Id"/>
 
-                    <h:outputLabel for="agencyIdListValueId" rows="10" value="Agency Id:" styleClass="search-label"/>
-                    <p:inputText id="agencyIdListValueId" value="#{codeListHandler.codeList.agencyId}"
+                    <h:outputLabel for="agencyIdListValueId" value="Agency Id:" styleClass="search-label"/>
+                    <p:inputText id="agencyIdListValueId" value="#{codeListCreateFromAnotherBean.codeList.agencyId}"
                                  label="Agency Id"/>
 
-                    <h:outputLabel for="version" rows="10" value="Version:" styleClass="search-label"/>
-                    <p:inputText id="version" value="#{codeListHandler.codeList.versionId}"
+                    <h:outputLabel for="version" value="Version:" styleClass="search-label"/>
+                    <p:inputText id="version" value="#{codeListCreateFromAnotherBean.codeList.versionId}"
                                  label="Version"/>
 
-                    <h:outputLabel for="remark" rows="10" value="Remark:" styleClass="search-label"/>
-                    <p:inputText id="remark" value="#{codeListHandler.codeList.remark}"
+                    <h:outputLabel for="remark" value="Remark:" styleClass="search-label"/>
+                    <p:inputText id="remark" value="#{codeListCreateFromAnotherBean.codeList.remark}"
                                  label="Remark"/>
 
                 </h:panelGrid>
                 <h:panelGrid columns="2" cellpadding="5">
                     <h:outputText style="font-weight:bold; color: #bd2c00;" value="Extensible? "/>
-                    <p:selectBooleanCheckbox value="#{codeListHandler.extensible}"/>
+                    <p:selectBooleanCheckbox value="#{codeListCreateFromAnotherBean.codeList.extensible}"/>
                 </h:panelGrid>
             </p:panel>
             <p:panel header="Code">
                 <h:panelGrid id="grid2" columns="1" cellpadding="5">
-                    <p:dataTable id="tbl" var="codeListValue" value="#{codeListHandler.codeListValues}"
+                    <p:dataTable id="tbl" var="codeListValue" value="#{codeListCreateFromAnotherBean.codeListValues}"
                                  style="width: 100%; margin-bottom:20px;">
                         <p:column style="width:65px">
                             <f:facet name="header">
@@ -78,7 +70,7 @@
                                                    disabled="#{codeListValue.disabled}" onLabel="Yes" offLabel="No"
                                                    onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:65px">
                                 <p:ajax update="tbl"
-                                        listener="#{codeListHandler.updateCodeListValue(codeListValue.codeListValueId)}"/>
+                                        listener="#{codeListCreateFromAnotherBean.updateCodeListValue(codeListValue.codeListValueId)}"/>
                             </p:selectBooleanButton>
                         </p:column>
 
@@ -117,19 +109,19 @@
                 <h:panelGrid columns="2" cellpadding="5">
                     <h:outputText styleClass="search-label" style="font-weight:bold; color: #4078c0" value="Add new Code List Value: "/>
                     <p:commandButton value="Add" icon="ui-icon-extlink"
-                                     actionListener="#{codeListHandler.addCodeListValue}">
-                        <p:ajax event="dialogReturn" listener="#{codeListHandler.onCodeListValueAdded}"
+                                     actionListener="#{codeListCreateFromAnotherBean.addCodeListValue}">
+                        <p:ajax event="dialogReturn" listener="#{codeListCreateFromAnotherBean.onCodeListValueAdded}"
                                 update=":form:tbl"/>
                     </p:commandButton>
                 </h:panelGrid>
                 <p:separator/>
                 <h:panelGrid id="grid3" columns="3" cellpadding="5">
                     <p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Save"
-                                     actionListener="#{codeListHandler.save()}"
+                                     actionListener="#{codeListCreateFromAnotherBean.save()}"
                                      action="code_lists.xhtml?faces-redirect=true"/>
 
                     <p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Publish"
-                                     actionListener="#{codeListHandler.publish()}"
+                                     actionListener="#{codeListCreateFromAnotherBean.publish()}"
                                      action="code_lists.xhtml?faces-redirect=true"/>
 
                     <p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Cancel"

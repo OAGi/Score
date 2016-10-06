@@ -1,6 +1,5 @@
-package org.oagi.srt.web.jsf.beans;
+package org.oagi.srt.web.jsf.beans.codelist;
 
-import org.oagi.srt.repository.entity.CodeList;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -11,7 +10,6 @@ import javax.faces.bean.ViewScoped;
 @Scope("view")
 @ManagedBean
 @ViewScoped
-public class CodeListCreateFromAnother {
+public class CodeListCreateWithoutBaseBean extends CodeListBaseBean {
 
-    private CodeList codeList = new CodeList();
 }

@@ -43,3 +43,10 @@ label {
     width: 100%;
     text-align: center;
 }
+
+.create-account-callout {
+    padding: 15px 20px;
+    text-align: center;
+    border: 1px solid #d8dee2;
+    border-radius: 5px;
+}

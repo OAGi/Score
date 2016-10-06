@@ -1,4 +1,4 @@
-package org.oagi.srt.web.handler;
+package org.oagi.srt.web.jsf.beans.user;
 
 import org.primefaces.context.RequestContext;
 import org.springframework.context.annotation.Scope;
@@ -12,7 +12,7 @@ import javax.faces.event.ActionEvent;
 @Controller
 @Scope("session")
 @ManagedBean
-public class UserLoginView {
+public class UserLoginBean {
      
     private String username;
      

@@ -457,7 +457,12 @@ input.ui-state-focus {
     border-bottom: 2px solid #c9510c !important;
 }
 
+.ui-chkbox .ui-chkbox-box {
+    margin-top: 3px;
+}
+
 .ui-chkbox-icon.ui-icon {
+    filter: invert(100%);
     border: 1px solid #666;
     border-radius: 3px;
 }
@@ -471,6 +476,11 @@ input.ui-state-focus {
     line-height: 30px;
     margin-left: 10px;
     font-weight: normal !important;
+}
+
+.boxed-filter {
+    border: 1px solid #ddd !important;
+    border-radius: 3px !important;
 }
 
 .ui-treetable .ui-treetable-header {
@@ -557,6 +567,53 @@ span.ui-button-text {
     border-radius: 3px;
 }
 
+.ui-button.delete {
+    background-image: none !important;
+    background-color: #900 !important;
+}
+
+.ui-autocomplete input {
+    width: 100%;
+}
+
+.section-label {
+    position: absolute;
+    width: 135px;
+    font-weight: normal;
+    color: #767676;
+    text-align: right;
+}
+
+.section-content {
+    margin-left: 150px;
+    color: #333;
+}
+
+.input-section {
+    min-width: 440px;
+}
+
+.ui-widget-header span.ui-button-text {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 10px !important;
+}
+
+.ui-button-icon-only {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.subhead {
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.subhead-heading {
+    font-weight: normal;
+}
+
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-weight: 600 !important
 }
@@ -607,4 +664,39 @@ span.ui-button-text {
 
 .h6 {
     font-size: 12px !important
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 600
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: 600
+}
+
+h3 {
+    font-size: 20px;
+    font-weight: 600
+}
+
+h4 {
+    font-size: 16px;
+    font-weight: 600
+}
+
+h5 {
+    font-size: 14px;
+    font-weight: 600
+}
+
+h6 {
+    font-size: 12px;
+    font-weight: 600
 }

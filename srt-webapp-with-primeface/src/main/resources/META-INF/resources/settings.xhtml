@@ -13,12 +13,12 @@
                 <h:panelGrid columns="1" styleClass="boxed-group-inner">
                     <label for="user_old_password">Old password</label>
                     <p:password id="user_old_password" name="user[old_password]"
-                                value="#{changePasswordHandler.oldPassword}" required="true"
+                                value="#{changePasswordBean.oldPassword}" required="true"
                                 styleClass="form-control" requiredMessage="Please fill out 'Old password' field."/>
 
                     <label for="user_new_password">New password</label>
                     <p:password id="user_new_password" name="user[password]"
-                                value="#{changePasswordHandler.newPassword}" required="true" styleClass="form-control"
+                                value="#{changePasswordBean.newPassword}" required="true" styleClass="form-control"
                                 requiredMessage="Please fill out 'New password' field."
                                 validatorMessage="New password is too short (minimum is 5 characters)">
                         <f:validateLength minimum="5"/>
@@ -26,12 +26,12 @@
 
                     <label for="user_confirm_new_password">Confirm new password</label>
                     <p:password id="user_confirm_new_password" name="user[password_confirmation]"
-                                value="#{changePasswordHandler.confirmNewPassword}" required="true"
+                                value="#{changePasswordBean.confirmNewPassword}" required="true"
                                 styleClass="form-control"
                                 requiredMessage="Please fill out 'Confirm new password' field."/>
 
                     <p:commandButton value="Update Password" id="update_password"
-                                     actionListener="#{changePasswordHandler.updatePassword}"
+                                     actionListener="#{changePasswordBean.updatePassword}"
                                      update="change_password_form"/>
                 </h:panelGrid>
             </p:panel>

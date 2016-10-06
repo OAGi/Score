@@ -1,4 +1,4 @@
-package org.oagi.srt.web.handler;
+package org.oagi.srt.web.jsf.beans.user;
 
 import org.oagi.srt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import javax.faces.context.FacesContext;
 @Scope("view")
 @ManagedBean
 @ViewScoped
-public class ChangePasswordHandler {
+public class ChangePasswordBean {
 
     @Autowired
     private UserService userService;

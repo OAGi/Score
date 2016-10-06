@@ -1,8 +1,11 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.repository.UserRepository;
+import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.service.UserService;
 import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -10,19 +13,22 @@ import javax.annotation.PostConstruct;
 @Component
 public class UIHandler {
 
-	@Autowired
-	private UserRepository userRepository;
-	protected int userId;
+    @Autowired
+    private UserService userService;
 
-	@PostConstruct
-	public void init() {
-		userId = userRepository.findAppUserIdByLoginId("oagis");
-		if (userId == 0) {
-			throw new IllegalStateException();
-		}
-	}
+    protected User currentUser;
+    protected long userId;
 
-	public void closeDialog() {
+    @PostConstruct
+    public void init() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            currentUser = userService.findByAuthentication(authentication);
+            userId = currentUser.getAppUserId();
+        }
+    }
+
+    public void closeDialog() {
         RequestContext.getCurrentInstance().closeDialog(this);
     }
 }
