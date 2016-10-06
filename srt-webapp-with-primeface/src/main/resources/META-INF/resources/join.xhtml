@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>OAGi SRT Application Login</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <h:outputScript library="js" name="jquery-2.2.4.min.js"></h:outputScript>
+    <h:outputStylesheet library="css" name="bootstrap-3.3.7.min.css"/>
+    <h:outputStylesheet library="css" name="bootstrap-theme-3.3.7.min.css"/>
+    <h:outputScript library="js" name="bootstrap-3.3.7.min.js"></h:outputScript>
+    <h:outputStylesheet library="css" name="login.css"/>
+</h:head>
+<h:body>
+    <div class="container">
+        <div class="header"></div>
+        <div class="row row-centered">
+            <form accept-charset="UTF-8" method="post">
+                <div class="col-lg-4 col-md-4 col-centered">
+                    <h1 class="text-center">Sign in to OAGi SRT Application</h1>
+                    <c:if test="${param.error != null}">
+                        <div class="alert alert-danger" role="alert">
+                            <a class="close" onclick="$('.alert').hide()">×</a>
+                            Invalid username or password
+                        </div>
+                    </c:if>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <label for="username">Username</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" autofocus="autofocus" name="username"
+                                       id="username"
+                                       tabindex="1"></input>
+                            </div>
+                            <label for="password">Password</label>
+                            <div class="input-group input-group-sm">
+                                <input type="password" class="form-control" name="password" id="password"
+                                       tabindex="2"></input>
+                            </div>
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+                            <input class="btn btn-primary btn-block" type="submit" value="Sign in" tabindex="3"></input>
+                        </div>
+                    </div>
+                    <div class="create-account-callout" style="line-height: 12px;">
+                        <p>New to OAGi SRT Application?</p>
+                        <a href="/join.xhtml">Create an account</a>.
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</h:body>
+</html>
