@@ -5,6 +5,7 @@ import org.oagi.srt.repository.entity.CodeList;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
+import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,7 @@ public class CodeListBaseBean extends UIHandler {
 
     private CodeList.State state;
     private boolean confirmDifferentNameButSameIdentity;
-    private boolean confirmSameNameButDifferentIdentity;
+    private boolean confirmSameListIdButDifferentIdentity;
 
     public CodeList getCodeList() {
         return codeList;
@@ -62,6 +64,23 @@ public class CodeListBaseBean extends UIHandler {
         this.selectedCodeListValue = selectedCodeListValue;
     }
 
+    public void toggleColor(Long codeListValueId) {
+        for (CodeListValue codeListValue : codeListValues) {
+            if (codeListValue.getCodeListValueId() == codeListValueId) {
+                switch (codeListValue.getColor()) {
+                    case Blue:
+                        codeListValue.setColor(CodeListValue.Color.DullRed);
+                        break;
+                    case DullRed:
+                        codeListValue.setColor(CodeListValue.Color.Blue);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
     public boolean isConfirmDifferentNameButSameIdentity() {
         return confirmDifferentNameButSameIdentity;
     }
@@ -70,12 +89,12 @@ public class CodeListBaseBean extends UIHandler {
         this.confirmDifferentNameButSameIdentity = confirmDifferentNameButSameIdentity;
     }
 
-    public boolean isConfirmSameNameButDifferentIdentity() {
-        return confirmSameNameButDifferentIdentity;
+    public boolean isConfirmSameListIdButDifferentIdentity() {
+        return confirmSameListIdButDifferentIdentity;
     }
 
-    public void setConfirmSameNameButDifferentIdentity(boolean confirmSameNameButDifferentIdentity) {
-        this.confirmSameNameButDifferentIdentity = confirmSameNameButDifferentIdentity;
+    public void setConfirmSameListIdButDifferentIdentity(boolean confirmSameListIdButDifferentIdentity) {
+        this.confirmSameListIdButDifferentIdentity = confirmSameListIdButDifferentIdentity;
     }
 
     public void deleteCodeListValue() {
@@ -95,6 +114,9 @@ public class CodeListBaseBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String update() {
         if (!checkDifferentNameButSameIdentity()) {
+            return null;
+        }
+        if (!checkDifferentListIdButSameIdentity()) {
             return null;
         }
 
@@ -133,7 +155,7 @@ public class CodeListBaseBean extends UIHandler {
                 String b = codeList.getVersionId();
                 if (StringUtils.equals(a, b)) {
                     FacesContext.getCurrentInstance().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Can't create same version of Code List."));
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Can't create same identity of Code List."));
                     return false;
                 }
             }
@@ -143,6 +165,31 @@ public class CodeListBaseBean extends UIHandler {
                     String b = codeList.getName();
                     if (!StringUtils.equals(a, b)) {
                         RequestContext.getCurrentInstance().execute("PF('confirmDifferentNameButSameIdentity').show()");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean checkDifferentListIdButSameIdentity() {
+        if (!isConfirmSameListIdButDifferentIdentity()) {
+            List<CodeList> sameNameAndAgencyIds =
+                    codeListService.findByNameAndAgencyId(codeList.getName(), codeList.getAgencyId());
+            if (codeList.getCodeListId() > 0L) {
+                sameNameAndAgencyIds = sameNameAndAgencyIds.stream()
+                        .filter(e -> e.getCodeListId() != codeList.getCodeListId())
+                        .collect(Collectors.toList());
+            }
+
+            if (!sameNameAndAgencyIds.isEmpty()) {
+                for (CodeList sameNameAndAgencyId : sameNameAndAgencyIds) {
+                    String a = sameNameAndAgencyId.getListId();
+                    String b = codeList.getListId();
+                    if (!StringUtils.equals(a, b)) {
+                        RequestContext.getCurrentInstance().execute("PF('confirmDifferentListIdButSameIdentity').show()");
                         return false;
                     }
                 }

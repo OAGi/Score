@@ -49,6 +49,10 @@ public class CodeListService {
         return codeListRepository.findByListIdAndAgencyId(listId, agencyId);
     }
 
+    public List<CodeList> findByNameAndAgencyId(String name, long agencyId) {
+        return codeListRepository.findByNameAndAgencyId(name, agencyId);
+    }
+
     public void updateState(CodeList codeList, CodeList.State state) {
         if (codeList != null && state != null) {
             codeList.setState(state);

@@ -72,11 +72,11 @@
                         <p:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
                                                  rendered="#{codeListValue.color ne 'BrightRed'}">
                             <p:ajax update="tbl"
-                                    listener="#{codeListCreateFromAnotherBean.updateCodeListValue(codeListValue.codeListValueId)}"/>
+                                    listener="#{codeListCreateFromAnotherBean.toggleColor(codeListValue.codeListValueId)}"/>
                         </p:selectBooleanCheckbox>
                     </p:column>
 
-                    <p:column style="width: 150px" headerText="Code">
+                    <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.value}"/>
@@ -87,7 +87,7 @@
                         </p:cellEditor>
                     </p:column>
 
-                    <p:column style="width: 150px" headerText="Short Name">
+                    <p:column style="width: 150px" headerText="Short Name" sortBy="#{codeListValue.name}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.name}"/>
@@ -98,7 +98,7 @@
                         </p:cellEditor>
                     </p:column>
 
-                    <p:column style="width: 400px" headerText="Definition">
+                    <p:column style="width: 400px" headerText="Definition" sortBy="#{codeListValue.definition}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.definition}"/>
@@ -110,7 +110,7 @@
                         </p:cellEditor>
                     </p:column>
 
-                    <p:column headerText="Definition Source">
+                    <p:column headerText="Definition Source" sortBy="#{codeListValue.definitionSource}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{codeListValue.definitionSource}"/>
@@ -158,18 +158,20 @@
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
-            <p:confirmDialog widgetVar="confirmSameNameButDifferentIdentity" showEffect="fade"
+            <p:confirmDialog widgetVar="confirmDifferentListIdButSameIdentity" showEffect="fade"
                              hideEffect="fade" closable="false" header="Warning">
                 <f:facet name="message">
-                    You are about to create a code list with the same name but different identity
+                    You are about to create a code list with the same List ID but different name and Agency ID
                     <br/>
-                    (i.e., same Agency ID but different List ID).
+                    (i.e., same name and Agency ID but different List ID).
                 </f:facet>
-                <p:commandButton value="Yes" icon="ui-icon-check"
-                                 actionListener="#{codeListCreateFromAnotherBean.setConfirmSameNameButDifferentIdentity(true)}"
-                                 action="#{codeListCreateFromAnotherBean.update()}"/>
-                <p:commandButton value="No" icon="ui-icon-close"
-                                 onclick="PF('confirmSameNameButDifferentIdentity').hide()"/>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     actionListener="#{codeListCreateFromAnotherBean.setConfirmSameListIdButDifferentIdentity(true)}"
+                                     action="#{codeListCreateFromAnotherBean.update()}"/>
+                    <p:commandButton value="Denied" icon="ui-icon-close"
+                                     onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
+                </div>
             </p:confirmDialog>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
