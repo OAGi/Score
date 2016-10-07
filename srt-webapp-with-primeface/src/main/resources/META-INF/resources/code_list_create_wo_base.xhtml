@@ -61,7 +61,9 @@
                 </f:facet>
 
                 <p:dataTable id="tbl" var="codeListValue" value="#{codeListCreateWithoutBaseBean.codeListValues}"
-                             editable="true" editMode="cell" widgetVar="codeListValues"
+                             editable="true" editMode="cell" widgetVar="codeListValues" rows="10"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom"
                              style="width: 100%; margin-bottom: 20px;">
                     <p:column style="text-align: center; width: 65px;">
                         <f:facet name="header">
@@ -77,8 +79,7 @@
                     <p:column style="width: 150px" headerText="Code">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{codeListValue.value}"
-                                              style="font-weight:bold; color:#{codeListValue.color};"/>
+                                <h:outputText value="#{codeListValue.value}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%"/>
@@ -89,8 +90,7 @@
                     <p:column style="width: 150px" headerText="Short Name">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{codeListValue.name}"
-                                              style="font-weight:bold; color:#{codeListValue.color};"/>
+                                <h:outputText value="#{codeListValue.name}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{codeListValue.name}" label="Short Name" style="width: 100%"/>
@@ -101,8 +101,7 @@
                     <p:column style="width: 400px" headerText="Definition">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{codeListValue.definition}"
-                                              style="font-weight:bold; color:#{codeListValue.color};"/>
+                                <h:outputText value="#{codeListValue.definition}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{codeListValue.definition}" label="Definition"
@@ -114,8 +113,7 @@
                     <p:column headerText="Definition Source">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{codeListValue.definitionSource}"
-                                              style="font-weight:bold; color:#{codeListValue.color};"/>
+                                <h:outputText value="#{codeListValue.definitionSource}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <p:inputText value="#{codeListValue.definitionSource}" label="Definition Source"
@@ -137,13 +135,43 @@
                 <p:separator/>
 
                 <p:commandButton ajax="true" value="Save"
-                                 actionListener="#{codeListCreateWithoutBaseBean.save()}"
-                                 action="code_lists.xhtml?faces-redirect=true"/>
+                                 actionListener="#{codeListCreateWithoutBaseBean.setState('Editing')}"
+                                 action="#{codeListCreateWithoutBaseBean.update()}"/>
 
                 <p:commandButton ajax="true" value="Publish"
-                                 actionListener="#{codeListCreateWithoutBaseBean.publish()}"
-                                 action="code_lists.xhtml?faces-redirect=true"/>
+                                 actionListener="#{codeListCreateWithoutBaseBean.setState('Published')}"
+                                 action="#{codeListCreateWithoutBaseBean.update()}"/>
             </p:panel>
+
+            <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    You are about to create a code list with the different name but same identity
+                    <br/>
+                    (i.e., same Agency ID and List ID but different name).
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     actionListener="#{codeListCreateWithoutBaseBean.setConfirmDifferentNameButSameIdentity(true)}"
+                                     action="#{codeListCreateWithoutBaseBean.update()}"/>
+                    <p:commandButton value="Denied" icon="ui-icon-close"
+                                     onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
+                </div>
+            </p:confirmDialog>
+            <p:confirmDialog widgetVar="confirmSameNameButDifferentIdentity" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    You are about to create a code list with the same name but different identity
+                    <br/>
+                    (i.e., same Agency ID but different List ID).
+                </f:facet>
+                <p:commandButton value="Yes" icon="ui-icon-check"
+                                 actionListener="#{codeListCreateWithoutBaseBean.setConfirmSameNameButDifferentIdentity(true)}"
+                                 action="#{codeListCreateWithoutBaseBean.update()}"/>
+                <p:commandButton value="No" icon="ui-icon-close"
+                                 onclick="PF('confirmSameNameButDifferentIdentity').hide()"/>
+            </p:confirmDialog>
+
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
     </ui:define>

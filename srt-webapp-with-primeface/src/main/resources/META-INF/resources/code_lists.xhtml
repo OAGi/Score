@@ -13,15 +13,16 @@
         </div>
         <h:form id="form">
             <p:panel>
-                <h:panelGrid id="grid" columns="5" cellpadding="5">
-                    <h:outputLabel for="ccName" value="Name: " styleClass="search-label"/>
-                    <p:autoComplete id="ccName" value="#{codeListBean.basedCodeListName}" style="min-width: 440px;"
+                <f:facet name="header">
+                    <p:autoComplete id="ccName" value="#{codeListBean.basedCodeListName}"
+                                    style="min-width: 440px; margin-right: 20px;"
+                                    maxResults="10"
                                     completeMethod="#{codeListBean.completeInput}"/>
                     <p:commandButton value="Search" ajax="true" actionListener="#{codeListBean.search}" update="tbl"
                                      icon="ui-icon-search"/>
-                </h:panelGrid>
-            </p:panel>
-            <p:panel>
+                    <p:button value="Create Code List without Base" style="float: right; margin-top: 3px; padding: 3px 0 3px 0;"
+                              outcome="code_list_create_wo_base"/>
+                </f:facet>
                 <p:dataTable id="tbl" var="cVO"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="20"

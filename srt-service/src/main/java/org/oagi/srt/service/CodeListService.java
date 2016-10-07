@@ -24,6 +24,10 @@ public class CodeListService {
     @Autowired
     private CodeListValueRepository codeListValueRepository;
 
+    public List<CodeList> findAll() {
+        return codeListRepository.findAll();
+    }
+
     public List<CodeList> findAll(Sort.Direction direction, String property) {
         return codeListRepository.findAll(new Sort(new Sort.Order(direction, property)));
     }
@@ -39,6 +43,10 @@ public class CodeListService {
 
     public CodeList findOne(long codeListId) {
         return codeListRepository.findOne(codeListId);
+    }
+
+    public List<CodeList> findByListIdAndAgencyId(String listId, long agencyId) {
+        return codeListRepository.findByListIdAndAgencyId(listId, agencyId);
     }
 
     public void updateState(CodeList codeList, CodeList.State state) {

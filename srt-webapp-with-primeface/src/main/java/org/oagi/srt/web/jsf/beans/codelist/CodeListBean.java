@@ -30,7 +30,6 @@ public class CodeListBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        super.init();
         codeLists = codeListService.findAll(Sort.Direction.ASC, "name");
     }
 

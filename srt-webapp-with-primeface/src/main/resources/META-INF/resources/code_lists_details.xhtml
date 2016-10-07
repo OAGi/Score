@@ -8,6 +8,13 @@
 
     <ui:define name="content">
         <div class="settings-next">
+            <div class="ui-widget-header">
+                <p:button value="Create Code List based on this"
+                          style="float: right; margin-top: -2px; padding: 3px 0 3px 0;"
+                          outcome="code_list_create_from_another.xhtml">
+                    <f:param name="codeListId" value="#{codeListDetailBean.codeList.codeListId}"/>
+                </p:button>
+            </div>
             <div class="subhead">
                 <h2 class="subhead-heading">Code List Detail</h2>
             </div>
@@ -55,24 +62,20 @@
                                          paginator="true" paginatorPosition="bottom" rows="10"
                                          style="width: 100%; margin-bottom: 20px;">
                                 <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
-                                    <h:outputText value="#{codeListValue.value}"
-                                                  style="font-weight:bold; color:#{codeListValue.color};"/>
+                                    <h:outputText value="#{codeListValue.value}"/>
                                 </p:column>
 
                                 <p:column style="width: 150px" headerText="Short Name" sortBy="#{codeListValue.name}">
-                                    <h:outputText value="#{codeListValue.name}"
-                                                  style="font-weight:bold; color:#{codeListValue.color};"/>
+                                    <h:outputText value="#{codeListValue.name}"/>
                                 </p:column>
 
                                 <p:column style="width: 400px" headerText="Definition"
                                           sortBy="#{codeListValue.definition}">
-                                    <h:outputText value="#{codeListValue.definition}"
-                                                  style="color:#{codeListValue.color};"/>
+                                    <h:outputText value="#{codeListValue.definition}"/>
                                 </p:column>
 
                                 <p:column headerText="Definition Source" sortBy="#{codeListValue.definitionSource}">
-                                    <h:outputText value="#{codeListValue.definitionSource}"
-                                                  style="color:#{codeListValue.color};"/>
+                                    <h:outputText value="#{codeListValue.definitionSource}"/>
                                 </p:column>
                             </p:dataTable>
                         </p:panel>
@@ -142,7 +145,9 @@
 
                         <p:dataTable id="tbl" var="codeListValue"
                                      value="#{codeListDetailBean.codeListValues}"
-                                     editable="true" editMode="cell" widgetVar="codeListValues"
+                                     editable="true" editMode="cell" widgetVar="codeListValues" rows="10"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorPosition="bottom"
                                      style="width: 100%; margin-bottom: 20px;">
                             <p:column style="text-align: center; width: 65px;" headerText="Used">
                                 <p:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
@@ -155,8 +160,7 @@
                             <p:column style="width: 150px" headerText="Code">
                                 <p:cellEditor>
                                     <f:facet name="output">
-                                        <h:outputText value="#{codeListValue.value}"
-                                                      style="font-weight:bold; color:#{codeListValue.color};"/>
+                                        <h:outputText value="#{codeListValue.value}"/>
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%"/>
@@ -167,8 +171,7 @@
                             <p:column style="width: 150px" headerText="Short Name">
                                 <p:cellEditor>
                                     <f:facet name="output">
-                                        <h:outputText value="#{codeListValue.name}"
-                                                      style="font-weight:bold; color:#{codeListValue.color};"/>
+                                        <h:outputText value="#{codeListValue.name}"/>
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.name}" label="Short Name"
@@ -180,8 +183,7 @@
                             <p:column style="width: 400px" headerText="Definition">
                                 <p:cellEditor>
                                     <f:facet name="output">
-                                        <h:outputText value="#{codeListValue.definition}"
-                                                      style="font-weight:bold; color:#{codeListValue.color};"/>
+                                        <h:outputText value="#{codeListValue.definition}"/>
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.definition}" label="Definition"
@@ -193,8 +195,7 @@
                             <p:column headerText="Definition Source">
                                 <p:cellEditor>
                                     <f:facet name="output">
-                                        <h:outputText value="#{codeListValue.definitionSource}"
-                                                      style="font-weight:bold; color:#{codeListValue.color};"/>
+                                        <h:outputText value="#{codeListValue.definitionSource}"/>
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.definitionSource}" label="Definition Source"
@@ -216,13 +217,42 @@
                         <p:separator/>
 
                         <p:commandButton ajax="true" value="Update"
-                                         actionListener="#{codeListDetailBean.save}"
-                                         action="code_lists.xhtml?faces-redirect=true"/>
+                                         actionListener="#{codeListDetailBean.setState('Editing')}"
+                                         action="#{codeListDetailBean.update()}"/>
 
                         <p:commandButton ajax="true" value="Publish"
-                                         actionListener="#{codeListDetailBean.publish}"
-                                         action="code_lists.xhtml?faces-redirect=true"/>
+                                         actionListener="#{codeListDetailBean.setState('Published')}"
+                                         action="#{codeListDetailBean.update()}"/>
                     </p:panel>
+
+                    <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+                                     hideEffect="fade" closable="false" header="Warning">
+                        <f:facet name="message">
+                            You are about to create a code list with the different name but same identity
+                            <br/>
+                            (i.e., same Agency ID and List ID but different name).
+                        </f:facet>
+                        <div style="text-align: center;">
+                            <p:commandButton value="Accept" icon="ui-icon-check"
+                                             actionListener="#{codeListDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
+                                             action="#{codeListDetailBean.update()}"/>
+                            <p:commandButton value="Denied" icon="ui-icon-close"
+                                             onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
+                        </div>
+                    </p:confirmDialog>
+                    <p:confirmDialog widgetVar="confirmSameNameButDifferentIdentity" showEffect="fade"
+                                     hideEffect="fade" closable="false" header="Warning">
+                        <f:facet name="message">
+                            You are about to create a code list with the same name but different identity
+                            <br/>
+                            (i.e., same Agency ID but different List ID).
+                        </f:facet>
+                        <p:commandButton value="Yes" icon="ui-icon-check"
+                                         actionListener="#{codeListDetailBean.setConfirmSameNameButDifferentIdentity(true)}"
+                                         action="#{codeListDetailBean.update()}"/>
+                        <p:commandButton value="No" icon="ui-icon-close"
+                                         onclick="PF('confirmSameNameButDifferentIdentity').hide()"/>
+                    </p:confirmDialog>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 </h:form>
             </c:otherwise>

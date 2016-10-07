@@ -12,122 +12,166 @@
         </div>
         <h:form id="form">
             <p:panel>
-                <p:messages autoUpdate="true"/>
-                <h:panelGrid id="grid0" columns="6" cellpadding="5">
-                    <h:outputLabel for="desc" value="Based Code List"
-                                   styleClass="search-label" style="font-weight:bold; color: #4078c0;"/>
-                    <p:commandButton value="Search" icon="ui-icon-extlink"
-                                     actionListener="#{codeListCreateFromAnotherBean.chooseBasedCode}">
-                        <p:ajax event="dialogReturn" listener="#{codeListCreateFromAnotherBean.onBasedCodeChosen}"
-                                update=":form:tbl"/>
-                    </p:commandButton>
-                </h:panelGrid>
-                <h:panelGrid id="grid" columns="6" cellpadding="5">
-                    <h:outputLabel for="name" value="Name:" styleClass="search-label"/>
-                    <p:inputText id="name" value="#{codeListCreateFromAnotherBean.codeList.name}"
-                                 label="Name"/>
+                <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                            closable="true"/>
+                <h:panelGrid id="grid" columns="2">
+                    <h:outputText for="name" value="Name" styleClass="section-label"/>
+                    <h:inputText id="name" value="#{codeListCreateFromAnotherBean.codeList.name}" required="true"
+                                 requiredMessage="Please fill out 'Name' field."
+                                 label="Name" styleClass="section-content input-section"/>
 
-                    <h:outputLabel for="definition" value="Definition:" styleClass="search-label"/>
-                    <p:inputText id="definition" value="#{codeListCreateFromAnotherBean.codeList.definition}"
-                                 label="Definition"/>
+                    <h:outputText for="listID" value="List ID" styleClass="section-label"/>
+                    <h:inputText id="listID" value="#{codeListCreateFromAnotherBean.codeList.listId}" required="true"
+                                 requiredMessage="Please fill out 'List ID' field."
+                                 label="List ID" styleClass="section-content input-section"/>
 
-                    <h:outputLabel for="definitionSource" value="Definition Source:"
-                                   styleClass="search-label"/>
-                    <p:inputText id="definitionSource" value="#{codeListCreateFromAnotherBean.codeList.definitionSource}"
-                                 label="Definition Source"/>
+                    <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
+                    <h:inputText id="agencyIdListValueID" value="#{codeListCreateFromAnotherBean.codeList.agencyId}"
+                                 label="Agency ID" styleClass="section-content input-section"/>
 
-                    <h:outputLabel for="listId" value="List Id:" styleClass="search-label"/>
-                    <p:inputText id="listId" value="#{codeListCreateFromAnotherBean.codeList.listId}"
-                                 label="List Id"/>
+                    <h:outputText for="version" value="Version" styleClass="section-label"/>
+                    <h:inputText id="version" value="#{codeListCreateFromAnotherBean.codeList.versionId}"
+                                 required="true" requiredMessage="Please fill out 'Version' field."
+                                 label="Version" styleClass="section-content input-section"/>
 
-                    <h:outputLabel for="agencyIdListValueId" value="Agency Id:" styleClass="search-label"/>
-                    <p:inputText id="agencyIdListValueId" value="#{codeListCreateFromAnotherBean.codeList.agencyId}"
-                                 label="Agency Id"/>
+                    <h:outputText for="definition" value="Definition" styleClass="section-label"/>
+                    <h:inputText id="definition" value="#{codeListCreateFromAnotherBean.codeList.definition}"
+                                 label="Definition" styleClass="section-content input-section"/>
 
-                    <h:outputLabel for="version" value="Version:" styleClass="search-label"/>
-                    <p:inputText id="version" value="#{codeListCreateFromAnotherBean.codeList.versionId}"
-                                 label="Version"/>
+                    <h:outputText for="definitionSource" value="Definition Source"
+                                  styleClass="section-label"/>
+                    <h:inputText id="definitionSource"
+                                 value="#{codeListCreateFromAnotherBean.codeList.definitionSource}"
+                                 label="Definition Source" styleClass="section-content input-section"/>
 
-                    <h:outputLabel for="remark" value="Remark:" styleClass="search-label"/>
-                    <p:inputText id="remark" value="#{codeListCreateFromAnotherBean.codeList.remark}"
-                                 label="Remark"/>
+                    <h:outputText for="remark" value="Remark" styleClass="section-label"/>
+                    <h:inputText id="remark" value="#{codeListCreateFromAnotherBean.codeList.remark}"
+                                 label="Remark" styleClass="section-content input-section"/>
 
-                </h:panelGrid>
-                <h:panelGrid columns="2" cellpadding="5">
-                    <h:outputText style="font-weight:bold; color: #bd2c00;" value="Extensible? "/>
-                    <p:selectBooleanCheckbox value="#{codeListCreateFromAnotherBean.codeList.extensible}"/>
+                    <h:outputText for="name" value="Extensible?" styleClass="section-label"/>
+                    <p:selectBooleanCheckbox value="#{codeListCreateFromAnotherBean.codeList.extensibleIndicator}"
+                                             styleClass="section-content input-section" style="text-align: left;"/>
                 </h:panelGrid>
             </p:panel>
-            <p:panel header="Code">
-                <h:panelGrid id="grid2" columns="1" cellpadding="5">
-                    <p:dataTable id="tbl" var="codeListValue" value="#{codeListCreateFromAnotherBean.codeListValues}"
-                                 style="width: 100%; margin-bottom:20px;">
-                        <p:column style="width:65px">
-                            <f:facet name="header">
-                                <h:outputText value="Select"/>
-                            </f:facet>
-                            <p:selectBooleanButton id="value2" value="#{codeListValue.usedIndicator}"
-                                                   disabled="#{codeListValue.disabled}" onLabel="Yes" offLabel="No"
-                                                   onIcon="ui-icon-check" offIcon="ui-icon-close" style="width:65px">
-                                <p:ajax update="tbl"
-                                        listener="#{codeListCreateFromAnotherBean.updateCodeListValue(codeListValue.codeListValueId)}"/>
-                            </p:selectBooleanButton>
-                        </p:column>
+            <p:panel>
+                <f:facet name="header">
+                    <h:outputText value="Code List Values"/>
+                    <p:commandButton value="Add" style="float: right;"
+                                     actionListener="#{codeListCreateFromAnotherBean.addCodeListValue}" update="tbl"/>
+                </f:facet>
 
-                        <p:column style="width:100px">
-                            <f:facet name="header">
-                                <h:outputText value="Code"/>
-                            </f:facet>
-                            <h:outputText value="#{codeListValue.value}"
-                                          style="font-weight:bold; color:#{codeListValue.color};"/>
-                        </p:column>
+                <p:dataTable id="tbl" var="codeListValue" value="#{codeListCreateFromAnotherBean.codeListValues}"
+                             editable="true" editMode="cell" widgetVar="codeListValues" rows="10"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom"
+                             style="width: 100%; margin-bottom: 20px;">
+                    <p:column style="text-align: center; width: 65px;">
+                        <f:facet name="header">
+                            <h:outputText value="Select"/>
+                        </f:facet>
+                        <p:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
+                                                 rendered="#{codeListValue.color ne 'BrightRed'}">
+                            <p:ajax update="tbl"
+                                    listener="#{codeListCreateFromAnotherBean.updateCodeListValue(codeListValue.codeListValueId)}"/>
+                        </p:selectBooleanCheckbox>
+                    </p:column>
 
-                        <p:column style="width:100px">
-                            <f:facet name="header">
-                                <h:outputText value="Short Name"/>
+                    <p:column style="width: 150px" headerText="Code">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.value}"/>
                             </f:facet>
-                            <h:outputText value="#{codeListValue.name}"
-                                          style="font-weight:bold; color:#{codeListValue.color};"/>
-                        </p:column>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                        <p:column style="width:335px">
-                            <f:facet name="header">
-                                <h:outputText value="Definition"/>
+                    <p:column style="width: 150px" headerText="Short Name">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.name}"/>
                             </f:facet>
-                            <h:outputText value="#{codeListValue.definition}" style="color:#{codeListValue.color};"/>
-                        </p:column>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.name}" label="Short Name" style="width: 100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
 
-                        <p:column style="width:400px">
-                            <f:facet name="header">
-                                <h:outputText value="Definition Source"/>
+                    <p:column style="width: 400px" headerText="Definition">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.definition}"/>
                             </f:facet>
-                            <h:outputText value="#{codeListValue.definitionSource}"
-                                          style="color:#{codeListValue.color};"/>
-                        </p:column>
-                    </p:dataTable>
-                </h:panelGrid>
-                <h:panelGrid columns="2" cellpadding="5">
-                    <h:outputText styleClass="search-label" style="font-weight:bold; color: #4078c0" value="Add new Code List Value: "/>
-                    <p:commandButton value="Add" icon="ui-icon-extlink"
-                                     actionListener="#{codeListCreateFromAnotherBean.addCodeListValue}">
-                        <p:ajax event="dialogReturn" listener="#{codeListCreateFromAnotherBean.onCodeListValueAdded}"
-                                update=":form:tbl"/>
-                    </p:commandButton>
-                </h:panelGrid>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.definition}" label="Definition"
+                                             style="width: 100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Definition Source">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.definitionSource}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.definitionSource}" label="Definition Source"
+                                             style="width: 100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                                         action="#{codeListCreateFromAnotherBean.deleteCodeListValue}"
+                                         update="tbl" rendered="#{codeListValue.color == 'Green'}">
+                            <f:setPropertyActionListener value="#{codeListValue}"
+                                                         target="#{codeListCreateFromAnotherBean.selectedCodeListValue}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
                 <p:separator/>
-                <h:panelGrid id="grid3" columns="3" cellpadding="5">
-                    <p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Save"
-                                     actionListener="#{codeListCreateFromAnotherBean.save()}"
-                                     action="code_lists.xhtml?faces-redirect=true"/>
 
-                    <p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Publish"
-                                     actionListener="#{codeListCreateFromAnotherBean.publish()}"
-                                     action="code_lists.xhtml?faces-redirect=true"/>
+                <p:commandButton ajax="true" value="Save"
+                                 actionListener="#{codeListCreateFromAnotherBean.setState('Editing')}"
+                                 action="#{codeListCreateFromAnotherBean.update()}"/>
 
-                    <p:commandButton ajax="true" style="width:100px" icon="ui-icon-search" value="Cancel"
-                                     action="code_lists.xhtml?faces-redirect=true"/>
-                </h:panelGrid>
+                <p:commandButton ajax="true" value="Publish"
+                                 actionListener="#{codeListCreateFromAnotherBean.setState('Published')}"
+                                 action="#{codeListCreateFromAnotherBean.update()}"/>
             </p:panel>
+
+            <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    You are about to create a code list with the different name but same identity
+                    <br/>
+                    (i.e., same Agency ID and List ID but different name).
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     actionListener="#{codeListCreateFromAnotherBean.setConfirmDifferentNameButSameIdentity(true)}"
+                                     action="#{codeListCreateFromAnotherBean.update()}"/>
+                    <p:commandButton value="Denied" icon="ui-icon-close"
+                                     onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
+                </div>
+            </p:confirmDialog>
+            <p:confirmDialog widgetVar="confirmSameNameButDifferentIdentity" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    You are about to create a code list with the same name but different identity
+                    <br/>
+                    (i.e., same Agency ID but different List ID).
+                </f:facet>
+                <p:commandButton value="Yes" icon="ui-icon-check"
+                                 actionListener="#{codeListCreateFromAnotherBean.setConfirmSameNameButDifferentIdentity(true)}"
+                                 action="#{codeListCreateFromAnotherBean.update()}"/>
+                <p:commandButton value="No" icon="ui-icon-close"
+                                 onclick="PF('confirmSameNameButDifferentIdentity').hide()"/>
+            </p:confirmDialog>
+
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
     </ui:define>

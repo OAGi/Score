@@ -22,8 +22,6 @@ public class CodeListDetailBean extends CodeListBaseBean {
 
     @PostConstruct
     public void init() {
-        super.init();
-
         Long codeListId = Long.parseLong(
                 FacesContext.getCurrentInstance().getExternalContext()
                         .getRequestParameterMap().get("codeListId"));

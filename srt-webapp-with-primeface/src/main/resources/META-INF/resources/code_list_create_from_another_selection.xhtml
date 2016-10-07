@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Create a code list from another</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:panel header="Select Based Code List">
+                <p:dataTable id="tblBasedCodeList" var="cVO"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="20"
+                             style="width: 100%; margin-bottom: 20px;"
+                             value="#{codeListCreateFromAnotherSelectionBean.basedCodeLists}" rowKey="#{cVO.codeListId}">
+                    <p:column headerText="Name" sortBy="#{cVO.name}">
+                        <h:link value="#{cVO.name}" outcome="code_list_create_from_another.xhtml">
+                            <f:param name="codeListId" value="#{cVO.codeListId}"/>
+                        </h:link>
+                    </p:column>
+                    <p:column style="width: 120px;" headerText="Agency ID" sortBy="#{cVO.agencyId}">
+                        <h:outputText value="#{cVO.agencyId}" style="float: right;"/>
+                    </p:column>
+                    <p:column style="width: 100px;" headerText="Version" sortBy="#{cVO.versionId}">
+                        <h:outputText value="#{cVO.versionId}" style="float: right;"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>
