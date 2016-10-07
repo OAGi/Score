@@ -142,7 +142,7 @@ public class CodeListBaseBean extends UIHandler {
                         .collect(Collectors.toList())
         );
 
-        return "code_lists.xhtml?faces-redirect=true";
+        return "/views/code_list/list.xhtml?faces-redirect=true";
     }
 
     private boolean checkDifferentNameButSameIdentity() {

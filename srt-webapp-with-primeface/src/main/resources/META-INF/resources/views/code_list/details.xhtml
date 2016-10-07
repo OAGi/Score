@@ -4,14 +4,14 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
-                template="template.xhtml">
+                template="../../template.xhtml">
 
     <ui:define name="content">
         <div class="settings-next">
             <div class="ui-widget-header">
                 <p:button value="Create Code List based on this"
                           style="float: right; margin-top: -2px; padding: 3px 0 3px 0;"
-                          outcome="code_list_create_from_another.xhtml"
+                          outcome="/views/code_list/create_from_another.xhtml"
                           rendered="#{codeListDetailBean.codeList.state == 'Published' and codeListDetailBean.codeList.extensibleIndicator}">
                     <f:param name="codeListId" value="#{codeListDetailBean.codeList.codeListId}"/>
                 </p:button>
@@ -82,7 +82,8 @@
                         </p:panel>
                     </p:panel>
 
-                    <p:commandButton ajax="true" value="Delete" rendered="#{codeListDetailBean.codeList.state == 'Published'}"
+                    <p:commandButton ajax="true" value="Delete"
+                                     rendered="#{codeListDetailBean.codeList.state == 'Published'}"
                                      styleClass="danger"
                                      actionListener="#{codeListDetailBean.setState('Deleted')}"
                                      action="#{codeListDetailBean.forceUpdate()}"/>
@@ -99,15 +100,19 @@
                         <h:panelGrid id="grid" columns="2">
                             <h:outputText for="name" value="Name" styleClass="section-label"/>
                             <h:inputText id="name" value="#{codeListDetailBean.codeList.name}"
-                                         required="true"
+                                         required="true" maxlength="100"
                                          requiredMessage="Please fill out 'Name' field."
-                                         label="Name" styleClass="section-content input-section"/>
+                                         label="Name" styleClass="section-content input-section">
+                                <f:validateLength maximum="100"/>
+                            </h:inputText>
 
                             <h:outputText for="listID" value="List ID" styleClass="section-label"/>
                             <h:inputText id="listID" value="#{codeListDetailBean.codeList.listId}"
-                                         required="true"
+                                         required="true" maxlength="100"
                                          requiredMessage="Please fill out 'List ID' field."
-                                         label="List ID" styleClass="section-content input-section"/>
+                                         label="List ID" styleClass="section-content input-section">
+                                <f:validateLength maximum="100"/>
+                            </h:inputText>
 
                             <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
                             <h:inputText id="agencyIdListValueID"
@@ -117,7 +122,10 @@
                             <h:outputText for="version" value="Version" styleClass="section-label"/>
                             <h:inputText id="version" value="#{codeListDetailBean.codeList.versionId}"
                                          required="true" requiredMessage="Please fill out 'Version' field."
-                                         label="Version" styleClass="section-content input-section"/>
+                                         maxlength="10"
+                                         label="Version" styleClass="section-content input-section">
+                                <f:validateLength maximum="10"/>
+                            </h:inputText>
 
                             <h:outputText for="definition" value="Definition" styleClass="section-label"/>
                             <h:inputText id="definition" value="#{codeListDetailBean.codeList.definition}"
@@ -125,13 +133,17 @@
 
                             <h:outputText for="definitionSource" value="Definition Source"
                                           styleClass="section-label"/>
-                            <h:inputText id="definitionSource"
+                            <h:inputText id="definitionSource" maxlength="100"
                                          value="#{codeListDetailBean.codeList.definitionSource}"
-                                         label="Definition Source" styleClass="section-content input-section"/>
+                                         label="Definition Source" styleClass="section-content input-section">
+                                <f:validateLength maximum="100"/>
+                            </h:inputText>
 
                             <h:outputText for="remark" value="Remark" styleClass="section-label"/>
                             <h:inputText id="remark" value="#{codeListDetailBean.codeList.remark}"
-                                         label="Remark" styleClass="section-content input-section"/>
+                                         label="Remark" styleClass="section-content input-section" maxlength="225">
+                                <f:validateLength maximum="225"/>
+                            </h:inputText>
 
                             <h:outputText value="State" styleClass="section-label"/>
                             <h:outputText value="#{codeListDetailBean.codeList.state}" styleClass="section-content"/>
@@ -170,7 +182,9 @@
                                         <h:outputText value="#{codeListValue.value}"/>
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%"/>
+                                        <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%" maxlength="100">
+                                            <f:validateLength maximum="100"/>
+                                        </p:inputText>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -182,7 +196,9 @@
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.name}" label="Short Name"
-                                                     style="width: 100%"/>
+                                                     style="width: 100%" maxlength="100">
+                                            <f:validateLength maximum="100"/>
+                                        </p:inputText>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -206,7 +222,9 @@
                                     </f:facet>
                                     <f:facet name="input">
                                         <p:inputText value="#{codeListValue.definitionSource}" label="Definition Source"
-                                                     style="width: 100%"/>
+                                                     style="width: 100%" maxlength="100">
+                                            <f:validateLength maximum="100"/>
+                                        </p:inputText>
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
@@ -231,7 +249,8 @@
                                          actionListener="#{codeListDetailBean.setState('Published')}"
                                          action="#{codeListDetailBean.update()}"/>
 
-                        <p:commandButton ajax="true" value="Discard" rendered="#{codeListDetailBean.codeList.state == 'Editing'}"
+                        <p:commandButton ajax="true" value="Discard"
+                                         rendered="#{codeListDetailBean.codeList.state == 'Editing'}"
                                          styleClass="danger"
                                          actionListener="#{codeListDetailBean.setState('Discarded')}"
                                          action="#{codeListDetailBean.forceUpdate()}"/>

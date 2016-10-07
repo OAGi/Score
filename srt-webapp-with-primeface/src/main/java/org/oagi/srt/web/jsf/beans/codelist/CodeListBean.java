@@ -26,11 +26,13 @@ public class CodeListBean extends UIHandler {
     private CodeListService codeListService;
 
     private String basedCodeListName;
+    private List<CodeList> allCodeLists;
     private List<CodeList> codeLists = new ArrayList();
 
     @PostConstruct
     public void init() {
-        codeLists = codeListService.findAll(Sort.Direction.ASC, "name");
+        allCodeLists = codeListService.findAll(Sort.Direction.ASC, "name");
+        setCodeLists(allCodeLists);
     }
 
     public List<CodeList> getCodeLists() {
@@ -50,7 +52,7 @@ public class CodeListBean extends UIHandler {
     }
 
     public List<String> completeInput(String query) {
-        return codeLists.stream()
+        return allCodeLists.stream()
                 .map(e -> e.getName())
                 .distinct()
                 .filter(s -> s.toLowerCase().contains(query.toLowerCase()))
@@ -60,9 +62,13 @@ public class CodeListBean extends UIHandler {
     public void search() {
         String basedCodeListName = getBasedCodeListName();
         if (StringUtils.isEmpty(basedCodeListName)) {
-            codeLists = codeListService.findAll(Sort.Direction.ASC, "name");
+            setCodeLists(
+                    allCodeLists.stream()
+                            .filter(e -> e.getName().toLowerCase().contains(basedCodeListName))
+                            .collect(Collectors.toList())
+            );
         } else {
-            codeLists = codeListService.findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(basedCodeListName);
+            setCodeLists(allCodeLists);
         }
     }
 

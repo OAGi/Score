@@ -10,4 +10,10 @@ public interface ContextSchemeRepository extends JpaRepository<ContextScheme, Lo
 
     @Query("select c from ContextScheme c where c.ctxCategoryId = ?1")
     public List<ContextScheme> findByCtxCategoryId(long ctxCategoryId);
+
+    @Query("select c from ContextScheme c where c.schemeId = ?1 and c.schemeAgencyId = ?2")
+    public List<ContextScheme> findBySchemeIdAndSchemeAgencyId(String schemeId, String schemeAgencyId);
+
+    @Query("select c from ContextScheme c where c.schemeName = ?1 and c.schemeAgencyId = ?2")
+    public List<ContextScheme> findBySchemeNameAndSchemeAgencyId(String schemeName, String schemeAgencyId);
 }

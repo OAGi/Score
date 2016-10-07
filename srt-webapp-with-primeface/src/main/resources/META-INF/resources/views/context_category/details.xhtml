@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h:panelGroup rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}">
+                    <h2 class="subhead-heading">Context Category Detail</h2>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId == 0}">
+                    <h2 class="subhead-heading">Create Context Category</h2>
+                </h:panelGroup>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                        autoUpdate="true"
+                        closable="true"/>
+            <p:panel>
+                <h:panelGrid columns="2" cellpadding="3">
+                    <h:outputText value="GUID" styleClass="section-label"
+                                  rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"/>
+                    <h:outputText value="#{contextCategoryDetailBean.contextCategory.guid}"
+                                  rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
+                                  styleClass="section-content"/>
+
+                    <h:outputText value="Name" styleClass="section-label"/>
+                    <h:inputText id="name" value="#{contextCategoryDetailBean.contextCategory.name}"
+                                 required="true"
+                                 requiredMessage="Please fill out 'Name' field."
+                                 maxlength="45"
+                                 label="Name" styleClass="section-content input-section">
+                        <f:validateLength maximum="45"/>
+                    </h:inputText>
+
+                    <h:outputText value="Description" styleClass="section-label"/>
+                    <h:inputTextarea value="#{contextCategoryDetailBean.contextCategory.description}"
+                                     rows="10"
+                                     styleClass="section-content input-section"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:commandButton ajax="true" value="Create"
+                             rendered="#{contextCategoryDetailBean.contextCategory.guid == null}"
+                             action="#{contextCategoryDetailBean.update()}"/>
+
+            <p:commandButton ajax="true" value="Update"
+                             rendered="#{contextCategoryDetailBean.contextCategory.guid != null}"
+                             action="#{contextCategoryDetailBean.update()}"/>
+
+            <p:commandButton ajax="true" value="Discard"
+                             rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
+                             styleClass="danger"
+                             onclick="PF('confirmDiscard').show()"/>
+
+            <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    The context category will be permanently removed.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     action="#{contextCategoryDetailBean.delete()}"
+                                     oncomplete="PF('confirmDiscard').hide()"/>
+                    <p:commandButton value="Denied" icon="ui-icon-close"
+                                     onclick="PF('confirmDiscard').hide()"/>
+                </div>
+            </p:confirmDialog>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -2,12 +2,12 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" template="template.xhtml">
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
 
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Create a code list from another</h2>
+                <h2 class="subhead-heading">Select Based Code List to create new Code List</h2>
             </div>
         </div>
         <h:form id="form">
@@ -18,7 +18,7 @@
                              style="width: 100%; margin-bottom: 20px;"
                              value="#{codeListCreateFromAnotherSelectionBean.basedCodeLists}" rowKey="#{cVO.codeListId}">
                     <p:column headerText="Name" sortBy="#{cVO.name}">
-                        <h:link value="#{cVO.name}" outcome="code_list_create_from_another.xhtml">
+                        <h:link value="#{cVO.name}" outcome="/views/code_list/create_from_another.xhtml">
                             <f:param name="codeListId" value="#{cVO.codeListId}"/>
                         </h:link>
                     </p:column>

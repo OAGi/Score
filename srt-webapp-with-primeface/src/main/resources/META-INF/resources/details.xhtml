@@ -13,7 +13,7 @@
     </h:head>
 
     <h:body>
-    	<p:dataTable var="cc" value="#{contextCategoryHandler.contextCategory}">
+    	<p:dataTable var="cc" value="#{contextCategoryBean.contextCategory}">
     		<p:column headerText = "ID">
     			<h:outputText value = "#{cc.contextCategoryGUID}" />
     		</p:column>

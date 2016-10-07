@@ -59,6 +59,9 @@ public class ContextCategoryService {
 
     @Transactional(readOnly = false)
     public void update(ContextCategory contextCategory) {
+        if (StringUtils.isEmpty(contextCategory.getGuid())) {
+            contextCategory.setGuid(Utility.generateGUID());
+        }
         contextCategoryRepository.save(contextCategory);
     }
 
