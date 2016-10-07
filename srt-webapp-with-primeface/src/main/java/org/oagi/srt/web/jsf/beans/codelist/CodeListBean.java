@@ -31,8 +31,12 @@ public class CodeListBean extends UIHandler {
 
     @PostConstruct
     public void init() {
+        setCodeLists(allCodeLists());
+    }
+
+    public List<CodeList> allCodeLists() {
         allCodeLists = codeListService.findAll(Sort.Direction.ASC, "name");
-        setCodeLists(allCodeLists);
+        return allCodeLists;
     }
 
     public List<CodeList> getCodeLists() {
@@ -52,7 +56,7 @@ public class CodeListBean extends UIHandler {
     }
 
     public List<String> completeInput(String query) {
-        return allCodeLists.stream()
+        return allCodeLists().stream()
                 .map(e -> e.getName())
                 .distinct()
                 .filter(s -> s.toLowerCase().contains(query.toLowerCase()))
@@ -62,13 +66,13 @@ public class CodeListBean extends UIHandler {
     public void search() {
         String basedCodeListName = getBasedCodeListName();
         if (StringUtils.isEmpty(basedCodeListName)) {
+            setCodeLists(allCodeLists());
+        } else {
             setCodeLists(
-                    allCodeLists.stream()
-                            .filter(e -> e.getName().toLowerCase().contains(basedCodeListName))
+                    allCodeLists().stream()
+                            .filter(e -> e.getName().toLowerCase().contains(basedCodeListName.toLowerCase()))
                             .collect(Collectors.toList())
             );
-        } else {
-            setCodeLists(allCodeLists);
         }
     }
 

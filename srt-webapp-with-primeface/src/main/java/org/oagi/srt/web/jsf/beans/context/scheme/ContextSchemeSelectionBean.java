@@ -33,14 +33,18 @@ public class ContextSchemeSelectionBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        allContextCategories = contextCategoryService.findAll(Sort.Direction.DESC, "ctxCategoryId");
-        setContextCategories(allContextCategories);
+        setContextCategories(allContextCategories());
 
         String paramCtxSchemeId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("ctxSchemeId");
         if (StringUtils.isEmpty(paramCtxSchemeId)) {
             paramCtxSchemeId = "";
         }
         setParamCtxSchemeId(paramCtxSchemeId);
+    }
+
+    public List<ContextCategory> allContextCategories() {
+        allContextCategories = contextCategoryService.findAll(Sort.Direction.DESC, "ctxCategoryId");
+        return allContextCategories;
     }
 
     public List<ContextCategory> getContextCategories() {
@@ -68,17 +72,21 @@ public class ContextSchemeSelectionBean extends UIHandler {
     }
 
     public List<String> completeInput(String query) {
-        return allContextCategories.stream()
+        return allContextCategories().stream()
                 .map(e -> e.getName())
                 .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     public void search() {
-        setContextCategories(
-                allContextCategories.stream()
-                        .filter(e -> e.getName().toLowerCase().contains(name))
-                        .collect(Collectors.toList())
-        );
+        if (StringUtils.isEmpty(name)) {
+            setContextCategories(allContextCategories());
+        } else {
+            setContextCategories(
+                    allContextCategories().stream()
+                            .filter(e -> e.getName().toLowerCase().contains(name.toLowerCase()))
+                            .collect(Collectors.toList())
+            );
+        }
     }
 }

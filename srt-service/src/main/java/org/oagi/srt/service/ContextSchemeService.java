@@ -22,10 +22,12 @@ public class ContextSchemeService {
     @Autowired
     private ContextSchemeValueRepository contextSchemeValueRepository;
 
+    public List<ContextScheme> findAll() {
+        return contextSchemeRepository.findAll();
+    }
+
     public List<ContextScheme> findAll(Sort.Direction direction, String property) {
-        return Collections.unmodifiableList(
-                contextSchemeRepository.findAll(new Sort(new Sort.Order(direction, property)))
-        );
+        return contextSchemeRepository.findAll(new Sort(new Sort.Order(direction, property)));
     }
 
     public List<ContextScheme> findByCtxCategoryId(long ctxCategoryId) {

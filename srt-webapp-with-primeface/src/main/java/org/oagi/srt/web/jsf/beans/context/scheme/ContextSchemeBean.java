@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -28,8 +29,12 @@ public class ContextSchemeBean {
 
     @PostConstruct
     public void init() {
+        setContextSchemes(allContextSchemes());
+    }
+
+    public List<ContextScheme> allContextSchemes() {
         allContextSchemes = contextSchemeService.findAll(Sort.Direction.DESC, "ctxSchemeId");
-        setContextSchemes(allContextSchemes);
+        return allContextSchemes;
     }
 
     public List<ContextScheme> getContextSchemes() {
@@ -49,17 +54,21 @@ public class ContextSchemeBean {
     }
 
     public List<String> completeInput(String query) {
-        return allContextSchemes.stream()
+        return allContextSchemes().stream()
                 .map(e -> e.getSchemeName())
                 .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     public void search() {
-        setContextSchemes(
-                allContextSchemes.stream()
-                        .filter(e -> e.getSchemeName().toLowerCase().contains(name))
-                        .collect(Collectors.toList())
-        );
+        if (StringUtils.isEmpty(name)) {
+            setContextSchemes(allContextSchemes());
+        } else {
+            setContextSchemes(
+                    allContextSchemes().stream()
+                            .filter(e -> e.getSchemeName().toLowerCase().contains(name.toLowerCase()))
+                            .collect(Collectors.toList())
+            );
+        }
     }
 }

@@ -35,11 +35,19 @@
                                   rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
                                   styleClass="section-content"/>
 
+                    <h:outputText value="Name" styleClass="section-label"/>
+                    <h:inputText id="name" value="#{contextSchemeDetailBean.contextScheme.schemeName}"
+                                 required="true" maxlength="255"
+                                 requiredMessage="Please fill out 'Name' field."
+                                 label="Name" styleClass="section-content input-section">
+                        <f:validateLength maximum="255"/>
+                    </h:inputText>
+
                     <h:outputText value="Scheme ID" styleClass="section-label"/>
                     <h:inputText id="schemeId" value="#{contextSchemeDetailBean.contextScheme.schemeId}"
                                  required="true" maxlength="45"
                                  requiredMessage="Please fill out 'Scheme ID' field."
-                                 label="Name" styleClass="section-content input-section">
+                                 label="Scheme ID" styleClass="section-content input-section">
                         <f:validateLength maximum="45"/>
                     </h:inputText>
 
@@ -47,7 +55,7 @@
                     <h:inputText id="agencyId" value="#{contextSchemeDetailBean.contextScheme.schemeAgencyId}"
                                  required="true" maxlength="45"
                                  requiredMessage="Please fill out 'Agency ID' field."
-                                 label="Name" styleClass="section-content input-section">
+                                 label="Agency ID" styleClass="section-content input-section">
                         <f:validateLength maximum="45"/>
                     </h:inputText>
 
@@ -55,16 +63,8 @@
                     <h:inputText id="version" value="#{contextSchemeDetailBean.contextScheme.schemeVersionId}"
                                  required="true" maxlength="45"
                                  requiredMessage="Please fill out 'Version' field."
-                                 label="Name" styleClass="section-content input-section">
+                                 label="Version" styleClass="section-content input-section">
                         <f:validateLength maximum="45"/>
-                    </h:inputText>
-
-                    <h:outputText value="Name" styleClass="section-label"/>
-                    <h:inputText id="name" value="#{contextSchemeDetailBean.contextScheme.schemeName}"
-                                 required="true" maxlength="255"
-                                 requiredMessage="Please fill out 'Name' field."
-                                 label="Name" styleClass="section-content input-section">
-                        <f:validateLength maximum="255"/>
                     </h:inputText>
 
                     <h:outputText value="Description" styleClass="section-label"/>

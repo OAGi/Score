@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -29,8 +30,12 @@ public class ContextCategoryBean extends UIHandler {
 
     @PostConstruct
     public void init() {
+        setContextCategories(allContextCategories());
+    }
+
+    public List<ContextCategory> allContextCategories() {
         allContextCategories = contextCategoryService.findAll(Sort.Direction.DESC, "ctxCategoryId");
-        setContextCategories(allContextCategories);
+        return allContextCategories;
     }
 
     public List<ContextCategory> getContextCategories() {
@@ -50,17 +55,21 @@ public class ContextCategoryBean extends UIHandler {
     }
 
     public List<String> completeInput(String query) {
-        return allContextCategories.stream()
+        return allContextCategories().stream()
                 .map(e -> e.getName())
                 .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     public void search() {
-        setContextCategories(
-                allContextCategories.stream()
-                        .filter(e -> e.getName().toLowerCase().contains(name))
-                        .collect(Collectors.toList())
-        );
+        if (StringUtils.isEmpty(name)) {
+            setContextCategories(allContextCategories());
+        } else {
+            setContextCategories(
+                    allContextCategories().stream()
+                            .filter(e -> e.getName().toLowerCase().contains(name.toLowerCase()))
+                            .collect(Collectors.toList())
+            );
+        }
     }
 }
