@@ -21,7 +21,7 @@
             </div>
         </div>
         <c:choose>
-            <c:when test="#{codeListDetailBean.codeList.state == 'Published'}">
+            <c:when test="#{codeListDetailBean.codeList.state != 'Editing'}">
                 <h:form id="form">
                     <p:panel>
                         <h:panelGrid columns="2" cellpadding="3">
@@ -81,6 +81,12 @@
                             </p:dataTable>
                         </p:panel>
                     </p:panel>
+
+                    <p:commandButton ajax="true" value="Delete" rendered="#{codeListDetailBean.codeList.state == 'Published'}"
+                                     styleClass="danger"
+                                     actionListener="#{codeListDetailBean.setState('Deleted')}"
+                                     action="#{codeListDetailBean.forceUpdate()}"/>
+
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 </h:form>
             </c:when>
@@ -224,6 +230,11 @@
                         <p:commandButton ajax="true" value="Publish"
                                          actionListener="#{codeListDetailBean.setState('Published')}"
                                          action="#{codeListDetailBean.update()}"/>
+
+                        <p:commandButton ajax="true" value="Discard" rendered="#{codeListDetailBean.codeList.state == 'Editing'}"
+                                         styleClass="danger"
+                                         actionListener="#{codeListDetailBean.setState('Discarded')}"
+                                         action="#{codeListDetailBean.forceUpdate()}"/>
                     </p:panel>
 
                     <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"

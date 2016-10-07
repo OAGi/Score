@@ -47,6 +47,7 @@ public class CodeListCreateFromAnotherBean extends CodeListBaseBean {
         codeList.setDefinitionSource(basedCodeList.getDefinitionSource());
         codeList.setRemark(basedCodeList.getRemark());
         codeList.setBasedCodeListId(basedCodeList.getCodeListId());
+        codeList.setExtensibleIndicator(basedCodeList.isExtensibleIndicator());
         setCodeList(codeList);
 
         setCodeListValues(
