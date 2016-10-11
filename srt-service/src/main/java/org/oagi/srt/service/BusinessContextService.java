@@ -5,6 +5,7 @@ import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.BusinessContextValueRepository;
 import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.entity.BusinessContextValue;
+import org.oagi.srt.repository.entity.ContextSchemeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,20 @@ public class BusinessContextService {
         );
     }
 
+    public List<BusinessContext> findByName(String name) {
+        return businessContextRepository.findByName(name);
+    }
+
     public List<BusinessContextValue> findByBizCtxId(long bizCtxId) {
         return businessContextValueRepository.findByBizCtxId(bizCtxId);
+    }
+
+    public BusinessContext findById(long bizCtxId) {
+        return businessContextRepository.findOne(bizCtxId);
+    }
+
+    public void update(BusinessContext businessContext) {
+        businessContextRepository.save(businessContext);
     }
 
     public BusinessContextBuilder newBusinessContextBuilder() {
@@ -42,7 +55,7 @@ public class BusinessContextService {
 
         private String name;
         private long userId;
-        private List<Long> ctxSchemeValueIds;
+        private List<ContextSchemeValue> contextSchemeValues;
 
         public BusinessContextBuilder name(String name) {
             this.name = name;
@@ -54,8 +67,8 @@ public class BusinessContextService {
             return this;
         }
 
-        public BusinessContextBuilder ctxSchemeValueIds(List<Long> ctxSchemeValueIds) {
-            this.ctxSchemeValueIds = ctxSchemeValueIds;
+        public BusinessContextBuilder contextSchemeValues(List<ContextSchemeValue> contextSchemeValues) {
+            this.contextSchemeValues = contextSchemeValues;
             return this;
         }
 
@@ -77,11 +90,11 @@ public class BusinessContextService {
 
             businessContext = businessContextRepository.saveAndFlush(businessContext);
 
-            if (ctxSchemeValueIds != null && !ctxSchemeValueIds.isEmpty()) {
-                for (long ctxSchemeValueId : ctxSchemeValueIds) {
+            if (contextSchemeValues != null && !contextSchemeValues.isEmpty()) {
+                for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
                     BusinessContextValue businessContextValue = new BusinessContextValue();
-                    businessContextValue.setBizCtxId(businessContext.getBizCtxId());
-                    businessContextValue.setCtxSchemeValueId(ctxSchemeValueId);
+                    businessContextValue.setBusinessContext(businessContext);
+                    businessContextValue.setContextSchemeValue(contextSchemeValue);
                     businessContextValueRepository.save(businessContextValue);
                 }
             }

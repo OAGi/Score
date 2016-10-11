@@ -7,6 +7,7 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.web.jsf.beans.codelist.CodeListBean;
+import org.oagi.srt.web.jsf.beans.context.business.BusinessContextHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -1158,8 +1159,8 @@ public class TopLevelABIEHandler implements Serializable {
         for (BusinessContextHandler.BusinessContextValues bcv : bcH.getBcValues()) {
             for (ContextSchemeValue cVO : bcv.getCsList()) {
                 BusinessContextValue bcvVO = new BusinessContextValue();
-                bcvVO.setBizCtxId(bcVO.getBizCtxId());
-                bcvVO.setCtxSchemeValueId(cVO.getCtxSchemeValueId());
+                bcvVO.setBusinessContext(bcVO);
+                bcvVO.setContextSchemeValue(cVO);
                 businessContextValueRepository.saveAndFlush(bcvVO);
             }
         }

@@ -46,6 +46,10 @@ public class ContextSchemeService {
         return contextSchemeValueRepository.findByOwnerCtxSchemeId(ownerCtxSchemeId);
     }
 
+    public List<ContextSchemeValue> findAllContextSchemeValues() {
+        return contextSchemeValueRepository.findAll();
+    }
+
     public ContextScheme findContextSchemeById(long ctxSchemeId) {
         return contextSchemeRepository.findOne(ctxSchemeId);
     }
@@ -57,7 +61,7 @@ public class ContextSchemeService {
     @Transactional(readOnly = false)
     public void update(ContextScheme contextScheme, List<ContextSchemeValue> contextSchemeValues) {
         contextSchemeRepository.saveAndFlush(contextScheme);
-        contextSchemeValues.stream().forEach(e -> e.setOwnerCtxSchemeId(contextScheme.getCtxSchemeId()));
+        contextSchemeValues.stream().forEach(e -> e.setContextScheme(contextScheme));
         contextSchemeValueRepository.save(contextSchemeValues);
     }
 

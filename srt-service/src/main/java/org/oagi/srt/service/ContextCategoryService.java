@@ -28,9 +28,11 @@ public class ContextCategoryService {
     private ContextSchemeValueRepository contextSchemeValueRepository;
 
     public List<ContextCategory> findAll(Sort.Direction direction, String property) {
-        return Collections.unmodifiableList(
-                contextCategoryRepository.findAll(new Sort(new Sort.Order(direction, property)))
-        );
+        return contextCategoryRepository.findAll(new Sort(new Sort.Order(direction, property)));
+    }
+
+    public List<ContextCategory> findAll() {
+        return contextCategoryRepository.findAll();
     }
 
     public List<ContextCategory> findByName(String name) {

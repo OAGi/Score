@@ -23,7 +23,6 @@
     <h:outputStylesheet library="css" name="bootstrap-theme-3.3.7.min.css"/>
     <h:outputScript library="js" name="bootstrap-3.3.7.min.js"></h:outputScript>
     <h:outputStylesheet library="css" name="font-awesome-4.6.3.min.css"/>
-    <h:outputStylesheet library="css" name="sr.css"/>
     <h:outputStylesheet library="css" name="srt.css"/>
     <h:outputScript library="js" name="srt.js"></h:outputScript>
 
@@ -57,10 +56,10 @@
                                        aria-haspopup="true" aria-expanded="false">BODs <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
                                         <li><a class="header-nav-link"
-                                               href="/top_level_abie_create.xhtml">#{str['Create_top-level_ABIE']}</a>
+                                               href="/views/profile_bod/top_level_abie_create.xhtml">#{str['Create_top-level_ABIE']}</a>
                                         </li>
-                                        <li><a href="/top_level_abie_list.xhtml">Profile BOD List</a></li>
-                                        <li><a href="/top_level_abie_copy.xhtml">#{str['Copy_top-level_ABIE']}</a></li>
+                                        <li><a href="/views/profile_bod/top_level_abie_list.xhtml">Profile BOD List</a></li>
+                                        <li><a href="/views/profile_bod/top_level_abie_copy.xhtml">#{str['Copy_top-level_ABIE']}</a></li>
                                     </ul>
                                 </li>
                                 <li class="dropdown">
@@ -68,7 +67,7 @@
                                        aria-haspopup="true" aria-expanded="false">Profile OAGIS <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/oagis_expression_generate.xhtml">Generate OAGIS Expression</a>
+                                        <li><a href="/views/generate_oagis/oagis_expression_generate.xhtml">Generate OAGIS Expression</a>
                                         </li>
                                     </ul>
                                 </li>
@@ -77,8 +76,8 @@
                                        aria-haspopup="true" aria-expanded="false">Business Context <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/business_context_list.xhtml">Business Context List</a></li>
-                                        <li><a href="/business_context_create.xhtml">Create Business Context</a></li>
+                                        <li><a href="/views/business_context/list.xhtml">Business Context List</a></li>
+                                        <li><a href="/views/business_context/business_context_create.xhtml">Create Business Context</a></li>
                                     </ul>
                                 </li>
                                 <li class="dropdown">
@@ -120,7 +119,7 @@
                                         <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
                                         </li>
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="/settings.xhtml">Settings</a></li>
+                                        <li><a href="/views/user/settings.xhtml">Settings</a></li>
                                         <li><a href="/logout">Sign out</a></li>
                                     </ul>
                                 </li>
@@ -147,7 +146,7 @@
             <div class="col-lg-12">
                 <div class="footer">
                     <span class="copyright">© 2015-16 <a href="http://www.oagi.org">Open Application Group, Inc</a>. All rights reserved.</span>
-                    <span class="floatRight"><p:clock/></span>
+                    <span style="float: right;"><p:clock/></span>
                 </div>
             </div>
         </div>

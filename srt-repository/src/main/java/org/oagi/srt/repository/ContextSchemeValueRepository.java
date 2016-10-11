@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface ContextSchemeValueRepository extends JpaRepository<ContextSchemeValue, Long> {
 
-    @Query("select c from ContextSchemeValue c where c.ownerCtxSchemeId = ?1")
+    @Query("select c from ContextSchemeValue c where c.contextScheme.ctxSchemeId = ?1")
     public List<ContextSchemeValue> findByOwnerCtxSchemeId(long ownerCtxSchemeId);
 
     @Modifying
-    @Query("delete from ContextSchemeValue c where c.ownerCtxSchemeId = ?1")
+    @Query("delete from ContextSchemeValue c where c.contextScheme.ctxSchemeId = ?1")
     public void deleteByOwnerCtxSchemeId(long ownerCtxSchemeId);
 }

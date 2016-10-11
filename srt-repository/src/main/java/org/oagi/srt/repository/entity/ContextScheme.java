@@ -3,6 +3,7 @@ package org.oagi.srt.repository.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "ctx_scheme")
@@ -34,8 +35,9 @@ public class ContextScheme implements Serializable {
     @Column(nullable = false, length = 45)
     private String schemeVersionId;
 
-    @Column(nullable = false)
-    private long ctxCategoryId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ctx_category_id", nullable = false)
+    private ContextCategory contextCategory;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -118,12 +120,12 @@ public class ContextScheme implements Serializable {
         this.schemeVersionId = schemeVersionId;
     }
 
-    public long getCtxCategoryId() {
-        return ctxCategoryId;
+    public ContextCategory getContextCategory() {
+        return contextCategory;
     }
 
-    public void setCtxCategoryId(long ctxCategoryId) {
-        this.ctxCategoryId = ctxCategoryId;
+    public void setContextCategory(ContextCategory contextCategory) {
+        this.contextCategory = contextCategory;
     }
 
     public long getCreatedBy() {
@@ -166,7 +168,6 @@ public class ContextScheme implements Serializable {
         ContextScheme that = (ContextScheme) o;
 
         if (ctxSchemeId != that.ctxSchemeId) return false;
-        if (ctxCategoryId != that.ctxCategoryId) return false;
         if (createdBy != that.createdBy) return false;
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
@@ -176,6 +177,8 @@ public class ContextScheme implements Serializable {
         if (schemeAgencyId != null ? !schemeAgencyId.equals(that.schemeAgencyId) : that.schemeAgencyId != null)
             return false;
         if (schemeVersionId != null ? !schemeVersionId.equals(that.schemeVersionId) : that.schemeVersionId != null)
+            return false;
+        if (contextCategory != null ? !contextCategory.equals(that.contextCategory) : that.contextCategory != null)
             return false;
         if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
             return false;
@@ -192,7 +195,7 @@ public class ContextScheme implements Serializable {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (schemeAgencyId != null ? schemeAgencyId.hashCode() : 0);
         result = 31 * result + (schemeVersionId != null ? schemeVersionId.hashCode() : 0);
-        result = 31 * result + (int) (ctxCategoryId ^ (ctxCategoryId >>> 32));
+        result = 31 * result + (contextCategory != null ? contextCategory.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
@@ -210,7 +213,7 @@ public class ContextScheme implements Serializable {
                 ", description='" + description + '\'' +
                 ", schemeAgencyId='" + schemeAgencyId + '\'' +
                 ", schemeVersionId='" + schemeVersionId + '\'' +
-                ", ctxCategoryId=" + ctxCategoryId +
+                ", contextCategory=" + contextCategory +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +

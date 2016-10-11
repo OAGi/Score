@@ -1,0 +1,143 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h:panelGroup rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}">
+                    <h2 class="subhead-heading">Business Context Detail</h2>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{businessContextDetailBean.businessContext.bizCtxId == 0}">
+                    <h2 class="subhead-heading">Create Business Context</h2>
+                </h:panelGroup>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false"
+                        autoUpdate="true"
+                        closable="true"/>
+            <p:panel>
+                <h:panelGrid columns="2" cellpadding="3">
+                    <h:outputText value="GUID" styleClass="section-label"
+                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"/>
+                    <h:outputText value="#{businessContextDetailBean.businessContext.guid}"
+                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
+                                  styleClass="section-content"/>
+
+                    <h:outputText value="Name" styleClass="section-label"/>
+                    <h:inputText id="name" value="#{businessContextDetailBean.businessContext.name}"
+                                 required="true"
+                                 requiredMessage="Please fill out 'Name' field."
+                                 maxlength="45"
+                                 label="Name" styleClass="section-content input-section">
+                        <f:validateLength maximum="45"/>
+                    </h:inputText>
+                </h:panelGrid>
+            </p:panel>
+
+
+            <p:panel>
+                <f:facet name="header">
+                    <h:outputText value="Business Context Values"/>
+                    <p:commandButton value="Add" style="float: right;"
+                                     actionListener="#{businessContextDetailBean.addBusinessContextValue}"
+                                     update="tbl"/>
+                </f:facet>
+
+                <p:dataTable id="tbl" var="businessContextValue"
+                             value="#{businessContextDetailBean.bcvs}"
+                             editable="true" editMode="cell" widgetVar="businessContextValues" rows="10"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom"
+                             style="width: 100%; margin-bottom: 20px;">
+
+                    <p:column style="width: 33%" headerText="Context Category"
+                              sortBy="#{businessContextValue.contextCategory.name}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText
+                                        value="#{businessContextValue.contextCategory.name}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu style="width: 100%"
+                                                 value="#{businessContextValue.contextCategory}">
+                                    <f:selectItems value="#{businessContextDetailBean.contextCategories}"
+                                                   var="contextCategory"
+                                                   itemLabel="#{contextCategory.name}"
+                                                   itemValue="#{contextCategory}"/>
+                                    <f:converter binding="#{contextCategoryConverter}"/>
+                                    <f:ajax listener="#{businessContextDetailBean.onChange}" render="tbl"/>
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="width: 33%" headerText="Context Scheme Name"
+                              sortBy="#{businessContextValue.contextCategory.contextScheme.schemeName}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText
+                                        value="#{businessContextValue.contextCategory.contextScheme.schemeName}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu style="width: 100%"
+                                                 value="#{businessContextValue.contextCategory.contextScheme}">
+                                    <f:selectItems
+                                            value="#{businessContextDetailBean.getContextSchemes(businessContextValue.contextCategory.ctxCategoryId)}"
+                                            var="contextScheme"
+                                            itemLabel="#{contextScheme.schemeName}"
+                                            itemValue="#{contextScheme}"/>
+                                    <f:converter binding="#{contextSchemeConverter}"/>
+                                    <f:ajax listener="#{businessContextDetailBean.onChange}" render="tbl"/>
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Context Scheme Value"
+                              sortBy="#{businessContextValue.contextCategory.contextScheme.contextSchemeValue.value}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{businessContextValue.contextCategory.contextScheme.contextSchemeValue.value}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <h:selectOneMenu style="width: 100%" value="#{businessContextValue.contextCategory.contextScheme.contextSchemeValue}">
+                                    <f:selectItems
+                                            value="#{businessContextDetailBean.getContextSchemeValues(businessContextValue.contextCategory.contextScheme.ctxSchemeId)}"
+                                            var="contextSchemeValue"
+                                            itemLabel="#{contextSchemeValue.value}"
+                                            itemValue="#{contextSchemeValue}"/>
+                                    <f:converter binding="#{contextSchemeValueConverter}"/>
+                                    <f:ajax listener="#{businessContextDetailBean.onChange}" render="tbl"/>
+                                </h:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+
+                    </p:column>
+                </p:dataTable>
+
+                <p:separator/>
+
+                <p:commandButton ajax="true" value="Create"
+                                 rendered="#{businessContextDetailBean.businessContext.guid == null}"
+                                 action="#{businessContextDetailBean.update()}"/>
+
+                <p:commandButton ajax="true" value="Update"
+                                 rendered="#{businessContextDetailBean.businessContext.guid != null}"
+                                 action="#{businessContextDetailBean.update()}"/>
+
+                <p:commandButton ajax="true" value="Discard"
+                                 rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
+                                 styleClass="danger"
+                                 onclick="PF('confirmDiscard').show()"/>
+            </p:panel>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

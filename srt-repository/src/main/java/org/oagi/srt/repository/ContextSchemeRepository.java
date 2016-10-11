@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ContextSchemeRepository extends JpaRepository<ContextScheme, Long> {
 
-    @Query("select c from ContextScheme c where c.ctxCategoryId = ?1")
+    @Query("select c from ContextScheme c where c.contextCategory.ctxCategoryId = ?1")
     public List<ContextScheme> findByCtxCategoryId(long ctxCategoryId);
 
     @Query("select c from ContextScheme c where c.schemeId = ?1 and c.schemeAgencyId = ?2")

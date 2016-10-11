@@ -1,9 +1,10 @@
-package org.oagi.srt.web.handler;
+package org.oagi.srt.web.jsf.beans.context.business;
 
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessContextService;
 import org.oagi.srt.service.ContextCategoryService;
 import org.oagi.srt.service.ContextSchemeService;
+import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -182,10 +183,9 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
         businessContextService.newBusinessContextBuilder()
                 .name(this.name)
                 .userId(loadAuthentication().getAppUserId())
-                .ctxSchemeValueIds(
+                .contextSchemeValues(
                         bcValues.stream()
                                 .flatMap(e -> e.getCsList().stream())
-                                .map(c -> c.getCtxSchemeValueId())
                                 .distinct()
                                 .collect(Collectors.toList()))
                 .build();
@@ -310,13 +310,13 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
             for (BusinessContextValue businessContextValue : bcvVOList) {
                 BusinessContextValues businessContextValues = new BusinessContextValues();
 
-                ContextSchemeValue contextSchemeValue = contextSchemeService.findContextSchemeValueById(businessContextValue.getCtxSchemeValueId());
+                ContextSchemeValue contextSchemeValue = businessContextValue.getContextSchemeValue();
                 businessContextValues.setCsvVO(contextSchemeValue);
 
-                ContextScheme contextScheme = contextSchemeService.findContextSchemeById(contextSchemeValue.getOwnerCtxSchemeId());
+                ContextScheme contextScheme = contextSchemeValue.getContextScheme();
                 businessContextValues.setCsVO(contextScheme);
 
-                ContextCategory contextCategory = contextCategoryService.findById(contextScheme.getCtxCategoryId());
+                ContextCategory contextCategory = contextScheme.getContextCategory();
                 businessContextValues.setCcVO(contextCategory);
 
                 bcDetails.add(businessContextValues);

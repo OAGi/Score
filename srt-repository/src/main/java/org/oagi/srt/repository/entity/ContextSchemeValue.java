@@ -24,8 +24,9 @@ public class ContextSchemeValue implements Serializable {
     @Column(length = 10 * 1024)
     private String meaning;
 
-    @Column
-    private Long ownerCtxSchemeId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_ctx_scheme_id", nullable = false)
+    private ContextScheme contextScheme;
 
     public long getCtxSchemeValueId() {
         return ctxSchemeValueId;
@@ -59,12 +60,12 @@ public class ContextSchemeValue implements Serializable {
         this.meaning = meaning;
     }
 
-    public long getOwnerCtxSchemeId() {
-        return (ownerCtxSchemeId == null) ? 0L : ownerCtxSchemeId;
+    public ContextScheme getContextScheme() {
+        return contextScheme;
     }
 
-    public void setOwnerCtxSchemeId(long ownerCtxSchemeId) {
-        this.ownerCtxSchemeId = ownerCtxSchemeId;
+    public void setContextScheme(ContextScheme contextScheme) {
+        this.contextScheme = contextScheme;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class ContextSchemeValue implements Serializable {
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
         if (meaning != null ? !meaning.equals(that.meaning) : that.meaning != null) return false;
-        return ownerCtxSchemeId != null ? ownerCtxSchemeId.equals(that.ownerCtxSchemeId) : that.ownerCtxSchemeId == null;
+        return contextScheme != null ? contextScheme.equals(that.contextScheme) : that.contextScheme == null;
 
     }
 
@@ -88,7 +89,7 @@ public class ContextSchemeValue implements Serializable {
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (meaning != null ? meaning.hashCode() : 0);
-        result = 31 * result + (ownerCtxSchemeId != null ? ownerCtxSchemeId.hashCode() : 0);
+        result = 31 * result + (contextScheme != null ? contextScheme.hashCode() : 0);
         return result;
     }
 
@@ -99,7 +100,7 @@ public class ContextSchemeValue implements Serializable {
                 ", guid='" + guid + '\'' +
                 ", value='" + value + '\'' +
                 ", meaning='" + meaning + '\'' +
-                ", ownerCtxSchemeId=" + ownerCtxSchemeId +
+                ", contextScheme=" + contextScheme +
                 '}';
     }
 }

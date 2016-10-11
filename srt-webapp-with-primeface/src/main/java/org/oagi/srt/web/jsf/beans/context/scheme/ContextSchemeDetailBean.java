@@ -76,11 +76,7 @@ public class ContextSchemeDetailBean extends UIHandler {
                 setContextSchemeValues(
                         contextSchemeService.findByOwnerCtxSchemeId(contextScheme.getCtxSchemeId())
                 );
-            }
-            if (contextScheme.getCtxCategoryId() > 0L) {
-                setContextCategory(
-                        contextCategoryService.findById(contextScheme.getCtxCategoryId())
-                );
+                setContextCategory(contextScheme.getContextCategory());
             }
         }
     }
@@ -159,7 +155,7 @@ public class ContextSchemeDetailBean extends UIHandler {
             contextScheme.setCreatedBy(loadAuthentication().getAppUserId());
         }
         contextScheme.setLastUpdatedBy(loadAuthentication().getAppUserId());
-        contextScheme.setCtxCategoryId(contextCategory.getCtxCategoryId());
+        contextScheme.setContextCategory(contextCategory);
         contextSchemeValues.stream().filter(e -> e.getGuid() == null).forEach(e -> e.setGuid(Utility.generateGUID()));
 
         contextSchemeService.update(contextScheme, contextSchemeValues);
