@@ -39,7 +39,6 @@
                 </h:panelGrid>
             </p:panel>
 
-
             <p:panel>
                 <f:facet name="header">
                     <h:outputText value="Business Context Values"/>
@@ -49,13 +48,13 @@
                 </f:facet>
 
                 <p:dataTable id="tbl" var="businessContextValue"
-                             value="#{businessContextDetailBean.bcvs}"
+                             value="#{businessContextDetailBean.businessContextValues}"
                              editable="true" editMode="cell" widgetVar="businessContextValues" rows="10"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom"
                              style="width: 100%; margin-bottom: 20px;">
 
-                    <p:column style="width: 33%" headerText="Context Category"
+                    <p:column style="width: 30%; height: 30px;" headerText="Context Category"
                               sortBy="#{businessContextValue.contextCategory.name}">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -65,6 +64,7 @@
                             <f:facet name="input">
                                 <h:selectOneMenu style="width: 100%"
                                                  value="#{businessContextValue.contextCategory}">
+                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
                                     <f:selectItems value="#{businessContextDetailBean.contextCategories}"
                                                    var="contextCategory"
                                                    itemLabel="#{contextCategory.name}"
@@ -76,16 +76,17 @@
                         </p:cellEditor>
                     </p:column>
 
-                    <p:column style="width: 33%" headerText="Context Scheme Name"
-                              sortBy="#{businessContextValue.contextCategory.contextScheme.schemeName}">
+                    <p:column style="width: 30%" headerText="Context Scheme Name"
+                              sortBy="#{businessContextValue.contextScheme.schemeName}">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText
-                                        value="#{businessContextValue.contextCategory.contextScheme.schemeName}"/>
+                                        value="#{businessContextValue.contextScheme.schemeName}"/>
                             </f:facet>
                             <f:facet name="input">
                                 <h:selectOneMenu style="width: 100%"
-                                                 value="#{businessContextValue.contextCategory.contextScheme}">
+                                                 value="#{businessContextValue.contextScheme}">
+                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
                                     <f:selectItems
                                             value="#{businessContextDetailBean.getContextSchemes(businessContextValue.contextCategory.ctxCategoryId)}"
                                             var="contextScheme"
@@ -98,16 +99,17 @@
                         </p:cellEditor>
                     </p:column>
 
-                    <p:column headerText="Context Scheme Value"
-                              sortBy="#{businessContextValue.contextCategory.contextScheme.contextSchemeValue.value}">
+                    <p:column style="width: 30%" headerText="Context Scheme Value"
+                              sortBy="#{businessContextValue.contextSchemeValue.value}">
                         <p:cellEditor>
                             <f:facet name="output">
-                                <h:outputText value="#{businessContextValue.contextCategory.contextScheme.contextSchemeValue.value}"/>
+                                <h:outputText value="#{businessContextValue.contextSchemeValue.value}"/>
                             </f:facet>
                             <f:facet name="input">
-                                <h:selectOneMenu style="width: 100%" value="#{businessContextValue.contextCategory.contextScheme.contextSchemeValue}">
+                                <h:selectOneMenu style="width: 100%" value="#{businessContextValue.contextSchemeValue}">
+                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
                                     <f:selectItems
-                                            value="#{businessContextDetailBean.getContextSchemeValues(businessContextValue.contextCategory.contextScheme.ctxSchemeId)}"
+                                            value="#{businessContextDetailBean.getContextSchemeValues(businessContextValue.contextScheme.ctxSchemeId)}"
                                             var="contextSchemeValue"
                                             itemLabel="#{contextSchemeValue.value}"
                                             itemValue="#{contextSchemeValue}"/>
@@ -116,7 +118,15 @@
                                 </h:selectOneMenu>
                             </f:facet>
                         </p:cellEditor>
+                    </p:column>
 
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                                         action="#{businessContextDetailBean.deleteBusinessContextValue}"
+                                         update="tbl">
+                            <f:setPropertyActionListener value="#{businessContextValue}"
+                                                         target="#{businessContextDetailBean.selectedBusinessContextValue}"/>
+                        </p:commandButton>
                     </p:column>
                 </p:dataTable>
 
@@ -134,6 +144,20 @@
                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
                                  styleClass="danger"
                                  onclick="PF('confirmDiscard').show()"/>
+
+                <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+                                 hideEffect="fade" closable="false" header="Warning">
+                    <f:facet name="message">
+                        The business context will be permanently removed.
+                    </f:facet>
+                    <div style="text-align: center;">
+                        <p:commandButton value="Accept" icon="ui-icon-check"
+                                         action="#{businessContextDetailBean.delete()}"
+                                         oncomplete="PF('confirmDiscard').hide()"/>
+                        <p:commandButton value="Denied" icon="ui-icon-close"
+                                         onclick="PF('confirmDiscard').hide()"/>
+                    </div>
+                </p:confirmDialog>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

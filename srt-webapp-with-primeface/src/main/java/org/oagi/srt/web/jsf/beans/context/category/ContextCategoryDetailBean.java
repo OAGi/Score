@@ -15,6 +15,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.util.stream.Collectors;
 
 @Controller
 @Scope("view")
@@ -55,7 +56,9 @@ public class ContextCategoryDetailBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String update() {
         String name = contextCategory.getName();
-        if (!contextCategoryService.findByName(name).isEmpty()) {
+        if (!contextCategoryService.findByName(name).stream()
+                .filter(e -> e.getCtxCategoryId() != contextCategory.getCtxCategoryId())
+                .collect(Collectors.toList()).isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Name is already taken."));
             return null;

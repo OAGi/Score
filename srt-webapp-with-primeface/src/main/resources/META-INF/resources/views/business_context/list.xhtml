@@ -20,9 +20,9 @@
                     <p:commandButton value="Search" ajax="true" actionListener="#{businessContextBean.search}"
                                      update="tbl1"
                                      icon="ui-icon-search"/>
-                    <p:button value="Create Context Scheme"
+                    <p:button value="Create Business Context"
                               style="float: right; margin-top: 3px; padding: 3px 0 3px 0;"
-                              outcome="/views/context_scheme/create_category_selection.xhtml"/>
+                              outcome="/views/business_context/details.xhtml"/>
                 </f:facet>
                 <p:dataTable id="tbl1" var="businessContext" value="#{businessContextBean.businessContexts}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"

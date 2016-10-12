@@ -1,6 +1,7 @@
 package org.oagi.srt.web.jsf.beans.context.business;
 
-import com.google.common.base.Functions;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessContextService;
 import org.oagi.srt.service.ContextCategoryService;
@@ -8,6 +9,7 @@ import org.oagi.srt.service.ContextSchemeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,9 +19,10 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,6 +30,9 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class BusinessContextDetailBean extends UIHandler {
+
+    @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
 
     @Autowired
     private BusinessContextService businessContextService;
@@ -37,97 +43,47 @@ public class BusinessContextDetailBean extends UIHandler {
     @Autowired
     private ContextSchemeService contextSchemeService;
 
-    private LinkedList<BCV> bcvs = new LinkedList();
-
     public static class BCV {
-        private CC contextCategory;
+        private BusinessContextValue businessContextValue;
+        private ContextCategory contextCategory;
+        private ContextScheme contextScheme;
+        private ContextSchemeValue contextSchemeValue;
 
-        public BCV(CC contextCategory) {
-            this.contextCategory = contextCategory;
+        public BCV() {
+            setBusinessContextValue(new BusinessContextValue());
         }
 
-        public CC getContextCategory() {
+        public BCV(BusinessContextValue businessContextValue) {
+            this.businessContextValue = businessContextValue;
+            this.contextSchemeValue = businessContextValue.getContextSchemeValue();
+            this.contextScheme = this.contextSchemeValue.getContextScheme();
+            this.contextCategory = this.contextScheme.getContextCategory();
+        }
+
+        public BusinessContextValue getBusinessContextValue() {
+            return businessContextValue;
+        }
+
+        public void setBusinessContextValue(BusinessContextValue businessContextValue) {
+            this.businessContextValue = businessContextValue;
+        }
+
+        public ContextCategory getContextCategory() {
             return contextCategory;
         }
 
-        public void setContextCategory(CC contextCategory) {
+        public void setContextCategory(ContextCategory contextCategory) {
             this.contextCategory = contextCategory;
-        }
-    }
-
-    public static class CC {
-        private ContextCategory contextCategory;
-        private CS contextScheme;
-
-        public CC(ContextCategory contextCategory) {
-            this.contextCategory = contextCategory;
+            setContextScheme(new ContextScheme());
         }
 
-        public Long getCtxCategoryId() {
-            return contextCategory.getCtxCategoryId();
-        }
-
-        public String getName() {
-            return contextCategory.getName();
-        }
-
-        public CS getContextScheme() {
+        public ContextScheme getContextScheme() {
             return contextScheme;
         }
 
-        public void setContextScheme(CS contextScheme) {
+        public void setContextScheme(ContextScheme contextScheme) {
             this.contextScheme = contextScheme;
-        }
-
-        public CC withContextScheme(CS contextScheme) {
-            setContextScheme(contextScheme);
-            return this;
-        }
-    }
-
-    public static class CS {
-        private ContextScheme contextScheme;
-        private CSV contextSchemeValue;
-
-        public CS(ContextScheme contextScheme) {
-            this.contextScheme = contextScheme;
-        }
-
-        public Long getCtxSchemeId() {
-            return contextScheme.getCtxSchemeId();
-        }
-
-        public String getSchemeName() {
-            return contextScheme.getSchemeName();
-        }
-
-        public CSV getContextSchemeValue() {
-            return contextSchemeValue;
-        }
-
-        public void setContextSchemeValue(CSV contextSchemeValue) {
-            this.contextSchemeValue = contextSchemeValue;
-        }
-
-        public CS withContextSchemeValue(CSV contextSchemeValue) {
-            setContextSchemeValue(contextSchemeValue);
-            return this;
-        }
-    }
-
-    public static class CSV {
-        private ContextSchemeValue contextSchemeValue;
-
-        public CSV(ContextSchemeValue contextSchemeValue) {
-            this.contextSchemeValue = contextSchemeValue;
-        }
-
-        public Long getCtxSchemeValueId() {
-            return contextSchemeValue.getCtxSchemeValueId();
-        }
-
-        public String getValue() {
-            return contextSchemeValue.getValue();
+            setContextSchemeValue(new ContextSchemeValue());
         }
 
         public ContextSchemeValue getContextSchemeValue() {
@@ -138,10 +94,6 @@ public class BusinessContextDetailBean extends UIHandler {
             this.contextSchemeValue = contextSchemeValue;
         }
     }
-
-    private List<CC> contextCategories = new ArrayList();
-    private Map<Long, List<CS>> contextSchemes = new HashMap();
-    private Map<Long, List<CSV>> contextSchemeValues = new HashMap();
 
     @PostConstruct
     public void init() {
@@ -156,52 +108,16 @@ public class BusinessContextDetailBean extends UIHandler {
 
                 List<BusinessContextValue> businessContextValues =
                         businessContextService.findByBizCtxId(businessContext.getBizCtxId());
-                setBusinessContextValues(new LinkedList(businessContextValues));
-                for (BusinessContextValue businessContextValue : businessContextValues) {
-                    ContextSchemeValue contextSchemeValue = businessContextValue.getContextSchemeValue();
-                    ContextScheme contextScheme = contextSchemeValue.getContextScheme();
-                    ContextCategory contextCategory = contextScheme.getContextCategory();
-
-                    BCV bcv = new BCV(
-                            new CC(contextCategory)
-                                .withContextScheme(new CS(contextScheme)
-                                        .withContextSchemeValue(new CSV(contextSchemeValue))));
-                    bcvs.add(bcv);
-                }
+                setBusinessContextValues(businessContextValues.stream()
+                        .map(e -> new BCV(e)).collect(Collectors.toList()));
             }
         }
-
-        List<ContextSchemeValue> contextSchemeValues = contextSchemeService.findAllContextSchemeValues();
-        List<ContextScheme> contextSchemes = contextSchemeValues.stream()
-                .map(e -> e.getContextScheme()).distinct().collect(Collectors.toList());
-        List<ContextCategory> contextCategories = contextSchemes.stream()
-                .map(e -> e.getContextCategory()).distinct().collect(Collectors.toList());
-
-        Map<Long, CC> ccMap = new HashMap();
-        for (ContextSchemeValue contextSchemeValue : contextSchemeValues) {
-            ContextScheme contextScheme = contextSchemeValue.getContextScheme();
-            ContextCategory contextCategory = contextScheme.getContextCategory();
-
-            CSV csv = new CSV(contextSchemeValue);
-            CS cs = new CS(contextScheme).withContextSchemeValue(csv);
-            CC cc = new CC(contextCategory).withContextScheme(cs);
-
-            ccMap.putIfAbsent(cc.getCtxCategoryId(), cc);
-            List<CS> csList = this.contextSchemes.get(cc.getCtxCategoryId());
-            if (csList == null) {
-                csList = new ArrayList();
-                this.contextSchemes.put(cc.getCtxCategoryId(), csList);
-            }
-        }
-
-    }
-
-    public LinkedList<BCV> getBcvs() {
-        return bcvs;
     }
 
     private BusinessContext businessContext;
-    private LinkedList<BusinessContextValue> businessContextValues = new LinkedList();
+    private LinkedList<BCV> businessContextValues = new LinkedList();
+    private BCV selectedBusinessContextValue;
+    private List<BCV> deleteBusinessContextValues = new ArrayList();
 
     public BusinessContext getBusinessContext() {
         return businessContext;
@@ -211,42 +127,101 @@ public class BusinessContextDetailBean extends UIHandler {
         this.businessContext = businessContext;
     }
 
-    public List<BusinessContextValue> getBusinessContextValues() {
+    public List<BCV> getBusinessContextValues() {
         return businessContextValues;
     }
 
-    public void setBusinessContextValues(List<BusinessContextValue> businessContextValues) {
+    public void setBusinessContextValues(List<BCV> businessContextValues) {
         this.businessContextValues = new LinkedList(businessContextValues);
     }
 
-    public void addBusinessContextValue() {
-        this.businessContextValues.addFirst(new BusinessContextValue());
+    public BCV getSelectedBusinessContextValue() {
+        return selectedBusinessContextValue;
     }
 
-    public void onChange(AjaxBehaviorEvent event) {
-        System.out.println("##");
+    public void setSelectedBusinessContextValue(BCV selectedBusinessContextValue) {
+        this.selectedBusinessContextValue = selectedBusinessContextValue;
+    }
+
+    public void addBusinessContextValue() {
+        this.businessContextValues.addFirst(new BCV());
+    }
+
+    public List<ContextCategory> getContextCategories() {
+        return contextCategoryService.findAll(Sort.Direction.ASC, "name");
+    }
+
+    public List<ContextScheme> getContextSchemes(Long ctxCategoryId) {
+        if (ctxCategoryId == null || ctxCategoryId <= 0L) {
+            return Collections.emptyList();
+        }
+        return contextSchemeService.findByCtxCategoryId(ctxCategoryId);
+    }
+
+    public List<ContextSchemeValue> getContextSchemeValues(Long ctxSchemeId) {
+        if (ctxSchemeId == null || ctxSchemeId <= 0L) {
+            return Collections.emptyList();
+        }
+        return contextSchemeService.findByOwnerCtxSchemeId(ctxSchemeId);
+    }
+
+    public void deleteBusinessContextValue() {
+        if (selectedBusinessContextValue != null) {
+            businessContextValues.remove(selectedBusinessContextValue);
+            deleteBusinessContextValues.add(selectedBusinessContextValue);
+        }
+        selectedBusinessContextValue = null;
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public String update() {
         String name = businessContext.getName();
-        if (!businessContextService.findByName(name).isEmpty()) {
+        if (!businessContextService.findByName(name).stream()
+                .filter(e -> e.getBizCtxId() != businessContext.getBizCtxId())
+                .collect(Collectors.toList()).isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Name is already taken."));
             return null;
         }
 
-        businessContextService.update(businessContext);
+        if (businessContext.getBizCtxId() <= 0L) {
+            businessContext.setGuid(Utility.generateGUID());
+            businessContext.setCreatedBy(loadAuthentication().getAppUserId());
+        }
+        businessContext.setLastUpdatedBy(loadAuthentication().getAppUserId());
 
-        return "/views/context_category/list.xhtml?faces-redirect=true";
+        businessContextService.update(businessContext, businessContextValues.stream()
+                .map(e -> {
+                    BusinessContextValue businessContextValue = e.getBusinessContextValue();
+                    businessContextValue.setContextSchemeValue(e.getContextSchemeValue());
+                    return businessContextValue;
+                }).collect(Collectors.toList()));
+
+        businessContextService.delete(
+                deleteBusinessContextValues.stream()
+                        .map(e -> e.getBusinessContextValue())
+                        .filter(e -> e.getBizCtxValueId() > 0L)
+                        .collect(Collectors.toList())
+        );
+
+        return "/views/business_context/list.xhtml?faces-redirect=true";
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public String delete() {
         long bizCtxId = businessContext.getBizCtxId();
+        List<AggregateBusinessInformationEntity> abies = abieRepository.findByBizCtxId(bizCtxId);
+        if (!abies.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                            "The selected business context cannot be discarded. " +
+                                    "The ABIEs with the following IDs depend on it. " +
+                                    "They need to be discarded first."));
+            return null;
+        }
 
-        //businessContextService.deleteById(bizCtxId);
+        businessContextService.deleteById(bizCtxId);
 
-        return "/views/context_category/list.xhtml?faces-redirect=true";
+        return "/views/business_context/list.xhtml?faces-redirect=true";
     }
 }

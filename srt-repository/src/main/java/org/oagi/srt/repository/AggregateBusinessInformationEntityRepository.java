@@ -12,4 +12,7 @@ public interface AggregateBusinessInformationEntityRepository
 
     @Query("select a from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public List<AggregateBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
+
+    @Query("select a from AggregateBusinessInformationEntity a where a.bizCtxId = ?1")
+    public List<AggregateBusinessInformationEntity> findByBizCtxId(long bizCtxId);
 }

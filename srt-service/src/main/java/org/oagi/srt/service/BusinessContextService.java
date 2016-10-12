@@ -41,8 +41,20 @@ public class BusinessContextService {
         return businessContextRepository.findOne(bizCtxId);
     }
 
-    public void update(BusinessContext businessContext) {
-        businessContextRepository.save(businessContext);
+    public void update(BusinessContext businessContext, List<BusinessContextValue> businessContextValues) {
+        businessContextRepository.saveAndFlush(businessContext);
+        businessContextValues.stream()
+                .forEach(e -> e.setBusinessContext(businessContext));
+        businessContextValueRepository.save(businessContextValues);
+    }
+
+    public void delete(List<BusinessContextValue> businessContextValues) {
+        businessContextValueRepository.delete(businessContextValues);
+    }
+
+    public void deleteById(long bizCtxId) {
+        businessContextValueRepository.deleteByBizCtxId(bizCtxId);
+        businessContextRepository.delete(bizCtxId);
     }
 
     public BusinessContextBuilder newBusinessContextBuilder() {
