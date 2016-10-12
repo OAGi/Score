@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Profile BOD</h2>
+            </div>
+        </div>
+        <h:form id="listForm">
+            <p:panel>
+                <f:facet name="header">
+                    <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"
+                                    completeMethod="#{profileBODBean.completeInput}" maxResults="20"
+                                    style="width: 440px; margin-right: 20px;"/>
+                    <p:commandButton value="Search" ajax="true" actionListener="#{profileBODBean.search}"
+                                     update="tbl1" icon="ui-icon-search"/>
+                </f:facet>
+                <p:dataTable id="tbl1" var="profileBOD" value="#{profileBODBean.profileBODs}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
+                    <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                        <h:outputText value="#{profileBOD.propertyTerm}"/>
+                    </p:column>
+                    <p:column style="width: 200px; text-align: center;" headerText="Business Context" sortBy="#{profileBOD.bizCtxName}">
+                        <h:outputText value="#{profileBOD.bizCtxName}"/>
+                    </p:column>
+                    <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                              sortBy="#{profileBOD.creationTimestamp}">
+                        <h:outputText value="#{profileBOD.creationTimestamp}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
+                        <h:panelGroup rendered="#{profileBOD.state == 2}">
+                            <span class="label label-primary">Editing</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{profileBOD.state == 4}">
+                            <span class="label label-default">Published</span>
+                        </h:panelGroup>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

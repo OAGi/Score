@@ -25,7 +25,7 @@
                 </f:facet>
                 <p:dataTable id="tbl" var="cVO"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                             paginator="true" paginatorPosition="bottom" rows="20"
+                             paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom: 20px;"
                              value="#{codeListBean.codeLists}" rowKey="#{cVO.codeListId}">
                     <p:ajax event="rowSelect" listener="#{codeListBean.onRowSelect}"/>

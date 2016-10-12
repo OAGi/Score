@@ -74,6 +74,9 @@ public class TopLevelABIEHandler implements Serializable {
     private AssociationCoreComponentPropertyRepository asccpRepository;
 
     @Autowired
+    private TopLevelConceptRepository topLevelConceptRepository;
+
+    @Autowired
     private BasicCoreComponentRepository bccRepository;
 
     @Autowired
@@ -133,7 +136,7 @@ public class TopLevelABIEHandler implements Serializable {
     private String propertyTerm;
     private String den;
     private String definition;
-    private List<AssociationCoreComponentProperty> asccpVOs;
+    private List<TopLevelConcept> asccpVOs;
 
     private AssociationCoreComponentProperty selected;
     private BusinessContext bCSelected;
@@ -152,7 +155,7 @@ public class TopLevelABIEHandler implements Serializable {
         maxBIEID = bbieRepository.count();
         maxBBIESCID = bbiescRepository.count();
 
-        asccpVOs = asccpRepository.findAllOrderByPropertyTermAsc();
+        asccpVOs = topLevelConceptRepository.findAllOrderByPropertyTermAsc();
     }
 
     public BarChartModel getBarModel() {
@@ -335,7 +338,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void search() {
-        asccpVOs = asccpRepository.findByPropertyTermContaining(getPropertyTerm());
+        asccpVOs = topLevelConceptRepository.findByPropertyTermContaining(getPropertyTerm());
     }
 
     public void addMessage(String summary) {
@@ -820,7 +823,7 @@ public class TopLevelABIEHandler implements Serializable {
         av.setBbiesc(nbbiescVO);
         String sc_name = "";
         if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Text") ||
-            dtscvo.getPropertyTerm().contains(dtscvo.getRepresentationTerm())) {
+                dtscvo.getPropertyTerm().contains(dtscvo.getRepresentationTerm())) {
             sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm());
         } else {
             sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm()).concat(dtscvo.getRepresentationTerm());
@@ -906,14 +909,15 @@ public class TopLevelABIEHandler implements Serializable {
 
     }
 
-    public List<AssociationCoreComponentProperty> getAsccpVOs() {
+    public List<TopLevelConcept> getAsccpVOs() {
         return asccpVOs;
     }
 
     public List<String> completeInput(String query) {
-        return asccpRepository.findAll().stream()
-                .filter(associationCoreComponentProperty -> associationCoreComponentProperty.getPropertyTerm().contains(query))
-                .map(associationCoreComponentProperty -> associationCoreComponentProperty.getPropertyTerm())
+        return topLevelConceptRepository.findAll().stream()
+                .map(e -> e.getPropertyTerm())
+                .distinct()
+                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -1069,7 +1073,7 @@ public class TopLevelABIEHandler implements Serializable {
 
             String sc_name = "";
             if (dtscVO.getRepresentationTerm().equalsIgnoreCase("Text") ||
-                dtscVO.getPropertyTerm().contains(dtscVO.getRepresentationTerm())) {
+                    dtscVO.getPropertyTerm().contains(dtscVO.getRepresentationTerm())) {
                 sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm());
             } else {
                 sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm().concat(dtscVO.getRepresentationTerm()));

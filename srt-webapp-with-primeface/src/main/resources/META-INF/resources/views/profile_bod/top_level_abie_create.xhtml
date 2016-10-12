@@ -4,24 +4,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
 
-    <ui:define name="side_menu">
-        <h:form>
-            <p:growl id="messages" showDetail="false"/>
-
-            <p:menu>
-                <p:submenu style="width: 180px !important;" label="Context Category">
-                    <p:menuitem value="List" url="context_category_list.xhtml" icon="ui-icon-create"/>
-                    <p:menuitem value="Create" url="context_category_create.xhtml" icon="ui-icon-create"/>
-                    <p:menuitem value="Search" url="context_category_search.xhtml" icon="ui-icon-search"/>
-                </p:submenu>
-            </p:menu>
-        </h:form>
-    </ui:define>
-
-
     <ui:define name="content">
         <h:form id="form">
-
             <p:growl id="growl" sticky="true" showDetail="true"/>
 
             <p:wizard flowListener="#{topLevelABIEHandler.onFlowProcess}">
@@ -31,7 +15,8 @@
                         <h:panelGrid id="grid" columns="5" cellpadding="5">
                             <h:outputLabel for="propertyTerm" value="ASCCP Property Term:" styleClass="search-label"/>
                             <p:autoComplete id="propertyTerm" value="#{topLevelABIEHandler.propertyTerm}"
-                                            completeMethod="#{topLevelABIEHandler.completeInput}"/>
+                                            completeMethod="#{topLevelABIEHandler.completeInput}" maxResults="20"
+                                            style="width: 440px;"/>
                             <p:commandButton value="Search" ajax="true" actionListener="#{topLevelABIEHandler.search}"
                                              update="tbl" icon="ui-icon-search"/>
                         </h:panelGrid>
@@ -39,34 +24,23 @@
                     <p:panel header="Top-level Concept List">
                         <p:dataTable id="tbl" var="aSCCP" value="#{topLevelABIEHandler.asccpVOs}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                     paginator="true" paginatorPosition="bottom" rows="20" style="width: 100%; margin-bottom:20px"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
+                                     style="width: 100%; margin-bottom: 20px"
                                      selection="#{topLevelABIEHandler.selected}" rowKey="#{aSCCP.asccpId}"
                                      selectionMode="single">
-                            <p:ajax event="rowSelect" listener="#{topLevelABIEHandler.onRowSelect}"/>
-                            <p:ajax event="rowUnselect" listener="#{topLevelABIEHandler.onRowUnselect}"/>
-                            <p:column style="width: 40%">
-                                <f:facet name="header">
-                                    <h:outputText value="ASCCP Property Term"/>
-                                </f:facet>
+                            <p:column style="width: 40%" headerText="ASCCP Property Term">
                                 <h:outputText value="#{aSCCP.propertyTerm}"/>
                             </p:column>
 
-                            <p:column style="width: 40%">
-                                <f:facet name="header">
-                                    <h:outputText value="Module"/>
-                                </f:facet>
-                                <h:outputText value="#{aSCCP.module.module}"/>
+                            <p:column headerText="Module">
+                                <h:outputText value="#{aSCCP.module}"/>
                             </p:column>
 
-                            <p:column style="width: 20%; text-align: center;">
-                                <f:facet name="header">
-                                    <h:outputText value="Last Updated Time"/>
-                                </f:facet>
+                            <p:column style="width: 200px; text-align: center;" headerText="Last Updated Time">
                                 <h:outputText value="#{aSCCP.lastUpdateTimestamp}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
-
                         </p:dataTable>
                     </p:panel>
                 </p:tab>
@@ -101,7 +75,8 @@
                             <p:dataTable id="tbl1" var="businessContext"
                                          value="#{businessContextHandler.businessContexts}"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                         paginator="true" paginatorPosition="bottom" rows="10" style="width: 100%; margin-bottom:20px"
+                                         paginator="true" paginatorPosition="bottom" rows="10"
+                                         style="width: 100%; margin-bottom:20px"
                                          selection="#{businessContextHandler.bcDetail}"
                                          rowKey="#{businessContext.bizCtxId}">
                                 <p:column selectionMode="single" style="width: 30px;text-align:center"/>
@@ -574,7 +549,8 @@
                             <h:panelGrid id="grid6" cellpadding="5">
                                 <p:row>
                                     <p:column style="width:800px">
-                                        <h:outputLabel value="Derived Code List" style="font-weight:bold; color: #bd2c00"/>
+                                        <h:outputLabel value="Derived Code List"
+                                                       style="font-weight:bold; color: #bd2c00"/>
                                     </p:column>
                                 </p:row>
                             </h:panelGrid>
@@ -582,7 +558,8 @@
 
                             <p:dataTable id="tbl_01" var="cVO"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                         paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
+                                         paginator="true" paginatorPosition="bottom" rows="10"
+                                         style="width:550px; margin-bottom:20px"
                                          value="#{topLevelABIEHandler.codeLists}"
                                          selection="#{topLevelABIEHandler.codeList}" rowKey="#{cVO.codeListId}"
                                          selectionMode="single">
@@ -623,7 +600,8 @@
                             </h:panelGrid>
                             <p:dataTable id="tbl02" var="cVO"
                                          paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                         paginator="true" paginatorPosition="bottom" rows="10" style="width:550px; margin-bottom:20px"
+                                         paginator="true" paginatorPosition="bottom" rows="10"
+                                         style="width:550px; margin-bottom:20px"
                                          value="#{topLevelABIEHandler.codeLists2}"
                                          selection="#{topLevelABIEHandler.codeList}" rowKey="#{cVO.codeListId}"
                                          selectionMode="single">

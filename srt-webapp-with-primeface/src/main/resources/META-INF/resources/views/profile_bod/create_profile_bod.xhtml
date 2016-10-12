@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Create Profile BOD</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+            <p:wizard flowListener="#{createProfileBODBean.onFlowProcess}">
+                <!--
+                    Step 1: Select Top-Level Concept
+                -->
+                <p:tab id="step_1">
+                    <f:facet name="title">
+                        <strong class="step">Step 1:</strong>
+                        <h:outputText value="Select Top-Level Concept"/>
+                    </f:facet>
+                    <p:panel>
+                        <f:facet name="header">
+                            <p:autoComplete id="propertyTerm" value="#{createProfileBODBean.selectedPropertyTerm}"
+                                            completeMethod="#{createProfileBODBean.completeInput}"
+                                            style="width: 440px; margin-right: 20px;"/>
+                            <p:commandButton value="Search" ajax="true" actionListener="#{createProfileBODBean.search}"
+                                             update="tbl1" icon="ui-icon-search"/>
+                        </f:facet>
+                        <p:dataTable id="tbl1" var="topLevelConcept" value="#{createProfileBODBean.topLevelConcepts}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
+                                     style="width: 100%; margin-bottom: 20px"
+                                     selection="#{createProfileBODBean.selectedTopLevelConcept}"
+                                     rowKey="#{topLevelConcept.asccpId}"
+                                     selectionMode="single">
+                            <p:column style="width: 40%" headerText="ASCCP Property Term"
+                                      sortBy="#{topLevelConcept.propertyTerm}">
+                                <h:outputText value="#{topLevelConcept.propertyTerm}"/>
+                            </p:column>
+
+                            <p:column headerText="Module" sortBy="#{topLevelConcept.module}">
+                                <h:outputText value="#{topLevelConcept.module}"/>
+                            </p:column>
+
+                            <p:column style="width: 200px; text-align: center;" headerText="Last Updated Time"
+                                      sortBy="#{topLevelConcept.lastUpdateTimestamp}">
+                                <h:outputText value="#{topLevelConcept.lastUpdateTimestamp}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </p:tab>
+
+                <!--
+                    Step 2: Select Business Context
+                -->
+                <p:tab id="step_2">
+                    <f:facet name="title">
+                        <strong class="step">Step 2:</strong>
+                        <h:outputText value="Select Business Context"/>
+                    </f:facet>
+                    <p:panel header="Selected Top-Level Concept">
+                        <p:dataTable var="topLevelConcept" value="#{createProfileBODBean.selectedTopLevelConcept}"
+                                     style="width: 100%; margin-bottom: 20px;">
+                            <p:column style="width: 40%" headerText="ASCCP Property Term">
+                                <h:outputText value="#{topLevelConcept.propertyTerm}"/>
+                            </p:column>
+
+                            <p:column headerText="Module">
+                                <h:outputText value="#{topLevelConcept.module}"/>
+                            </p:column>
+
+                            <p:column style="width: 200px; text-align: center;" headerText="Last Updated Time">
+                                <h:outputText value="#{topLevelConcept.lastUpdateTimestamp}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel>
+                        <p:dataTable id="tbl2" var="businessContext"
+                                     value="#{createProfileBODBean.businessContexts}"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
+                                     style="width: 100%; margin-bottom:20px"
+                                     selection="#{createProfileBODBean.selectedBusinessContext}"
+                                     selectionMode="single"
+                                     rowKey="#{businessContext.bizCtxId}">
+                            <p:column headerText="Business Context Name" sortBy="#{businessContext.name}">
+                                <h:outputText value="#{businessContext.name}"/>
+                                <div>
+                                    <h:outputText value="GUID: #{businessContext.guid}"
+                                                  style="font-size: 12px !important; color: #767676 !important;"/>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </p:tab>
+
+                <!--
+                    Step 3: Create BIE
+                -->
+                <p:tab id="step_3">
+                    <f:facet name="title">
+                        <strong class="step">Step 3:</strong>
+                        <h:outputText value="Create BIE"/>
+                    </f:facet>
+                    <p:layout>
+                        <p:layoutUnit position="west" resizable="true" minSize="200">
+                            <p:panel>
+
+                            </p:panel>
+                        </p:layoutUnit>
+
+                        <p:layoutUnit position="center">
+                            <p:panel>
+
+                            </p:panel>
+                        </p:layoutUnit>
+                    </p:layout>
+
+                    <div style="float: right;">
+                        <p:commandButton icon="ui-icon-check" value="Create"/>
+                    </div>
+                </p:tab>
+            </p:wizard>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -504,6 +504,18 @@ input.ui-state-focus {
     text-align: center;
 }
 
+.ui-wizard-step-title strong.step {
+    display: block;
+}
+
+.ui-wizard-step-title.ui-state-highlight strong.step {
+    color: #333;
+}
+
+strong {
+    font-weight: 600;
+}
+
 .boxed-group-inner {
     padding: 10px;
     color: #666;
