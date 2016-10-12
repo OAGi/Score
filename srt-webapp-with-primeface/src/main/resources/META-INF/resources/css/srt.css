@@ -594,6 +594,10 @@ span.ui-button-text {
     border: 1px solid #ddd;
 }
 
+.ui-chkbox.input-section {
+    border: 0 !important;
+}
+
 .ui-widget-header span.ui-button-text {
     font-size: 12px;
     font-weight: 300;
