@@ -1,0 +1,92 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableView class="oracle.dbtools.crest.model.design.relational.TableView" directorySegmentName="seg_0" id="C71A93E0-A1C6-0156-7470-FF2A30B4B42A" name="V_TOP_LEVEL_CONCEPT">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 13:59:40 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>view_3</ordsAlias>
+<userDefined>true</userDefined>
+<userDefinedSQL>SELECT ASCCP.ASCCP_ID,&lt;br/&gt;  ASCCP.PROPERTY_TERM,&lt;br/&gt;  MODULE.MODULE,&lt;br/&gt;  ASCCP.LAST_UPDATE_TIMESTAMP&lt;br/&gt;FROM ASCCP&lt;br/&gt;INNER JOIN MODULE&lt;br/&gt;ON MODULE.MODULE_ID = ASCCP.MODULE_ID&lt;br/&gt;WHERE MODULE.MODULE NOT LIKE &apos;%Components%&apos;&lt;br/&gt;AND MODULE.MODULE NOT LIKE &apos;%Meta%&apos;&lt;br/&gt;AND MODULE.MODULE NOT LIKE &apos;%Noun%&apos;&lt;br/&gt;AND MODULE.MODULE NOT LIKE &apos;%Extension%&apos;</userDefinedSQL>
+<parsed>true</parsed>
+<usedContainers>
+<container containerID="30DE5E1B-4F52-385D-93A8-51B9334F7DC5"/>
+</usedContainers>
+<viewElements>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="ASCCP_ID" id="DF18A70A-F1D1-D20B-21A0-413BC07FA947">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 14:17:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42</referencedColumn>
+<table>57887A37-4817-84D7-B59E-1A6BC48C563D</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="PROPERTY_TERM" id="BA4E0D6A-3481-4744-C07C-DF6DAD1D8AFC">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 14:17:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (60)</dataType>
+<reference>false</reference>
+<referencedColumn>9172A573-E644-9EEE-0176-D6363478E0DE</referencedColumn>
+<table>57887A37-4817-84D7-B59E-1A6BC48C563D</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="MODULE" id="1639AA80-3BEA-3A4A-67AA-E06317A3CF29">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 14:17:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (100 CHAR)</dataType>
+<reference>false</reference>
+<referencedColumn>48C46ED6-F256-5D7C-40E9-1404C4271D0A</referencedColumn>
+<table>30DE5E1B-4F52-385D-93A8-51B9334F7DC5</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="LAST_UPDATE_TIMESTAMP" id="E2A8A354-7127-CC01-FB73-6BBFBDDC3425">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 14:17:02 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>TIMESTAMP WITH TIME ZONE</dataType>
+<reference>false</reference>
+<referencedColumn>50F33555-8F16-9E02-D4E0-28223BC357D0</referencedColumn>
+<table>57887A37-4817-84D7-B59E-1A6BC48C563D</table>
+</viewElement>
+</viewElements>
+<usedObjects>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="57887A37-4817-84D7-B59E-1A6BC48C563D">
+<container>true</container>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="30DE5E1B-4F52-385D-93A8-51B9334F7DC5">
+<container>true</container>
+<tableName>MODULE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42">
+<columnName>ASCCP_ID</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="9172A573-E644-9EEE-0176-D6363478E0DE">
+<columnName>PROPERTY_TERM</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="48C46ED6-F256-5D7C-40E9-1404C4271D0A">
+<columnName>MODULE</columnName>
+<tableName>MODULE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="50F33555-8F16-9E02-D4E0-28223BC357D0">
+<columnName>LAST_UPDATE_TIMESTAMP</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="E1CA8976-9A33-345E-BCDE-51EAB731E1C7">
+<columnName>MODULE_ID</columnName>
+<tableName>MODULE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="9A021C15-D08F-3C62-2742-6F097B1D6342">
+<columnName>MODULE_ID</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+</usedObjects>
+</TableView>

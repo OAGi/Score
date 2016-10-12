@@ -1,0 +1,6 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableViewProxyOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.TableViewProxyOraclev10g" name="V_PROFILE_BOD" directorySegmentName="seg_0" id="2C158D7E-43CE-BC76-B1D7-746EBAECD3C5">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:22:12 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+</TableViewProxyOraclev10g>

@@ -1,0 +1,268 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableView class="oracle.dbtools.crest.model.design.relational.TableView" directorySegmentName="seg_0" id="2C158D7E-43CE-BC76-B1D7-746EBAECD3C5" name="V_PROFILE_BOD">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:22:12 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<ordsAlias>view_5</ordsAlias>
+<userDefined>true</userDefined>
+<userDefinedSQL>SELECT TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID,&lt;br/&gt;  ABIE.ABIE_ID,&lt;br/&gt;  ASBIEP.ASBIEP_ID,&lt;br/&gt;  ASCCP.ASCCP_ID,&lt;br/&gt;  ASCCP.PROPERTY_TERM,&lt;br/&gt;  BIZ_CTX.BIZ_CTX_ID,&lt;br/&gt;  BIZ_CTX.NAME AS BIZ_CTX_NAME,&lt;br/&gt;  ABIE.STATE,&lt;br/&gt;  ABIE.CREATED_BY,&lt;br/&gt;  APP_USER.NAME AS CREATED_USERNAME,&lt;br/&gt;  ABIE.CREATION_TIMESTAMP&lt;br/&gt;FROM TOP_LEVEL_ABIE&lt;br/&gt;INNER JOIN ABIE&lt;br/&gt;ON ABIE.ABIE_ID                      = TOP_LEVEL_ABIE.ABIE_ID&lt;br/&gt;AND TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID = ABIE.OWNER_TOP_LEVEL_ABIE_ID&lt;br/&gt;INNER JOIN BIZ_CTX&lt;br/&gt;ON BIZ_CTX.BIZ_CTX_ID = ABIE.BIZ_CTX_ID&lt;br/&gt;INNER JOIN ASBIEP&lt;br/&gt;ON TOP_LEVEL_ABIE.TOP_LEVEL_ABIE_ID = ASBIEP.OWNER_TOP_LEVEL_ABIE_ID&lt;br/&gt;AND ABIE.ABIE_ID                    = ASBIEP.ROLE_OF_ABIE_ID&lt;br/&gt;INNER JOIN ASCCP&lt;br/&gt;ON ASCCP.ASCCP_ID = ASBIEP.BASED_ASCCP_ID&lt;br/&gt;INNER JOIN APP_USER&lt;br/&gt;ON APP_USER.APP_USER_ID  = ABIE.CREATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = ABIE.LAST_UPDATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = BIZ_CTX.CREATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = BIZ_CTX.LAST_UPDATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = ASBIEP.CREATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = ASBIEP.LAST_UPDATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = ASCCP.CREATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = ASCCP.LAST_UPDATED_BY&lt;br/&gt;AND APP_USER.APP_USER_ID = ASCCP.OWNER_USER_ID</userDefinedSQL>
+<parsed>true</parsed>
+<usedContainers>
+<container containerID="629839AE-F8C3-6544-3090-0E21DF98F56A"/>
+</usedContainers>
+<viewElements>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="TOP_LEVEL_ABIE_ID" id="BE232FA0-9B00-6EC3-B60D-611E714853B3">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:23:55 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45</referencedColumn>
+<table>B66FD1EF-BE3E-85E8-AA50-2C36B1A57813</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="ABIE_ID" id="60C67D9E-5F47-FBE7-3A06-2ABAAFD3D96F">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:23:55 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>C59E5D9E-2C77-185D-7AFC-7C43FA943385</referencedColumn>
+<table>B66FD1EF-BE3E-85E8-AA50-2C36B1A57813</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="ASBIEP_ID" id="9FF7B340-7A5C-08BB-F7E7-D2F3F04F06E1">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:31:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>DED39440-6579-847B-FCCE-72A73CB3A55D</referencedColumn>
+<table>D0BD9A78-D40E-1CD3-1AF7-394263DA4169</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="ASCCP_ID" id="846CC35E-441D-91BE-8BD8-CC66FA06B344">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:31:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42</referencedColumn>
+<table>57887A37-4817-84D7-B59E-1A6BC48C563D</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="PROPERTY_TERM" id="4442197D-B866-24B3-B1EE-01DABBE0C023">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:31:41 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (60)</dataType>
+<reference>false</reference>
+<referencedColumn>9172A573-E644-9EEE-0176-D6363478E0DE</referencedColumn>
+<table>57887A37-4817-84D7-B59E-1A6BC48C563D</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="BIZ_CTX_ID" id="992D243B-540A-A987-F456-677407A97959">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:39:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>5925057B-29E1-5A22-3A22-6E5C72802C85</referencedColumn>
+<table>8FED50B9-C9BB-3A4B-200D-42C19812C990</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="BIZ_CTX_NAME" id="9220C3B2-F98A-1EB0-0383-2F04D9A66D83">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:36:53 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>BIZ_CTX_NAME</alias>
+<dataType>VARCHAR2 (100)</dataType>
+<reference>false</reference>
+<referencedColumn>43443A5F-29DA-6D48-7759-76D595FDDF99</referencedColumn>
+<table>8FED50B9-C9BB-3A4B-200D-42C19812C990</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="STATE" id="CB47F124-C882-D188-9594-30CDBA3E387A">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:23:55 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (10)</dataType>
+<reference>false</reference>
+<referencedColumn>E1D29F4F-9B32-AEB2-01FB-87B85442E750</referencedColumn>
+<table>62784CB3-2B23-A1BB-C6D2-59AC6B43E818</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="CREATED_BY" id="92B8FB12-D348-862E-6041-6068DE66ED3C">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:39:42 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>NUMBER (19)</dataType>
+<reference>false</reference>
+<referencedColumn>B87AA5AC-6CE3-FC75-E351-559BE67EDE5E</referencedColumn>
+<table>62784CB3-2B23-A1BB-C6D2-59AC6B43E818</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="CREATION_TIMESTAMP" id="5B0245E1-CBF4-AA77-76D1-7BBEF7322EB6">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:23:55 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>TIMESTAMP WITH TIME ZONE</dataType>
+<reference>false</reference>
+<referencedColumn>E5D9E23A-0BC6-2D0D-41EB-A1B5F21D377D</referencedColumn>
+<table>62784CB3-2B23-A1BB-C6D2-59AC6B43E818</table>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="CREATED_USERNAME" id="F7CA9FC4-1B67-5327-DA79-39BEAF479DDD">
+<createdBy>hno2</createdBy>
+<createdTime>2016-10-12 15:36:53 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<alias>CREATED_USERNAME</alias>
+<dataType>VARCHAR2 (100 CHAR)</dataType>
+<reference>false</reference>
+<referencedColumn>1232C853-4D5B-F9FA-027A-A058A7677D88</referencedColumn>
+<table>629839AE-F8C3-6544-3090-0E21DF98F56A</table>
+</viewElement>
+</viewElements>
+<usedObjects>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="B66FD1EF-BE3E-85E8-AA50-2C36B1A57813">
+<container>true</container>
+<tableName>TOP_LEVEL_ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="62784CB3-2B23-A1BB-C6D2-59AC6B43E818">
+<container>true</container>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="D0BD9A78-D40E-1CD3-1AF7-394263DA4169">
+<container>true</container>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="57887A37-4817-84D7-B59E-1A6BC48C563D">
+<container>true</container>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="8FED50B9-C9BB-3A4B-200D-42C19812C990">
+<container>true</container>
+<tableName>BIZ_CTX</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="629839AE-F8C3-6544-3090-0E21DF98F56A">
+<container>true</container>
+<tableName>APP_USER</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45">
+<columnName>TOP_LEVEL_ABIE_ID</columnName>
+<tableName>TOP_LEVEL_ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="C59E5D9E-2C77-185D-7AFC-7C43FA943385">
+<columnName>ABIE_ID</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="DED39440-6579-847B-FCCE-72A73CB3A55D">
+<columnName>ASBIEP_ID</columnName>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="BEB2FA51-2B57-BD5D-51D5-8FAB3178AC42">
+<columnName>ASCCP_ID</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="9172A573-E644-9EEE-0176-D6363478E0DE">
+<columnName>PROPERTY_TERM</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="5925057B-29E1-5A22-3A22-6E5C72802C85">
+<columnName>BIZ_CTX_ID</columnName>
+<tableName>BIZ_CTX</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="43443A5F-29DA-6D48-7759-76D595FDDF99">
+<columnName>NAME</columnName>
+<tableName>BIZ_CTX</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="E1D29F4F-9B32-AEB2-01FB-87B85442E750">
+<columnName>STATE</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="B87AA5AC-6CE3-FC75-E351-559BE67EDE5E">
+<columnName>CREATED_BY</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="1232C853-4D5B-F9FA-027A-A058A7677D88">
+<columnName>NAME</columnName>
+<tableName>APP_USER</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="E5D9E23A-0BC6-2D0D-41EB-A1B5F21D377D">
+<columnName>CREATION_TIMESTAMP</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B">
+<columnName>ABIE_ID</columnName>
+<tableName>TOP_LEVEL_ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="32BC279F-7BC0-55C4-30D6-FEE4AF40FE20">
+<columnName>OWNER_TOP_LEVEL_ABIE_ID</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="D87C3EDE-41CF-4696-10CD-B167C779F400">
+<columnName>BIZ_CTX_ID</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="87AE10D5-BD69-AA4D-8881-EDAC41D02527">
+<columnName>OWNER_TOP_LEVEL_ABIE_ID</columnName>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="406835BD-59CE-863D-DECA-AB8B5D705022">
+<columnName>ROLE_OF_ABIE_ID</columnName>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="818D33E8-398D-DF2F-E59A-5A0FFBBEECF4">
+<columnName>BASED_ASCCP_ID</columnName>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="0F407506-2FE3-AC47-2F58-3B1949647DAD">
+<columnName>APP_USER_ID</columnName>
+<tableName>APP_USER</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="10DE0123-E13C-2396-ED54-70CC1C509C40">
+<columnName>LAST_UPDATED_BY</columnName>
+<tableName>ABIE</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="255A2D39-2CA9-FFF0-DA12-3DB69F663DD4">
+<columnName>CREATED_BY</columnName>
+<tableName>BIZ_CTX</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="58B499C3-98AD-C18A-DCBE-F5015C7F7FF5">
+<columnName>LAST_UPDATED_BY</columnName>
+<tableName>BIZ_CTX</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="180B16FC-A5AB-8E87-4B62-59861AD41EC6">
+<columnName>CREATED_BY</columnName>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="22D5CFAA-B0A7-91D0-51B7-45103BFF909A">
+<columnName>LAST_UPDATED_BY</columnName>
+<tableName>ASBIEP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="91D004DD-A508-5C33-5A15-808BAFF35B64">
+<columnName>CREATED_BY</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="96849054-8E9B-9161-B01A-99114F0900DD">
+<columnName>LAST_UPDATED_BY</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="9E214896-59B0-FE42-5A26-B0E108CBF28E">
+<columnName>OWNER_USER_ID</columnName>
+<tableName>ASCCP</tableName>
+</UsedObject>
+</usedObjects>
+</TableView>
