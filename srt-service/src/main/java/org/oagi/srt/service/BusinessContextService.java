@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class BusinessContextService {
         return businessContextRepository.findOne(bizCtxId);
     }
 
-    public void update(BusinessContext businessContext, List<BusinessContextValue> businessContextValues) {
+    public void update(BusinessContext businessContext, Collection<BusinessContextValue> businessContextValues) {
         businessContextRepository.saveAndFlush(businessContext);
         businessContextValues.stream()
                 .forEach(e -> e.setBusinessContext(businessContext));

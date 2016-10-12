@@ -19,10 +19,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -190,12 +187,29 @@ public class BusinessContextDetailBean extends UIHandler {
         }
         businessContext.setLastUpdatedBy(loadAuthentication().getAppUserId());
 
-        businessContextService.update(businessContext, businessContextValues.stream()
-                .map(e -> {
-                    BusinessContextValue businessContextValue = e.getBusinessContextValue();
-                    businessContextValue.setContextSchemeValue(e.getContextSchemeValue());
-                    return businessContextValue;
-                }).collect(Collectors.toList()));
+        Map<Long, BusinessContextValue> bcvs = new HashMap();
+        for (BCV bcv : businessContextValues) {
+            BusinessContextValue businessContextValue = bcv.getBusinessContextValue();
+            ContextSchemeValue contextSchemeValue = bcv.getContextSchemeValue();
+            if (contextSchemeValue == null || StringUtils.isEmpty(contextSchemeValue.getValue())) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "The business context value must contain a specified context scheme value."));
+                return null;
+            }
+
+            if (bcvs.containsKey(contextSchemeValue.getCtxSchemeValueId())) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "A duplicate context scheme value exists on the list."));
+                return null;
+            } else {
+                businessContextValue.setContextSchemeValue(contextSchemeValue);
+                bcvs.put(contextSchemeValue.getCtxSchemeValueId(), businessContextValue);
+            }
+        }
+
+        businessContextService.update(businessContext, bcvs.values());
 
         businessContextService.delete(
                 deleteBusinessContextValues.stream()
