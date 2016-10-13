@@ -29,7 +29,8 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    public BusinessDataTypePrimitiveRestriction() {}
+    public BusinessDataTypePrimitiveRestriction() {
+    }
 
     public BusinessDataTypePrimitiveRestriction(int bdtPriRestriId) {
         this.bdtPriRestriId = bdtPriRestriId;

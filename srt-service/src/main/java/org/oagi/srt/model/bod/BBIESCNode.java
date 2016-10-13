@@ -1,18 +1,19 @@
-package org.oagi.srt.web.jsf.component.treetable;
+package org.oagi.srt.model.bod;
 
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.model.Node;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
-import java.util.Collections;
-import java.util.List;
-
-public class BBIESCNode implements Node {
+public class BBIESCNode extends AbstractNode {
 
     private BasicBusinessInformationEntitySupplementaryComponent bbiesc;
     private DataTypeSupplementaryComponent dtsc;
 
-    public BBIESCNode(BasicBusinessInformationEntitySupplementaryComponent bbiesc, DataTypeSupplementaryComponent dtsc) {
+    public BBIESCNode(BBIENode parent,
+                      BasicBusinessInformationEntitySupplementaryComponent bbiesc,
+                      DataTypeSupplementaryComponent dtsc) {
+        super(0, parent);
         this.bbiesc = bbiesc;
         this.dtsc = dtsc;
     }
@@ -34,11 +35,6 @@ public class BBIESCNode implements Node {
     }
 
     @Override
-    public String getType() {
-        return "BBIESC";
-    }
-
-    @Override
     public String getName() {
         if (dtsc.getRepresentationTerm().equalsIgnoreCase("Text") ||
             dtsc.getPropertyTerm().contains(dtsc.getRepresentationTerm())) {
@@ -46,15 +42,5 @@ public class BBIESCNode implements Node {
         } else {
             return Utility.spaceSeparator(dtsc.getPropertyTerm().concat(dtsc.getRepresentationTerm()));
         }
-    }
-
-    @Override
-    public <T extends Node> void addChild(T child) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<? extends Node> getChildren() {
-        return Collections.emptyList();
     }
 }

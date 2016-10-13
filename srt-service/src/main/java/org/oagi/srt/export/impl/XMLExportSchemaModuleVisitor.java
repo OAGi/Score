@@ -11,6 +11,7 @@ import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.export.model.*;
+import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
@@ -46,6 +47,9 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     private final Namespace OAGI_NS = Namespace.getNamespace("", SRTConstants.OAGI_NS);
     private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
+
+    @Autowired
+    private CoreComponentProvider coreComponentProvider;
 
     @Autowired
     private CoreComponentService coreComponentService;
@@ -408,7 +412,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         complexTypeElement.setAttribute("id", accComplexType.getGuid());
 
         Element sequenceElement = new Element("sequence", XSD_NS);
-        List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
+        List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(
+                accComplexType.getRawId(), coreComponentProvider);
         // for ASCC or BCC (Sequence Key != 0)
         for (CoreComponent coreComponent : coreComponents) {
             if (coreComponent.getDen().endsWith("Any Structured Content")) {

@@ -13,17 +13,6 @@ import java.util.*;
 @Service
 public class CoreComponentService {
 
-    @Autowired
-    private CoreComponentProvider coreComponentProvider;
-
-    public List<CoreComponent> getCoreComponents(long accId) {
-        return getCoreComponents(accId, coreComponentProvider);
-    }
-
-    public List<CoreComponent> getCoreComponents(AggregateCoreComponent acc) {
-        return getCoreComponents(acc, coreComponentProvider);
-    }
-
     public List<CoreComponent> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
         long accId = acc.getAccId();

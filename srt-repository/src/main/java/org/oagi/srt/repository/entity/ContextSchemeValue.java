@@ -24,7 +24,7 @@ public class ContextSchemeValue implements Serializable {
     @Column(length = 10 * 1024)
     private String meaning;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_ctx_scheme_id", nullable = false)
     private ContextScheme contextScheme;
 

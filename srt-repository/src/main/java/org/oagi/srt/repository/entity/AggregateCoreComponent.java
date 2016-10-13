@@ -37,7 +37,7 @@ public class AggregateCoreComponent implements Serializable {
     @Column
     private int oagisComponentType;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 
@@ -85,7 +85,8 @@ public class AggregateCoreComponent implements Serializable {
     @Column(name = "is_abstract", nullable = false)
     private boolean isAbstract;
 
-    public AggregateCoreComponent() {}
+    public AggregateCoreComponent() {
+    }
 
     public AggregateCoreComponent(long accId, String den) {
         this.accId = accId;

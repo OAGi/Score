@@ -56,7 +56,7 @@ public class DataType implements Serializable {
     @Column(length = 10 * 1024)
     private String revisionDoc;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 
@@ -98,7 +98,8 @@ public class DataType implements Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
-    public DataType() {}
+    public DataType() {
+    }
 
     public DataType(long dtId, String dataTypeTerm) {
         this.dtId = dtId;

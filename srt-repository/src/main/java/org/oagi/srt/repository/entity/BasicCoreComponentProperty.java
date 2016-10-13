@@ -34,7 +34,7 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
     @Column(length = 10 * 1024)
     private String definition;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 
@@ -85,7 +85,8 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
     @Column
     private String defaultValue;
 
-    public BasicCoreComponentProperty() {}
+    public BasicCoreComponentProperty() {
+    }
 
     public BasicCoreComponentProperty(long bccpId, String den) {
         this.bccpId = bccpId;

@@ -1,5 +1,6 @@
-package org.oagi.srt.web.jsf.component.treetable;
+package org.oagi.srt.model.bod;
 
+import org.oagi.srt.model.Node;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
@@ -8,7 +9,7 @@ import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ASBIENode implements Node {
+public class ASBIENode extends AbstractNode {
 
     private AssociationBusinessInformationEntity asbie;
     private AssociationBusinessInformationEntityProperty asbiep;
@@ -16,8 +17,12 @@ public class ASBIENode implements Node {
     private AggregateBusinessInformationEntity abie;
     private List<Node> children = new ArrayList();
 
-    public ASBIENode(AssociationBusinessInformationEntity asbie, AssociationBusinessInformationEntityProperty asbiep,
-                     AssociationCoreComponentProperty asccp, AggregateBusinessInformationEntity abie) {
+    public ASBIENode(int seqKey, Node parent,
+                     AssociationBusinessInformationEntity asbie,
+                     AssociationBusinessInformationEntityProperty asbiep,
+                     AssociationCoreComponentProperty asccp,
+                     AggregateBusinessInformationEntity abie) {
+        super(seqKey, parent);
         this.asbie = asbie;
         this.asbiep = asbiep;
         this.asccp = asccp;
@@ -54,11 +59,6 @@ public class ASBIENode implements Node {
 
     public void setAbie(AggregateBusinessInformationEntity abie) {
         this.abie = abie;
-    }
-
-    @Override
-    public String getType() {
-        return "ASBIE";
     }
 
     @Override

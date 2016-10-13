@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Create Profile BOD</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+            <p:panel>
+                    <div id="left_panel" class="col-md-4">
+                        <p:treeTable value="#{createProfileBODBean.treeNode}" var="node"
+                                     selection="#{createProfileBODBean.selectedTreeNode}"
+                                     selectionMode="single">
+                            <p:column headerText="BIEs">
+                                <h:outputText value="#{node.name}" style="color: #{node.getAttribute('color')}"/>
+                            </p:column>
+                        </p:treeTable>
+                    </div>
+                    <div id="main_panel" class="col-md-8">
+                        <div data-spy="affix" data-offset-top="130">
+                            <p:panel id="details" header="View and Edit BIE">
+
+                            </p:panel>
+                        </div>
+                    </div>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <script>
+                var fixAffixWidth = function() {
+                    var $affixElement = $('div[data-spy="affix"]');
+                    $affixElement.width($affixElement.parent().width());
+                };
+                fixAffixWidth();
+                window.onresize = function (event) {
+                    fixAffixWidth();
+                };
+            </script>
+        </h:form>
+    </ui:define>
+</ui:composition>

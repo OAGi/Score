@@ -32,7 +32,7 @@ public class AgencyIdList implements Serializable {
     @Column(length = 10)
     private String versionId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 

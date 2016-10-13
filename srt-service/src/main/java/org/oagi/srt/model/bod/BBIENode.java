@@ -1,5 +1,7 @@
-package org.oagi.srt.web.jsf.component.treetable;
+package org.oagi.srt.model.bod;
 
+import org.oagi.srt.model.Node;
+import org.oagi.srt.model.NodeVisitor;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntity;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
@@ -8,7 +10,7 @@ import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BBIENode implements Node {
+public class BBIENode extends AbstractNode {
 
     private BasicBusinessInformationEntity bbie;
     private BasicBusinessInformationEntityProperty bbiep;
@@ -16,7 +18,11 @@ public class BBIENode implements Node {
     private BusinessDataTypePrimitiveRestriction bdtPriRest;
     private List<Node> children = new ArrayList();
 
-    public BBIENode(BasicBusinessInformationEntity bbie, BasicBusinessInformationEntityProperty bbiep, BasicCoreComponentProperty bccp) {
+    public BBIENode(int seqKey, Node parent,
+                    BasicBusinessInformationEntity bbie,
+                    BasicBusinessInformationEntityProperty bbiep,
+                    BasicCoreComponentProperty bccp) {
+        super(seqKey, parent);
         this.bbie = bbie;
         this.bbiep = bbiep;
         this.bccp = bccp;
@@ -53,11 +59,6 @@ public class BBIENode implements Node {
 
     public void setBdtPriRest(BusinessDataTypePrimitiveRestriction bdtPriRest) {
         this.bdtPriRest = bdtPriRest;
-    }
-
-    @Override
-    public String getType() {
-        return "BBIE";
     }
 
     @Override

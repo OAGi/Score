@@ -17,11 +17,11 @@ public class Module implements Serializable {
     @Column(length = 100, nullable = false)
     private String module;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "release_id", nullable = false)
     private Release release;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "namespace_id", nullable = false)
     private Namespace namespace;
 

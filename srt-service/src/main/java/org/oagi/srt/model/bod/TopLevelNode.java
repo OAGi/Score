@@ -1,20 +1,40 @@
-package org.oagi.srt.web.jsf.component.treetable;
+package org.oagi.srt.model.bod;
 
+import org.oagi.srt.model.Node;
+import org.oagi.srt.model.NodeVisitor;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
+import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.BusinessContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TopLevelNode implements Node {
+public class TopLevelNode extends AbstractNode {
 
+    private AssociationBusinessInformationEntityProperty asbiep;
     private AssociationCoreComponentProperty asccp;
     private AggregateBusinessInformationEntity abie;
+    private BusinessContext bizCtx;
     private List<Node> children = new ArrayList();
 
-    public TopLevelNode(AssociationCoreComponentProperty asccp, AggregateBusinessInformationEntity abie) {
+    public TopLevelNode(AssociationBusinessInformationEntityProperty asbiep,
+                        AssociationCoreComponentProperty asccp,
+                        AggregateBusinessInformationEntity abie,
+                        BusinessContext bizCtx) {
+        super(0);
+        this.asbiep = asbiep;
         this.asccp = asccp;
         this.abie = abie;
+        this.bizCtx = bizCtx;
+    }
+
+    public AssociationBusinessInformationEntityProperty getAsbiep() {
+        return asbiep;
+    }
+
+    public void setAsbiep(AssociationBusinessInformationEntityProperty asbiep) {
+        this.asbiep = asbiep;
     }
 
     public AssociationCoreComponentProperty getAsccp() {
@@ -33,9 +53,12 @@ public class TopLevelNode implements Node {
         this.abie = abie;
     }
 
-    @Override
-    public String getType() {
-        return "ABIE";
+    public BusinessContext getBizCtx() {
+        return bizCtx;
+    }
+
+    public void setBizCtx(BusinessContext bizCtx) {
+        this.bizCtx = bizCtx;
     }
 
     @Override

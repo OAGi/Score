@@ -14,7 +14,7 @@ public class TopLevelAbie implements Serializable {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long topLevelAbieId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "abie_id")
     private AggregateBusinessInformationEntity abie;
 

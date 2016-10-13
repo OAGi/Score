@@ -25,7 +25,7 @@ public class BlobContent implements Serializable {
     @Column(nullable = false)
     private long releaseId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id", nullable = false)
     private Module module;
 

@@ -1,10 +1,15 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.TopLevelConceptRepository;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.BusinessContext;
 import org.oagi.srt.repository.entity.TopLevelConcept;
+import org.oagi.srt.web.jsf.component.treenode.CreateBIETreeNode;
+import org.primefaces.component.tree.Tree;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -43,6 +48,16 @@ public class CreateProfileBODBean {
     private List<BusinessContext> businessContexts;
     private BusinessContext selectedBusinessContext;
 
+    /*
+     * for 'Create BIE' Step
+     */
+    @Autowired
+    private CreateBIETreeNode createBIETreeNode;
+    @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
+    private TreeNode treeNode;
+    private TreeNode selectedTreeNode;
+
     @PostConstruct
     public void init() {
         allTopLevelConcepts = topLevelConceptRepository.findAll();
@@ -52,6 +67,16 @@ public class CreateProfileBODBean {
         setBusinessContexts(
                 businessContextRepository.findAll()
         );
+
+        setSelectedTopLevelConcept(
+                topLevelConceptRepository.findOne(222L)
+        );
+        setSelectedBusinessContext(
+                businessContextRepository.findOne(1L)
+        );
+        AssociationCoreComponentProperty selectedASCCP =
+                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+        treeNode = createBIETreeNode.createTreeNode(selectedASCCP, selectedBusinessContext);
     }
 
     public String getSelectedPropertyTerm() {
@@ -117,6 +142,22 @@ public class CreateProfileBODBean {
         this.selectedBusinessContext = selectedBusinessContext;
     }
 
+    public TreeNode getTreeNode() {
+        return treeNode;
+    }
+
+    public void setTreeNode(TreeNode treeNode) {
+        this.treeNode = treeNode;
+    }
+
+    public TreeNode getSelectedTreeNode() {
+            return selectedTreeNode;
+    }
+
+    public void setSelectedTreeNode(TreeNode selectedTreeNode) {
+        this.selectedTreeNode = selectedTreeNode;
+    }
+
     public String onFlowProcess(FlowEvent event) {
         String newStep = event.getNewStep();
 
@@ -136,6 +177,10 @@ public class CreateProfileBODBean {
                                     "'Business Context' must be selected."));
                     return event.getOldStep();
                 }
+
+                AssociationCoreComponentProperty selectedASCCP =
+                        asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                treeNode = createBIETreeNode.createTreeNode(selectedASCCP, selectedBusinessContext);
                 break;
         }
 

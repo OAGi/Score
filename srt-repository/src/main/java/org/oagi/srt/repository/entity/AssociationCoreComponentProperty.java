@@ -53,7 +53,7 @@ public class AssociationCoreComponentProperty implements CoreComponentProperty, 
     @Column(nullable = false)
     private int state;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
 
@@ -84,7 +84,8 @@ public class AssociationCoreComponentProperty implements CoreComponentProperty, 
     @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
 
-    public AssociationCoreComponentProperty() {}
+    public AssociationCoreComponentProperty() {
+    }
 
     public AssociationCoreComponentProperty(long asccpId, String den) {
         this.asccpId = asccpId;

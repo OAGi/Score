@@ -3,7 +3,6 @@ package org.oagi.srt.repository.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "ctx_scheme")
@@ -35,7 +34,7 @@ public class ContextScheme implements Serializable {
     @Column(nullable = false, length = 45)
     private String schemeVersionId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ctx_category_id", nullable = false)
     private ContextCategory contextCategory;
 

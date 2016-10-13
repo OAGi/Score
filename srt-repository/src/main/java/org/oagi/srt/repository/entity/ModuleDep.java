@@ -44,12 +44,12 @@ public class ModuleDep implements Serializable {
     @Convert(attributeName = "dependencyType", converter = DependencyTypeConverter.class)
     private DependencyType dependencyType;
 
-    @OneToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="depending_module_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "depending_module_id", nullable = false)
     private Module dependingModule;
 
-    @OneToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="depended_module_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "depended_module_id", nullable = false)
     private Module dependedModule;
 
     public long getModuleDepId() {

@@ -2,7 +2,6 @@ package org.oagi.srt.repository.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Table(name = "biz_ctx_value")
@@ -15,11 +14,11 @@ public class BusinessContextValue implements Serializable {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bizCtxValueId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "biz_ctx_id", nullable = false)
     private BusinessContext businessContext;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ctx_scheme_value_id", nullable = false)
     private ContextSchemeValue contextSchemeValue;
 
