@@ -107,7 +107,6 @@ public class CreateBIETreeNode {
         AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp);
 
         TopLevelNode topLevelNode = new TopLevelNode(asbiep, asccp, abie, bizCtx);
-        topLevelNode.setAttribute("color", "#4078c0");
         appendChildren(dataContainer, acc, abie, topLevelNode);
         return topLevelNode;
     }
@@ -257,28 +256,57 @@ public class CreateBIETreeNode {
         private Map<Long, BasicCoreComponentProperty> bccpMap;
         private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriMap;
         private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriMap;
+        private Map<Long, DataType> dtMap;
         private Map<Long, DataTypeSupplementaryComponent> dtScMap;
+
+        private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriDefaultMap;
+        private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriCodeListMap;
+
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriDefaultMap;
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriCodeListMap;
 
         private List<BasicCoreComponent> basicCoreComponents;
         private List<AssociationCoreComponent> associationCoreComponents;
+        private List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList;
+        private List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList;
+        private List<DataType> dataTypes;
         private List<DataTypeSupplementaryComponent> dataTypeSupplementaryComponents;
 
         public DataContainer() {
+            basicCoreComponents = bccRepository.findAll();
+            associationCoreComponents = asccRepository.findAll();
+            bdtPriRestriList = bdtPriRestriRepository.findAll();
+            bdtScPriRestriList = bdtScPriRestriRepository.findAll();
+            dataTypes = dataTypeRepository.findAll();
+            dataTypeSupplementaryComponents = dtScRepository.findAll();
+
             accMap = accRepository.findAll().stream()
                     .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
             asccpMap = asccpRepository.findAll().stream()
                     .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
             bccpMap = bccpRepository.findAll().stream()
                     .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
-            bdtPriRestriMap = bdtPriRestriRepository.findAll().stream()
+            bdtPriRestriMap = bdtPriRestriList.stream()
                     .collect(Collectors.toMap(e -> e.getBdtPriRestriId(), Function.identity()));
-            bdtScPriRestriMap = bdtScPriRestriRepository.findAll().stream()
+            bdtScPriRestriMap = bdtScPriRestriList.stream()
                     .collect(Collectors.toMap(e -> e.getBdtScPriRestriId(), Function.identity()));
 
-            basicCoreComponents = bccRepository.findAll();
-            associationCoreComponents = asccRepository.findAll();
-            dataTypeSupplementaryComponents = dtScRepository.findAll();
+            bdtPriRestriDefaultMap = bdtPriRestriList.stream()
+                    .filter(bdtPriRestri -> bdtPriRestri.isDefault())
+                    .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
+            bdtPriRestriCodeListMap = bdtPriRestriList.stream()
+                    .filter(bdtPriRestri -> bdtPriRestri.getCodeListId() > 0)
+                    .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
 
+            bdtScPriRestriDefaultMap = bdtScPriRestriList.stream()
+                    .filter(bdtScPriRestri -> bdtScPriRestri.isDefault())
+                    .collect(Collectors.toMap(bdtScPriRestri -> bdtScPriRestri.getBdtScId(), Function.identity()));
+            bdtScPriRestriCodeListMap = bdtScPriRestriList.stream()
+                    .filter(bdtScPriRestri -> bdtScPriRestri.getCodeListId() > 0)
+                    .collect(Collectors.toMap(bdtScPriRestri -> bdtScPriRestri.getBdtScId(), Function.identity()));
+
+            dtMap = dataTypes.stream()
+                    .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
             dtScMap = dataTypeSupplementaryComponents.stream()
                     .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
         }
@@ -296,11 +324,11 @@ public class CreateBIETreeNode {
         }
 
         public long getDefaultBdtPriRestriId(long bdtId) {
-            return bdtPriRestriMap.get(bdtId).getBdtPriRestriId();
+            return bdtPriRestriDefaultMap.get(bdtId).getBdtPriRestriId();
         }
 
         public long getCodeListIdOfBdtPriRestriId(long bdtId) {
-            BusinessDataTypePrimitiveRestriction e = bdtPriRestriMap.get(bdtId);
+            BusinessDataTypePrimitiveRestriction e = bdtPriRestriCodeListMap.get(bdtId);
             return (e != null) ? e.getCodeListId() : 0L;
         }
 
@@ -311,17 +339,27 @@ public class CreateBIETreeNode {
         }
 
         public long getDefaultBdtScPriRestriId(long bdtScId) {
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriMap.get(bdtScId);
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriDefaultMap.get(bdtScId);
             return (e != null) ? e.getBdtScPriRestriId() : 0L;
         }
 
         public long getCodeListIdOfBdtScPriRestriId(long bdtScId) {
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriMap.get(bdtScId);
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction e = bdtScPriRestriCodeListMap.get(bdtScId);
             return (e != null) ? e.getCodeListId() : 0L;
+        }
+
+        public DataType getDt(long dtId) {
+            return dtMap.get(dtId);
         }
 
         public DataTypeSupplementaryComponent getDtSc(long dtScId) {
             return dtScMap.get(dtScId);
+        }
+
+        public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriByBdtId(long bdtId) {
+            return bdtPriRestriList.stream()
+                    .filter(e -> e.getBdtId() == bdtId)
+                    .collect(Collectors.toList());
         }
 
         @Override
@@ -422,7 +460,7 @@ public class CreateBIETreeNode {
         private void appendBBIESC(BasicBusinessInformationEntity bbie, BBIENode parent) {
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
                 DataTypeSupplementaryComponent dtsc = dataContainer.getDtSc(bbiesc.getDtScId());
-                new BBIESCNode(parent, bbiesc, dtsc).setAttribute("color", "#bd2c00");
+                new BBIESCNode(parent, bbiesc, dtsc);
             }
         }
 
@@ -431,13 +469,15 @@ public class CreateBIETreeNode {
             long bdtId = bccp.getBdtId();
             long bdtPrimitiveRestrictionId = dataContainer.getDefaultBdtPriRestriId(bdtId);
             long codeListId = dataContainer.getCodeListIdOfBdtPriRestriId(bdtId);
+            DataType bdt = dataContainer.getDt(bdtId);
 
             createBBIEP(bccp);
             createBBIE(bdtPrimitiveRestrictionId, codeListId);
             createBBIESC(bdtId);
 
-            BBIENode bbieNode = new BBIENode(seqKey, parent, bbie, bbiep, bccp);
-            bbieNode.setAttribute("color", "#006400");
+            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainer.getBdtPriRestriByBdtId(bdtId);
+
+            BBIENode bbieNode = new BBIENode(seqKey, parent, bbie, bbiep, bccp, bdt, bdtPriRestriList);
             appendBBIESC(bbie, bbieNode);
             return bbieNode;
         }
@@ -496,7 +536,6 @@ public class CreateBIETreeNode {
             this.roleOfAbie = createABIE(acc);
 
             ASBIENode asbieNode = new ASBIENode(seqKey, parent, asbie, asbiep, asccp, roleOfAbie);
-            asbieNode.setAttribute("color", "#4078c0");
             appendChildren(dataContainer, acc, roleOfAbie, asbieNode);
             return asbieNode;
         }

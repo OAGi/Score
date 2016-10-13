@@ -624,7 +624,7 @@ span.ui-button-text {
 }
 
 .section-content {
-    margin-left: 150px;
+    margin-left: 150px !important;
     color: #333;
 }
 
@@ -743,4 +743,17 @@ h5 {
 h6 {
     font-size: 12px;
     font-weight: 600
+}
+
+.ABIE, .ui-state-hover.ABIE, .ui-state-highlight.ABIE,
+.ASBIE, .ui-state-hover.ASBIE, .ui-state-highlight.ASBIE {
+    color: #4078c0 !important;
+}
+
+.BBIE, .ui-state-hover.BBIE, .ui-state-highlight.BBIE {
+    color: #006400 !important;
+}
+
+.BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC {
+    color: #bd2c00 !important;
 }

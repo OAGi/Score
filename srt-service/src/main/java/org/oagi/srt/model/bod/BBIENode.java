@@ -2,10 +2,7 @@ package org.oagi.srt.model.bod;
 
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.repository.entity.BasicBusinessInformationEntity;
-import org.oagi.srt.repository.entity.BasicBusinessInformationEntityProperty;
-import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
+import org.oagi.srt.repository.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +12,22 @@ public class BBIENode extends AbstractNode {
     private BasicBusinessInformationEntity bbie;
     private BasicBusinessInformationEntityProperty bbiep;
     private BasicCoreComponentProperty bccp;
-    private BusinessDataTypePrimitiveRestriction bdtPriRest;
+    private DataType bdt;
+    private List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList;
     private List<Node> children = new ArrayList();
 
     public BBIENode(int seqKey, Node parent,
                     BasicBusinessInformationEntity bbie,
                     BasicBusinessInformationEntityProperty bbiep,
-                    BasicCoreComponentProperty bccp) {
+                    BasicCoreComponentProperty bccp,
+                    DataType bdt,
+                    List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
         super(seqKey, parent);
         this.bbie = bbie;
         this.bbiep = bbiep;
         this.bccp = bccp;
-        this.bdtPriRest = bdtPriRest;
+        this.bdt = bdt;
+        this.bdtPriRestriList = bdtPriRestriList;
     }
 
     public BasicBusinessInformationEntity getBbie() {
@@ -53,12 +54,24 @@ public class BBIENode extends AbstractNode {
         this.bccp = bccp;
     }
 
-    public BusinessDataTypePrimitiveRestriction getBdtPriRest() {
-        return bdtPriRest;
+    public DataType getBdt() {
+        return bdt;
     }
 
-    public void setBdtPriRest(BusinessDataTypePrimitiveRestriction bdtPriRest) {
-        this.bdtPriRest = bdtPriRest;
+    public void setBdt(DataType bdt) {
+        this.bdt = bdt;
+    }
+
+    public long getBdtPrimitiveRestrictionId() {
+        return bbie.getBdtPriRestriId();
+    }
+
+    public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList() {
+        return bdtPriRestriList;
+    }
+
+    public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
+        this.bdtPriRestriList = bdtPriRestriList;
     }
 
     @Override
