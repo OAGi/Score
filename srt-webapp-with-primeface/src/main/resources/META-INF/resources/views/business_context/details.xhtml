@@ -70,7 +70,7 @@
                                                    itemLabel="#{contextCategory.name}"
                                                    itemValue="#{contextCategory}"/>
                                     <f:converter binding="#{contextCategoryConverter}"/>
-                                    <f:ajax listener="#{businessContextDetailBean.onChange}" render="tbl"/>
+                                    <f:ajax render="tbl"/>
                                 </h:selectOneMenu>
                             </f:facet>
                         </p:cellEditor>
@@ -93,7 +93,7 @@
                                             itemLabel="#{contextScheme.schemeName}"
                                             itemValue="#{contextScheme}"/>
                                     <f:converter binding="#{contextSchemeConverter}"/>
-                                    <f:ajax listener="#{businessContextDetailBean.onChange}" render="tbl"/>
+                                    <f:ajax render="tbl"/>
                                 </h:selectOneMenu>
                             </f:facet>
                         </p:cellEditor>
@@ -114,7 +114,7 @@
                                             itemLabel="#{contextSchemeValue.value}"
                                             itemValue="#{contextSchemeValue}"/>
                                     <f:converter binding="#{contextSchemeValueConverter}"/>
-                                    <f:ajax listener="#{businessContextDetailBean.onChange}" render="tbl"/>
+                                    <f:ajax render="tbl"/>
                                 </h:selectOneMenu>
                             </f:facet>
                         </p:cellEditor>
