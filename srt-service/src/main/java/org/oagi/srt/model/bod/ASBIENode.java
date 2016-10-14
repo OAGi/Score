@@ -1,6 +1,7 @@
 package org.oagi.srt.model.bod;
 
 import org.oagi.srt.model.Node;
+import org.oagi.srt.model.NodeVisitor;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
@@ -78,5 +79,13 @@ public class ASBIENode extends AbstractNode {
     @Override
     public List<? extends Node> getChildren() {
         return children;
+    }
+
+    @Override
+    public void accept(NodeVisitor visitor) {
+        visitor.visitASBIENode(this);
+        for (Node node : getChildren()) {
+            node.accept(visitor);
+        }
     }
 }

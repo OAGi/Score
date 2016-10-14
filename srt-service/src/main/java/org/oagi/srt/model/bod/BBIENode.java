@@ -91,4 +91,12 @@ public class BBIENode extends AbstractNode {
     public List<? extends Node> getChildren() {
         return children;
     }
+
+    @Override
+    public void accept(NodeVisitor visitor) {
+        visitor.visitBBIENode(this);
+        for (Node child : getChildren()) {
+            child.accept(visitor);
+        }
+    }
 }

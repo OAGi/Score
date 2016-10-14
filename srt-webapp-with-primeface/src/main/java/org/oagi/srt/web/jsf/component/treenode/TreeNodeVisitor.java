@@ -8,6 +8,7 @@ import org.oagi.srt.model.bod.BBIESCNode;
 import org.oagi.srt.model.bod.TopLevelNode;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.springframework.stereotype.Component;
 
 public class TreeNodeVisitor implements NodeVisitor {
 
@@ -18,23 +19,33 @@ public class TreeNodeVisitor implements NodeVisitor {
     }
 
     @Override
-    public void visit(Node node) {
+    public void startNode(TopLevelNode topLevelNode) {
+        visit(topLevelNode, "ABIE");
+    }
+
+    @Override
+    public void visitASBIENode(ASBIENode asbieNode) {
+        visit(asbieNode, "ASBIE");
+    }
+
+    @Override
+    public void visitBBIENode(BBIENode bbieNode) {
+        visit(bbieNode, "BBIE");
+    }
+
+    @Override
+    public void visitBBIESCNode(BBIESCNode bbiescNode) {
+        visit(bbiescNode, "BBIESC");
+    }
+
+    private void visit(Node node, String type) {
         Node parent = node.getParent();
         TreeNode parentTreeNode = (parent != null) ? (TreeNode) parent.getAttribute("treeNode") : root;
-        TreeNode treeNode;
-        if (node instanceof TopLevelNode) {
-            treeNode = new DefaultTreeNode("ABIE", node, parentTreeNode);
-        } else if (node instanceof ASBIENode) {
-            treeNode = new DefaultTreeNode("ASBIE", node, parentTreeNode);
-        } else if (node instanceof BBIENode) {
-            treeNode = new DefaultTreeNode("BBIE", node, parentTreeNode);
-        } else if (node instanceof BBIESCNode) {
-            treeNode = new DefaultTreeNode("BBIESC", node, parentTreeNode);
-        } else {
-            throw new IllegalStateException("Unknown node: " + node);
-        }
-
+        TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);
         node.setAttribute("treeNode", treeNode);
     }
 
+    @Override
+    public void endNode() {
+    }
 }

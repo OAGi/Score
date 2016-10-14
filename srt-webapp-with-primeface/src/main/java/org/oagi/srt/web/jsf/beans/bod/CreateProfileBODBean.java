@@ -2,15 +2,20 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bod.BBIENode;
+import org.oagi.srt.model.bod.TopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.web.jsf.component.treenode.CreateBIETreeNode;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +26,7 @@ import javax.faces.context.FacesContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
@@ -28,6 +34,8 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class CreateProfileBODBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateProfileBODBean.class);
 
     @Autowired
     private TopLevelConceptRepository topLevelConceptRepository;
@@ -69,6 +77,7 @@ public class CreateProfileBODBean {
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
+    private String restrictionType;
 
     @PostConstruct
     public void init() {
@@ -178,12 +187,45 @@ public class CreateProfileBODBean {
         this.treeNode = treeNode;
     }
 
+    public TopLevelNode getTopLevelNode() {
+        TreeNode treeNode = getTreeNode();
+        return (TopLevelNode) treeNode.getChildren().get(0).getData();
+    }
+
     public TreeNode getSelectedTreeNode() {
         return selectedTreeNode;
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
         this.selectedTreeNode = selectedTreeNode;
+    }
+
+    public void setRestrictionType(String restrictionType) {
+        switch (restrictionType) {
+            case "Primitive":
+                break;
+            case "Code":
+                break;
+        }
+    }
+
+    public String getRestrictionType() {
+        TreeNode selectedTreeNode = getSelectedTreeNode();
+        if (selectedTreeNode == null) {
+            return null;
+        }
+
+        Node node = (Node) selectedTreeNode.getData();
+        if (node instanceof BBIENode) {
+            BBIENode bbieNode = (BBIENode) node;
+            if (bbieNode.getBbie().getBdtPriRestri().getBdtPriRestriId() > 0L) {
+                return "Primitive";
+            } else {
+                return "Code";
+            }
+        } else {
+            return null;
+        }
     }
 
     public String onFlowProcess(FlowEvent event) {
@@ -227,11 +269,50 @@ public class CreateProfileBODBean {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("$(document.getElementById(PF('btnBack').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
             requestContext.execute("$(document.getElementById(PF('btnNext').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
         }
     }
 
-    public String getRestrictionType(Node node) {
-        return null;
+    public static class ProgressListener implements PersistEventListener {
+        private int maxCount = 0;
+        private AtomicInteger currentCount = new AtomicInteger();
+
+        public void setMaxCount(int maxCount) {
+            this.maxCount = maxCount;
+        }
+
+        @Override
+        public void onPrePersist(Object object) {
+        }
+
+        @Override
+        public void onPostPersist(Object object) {
+            currentCount.incrementAndGet();
+        }
+
+        public int getProgress() {
+            long progress = Math.round((currentCount.get() / (double) maxCount) * 100);
+            logger.info("Submit Progress: " + progress);
+            return (int) progress;
+        }
+    }
+
+    private ProgressListener progressListener;
+
+    public int getSubmitProgress() {
+        if (progressListener == null) {
+            return 0;
+        } else {
+            return progressListener.getProgress();
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public String submit() {
+        progressListener = new ProgressListener();
+        createBIETreeNode.submit(getTopLevelNode(), progressListener);
+
+        return "/views/profile_bod/list.xhtml?faces-redirect=true";
     }
 
     public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {

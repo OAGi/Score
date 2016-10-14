@@ -79,4 +79,13 @@ public class TopLevelNode extends AbstractNode {
     public List<? extends Node> getChildren() {
         return children;
     }
+
+    @Override
+    public void accept(NodeVisitor visitor) {
+        visitor.startNode(this);
+        for (Node child : getChildren()) {
+            child.accept(visitor);
+        }
+        visitor.endNode();
+    }
 }

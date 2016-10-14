@@ -34,6 +34,7 @@
                 var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
                 var btnBack = $(document.getElementById(PF('btnBack').id));
                 var btnNext = $(document.getElementById(PF('btnNext').id));
+                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
 
                 if (idx == 0 || idx == 1) {
                     btnBack.hide();
@@ -41,26 +42,51 @@
                     btnBack.show();
                 }
                 btnNext.show();
+                btnSubmit.hide();
 
                 btnBack.prop("disabled", true).addClass('ui-state-disabled');
                 btnNext.prop("disabled", true).addClass('ui-state-disabled');
+                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
             };
             var onNext = function () {
                 var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
                 var btnBack = $(document.getElementById(PF('btnBack').id));
                 var btnNext = $(document.getElementById(PF('btnNext').id));
+                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
 
                 if (idx == 1) {
                     btnNext.hide();
+                    btnSubmit.show();
                     PF('loadingBlock').show();
                 } else {
                     btnNext.show();
+                    btnSubmit.hide();
                 }
                 btnBack.show();
 
                 btnBack.prop("disabled", true).addClass('ui-state-disabled');
                 btnNext.prop("disabled", true).addClass('ui-state-disabled');
+                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
             };
+            var onSubmit = function () {
+                var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
+                $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
+
+                var btnBack = $(document.getElementById(PF('btnBack').id));
+                var btnNext = $(document.getElementById(PF('btnNext').id));
+                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
+
+                btnBack.prop("disabled", true).addClass('ui-state-disabled');
+                btnNext.prop("disabled", true).addClass('ui-state-disabled');
+                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
+
+                PF('progressBlock').show();
+                PF('progressBar').start();
+            };
+
+            $(document).ready(function () {
+                $('.fa-spin').parent().addClass('loading-block');
+            });
         </script>
         <h:form id="form">
             <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
@@ -184,7 +210,7 @@
                                             </f:facet>
 
                                             <p:selectOneRadio id="customRadio"
-                                                              value="#{createProfileBODBean.getRestrictionType(createProfileBODBean.selectedTreeNode.data)}"
+                                                              value="#{createProfileBODBean.restrictionType}"
                                                               layout="custom">
                                                 <f:selectItem itemLabel="Primitive" itemValue="Primitive"/>
                                                 <f:selectItem itemLabel="Code" itemValue="Code"/>
@@ -232,7 +258,8 @@
                                             <!--
                                                 ASBIE
                                             -->
-                                            <h:panelGroup rendered="#{createProfileBODBean.selectedTreeNode.type eq 'ASBIE'}">
+                                            <h:panelGroup
+                                                    rendered="#{createProfileBODBean.selectedTreeNode.type eq 'ASBIE'}">
                                                 <p:panel>
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>
@@ -395,27 +422,36 @@
                                                     </h:panelGrid>
 
                                                     <h:panelGrid columns="4" cellpadding="4">
-                                                        <p:radioButton id="opt1" for="customRadio" itemIndex="0" style="margin: 12px;"/>
-                                                        <h:outputText value="Primitive" styleClass="section-label" style="margin-left: -48px; margin-top: 8px;"/>
+                                                        <p:radioButton id="opt1" for="customRadio" itemIndex="0"
+                                                                       style="margin: 12px;"/>
+                                                        <h:outputText value="Primitive" styleClass="section-label"
+                                                                      style="margin-left: -48px; margin-top: 8px;"/>
 
-                                                        <p:selectOneMenu style="margin-left: 100px !important; margin-top: 3px;"
+                                                        <p:selectOneMenu
+                                                                style="margin-left: 100px !important; margin-top: 3px;"
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bdtPrimitiveRestrictionId}">
                                                             <f:selectItems
                                                                     value="#{createProfileBODBean.getBdtPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
                                                         </p:selectOneMenu>
 
-                                                        <h:outputText value="#{createProfileBODBean.getPrimitiveType(createProfileBODBean.selectedTreeNode.data)}"
-                                                                      style="position: absolute; margin-left: 20px; margin-top: 8px;"/>
+                                                        <h:outputText
+                                                                value="#{createProfileBODBean.getPrimitiveType(createProfileBODBean.selectedTreeNode.data)}"
+                                                                style="position: absolute; margin-left: 20px; margin-top: 8px;"/>
                                                     </h:panelGrid>
 
                                                     <h:panelGrid columns="4" cellpadding="4">
-                                                        <p:radioButton id="opt2" for="customRadio" itemIndex="1" style="margin: 12px;"/>
-                                                        <h:outputText value="Code List" styleClass="section-label" style="margin-left: -48px; margin-top: 8px;"/>
+                                                        <p:radioButton id="opt2" for="customRadio" itemIndex="1"
+                                                                       style="margin: 12px;"/>
+                                                        <h:outputText value="Code List" styleClass="section-label"
+                                                                      style="margin-left: -48px; margin-top: 8px;"/>
 
-                                                        <h:outputText value="#{createProfileBODBean.getCodeListName(createProfileBODBean.selectedTreeNode.data)}" styleClass="section-label"/>
+                                                        <h:outputText
+                                                                value="#{createProfileBODBean.getCodeListName(createProfileBODBean.selectedTreeNode.data)}"
+                                                                styleClass="section-label"/>
 
                                                         <h:panelGroup style="margin-left: 295px;">
-                                                            <p:commandButton value="Code List" icon="ui-icon-extlink" style="margin-right: 10px;"
+                                                            <p:commandButton value="Code List" icon="ui-icon-extlink"
+                                                                             style="margin-right: 10px;"
                                                                              disabled="#{(createProfileBODBean.getPrimitiveType(createProfileBODBean.selectedTreeNode.data) == 'XSD Builtin Type') ? 'false' : 'true'}">
                                                             </p:commandButton>
 
@@ -495,11 +531,21 @@
                 <span class="sr-only">Loading...</span>
             </p:blockUI>
 
+            <p:blockUI widgetVar="progressBlock" block="wizard">
+                <p:progressBar widgetVar="progressBar" ajax="true" interval="500" style="width: 900px;"
+                               value="#{createProfileBODBean.submitProgress}"
+                               labelTemplate="{value}%" global="false">
+                    <p:ajax event="complete" oncomplete="PF('progressBlock').hide();"/>
+                </p:progressBar>
+            </p:blockUI>
+
             <p:panel id="btnGroup">
                 <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
                                  value="Back" icon="ui-icon-arrowthick-1-w" onclick="PF('wizard').back()"/>
                 <p:commandButton id="btnNext" widgetVar="btnNext" style=""
                                  value="Next" icon="ui-icon-arrowthick-1-e" onclick="PF('wizard').next();"/>
+                <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
+                                 value="Submit" icon="ui-icon-check" action="#{createProfileBODBean.submit()}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

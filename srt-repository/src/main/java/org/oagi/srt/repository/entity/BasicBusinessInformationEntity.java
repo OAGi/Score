@@ -1,21 +1,25 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "bbie")
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class BasicBusinessInformationEntity implements Serializable, BusinessInformationEntity, IdEntity, IGuidEntity {
+public class BasicBusinessInformationEntity
+        implements Serializable, TimestampAware, BusinessInformationEntity, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
     private long bbieId;
 
     @Column(nullable = false, length = 41)
@@ -88,17 +92,6 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
-
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
-    }
 
     @Override
     public long getId() {
@@ -306,5 +299,131 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = (int) (bbieId ^ (bbieId >>> 32));
+        result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (int) (basedBccId ^ (basedBccId >>> 32));
+        result = 31 * result + (fromAbie != null ? fromAbie.hashCode() : 0);
+        result = 31 * result + (toBbiep != null ? toBbiep.hashCode() : 0);
+        result = 31 * result + (bdtPriRestri != null ? bdtPriRestri.hashCode() : 0);
+        result = 31 * result + (codeList != null ? codeList.hashCode() : 0);
+        result = 31 * result + cardinalityMin;
+        result = 31 * result + cardinalityMax;
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
+        result = 31 * result + (nillable ? 1 : 0);
+        result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
+        result = 31 * result + (nill ? 1 : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
+        result = 31 * result + (remark != null ? remark.hashCode() : 0);
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
+        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
+        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        temp = Double.doubleToLongBits(seqKey);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (used ? 1 : 0);
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "BasicBusinessInformationEntity{" +
+                "bbieId=" + bbieId +
+                ", guid='" + guid + '\'' +
+                ", basedBccId=" + basedBccId +
+                ", fromAbie=" + fromAbie +
+                ", toBbiep=" + toBbiep +
+                ", bdtPriRestri=" + bdtPriRestri +
+                ", codeList=" + codeList +
+                ", cardinalityMin=" + cardinalityMin +
+                ", cardinalityMax=" + cardinalityMax +
+                ", defaultValue='" + defaultValue + '\'' +
+                ", nillable=" + nillable +
+                ", fixedValue='" + fixedValue + '\'' +
+                ", nill=" + nill +
+                ", definition='" + definition + '\'' +
+                ", remark='" + remark + '\'' +
+                ", createdBy=" + createdBy +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", creationTimestamp=" + creationTimestamp +
+                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
+                ", seqKey=" + seqKey +
+                ", used=" + used +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public BasicBusinessInformationEntity() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
     }
 }

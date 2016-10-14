@@ -2,6 +2,7 @@ package org.oagi.srt.model.bod;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.Node;
+import org.oagi.srt.model.NodeVisitor;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
@@ -42,5 +43,10 @@ public class BBIESCNode extends AbstractNode {
         } else {
             return Utility.spaceSeparator(dtsc.getPropertyTerm().concat(dtsc.getRepresentationTerm()));
         }
+    }
+
+    @Override
+    public void accept(NodeVisitor visitor) {
+        visitor.visitBBIESCNode(this);
     }
 }

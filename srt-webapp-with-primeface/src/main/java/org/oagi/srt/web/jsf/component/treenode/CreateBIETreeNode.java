@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
+import com.google.common.collect.Lists;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.Node;
@@ -8,15 +9,19 @@ import org.oagi.srt.model.bod.ASBIENode;
 import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.BBIESCNode;
 import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bod.visitor.NodeSortVisitor;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.web.handler.UIHandler;
+import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class CreateBIETreeNode {
+public class CreateBIETreeNode extends UIHandler {
 
     @Autowired
     private CoreComponentService coreComponentService;
@@ -83,18 +88,169 @@ public class CreateBIETreeNode {
     @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
-    private class NodeSortVisitor implements NodeVisitor {
-        @Override
-        public void visit(Node node) {
-            Collections.sort(node.getChildren(), (a, b) -> a.getSeqKey() - b.getSeqKey());
+    @Autowired
+    private TopLevelAbieRepository topLevelAbieRepository;
+
+    private class SubmitNodeVisitor implements NodeVisitor {
+
+        private User user;
+        private CreateProfileBODBean.ProgressListener progressListener;
+
+        private TopLevelAbie topLevelAbie;
+        private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
+        private List<AssociationBusinessInformationEntity> asbieList = new ArrayList();
+        private List<AssociationBusinessInformationEntityProperty> asbiepList = new ArrayList();
+        private List<BasicBusinessInformationEntity> bbieList = new ArrayList();
+        private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
+        private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
+
+        public SubmitNodeVisitor(User user) {
+            this.user = user;
         }
+
+        public void setProgressListener(CreateProfileBODBean.ProgressListener progressListener) {
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public void startNode(TopLevelNode topLevelNode) {
+            topLevelAbie = new TopLevelAbie();
+            topLevelAbie.setAbie(topLevelNode.getAbie());
+            asbiepList.add(topLevelNode.getAsbiep());
+        }
+
+        @Override
+        public void visitASBIENode(ASBIENode asbieNode) {
+            abieList.add(asbieNode.getAbie());
+            asbieList.add(asbieNode.getAsbie());
+            asbiepList.add(asbieNode.getAsbiep());
+        }
+
+        @Override
+        public void visitBBIENode(BBIENode bbieNode) {
+            bbieList.add(bbieNode.getBbie());
+            bbiepList.add(bbieNode.getBbiep());
+        }
+
+        @Override
+        public void visitBBIESCNode(BBIESCNode bbiescNode) {
+            bbiescList.add(bbiescNode.getBbiesc());
+        }
+
+        @Override
+        public void endNode() {
+            adjust();
+            save();
+        }
+
+        private void adjust() {
+            AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
+            tAbie.setCreatedBy(user.getAppUserId());
+            tAbie.setLastUpdatedBy(user.getAppUserId());
+            tAbie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+            tAbie.setOwnerTopLevelAbie(topLevelAbie);
+            tAbie.addPersistEventListener(progressListener);
+
+            abieList.stream().forEach(abie -> {
+                abie.setCreatedBy(user.getAppUserId());
+                abie.setLastUpdatedBy(user.getAppUserId());
+                abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+                abie.setOwnerTopLevelAbie(topLevelAbie);
+                abie.addPersistEventListener(progressListener);
+            });
+            asbieList.stream().forEach(asbie -> {
+                asbie.setCreatedBy(user.getAppUserId());
+                asbie.setLastUpdatedBy(user.getAppUserId());
+                asbie.setOwnerTopLevelAbie(topLevelAbie);
+                asbie.addPersistEventListener(progressListener);
+            });
+            asbiepList.stream().forEach(asbiep -> {
+                asbiep.setCreatedBy(user.getAppUserId());
+                asbiep.setLastUpdatedBy(user.getAppUserId());
+                asbiep.setOwnerTopLevelAbie(topLevelAbie);
+                asbiep.addPersistEventListener(progressListener);
+            });
+            bbieList.stream().forEach(bbie -> {
+                bbie.setCreatedBy(user.getAppUserId());
+                bbie.setLastUpdatedBy(user.getAppUserId());
+                bbie.setOwnerTopLevelAbie(topLevelAbie);
+                bbie.addPersistEventListener(progressListener);
+            });
+            bbiepList.stream().forEach(bbiep -> {
+                bbiep.setCreatedBy(user.getAppUserId());
+                bbiep.setLastUpdatedBy(user.getAppUserId());
+                bbiep.setOwnerTopLevelAbie(topLevelAbie);
+                bbiep.addPersistEventListener(progressListener);
+            });
+            bbiescList.stream().forEach(bbiesc -> {
+                bbiesc.setOwnerTopLevelAbie(topLevelAbie);
+                bbiesc.addPersistEventListener(progressListener);
+            });
+
+            if (progressListener != null) {
+                int maxCount = abieList.size() + asbieList.size() + asbiepList.size() + bbieList.size() + bbiepList.size() + bbiescList.size();
+                progressListener.setMaxCount(maxCount);
+            }
+        }
+
+        private void save() {
+            saveTopLevelAbie();
+            saveAbieList();
+            saveBbiepList();
+            saveBbieList();
+            saveBbieScList();
+            saveAsbiepList();
+            saveAsbieList();
+        }
+
+        private void saveTopLevelAbie() {
+            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+            topLevelAbie.setAbie(null);
+
+            topLevelAbieRepository.saveAndFlush(topLevelAbie);
+            abie.setOwnerTopLevelAbie(topLevelAbie);
+
+            abieRepository.saveAndFlush(abie);
+
+            topLevelAbie.setAbie(abie);
+            topLevelAbieRepository.saveAndFlush(topLevelAbie);
+        }
+
+        private void saveAbieList() {
+            abieRepository.save(abieList);
+        }
+
+        private void saveBbiepList() {
+            bbiepRepository.save(bbiepList);
+        }
+
+        private void saveBbieList() {
+            bbieRepository.save(bbieList);
+        }
+
+        private void saveBbieScList() {
+            bbiescRepository.save(bbiescList);
+        }
+
+        private void saveAsbiepList() {
+            asbiepRepository.save(asbiepList);
+        }
+
+        private void saveAsbieList() {
+            asbieRepository.save(asbieList);
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void submit(TopLevelNode node, CreateProfileBODBean.ProgressListener progressListener) {
+        SubmitNodeVisitor submitNodeVisitor = new SubmitNodeVisitor(loadAuthentication());
+        submitNodeVisitor.setProgressListener(progressListener);
+        node.accept(submitNodeVisitor);
     }
 
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         Node node = createNode(asccp, bizCtx);
-        NodeSortVisitor nodeSortVisitor = new NodeSortVisitor();
-        node.accept(nodeSortVisitor);
-
+        node.accept(new NodeSortVisitor());
         TreeNodeVisitor treeNodeVisitor = new TreeNodeVisitor();
         node.accept(treeNodeVisitor);
         return treeNodeVisitor.getRoot();
@@ -120,10 +276,6 @@ public class CreateBIETreeNode {
         abie.setBasedAcc(acc);
         abie.setBizCtx(bizCtx);
         abie.setDefinition(acc.getDefinition());
-        // abie.setCreatedBy(userId);
-        // abie.setLastUpdatedBy(userId);
-        // abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
-        // abie.setOwnerTopLevelAbie(topLevelAbie);
 
         return abie;
     }
@@ -135,10 +287,7 @@ public class CreateBIETreeNode {
         asbiep.setGuid(Utility.generateGUID());
         asbiep.setBasedAsccp(asccp);
         asbiep.setRoleOfAbie(abie);
-        // asbiep.setCreatedBy(userId);
-        // asbiep.setLastUpdatedBy(userId);
         asbiep.setDefinition(asccp.getDefinition());
-        // asbiep.setOwnerTopLevelAbieId(topLevelAbie);
 
         return asbiep;
     }
@@ -254,6 +403,8 @@ public class CreateBIETreeNode {
 
     private class DataContainer implements CoreComponentProvider {
         private BusinessContext businessContext;
+        private TopLevelNode topLevelNode;
+
         private Map<Long, AggregateCoreComponent> accMap;
         private Map<Long, AssociationCoreComponentProperty> asccpMap;
         private Map<Long, BasicCoreComponentProperty> bccpMap;
@@ -318,6 +469,14 @@ public class CreateBIETreeNode {
 
         public BusinessContext getBusinessContext() {
             return businessContext;
+        }
+
+        public TopLevelNode getTopLevelNode() {
+            return topLevelNode;
+        }
+
+        public void setTopLevelNode(TopLevelNode topLevelNode) {
+            this.topLevelNode = topLevelNode;
         }
 
         private AggregateCoreComponent getACC(long accId) {
@@ -425,8 +584,6 @@ public class CreateBIETreeNode {
             bbiep.setGuid(Utility.generateGUID());
             bbiep.setBasedBccp(bccp);
             bbiep.setDefinition(bccp.getDefinition());
-//            bbiep.setCreatedBy(userId);
-//            bbiep.setLastUpdatedBy(userId);
         }
 
         private void createBBIE(BusinessDataTypePrimitiveRestriction bdtPriRestri, long codeListId) {
@@ -442,8 +599,6 @@ public class CreateBIETreeNode {
 //            if (codeListId > 0) {
 //                bbie.setCodeListId(codeListId);
 //            }
-//            bbie.setCreatedBy(userId);
-//            bbie.setLastUpdatedBy(userId);
             bbie.setSeqKey(seqKey);
         }
 
@@ -530,8 +685,6 @@ public class CreateBIETreeNode {
             asbiep.setGuid(Utility.generateGUID());
             asbiep.setBasedAsccp(asccp);
             asbiep.setRoleOfAbie(roleOfAbie);
-            // asbiep.setCreatedBy(userId);
-            // asbiep.setLastUpdatedBy(userId);
             asbiep.setDefinition(asccp.getDefinition());
         }
 
@@ -544,17 +697,15 @@ public class CreateBIETreeNode {
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
             asbie.setDefinition(ascc.getDefinition());
-            // asbie.setCreatedBy(userId);
-            // asbie.setLastUpdatedBy(userId);
             asbie.setSeqKey(seqKey);
         }
 
         public ASBIENode build(Node parent) {
-            createASBIEP();
-            createASBIE();
-
             AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
             this.roleOfAbie = createABIE(acc, dataContainer.getBusinessContext());
+
+            createASBIEP();
+            createASBIE();
 
             ASBIENode asbieNode = new ASBIENode(seqKey, parent, asbie, asbiep, asccp, roleOfAbie);
             appendChildren(dataContainer, acc, roleOfAbie, asbieNode);

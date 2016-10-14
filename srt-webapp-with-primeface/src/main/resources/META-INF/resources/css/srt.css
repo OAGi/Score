@@ -757,3 +757,9 @@ h6 {
 .BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC {
     color: #bd2c00 !important;
 }
+
+.loading-block {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}

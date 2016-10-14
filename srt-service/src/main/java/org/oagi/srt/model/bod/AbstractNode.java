@@ -1,7 +1,6 @@
 package org.oagi.srt.model.bod;
 
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,13 +51,5 @@ public abstract class AbstractNode implements Node {
     @Override
     public Object getAttribute(String key) {
         return attributes.get(key);
-    }
-
-    @Override
-    public void accept(NodeVisitor visitor) {
-        visitor.visit(this);
-        for (Node child : getChildren()) {
-            child.accept(visitor);
-        }
     }
 }
