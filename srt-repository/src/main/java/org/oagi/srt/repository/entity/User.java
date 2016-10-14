@@ -82,15 +82,10 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        User that = (User) o;
 
-        if (appUserId != user.appUserId) return false;
-        if (oagisDeveloperIndicator != user.oagisDeveloperIndicator) return false;
-        if (loginId != null ? !loginId.equals(user.loginId) : user.loginId != null) return false;
-        if (password != null ? !password.equals(user.password) : user.password != null) return false;
-        if (name != null ? !name.equals(user.name) : user.name != null) return false;
-        return organization != null ? organization.equals(user.organization) : user.organization == null;
-
+        if (appUserId != 0L && appUserId == that.appUserId) return true;
+        return false;
     }
 
     @Override

@@ -136,19 +136,8 @@ public class ProfileBOD {
 
         ProfileBOD that = (ProfileBOD) o;
 
-        if (topLevelAbieId != that.topLevelAbieId) return false;
-        if (abieId != that.abieId) return false;
-        if (asbiepId != that.asbiepId) return false;
-        if (asccpId != that.asccpId) return false;
-        if (bizCtxId != that.bizCtxId) return false;
-        if (state != that.state) return false;
-        if (createdBy != that.createdBy) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (bizCtxName != null ? !bizCtxName.equals(that.bizCtxName) : that.bizCtxName != null) return false;
-        if (createdUsername != null ? !createdUsername.equals(that.createdUsername) : that.createdUsername != null)
-            return false;
-        return creationTimestamp != null ? creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp == null;
-
+        if (topLevelAbieId != 0L && topLevelAbieId == that.topLevelAbieId) return true;
+        return false;
     }
 
     @Override

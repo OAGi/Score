@@ -53,11 +53,8 @@ public class BusinessContextValue implements Serializable {
 
         BusinessContextValue that = (BusinessContextValue) o;
 
-        if (bizCtxValueId != that.bizCtxValueId) return false;
-        if (businessContext != null ? !businessContext.equals(that.businessContext) : that.businessContext != null)
-            return false;
-        return contextSchemeValue != null ? contextSchemeValue.equals(that.contextSchemeValue) : that.contextSchemeValue == null;
-
+        if (bizCtxValueId != 0L && bizCtxValueId == that.bizCtxValueId) return true;
+        return false;
     }
 
     @Override

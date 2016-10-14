@@ -51,10 +51,8 @@ public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializab
 
         CoreDataTypeAllowedPrimitiveExpressionTypeMap that = (CoreDataTypeAllowedPrimitiveExpressionTypeMap) o;
 
-        if (cdtAwdPriXpsTypeMapId != that.cdtAwdPriXpsTypeMapId) return false;
-        if (cdtAwdPriId != that.cdtAwdPriId) return false;
-        return xbtId == that.xbtId;
-
+        if (cdtAwdPriXpsTypeMapId != 0L && cdtAwdPriXpsTypeMapId == that.cdtAwdPriXpsTypeMapId) return true;
+        return false;
     }
 
     @Override

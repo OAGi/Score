@@ -230,26 +230,13 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
 
         AggregateBusinessInformationEntity that = (AggregateBusinessInformationEntity) o;
 
-        if (abieId != that.abieId) return false;
-        if (basedAccId != that.basedAccId) return false;
-        if (bizCtxId != that.bizCtxId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (bizCtxName != null ? !bizCtxName.equals(that.bizCtxName) : that.bizCtxName != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (clientId != null ? !clientId.equals(that.clientId) : that.clientId != null) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        return bizTerm != null ? bizTerm.equals(that.bizTerm) : that.bizTerm == null;
-
+        if (abieId != 0L && abieId == that.abieId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

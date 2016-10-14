@@ -75,12 +75,13 @@ public class ContextSchemeValue implements Serializable {
 
         ContextSchemeValue that = (ContextSchemeValue) o;
 
-        if (ctxSchemeValueId != that.ctxSchemeValueId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (meaning != null ? !meaning.equals(that.meaning) : that.meaning != null) return false;
-        return contextScheme != null ? contextScheme.equals(that.contextScheme) : that.contextScheme == null;
-
+        if (ctxSchemeValueId != 0L && ctxSchemeValueId == that.ctxSchemeValueId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -62,11 +62,8 @@ public class XSDBuiltInType implements Serializable {
 
         XSDBuiltInType that = (XSDBuiltInType) o;
 
-        if (xbtId != that.xbtId) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (builtInType != null ? !builtInType.equals(that.builtInType) : that.builtInType != null) return false;
-        return subtypeOfXbtId != null ? subtypeOfXbtId.equals(that.subtypeOfXbtId) : that.subtypeOfXbtId == null;
-
+        if (xbtId != 0L && xbtId == that.xbtId) return true;
+        return false;
     }
 
     @Override

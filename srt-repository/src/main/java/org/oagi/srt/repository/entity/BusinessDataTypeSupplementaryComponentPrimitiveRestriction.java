@@ -90,14 +90,8 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
 
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction that = (BusinessDataTypeSupplementaryComponentPrimitiveRestriction) o;
 
-        if (bdtScPriRestriId != that.bdtScPriRestriId) return false;
-        if (bdtScId != that.bdtScId) return false;
-        if (isDefault != that.isDefault) return false;
-        if (cdtScAwdPriXpsTypeMapId != null ? !cdtScAwdPriXpsTypeMapId.equals(that.cdtScAwdPriXpsTypeMapId) : that.cdtScAwdPriXpsTypeMapId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        return agencyIdListId != null ? agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId == null;
-
+        if (bdtScPriRestriId != 0L && bdtScPriRestriId == that.bdtScPriRestriId) return true;
+        return false;
     }
 
     @Override

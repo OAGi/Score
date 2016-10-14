@@ -144,21 +144,10 @@ public class Namespace implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Namespace namespace = (Namespace) o;
+        Namespace that = (Namespace) o;
 
-        if (namespaceId != namespace.namespaceId) return false;
-        if (stdNmsp != namespace.stdNmsp) return false;
-        if (createdBy != namespace.createdBy) return false;
-        if (ownerUserId != namespace.ownerUserId) return false;
-        if (lastUpdatedBy != namespace.lastUpdatedBy) return false;
-        if (uri != null ? !uri.equals(namespace.uri) : namespace.uri != null) return false;
-        if (prefix != null ? !prefix.equals(namespace.prefix) : namespace.prefix != null) return false;
-        if (description != null ? !description.equals(namespace.description) : namespace.description != null)
-            return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(namespace.creationTimestamp) : namespace.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(namespace.lastUpdateTimestamp) : namespace.lastUpdateTimestamp == null;
-
+        if (namespaceId != 0L && namespaceId == that.namespaceId) return true;
+        return false;
     }
 
     @Override

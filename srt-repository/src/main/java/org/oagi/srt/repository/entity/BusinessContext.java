@@ -109,15 +109,13 @@ public class BusinessContext implements Serializable {
 
         BusinessContext that = (BusinessContext) o;
 
-        if (bizCtxId != that.bizCtxId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (bizCtxId != 0L && bizCtxId == that.bizCtxId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

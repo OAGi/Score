@@ -41,9 +41,8 @@ public class TopLevelAbie implements Serializable {
 
         TopLevelAbie that = (TopLevelAbie) o;
 
-        if (topLevelAbieId != that.topLevelAbieId) return false;
-        return abie != null ? abie.equals(that.abie) : that.abie == null;
-
+        if (topLevelAbieId != 0L && topLevelAbieId == that.topLevelAbieId) return true;
+        return false;
     }
 
     @Override

@@ -274,31 +274,13 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
 
         AssociationCoreComponent that = (AssociationCoreComponent) o;
 
-        if (asccId != that.asccId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (seqKey != that.seqKey) return false;
-        if (fromAccId != that.fromAccId) return false;
-        if (toAsccpId != that.toAsccpId) return false;
-        if (deprecated != that.deprecated) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentAsccId != null ? currentAsccId.equals(that.currentAsccId) : that.currentAsccId == null;
-
+        if (asccId != 0L && asccId == that.asccId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

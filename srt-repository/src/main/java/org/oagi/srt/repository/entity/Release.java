@@ -61,13 +61,10 @@ public class Release implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Release release = (Release) o;
+        Release that = (Release) o;
 
-        if (releaseId != release.releaseId) return false;
-        if (namespaceId != release.namespaceId) return false;
-        if (releaseNum != null ? !releaseNum.equals(release.releaseNum) : release.releaseNum != null) return false;
-        return releaseNote != null ? releaseNote.equals(release.releaseNote) : release.releaseNote == null;
-
+        if (releaseId != 0L && releaseId == that.releaseId) return true;
+        return false;
     }
 
     @Override

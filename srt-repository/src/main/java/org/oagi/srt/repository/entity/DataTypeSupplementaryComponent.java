@@ -118,17 +118,13 @@ public class DataTypeSupplementaryComponent implements Serializable {
 
         DataTypeSupplementaryComponent that = (DataTypeSupplementaryComponent) o;
 
-        if (dtScId != that.dtScId) return false;
-        if (ownerDtId != that.ownerDtId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
-            return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        return basedDtScId != null ? basedDtScId.equals(that.basedDtScId) : that.basedDtScId == null;
-
+        if (dtScId != 0L && dtScId == that.dtScId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

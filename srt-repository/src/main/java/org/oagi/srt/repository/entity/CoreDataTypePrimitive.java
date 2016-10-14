@@ -40,9 +40,8 @@ public class CoreDataTypePrimitive implements Serializable {
 
         CoreDataTypePrimitive that = (CoreDataTypePrimitive) o;
 
-        if (cdtPriId != that.cdtPriId) return false;
-        return name != null ? name.equals(that.name) : that.name == null;
-
+        if (cdtPriId != 0L && cdtPriId == that.cdtPriId) return true;
+        return false;
     }
 
     @Override

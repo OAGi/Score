@@ -62,11 +62,8 @@ public class CoreDataTypeAllowedPrimitive implements Serializable {
 
         CoreDataTypeAllowedPrimitive that = (CoreDataTypeAllowedPrimitive) o;
 
-        if (cdtAwdPriId != that.cdtAwdPriId) return false;
-        if (cdtId != that.cdtId) return false;
-        if (cdtPriId != that.cdtPriId) return false;
-        return isDefault == that.isDefault;
-
+        if (cdtAwdPriId != 0L && cdtAwdPriId == that.cdtAwdPriId) return true;
+        return false;
     }
 
     @Override

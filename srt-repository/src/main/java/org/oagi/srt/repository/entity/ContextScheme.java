@@ -166,23 +166,13 @@ public class ContextScheme implements Serializable {
 
         ContextScheme that = (ContextScheme) o;
 
-        if (ctxSchemeId != that.ctxSchemeId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (schemeId != null ? !schemeId.equals(that.schemeId) : that.schemeId != null) return false;
-        if (schemeName != null ? !schemeName.equals(that.schemeName) : that.schemeName != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (schemeAgencyId != null ? !schemeAgencyId.equals(that.schemeAgencyId) : that.schemeAgencyId != null)
-            return false;
-        if (schemeVersionId != null ? !schemeVersionId.equals(that.schemeVersionId) : that.schemeVersionId != null)
-            return false;
-        if (contextCategory != null ? !contextCategory.equals(that.contextCategory) : that.contextCategory != null)
-            return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (ctxSchemeId != 0L && ctxSchemeId == that.ctxSchemeId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -89,14 +89,10 @@ public class ModuleDep implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ModuleDep moduleDep = (ModuleDep) o;
+        ModuleDep that = (ModuleDep) o;
 
-        if (moduleDepId != moduleDep.moduleDepId) return false;
-        if (dependencyType != moduleDep.dependencyType) return false;
-        if (dependingModule != null ? !dependingModule.equals(moduleDep.dependingModule) : moduleDep.dependingModule != null)
-            return false;
-        return dependedModule != null ? dependedModule.equals(moduleDep.dependedModule) : moduleDep.dependedModule == null;
-
+        if (moduleDepId != 0L && moduleDepId == that.moduleDepId) return true;
+        return false;
     }
 
     @Override

@@ -209,25 +209,13 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
         BasicBusinessInformationEntitySupplementaryComponent that = (BasicBusinessInformationEntitySupplementaryComponent) o;
 
-        if (bbieScId != that.bbieScId) return false;
-        if (bbieId != that.bbieId) return false;
-        if (dtScId != that.dtScId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (used != that.used) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (dtScPriRestriId != null ? !dtScPriRestriId.equals(that.dtScPriRestriId) : that.dtScPriRestriId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        if (agencyIdListId != null ? !agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId != null)
-            return false;
-        if (defaultValue != null ? !defaultValue.equals(that.defaultValue) : that.defaultValue != null) return false;
-        if (fixedValue != null ? !fixedValue.equals(that.fixedValue) : that.fixedValue != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        return bizTerm != null ? bizTerm.equals(that.bizTerm) : that.bizTerm == null;
-
+        if (bbieScId != 0L && bbieScId == that.bbieScId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

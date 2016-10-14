@@ -119,17 +119,13 @@ public class AgencyIdList implements Serializable {
 
         AgencyIdList that = (AgencyIdList) o;
 
-        if (agencyIdListId != that.agencyIdListId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (enumTypeGuid != null ? !enumTypeGuid.equals(that.enumTypeGuid) : that.enumTypeGuid != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (listId != null ? !listId.equals(that.listId) : that.listId != null) return false;
-        if (agencyIdListValueId != null ? !agencyIdListValueId.equals(that.agencyIdListValueId) : that.agencyIdListValueId != null)
-            return false;
-        if (versionId != null ? !versionId.equals(that.versionId) : that.versionId != null) return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        return definition != null ? definition.equals(that.definition) : that.definition == null;
-
+        if (agencyIdListId != 0L && agencyIdListId == that.agencyIdListId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

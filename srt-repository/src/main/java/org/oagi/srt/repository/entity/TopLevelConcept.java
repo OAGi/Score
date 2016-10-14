@@ -59,11 +59,8 @@ public class TopLevelConcept {
 
         TopLevelConcept that = (TopLevelConcept) o;
 
-        if (asccpId != that.asccpId) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (asccpId != 0L && asccpId == that.asccpId) return true;
+        return false;
     }
 
     @Override

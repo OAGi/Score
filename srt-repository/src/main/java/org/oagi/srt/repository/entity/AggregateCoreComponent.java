@@ -306,35 +306,13 @@ public class AggregateCoreComponent implements Serializable {
 
         AggregateCoreComponent that = (AggregateCoreComponent) o;
 
-        if (accId != that.accId) return false;
-        if (oagisComponentType != that.oagisComponentType) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (deprecated != that.deprecated) return false;
-        if (isAbstract != that.isAbstract) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (objectClassTerm != null ? !objectClassTerm.equals(that.objectClassTerm) : that.objectClassTerm != null)
-            return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (basedAccId != null ? !basedAccId.equals(that.basedAccId) : that.basedAccId != null) return false;
-        if (objectClassQualifier != null ? !objectClassQualifier.equals(that.objectClassQualifier) : that.objectClassQualifier != null)
-            return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        if (namespaceId != null ? !namespaceId.equals(that.namespaceId) : that.namespaceId != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentAccId != null ? currentAccId.equals(that.currentAccId) : that.currentAccId == null;
-
+        if (accId != 0L && accId == that.accId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

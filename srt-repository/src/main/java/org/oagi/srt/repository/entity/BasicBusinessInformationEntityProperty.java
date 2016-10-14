@@ -164,19 +164,13 @@ public class BasicBusinessInformationEntityProperty implements Serializable, IdE
 
         BasicBusinessInformationEntityProperty that = (BasicBusinessInformationEntityProperty) o;
 
-        if (bbiepId != that.bbiepId) return false;
-        if (basedBccpId != that.basedBccpId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        if (bizTerm != null ? !bizTerm.equals(that.bizTerm) : that.bizTerm != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (bbiepId != 0L && bbiepId == that.bbiepId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -51,10 +51,8 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap
 
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap that = (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap) o;
 
-        if (cdtScAwdPriXpsTypeMapId != that.cdtScAwdPriXpsTypeMapId) return false;
-        if (cdtScAwdPriId != that.cdtScAwdPriId) return false;
-        return xbtId == that.xbtId;
-
+        if (cdtScAwdPriXpsTypeMapId != 0L && cdtScAwdPriXpsTypeMapId == that.cdtScAwdPriXpsTypeMapId) return true;
+        return false;
     }
 
     @Override

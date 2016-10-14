@@ -79,11 +79,8 @@ public class BlobContent implements Serializable {
 
         BlobContent that = (BlobContent) o;
 
-        if (blobContentId != that.blobContentId) return false;
-        if (releaseId != that.releaseId) return false;
-        if (!Arrays.equals(content, that.content)) return false;
-        return module != null ? module.equals(that.module) : that.module == null;
-
+        if (blobContentId != 0L && blobContentId == that.blobContentId) return true;
+        return false;
     }
 
     @Override
@@ -92,6 +89,7 @@ public class BlobContent implements Serializable {
         result = 31 * result + Arrays.hashCode(content);
         result = 31 * result + (int) (releaseId ^ (releaseId >>> 32));
         result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (file != null ? file.hashCode() : 0);
         return result;
     }
 

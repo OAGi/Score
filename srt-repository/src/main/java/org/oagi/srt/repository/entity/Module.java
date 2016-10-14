@@ -73,14 +73,10 @@ public class Module implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Module module1 = (Module) o;
+        Module that = (Module) o;
 
-        if (moduleId != module1.moduleId) return false;
-        if (module != null ? !module.equals(module1.module) : module1.module != null) return false;
-        if (release != null ? !release.equals(module1.release) : module1.release != null) return false;
-        if (namespace != null ? !namespace.equals(module1.namespace) : module1.namespace != null) return false;
-        return versionNum != null ? versionNum.equals(module1.versionNum) : module1.versionNum == null;
-
+        if (moduleId != 0L && moduleId == that.moduleId) return true;
+        return false;
     }
 
     @Override

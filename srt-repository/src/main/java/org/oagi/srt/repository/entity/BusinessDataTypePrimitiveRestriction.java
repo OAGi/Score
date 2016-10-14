@@ -97,14 +97,8 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
         BusinessDataTypePrimitiveRestriction that = (BusinessDataTypePrimitiveRestriction) o;
 
-        if (bdtPriRestriId != that.bdtPriRestriId) return false;
-        if (bdtId != that.bdtId) return false;
-        if (isDefault != that.isDefault) return false;
-        if (cdtAwdPriXpsTypeMapId != null ? !cdtAwdPriXpsTypeMapId.equals(that.cdtAwdPriXpsTypeMapId) : that.cdtAwdPriXpsTypeMapId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        return agencyIdListId != null ? agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId == null;
-
+        if (bdtPriRestriId != 0L && bdtPriRestriId == that.bdtPriRestriId) return true;
+        return false;
     }
 
     @Override

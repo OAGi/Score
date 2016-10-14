@@ -311,34 +311,13 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
 
         BasicCoreComponent that = (BasicCoreComponent) o;
 
-        if (bccId != that.bccId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (fromAccId != that.fromAccId) return false;
-        if (toBccpId != that.toBccpId) return false;
-        if (seqKey != that.seqKey) return false;
-        if (entityType != that.entityType) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (deprecated != that.deprecated) return false;
-        if (nillable != that.nillable) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        if (currentBccId != null ? !currentBccId.equals(that.currentBccId) : that.currentBccId != null) return false;
-        return defaultValue != null ? defaultValue.equals(that.defaultValue) : that.defaultValue == null;
-
+        if (bccId != 0L && bccId == that.bccId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

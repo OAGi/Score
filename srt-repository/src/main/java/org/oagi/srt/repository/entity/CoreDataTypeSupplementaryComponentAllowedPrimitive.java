@@ -62,11 +62,8 @@ public class CoreDataTypeSupplementaryComponentAllowedPrimitive implements Seria
 
         CoreDataTypeSupplementaryComponentAllowedPrimitive that = (CoreDataTypeSupplementaryComponentAllowedPrimitive) o;
 
-        if (cdtScAwdPriId != that.cdtScAwdPriId) return false;
-        if (cdtScId != that.cdtScId) return false;
-        if (cdtPriId != that.cdtPriId) return false;
-        return isDefault == that.isDefault;
-
+        if (cdtScAwdPriId != 0L && cdtScAwdPriId == that.cdtScAwdPriId) return true;
+        return false;
     }
 
     @Override

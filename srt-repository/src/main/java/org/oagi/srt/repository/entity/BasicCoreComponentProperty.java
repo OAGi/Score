@@ -330,34 +330,13 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
 
         BasicCoreComponentProperty that = (BasicCoreComponentProperty) o;
 
-        if (bccpId != that.bccpId) return false;
-        if (bdtId != that.bdtId) return false;
-        if (deprecated != that.deprecated) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (revisionAction != that.revisionAction) return false;
-        if (nillable != that.nillable) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
-            return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        if (namespaceId != null ? !namespaceId.equals(that.namespaceId) : that.namespaceId != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        if (currentBccpId != null ? !currentBccpId.equals(that.currentBccpId) : that.currentBccpId != null)
-            return false;
-        return defaultValue != null ? defaultValue.equals(that.defaultValue) : that.defaultValue == null;
-
+        if (bccpId != 0L && bccpId == that.bccpId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

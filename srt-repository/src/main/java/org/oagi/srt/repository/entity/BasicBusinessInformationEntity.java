@@ -291,31 +291,13 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
 
         BasicBusinessInformationEntity that = (BasicBusinessInformationEntity) o;
 
-        if (bbieId != that.bbieId) return false;
-        if (basedBccId != that.basedBccId) return false;
-        if (fromAbieId != that.fromAbieId) return false;
-        if (toBbiepId != that.toBbiepId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (nillable != that.nillable) return false;
-        if (nill != that.nill) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (Double.compare(that.seqKey, seqKey) != 0) return false;
-        if (used != that.used) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (bdtPriRestriId != null ? !bdtPriRestriId.equals(that.bdtPriRestriId) : that.bdtPriRestriId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        if (defaultValue != null ? !defaultValue.equals(that.defaultValue) : that.defaultValue != null) return false;
-        if (fixedValue != null ? !fixedValue.equals(that.fixedValue) : that.fixedValue != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (bbieId != 0L && bbieId == that.bbieId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
