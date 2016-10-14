@@ -1,10 +1,13 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "cdt_sc_awd_pri")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class CoreDataTypeSupplementaryComponentAllowedPrimitive implements Serializable {
 
     public static final String SEQUENCE_NAME = "CDT_SC_AWD_PRI_ID_SEQ";

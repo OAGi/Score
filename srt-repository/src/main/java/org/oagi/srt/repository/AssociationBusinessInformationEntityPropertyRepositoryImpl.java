@@ -37,7 +37,7 @@ public class AssociationBusinessInformationEntityPropertyRepositoryImpl
     @Override
     protected void prepare(Dialect dialect, AssociationBusinessInformationEntityProperty entity, List<Object> args) {
         entity.prePersist();
-        args.add(entity.getBasedAsccpId());
+        args.add(entity.getBasedAsccp().getAsccpId());
         args.add(entity.getBizTerm());
         args.add(entity.getCreatedBy());
         args.add(entity.getCreationTimestamp());
@@ -46,7 +46,7 @@ public class AssociationBusinessInformationEntityPropertyRepositoryImpl
         args.add(entity.getLastUpdateTimestamp());
         args.add(entity.getLastUpdatedBy());
         args.add(entity.getRemark());
-        args.add(entity.getRoleOfAbieId());
+        args.add(entity.getRoleOfAbie().getAbieId());
     }
 
     @Override

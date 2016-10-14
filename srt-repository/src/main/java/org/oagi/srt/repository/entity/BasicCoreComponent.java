@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bcc")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class BasicCoreComponent implements CoreComponent, Serializable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";

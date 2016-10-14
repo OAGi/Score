@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "asbie")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class AssociationBusinessInformationEntity implements Serializable, IdEntity, BusinessInformationEntity {
 
     public static final String SEQUENCE_NAME = "ASBIE_ID_SEQ";
@@ -18,14 +21,17 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
-    private long fromAbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "from_abie_id", nullable = false)
+    private AggregateBusinessInformationEntity fromAbie;
 
-    @Column(nullable = false)
-    private long toAsbiepId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "to_asbiep_id", nullable = false)
+    private AssociationBusinessInformationEntityProperty toAsbiep;
 
-    @Column(nullable = false)
-    private long basedAsccId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "based_ascc_id", nullable = false)
+    private AssociationCoreComponent basedAscc;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -63,8 +69,9 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
-    private long ownerTopLevelAbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    private TopLevelAbie ownerTopLevelAbie;
 
     @PrePersist
     public void prePersist() {
@@ -103,28 +110,28 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.guid = guid;
     }
 
-    public long getFromAbieId() {
-        return fromAbieId;
+    public AggregateBusinessInformationEntity getFromAbie() {
+        return fromAbie;
     }
 
-    public void setFromAbieId(long fromAbieId) {
-        this.fromAbieId = fromAbieId;
+    public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
+        this.fromAbie = fromAbie;
     }
 
-    public long getToAsbiepId() {
-        return toAsbiepId;
+    public AssociationBusinessInformationEntityProperty getToAsbiep() {
+        return toAsbiep;
     }
 
-    public void setToAsbiepId(long toAsbiepId) {
-        this.toAsbiepId = toAsbiepId;
+    public void setToAsbiep(AssociationBusinessInformationEntityProperty toAsbiep) {
+        this.toAsbiep = toAsbiep;
     }
 
-    public long getBasedAsccId() {
-        return basedAsccId;
+    public AssociationCoreComponent getBasedAscc() {
+        return basedAscc;
     }
 
-    public void setBasedAsccId(long basedAsccId) {
-        this.basedAsccId = basedAsccId;
+    public void setBasedAscc(AssociationCoreComponent basedAscc) {
+        this.basedAscc = basedAscc;
     }
 
     public String getDefinition() {
@@ -221,12 +228,12 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         this.used = used;
     }
 
-    public long getOwnerTopLevelAbieId() {
-        return ownerTopLevelAbieId;
+    public TopLevelAbie getOwnerTopLevelAbie() {
+        return ownerTopLevelAbie;
     }
 
-    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
-        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
     }
 
     @Override
@@ -251,9 +258,9 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         long temp;
         result = (int) (asbieId ^ (asbieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
-        result = 31 * result + (int) (toAsbiepId ^ (toAsbiepId >>> 32));
-        result = 31 * result + (int) (basedAsccId ^ (basedAsccId >>> 32));
+        result = 31 * result + (fromAbie != null ? fromAbie.hashCode() : 0);
+        result = 31 * result + (toAsbiep != null ? toAsbiep.hashCode() : 0);
+        result = 31 * result + (basedAscc != null ? basedAscc.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
@@ -266,7 +273,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         temp = Double.doubleToLongBits(seqKey);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
         return result;
     }
 
@@ -275,9 +282,9 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
         return "AssociationBusinessInformationEntity{" +
                 "asbieId=" + asbieId +
                 ", guid='" + guid + '\'' +
-                ", fromAbieId=" + fromAbieId +
-                ", toAsbiepId=" + toAsbiepId +
-                ", basedAsccId=" + basedAsccId +
+                ", fromAbie=" + fromAbie +
+                ", toAsbiep=" + toAsbiep +
+                ", basedAscc=" + basedAscc +
                 ", definition='" + definition + '\'' +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
@@ -289,7 +296,7 @@ public class AssociationBusinessInformationEntity implements Serializable, IdEnt
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", seqKey=" + seqKey +
                 ", used=" + used +
-                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
                 '}';
     }
 }

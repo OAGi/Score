@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "bccp")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class BasicCoreComponentProperty implements CoreComponentProperty, Serializable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
@@ -34,7 +37,7 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
     @Column(length = 10 * 1024)
     private String definition;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 

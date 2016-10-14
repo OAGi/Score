@@ -54,7 +54,7 @@
                             </p:column>
 
                             <p:column headerText="Module">
-                                <h:outputText value="#{aSCCP.module.module}"/>
+                                <h:outputText value="#{aSCCP.module}"/>
                             </p:column>
 
                             <p:column headerText="Last Updated Time">
@@ -250,7 +250,7 @@
                                         <p:ajax event="collapse" listener="#{topLevelABIEHandler.collapse}"
                                                 update=":form:treeTable :form:details"/>
                                         <f:facet name="header">
-                                            #{topLevelABIEHandler.selected.module.module}
+                                            #{topLevelABIEHandler.selected.module}
                                         </f:facet>
                                         <p:column headerText="BIEs">
                                             <h:outputText value="#{aBIEView.name}" style="color:#{aBIEView.color};"/>

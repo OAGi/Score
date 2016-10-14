@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "code_list")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CodeList implements Serializable {
 
     public enum State {
@@ -56,7 +59,7 @@ public class CodeList implements Serializable {
     @Column(nullable = false)
     private boolean extensibleIndicator;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 

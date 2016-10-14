@@ -1,10 +1,13 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "agency_id_list")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class AgencyIdList implements Serializable {
 
     public static final String SEQUENCE_NAME = "AGENCY_ID_LIST_ID_SEQ";
@@ -32,7 +35,7 @@ public class AgencyIdList implements Serializable {
     @Column(length = 10)
     private String versionId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 

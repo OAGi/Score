@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "acc")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class AggregateCoreComponent implements Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
@@ -37,7 +40,7 @@ public class AggregateCoreComponent implements Serializable {
     @Column
     private int oagisComponentType;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 

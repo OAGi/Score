@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "ctx_scheme")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ContextScheme implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_SCHEME_ID_SEQ";
@@ -34,7 +37,7 @@ public class ContextScheme implements Serializable {
     @Column(nullable = false, length = 45)
     private String schemeVersionId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ctx_category_id", nullable = false)
     private ContextCategory contextCategory;
 

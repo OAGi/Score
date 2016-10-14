@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "dt")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class DataType implements Serializable {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
@@ -56,7 +57,7 @@ public class DataType implements Serializable {
     @Column(length = 10 * 1024)
     private String revisionDoc;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 

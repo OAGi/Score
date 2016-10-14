@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "bbie")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class BasicBusinessInformationEntity implements Serializable, BusinessInformationEntity, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_ID_SEQ";
@@ -21,17 +24,21 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     @Column(nullable = false)
     private long basedBccId;
 
-    @Column(nullable = false)
-    private long fromAbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "from_abie_id", nullable = false)
+    private AggregateBusinessInformationEntity fromAbie;
 
-    @Column(nullable = false)
-    private long toBbiepId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "to_bbiep_id", nullable = false)
+    private BasicBusinessInformationEntityProperty toBbiep;
 
-    @Column
-    private Long bdtPriRestriId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bdt_pri_restri_id")
+    private BusinessDataTypePrimitiveRestriction bdtPriRestri;
 
-    @Column
-    private Long codeListId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code_list_id")
+    private CodeList codeList;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -78,8 +85,9 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
-    private long ownerTopLevelAbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    private TopLevelAbie ownerTopLevelAbie;
 
     @PrePersist
     public void prePersist() {
@@ -126,36 +134,36 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.basedBccId = basedBccId;
     }
 
-    public long getFromAbieId() {
-        return fromAbieId;
+    public AggregateBusinessInformationEntity getFromAbie() {
+        return fromAbie;
     }
 
-    public void setFromAbieId(long fromAbieId) {
-        this.fromAbieId = fromAbieId;
+    public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
+        this.fromAbie = fromAbie;
     }
 
-    public long getToBbiepId() {
-        return toBbiepId;
+    public BasicBusinessInformationEntityProperty getToBbiep() {
+        return toBbiep;
     }
 
-    public void setToBbiepId(long toBbiepId) {
-        this.toBbiepId = toBbiepId;
+    public void setToBbiep(BasicBusinessInformationEntityProperty toBbiep) {
+        this.toBbiep = toBbiep;
     }
 
-    public long getBdtPriRestriId() {
-        return (bdtPriRestriId == null) ? 0L : bdtPriRestriId;
+    public BusinessDataTypePrimitiveRestriction getBdtPriRestri() {
+        return bdtPriRestri;
     }
 
-    public void setBdtPriRestriId(Long bdtPriRestriId) {
-        this.bdtPriRestriId = bdtPriRestriId;
+    public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
+        this.bdtPriRestri = bdtPriRestri;
     }
 
-    public long getCodeListId() {
-        return (codeListId == null) ? 0L : codeListId;
+    public CodeList getCodeList() {
+        return codeList;
     }
 
-    public void setCodeListId(Long codeListId) {
-        this.codeListId = codeListId;
+    public void setCodeList(CodeList codeList) {
+        this.codeList = codeList;
     }
 
     public int getCardinalityMin() {
@@ -276,12 +284,12 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.used = used;
     }
 
-    public long getOwnerTopLevelAbieId() {
-        return ownerTopLevelAbieId;
+    public TopLevelAbie getOwnerTopLevelAbie() {
+        return ownerTopLevelAbie;
     }
 
-    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
-        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
     }
 
     @Override
@@ -298,63 +306,5 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
             }
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        result = (int) (bbieId ^ (bbieId >>> 32));
-        result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (int) (basedBccId ^ (basedBccId >>> 32));
-        result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
-        result = 31 * result + (int) (toBbiepId ^ (toBbiepId >>> 32));
-        result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
-        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
-        result = 31 * result + cardinalityMin;
-        result = 31 * result + cardinalityMax;
-        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
-        result = 31 * result + (nillable ? 1 : 0);
-        result = 31 * result + (fixedValue != null ? fixedValue.hashCode() : 0);
-        result = 31 * result + (nill ? 1 : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + (remark != null ? remark.hashCode() : 0);
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
-        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
-        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        temp = Double.doubleToLongBits(seqKey);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "BasicBusinessInformationEntity{" +
-                "bbieId=" + bbieId +
-                ", guid='" + guid + '\'' +
-                ", basedBccId=" + basedBccId +
-                ", fromAbieId=" + fromAbieId +
-                ", toBbiepId=" + toBbiepId +
-                ", bdtPriRestriId=" + bdtPriRestriId +
-                ", codeListId=" + codeListId +
-                ", cardinalityMin=" + cardinalityMin +
-                ", cardinalityMax=" + cardinalityMax +
-                ", defaultValue='" + defaultValue + '\'' +
-                ", nillable=" + nillable +
-                ", fixedValue='" + fixedValue + '\'' +
-                ", nill=" + nill +
-                ", definition='" + definition + '\'' +
-                ", remark='" + remark + '\'' +
-                ", createdBy=" + createdBy +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                ", creationTimestamp=" + creationTimestamp +
-                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
-                ", seqKey=" + seqKey +
-                ", used=" + used +
-                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
-                '}';
     }
 }

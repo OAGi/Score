@@ -1,10 +1,13 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "biz_ctx_value")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class BusinessContextValue implements Serializable {
 
     public static final String SEQUENCE_NAME = "BIZ_CTX_VALUE_ID_SEQ";
@@ -14,11 +17,11 @@ public class BusinessContextValue implements Serializable {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bizCtxValueId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "biz_ctx_id", nullable = false)
     private BusinessContext businessContext;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ctx_scheme_value_id", nullable = false)
     private ContextSchemeValue contextSchemeValue;
 

@@ -1,10 +1,13 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "release")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Release implements Serializable {
 
     public static final String SEQUENCE_NAME = "RELEASE_ID_SEQ";

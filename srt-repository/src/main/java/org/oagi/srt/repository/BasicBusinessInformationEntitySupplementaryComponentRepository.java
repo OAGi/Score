@@ -10,9 +10,9 @@ public interface BasicBusinessInformationEntitySupplementaryComponentRepository
         extends JpaRepository<BasicBusinessInformationEntitySupplementaryComponent, Long>,
         BulkInsertRepository<BasicBusinessInformationEntitySupplementaryComponent> {
 
-    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1")
+    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbie.bbieId = ?1")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(long bbieId);
 
-    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.ownerTopLevelAbieId = ?1 and b.used = true")
+    @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.ownerTopLevelAbie.topLevelAbieId = ?1 and b.used = true")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 }

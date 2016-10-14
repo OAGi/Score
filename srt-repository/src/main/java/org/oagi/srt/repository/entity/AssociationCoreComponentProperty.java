@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "asccp")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class AssociationCoreComponentProperty implements CoreComponentProperty, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
@@ -53,7 +54,7 @@ public class AssociationCoreComponentProperty implements CoreComponentProperty, 
     @Column(nullable = false)
     private int state;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 

@@ -24,6 +24,8 @@ spring:
         dialect: org.hibernate.dialect.Oracle12cDialect
         id:
           new_generator_mappings: true
+        cache:
+          use_second_level_cache: false
         ejb:
           interceptor: org.oagi.srt.persistence.populate.EntityUpdateInterceptor
 

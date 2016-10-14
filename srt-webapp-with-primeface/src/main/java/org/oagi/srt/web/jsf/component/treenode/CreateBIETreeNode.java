@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
+import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.NodeVisitor;
@@ -100,43 +101,44 @@ public class CreateBIETreeNode {
     }
 
     private Node createNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
-        DataContainer dataContainer = new DataContainer();
+        DataContainer dataContainer = new DataContainer(bizCtx);
         long roleOfAccId = asccp.getRoleOfAccId();
         AggregateCoreComponent acc = dataContainer.getACC(roleOfAccId);
-        AggregateBusinessInformationEntity abie = createABIE(acc);
-        AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp);
+        AggregateBusinessInformationEntity abie = createABIE(acc, bizCtx);
+        AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp, abie);
 
         TopLevelNode topLevelNode = new TopLevelNode(asbiep, asccp, abie, bizCtx);
         appendChildren(dataContainer, acc, abie, topLevelNode);
         return topLevelNode;
     }
 
-    private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc) {
+    private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc, BusinessContext bizCtx) {
 
         AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
         String abieGuid = Utility.generateGUID();
         abie.setGuid(abieGuid);
-        abie.setBasedAccId(acc.getAccId());
-        //abie.setBizCtxId(bizCtx.getBizCtxId());
+        abie.setBasedAcc(acc);
+        abie.setBizCtx(bizCtx);
         abie.setDefinition(acc.getDefinition());
-        //abie.setCreatedBy(userId);
-        //abie.setLastUpdatedBy(userId);
-        //abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
-        //abie.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+        // abie.setCreatedBy(userId);
+        // abie.setLastUpdatedBy(userId);
+        // abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+        // abie.setOwnerTopLevelAbie(topLevelAbie);
 
         return abie;
     }
 
-    private AssociationBusinessInformationEntityProperty createASBIEP(AssociationCoreComponentProperty asccp) {
+    private AssociationBusinessInformationEntityProperty createASBIEP(AssociationCoreComponentProperty asccp,
+                                                                      AggregateBusinessInformationEntity abie) {
         AssociationBusinessInformationEntityProperty asbiep =
                 new AssociationBusinessInformationEntityProperty();
         asbiep.setGuid(Utility.generateGUID());
-        asbiep.setBasedAsccpId(asccp.getAsccpId());
-//        asbiep.setRoleOfAbieId(topLevelAbie.getAbie().getAbieId());
-//        asbiep.setCreatedBy(userId);
-//        asbiep.setLastUpdatedBy(userId);
+        asbiep.setBasedAsccp(asccp);
+        asbiep.setRoleOfAbie(abie);
+        // asbiep.setCreatedBy(userId);
+        // asbiep.setLastUpdatedBy(userId);
         asbiep.setDefinition(asccp.getDefinition());
-//        asbiep.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+        // asbiep.setOwnerTopLevelAbieId(topLevelAbie);
 
         return asbiep;
     }
@@ -251,17 +253,18 @@ public class CreateBIETreeNode {
     }
 
     private class DataContainer implements CoreComponentProvider {
+        private BusinessContext businessContext;
         private Map<Long, AggregateCoreComponent> accMap;
         private Map<Long, AssociationCoreComponentProperty> asccpMap;
         private Map<Long, BasicCoreComponentProperty> bccpMap;
-        private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriMap;
-        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriMap;
         private Map<Long, DataType> dtMap;
         private Map<Long, DataTypeSupplementaryComponent> dtScMap;
 
+        private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriMap;
         private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriDefaultMap;
         private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriCodeListMap;
 
+        private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriMap;
         private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriDefaultMap;
         private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriCodeListMap;
 
@@ -272,7 +275,9 @@ public class CreateBIETreeNode {
         private List<DataType> dataTypes;
         private List<DataTypeSupplementaryComponent> dataTypeSupplementaryComponents;
 
-        public DataContainer() {
+        public DataContainer(BusinessContext businessContext) {
+            this.businessContext = businessContext;
+
             basicCoreComponents = bccRepository.findAll();
             associationCoreComponents = asccRepository.findAll();
             bdtPriRestriList = bdtPriRestriRepository.findAll();
@@ -286,11 +291,9 @@ public class CreateBIETreeNode {
                     .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
             bccpMap = bccpRepository.findAll().stream()
                     .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
+
             bdtPriRestriMap = bdtPriRestriList.stream()
                     .collect(Collectors.toMap(e -> e.getBdtPriRestriId(), Function.identity()));
-            bdtScPriRestriMap = bdtScPriRestriList.stream()
-                    .collect(Collectors.toMap(e -> e.getBdtScPriRestriId(), Function.identity()));
-
             bdtPriRestriDefaultMap = bdtPriRestriList.stream()
                     .filter(bdtPriRestri -> bdtPriRestri.isDefault())
                     .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
@@ -298,6 +301,8 @@ public class CreateBIETreeNode {
                     .filter(bdtPriRestri -> bdtPriRestri.getCodeListId() > 0)
                     .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
 
+            bdtScPriRestriMap = bdtScPriRestriList.stream()
+                    .collect(Collectors.toMap(e -> e.getBdtScPriRestriId(), Function.identity()));
             bdtScPriRestriDefaultMap = bdtScPriRestriList.stream()
                     .filter(bdtScPriRestri -> bdtScPriRestri.isDefault())
                     .collect(Collectors.toMap(bdtScPriRestri -> bdtScPriRestri.getBdtScId(), Function.identity()));
@@ -311,6 +316,10 @@ public class CreateBIETreeNode {
                     .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
         }
 
+        public BusinessContext getBusinessContext() {
+            return businessContext;
+        }
+
         private AggregateCoreComponent getACC(long accId) {
             return accMap.get(accId);
         }
@@ -321,6 +330,10 @@ public class CreateBIETreeNode {
 
         public BasicCoreComponentProperty getBCCP(long bccpId) {
             return bccpMap.get(bccpId);
+        }
+
+        public BusinessDataTypePrimitiveRestriction getBdtPriRestri(long bdtPriRestriId) {
+            return bdtPriRestriMap.get(bdtPriRestriId);
         }
 
         public long getDefaultBdtPriRestriId(long bdtId) {
@@ -336,6 +349,10 @@ public class CreateBIETreeNode {
             return dataTypeSupplementaryComponents.stream()
                     .filter(dtSc -> dtSc.getOwnerDtId() == ownerDtId)
                     .collect(Collectors.toList());
+        }
+
+        public BusinessDataTypeSupplementaryComponentPrimitiveRestriction getBdtScPriRestri(long bdtScPriRestriId) {
+            return bdtScPriRestriMap.get(bdtScPriRestriId);
         }
 
         public long getDefaultBdtScPriRestriId(long bdtScId) {
@@ -406,22 +423,22 @@ public class CreateBIETreeNode {
         private void createBBIEP(BasicCoreComponentProperty bccp) {
             bbiep = new BasicBusinessInformationEntityProperty();
             bbiep.setGuid(Utility.generateGUID());
-            bbiep.setBasedBccpId(bccp.getBccpId());
+            bbiep.setBasedBccp(bccp);
             bbiep.setDefinition(bccp.getDefinition());
 //            bbiep.setCreatedBy(userId);
 //            bbiep.setLastUpdatedBy(userId);
         }
 
-        private void createBBIE(long bdtPrimitiveRestrictionId, long codeListId) {
+        private void createBBIE(BusinessDataTypePrimitiveRestriction bdtPriRestri, long codeListId) {
             bbie = new BasicBusinessInformationEntity();
             bbie.setGuid(Utility.generateGUID());
             bbie.setBasedBccId(bcc.getBccId());
-            // bbie.setFromAbieId(abie);
-            // bbie.setToBbiepId(bbiepId);
+            bbie.setFromAbie(abie);
+            bbie.setToBbiep(bbiep);
             bbie.setNillable(false);
             bbie.setCardinalityMax(bcc.getCardinalityMax());
             bbie.setCardinalityMin(bcc.getCardinalityMin());
-            bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
+            bbie.setBdtPriRestri(bdtPriRestri);
 //            if (codeListId > 0) {
 //                bbie.setCodeListId(codeListId);
 //            }
@@ -437,13 +454,13 @@ public class CreateBIETreeNode {
                     .map(dtSc -> {
                         BasicBusinessInformationEntitySupplementaryComponent bbieSc =
                                 new BasicBusinessInformationEntitySupplementaryComponent();
-                        // bbieSc.setBbieId(bbieId);
                         long bdtScId = dtSc.getDtScId();
-                        bbieSc.setDtScId(bdtScId);
+                        bbieSc.setBbie(bbie);
+                        bbieSc.setDtSc(dtSc);
                         bbieSc.setGuid(Utility.generateGUID());
                         long bdtScPriRestriId = dataContainer.getDefaultBdtScPriRestriId(bdtScId);
                         if (bdtScPriRestriId > 0L) {
-                            bbieSc.setDtScPriRestriId(bdtScPriRestriId);
+                            bbieSc.setDtScPriRestri(dataContainer.getBdtScPriRestri(bdtScPriRestriId));
                         }
                         long codeListId = dataContainer.getCodeListIdOfBdtScPriRestriId(bdtScId);
 //                        if (codeListId > 0) {
@@ -459,7 +476,7 @@ public class CreateBIETreeNode {
 
         private void appendBBIESC(BasicBusinessInformationEntity bbie, BBIENode parent) {
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
-                DataTypeSupplementaryComponent dtsc = dataContainer.getDtSc(bbiesc.getDtScId());
+                DataTypeSupplementaryComponent dtsc = bbiesc.getDtSc();
                 new BBIESCNode(parent, bbiesc, dtsc);
             }
         }
@@ -468,11 +485,13 @@ public class CreateBIETreeNode {
             BasicCoreComponentProperty bccp = dataContainer.getBCCP(bcc.getToBccpId());
             long bdtId = bccp.getBdtId();
             long bdtPrimitiveRestrictionId = dataContainer.getDefaultBdtPriRestriId(bdtId);
+            BusinessDataTypePrimitiveRestriction bdtPriRestri =
+                    dataContainer.getBdtPriRestri(bdtPrimitiveRestrictionId);
             long codeListId = dataContainer.getCodeListIdOfBdtPriRestriId(bdtId);
             DataType bdt = dataContainer.getDt(bdtId);
 
             createBBIEP(bccp);
-            createBBIE(bdtPrimitiveRestrictionId, codeListId);
+            createBBIE(bdtPriRestri, codeListId);
             createBBIESC(bdtId);
 
             List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainer.getBdtPriRestriByBdtId(bdtId);
@@ -495,7 +514,9 @@ public class CreateBIETreeNode {
         private AssociationBusinessInformationEntity asbie;
 
         public ASBIENodeBuilder(DataContainer dataContainer,
-                                AssociationCoreComponent ascc, AggregateBusinessInformationEntity fromAbie, int seqKey) {
+                                AssociationCoreComponent ascc,
+                                AggregateBusinessInformationEntity fromAbie,
+                                int seqKey) {
             this.dataContainer = dataContainer;
             this.ascc = ascc;
             this.fromAbie = fromAbie;
@@ -507,8 +528,8 @@ public class CreateBIETreeNode {
         public void createASBIEP() {
             asbiep = new AssociationBusinessInformationEntityProperty();
             asbiep.setGuid(Utility.generateGUID());
-            asbiep.setBasedAsccpId(asccp.getAsccpId());
-            // asbiep.setRoleOfAbieId(roleOfAbieId);
+            asbiep.setBasedAsccp(asccp);
+            asbiep.setRoleOfAbie(roleOfAbie);
             // asbiep.setCreatedBy(userId);
             // asbiep.setLastUpdatedBy(userId);
             asbiep.setDefinition(asccp.getDefinition());
@@ -517,9 +538,9 @@ public class CreateBIETreeNode {
         public void createASBIE() {
             asbie = new AssociationBusinessInformationEntity();
             asbie.setGuid(Utility.generateGUID());
-            // asbie.setFromAbieId(fromAbieId);
-            // asbie.setToAsbiepId(asbiep);
-            asbie.setBasedAsccId(ascc.getAsccId());
+            asbie.setFromAbie(fromAbie);
+            asbie.setToAsbiep(asbiep);
+            asbie.setBasedAscc(ascc);
             asbie.setCardinalityMax(ascc.getCardinalityMax());
             asbie.setCardinalityMin(ascc.getCardinalityMin());
             asbie.setDefinition(ascc.getDefinition());
@@ -533,7 +554,7 @@ public class CreateBIETreeNode {
             createASBIE();
 
             AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
-            this.roleOfAbie = createABIE(acc);
+            this.roleOfAbie = createABIE(acc, dataContainer.getBusinessContext());
 
             ASBIENode asbieNode = new ASBIENode(seqKey, parent, asbie, asbiep, asccp, roleOfAbie);
             appendChildren(dataContainer, acc, roleOfAbie, asbieNode);

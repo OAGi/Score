@@ -2,6 +2,7 @@ package org.oagi.srt.repository;
 
 import org.hibernate.dialect.Dialect;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntity;
+import org.oagi.srt.repository.entity.CodeList;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -40,16 +41,17 @@ public class BasicBusinessInformationEntityRepositoryImpl
     protected void prepare(Dialect dialect, BasicBusinessInformationEntity entity, List<Object> args) {
         entity.prePersist();
         args.add(entity.getBasedBccId());
-        args.add(entity.getBdtPriRestriId());
+        args.add(entity.getBdtPriRestri().getBdtPriRestriId());
         args.add(entity.getCardinalityMax());
         args.add(entity.getCardinalityMin());
-        args.add(entity.getCodeListId() == 0 ? null : entity.getCodeListId());
+        CodeList codeList = entity.getCodeList();
+        args.add(codeList == null ? null : codeList.getCodeListId());
         args.add(entity.getCreatedBy());
         args.add(entity.getCreationTimestamp());
         args.add(entity.getDefaultValue());
         args.add(entity.getDefinition());
         args.add(entity.getFixedValue());
-        args.add(entity.getFromAbieId());
+        args.add(entity.getFromAbie().getAbieId());
         args.add(entity.getGuid());
         args.add(entity.getLastUpdateTimestamp());
         args.add(entity.getLastUpdatedBy());
@@ -57,7 +59,7 @@ public class BasicBusinessInformationEntityRepositoryImpl
         args.add(entity.isNillable() ? 1 : 0);
         args.add(entity.getRemark());
         args.add(entity.getSeqKey());
-        args.add(entity.getToBbiepId());
+        args.add(entity.getToBbiep().getBbiepId());
         args.add(entity.isUsed() ? 1 : 0);
     }
 

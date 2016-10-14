@@ -63,7 +63,7 @@ public class BBIENode extends AbstractNode {
     }
 
     public long getBdtPrimitiveRestrictionId() {
-        return bbie.getBdtPriRestriId();
+        return bbie.getBdtPriRestri().getBdtPriRestriId();
     }
 
     public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList() {

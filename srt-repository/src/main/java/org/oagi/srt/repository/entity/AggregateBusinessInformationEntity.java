@@ -1,11 +1,14 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "abie")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class AggregateBusinessInformationEntity implements Serializable, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";
@@ -18,11 +21,13 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
-    private long basedAccId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "based_acc_id", nullable = false)
+    private AggregateCoreComponent basedAcc;
 
-    @Column
-    private long bizCtxId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "biz_ctx_id")
+    private BusinessContext bizCtx;
 
     @Transient
     private String bizCtxName;
@@ -63,8 +68,9 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     @Column(length = 225)
     private String bizTerm;
 
-    @Column(nullable = false)
-    private long ownerTopLevelAbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    private TopLevelAbie ownerTopLevelAbie;
 
     @PrePersist
     public void prePersist() {
@@ -103,20 +109,20 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.guid = guid;
     }
 
-    public long getBasedAccId() {
-        return basedAccId;
+    public AggregateCoreComponent getBasedAcc() {
+        return basedAcc;
     }
 
-    public void setBasedAccId(long basedAccId) {
-        this.basedAccId = basedAccId;
+    public void setBasedAcc(AggregateCoreComponent basedAcc) {
+        this.basedAcc = basedAcc;
     }
 
-    public long getBizCtxId() {
-        return bizCtxId;
+    public BusinessContext getBizCtx() {
+        return bizCtx;
     }
 
-    public void setBizCtxId(long bizCtxId) {
-        this.bizCtxId = bizCtxId;
+    public void setBizCtx(BusinessContext bizCtx) {
+        this.bizCtx = bizCtx;
     }
 
     public String getBizCtxName() {
@@ -215,12 +221,12 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.bizTerm = bizTerm;
     }
 
-    public long getOwnerTopLevelAbieId() {
-        return ownerTopLevelAbieId;
+    public TopLevelAbie getOwnerTopLevelAbie() {
+        return ownerTopLevelAbie;
     }
 
-    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
-        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
     }
 
     @Override
@@ -243,8 +249,8 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     public int hashCode() {
         int result = (int) (abieId ^ (abieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (int) (basedAccId ^ (basedAccId >>> 32));
-        result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
+        result = 31 * result + (basedAcc != null ? basedAcc.hashCode() : 0);
+        result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -257,7 +263,7 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
         return result;
     }
 
@@ -266,8 +272,8 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         return "AggregateBusinessInformationEntity{" +
                 "abieId=" + abieId +
                 ", guid='" + guid + '\'' +
-                ", basedAccId=" + basedAccId +
-                ", bizCtxId=" + bizCtxId +
+                ", basedAcc=" + basedAcc +
+                ", bizCtx=" + bizCtx +
                 ", bizCtxName='" + bizCtxName + '\'' +
                 ", definition='" + definition + '\'' +
                 ", createdBy=" + createdBy +
@@ -280,7 +286,7 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
                 ", status='" + status + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
-                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
                 '}';
     }
 }

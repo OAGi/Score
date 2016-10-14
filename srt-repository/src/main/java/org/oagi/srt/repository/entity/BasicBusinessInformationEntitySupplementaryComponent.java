@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "bbie_sc")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable, IdEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";
@@ -19,17 +20,21 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @Column(nullable = false)
-    private long bbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bbie_id", nullable = false)
+    private BasicBusinessInformationEntity bbie;
 
-    @Column(nullable = false)
-    private long dtScId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dt_sc_id", nullable = false)
+    private DataTypeSupplementaryComponent dtSc;
 
-    @Column
-    private Long dtScPriRestriId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dt_sc_pri_restri_id")
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri;
 
-    @Column
-    private Long codeListId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code_list_id")
+    private CodeList codeList;
 
     @Column
     private Long agencyIdListId;
@@ -59,8 +64,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
-    private long ownerTopLevelAbieId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    private TopLevelAbie ownerTopLevelAbie;
 
     @Override
     public long getId() {
@@ -88,36 +94,36 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.guid = guid;
     }
 
-    public long getBbieId() {
-        return bbieId;
+    public BasicBusinessInformationEntity getBbie() {
+        return bbie;
     }
 
-    public void setBbieId(long bbieId) {
-        this.bbieId = bbieId;
+    public void setBbie(BasicBusinessInformationEntity bbie) {
+        this.bbie = bbie;
     }
 
-    public long getDtScId() {
-        return dtScId;
+    public DataTypeSupplementaryComponent getDtSc() {
+        return dtSc;
     }
 
-    public void setDtScId(long dtScId) {
-        this.dtScId = dtScId;
+    public void setDtSc(DataTypeSupplementaryComponent dtSc) {
+        this.dtSc = dtSc;
     }
 
-    public long getDtScPriRestriId() {
-        return (dtScPriRestriId == null) ? 0L : dtScPriRestriId;
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction getDtScPriRestri() {
+        return dtScPriRestri;
     }
 
-    public void setDtScPriRestriId(long dtScPriRestriId) {
-        this.dtScPriRestriId = dtScPriRestriId;
+    public void setDtScPriRestri(BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri) {
+        this.dtScPriRestri = dtScPriRestri;
     }
 
-    public long getCodeListId() {
-        return (codeListId == null) ? 0L : codeListId;
+    public CodeList getCodeList() {
+        return codeList;
     }
 
-    public void setCodeListId(long codeListId) {
-        this.codeListId = codeListId;
+    public void setCodeList(CodeList codeList) {
+        this.codeList = codeList;
     }
 
     public long getAgencyIdListId() {
@@ -194,12 +200,12 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.used = used;
     }
 
-    public long getOwnerTopLevelAbieId() {
-        return ownerTopLevelAbieId;
+    public TopLevelAbie getOwnerTopLevelAbie() {
+        return ownerTopLevelAbie;
     }
 
-    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
-        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
     }
 
     @Override
@@ -222,10 +228,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     public int hashCode() {
         int result = (int) (bbieScId ^ (bbieScId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (int) (bbieId ^ (bbieId >>> 32));
-        result = 31 * result + (int) (dtScId ^ (dtScId >>> 32));
-        result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
-        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (bbie != null ? bbie.hashCode() : 0);
+        result = 31 * result + (dtSc != null ? dtSc.hashCode() : 0);
+        result = 31 * result + (dtScPriRestri != null ? dtScPriRestri.hashCode() : 0);
+        result = 31 * result + (codeList != null ? codeList.hashCode() : 0);
         result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
@@ -235,7 +241,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
         return result;
     }
 
@@ -244,10 +250,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         return "BasicBusinessInformationEntitySupplementaryComponent{" +
                 "bbieScId=" + bbieScId +
                 ", guid='" + guid + '\'' +
-                ", bbieId=" + bbieId +
-                ", dtScId=" + dtScId +
-                ", dtScPriRestriId=" + dtScPriRestriId +
-                ", codeListId=" + codeListId +
+                ", bbie=" + bbie +
+                ", dtSc=" + dtSc +
+                ", dtScPriRestri=" + dtScPriRestri +
+                ", codeList=" + codeList +
                 ", agencyIdListId=" + agencyIdListId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
@@ -257,7 +263,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", used=" + used +
-                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
                 '}';
     }
 }

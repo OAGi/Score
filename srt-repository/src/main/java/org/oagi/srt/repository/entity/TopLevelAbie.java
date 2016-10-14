@@ -1,10 +1,13 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "top_level_abie")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class TopLevelAbie implements Serializable {
 
     public static final String SEQUENCE_NAME = "TOP_LEVEL_ABIE_ID_SEQ";
@@ -14,7 +17,7 @@ public class TopLevelAbie implements Serializable {
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long topLevelAbieId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "abie_id")
     private AggregateBusinessInformationEntity abie;
 
@@ -47,9 +50,7 @@ public class TopLevelAbie implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
-        result = 31 * result + (abie != null ? abie.hashCode() : 0);
-        return result;
+        return (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -302,6 +303,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
         this.businessContexts = businessContexts;
     }
 
+    @Transactional
     public BusinessContext getBcDetail() {
         bcDetails = new ArrayList();
         if (bcDetail != null) {
@@ -312,12 +314,15 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 
                 ContextSchemeValue contextSchemeValue = businessContextValue.getContextSchemeValue();
                 businessContextValues.setCsvVO(contextSchemeValue);
+                contextSchemeValue.getValue();
 
                 ContextScheme contextScheme = contextSchemeValue.getContextScheme();
                 businessContextValues.setCsVO(contextScheme);
+                contextScheme.getSchemeName();
 
                 ContextCategory contextCategory = contextScheme.getContextCategory();
                 businessContextValues.setCcVO(contextCategory);
+                contextCategory.getName();
 
                 bcDetails.add(businessContextValues);
             }
