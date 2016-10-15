@@ -11,31 +11,32 @@ spring:
     hibernate:
       ddl-auto: none
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.Oracle12cDialect
-        id:
-          new_generator_mappings: true
+      hibernate.dialect: org.hibernate.dialect.Oracle12cDialect
+      hibernate.id.new_generator_mappings: true
+      hibernate.jdbc.batch_size: 25
+      hibernate.jdbc.batch_versioned_data: true
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.cache.use_second_level_cache: false
 
   batch:
     initializer:
       enabled: false
 
-  freemarker:
-    suffix: .ftl
+  mvc:
+    favicon:
+      enabled: false
 
-  resources:
-    static-locations: classpath:/static
+jsf:
+  state-saving-method: server
+  datetimeconverter-default-timezone-is-system-timezone: true
 
-logging:
-  level:
-    org.oagi.srt: DEBUG
-    org.springframework: INFO
-    org.hibernate.SQL: DEBUG
-
-server:
-  compression:
-    enabled: true
-    mime-types: application/json, application/xml, text/html, text/xml, text/plain
+  primefaces:
+    theme: home
+    uploader: common
+    client-side-validation: true
+    public-captcha-key: 6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu
+    private-captcha-key: 6LfwZwoAAAAAAEhRyntKF1PBzysAJLzqp2v-GMRR
 
 # Development environment
 ---
@@ -50,8 +51,13 @@ spring:
     password: oagi
     platform: oracle
 
-  freemarker:
-    cache: false
+logging:
+  level:
+    org.oagi.srt: DEBUG
+    org.springframework: INFO
+
+jsf:
+  project-stage: Development
 
 # Staging environment
 ---
@@ -66,5 +72,5 @@ spring:
     password: oagi
     platform: oracle
 
-  freemarker:
-    cache: true
+jsf:
+  project-stage: Production
