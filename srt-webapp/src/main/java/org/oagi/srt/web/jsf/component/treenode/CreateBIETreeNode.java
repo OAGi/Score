@@ -25,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -313,9 +310,16 @@ public class CreateBIETreeNode extends UIHandler {
     @Transactional(readOnly = true)
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         Node node = createNode(asccp, bizCtx);
+
+        long s = System.currentTimeMillis();
         node.accept(new NodeSortVisitor());
+        logger.info("Node sorted - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+        s = System.currentTimeMillis();
+
         TreeNodeVisitor treeNodeVisitor = new TreeNodeVisitor();
         node.accept(treeNodeVisitor);
+        logger.info("TreeNodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+
         return treeNodeVisitor.getRoot();
     }
 
@@ -469,14 +473,19 @@ public class CreateBIETreeNode extends UIHandler {
         private Map<Long, AssociationCoreComponentProperty> asccpMap;
         private Map<Long, Boolean> groupcheckMap;
 
+        private Map<Long, List<BasicCoreComponent>> fromAccIdToBccMap;
+        private Map<Long, List<BasicCoreComponent>> fromAccIdToBccWithoutAttributesMap;
+        private Map<Long, List<AssociationCoreComponent>> fromAccIdToAsccMap;
         private Map<Long, BasicCoreComponentProperty> bccpMap;
 
         private Map<Long, DataType> dtMap;
         private Map<Long, DataTypeSupplementaryComponent> dtScMap;
+        private Map<Long, List<DataTypeSupplementaryComponent>> ownerDtScIdToDtScMap;
 
         private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriMap;
         private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriDefaultMap;
         private Map<Long, BusinessDataTypePrimitiveRestriction> bdtPriRestriCodeListMap;
+        private Map<Long, List<BusinessDataTypePrimitiveRestriction>> bdtIdTobdtPriRestriMap;
 
         private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriMap;
         private Map<Long, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriDefaultMap;
@@ -493,7 +502,16 @@ public class CreateBIETreeNode extends UIHandler {
             this.businessContext = businessContext;
 
             basicCoreComponents = bccRepository.findAll();
+            fromAccIdToBccMap = basicCoreComponents.stream()
+                    .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+            fromAccIdToBccWithoutAttributesMap = basicCoreComponents.stream()
+                    .filter(e -> e.getSeqKey() != 0)
+                    .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+
             associationCoreComponents = asccRepository.findAll();
+            fromAccIdToAsccMap = associationCoreComponents.stream()
+                    .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+
             bdtPriRestriList = bdtPriRestriRepository.findAll();
             bdtScPriRestriList = bdtScPriRestriRepository.findAll();
             dataTypes = dataTypeRepository.findAll();
@@ -514,6 +532,8 @@ public class CreateBIETreeNode extends UIHandler {
             bdtPriRestriCodeListMap = bdtPriRestriList.stream()
                     .filter(bdtPriRestri -> bdtPriRestri.getCodeListId() > 0)
                     .collect(Collectors.toMap(bdtPriRestri -> bdtPriRestri.getBdtId(), Function.identity()));
+            bdtIdTobdtPriRestriMap = bdtPriRestriList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getBdtId()));
 
             bdtScPriRestriMap = bdtScPriRestriList.stream()
                     .collect(Collectors.toMap(e -> e.getBdtScPriRestriId(), Function.identity()));
@@ -528,6 +548,8 @@ public class CreateBIETreeNode extends UIHandler {
                     .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
             dtScMap = dataTypeSupplementaryComponents.stream()
                     .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
+            ownerDtScIdToDtScMap = dataTypeSupplementaryComponents.stream()
+                    .collect(Collectors.groupingBy(e -> e.getOwnerDtId()));
 
             groupcheckMap = asccpMap.values().stream()
                     .collect(Collectors.toMap(e -> e.getAsccpId(), e -> {
@@ -574,9 +596,8 @@ public class CreateBIETreeNode extends UIHandler {
         }
 
         public List<DataTypeSupplementaryComponent> findDtScByOwnerDtId(long ownerDtId) {
-            return dataTypeSupplementaryComponents.stream()
-                    .filter(dtSc -> dtSc.getOwnerDtId() == ownerDtId)
-                    .collect(Collectors.toList());
+            List<DataTypeSupplementaryComponent> dtScList = ownerDtScIdToDtScMap.get(ownerDtId);
+            return (dtScList != null) ? dtScList : Collections.emptyList();
         }
 
         public BusinessDataTypeSupplementaryComponentPrimitiveRestriction getBdtScPriRestri(long bdtScPriRestriId) {
@@ -602,9 +623,7 @@ public class CreateBIETreeNode extends UIHandler {
         }
 
         public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriByBdtId(long bdtId) {
-            return bdtPriRestriList.stream()
-                    .filter(e -> e.getBdtId() == bdtId)
-                    .collect(Collectors.toList());
+            return bdtIdTobdtPriRestriMap.get(bdtId);
         }
 
         public boolean groupcheck(AssociationCoreComponent ascc) {
@@ -613,24 +632,20 @@ public class CreateBIETreeNode extends UIHandler {
 
         @Override
         public List<BasicCoreComponent> getBCCs(long accId) {
-            return basicCoreComponents.stream()
-                    .filter(bcc -> bcc.getFromAccId() == accId)
-                    .collect(Collectors.toList());
+            List<BasicCoreComponent> bccList = fromAccIdToBccMap.get(accId);
+            return (bccList != null) ? bccList : Collections.emptyList();
         }
 
         @Override
         public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId) {
-            return basicCoreComponents.stream()
-                    .filter(bcc -> bcc.getFromAccId() == accId)
-                    .filter(e -> e.getSeqKey() != 0)
-                    .collect(Collectors.toList());
+            List<BasicCoreComponent> bccList = fromAccIdToBccWithoutAttributesMap.get(accId);
+            return (bccList != null) ? bccList : Collections.emptyList();
         }
 
         @Override
         public List<AssociationCoreComponent> getASCCs(long accId) {
-            return associationCoreComponents.stream()
-                    .filter(acc -> acc.getFromAccId() == accId)
-                    .collect(Collectors.toList());
+            List<AssociationCoreComponent> asccList = fromAccIdToAsccMap.get(accId);
+            return (asccList != null) ? asccList : Collections.emptyList();
         }
     }
 

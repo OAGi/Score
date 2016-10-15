@@ -55,8 +55,8 @@
                 var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
 
                 if (idx == 1) {
-                    btnNext.hide();
-                    btnSubmit.show();
+                    // btnNext.hide();
+                    // btnSubmit.show();
                     PF('loadingBlock').show();
 
                     var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
@@ -528,11 +528,11 @@
 
             <p:blockUI widgetVar="loadingBlock" block="wizard">
                 <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-                <span class="sr-only">Loading...</span>
+                <span style="display: block; margin-top: 10px;">Loading...</span>
             </p:blockUI>
 
             <p:blockUI widgetVar="progressBlock" block="wizard">
-                <p:progressBar widgetVar="progressBar" ajax="true" interval="500"
+                <p:progressBar id="progressBar" widgetVar="progressBar" ajax="true" interval="500"
                                value="#{createProfileBODBean.submitProgress}"
                                labelTemplate="{value}%" global="false">
                     <p:ajax event="complete" oncomplete="PF('progressBlock').hide();"/>

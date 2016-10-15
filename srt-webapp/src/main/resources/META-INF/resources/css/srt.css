@@ -340,6 +340,18 @@ tr {
     border: 1px solid #e5e5e5 !important;
 }
 
+.ui-progressbar .ui-progressbar-label {
+    line-height: normal;
+}
+
+.ui-progressbar .ui-progressbar-value {
+    margin: 0 !important;
+    background: #51a7e8 !important;
+    opacity: 0.5;
+    margin-top: -4px;
+    height: 150%;
+}
+
 .ui-paginator a {
     position: relative;
     padding: 7px 16px !important;
