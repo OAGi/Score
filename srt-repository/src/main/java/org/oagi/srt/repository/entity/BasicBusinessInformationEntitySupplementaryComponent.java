@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "bbie_sc")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable, IdEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";

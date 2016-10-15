@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "acc")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AggregateCoreComponent implements Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";

@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "ctx_category")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ContextCategory implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_CATEGORY_ID_SEQ";

@@ -1,6 +1,5 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
-import com.google.common.collect.Lists;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.Node;
@@ -17,10 +16,15 @@ import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +34,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class CreateBIETreeNode extends UIHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateBIETreeNode.class);
 
     @Autowired
     private CoreComponentService coreComponentService;
@@ -90,6 +96,11 @@ public class CreateBIETreeNode extends UIHandler {
 
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
+
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
+    private int batchSize = 25;
 
     private class SubmitNodeVisitor implements NodeVisitor {
 
@@ -201,6 +212,29 @@ public class CreateBIETreeNode extends UIHandler {
             saveBbieScList();
             saveAsbiepList();
             saveAsbieList();
+
+//            EntityManager entityManager = null;
+//            EntityTransaction txn = null;
+//            try {
+//                entityManager = entityManagerFactory.createEntityManager();
+//                txn = entityManager.getTransaction();
+//                txn.begin();
+//
+//                saveTopLevelAbie(entityManager);
+//                saveBatch(entityManager, abieList);
+//                saveBatch(entityManager, bbiepList);
+//                saveBatch(entityManager, bbieList);
+//                saveBatch(entityManager, bbiescList);
+//                saveBatch(entityManager, asbiepList);
+//                saveBatch(entityManager, asbieList);
+//
+//                txn.commit();
+//            } catch (RuntimeException e) {
+//                if (txn != null && txn.isActive()) txn.rollback();
+//                throw e;
+//            } finally {
+//                entityManager.close();
+//            }
         }
 
         private void saveTopLevelAbie() {
@@ -213,7 +247,35 @@ public class CreateBIETreeNode extends UIHandler {
             abieRepository.saveAndFlush(abie);
 
             topLevelAbie.setAbie(abie);
-            topLevelAbieRepository.saveAndFlush(topLevelAbie);
+            topLevelAbieRepository.save(topLevelAbie);
+        }
+
+        private void saveTopLevelAbie(EntityManager entityManager) {
+            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+            topLevelAbie.setAbie(null);
+
+            entityManager.persist(topLevelAbie);
+            entityManager.flush();
+            abie.setOwnerTopLevelAbie(topLevelAbie);
+
+            entityManager.persist(abie);
+            entityManager.flush();
+
+            topLevelAbie.setAbie(abie);
+            entityManager.persist(topLevelAbie);
+            entityManager.flush();
+        }
+
+        private void saveBatch(EntityManager entityManager, List list) {
+            for (int i = 0, len = list.size(); i < len; ++i) {
+                entityManager.persist(list.get(i));
+
+                if (i % batchSize == 0) {
+                    // flush a batch of inserts and release memory
+                    entityManager.flush();
+                    entityManager.clear();
+                }
+            }
         }
 
         private void saveAbieList() {
@@ -248,6 +310,7 @@ public class CreateBIETreeNode extends UIHandler {
         node.accept(submitNodeVisitor);
     }
 
+    @Transactional(readOnly = true)
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         Node node = createNode(asccp, bizCtx);
         node.accept(new NodeSortVisitor());
@@ -257,7 +320,12 @@ public class CreateBIETreeNode extends UIHandler {
     }
 
     private Node createNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
+        long s = System.currentTimeMillis();
         DataContainer dataContainer = new DataContainer(bizCtx);
+
+        logger.info("DataContainer instantiated - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+        s = System.currentTimeMillis();
+
         long roleOfAccId = asccp.getRoleOfAccId();
         AggregateCoreComponent acc = dataContainer.getACC(roleOfAccId);
         AggregateBusinessInformationEntity abie = createABIE(acc, bizCtx);
@@ -265,6 +333,8 @@ public class CreateBIETreeNode extends UIHandler {
 
         TopLevelNode topLevelNode = new TopLevelNode(asbiep, asccp, abie, bizCtx);
         appendChildren(dataContainer, acc, abie, topLevelNode);
+        logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+
         return topLevelNode;
     }
 
@@ -315,7 +385,7 @@ public class CreateBIETreeNode extends UIHandler {
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
                     if (bcc.getSeqKey() == 0) {
-                        new BBIENodeBuilder(dataContainer, bcc, abie, skb).build(parent);
+                        new BBIENodeBuilder(dataContainer, parent, bcc, abie, skb).build();
                     }
                 }
             }
@@ -325,11 +395,11 @@ public class CreateBIETreeNode extends UIHandler {
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
                     if (bcc.getSeqKey() > 0) {
-                        new BBIENodeBuilder(dataContainer, bcc, abie, skb + i - attr_cnt).build(parent);
+                        new BBIENodeBuilder(dataContainer, parent, bcc, abie, skb + i - attr_cnt).build();
                     }
                 } else if (assoc instanceof AssociationCoreComponent) {
                     AssociationCoreComponent ascc = (AssociationCoreComponent) assoc;
-                    new ASBIENodeBuilder(dataContainer, ascc, abie, skb + i - attr_cnt).build(parent);
+                    new ASBIENodeBuilder(dataContainer, parent, ascc, abie, skb + i - attr_cnt).build();
                 }
             }
         }
@@ -351,7 +421,7 @@ public class CreateBIETreeNode extends UIHandler {
     private List<CoreComponent> getAssocList(DataContainer dataContainer, List<CoreComponent> list) {
         for (int i = 0; i < list.size(); i++) {
             CoreComponent srt = list.get(i);
-            if (srt instanceof AssociationCoreComponent && groupcheck(dataContainer, (AssociationCoreComponent) srt)) {
+            if (srt instanceof AssociationCoreComponent && dataContainer.groupcheck((AssociationCoreComponent) srt)) {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) srt;
                 AssociationCoreComponentProperty associationCoreComponentProperty = dataContainer.getASCCP(associationCoreComponent.getToAsccpId());
                 AggregateCoreComponent aggregateCoreComponent = dataContainer.getACC(associationCoreComponentProperty.getRoleOfAccId());
@@ -359,16 +429,6 @@ public class CreateBIETreeNode extends UIHandler {
             }
         }
         return list;
-    }
-
-    private boolean groupcheck(DataContainer dataContainer, AssociationCoreComponent associationCoreComponent) {
-        boolean check = false;
-        AssociationCoreComponentProperty asccp = dataContainer.getASCCP(associationCoreComponent.getToAsccpId());
-        AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
-        if (acc.getOagisComponentType() == 3) {
-            check = true;
-        }
-        return check;
     }
 
     private List<CoreComponent> handleNestedGroup(DataContainer dataContainer,
@@ -384,7 +444,7 @@ public class CreateBIETreeNode extends UIHandler {
         for (int i = 0; i < coreComponents.size(); i++) {
             CoreComponent coreComponent = coreComponents.get(i);
             if (coreComponent instanceof AssociationCoreComponent &&
-                    groupcheck(dataContainer, (AssociationCoreComponent) coreComponent)) {
+                    dataContainer.groupcheck((AssociationCoreComponent) coreComponent)) {
 
                 AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
                 AssociationCoreComponentProperty asccp = dataContainer.getASCCP(ascc.getToAsccpId());
@@ -407,7 +467,10 @@ public class CreateBIETreeNode extends UIHandler {
 
         private Map<Long, AggregateCoreComponent> accMap;
         private Map<Long, AssociationCoreComponentProperty> asccpMap;
+        private Map<Long, Boolean> groupcheckMap;
+
         private Map<Long, BasicCoreComponentProperty> bccpMap;
+
         private Map<Long, DataType> dtMap;
         private Map<Long, DataTypeSupplementaryComponent> dtScMap;
 
@@ -465,6 +528,12 @@ public class CreateBIETreeNode extends UIHandler {
                     .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
             dtScMap = dataTypeSupplementaryComponents.stream()
                     .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
+
+            groupcheckMap = asccpMap.values().stream()
+                    .collect(Collectors.toMap(e -> e.getAsccpId(), e -> {
+                        AggregateCoreComponent acc = getACC(e.getRoleOfAccId());
+                        return (acc.getOagisComponentType() == 3) ? true : false;
+                    }));
         }
 
         public BusinessContext getBusinessContext() {
@@ -538,6 +607,10 @@ public class CreateBIETreeNode extends UIHandler {
                     .collect(Collectors.toList());
         }
 
+        public boolean groupcheck(AssociationCoreComponent ascc) {
+            return groupcheckMap.get(ascc.getToAsccpId());
+        }
+
         @Override
         public List<BasicCoreComponent> getBCCs(long accId) {
             return basicCoreComponents.stream()
@@ -563,6 +636,7 @@ public class CreateBIETreeNode extends UIHandler {
 
     private class BBIENodeBuilder {
         private DataContainer dataContainer;
+        private Node parent;
         private BasicCoreComponent bcc;
         private AggregateBusinessInformationEntity abie;
         private int seqKey;
@@ -571,9 +645,10 @@ public class CreateBIETreeNode extends UIHandler {
         private BasicBusinessInformationEntity bbie;
         private List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList;
 
-        public BBIENodeBuilder(DataContainer dataContainer,
+        public BBIENodeBuilder(DataContainer dataContainer, Node parent,
                                BasicCoreComponent bcc, AggregateBusinessInformationEntity abie, int seqKey) {
             this.dataContainer = dataContainer;
+            this.parent = parent;
             this.bcc = bcc;
             this.abie = abie;
             this.seqKey = seqKey;
@@ -636,7 +711,7 @@ public class CreateBIETreeNode extends UIHandler {
             }
         }
 
-        public BBIENode build(Node parent) {
+        public BBIENode build() {
             BasicCoreComponentProperty bccp = dataContainer.getBCCP(bcc.getToBccpId());
             long bdtId = bccp.getBdtId();
             long bdtPrimitiveRestrictionId = dataContainer.getDefaultBdtPriRestriId(bdtId);
@@ -659,6 +734,8 @@ public class CreateBIETreeNode extends UIHandler {
 
     private class ASBIENodeBuilder {
         private DataContainer dataContainer;
+        private Node parent;
+
         private AssociationCoreComponent ascc;
         private AggregateBusinessInformationEntity fromAbie;
         private AssociationCoreComponentProperty asccp;
@@ -668,11 +745,12 @@ public class CreateBIETreeNode extends UIHandler {
         private AssociationBusinessInformationEntityProperty asbiep;
         private AssociationBusinessInformationEntity asbie;
 
-        public ASBIENodeBuilder(DataContainer dataContainer,
+        public ASBIENodeBuilder(DataContainer dataContainer, Node parent,
                                 AssociationCoreComponent ascc,
                                 AggregateBusinessInformationEntity fromAbie,
                                 int seqKey) {
             this.dataContainer = dataContainer;
+            this.parent = parent;
             this.ascc = ascc;
             this.fromAbie = fromAbie;
             this.seqKey = seqKey;
@@ -700,7 +778,7 @@ public class CreateBIETreeNode extends UIHandler {
             asbie.setSeqKey(seqKey);
         }
 
-        public ASBIENode build(Node parent) {
+        public ASBIENode build() {
             AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
             this.roleOfAbie = createABIE(acc, dataContainer.getBusinessContext());
 

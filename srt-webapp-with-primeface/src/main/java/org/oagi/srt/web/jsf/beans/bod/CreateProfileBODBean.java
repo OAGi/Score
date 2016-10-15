@@ -90,14 +90,11 @@ public class CreateProfileBODBean {
         );
 
         setSelectedTopLevelConcept(
-                topLevelConceptRepository.findOne(222L)
+                topLevelConceptRepository.findOne(3252L)
         );
         setSelectedBusinessContext(
                 businessContextRepository.findOne(1L)
         );
-        AssociationCoreComponentProperty selectedASCCP =
-                asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-        treeNode = createBIETreeNode.createTreeNode(selectedASCCP, selectedBusinessContext);
     }
 
     public boolean isBtnBackDisable() {
@@ -292,7 +289,6 @@ public class CreateProfileBODBean {
 
         public int getProgress() {
             long progress = Math.round((currentCount.get() / (double) maxCount) * 100);
-            logger.info("Submit Progress: " + progress);
             return (int) progress;
         }
     }

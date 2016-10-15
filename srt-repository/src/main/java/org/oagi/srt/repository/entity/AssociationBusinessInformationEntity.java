@@ -11,7 +11,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "asbie")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AssociationBusinessInformationEntity
         implements Serializable, TimestampAware, IdEntity, BusinessInformationEntity {
 

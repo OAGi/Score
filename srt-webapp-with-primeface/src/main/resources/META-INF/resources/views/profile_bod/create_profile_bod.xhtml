@@ -58,6 +58,9 @@
                     btnNext.hide();
                     btnSubmit.show();
                     PF('loadingBlock').show();
+
+                    var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
+                    $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
                 } else {
                     btnNext.show();
                     btnSubmit.hide();
@@ -69,9 +72,6 @@
                 btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
             };
             var onSubmit = function () {
-                var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
-                $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
-
                 var btnBack = $(document.getElementById(PF('btnBack').id));
                 var btnNext = $(document.getElementById(PF('btnNext').id));
                 var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
@@ -532,7 +532,7 @@
             </p:blockUI>
 
             <p:blockUI widgetVar="progressBlock" block="wizard">
-                <p:progressBar widgetVar="progressBar" ajax="true" interval="500" style="width: 900px;"
+                <p:progressBar widgetVar="progressBar" ajax="true" interval="500"
                                value="#{createProfileBODBean.submitProgress}"
                                labelTemplate="{value}%" global="false">
                     <p:ajax event="complete" oncomplete="PF('progressBlock').hide();"/>

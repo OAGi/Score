@@ -11,7 +11,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "abie")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AggregateBusinessInformationEntity implements Serializable, TimestampAware, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";

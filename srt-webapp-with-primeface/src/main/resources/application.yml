@@ -11,26 +11,13 @@ spring:
     hibernate:
       ddl-auto: none
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.Oracle12cDialect
-        id:
-          new_generator_mappings: true
-        cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region:
-            factory_class: org.hibernate.cache.redis.hibernate5.SingletonRedisRegionFactory
-          region_prefix: hibernate
-          use_structured_entries: true
-          generate_statistics: true
-
-      redisson-config: classpath:redisson.yml
-
-      redis:
-        expiryInSeconds:
-          default: 120
-          hibernate:
-            read_only: 86400
+      hibernate.dialect: org.hibernate.dialect.Oracle12cDialect
+      hibernate.id.new_generator_mappings: true
+      hibernate.jdbc.batch_size: 25
+      hibernate.jdbc.batch_versioned_data: true
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.cache.use_second_level_cache: false
 
   batch:
     initializer:
@@ -68,7 +55,6 @@ logging:
   level:
     org.oagi.srt: DEBUG
     org.springframework: INFO
-    org.hibernate.SQL: DEBUG
 
 jsf:
   project-stage: Development

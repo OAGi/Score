@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "top_level_abie")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TopLevelAbie implements Serializable {
 
     public static final String SEQUENCE_NAME = "TOP_LEVEL_ABIE_ID_SEQ";

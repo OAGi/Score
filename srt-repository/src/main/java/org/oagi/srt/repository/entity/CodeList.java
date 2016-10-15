@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "code_list")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CodeList implements Serializable {
 
     public enum State {

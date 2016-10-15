@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "asccp")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AssociationCoreComponentProperty implements CoreComponentProperty, Serializable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";

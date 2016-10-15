@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "ctx_scheme")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ContextScheme implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_SCHEME_ID_SEQ";

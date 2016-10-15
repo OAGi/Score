@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "release")
-@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Release implements Serializable {
 
     public static final String SEQUENCE_NAME = "RELEASE_ID_SEQ";
