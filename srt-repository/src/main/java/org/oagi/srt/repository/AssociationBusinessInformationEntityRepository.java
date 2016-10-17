@@ -13,6 +13,9 @@ public interface AssociationBusinessInformationEntityRepository
     @Query("select a from AssociationBusinessInformationEntity a where a.fromAbie.abieId = ?1")
     public List<AssociationBusinessInformationEntity> findByFromAbieId(long fromAbieId);
 
+    @Query("select a from AssociationBusinessInformationEntity a where a.ownerTopLevelAbie.topLevelAbieId = ?1")
+    public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
+
     @Query("select a from AssociationBusinessInformationEntity a where a.ownerTopLevelAbie.topLevelAbieId = ?1 and a.used = true")
     public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 }

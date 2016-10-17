@@ -6,7 +6,7 @@ import org.oagi.srt.model.bod.TopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
-import org.oagi.srt.web.jsf.component.treenode.CreateBIETreeNode;
+import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.model.TreeNode;
@@ -23,7 +23,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import java.util.stream.Collectors;
 @Scope("view")
 @ManagedBean
 @ViewScoped
+@Transactional(readOnly = true)
 public class CreateProfileBODBean {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateProfileBODBean.class);
@@ -67,7 +67,7 @@ public class CreateProfileBODBean {
      * for 'Create BIE' Step
      */
     @Autowired
-    private CreateBIETreeNode createBIETreeNode;
+    private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
     @Autowired
@@ -76,9 +76,9 @@ public class CreateProfileBODBean {
     private CodeListRepository codeListRepository;
     @Autowired
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
-    private String restrictionType;
 
     @PostConstruct
     public void init() {
@@ -226,6 +226,24 @@ public class CreateProfileBODBean {
         }
     }
 
+    public String getPrimitiveType(BBIENode node) {
+        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
+        String primitiveType = null;
+        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
+            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
+                primitiveType = "XSD Builtin Type";
+            } else {
+                primitiveType = "Code List";
+            }
+        }
+        return primitiveType;
+    }
+
+    public String getCodeListName(Node node) {
+        CodeList codeList = (CodeList) node.getAttribute("codeList");
+        return (codeList != null) ? codeList.getName() : null;
+    }
+
     public String onFlowProcess(FlowEvent event) {
         try {
             String newStep = event.getNewStep();
@@ -249,7 +267,7 @@ public class CreateProfileBODBean {
 
                     AssociationCoreComponentProperty selectedASCCP =
                             asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                    treeNode = createBIETreeNode.createTreeNode(selectedASCCP, selectedBusinessContext);
+                    treeNode = bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext);
 
                     /*
                      * Hide loading dialog
@@ -346,7 +364,7 @@ public class CreateProfileBODBean {
     @Transactional(rollbackFor = Throwable.class)
     public String submit() {
         progressListener = new ProgressListener();
-        createBIETreeNode.submit(getTopLevelNode(), progressListener);
+        bieTreeNodeHandler.submit(getTopLevelNode(), progressListener);
 
         return "/views/profile_bod/list.xhtml?faces-redirect=true";
     }
@@ -367,23 +385,5 @@ public class CreateProfileBODBean {
         }
 
         return bdtPrimitiveRestrictions;
-    }
-
-    public String getPrimitiveType(BBIENode node) {
-        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
-        String primitiveType = null;
-        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
-            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
-                primitiveType = "XSD Builtin Type";
-            } else {
-                primitiveType = "Code List";
-            }
-        }
-        return primitiveType;
-    }
-
-    public String getCodeListName(Node node) {
-        CodeList codeList = (CodeList) node.getAttribute("codeList");
-        return (codeList != null) ? codeList.getName() : null;
     }
 }

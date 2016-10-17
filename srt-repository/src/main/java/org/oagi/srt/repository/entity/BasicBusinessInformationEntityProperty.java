@@ -24,7 +24,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "based_bccp_id", nullable = false)
     private BasicCoreComponentProperty basedBccp;
 
@@ -52,7 +52,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
 

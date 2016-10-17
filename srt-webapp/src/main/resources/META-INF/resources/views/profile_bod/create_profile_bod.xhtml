@@ -535,7 +535,7 @@
                 <p:progressBar id="progressBar" widgetVar="progressBar" ajax="true" interval="500"
                                value="#{createProfileBODBean.submitProgress}"
                                labelTemplate="{value}%" global="false">
-                    <p:ajax event="complete" oncomplete="PF('progressBlock').hide();"/>
+                    <p:ajax event="complete" oncomplete="PF('progressBar').setValue(100); PF('progressBlock').hide();"/>
                 </p:progressBar>
             </p:blockUI>
 

@@ -1311,7 +1311,7 @@ public class StandaloneXMLSchema {
         }
 
         public AgencyIdList getAgencyIdList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) {
-            AgencyIdList agencyIdList = findAgencyIdList(gBBIESC.getAgencyIdListId());
+            AgencyIdList agencyIdList = gBBIESC.getAgencyIdList();
             if (agencyIdList != null) {
                 return agencyIdList;
             }

@@ -795,7 +795,7 @@ public class TopLevelABIEHandler implements Serializable {
         nbbiescVO.setDtSc(obbiescvo.getDtSc());
         nbbiescVO.setDtScPriRestri(obbiescvo.getDtScPriRestri());
         nbbiescVO.setCodeList(obbiescvo.getCodeList());
-        nbbiescVO.setAgencyIdListId(obbiescvo.getAgencyIdListId());
+        nbbiescVO.setAgencyIdList(obbiescvo.getAgencyIdList());
         nbbiescVO.setCardinalityMax(obbiescvo.getCardinalityMax());
         nbbiescVO.setCardinalityMin(obbiescvo.getCardinalityMin());
         nbbiescVO.setDefaultValue(obbiescvo.getDefaultValue());

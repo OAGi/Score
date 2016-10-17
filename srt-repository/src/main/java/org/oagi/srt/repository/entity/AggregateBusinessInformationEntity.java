@@ -24,11 +24,11 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "based_acc_id", nullable = false)
     private AggregateCoreComponent basedAcc;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "biz_ctx_id")
     private BusinessContext bizCtx;
 
@@ -71,7 +71,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Column(length = 225)
     private String bizTerm;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
 

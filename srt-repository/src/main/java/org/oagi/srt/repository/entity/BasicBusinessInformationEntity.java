@@ -28,19 +28,19 @@ public class BasicBusinessInformationEntity
     @Column(nullable = false)
     private long basedBccId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_abie_id", nullable = false)
     private AggregateBusinessInformationEntity fromAbie;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_bbiep_id", nullable = false)
     private BasicBusinessInformationEntityProperty toBbiep;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bdt_pri_restri_id")
     private BusinessDataTypePrimitiveRestriction bdtPriRestri;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "code_list_id")
     private CodeList codeList;
 
@@ -89,7 +89,7 @@ public class BasicBusinessInformationEntity
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
 

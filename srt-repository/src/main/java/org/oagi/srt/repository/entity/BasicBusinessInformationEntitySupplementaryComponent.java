@@ -27,24 +27,25 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bbie_id", nullable = false)
     private BasicBusinessInformationEntity bbie;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dt_sc_id", nullable = false)
     private DataTypeSupplementaryComponent dtSc;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dt_sc_pri_restri_id")
     private BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "code_list_id")
     private CodeList codeList;
 
-    @Column
-    private Long agencyIdListId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agency_id_list_id")
+    private AgencyIdList agencyIdList;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -71,7 +72,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
 
@@ -133,12 +134,12 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.codeList = codeList;
     }
 
-    public long getAgencyIdListId() {
-        return (agencyIdListId == null) ? 0L : agencyIdListId;
+    public AgencyIdList getAgencyIdList() {
+        return agencyIdList;
     }
 
-    public void setAgencyIdListId(long agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+    public void setAgencyIdList(AgencyIdList agencyIdList) {
+        this.agencyIdList = agencyIdList;
     }
 
     public int getCardinalityMin() {
@@ -239,7 +240,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         result = 31 * result + (dtSc != null ? dtSc.hashCode() : 0);
         result = 31 * result + (dtScPriRestri != null ? dtScPriRestri.hashCode() : 0);
         result = 31 * result + (codeList != null ? codeList.hashCode() : 0);
-        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
+        result = 31 * result + (agencyIdList != null ? agencyIdList.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -261,7 +262,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", dtSc=" + dtSc +
                 ", dtScPriRestri=" + dtScPriRestri +
                 ", codeList=" + codeList +
-                ", agencyIdListId=" + agencyIdListId +
+                ", agencyIdList=" + agencyIdList +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
@@ -271,6 +272,8 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", bizTerm='" + bizTerm + '\'' +
                 ", used=" + used +
                 ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                ", persistEventListeners=" + persistEventListeners +
+                ", updateEventListeners=" + updateEventListeners +
                 '}';
     }
 

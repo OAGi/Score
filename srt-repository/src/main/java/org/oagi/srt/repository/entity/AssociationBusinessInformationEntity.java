@@ -25,15 +25,15 @@ public class AssociationBusinessInformationEntity
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_abie_id", nullable = false)
     private AggregateBusinessInformationEntity fromAbie;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_asbiep_id", nullable = false)
     private AssociationBusinessInformationEntityProperty toAsbiep;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "based_ascc_id", nullable = false)
     private AssociationCoreComponent basedAscc;
 
@@ -73,7 +73,7 @@ public class AssociationBusinessInformationEntity
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
 

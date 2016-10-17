@@ -32,7 +32,7 @@ public class BasicBusinessInformationEntitySupplementaryComponentRepositoryImpl
 
     @Override
     protected void prepare(Dialect dialect, BasicBusinessInformationEntitySupplementaryComponent entity, List<Object> args) {
-        args.add(entity.getAgencyIdListId() == 0 ? null : entity.getAgencyIdListId());
+        args.add(entity.getAgencyIdList());
         args.add(entity.getBbie().getBbieId());
         args.add(entity.getBizTerm());
         args.add(entity.getCodeList() == null ? null : entity.getCodeList().getCodeListId());

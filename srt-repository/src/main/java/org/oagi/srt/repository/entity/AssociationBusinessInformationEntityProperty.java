@@ -25,11 +25,11 @@ public class AssociationBusinessInformationEntityProperty
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "based_asccp_id", nullable = false)
     private AssociationCoreComponentProperty basedAsccp;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_of_abie_id", nullable = false)
     private AggregateBusinessInformationEntity roleOfAbie;
 
@@ -57,7 +57,7 @@ public class AssociationBusinessInformationEntityProperty
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
     private TopLevelAbie ownerTopLevelAbie;
 

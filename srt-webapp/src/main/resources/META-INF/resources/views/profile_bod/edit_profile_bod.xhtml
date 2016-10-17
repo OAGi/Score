@@ -1,0 +1,376 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Edit Profile BOD</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+            <p:panel>
+                <h:panelGroup style="width: 100%;">
+                    <div class="row">
+                        <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+                            <p:treeTable value="#{editProfileBODBean.treeNode}" var="node"
+                                         selection="#{editProfileBODBean.selectedTreeNode}"
+                                         selectionMode="single">
+                                <p:ajax event="select" update=":form:details"/>
+                                <p:column headerText="BIEs">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:column>
+                            </p:treeTable>
+                        </div>
+                        <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
+                            <div id="myAffix" style="overflow-y: auto;">
+                                <p:panel id="details">
+                                    <f:facet name="header">
+                                        <h:outputText value="View and Edit BIE"/>
+                                    </f:facet>
+
+                                    <p:selectOneRadio id="customRadio"
+                                                      value="#{editProfileBODBean.restrictionType}"
+                                                      layout="custom">
+                                        <f:selectItem itemLabel="Primitive" itemValue="Primitive"/>
+                                        <f:selectItem itemLabel="Code" itemValue="Code"/>
+                                    </p:selectOneRadio>
+
+                                    <!--
+                                        ABIE
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{editProfileBODBean.selectedTreeNode.type eq 'ABIE'}">
+                                        <p:panel>
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.name}"
+                                                        styleClass="section-content"/>
+                                            </h:panelGrid>
+
+                                            <h:outputText value="Used" styleClass="section-label"/>
+                                            <h:selectBooleanCheckbox
+                                                    value="${editProfileBODBean.selectedTreeNode.data.bbiesc.used}"
+                                                    styleClass="section-content"/>
+                                        </p:panel>
+                                        <p:panel header="Top-Level BIE Info">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.abie.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.abie.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        ASBIE
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{editProfileBODBean.selectedTreeNode.type eq 'ASBIE'}">
+                                        <p:panel>
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Used" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${editProfileBODBean.selectedTreeNode.data.asbie.used}"
+                                                        styleClass="section-content"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="ASBIE">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Nillable" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbie.nillable}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbie.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbie.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="ASBIEP">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbiep.bizTerm}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbiep.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.asbiep.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="Target ABIE">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.abie.bizTerm}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.abie.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.abie.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        BBIE
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                        <p:panel>
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Used" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${editProfileBODBean.selectedTreeNode.data.bbie.used}"
+                                                        styleClass="section-content"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="BBIE">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Nillable" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbie.nillable}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbie.fixedValue}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbie.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbie.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="BBIEP">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiep.bizTerm}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiep.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiep.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="BDT Primitive Restriction">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="BDT Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bdt.den}"
+                                                        styleClass="section-content"/>
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="4" cellpadding="4">
+                                                <p:radioButton id="opt1" for="customRadio" itemIndex="0"
+                                                               style="margin: 12px;"/>
+                                                <h:outputText value="Primitive" styleClass="section-label"
+                                                              style="margin-left: -48px; margin-top: 8px;"/>
+
+                                                <p:selectOneMenu
+                                                        style="margin-left: 100px !important; margin-top: 3px;"
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bdtPrimitiveRestrictionId}">
+                                                    <f:selectItems
+                                                            value="#{editProfileBODBean.getBdtPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
+                                                </p:selectOneMenu>
+
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.getPrimitiveType(editProfileBODBean.selectedTreeNode.data)}"
+                                                        style="position: absolute; margin-left: 20px; margin-top: 8px;"/>
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="4" cellpadding="4">
+                                                <p:radioButton id="opt2" for="customRadio" itemIndex="1"
+                                                               style="margin: 12px;"/>
+                                                <h:outputText value="Code List" styleClass="section-label"
+                                                              style="margin-left: -48px; margin-top: 8px;"/>
+
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.getCodeListName(editProfileBODBean.selectedTreeNode.data)}"
+                                                        styleClass="section-label"/>
+
+                                                <h:panelGroup style="margin-left: 295px;">
+                                                    <p:commandButton value="Code List" icon="ui-icon-extlink"
+                                                                     style="margin-right: 10px;"
+                                                                     disabled="#{(editProfileBODBean.getPrimitiveType(editProfileBODBean.selectedTreeNode.data) == 'XSD Builtin Type') ? 'false' : 'true'}">
+                                                    </p:commandButton>
+
+                                                    <p:commandButton value="Derived Code List"
+                                                                     icon="ui-icon-extlink"
+                                                                     disabled="#{(editProfileBODBean.getPrimitiveType(editProfileBODBean.selectedTreeNode.data) == 'XSD Builtin Type') ? 'true' : 'false'}">
+                                                    </p:commandButton>
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        BBIE_SC
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIESC'}">
+                                        <p:panel>
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Name" styleClass="section-label"/>
+                                                <h:outputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.name}"
+                                                        styleClass="section-content"/>
+
+                                                <h:outputText value="Used" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${editProfileBODBean.selectedTreeNode.data.bbiesc.used}"
+                                                        styleClass="section-content"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="BBIE SC">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.cardinalityMax}"
+                                                        styleClass="section-content input-section"/>
+                                                <h:outputText value="Fixed Value" styleClass="section-label"/>
+
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.fixedValue}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Default" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.defaultValue}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Business Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.bizTerm}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Remark" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.remark}"
+                                                        styleClass="section-content input-section"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.definition}"
+                                                        rows="10" autoResize="false"
+                                                        styleClass="section-content input-section"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:panel>
+
+            <p:blockUI widgetVar="loadingBlock" block="wizard">
+                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                <span style="display: block; margin-top: 10px;">Loading...</span>
+            </p:blockUI>
+
+            <p:blockUI widgetVar="progressBlock" block="wizard">
+                <p:progressBar id="progressBar" widgetVar="progressBar" ajax="true" interval="500"
+                               value="#{editProfileBODBean.submitProgress}"
+                               labelTemplate="{value}%" global="false">
+                    <p:ajax event="complete" oncomplete="PF('progressBar').setValue(100); PF('progressBlock').hide();"/>
+                </p:progressBar>
+            </p:blockUI>
+
+            <p:panel id="btnGroup">
+                <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
+                                 value="Back" icon="ui-icon-arrowthick-1-w" onclick="PF('wizard').back()"/>
+                <p:commandButton id="btnNext" widgetVar="btnNext" style=""
+                                 value="Next" icon="ui-icon-arrowthick-1-e" onclick="PF('wizard').next();"/>
+                <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
+                                 value="Submit" icon="ui-icon-check" action="#{editProfileBODBean.submit()}"/>
+            </p:panel>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>
