@@ -25,12 +25,14 @@ public class AssociationBusinessInformationEntityProperty
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "based_asccp_id", nullable = false)
+    @Column(nullable = false)
+    private long basedAsccpId;
+    @Transient
     private AssociationCoreComponentProperty basedAsccp;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_of_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long roleOfAbieId;
+    @Transient
     private AggregateBusinessInformationEntity roleOfAbie;
 
     @Lob
@@ -57,8 +59,9 @@ public class AssociationBusinessInformationEntityProperty
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long ownerTopLevelAbieId;
+    @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
     @Override
@@ -87,16 +90,24 @@ public class AssociationBusinessInformationEntityProperty
         this.guid = guid;
     }
 
-    public AssociationCoreComponentProperty getBasedAsccp() {
-        return basedAsccp;
+    public long getBasedAsccpId() {
+        return basedAsccpId;
+    }
+
+    public void setBasedAsccpId(long basedAsccpId) {
+        this.basedAsccpId = basedAsccpId;
     }
 
     public void setBasedAsccp(AssociationCoreComponentProperty basedAsccp) {
         this.basedAsccp = basedAsccp;
     }
 
-    public AggregateBusinessInformationEntity getRoleOfAbie() {
-        return roleOfAbie;
+    public long getRoleOfAbieId() {
+        return roleOfAbieId;
+    }
+
+    public void setRoleOfAbieId(long roleOfAbieId) {
+        this.roleOfAbieId = roleOfAbieId;
     }
 
     public void setRoleOfAbie(AggregateBusinessInformationEntity roleOfAbie) {
@@ -159,8 +170,12 @@ public class AssociationBusinessInformationEntityProperty
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public TopLevelAbie getOwnerTopLevelAbie() {
-        return ownerTopLevelAbie;
+    public long getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
+    }
+
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
@@ -183,41 +198,6 @@ public class AssociationBusinessInformationEntityProperty
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        int result = (int) (asbiepId ^ (asbiepId >>> 32));
-        result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (basedAsccp != null ? basedAsccp.hashCode() : 0);
-        result = 31 * result + (roleOfAbie != null ? roleOfAbie.hashCode() : 0);
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + (remark != null ? remark.hashCode() : 0);
-        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
-        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
-        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "AssociationBusinessInformationEntityProperty{" +
-                "asbiepId=" + asbiepId +
-                ", guid='" + guid + '\'' +
-                ", basedAsccp=" + basedAsccp +
-                ", roleOfAbie=" + roleOfAbie +
-                ", definition='" + definition + '\'' +
-                ", remark='" + remark + '\'' +
-                ", bizTerm='" + bizTerm + '\'' +
-                ", createdBy=" + createdBy +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                ", creationTimestamp=" + creationTimestamp +
-                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
-                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
-                '}';
-    }
-
     @Transient
     private transient List<PersistEventListener> persistEventListeners;
 
@@ -227,6 +207,24 @@ public class AssociationBusinessInformationEntityProperty
     public AssociationBusinessInformationEntityProperty() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                AssociationBusinessInformationEntityProperty asbiep = (AssociationBusinessInformationEntityProperty) object;
+                if (asbiep.basedAsccp != null) {
+                    asbiep.setBasedAsccpId(asbiep.basedAsccp.getAsccpId());
+                }
+                if (asbiep.roleOfAbie != null) {
+                    asbiep.setRoleOfAbieId(asbiep.roleOfAbie.getAbieId());
+                }
+                if (asbiep.ownerTopLevelAbie != null) {
+                    asbiep.setOwnerTopLevelAbieId(asbiep.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

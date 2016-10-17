@@ -24,8 +24,9 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "based_bccp_id", nullable = false)
+    @Column(nullable = false)
+    private long basedBccpId;
+    @Transient
     private BasicCoreComponentProperty basedBccp;
 
     @Lob
@@ -52,8 +53,9 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long ownerTopLevelAbieId;
+    @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
     @Override
@@ -82,8 +84,12 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
         this.guid = guid;
     }
 
-    public BasicCoreComponentProperty getBasedBccp() {
-        return basedBccp;
+    public long getBasedBccpId() {
+        return basedBccpId;
+    }
+
+    public void setBasedBccpId(long basedBccpId) {
+        this.basedBccpId = basedBccpId;
     }
 
     public void setBasedBccp(BasicCoreComponentProperty basedBccp) {
@@ -146,8 +152,12 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public TopLevelAbie getOwnerTopLevelAbie() {
-        return ownerTopLevelAbie;
+    public long getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
+    }
+
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
@@ -174,6 +184,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     public int hashCode() {
         int result = (int) (bbiepId ^ (bbiepId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
+        result = 31 * result + (int) (basedBccpId ^ (basedBccpId >>> 32));
         result = 31 * result + (basedBccp != null ? basedBccp.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
@@ -182,7 +193,10 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (persistEventListeners != null ? persistEventListeners.hashCode() : 0);
+        result = 31 * result + (updateEventListeners != null ? updateEventListeners.hashCode() : 0);
         return result;
     }
 
@@ -191,7 +205,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
         return "BasicBusinessInformationEntityProperty{" +
                 "bbiepId=" + bbiepId +
                 ", guid='" + guid + '\'' +
-                ", basedBccp=" + basedBccp +
+                ", basedBccpId=" + basedBccpId +
                 ", definition='" + definition + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
@@ -199,7 +213,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
-                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
     }
 
@@ -212,6 +226,21 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     public BasicBusinessInformationEntityProperty() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                BasicBusinessInformationEntityProperty bbiep = (BasicBusinessInformationEntityProperty) object;
+                if (bbiep.basedBccp != null) {
+                    bbiep.setBasedBccpId(bbiep.basedBccp.getBccpId());
+                }
+                if (bbiep.ownerTopLevelAbie != null) {
+                    bbiep.setOwnerTopLevelAbieId(bbiep.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

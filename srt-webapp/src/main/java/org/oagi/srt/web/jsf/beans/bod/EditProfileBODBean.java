@@ -4,10 +4,7 @@ import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.TopLevelNode;
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
-import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
-import org.oagi.srt.repository.entity.CodeList;
-import org.oagi.srt.repository.entity.TopLevelAbie;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Scope("view")
@@ -94,7 +93,7 @@ public class EditProfileBODBean {
         Node node = (Node) selectedTreeNode.getData();
         if (node instanceof BBIENode) {
             BBIENode bbieNode = (BBIENode) node;
-            if (bbieNode.getBbie().getBdtPriRestri().getBdtPriRestriId() > 0L) {
+            if (bbieNode.getBbie().getBdtPriRestriId() > 0L) {
                 return "Primitive";
             } else {
                 return "Code";
@@ -120,6 +119,24 @@ public class EditProfileBODBean {
     public String getCodeListName(Node node) {
         CodeList codeList = (CodeList) node.getAttribute("codeList");
         return (codeList != null) ? codeList.getName() : null;
+    }
+
+    public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
+        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
+        Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
+        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
+            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
+                CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
+                        cdtAwdPriXpsTypeMapRepository.findOne(cc.getCdtAwdPriXpsTypeMapId());
+                XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
+                bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
+            } else {
+                CodeList code = codeListRepository.findOne(cc.getCodeListId());
+                bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
+            }
+        }
+
+        return bdtPrimitiveRestrictions;
     }
 
 }

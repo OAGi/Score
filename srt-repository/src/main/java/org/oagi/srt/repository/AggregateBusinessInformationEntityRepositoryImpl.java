@@ -38,7 +38,7 @@ public class AggregateBusinessInformationEntityRepositoryImpl
     @Override
     protected void prepare(Dialect dialect, AggregateBusinessInformationEntity entity, List<Object> args) {
         entity.prePersist();
-        args.add(entity.getBasedAcc().getAccId());
+        args.add(entity.getBasedAccId());
         args.add(entity.getBizTerm());
         args.add(entity.getClientId() == 0 ? null : entity.getClientId());
         args.add(entity.getCreatedBy());

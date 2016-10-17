@@ -32,17 +32,17 @@ public class BasicBusinessInformationEntitySupplementaryComponentRepositoryImpl
 
     @Override
     protected void prepare(Dialect dialect, BasicBusinessInformationEntitySupplementaryComponent entity, List<Object> args) {
-        args.add(entity.getAgencyIdList());
-        args.add(entity.getBbie().getBbieId());
+        args.add(entity.getAgencyIdListId() == 0 ? null : entity.getAgencyIdListId());
+        args.add(entity.getBbieId());
         args.add(entity.getBizTerm());
-        args.add(entity.getCodeList() == null ? null : entity.getCodeList().getCodeListId());
+        args.add(entity.getCodeListId() == 0 ? null : entity.getCodeListId());
         args.add(entity.getDefaultValue());
         args.add(entity.getDefinition());
-        args.add(entity.getDtSc().getDtScId());
-        args.add(entity.getDtScPriRestri() == null ? null : entity.getDtScPriRestri().getBdtScPriRestriId());
+        args.add(entity.getDtScId());
+        args.add(entity.getDtScPriRestriId() == 0 ? null : entity.getDtScPriRestriId());
         args.add(entity.getFixedValue());
-        args.add(entity.getCardinalityMax());
         args.add(entity.getCardinalityMin());
+        args.add(entity.getCardinalityMax());
         args.add(entity.getRemark());
         args.add(entity.isUsed() ? 1 : 0);
     }

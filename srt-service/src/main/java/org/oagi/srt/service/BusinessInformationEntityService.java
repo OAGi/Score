@@ -190,7 +190,7 @@ public class BusinessInformationEntityService {
                 new AssociationBusinessInformationEntityProperty();
         asbiep.setGuid(Utility.generateGUID());
         asbiep.setBasedAsccp(asccp);
-        asbiep.setRoleOfAbie(topLevelAbie.getAbie());
+        asbiep.setRoleOfAbieId(topLevelAbie.getAbie().getAbieId());
         asbiep.setCreatedBy(userId);
         asbiep.setLastUpdatedBy(userId);
         asbiep.setDefinition(asccp.getDefinition());
@@ -399,7 +399,7 @@ public class BusinessInformationEntityService {
         }
 
         public AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc) {
-            return abieTaskHolder.createABIE(userId, acc, topLevelAbie.getAbie().getBizCtx());
+            return abieTaskHolder.createABIE(userId, acc, topLevelAbie.getAbie().getBizCtxId());
         }
 
         public void createBBIETree(BasicCoreComponent bcc, AggregateBusinessInformationEntity abie, int seqKey) {
@@ -479,12 +479,12 @@ public class BusinessInformationEntityService {
 
         private List<AggregateBusinessInformationEntity> aggregateBusinessInformationEntitys = new ArrayList();
 
-        public AggregateBusinessInformationEntity createABIE(long userId, AggregateCoreComponent acc, BusinessContext bizCtx) {
+        public AggregateBusinessInformationEntity createABIE(long userId, AggregateCoreComponent acc, long bizCtxId) {
             AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
             String abieGuid = Utility.generateGUID();
             abie.setGuid(abieGuid);
             abie.setBasedAcc(acc);
-            abie.setBizCtx(bizCtx);
+            abie.setBizCtxId(bizCtxId);
             abie.setDefinition(acc.getDefinition());
             abie.setCreatedBy(userId);
             abie.setLastUpdatedBy(userId);

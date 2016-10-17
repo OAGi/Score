@@ -24,12 +24,14 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "based_acc_id", nullable = false)
+    @Column(nullable = false)
+    private long basedAccId;
+    @Transient
     private AggregateCoreComponent basedAcc;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "biz_ctx_id")
+    @Column
+    private long bizCtxId;
+    @Transient
     private BusinessContext bizCtx;
 
     @Transient
@@ -71,8 +73,9 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Column(length = 225)
     private String bizTerm;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long ownerTopLevelAbieId;
+    @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
     @Override
@@ -101,16 +104,24 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         this.guid = guid;
     }
 
-    public AggregateCoreComponent getBasedAcc() {
-        return basedAcc;
+    public long getBasedAccId() {
+        return basedAccId;
+    }
+
+    public void setBasedAccId(long basedAccId) {
+        this.basedAccId = basedAccId;
     }
 
     public void setBasedAcc(AggregateCoreComponent basedAcc) {
         this.basedAcc = basedAcc;
     }
 
-    public BusinessContext getBizCtx() {
-        return bizCtx;
+    public long getBizCtxId() {
+        return bizCtxId;
+    }
+
+    public void setBizCtxId(long bizCtxId) {
+        this.bizCtxId = bizCtxId;
     }
 
     public void setBizCtx(BusinessContext bizCtx) {
@@ -213,8 +224,12 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         this.bizTerm = bizTerm;
     }
 
-    public TopLevelAbie getOwnerTopLevelAbie() {
-        return ownerTopLevelAbie;
+    public long getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
+    }
+
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
@@ -241,8 +256,8 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     public int hashCode() {
         int result = (int) (abieId ^ (abieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (basedAcc != null ? basedAcc.hashCode() : 0);
-        result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
+        result = 31 * result + (int) (basedAccId ^ (basedAccId >>> 32));
+        result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -255,7 +270,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 
@@ -264,8 +279,8 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         return "AggregateBusinessInformationEntity{" +
                 "abieId=" + abieId +
                 ", guid='" + guid + '\'' +
-                ", basedAcc=" + basedAcc +
-                ", bizCtx=" + bizCtx +
+                ", basedAccId=" + basedAccId +
+                ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
                 ", definition='" + definition + '\'' +
                 ", createdBy=" + createdBy +
@@ -278,7 +293,10 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
                 ", status='" + status + '\'' +
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                ", persistEventListeners=" + persistEventListeners +
+                ", updateEventListeners=" + updateEventListeners +
                 '}';
     }
 
@@ -291,6 +309,33 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     public AggregateBusinessInformationEntity() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                AggregateBusinessInformationEntity abie = (AggregateBusinessInformationEntity) object;
+                if (abie.basedAcc != null) {
+                    abie.setBasedAccId(abie.basedAcc.getAccId());
+                }
+                if (abie.getBasedAccId() == 0L) {
+                    throw new IllegalStateException("'basedAccId' parameter must not be null.");
+                }
+                if (abie.bizCtx != null) {
+                    abie.setBizCtxId(abie.bizCtx.getBizCtxId());
+                }
+                if (abie.getBizCtxId() == 0L) {
+                    throw new IllegalStateException("'bizCtxId' parameter must not be null.");
+                }
+                if (abie.ownerTopLevelAbie != null) {
+                    abie.setOwnerTopLevelAbieId(abie.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+                if (abie.getOwnerTopLevelAbieId() == 0L) {
+                    throw new IllegalStateException("'ownerTopLevelAbieId' parameter must not be null.");
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

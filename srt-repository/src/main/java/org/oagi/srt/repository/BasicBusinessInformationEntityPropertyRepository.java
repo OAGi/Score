@@ -11,6 +11,6 @@ public interface BasicBusinessInformationEntityPropertyRepository
         extends JpaRepository<BasicBusinessInformationEntityProperty, Long>,
         BulkInsertRepository<BasicBusinessInformationEntityProperty> {
 
-    @Query("select b from BasicBusinessInformationEntityProperty b where b.ownerTopLevelAbie.topLevelAbieId = ?1")
+    @Query("select b from BasicBusinessInformationEntityProperty b where b.ownerTopLevelAbieId = ?1")
     public List<BasicBusinessInformationEntityProperty> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 }

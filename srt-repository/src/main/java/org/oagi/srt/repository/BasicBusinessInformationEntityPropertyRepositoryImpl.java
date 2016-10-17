@@ -37,7 +37,7 @@ public class BasicBusinessInformationEntityPropertyRepositoryImpl
     @Override
     protected void prepare(Dialect dialect, BasicBusinessInformationEntityProperty entity, List<Object> args) {
         entity.prePersist();
-        args.add(entity.getBasedBccp().getBccpId());
+        args.add(entity.getBasedBccpId());
         args.add(entity.getBizTerm());
         args.add(entity.getCreatedBy());
         args.add(entity.getCreationTimestamp());

@@ -28,6 +28,9 @@ public class NodeService {
     private CoreComponentService coreComponentService;
 
     @Autowired
+    private BusinessContextRepository businessContextRepository;
+
+    @Autowired
     private DataTypeRepository dataTypeRepository;
 
     @Autowired
@@ -77,18 +80,18 @@ public class NodeService {
 
     public Node createNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         long s = System.currentTimeMillis();
-        DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder = new DataContainerForProfileBODBuilder(bizCtx);
+        DataContainerForProfileBODBuilder dataContainer = new DataContainerForProfileBODBuilder(bizCtx);
 
         logger.info("DataContainerForProfileBODBuilder instantiated - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
         s = System.currentTimeMillis();
 
         long roleOfAccId = asccp.getRoleOfAccId();
-        AggregateCoreComponent acc = dataContainerForProfileBODBuilder.getACC(roleOfAccId);
+        AggregateCoreComponent acc = dataContainer.getACC(roleOfAccId);
         AggregateBusinessInformationEntity abie = createABIE(acc, bizCtx);
         AssociationBusinessInformationEntityProperty asbiep = createASBIEP(asccp, abie);
 
         TopLevelNode topLevelNode = new TopLevelNode(asbiep, asccp, abie, bizCtx);
-        appendChildren(dataContainerForProfileBODBuilder, acc, abie, topLevelNode);
+        appendChildren(dataContainer, acc, abie, topLevelNode);
         logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
         s = System.currentTimeMillis();
@@ -99,6 +102,12 @@ public class NodeService {
     }
 
     private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc, BusinessContext bizCtx) {
+        if (acc == null) {
+            throw new IllegalArgumentException("'acc' argument must not be null.");
+        }
+        if (bizCtx == null) {
+            throw new IllegalArgumentException("'bizCtx' argument must not be null.");
+        }
 
         AggregateBusinessInformationEntity abie = new AggregateBusinessInformationEntity();
         String abieGuid = Utility.generateGUID();
@@ -112,6 +121,13 @@ public class NodeService {
 
     private AssociationBusinessInformationEntityProperty createASBIEP(AssociationCoreComponentProperty asccp,
                                                                       AggregateBusinessInformationEntity abie) {
+        if (asccp == null) {
+            throw new IllegalArgumentException("'asccp' argument must not be null.");
+        }
+        if (abie == null) {
+            throw new IllegalArgumentException("'abie' argument must not be null.");
+        }
+
         AssociationBusinessInformationEntityProperty asbiep =
                 new AssociationBusinessInformationEntityProperty();
         asbiep.setGuid(Utility.generateGUID());
@@ -122,12 +138,12 @@ public class NodeService {
         return asbiep;
     }
 
-    private void appendChildren(DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder,
+    private void appendChildren(DataContainerForProfileBODBuilder dataContainer,
                                 AggregateCoreComponent acc, AggregateBusinessInformationEntity abie, Node parent) {
         LinkedList<AggregateCoreComponent> accList = new LinkedList();
         accList.add(acc);
         while (acc.getBasedAccId() > 0) {
-            acc = dataContainerForProfileBODBuilder.getACC(acc.getBasedAccId());
+            acc = dataContainer.getACC(acc.getBasedAccId());
             accList.add(acc);
         }
 
@@ -135,17 +151,17 @@ public class NodeService {
             acc = accList.pollFirst();
             int skb = 0;
             for (AggregateCoreComponent cnt_acc : accList) {
-                skb += queryNestedChildAssoc_wo_attribute(dataContainerForProfileBODBuilder, cnt_acc).size(); //here
+                skb += queryNestedChildAssoc_wo_attribute(dataContainer, cnt_acc).size(); //here
             }
 
-            List<CoreComponent> childAssoc = queryNestedChildAssoc(dataContainerForProfileBODBuilder, acc);
-            int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(dataContainerForProfileBODBuilder, acc).size();
+            List<CoreComponent> childAssoc = queryNestedChildAssoc(dataContainer, acc);
+            int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(dataContainer, acc).size();
             for (int i = 0; i < childAssoc.size(); i++) {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
                     if (bcc.getSeqKey() == 0) {
-                        new BBIENodeBuilder(dataContainerForProfileBODBuilder, parent, bcc, abie, skb).build();
+                        new BBIENodeBuilder(dataContainer, parent, bcc, abie, skb).build();
                     }
                 }
             }
@@ -155,50 +171,50 @@ public class NodeService {
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
                     if (bcc.getSeqKey() > 0) {
-                        new BBIENodeBuilder(dataContainerForProfileBODBuilder, parent, bcc, abie, skb + i - attr_cnt).build();
+                        new BBIENodeBuilder(dataContainer, parent, bcc, abie, skb + i - attr_cnt).build();
                     }
                 } else if (assoc instanceof AssociationCoreComponent) {
                     AssociationCoreComponent ascc = (AssociationCoreComponent) assoc;
-                    new ASBIENodeBuilder(dataContainerForProfileBODBuilder, parent, ascc, abie, skb + i - attr_cnt).build();
+                    new ASBIENodeBuilder(dataContainer, parent, ascc, abie, skb + i - attr_cnt).build();
                 }
             }
         }
     }
 
     private List<CoreComponent> queryNestedChildAssoc_wo_attribute(
-            DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder,
+            DataContainerForProfileBODBuilder dataContainer,
             AggregateCoreComponent aggregateCoreComponent) {
         List<CoreComponent> assoc = coreComponentService.getCoreComponentsWithoutAttributes(
-                aggregateCoreComponent, dataContainerForProfileBODBuilder);
-        return getAssocList(dataContainerForProfileBODBuilder, assoc);
+                aggregateCoreComponent, dataContainer);
+        return getAssocList(dataContainer, assoc);
     }
 
     private List<CoreComponent> queryNestedChildAssoc(
-            DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder,
+            DataContainerForProfileBODBuilder dataContainer,
             AggregateCoreComponent aggregateCoreComponent) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, dataContainerForProfileBODBuilder);
-        return getAssocList(dataContainerForProfileBODBuilder, assoc);
+        List<CoreComponent> assoc = coreComponentService.getCoreComponents(aggregateCoreComponent, dataContainer);
+        return getAssocList(dataContainer, assoc);
     }
 
     private List<CoreComponent> getAssocList(
-            DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder, List<CoreComponent> list) {
+            DataContainerForProfileBODBuilder dataContainer, List<CoreComponent> list) {
         for (int i = 0; i < list.size(); i++) {
             CoreComponent srt = list.get(i);
-            if (srt instanceof AssociationCoreComponent && dataContainerForProfileBODBuilder.groupcheck((AssociationCoreComponent) srt)) {
+            if (srt instanceof AssociationCoreComponent && dataContainer.groupcheck((AssociationCoreComponent) srt)) {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) srt;
-                AssociationCoreComponentProperty associationCoreComponentProperty = dataContainerForProfileBODBuilder.getASCCP(associationCoreComponent.getToAsccpId());
-                AggregateCoreComponent aggregateCoreComponent = dataContainerForProfileBODBuilder.getACC(associationCoreComponentProperty.getRoleOfAccId());
-                list = handleNestedGroup(dataContainerForProfileBODBuilder, aggregateCoreComponent, list, i);
+                AssociationCoreComponentProperty associationCoreComponentProperty = dataContainer.getASCCP(associationCoreComponent.getToAsccpId());
+                AggregateCoreComponent aggregateCoreComponent = dataContainer.getACC(associationCoreComponentProperty.getRoleOfAccId());
+                list = handleNestedGroup(dataContainer, aggregateCoreComponent, list, i);
             }
         }
         return list;
     }
 
-    private List<CoreComponent> handleNestedGroup(DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder,
+    private List<CoreComponent> handleNestedGroup(DataContainerForProfileBODBuilder dataContainer,
                                                   AggregateCoreComponent acc,
                                                   List<CoreComponent> coreComponents, int gPosition) {
 
-        List<CoreComponent> bList = queryChildAssoc(dataContainerForProfileBODBuilder, acc);
+        List<CoreComponent> bList = queryChildAssoc(dataContainer, acc);
         if (!bList.isEmpty()) {
             coreComponents.addAll(gPosition, bList);
             coreComponents.remove(gPosition + bList.size());
@@ -207,21 +223,21 @@ public class NodeService {
         for (int i = 0; i < coreComponents.size(); i++) {
             CoreComponent coreComponent = coreComponents.get(i);
             if (coreComponent instanceof AssociationCoreComponent &&
-                    dataContainerForProfileBODBuilder.groupcheck((AssociationCoreComponent) coreComponent)) {
+                    dataContainer.groupcheck((AssociationCoreComponent) coreComponent)) {
 
                 AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
-                AssociationCoreComponentProperty asccp = dataContainerForProfileBODBuilder.getASCCP(ascc.getToAsccpId());
-                coreComponents = handleNestedGroup(dataContainerForProfileBODBuilder,
-                        dataContainerForProfileBODBuilder.getACC(asccp.getRoleOfAccId()), coreComponents, i);
+                AssociationCoreComponentProperty asccp = dataContainer.getASCCP(ascc.getToAsccpId());
+                coreComponents = handleNestedGroup(dataContainer,
+                        dataContainer.getACC(asccp.getRoleOfAccId()), coreComponents, i);
             }
         }
 
         return coreComponents;
     }
 
-    private List<CoreComponent> queryChildAssoc(DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder,
+    private List<CoreComponent> queryChildAssoc(DataContainerForProfileBODBuilder dataContainer,
                                                 AggregateCoreComponent acc) {
-        List<CoreComponent> assoc = coreComponentService.getCoreComponents(acc, dataContainerForProfileBODBuilder);
+        List<CoreComponent> assoc = coreComponentService.getCoreComponents(acc, dataContainer);
         return assoc;
     }
 
@@ -410,7 +426,7 @@ public class NodeService {
     }
 
     private class BBIENodeBuilder {
-        private DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder;
+        private DataContainerForProfileBODBuilder dataContainer;
         private Node parent;
         private BasicCoreComponent bcc;
         private AggregateBusinessInformationEntity abie;
@@ -420,9 +436,9 @@ public class NodeService {
         private BasicBusinessInformationEntity bbie;
         private List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList;
 
-        public BBIENodeBuilder(DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder, Node parent,
+        public BBIENodeBuilder(DataContainerForProfileBODBuilder dataContainer, Node parent,
                                BasicCoreComponent bcc, AggregateBusinessInformationEntity abie, int seqKey) {
-            this.dataContainerForProfileBODBuilder = dataContainerForProfileBODBuilder;
+            this.dataContainer = dataContainer;
             this.parent = parent;
             this.bcc = bcc;
             this.abie = abie;
@@ -453,7 +469,7 @@ public class NodeService {
         }
 
         private void createBBIESC(long bdtId) {
-            bbieScList = dataContainerForProfileBODBuilder.findDtScByOwnerDtId(bdtId)
+            bbieScList = dataContainer.findDtScByOwnerDtId(bdtId)
                     .stream()
                     .filter(dtSc -> dtSc.getCardinalityMax() != 0)
                     .map(dtSc -> {
@@ -463,11 +479,11 @@ public class NodeService {
                         bbieSc.setBbie(bbie);
                         bbieSc.setDtSc(dtSc);
                         bbieSc.setGuid(Utility.generateGUID());
-                        long bdtScPriRestriId = dataContainerForProfileBODBuilder.getDefaultBdtScPriRestriId(bdtScId);
+                        long bdtScPriRestriId = dataContainer.getDefaultBdtScPriRestriId(bdtScId);
                         if (bdtScPriRestriId > 0L) {
-                            bbieSc.setDtScPriRestri(dataContainerForProfileBODBuilder.getBdtScPriRestri(bdtScPriRestriId));
+                            bbieSc.setDtScPriRestri(dataContainer.getBdtScPriRestri(bdtScPriRestriId));
                         }
-                        long codeListId = dataContainerForProfileBODBuilder.getCodeListIdOfBdtScPriRestriId(bdtScId);
+                        long codeListId = dataContainer.getCodeListIdOfBdtScPriRestriId(bdtScId);
 //                        if (codeListId > 0) {
 //                            bbieSc.setCodeListId(codeListId);
 //                        }
@@ -481,25 +497,25 @@ public class NodeService {
 
         private void appendBBIESC(BasicBusinessInformationEntity bbie, BBIENode parent) {
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
-                DataTypeSupplementaryComponent dtsc = bbiesc.getDtSc();
+                DataTypeSupplementaryComponent dtsc = dataContainer.getDtSc(bbiesc.getDtScId());
                 new BBIESCNode(parent, bbiesc, dtsc);
             }
         }
 
         public BBIENode build() {
-            BasicCoreComponentProperty bccp = dataContainerForProfileBODBuilder.getBCCP(bcc.getToBccpId());
+            BasicCoreComponentProperty bccp = dataContainer.getBCCP(bcc.getToBccpId());
             long bdtId = bccp.getBdtId();
-            long bdtPrimitiveRestrictionId = dataContainerForProfileBODBuilder.getDefaultBdtPriRestriId(bdtId);
+            long bdtPrimitiveRestrictionId = dataContainer.getDefaultBdtPriRestriId(bdtId);
             BusinessDataTypePrimitiveRestriction bdtPriRestri =
-                    dataContainerForProfileBODBuilder.getBdtPriRestri(bdtPrimitiveRestrictionId);
-            long codeListId = dataContainerForProfileBODBuilder.getCodeListIdOfBdtPriRestriId(bdtId);
-            DataType bdt = dataContainerForProfileBODBuilder.getDt(bdtId);
+                    dataContainer.getBdtPriRestri(bdtPrimitiveRestrictionId);
+            long codeListId = dataContainer.getCodeListIdOfBdtPriRestriId(bdtId);
+            DataType bdt = dataContainer.getDt(bdtId);
 
             createBBIEP(bccp);
             createBBIE(bdtPriRestri, codeListId);
             createBBIESC(bdtId);
 
-            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainerForProfileBODBuilder.getBdtPriRestriByBdtId(bdtId);
+            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainer.getBdtPriRestriByBdtId(bdtId);
 
             BBIENode bbieNode = new BBIENode(seqKey, parent, bbie, bbiep, bccp, bdt, bdtPriRestriList);
             appendBBIESC(bbie, bbieNode);
@@ -508,7 +524,7 @@ public class NodeService {
     }
 
     private class ASBIENodeBuilder {
-        private DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder;
+        private DataContainerForProfileBODBuilder dataContainer;
         private Node parent;
 
         private AssociationCoreComponent ascc;
@@ -520,17 +536,17 @@ public class NodeService {
         private AssociationBusinessInformationEntityProperty asbiep;
         private AssociationBusinessInformationEntity asbie;
 
-        public ASBIENodeBuilder(DataContainerForProfileBODBuilder dataContainerForProfileBODBuilder, Node parent,
+        public ASBIENodeBuilder(DataContainerForProfileBODBuilder dataContainer, Node parent,
                                 AssociationCoreComponent ascc,
                                 AggregateBusinessInformationEntity fromAbie,
                                 int seqKey) {
-            this.dataContainerForProfileBODBuilder = dataContainerForProfileBODBuilder;
+            this.dataContainer = dataContainer;
             this.parent = parent;
             this.ascc = ascc;
             this.fromAbie = fromAbie;
             this.seqKey = seqKey;
 
-            this.asccp = dataContainerForProfileBODBuilder.getASCCP(ascc.getToAsccpId());
+            this.asccp = dataContainer.getASCCP(ascc.getToAsccpId());
         }
 
         public void createASBIEP() {
@@ -554,22 +570,29 @@ public class NodeService {
         }
 
         public ASBIENode build() {
-            AggregateCoreComponent acc = dataContainerForProfileBODBuilder.getACC(asccp.getRoleOfAccId());
-            this.roleOfAbie = createABIE(acc, dataContainerForProfileBODBuilder.getBusinessContext());
+            AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
+            this.roleOfAbie = createABIE(acc, dataContainer.getBusinessContext());
 
             createASBIEP();
             createASBIE();
 
             ASBIENode asbieNode = new ASBIENode(seqKey, parent, asbie, asbiep, asccp, roleOfAbie);
-            appendChildren(dataContainerForProfileBODBuilder, acc, roleOfAbie, asbieNode);
+            appendChildren(dataContainer, acc, roleOfAbie, asbieNode);
             return asbieNode;
         }
     }
 
 
-
     private class DataContainerForProfileBODLoader {
         private TopLevelAbie topLevelAbie;
+        private List<BusinessContext> businessContextList;
+        private List<BasicCoreComponent> bccList;
+        private List<AssociationCoreComponentProperty> asccpList;
+        private List<BasicCoreComponentProperty> bccpList;
+        private List<DataType> dtList;
+        private List<DataTypeSupplementaryComponent> dtScList;
+        private List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList;
+
         private List<AggregateBusinessInformationEntity> abieList;
         private List<AssociationBusinessInformationEntity> asbieList;
         private List<AssociationBusinessInformationEntityProperty> asbiepList;
@@ -577,16 +600,33 @@ public class NodeService {
         private List<BasicBusinessInformationEntityProperty> bbiepList;
         private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList;
 
+        private Map<Long, BusinessContext> bizCtxIdMap;
+        private Map<Long, BasicCoreComponent> bccIdMap;
+        private Map<Long, AssociationCoreComponentProperty> asccpIdMap;
+        private Map<Long, BasicCoreComponentProperty> bccpIdMap;
+        private Map<Long, DataType> dtIdMap;
+        private Map<Long, DataTypeSupplementaryComponent> dtScIdMap;
+        private Map<Long, List<BusinessDataTypePrimitiveRestriction>> bdtPriRestriListByBdtIdMap;
+
         private Map<Long, AggregateBusinessInformationEntity> abieIdMap;
-        private Map<Long, AssociationBusinessInformationEntity> asbieIdMap;
+        private Map<Long, List<AssociationBusinessInformationEntity>> asbieByFromAbieIdMap;
         private Map<Long, AssociationBusinessInformationEntityProperty> asbiepIdMap;
         private Map<Long, AssociationBusinessInformationEntityProperty> asbiepByRoleOfAbieIdMap;
-        private Map<Long, BasicBusinessInformationEntity> bbieIdMap;
+        private Map<Long, List<BasicBusinessInformationEntity>> bbieByFromAbieIdMap;
         private Map<Long, BasicBusinessInformationEntityProperty> bbiepIdMap;
-        private Map<Long, BasicBusinessInformationEntitySupplementaryComponent> bbiescIdMap;
+        private Map<Long, List<BasicBusinessInformationEntitySupplementaryComponent>> bbieScListByBbieIdMap;
+
 
         public DataContainerForProfileBODLoader(TopLevelAbie topLevelAbie) {
             this.topLevelAbie = topLevelAbie;
+
+            businessContextList = businessContextRepository.findAll();
+            bccList = bccRepository.findAll();
+            asccpList = asccpRepository.findAll();
+            bccpList = bccpRepository.findAll();
+            dtList = dataTypeRepository.findAll();
+            dtScList = dtScRepository.findAll();
+            bdtPriRestriList = bdtPriRestriRepository.findAll();
 
             abieList = abieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
             asbieList = asbieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
@@ -595,47 +635,124 @@ public class NodeService {
             bbiepList = bbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
             bbiescList = bbiescRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
+            bizCtxIdMap = businessContextList.stream()
+                    .collect(Collectors.toMap(e -> e.getBizCtxId(), Function.identity()));
+            bccIdMap = bccList.stream()
+                    .collect(Collectors.toMap(e -> e.getBccId(), Function.identity()));
+            asccpIdMap = asccpList.stream()
+                    .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
+            bccpIdMap = bccpList.stream()
+                    .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
+            dtIdMap = dtList.stream()
+                    .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
+            dtScIdMap = dtScList.stream()
+                    .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
+            bdtPriRestriListByBdtIdMap = bdtPriRestriList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getBdtId()));
+
             abieIdMap = abieList.stream()
                     .collect(Collectors.toMap(e -> e.getAbieId(), Function.identity()));
-            asbieIdMap = asbieList.stream()
-                    .collect(Collectors.toMap(e -> e.getAsbieId(), Function.identity()));
+            asbieByFromAbieIdMap = asbieList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
             asbiepIdMap = asbiepList.stream()
                     .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
             asbiepByRoleOfAbieIdMap = asbiepList.stream()
                     .collect(Collectors.toMap(e -> e.getRoleOfAbieId(), Function.identity()));
-            bbieIdMap = bbieList.stream()
-                    .collect(Collectors.toMap(e -> e.getBbieId(), Function.identity()));
+            bbieByFromAbieIdMap = bbieList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
             bbiepIdMap = bbiepList.stream()
                     .collect(Collectors.toMap(e -> e.getBbiepId(), Function.identity()));
-            bbiescIdMap = bbiescList.stream()
-                    .collect(Collectors.toMap(e -> e.getBbieScId(), Function.identity()));
+            bbieScListByBbieIdMap = bbiescList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getBbieId()));
+        }
+
+        public BusinessContext findBusinessContext(long bizCtxId) {
+            return bizCtxIdMap.get(bizCtxId);
         }
 
         public AggregateBusinessInformationEntity findAbie(long abieId) {
             return abieIdMap.get(abieId);
         }
+
+        public BasicCoreComponent findBcc(long bccId) {
+            return bccIdMap.get(bccId);
+        }
+
+        public BasicCoreComponentProperty findBccp(long bccpId) {
+            return bccpIdMap.get(bccpId);
+        }
+
+        public AssociationCoreComponentProperty findAsccp(long asccpId) {
+            return asccpIdMap.get(asccpId);
+        }
+
+        public DataType findDt(long dtId) {
+            return dtIdMap.get(dtId);
+        }
+
+        public DataTypeSupplementaryComponent findDtSc(long dtScId) {
+            return dtScIdMap.get(dtScId);
+        }
+
+        public List<BusinessDataTypePrimitiveRestriction> findBdtPriRestriByBdtId(long bdtId) {
+            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriListByBdtIdMap.get(bdtId);
+            return (bdtPriRestriList != null) ? bdtPriRestriList : Collections.emptyList();
+        }
+
+        public AssociationBusinessInformationEntityProperty findAsbiep(long asbiepId) {
+            return asbiepIdMap.get(asbiepId);
+        }
+
+        public BasicBusinessInformationEntityProperty findBbiep(long bbiepId) {
+            return bbiepIdMap.get(bbiepId);
+        }
+
+        public AssociationBusinessInformationEntityProperty findAsbiepByRoleOfAbie(AggregateBusinessInformationEntity abie) {
+            return asbiepByRoleOfAbieIdMap.get(abie.getAbieId());
+        }
+
+        public List<BasicBusinessInformationEntity> findBbieByFromAbieId(AggregateBusinessInformationEntity abie) {
+            List<BasicBusinessInformationEntity> bbieList = bbieByFromAbieIdMap.get(abie.getAbieId());
+            return (bbieList != null) ? bbieList : Collections.emptyList();
+        }
+
+        public List<AssociationBusinessInformationEntity> findAsbieByFromAbieId(AggregateBusinessInformationEntity abie) {
+            List<AssociationBusinessInformationEntity> asbieList = asbieByFromAbieIdMap.get(abie.getAbieId());
+            return (asbieList != null) ? asbieList : Collections.emptyList();
+        }
+
+        public List<BasicBusinessInformationEntitySupplementaryComponent> findBbieScByBbieId(long bbieId) {
+            List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = bbieScListByBbieIdMap.get(bbieId);
+            return (bbieScList != null) ? bbieScList : Collections.emptyList();
+        }
+
     }
 
-
-
-
     public Node createNode(TopLevelAbie topLevelAbie) {
+        long s = System.currentTimeMillis();
         DataContainerForProfileBODLoader dataContainer = new DataContainerForProfileBODLoader(topLevelAbie);
+        logger.info("DataContainerForProfileBODLoader instantiated - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+        s = System.currentTimeMillis();
 
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-        BusinessContext bizCtx = abie.getBizCtx();
-        AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
-        AssociationCoreComponentProperty asccp = asbiep.getBasedAsccp();
+        BusinessContext bizCtx = dataContainer.findBusinessContext(abie.getBizCtxId());
+        AssociationBusinessInformationEntityProperty asbiep = dataContainer.findAsbiepByRoleOfAbie(abie);
+        AssociationCoreComponentProperty asccp = dataContainer.findAsccp(asbiep.getBasedAsccpId());
         TopLevelNode topLevelNode = new TopLevelNode(asbiep, asccp, abie, bizCtx);
+        createBIEChildren(dataContainer, abie, topLevelNode);
+        logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
-        createBIEChildren(abie, topLevelNode);
+        s = System.currentTimeMillis();
+        topLevelNode.accept(new NodeSortVisitor());
+        logger.info("Node sorted - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+
         return topLevelNode;
     }
 
-    private void createBIEChildren(AggregateBusinessInformationEntity abie, Node parent) {
-        long abieId = abie.getAbieId();
-        List<BasicBusinessInformationEntity> bbieList = bbieRepository.findByFromAbieId(abieId);
-        List<AssociationBusinessInformationEntity> asbieList = asbieRepository.findByFromAbieId(abieId);
+    private void createBIEChildren(DataContainerForProfileBODLoader dataContainer,
+                                   AggregateBusinessInformationEntity abie, Node parent) {
+        List<BasicBusinessInformationEntity> bbieList = dataContainer.findBbieByFromAbieId(abie);
+        List<AssociationBusinessInformationEntity> asbieList = dataContainer.findAsbieByFromAbieId(abie);
 
         Map<BusinessInformationEntity, Double> sequence = new HashMap();
         ValueComparator bvc = new ValueComparator(sequence);
@@ -643,15 +760,15 @@ public class NodeService {
 
         for (BasicBusinessInformationEntity bbie : bbieList) {
             double sk = bbie.getSeqKey();
-            if (getEntityType(bbie.getBasedBccId()) == 0L)
-                showBBIETree(bbie, parent);
+            if (getEntityType(dataContainer, bbie.getBasedBccId()) == 0L)
+                showBBIETree(dataContainer, bbie, parent);
             else
                 sequence.put(bbie, sk);
         }
 
-        for (AssociationBusinessInformationEntity asbieVO : asbieList) {
-            double sk = asbieVO.getSeqKey();
-            sequence.put(asbieVO, sk);
+        for (AssociationBusinessInformationEntity asbie : asbieList) {
+            double sk = asbie.getSeqKey();
+            sequence.put(asbie, sk);
         }
 
         ordered_sequence.putAll(sequence);
@@ -660,9 +777,9 @@ public class NodeService {
         while (i.hasNext()) {
             Map.Entry me = (Map.Entry) i.next();
             if (me.getKey() instanceof BasicBusinessInformationEntity)
-                showBBIETree((BasicBusinessInformationEntity) me.getKey(), parent);
+                showBBIETree(dataContainer, (BasicBusinessInformationEntity) me.getKey(), parent);
             else
-                showASBIETree((AssociationBusinessInformationEntity) me.getKey(), parent);
+                showASBIETree(dataContainer, (AssociationBusinessInformationEntity) me.getKey(), parent);
         }
     }
 
@@ -684,40 +801,42 @@ public class NodeService {
         }
     }
 
-    public int getEntityType(long bccId) {
-        BasicCoreComponent basicCoreComponent = bccRepository.findOne(bccId);
+    public int getEntityType(DataContainerForProfileBODLoader dataContainer, long bccId) {
+        BasicCoreComponent basicCoreComponent = dataContainer.findBcc(bccId);
         return basicCoreComponent.getEntityType();
     }
 
-    private void showBBIETree(BasicBusinessInformationEntity bbie, Node parent) {
-        BasicBusinessInformationEntityProperty bbiep = bbie.getToBbiep();
-        BasicCoreComponentProperty bccp = bbiep.getBasedBccp();
+    private void showBBIETree(DataContainerForProfileBODLoader dataContainer,
+                              BasicBusinessInformationEntity bbie, Node parent) {
+        BasicBusinessInformationEntityProperty bbiep = dataContainer.findBbiep(bbie.getToBbiepId());
+        BasicCoreComponentProperty bccp = dataContainer.findBccp(bbiep.getBasedBccpId());
 
         long bdtId = bccp.getBdtId();
-        DataType bdt = dataTypeRepository.findOne(bdtId);
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findByBdtId(bdtId);
+        DataType bdt = dataContainer.findDt(bdtId);
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainer.findBdtPriRestriByBdtId(bdtId);
 
         int seqKey = (int) bbie.getSeqKey();
         BBIENode bbieNode = new BBIENode(seqKey, parent, bbie, bbiep, bccp, bdt, bdtPriRestriList);
-        appendBBIESC(bbie, bbieNode);
+        appendBBIESC(dataContainer, bbie, bbieNode);
     }
 
-    private void appendBBIESC(BasicBusinessInformationEntity bbie, BBIENode parent) {
-        List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList =
-                bbiescRepository.findByBbieId(bbie.getBbieId());
+    private void appendBBIESC(DataContainerForProfileBODLoader dataContainer,
+                              BasicBusinessInformationEntity bbie, BBIENode parent) {
+        List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = dataContainer.findBbieScByBbieId(bbie.getBbieId());
         for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbiescList) {
-            DataTypeSupplementaryComponent dtsc = bbiesc.getDtSc();
+            DataTypeSupplementaryComponent dtsc = dataContainer.findDtSc(bbiesc.getDtScId());
             new BBIESCNode(parent, bbiesc, dtsc);
         }
     }
 
-    private void showASBIETree(AssociationBusinessInformationEntity asbie, Node parent) {
-        AssociationBusinessInformationEntityProperty asbiep = asbie.getToAsbiep();
-        AssociationCoreComponentProperty asccp = asbiep.getBasedAsccp();
-        AggregateBusinessInformationEntity roleOfAbie = asbiep.getRoleOfAbie();
+    private void showASBIETree(DataContainerForProfileBODLoader dataContainer,
+                               AssociationBusinessInformationEntity asbie, Node parent) {
+        AssociationBusinessInformationEntityProperty asbiep = dataContainer.findAsbiep(asbie.getToAsbiepId());
+        AssociationCoreComponentProperty asccp = dataContainer.findAsccp(asbiep.getBasedAsccpId());
+        AggregateBusinessInformationEntity roleOfAbie = dataContainer.findAbie(asbiep.getRoleOfAbieId());
 
         int seqKey = (int) asbie.getSeqKey();
         ASBIENode asbieNode = new ASBIENode(seqKey, parent, asbie, asbiep, asccp, roleOfAbie);
-        createBIEChildren(roleOfAbie, asbieNode);
+        createBIEChildren(dataContainer, roleOfAbie, asbieNode);
     }
 }

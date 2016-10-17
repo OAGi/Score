@@ -41,8 +41,8 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
             "AssociationBusinessInformationEntityProperty asbiep, " +
             "AssociationCoreComponentProperty asccp where " +
             "topLevelAbie.abie.abieId = abie.abieId and " +
-            "abie.abieId = asbiep.roleOfAbie.abieId and " +
-            "asbiep.basedAsccp.asccpId = asccp.asccpId and " +
+            "abie.abieId = asbiep.roleOfAbieId and " +
+            "asbiep.basedAsccpId = asccp.asccpId and " +
             "asccp.propertyTerm like %?1%")
     public List<String> findPropertyTermByPropertyTermContains(String propertyTerm);
 

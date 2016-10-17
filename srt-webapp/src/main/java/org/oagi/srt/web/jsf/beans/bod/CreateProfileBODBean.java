@@ -216,7 +216,7 @@ public class CreateProfileBODBean {
         Node node = (Node) selectedTreeNode.getData();
         if (node instanceof BBIENode) {
             BBIENode bbieNode = (BBIENode) node;
-            if (bbieNode.getBbie().getBdtPriRestri().getBdtPriRestriId() > 0L) {
+            if (bbieNode.getBbie().getBdtPriRestriId() > 0L) {
                 return "Primitive";
             } else {
                 return "Code";
@@ -242,6 +242,24 @@ public class CreateProfileBODBean {
     public String getCodeListName(Node node) {
         CodeList codeList = (CodeList) node.getAttribute("codeList");
         return (codeList != null) ? codeList.getName() : null;
+    }
+
+    public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
+        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
+        Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
+        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
+            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
+                CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
+                        cdtAwdPriXpsTypeMapRepository.findOne(cc.getCdtAwdPriXpsTypeMapId());
+                XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
+                bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
+            } else {
+                CodeList code = codeListRepository.findOne(cc.getCodeListId());
+                bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
+            }
+        }
+
+        return bdtPrimitiveRestrictions;
     }
 
     public String onFlowProcess(FlowEvent event) {
@@ -367,23 +385,5 @@ public class CreateProfileBODBean {
         bieTreeNodeHandler.submit(getTopLevelNode(), progressListener);
 
         return "/views/profile_bod/list.xhtml?faces-redirect=true";
-    }
-
-    public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
-        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
-        Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
-        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
-            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
-                CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
-                        cdtAwdPriXpsTypeMapRepository.findOne(cc.getCdtAwdPriXpsTypeMapId());
-                XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
-                bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
-            } else {
-                CodeList code = codeListRepository.findOne(cc.getCodeListId());
-                bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
-            }
-        }
-
-        return bdtPrimitiveRestrictions;
     }
 }

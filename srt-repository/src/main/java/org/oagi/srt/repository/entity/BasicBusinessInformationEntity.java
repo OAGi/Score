@@ -28,20 +28,24 @@ public class BasicBusinessInformationEntity
     @Column(nullable = false)
     private long basedBccId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long fromAbieId;
+    @Transient
     private AggregateBusinessInformationEntity fromAbie;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_bbiep_id", nullable = false)
+    @Column(nullable = false)
+    private long toBbiepId;
+    @Transient
     private BasicBusinessInformationEntityProperty toBbiep;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bdt_pri_restri_id")
+    @Column
+    private Long bdtPriRestriId;
+    @Transient
     private BusinessDataTypePrimitiveRestriction bdtPriRestri;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "code_list_id")
+    @Column
+    private Long codeListId;
+    @Transient
     private CodeList codeList;
 
     @Column(nullable = false)
@@ -89,8 +93,9 @@ public class BasicBusinessInformationEntity
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long ownerTopLevelAbieId;
+    @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
     @Override
@@ -127,32 +132,48 @@ public class BasicBusinessInformationEntity
         this.basedBccId = basedBccId;
     }
 
-    public AggregateBusinessInformationEntity getFromAbie() {
-        return fromAbie;
+    public long getFromAbieId() {
+        return fromAbieId;
+    }
+
+    public void setFromAbieId(long fromAbieId) {
+        this.fromAbieId = fromAbieId;
     }
 
     public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
         this.fromAbie = fromAbie;
     }
 
-    public BasicBusinessInformationEntityProperty getToBbiep() {
-        return toBbiep;
+    public long getToBbiepId() {
+        return toBbiepId;
+    }
+
+    public void setToBbiepId(long toBbiepId) {
+        this.toBbiepId = toBbiepId;
     }
 
     public void setToBbiep(BasicBusinessInformationEntityProperty toBbiep) {
         this.toBbiep = toBbiep;
     }
 
-    public BusinessDataTypePrimitiveRestriction getBdtPriRestri() {
-        return bdtPriRestri;
+    public long getBdtPriRestriId() {
+        return (bdtPriRestriId == null) ? 0L : bdtPriRestriId;
+    }
+
+    public void setBdtPriRestriId(Long bdtPriRestriId) {
+        this.bdtPriRestriId = bdtPriRestriId;
     }
 
     public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
         this.bdtPriRestri = bdtPriRestri;
     }
 
-    public CodeList getCodeList() {
-        return codeList;
+    public long getCodeListId() {
+        return (codeListId == null) ? 0L : codeListId;
+    }
+
+    public void setCodeListId(Long codeListId) {
+        this.codeListId = codeListId;
     }
 
     public void setCodeList(CodeList codeList) {
@@ -277,8 +298,12 @@ public class BasicBusinessInformationEntity
         this.used = used;
     }
 
-    public TopLevelAbie getOwnerTopLevelAbie() {
-        return ownerTopLevelAbie;
+    public long getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
+    }
+
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
@@ -308,10 +333,10 @@ public class BasicBusinessInformationEntity
         result = (int) (bbieId ^ (bbieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (basedBccId ^ (basedBccId >>> 32));
-        result = 31 * result + (fromAbie != null ? fromAbie.hashCode() : 0);
-        result = 31 * result + (toBbiep != null ? toBbiep.hashCode() : 0);
-        result = 31 * result + (bdtPriRestri != null ? bdtPriRestri.hashCode() : 0);
-        result = 31 * result + (codeList != null ? codeList.hashCode() : 0);
+        result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
+        result = 31 * result + (int) (toBbiepId ^ (toBbiepId >>> 32));
+        result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -327,7 +352,7 @@ public class BasicBusinessInformationEntity
         temp = Double.doubleToLongBits(seqKey);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 
@@ -337,10 +362,10 @@ public class BasicBusinessInformationEntity
                 "bbieId=" + bbieId +
                 ", guid='" + guid + '\'' +
                 ", basedBccId=" + basedBccId +
-                ", fromAbie=" + fromAbie +
-                ", toBbiep=" + toBbiep +
-                ", bdtPriRestri=" + bdtPriRestri +
-                ", codeList=" + codeList +
+                ", fromAbieId=" + fromAbieId +
+                ", toBbiepId=" + toBbiepId +
+                ", bdtPriRestriId=" + bdtPriRestriId +
+                ", codeListId=" + codeListId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
@@ -355,7 +380,7 @@ public class BasicBusinessInformationEntity
                 ", lastUpdateTimestamp=" + lastUpdateTimestamp +
                 ", seqKey=" + seqKey +
                 ", used=" + used +
-                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
     }
 
@@ -368,7 +393,47 @@ public class BasicBusinessInformationEntity
     public BasicBusinessInformationEntity() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
+                if (bbie.fromAbie != null) {
+                    bbie.setFromAbieId(bbie.fromAbie.getAbieId());
+                }
+                if (bbie.toBbiep != null) {
+                    bbie.setToBbiepId(bbie.toBbiep.getBbiepId());
+                }
+                if (bbie.bdtPriRestri != null) {
+                    bbie.setBdtPriRestriId(bbie.bdtPriRestri.getBdtPriRestriId());
+                }
+                if (bbie.codeList != null) {
+                    bbie.setCodeListId(bbie.codeList.getCodeListId());
+                }
+                if (bbie.ownerTopLevelAbie != null) {
+                    bbie.setOwnerTopLevelAbieId(bbie.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
+                if (bbie.bdtPriRestri != null) {
+                    bbie.setBdtPriRestriId(bbie.bdtPriRestri.getBdtPriRestriId());
+                }
+                if (bbie.codeList != null) {
+                    bbie.setCodeListId(bbie.codeList.getCodeListId());
+                }
+            }
+            @Override
+            public void onPostUpdate(Object object) {
+
+            }
+        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

@@ -27,24 +27,29 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bbie_id", nullable = false)
+    @Column(nullable = false)
+    private long bbieId;
+    @Transient
     private BasicBusinessInformationEntity bbie;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dt_sc_id", nullable = false)
+    @Column(nullable = false)
+    private long dtScId;
+    @Transient
     private DataTypeSupplementaryComponent dtSc;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dt_sc_pri_restri_id")
+    @Column
+    private Long dtScPriRestriId;
+    @Transient
     private BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "code_list_id")
+    @Column
+    private Long codeListId;
+    @Transient
     private CodeList codeList;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agency_id_list_id")
+    @Column
+    private Long agencyIdListId;
+    @Transient
     private AgencyIdList agencyIdList;
 
     @Column(nullable = false)
@@ -72,8 +77,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long ownerTopLevelAbieId;
+    @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
     @Override
@@ -102,40 +108,60 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.guid = guid;
     }
 
-    public BasicBusinessInformationEntity getBbie() {
-        return bbie;
+    public long getBbieId() {
+        return bbieId;
+    }
+
+    public void setBbieId(long bbieId) {
+        this.bbieId = bbieId;
     }
 
     public void setBbie(BasicBusinessInformationEntity bbie) {
         this.bbie = bbie;
     }
 
-    public DataTypeSupplementaryComponent getDtSc() {
-        return dtSc;
+    public long getDtScId() {
+        return dtScId;
+    }
+
+    public void setDtScId(long dtScId) {
+        this.dtScId = dtScId;
     }
 
     public void setDtSc(DataTypeSupplementaryComponent dtSc) {
         this.dtSc = dtSc;
     }
 
-    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction getDtScPriRestri() {
-        return dtScPriRestri;
+    public long getDtScPriRestriId() {
+        return (dtScPriRestriId == null) ? 0L : dtScPriRestriId;
+    }
+
+    public void setDtScPriRestriId(Long dtScPriRestriId) {
+        this.dtScPriRestriId = dtScPriRestriId;
     }
 
     public void setDtScPriRestri(BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri) {
         this.dtScPriRestri = dtScPriRestri;
     }
 
-    public CodeList getCodeList() {
-        return codeList;
+    public long getCodeListId() {
+        return (codeListId == null) ? 0L : codeListId;
+    }
+
+    public void setCodeListId(Long codeListId) {
+        this.codeListId = codeListId;
     }
 
     public void setCodeList(CodeList codeList) {
         this.codeList = codeList;
     }
 
-    public AgencyIdList getAgencyIdList() {
-        return agencyIdList;
+    public long getAgencyIdListId() {
+        return (agencyIdListId == null) ? 0L : agencyIdListId;
+    }
+
+    public void setAgencyIdListId(Long agencyIdListId) {
+        this.agencyIdListId = agencyIdListId;
     }
 
     public void setAgencyIdList(AgencyIdList agencyIdList) {
@@ -208,8 +234,12 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.used = used;
     }
 
-    public TopLevelAbie getOwnerTopLevelAbie() {
-        return ownerTopLevelAbie;
+    public long getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
+    }
+
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
@@ -236,11 +266,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     public int hashCode() {
         int result = (int) (bbieScId ^ (bbieScId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (bbie != null ? bbie.hashCode() : 0);
-        result = 31 * result + (dtSc != null ? dtSc.hashCode() : 0);
-        result = 31 * result + (dtScPriRestri != null ? dtScPriRestri.hashCode() : 0);
-        result = 31 * result + (codeList != null ? codeList.hashCode() : 0);
-        result = 31 * result + (agencyIdList != null ? agencyIdList.hashCode() : 0);
+        result = 31 * result + (int) (bbieId ^ (bbieId >>> 32));
+        result = 31 * result + (int) (dtScId ^ (dtScId >>> 32));
+        result = 31 * result + (dtScPriRestriId != null ? dtScPriRestriId.hashCode() : 0);
+        result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -249,7 +279,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
     }
 
@@ -258,11 +288,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         return "BasicBusinessInformationEntitySupplementaryComponent{" +
                 "bbieScId=" + bbieScId +
                 ", guid='" + guid + '\'' +
-                ", bbie=" + bbie +
-                ", dtSc=" + dtSc +
-                ", dtScPriRestri=" + dtScPriRestri +
-                ", codeList=" + codeList +
-                ", agencyIdList=" + agencyIdList +
+                ", bbieId=" + bbieId +
+                ", dtScId=" + dtScId +
+                ", dtScPriRestriId=" + dtScPriRestriId +
+                ", codeListId=" + codeListId +
+                ", agencyIdListId=" + agencyIdListId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
@@ -271,9 +301,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", used=" + used +
-                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
-                ", persistEventListeners=" + persistEventListeners +
-                ", updateEventListeners=" + updateEventListeners +
+                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
     }
 
@@ -286,7 +314,56 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     public BasicBusinessInformationEntitySupplementaryComponent() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                BasicBusinessInformationEntitySupplementaryComponent bbiesc = (BasicBusinessInformationEntitySupplementaryComponent) object;
+                if (bbiesc.bbie != null) {
+                    bbiesc.setBbieId(bbiesc.bbie.getBbieId());
+                }
+                if (bbiesc.dtSc != null) {
+                    bbiesc.setDtScId(bbiesc.dtSc.getDtScId());
+                }
+                if (bbiesc.dtScPriRestriId != null) {
+                    bbiesc.setDtScPriRestriId(bbiesc.dtScPriRestri.getBdtScPriRestriId());
+                }
+                if (bbiesc.codeListId != null) {
+                    bbiesc.setCodeListId(bbiesc.codeList.getCodeListId());
+                }
+                if (bbiesc.agencyIdList != null) {
+                    bbiesc.setAgencyIdListId(bbiesc.agencyIdListId);
+                }
+                if (bbiesc.bbie != null) {
+                    bbiesc.setBbieId(bbiesc.bbie.getBbieId());
+                }
+                if (bbiesc.ownerTopLevelAbie != null) {
+                    bbiesc.setOwnerTopLevelAbieId(bbiesc.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
+        addUpdateEventListener(new UpdateEventListener() {
+            @Override
+            public void onPreUpdate(Object object) {
+                BasicBusinessInformationEntitySupplementaryComponent bbiesc = (BasicBusinessInformationEntitySupplementaryComponent) object;
+                if (bbiesc.dtScPriRestriId != null) {
+                    bbiesc.setDtScPriRestriId(bbiesc.dtScPriRestri.getBdtScPriRestriId());
+                }
+                if (bbiesc.codeListId != null) {
+                    bbiesc.setCodeListId(bbiesc.codeList.getCodeListId());
+                }
+                if (bbiesc.agencyIdList != null) {
+                    bbiesc.setAgencyIdListId(bbiesc.agencyIdListId);
+                }
+            }
+            @Override
+            public void onPostUpdate(Object object) {
+
+            }
+        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

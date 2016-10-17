@@ -261,7 +261,8 @@ public class StandaloneXMLSchema {
     }
 
     public String setBDTBase(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = gBBIE.getBdtPriRestri();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType =
@@ -284,7 +285,8 @@ public class StandaloneXMLSchema {
     }
 
     public Element setBBIE_Attr_Type(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, Element gNode) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = gBBIE.getBdtPriRestri();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType =
@@ -321,7 +323,7 @@ public class StandaloneXMLSchema {
 
         DataType gBDT = generationContext.queryAssocBDT(gBBIE);
 
-        if (gBBIE.getBdtPriRestri() == null)
+        if (gBBIE.getBdtPriRestriId() == 0)
             extNode.setAttribute("base", setBDTBase(generationContext, gBDT));
         else {
             extNode.setAttribute("base", setBDTBase(generationContext, gBBIE));
@@ -362,7 +364,7 @@ public class StandaloneXMLSchema {
 
     public Element generateASBIEP(GenerationContext generationContext,
                                   AssociationBusinessInformationEntityProperty gASBIEP, Element gElementNode) {
-        AssociationCoreComponentProperty asccp = gASBIEP.getBasedAsccp();
+        AssociationCoreComponentProperty asccp = generationContext.findASCCP(gASBIEP.getBasedAsccpId());
         gElementNode.setAttribute("name", Utility.first(asccp.getDen(), true));
         //gElementNode.setAttribute("type", Utility.second(asccp.getDen())+"Type");
         return gElementNode;
@@ -441,12 +443,13 @@ public class StandaloneXMLSchema {
     public CodeList getCodeList(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, DataType gBDT) {
         CodeList aCL = null;
 
-        if (gBBIE.getCodeList() != null) {
-            aCL = gBBIE.getCodeList();
+        if (gBBIE.getCodeListId() != 0) {
+            aCL = generationContext.findCodeList(gBBIE.getCodeListId());
         }
 
         if (aCL == null) {
-            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = gBBIE.getBdtPriRestri();
+            BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                    generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
             if (aBDTPrimitiveRestriction.getCodeListId() != 0) {
                 aCL = generationContext.findCodeList(aBDTPrimitiveRestriction.getCodeListId());
             }
@@ -478,7 +481,8 @@ public class StandaloneXMLSchema {
     }
 
     public Element setBBIEType(GenerationContext generationContext, BasicBusinessInformationEntity gBBIE, Element gNode) {
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction = gBBIE.getBdtPriRestri();
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
+                generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
         CoreDataTypeAllowedPrimitiveExpressionTypeMap aDTAllowedPrimitiveExpressionTypeMap =
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType =
@@ -509,7 +513,7 @@ public class StandaloneXMLSchema {
             CodeList aCL = getCodeList(generationContext, gBBIE, gBDT);
 
             if (aCL == null) {
-                if (gBBIE.getBdtPriRestri() == null) {
+                if (gBBIE.getBdtPriRestriId() == 0) {
                     if (bbieScList.isEmpty()) {
                         eNode = setBBIEType(generationContext, gBDT, eNode);
                         return eNode;
@@ -547,7 +551,7 @@ public class StandaloneXMLSchema {
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList = generationContext.queryBBIESCs(gBBIE);
             CodeList aCL = getCodeList(generationContext, gBBIE, gBDT);
             if (aCL == null) {
-                if (gBBIE.getBdtPriRestri() == null) {
+                if (gBBIE.getBdtPriRestriId() == 0) {
                     if (bbieScList.isEmpty()) {
                         eNode = newElement("attribute");
                         eNode = handleBBIE_Attributevalue(gBBIE, eNode, generationContext);
@@ -601,7 +605,7 @@ public class StandaloneXMLSchema {
                     }
                     return eNode;
                 } else {
-                    if (gBBIE.getBdtPriRestri() == null) {
+                    if (gBBIE.getBdtPriRestriId() == 0) {
                         eNode = setBBIE_Attr_Type(generationContext, gBDT, eNode);
                         return eNode;
                     } else {
@@ -709,7 +713,7 @@ public class StandaloneXMLSchema {
         /*
          * Section 3.8.1.22 GenerateSCs #2
          */
-        DataTypeSupplementaryComponent dtSc = aBBIESC.getDtSc();
+        DataTypeSupplementaryComponent dtSc = generationContext.findDtSc(aBBIESC.getDtScId());
         String representationTerm = dtSc.getRepresentationTerm();
         String propertyTerm = dtSc.getPropertyTerm();
         if ("Text".equals(representationTerm) ||
@@ -741,7 +745,7 @@ public class StandaloneXMLSchema {
 
     public Element setBBIESCType(GenerationContext generationContext,
                                  BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) {
-        DataTypeSupplementaryComponent gDTSC = gBBIESC.getDtSc();
+        DataTypeSupplementaryComponent gDTSC = generationContext.findDtSc(gBBIESC.getDtScId());
         if (gDTSC != null) {
             BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
                     generationContext.findBdtScPriRestriByBdtScIdAndDefaultIsTrue(gDTSC.getDtScId());
@@ -761,7 +765,8 @@ public class StandaloneXMLSchema {
 
     public Element setBBIESCType2(GenerationContext generationContext,
                                   BasicBusinessInformationEntitySupplementaryComponent gBBIESC, Element gNode) {
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction = gBBIESC.getDtScPriRestri();
+        BusinessDataTypeSupplementaryComponentPrimitiveRestriction aBDTSCPrimitiveRestriction =
+                generationContext.findBdtScPriRestri(gBBIESC.getDtScPriRestriId());
         CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap aCDTSCAllowedPrimitiveExpressionTypeMap =
                         generationContext.findCdtScAwdPriXpsTypeMap(aBDTSCPrimitiveRestriction.getCdtScAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType = generationContext.findXSDBuiltInType(aCDTSCAllowedPrimitiveExpressionTypeMap.getXbtId());
@@ -817,8 +822,8 @@ public class StandaloneXMLSchema {
                 }
 
                 if (aAL == null) { //aAL = null?
-                    BusinessDataTypeSupplementaryComponentPrimitiveRestriction primRestriction = aBBIESC.getDtScPriRestri();
-                    if (primRestriction == null)
+                    long primRestriction = aBBIESC.getDtScPriRestriId();
+                    if (primRestriction == 0L)
                         aNode = setBBIESCType(generationContext, aBBIESC, aNode);
                     else
                         aNode = setBBIESCType2(generationContext, aBBIESC, aNode);
@@ -831,7 +836,7 @@ public class StandaloneXMLSchema {
                 }
             } else { //aCL = null?
                 if (!generationContext.isCodeListGenerated(aCL)) {
-                    DataTypeSupplementaryComponent aDTSC = aBBIESC.getDtSc();
+                    DataTypeSupplementaryComponent aDTSC = generationContext.findDtSc(aBBIESC.getDtScId());
                     generateCodeList(aCL, aDTSC, gSchemaNode, generationContext);
                 }
                 if (getCodeListTypeName(aCL) != null) {
@@ -991,26 +996,26 @@ public class StandaloneXMLSchema {
                     bbieRepository.findByOwnerTopLevelAbieIdAndUsedIsTrue(topLevelAbie.getTopLevelAbieId());
             findBbieByFromAbieIdAndUsedIsTrueMap = bbieList.stream()
                     .filter(e -> e.isUsed())
-                    .collect(Collectors.groupingBy(e -> e.getFromAbie().getAbieId()));
+                    .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
 
             List<BasicBusinessInformationEntitySupplementaryComponent> bbieScList =
                     bbieScRepository.findByOwnerTopLevelAbieIdAndUsedIsTrue(topLevelAbie.getTopLevelAbieId());
             findBbieScByBbieIdAndUsedIsTrueMap = bbieScList.stream()
                     .filter(e -> e.isUsed())
-                    .collect(Collectors.groupingBy(e -> e.getBbie().getBbieId()));
+                    .collect(Collectors.groupingBy(e -> e.getBbieId()));
 
             List<AssociationBusinessInformationEntity> asbieList =
                     asbieRepository.findByOwnerTopLevelAbieIdAndUsedIsTrue(topLevelAbie.getTopLevelAbieId());
             findAsbieByFromAbieIdAndUsedIsTrueMap = asbieList.stream()
                     .filter(e -> e.isUsed())
-                    .collect(Collectors.groupingBy(e -> e.getFromAbie().getAbieId()));
+                    .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
 
             List<AssociationBusinessInformationEntityProperty> asbiepList =
                     asbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
             findASBIEPMap = asbiepList.stream()
                     .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
             findAsbiepByRoleOfAbieIdMap = asbiepList.stream()
-                    .collect(Collectors.toMap(e -> e.getRoleOfAbie().getAbieId(), Function.identity()));
+                    .collect(Collectors.toMap(e -> e.getRoleOfAbieId(), Function.identity()));
         }
 
         // Prepared Datas
@@ -1205,7 +1210,8 @@ public class StandaloneXMLSchema {
         }
 
         public AggregateCoreComponent queryBasedACC(AggregateBusinessInformationEntity gABIE) {
-            return gABIE.getBasedAcc();
+            long basedAccId = gABIE.getBasedAccId();
+            return findACC(basedAccId);
         }
 
         // Get only Child BIEs whose is_used flag is true
@@ -1258,29 +1264,29 @@ public class StandaloneXMLSchema {
         }
 
         public AssociationCoreComponentProperty queryBasedASCCP(AssociationBusinessInformationEntityProperty gASBIEP) {
-            AssociationCoreComponentProperty asccpVO = gASBIEP.getBasedAsccp();
+            AssociationCoreComponentProperty asccpVO = findASCCP(gASBIEP.getBasedAsccpId());
             return asccpVO;
         }
 
         public AssociationCoreComponent queryBasedASCC(AssociationBusinessInformationEntity gASBIE) {
-            AssociationCoreComponent gASCC = gASBIE.getBasedAscc();
+            AssociationCoreComponent gASCC = findASCC(gASBIE.getBasedAsccId());
             return gASCC;
         }
 
         public AggregateBusinessInformationEntity queryTargetABIE(AssociationBusinessInformationEntityProperty gASBIEP) {
-            AggregateBusinessInformationEntity abievo = gASBIEP.getRoleOfAbie();
+            AggregateBusinessInformationEntity abievo = findAbie(gASBIEP.getRoleOfAbieId());
             return abievo;
         }
 
         public AggregateCoreComponent queryTargetACC(AssociationBusinessInformationEntityProperty gASBIEP) {
-            AggregateBusinessInformationEntity abievo = gASBIEP.getRoleOfAbie();
+            AggregateBusinessInformationEntity abievo = findAbie(gASBIEP.getRoleOfAbieId());
 
-            AggregateCoreComponent aAggregateCoreComponent = abievo.getBasedAcc();
+            AggregateCoreComponent aAggregateCoreComponent = findACC(abievo.getBasedAccId());
             return aAggregateCoreComponent;
         }
 
         public AggregateBusinessInformationEntity queryTargetABIE2(AssociationBusinessInformationEntityProperty gASBIEP) {
-            AggregateBusinessInformationEntity abieVO = gASBIEP.getRoleOfAbie();
+            AggregateBusinessInformationEntity abieVO = findAbie(gASBIEP.getRoleOfAbieId());
             return abieVO;
         }
 
@@ -1290,16 +1296,17 @@ public class StandaloneXMLSchema {
         }
 
         public CodeList getCodeList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) {
-            CodeList codeList = gBBIESC.getCodeList();
+            CodeList codeList = findCodeList(gBBIESC.getCodeListId());
             if (codeList != null) {
                 return codeList;
             }
 
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri = gBBIESC.getDtScPriRestri();
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                    findBdtScPriRestri(gBBIESC.getDtScPriRestriId());
             if (bdtScPriRestri != null) {
                 return findCodeList(bdtScPriRestri.getCodeListId());
             } else {
-                DataTypeSupplementaryComponent gDTSC = gBBIESC.getDtSc();
+                DataTypeSupplementaryComponent gDTSC = findDtSc(gBBIESC.getDtScId());
                 BusinessDataTypeSupplementaryComponentPrimitiveRestriction bBDTSCPrimitiveRestriction =
                         findBdtScPriRestriByBdtScIdAndDefaultIsTrue(gDTSC.getDtScId());
                 if (bBDTSCPrimitiveRestriction != null) {
@@ -1311,18 +1318,19 @@ public class StandaloneXMLSchema {
         }
 
         public AgencyIdList getAgencyIdList(BasicBusinessInformationEntitySupplementaryComponent gBBIESC) {
-            AgencyIdList agencyIdList = gBBIESC.getAgencyIdList();
+            AgencyIdList agencyIdList = findAgencyIdList(gBBIESC.getAgencyIdListId());
             if (agencyIdList != null) {
                 return agencyIdList;
             }
 
-            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri = gBBIESC.getDtScPriRestri();
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
+                    findBdtScPriRestri(gBBIESC.getDtScPriRestriId());
             if (bdtScPriRestri != null) {
                 agencyIdList = findAgencyIdList(bdtScPriRestri.getAgencyIdListId());
             }
 
             if (agencyIdList == null) {
-                DataTypeSupplementaryComponent gDTSC = gBBIESC.getDtSc();
+                DataTypeSupplementaryComponent gDTSC = findDtSc(gBBIESC.getDtScId());
                 bdtScPriRestri = findBdtScPriRestriByBdtScIdAndDefaultIsTrue(gDTSC.getDtScId());
                 if (bdtScPriRestri != null) {
                     agencyIdList = findAgencyIdList(bdtScPriRestri.getAgencyIdListId());
@@ -1336,7 +1344,7 @@ public class StandaloneXMLSchema {
         }
 
         public AssociationBusinessInformationEntityProperty queryAssocToASBIEP(AssociationBusinessInformationEntity gASBIE) {
-            AssociationBusinessInformationEntityProperty asbiepVO = gASBIE.getToAsbiep();
+            AssociationBusinessInformationEntityProperty asbiepVO = findASBIEP(gASBIE.getToAsbiepId());
             return asbiepVO;
         }
 
@@ -1363,7 +1371,7 @@ public class StandaloneXMLSchema {
                 AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
                 System.out.println("Generating Top Level ABIE w/ given AssociationBusinessInformationEntityProperty Id: " + asbiep.getAsbiepId());
                 doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);
-                AssociationCoreComponentProperty asccpvo = asbiep.getBasedAsccp();
+                AssociationCoreComponentProperty asccpvo = generationContext.findASCCP(asbiep.getBasedAsccpId());
                 filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
                 filepath = writeXSDFile(doc, filename + "_standalone");
             } else {

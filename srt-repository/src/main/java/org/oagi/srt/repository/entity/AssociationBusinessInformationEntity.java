@@ -25,16 +25,19 @@ public class AssociationBusinessInformationEntity
     @Column(nullable = false, length = 41)
     private String guid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long fromAbieId;
+    @Transient
     private AggregateBusinessInformationEntity fromAbie;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_asbiep_id", nullable = false)
+    @Column(nullable = false)
+    private long toAsbiepId;
+    @Transient
     private AssociationBusinessInformationEntityProperty toAsbiep;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "based_ascc_id", nullable = false)
+    @Column(nullable = false)
+    private long basedAsccId;
+    @Transient
     private AssociationCoreComponent basedAscc;
 
     @Lob
@@ -73,8 +76,9 @@ public class AssociationBusinessInformationEntity
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_top_level_abie_id", nullable = false)
+    @Column(nullable = false)
+    private long ownerTopLevelAbieId;
+    @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
     @Override
@@ -103,24 +107,36 @@ public class AssociationBusinessInformationEntity
         this.guid = guid;
     }
 
-    public AggregateBusinessInformationEntity getFromAbie() {
-        return fromAbie;
+    public long getFromAbieId() {
+        return fromAbieId;
+    }
+
+    public void setFromAbieId(long fromAbieId) {
+        this.fromAbieId = fromAbieId;
+    }
+
+    public long getToAsbiepId() {
+        return toAsbiepId;
     }
 
     public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
         this.fromAbie = fromAbie;
     }
 
-    public AssociationBusinessInformationEntityProperty getToAsbiep() {
-        return toAsbiep;
+    public void setToAsbiepId(long toAsbiepId) {
+        this.toAsbiepId = toAsbiepId;
     }
 
     public void setToAsbiep(AssociationBusinessInformationEntityProperty toAsbiep) {
         this.toAsbiep = toAsbiep;
     }
 
-    public AssociationCoreComponent getBasedAscc() {
-        return basedAscc;
+    public long getBasedAsccId() {
+        return basedAsccId;
+    }
+
+    public void setBasedAsccId(long basedAsccId) {
+        this.basedAsccId = basedAsccId;
     }
 
     public void setBasedAscc(AssociationCoreComponent basedAscc) {
@@ -221,8 +237,12 @@ public class AssociationBusinessInformationEntity
         this.used = used;
     }
 
-    public TopLevelAbie getOwnerTopLevelAbie() {
-        return ownerTopLevelAbie;
+    public long getOwnerTopLevelAbieId() {
+        return ownerTopLevelAbieId;
+    }
+
+    public void setOwnerTopLevelAbieId(long ownerTopLevelAbieId) {
+        this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
     public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
@@ -251,9 +271,9 @@ public class AssociationBusinessInformationEntity
         long temp;
         result = (int) (asbieId ^ (asbieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (fromAbie != null ? fromAbie.hashCode() : 0);
-        result = 31 * result + (toAsbiep != null ? toAsbiep.hashCode() : 0);
-        result = 31 * result + (basedAscc != null ? basedAscc.hashCode() : 0);
+        result = 31 * result + (int) (fromAbieId ^ (fromAbieId >>> 32));
+        result = 31 * result + (int) (toAsbiepId ^ (toAsbiepId >>> 32));
+        result = 31 * result + (int) (basedAsccId ^ (basedAsccId >>> 32));
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
@@ -266,31 +286,8 @@ public class AssociationBusinessInformationEntity
         temp = Double.doubleToLongBits(seqKey);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (used ? 1 : 0);
-        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "AssociationBusinessInformationEntity{" +
-                "asbieId=" + asbieId +
-                ", guid='" + guid + '\'' +
-                ", fromAbie=" + fromAbie +
-                ", toAsbiep=" + toAsbiep +
-                ", basedAscc=" + basedAscc +
-                ", definition='" + definition + '\'' +
-                ", cardinalityMin=" + cardinalityMin +
-                ", cardinalityMax=" + cardinalityMax +
-                ", nillable=" + nillable +
-                ", remark='" + remark + '\'' +
-                ", createdBy=" + createdBy +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                ", creationTimestamp=" + creationTimestamp +
-                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
-                ", seqKey=" + seqKey +
-                ", used=" + used +
-                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
-                '}';
     }
 
     @Transient
@@ -302,6 +299,27 @@ public class AssociationBusinessInformationEntity
     public AssociationBusinessInformationEntity() {
         TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
         addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                AssociationBusinessInformationEntity asbie = (AssociationBusinessInformationEntity) object;
+                if (asbie.fromAbie != null) {
+                    asbie.setFromAbieId(asbie.fromAbie.getAbieId());
+                }
+                if (asbie.toAsbiep != null) {
+                    asbie.setToAsbiepId(asbie.toAsbiep.getAsbiepId());
+                }
+                if (asbie.basedAscc != null) {
+                    asbie.setBasedAsccId(asbie.basedAscc.getAsccId());
+                }
+                if (asbie.ownerTopLevelAbie != null) {
+                    asbie.setOwnerTopLevelAbieId(asbie.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
         addUpdateEventListener(timestampAwareEventListener);
     }
 

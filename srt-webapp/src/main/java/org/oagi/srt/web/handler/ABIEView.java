@@ -107,7 +107,7 @@ public class ABIEView implements Serializable, Comparable<ABIEView> {
         // Implicitly declaration. Why does it need to be here?
         // Because of this code, Add 'setBccpVO_BbieVO' method.
         // TODO: Fix me.
-        bdtPrimitiveRestrictionId = bbie.getBdtPriRestri().getBdtPriRestriId();
+        bdtPrimitiveRestrictionId = bbie.getBdtPriRestriId();
         for (BusinessDataTypePrimitiveRestriction cc : ccs) {
             if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
                 primitiveType = "XSD Builtin Type";

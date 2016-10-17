@@ -122,7 +122,8 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
 			if (asbiepVO == null) {
 				continue;
 			}
-			AssociationCoreComponentProperty asccpVO = asbiepVO.getBasedAsccp();
+			AssociationCoreComponentProperty asccpVO =
+					asccpRepository.findOne(asbiepVO.getBasedAsccpId());
 			if (asccpVO == null) {
 				continue;
 			}

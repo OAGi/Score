@@ -10,13 +10,13 @@ public interface BasicBusinessInformationEntityRepository
         extends JpaRepository<BasicBusinessInformationEntity, Long>,
         BulkInsertRepository<BasicBusinessInformationEntity> {
 
-    @Query("select b from BasicBusinessInformationEntity b where b.fromAbie.abieId = ?1")
+    @Query("select b from BasicBusinessInformationEntity b where b.fromAbieId = ?1")
     public List<BasicBusinessInformationEntity> findByFromAbieId(long fromAbieId);
 
-    @Query("select b from BasicBusinessInformationEntity b where b.ownerTopLevelAbie.topLevelAbieId = ?1")
+    @Query("select b from BasicBusinessInformationEntity b where b.ownerTopLevelAbieId = ?1")
     public List<BasicBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 
-    @Query("select b from BasicBusinessInformationEntity b where b.ownerTopLevelAbie.topLevelAbieId = ?1 and b.used = true")
+    @Query("select b from BasicBusinessInformationEntity b where b.ownerTopLevelAbieId = ?1 and b.used = true")
     public List<BasicBusinessInformationEntity> findByOwnerTopLevelAbieIdAndUsedIsTrue(long ownerTopLevelAbieId);
 
 }
