@@ -13,7 +13,7 @@
         <h:form id="form">
             <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
                         closable="true"/>
-            <p:panel>
+            <p:panel id="panel">
                 <h:panelGroup style="width: 100%;">
                     <div class="row">
                         <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
@@ -341,6 +341,10 @@
                         </div>
                     </div>
                 </h:panelGroup>
+            </p:panel>
+
+            <p:panel id="btnGroup">
+                <p:commandButton id="btnUpdate" widgetVar="btnUpdate" value="Update" action="#{editProfileBODBean.update()}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

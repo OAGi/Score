@@ -19,21 +19,21 @@ public class BasicBusinessInformationEntity
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 5000)
     private long bbieId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedBccId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long fromAbieId;
     @Transient
     private AggregateBusinessInformationEntity fromAbie;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long toBbiepId;
     @Transient
     private BasicBusinessInformationEntityProperty toBbiep;
@@ -87,16 +87,19 @@ public class BasicBusinessInformationEntity
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private double seqKey;
 
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
+
+    @Transient
+    private boolean dirty;
 
     @Override
     public long getId() {
@@ -106,6 +109,14 @@ public class BasicBusinessInformationEntity
     @Override
     public void setId(long id) {
         setBbieId(id);
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
     public long getBbieId() {
@@ -162,6 +173,7 @@ public class BasicBusinessInformationEntity
 
     public void setBdtPriRestriId(Long bdtPriRestriId) {
         this.bdtPriRestriId = bdtPriRestriId;
+        setDirty(true);
     }
 
     public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
@@ -174,6 +186,7 @@ public class BasicBusinessInformationEntity
 
     public void setCodeListId(Long codeListId) {
         this.codeListId = codeListId;
+        setDirty(true);
     }
 
     public void setCodeList(CodeList codeList) {
@@ -189,6 +202,7 @@ public class BasicBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
         }
         this.cardinalityMin = cardinalityMin;
+        setDirty(true);
     }
 
     public int getCardinalityMax() {
@@ -200,6 +214,7 @@ public class BasicBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
         }
         this.cardinalityMax = cardinalityMax;
+        setDirty(true);
     }
 
     public String getDefaultValue() {
@@ -208,6 +223,7 @@ public class BasicBusinessInformationEntity
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+        setDirty(true);
     }
 
     public boolean isNillable() {
@@ -216,6 +232,7 @@ public class BasicBusinessInformationEntity
 
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
+        setDirty(true);
     }
 
     public String getFixedValue() {
@@ -224,6 +241,7 @@ public class BasicBusinessInformationEntity
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+        setDirty(true);
     }
 
     public boolean isNill() {
@@ -232,6 +250,7 @@ public class BasicBusinessInformationEntity
 
     public void setNill(boolean nill) {
         this.nill = nill;
+        setDirty(true);
     }
 
     public String getDefinition() {
@@ -240,6 +259,7 @@ public class BasicBusinessInformationEntity
 
     public void setDefinition(String definition) {
         this.definition = definition;
+        setDirty(true);
     }
 
     public String getRemark() {
@@ -248,6 +268,7 @@ public class BasicBusinessInformationEntity
 
     public void setRemark(String remark) {
         this.remark = remark;
+        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -296,6 +317,7 @@ public class BasicBusinessInformationEntity
 
     public void setUsed(boolean used) {
         this.used = used;
+        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {

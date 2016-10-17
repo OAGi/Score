@@ -465,6 +465,10 @@ input.ui-state-focus {
     filter: invert(100%);
 }
 
+.ui-treetable-data .ui-state-hover .ui-icon {
+    filter: invert(100%);
+}
+
 .ui-wizard-step-titles {
     border-bottom: solid 1px #ddd !important;
 }

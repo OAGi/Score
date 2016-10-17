@@ -14,12 +14,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class NodeService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -77,6 +85,18 @@ public class NodeService {
 
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
+
+    private ExecutorService executorService;
+
+    @PostConstruct
+    public void init() {
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        executorService.shutdownNow();
+    }
 
     public Node createNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         long s = System.currentTimeMillis();
@@ -620,50 +640,96 @@ public class NodeService {
         public DataContainerForProfileBODLoader(TopLevelAbie topLevelAbie) {
             this.topLevelAbie = topLevelAbie;
 
-            businessContextList = businessContextRepository.findAll();
-            bccList = bccRepository.findAll();
-            asccpList = asccpRepository.findAll();
-            bccpList = bccpRepository.findAll();
-            dtList = dataTypeRepository.findAll();
-            dtScList = dtScRepository.findAll();
-            bdtPriRestriList = bdtPriRestriRepository.findAll();
+            ExecutorCompletionService executorCompletionService = new ExecutorCompletionService(executorService);
+            executorCompletionService.submit(() -> {
+                businessContextList = businessContextRepository.findAll();
+                bizCtxIdMap = businessContextList.stream()
+                        .collect(Collectors.toMap(e -> e.getBizCtxId(), Function.identity()));
+            }, null);
 
-            abieList = abieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
-            asbieList = asbieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
-            asbiepList = asbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
-            bbieList = bbieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
-            bbiepList = bbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
-            bbiescList = bbiescRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+            executorCompletionService.submit(() -> {
+                bccList = bccRepository.findAll();
+                bccIdMap = bccList.stream()
+                        .collect(Collectors.toMap(e -> e.getBccId(), Function.identity()));
+            }, null);
 
-            bizCtxIdMap = businessContextList.stream()
-                    .collect(Collectors.toMap(e -> e.getBizCtxId(), Function.identity()));
-            bccIdMap = bccList.stream()
-                    .collect(Collectors.toMap(e -> e.getBccId(), Function.identity()));
-            asccpIdMap = asccpList.stream()
-                    .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
-            bccpIdMap = bccpList.stream()
-                    .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
-            dtIdMap = dtList.stream()
-                    .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
-            dtScIdMap = dtScList.stream()
-                    .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
-            bdtPriRestriListByBdtIdMap = bdtPriRestriList.stream()
-                    .collect(Collectors.groupingBy(e -> e.getBdtId()));
+            executorCompletionService.submit(() -> {
+                asccpList = asccpRepository.findAll();
+                asccpIdMap = asccpList.stream()
+                        .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
+            }, null);
 
-            abieIdMap = abieList.stream()
-                    .collect(Collectors.toMap(e -> e.getAbieId(), Function.identity()));
-            asbieByFromAbieIdMap = asbieList.stream()
-                    .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
-            asbiepIdMap = asbiepList.stream()
-                    .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
-            asbiepByRoleOfAbieIdMap = asbiepList.stream()
-                    .collect(Collectors.toMap(e -> e.getRoleOfAbieId(), Function.identity()));
-            bbieByFromAbieIdMap = bbieList.stream()
-                    .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
-            bbiepIdMap = bbiepList.stream()
-                    .collect(Collectors.toMap(e -> e.getBbiepId(), Function.identity()));
-            bbieScListByBbieIdMap = bbiescList.stream()
-                    .collect(Collectors.groupingBy(e -> e.getBbieId()));
+            executorCompletionService.submit(() -> {
+                bccpList = bccpRepository.findAll();
+                bccpIdMap = bccpList.stream()
+                        .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                dtList = dataTypeRepository.findAll();
+                dtIdMap = dtList.stream()
+                        .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                dtScList = dtScRepository.findAll();
+                dtScIdMap = dtScList.stream()
+                        .collect(Collectors.toMap(e -> e.getDtScId(), Function.identity()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                bdtPriRestriList = bdtPriRestriRepository.findAll();
+                bdtPriRestriListByBdtIdMap = bdtPriRestriList.stream()
+                        .collect(Collectors.groupingBy(e -> e.getBdtId()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                abieList = abieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                abieIdMap = abieList.stream()
+                        .collect(Collectors.toMap(e -> e.getAbieId(), Function.identity()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                asbieList = asbieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                asbieByFromAbieIdMap = asbieList.stream()
+                        .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                asbiepList = asbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                asbiepIdMap = asbiepList.stream()
+                        .collect(Collectors.toMap(e -> e.getAsbiepId(), Function.identity()));
+                asbiepByRoleOfAbieIdMap = asbiepList.stream()
+                        .collect(Collectors.toMap(e -> e.getRoleOfAbieId(), Function.identity()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                bbieList = bbieRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                bbieByFromAbieIdMap = bbieList.stream()
+                        .collect(Collectors.groupingBy(e -> e.getFromAbieId()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                bbiepList = bbiepRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                bbiepIdMap = bbiepList.stream()
+                        .collect(Collectors.toMap(e -> e.getBbiepId(), Function.identity()));
+            }, null);
+
+            executorCompletionService.submit(() -> {
+                bbiescList = bbiescRepository.findByOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
+                bbieScListByBbieIdMap = bbiescList.stream()
+                        .collect(Collectors.groupingBy(e -> e.getBbieId()));
+            }, null);
+
+            for (int i = 0, taskSize = 13; i < taskSize; ++i) {
+                try {
+                    executorCompletionService.take().get();
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(e);
+                } catch (ExecutionException e) {
+                    throw new IllegalStateException(e.getCause());
+                }
+            }
         }
 
         public BusinessContext findBusinessContext(long bizCtxId) {

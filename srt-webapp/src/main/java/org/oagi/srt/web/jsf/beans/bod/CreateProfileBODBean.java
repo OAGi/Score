@@ -40,6 +40,7 @@ public class CreateProfileBODBean {
 
     @Autowired
     private TopLevelConceptRepository topLevelConceptRepository;
+    private String currentStep;
 
     /*
      * To control Wizard Button
@@ -89,13 +90,14 @@ public class CreateProfileBODBean {
         setBusinessContexts(
                 businessContextRepository.findAll()
         );
+    }
 
-        setSelectedTopLevelConcept(
-                topLevelConceptRepository.findOne(3252L)
-        );
-        setSelectedBusinessContext(
-                businessContextRepository.findOne(1L)
-        );
+    public String getCurrentStep() {
+        return currentStep;
+    }
+
+    public void setCurrentStep(String currentStep) {
+        this.currentStep = currentStep;
     }
 
     public boolean isBtnBackDisable() {
@@ -262,51 +264,78 @@ public class CreateProfileBODBean {
         return bdtPrimitiveRestrictions;
     }
 
-    public String onFlowProcess(FlowEvent event) {
-        try {
-            String newStep = event.getNewStep();
+    public void onNext() {
 
-            switch (newStep) {
+    }
+
+    public String onFlowProcess(FlowEvent event) {
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        String nextStep;
+        try {
+            nextStep = event.getNewStep();
+
+            switch (nextStep) {
+                case "step_1":
+                    requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
+                    requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
+                    requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
+
+                    break;
+
                 case "step_2":
                     if (selectedTopLevelConcept == null) {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
                                         "'Top-Level Concept' must be selected."));
-                        return event.getOldStep();
+                        nextStep = event.getOldStep();
+                        requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
+                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
+                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
+                    } else {
+                        requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
+                        requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
+                        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                     }
+
                     break;
+
                 case "step_3":
-                    if (selectedBusinessContext == null) {
-                        FacesContext.getCurrentInstance().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                        "'Business Context' must be selected."));
-                        return event.getOldStep();
+                    try {
+                        if (selectedBusinessContext == null) {
+                            FacesContext.getCurrentInstance().addMessage(null,
+                                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                            "'Business Context' must be selected."));
+                            nextStep = event.getOldStep();
+
+                            requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
+                            requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
+                            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
+                        } else {
+
+                            AssociationCoreComponentProperty selectedASCCP =
+                                    asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
+                            treeNode = bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext);
+
+                            requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
+                            requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
+                            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
+                        }
+
+                        break;
+                    } finally {
+                        /*
+                         * Hide loading dialog
+                         */
+                        requestContext.execute("PF('loadingBlock').hide()");
                     }
-
-                    AssociationCoreComponentProperty selectedASCCP =
-                            asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                    treeNode = bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext);
-
-                    /*
-                     * Hide loading dialog
-                     */
-                    RequestContext requestContext = RequestContext.getCurrentInstance();
-                    requestContext.execute("PF('loadingBlock').hide()");
-
-                    /*
-                     * Show 'Submit' button
-                     */
-                    requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
-                    requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).show()");
-                    break;
             }
 
-            return newStep;
+            setCurrentStep(nextStep);
+            return nextStep;
         } finally {
             /*
              * Enable buttons
              */
-            RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.execute("$(document.getElementById(PF('btnBack').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
             requestContext.execute("$(document.getElementById(PF('btnNext').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
             requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");

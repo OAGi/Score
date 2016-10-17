@@ -22,20 +22,20 @@ public class AssociationBusinessInformationEntity
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
     private long asbieId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long fromAbieId;
     @Transient
     private AggregateBusinessInformationEntity fromAbie;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long toAsbiepId;
     @Transient
     private AssociationBusinessInformationEntityProperty toAsbiep;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedAsccId;
     @Transient
     private AssociationCoreComponent basedAscc;
@@ -70,16 +70,19 @@ public class AssociationBusinessInformationEntity
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private double seqKey;
 
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
+
+    @Transient
+    private boolean dirty;
 
     @Override
     public long getId() {
@@ -89,6 +92,14 @@ public class AssociationBusinessInformationEntity
     @Override
     public void setId(long id) {
         setAsbieId(id);
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
     public long getAsbieId() {
@@ -149,6 +160,7 @@ public class AssociationBusinessInformationEntity
 
     public void setDefinition(String definition) {
         this.definition = definition;
+        setDirty(true);
     }
 
     public int getCardinalityMin() {
@@ -160,6 +172,7 @@ public class AssociationBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
         }
         this.cardinalityMin = cardinalityMin;
+        setDirty(true);
     }
 
     public int getCardinalityMax() {
@@ -171,6 +184,7 @@ public class AssociationBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
         }
         this.cardinalityMax = cardinalityMax;
+        setDirty(true);
     }
 
     public boolean isNillable() {
@@ -179,6 +193,7 @@ public class AssociationBusinessInformationEntity
 
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
+        setDirty(true);
     }
 
     public String getRemark() {
@@ -187,6 +202,7 @@ public class AssociationBusinessInformationEntity
 
     public void setRemark(String remark) {
         this.remark = remark;
+        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -235,6 +251,7 @@ public class AssociationBusinessInformationEntity
 
     public void setUsed(boolean used) {
         this.used = used;
+        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {

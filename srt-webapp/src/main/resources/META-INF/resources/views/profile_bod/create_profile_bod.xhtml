@@ -30,55 +30,35 @@
             //                affix.width(affix.parent().width());
             //            });
 
-            var onBack = function () {
-                var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
+            var disableButtons = function () {
                 var btnBack = $(document.getElementById(PF('btnBack').id));
                 var btnNext = $(document.getElementById(PF('btnNext').id));
                 var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
-
-                if (idx == 0 || idx == 1) {
-                    btnBack.hide();
-                } else {
-                    btnBack.show();
-                }
-                btnNext.show();
-                btnSubmit.hide();
 
                 btnBack.prop("disabled", true).addClass('ui-state-disabled');
                 btnNext.prop("disabled", true).addClass('ui-state-disabled');
                 btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
             };
+
+            var onBack = function () {
+                disableButtons();
+            };
+
             var onNext = function () {
+                disableButtons();
+
                 var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
-                var btnBack = $(document.getElementById(PF('btnBack').id));
-                var btnNext = $(document.getElementById(PF('btnNext').id));
-                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
+                console.log(idx);
 
                 if (idx == 1) {
-                    // btnNext.hide();
-                    // btnSubmit.show();
                     PF('loadingBlock').show();
 
                     var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
                     $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
-                } else {
-                    btnNext.show();
-                    btnSubmit.hide();
                 }
-                btnBack.show();
-
-                btnBack.prop("disabled", true).addClass('ui-state-disabled');
-                btnNext.prop("disabled", true).addClass('ui-state-disabled');
-                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
             };
             var onSubmit = function () {
-                var btnBack = $(document.getElementById(PF('btnBack').id));
-                var btnNext = $(document.getElementById(PF('btnNext').id));
-                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
-
-                btnBack.prop("disabled", true).addClass('ui-state-disabled');
-                btnNext.prop("disabled", true).addClass('ui-state-disabled');
-                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
+                disableButtons();
 
                 PF('progressBlock').show();
                 PF('progressBar').start();
@@ -536,9 +516,9 @@
 
             <p:panel id="btnGroup">
                 <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
-                                 value="Back" icon="ui-icon-arrowthick-1-w" onclick="PF('wizard').back()"/>
+                                 value="Back" icon="ui-icon-arrowthick-1-w" oncomplete="PF('wizard').back();"/>
                 <p:commandButton id="btnNext" widgetVar="btnNext" style=""
-                                 value="Next" icon="ui-icon-arrowthick-1-e" onclick="PF('wizard').next();"/>
+                                 value="Next" icon="ui-icon-arrowthick-1-e" oncomplete="PF('wizard').next();"/>
                 <p:commandButton id="btnSubmit" widgetVar="btnSubmit" style="display: none;" onclick="onSubmit();"
                                  value="Submit" icon="ui-icon-check" action="#{createProfileBODBean.submit()}"/>
             </p:panel>

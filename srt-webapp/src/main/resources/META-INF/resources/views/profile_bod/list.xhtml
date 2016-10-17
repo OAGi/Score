@@ -11,7 +11,7 @@
             </div>
         </div>
         <h:form id="listForm">
-            <p:panel>
+            <p:panel id="panel">
                 <f:facet name="header">
                     <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"
                                     completeMethod="#{profileBODBean.completeInput}" maxResults="20"
@@ -24,11 +24,13 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
                     <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
-                        <h:link value="#{profileBOD.propertyTerm}" outcome="/views/profile_bod/edit_profile_bod.xhtml">
+                        <h:link value="#{profileBOD.propertyTerm}" outcome="/views/profile_bod/edit_profile_bod.xhtml"
+                                onclick="PF('loadingBlock').show();">
                             <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
                         </h:link>
                     </p:column>
-                    <p:column style="width: 200px; text-align: center;" headerText="Business Context" sortBy="#{profileBOD.bizCtxName}">
+                    <p:column style="width: 200px; text-align: center;" headerText="Business Context"
+                              sortBy="#{profileBOD.bizCtxName}">
                         <h:outputText value="#{profileBOD.bizCtxName}"/>
                     </p:column>
                     <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
@@ -47,7 +49,18 @@
                     </p:column>
                 </p:dataTable>
             </p:panel>
+
+            <p:blockUI widgetVar="loadingBlock" block="panel">
+                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                <span style="display: block; margin-top: 10px;">Loading...</span>
+            </p:blockUI>
+
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
+        <script>
+            $(document).ready(function () {
+                $('.fa-spin').parent().addClass('loading-block');
+            });
+        </script>
     </ui:define>
 </ui:composition>

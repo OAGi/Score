@@ -5,6 +5,7 @@ import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.TopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -25,7 +27,7 @@ import java.util.Map;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class EditProfileBODBean {
+public class EditProfileBODBean extends UIHandler {
 
     @Autowired
     private BIETreeNodeHandler bieTreeNodeHandler;
@@ -139,4 +141,17 @@ public class EditProfileBODBean {
         return bdtPrimitiveRestrictions;
     }
 
+    @Transactional(readOnly = false, rollbackFor = Throwable.class)
+    public void update() {
+        try {
+            bieTreeNodeHandler.update(getTopLevelNode());
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Updated successfully."));
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+
+    }
 }

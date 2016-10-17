@@ -21,15 +21,15 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
     private long abieId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedAccId;
     @Transient
     private AggregateCoreComponent basedAcc;
 
-    @Column
+    @Column(updatable = false)
     private long bizCtxId;
     @Transient
     private BusinessContext bizCtx;
@@ -73,10 +73,13 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Column(length = 225)
     private String bizTerm;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
+
+    @Transient
+    private boolean dirty;
 
     @Override
     public long getId() {
@@ -86,6 +89,14 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Override
     public void setId(long id) {
         setAbieId(id);
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
     public long getAbieId() {
@@ -126,6 +137,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setBizCtx(BusinessContext bizCtx) {
         this.bizCtx = bizCtx;
+        setDirty(true);
     }
 
     public String getBizCtxName() {
@@ -142,6 +154,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setDefinition(String definition) {
         this.definition = definition;
+        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -166,6 +179,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setState(int state) {
         this.state = state;
+        setDirty(true);
     }
 
     public Date getCreationTimestamp() {
@@ -190,6 +204,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setClientId(long clientId) {
         this.clientId = clientId;
+        setDirty(true);
     }
 
     public String getVersion() {
@@ -198,6 +213,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setVersion(String version) {
         this.version = version;
+        setDirty(true);
     }
 
     public String getStatus() {
@@ -206,6 +222,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setStatus(String status) {
         this.status = status;
+        setDirty(true);
     }
 
     public String getRemark() {
@@ -214,6 +231,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setRemark(String remark) {
         this.remark = remark;
+        setDirty(true);
     }
 
     public String getBizTerm() {
@@ -222,6 +240,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
+        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {

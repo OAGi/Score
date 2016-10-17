@@ -62,6 +62,10 @@ public class BBIENode extends AbstractNode {
         this.bdt = bdt;
     }
 
+    public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId) {
+        bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
+    }
+
     public long getBdtPrimitiveRestrictionId() {
         return bbie.getBdtPriRestriId();
     }

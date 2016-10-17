@@ -18,13 +18,13 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 5000)
     private long bbiepId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedBccpId;
     @Transient
     private BasicCoreComponentProperty basedBccp;
@@ -53,10 +53,13 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
+
+    @Transient
+    private boolean dirty;
 
     @Override
     public long getId() {
@@ -66,6 +69,14 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Override
     public void setId(long id) {
         setBbiepId(id);
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
     public long getBbiepId() {
@@ -102,6 +113,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     public void setDefinition(String definition) {
         this.definition = definition;
+        setDirty(true);
     }
 
     public String getRemark() {
@@ -110,6 +122,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     public void setRemark(String remark) {
         this.remark = remark;
+        setDirty(true);
     }
 
     public String getBizTerm() {
@@ -118,6 +131,7 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
+        setDirty(true);
     }
 
     public long getCreatedBy() {

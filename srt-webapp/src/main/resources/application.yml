@@ -13,6 +13,7 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.Oracle12cDialect
       hibernate.id.new_generator_mappings: true
+      hibernate.jdbc.fetch_size: 100
       hibernate.jdbc.batch_size: 25
       hibernate.jdbc.batch_versioned_data: true
       hibernate.order_inserts: true
