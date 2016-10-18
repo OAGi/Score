@@ -9,8 +9,10 @@ import org.oagi.srt.service.ContextCategoryService;
 import org.oagi.srt.service.ContextSchemeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +21,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -60,7 +65,11 @@ public class ContextSchemeDetailBean extends UIHandler {
     private ContextScheme contextScheme;
     private List<ContextSchemeValue> contextSchemeValues = new ArrayList();
     private List<ContextSchemeValue> deletedContextSchemeValues = new ArrayList();
+
+    private List<ContextCategory> allContextCategories;
+    private Map<String, ContextCategory> contextCategoryMap;
     private ContextCategory contextCategory;
+
     private ContextSchemeValue selectedContextSchemeValue;
     private boolean confirmDifferentNameButSameIdentity;
     private boolean confirmSameAgencyIdButDifferentIdentity;
@@ -70,6 +79,10 @@ public class ContextSchemeDetailBean extends UIHandler {
     }
 
     public void setContextScheme(ContextScheme contextScheme) {
+        allContextCategories = contextCategoryService.findAll(Sort.Direction.ASC, "name");
+        contextCategoryMap = allContextCategories.stream()
+                .collect(Collectors.toMap(e -> e.getName(), Function.identity()));
+
         this.contextScheme = contextScheme;
         if (contextScheme != null) {
             if (contextScheme.getCtxSchemeId() > 0L) {
@@ -89,12 +102,36 @@ public class ContextSchemeDetailBean extends UIHandler {
         this.contextSchemeValues = contextSchemeValues;
     }
 
+    public String getSelectedContextCategoryName() {
+        return (contextCategory != null) ? contextCategory.getName() : null;
+    }
+
+    public void setSelectedContextCategoryName(String selectedContextCategoryName) {
+        setContextCategory(contextCategoryMap.get(selectedContextCategoryName));
+    }
+
     public ContextCategory getContextCategory() {
         return contextCategory;
     }
 
     public void setContextCategory(ContextCategory contextCategory) {
         this.contextCategory = contextCategory;
+    }
+
+    public List<String> completeInputForContextCategory(String query) {
+        if (StringUtils.isEmpty(query)) {
+            return allContextCategories.stream()
+                    .map(e -> e.getName())
+                    .collect(Collectors.toList());
+        }
+        return allContextCategories.stream()
+                .map(e -> e.getName())
+                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public void onSelectContextCategory(SelectEvent event) {
+        setSelectedContextCategoryName(event.getObject().toString());
     }
 
     public void addContextSchemeValue() {

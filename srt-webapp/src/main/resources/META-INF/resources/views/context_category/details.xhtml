@@ -24,9 +24,9 @@
                 <h:panelGrid columns="2" cellpadding="3">
                     <h:outputText value="GUID" styleClass="section-label"
                                   rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"/>
-                    <h:outputText value="#{contextCategoryDetailBean.contextCategory.guid}"
-                                  rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
-                                  styleClass="section-content"/>
+                    <h:inputText value="#{contextCategoryDetailBean.contextCategory.guid}"
+                                 rendered="#{contextCategoryDetailBean.contextCategory.ctxCategoryId > 0}"
+                                 styleClass="section-content input-section disabled" disabled="true"/>
 
                     <h:outputText value="Name" styleClass="section-label"/>
                     <h:inputText id="name" value="#{contextCategoryDetailBean.contextCategory.name}"
@@ -39,7 +39,7 @@
 
                     <h:outputText value="Description" styleClass="section-label"/>
                     <h:inputTextarea value="#{contextCategoryDetailBean.contextCategory.description}"
-                                     rows="10"
+                                     rows="6"
                                      styleClass="section-content input-section"/>
                 </h:panelGrid>
             </p:panel>

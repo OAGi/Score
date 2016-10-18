@@ -20,7 +20,8 @@
                             <p:treeTable value="#{editProfileBODBean.treeNode}" var="node" id="treeTable"
                                          selection="#{editProfileBODBean.selectedTreeNode}"
                                          selectionMode="single">
-                                <p:ajax event="expand" listener="#{editProfileBODBean.expand}" update=":form:treeTable"/>
+                                <p:ajax event="expand" listener="#{editProfileBODBean.expand}"
+                                        update=":form:treeTable"/>
                                 <p:ajax event="select" update=":form:details"/>
                                 <p:column headerText="BIEs">
                                     <h:outputText value="#{node.name}"/>
@@ -69,7 +70,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.abie.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -118,7 +119,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.asbie.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -137,7 +138,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.asbiep.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -156,7 +157,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.abie.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -210,7 +211,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.bbie.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -229,7 +230,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.bbiep.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -332,7 +333,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{editProfileBODBean.selectedTreeNode.data.bbiesc.definition}"
-                                                        rows="10" autoResize="false"
+                                                        rows="6" autoResize="false"
                                                         styleClass="section-content input-section"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -345,7 +346,8 @@
             </p:panel>
 
             <p:panel id="btnGroup">
-                <p:commandButton id="btnUpdate" widgetVar="btnUpdate" value="Update" action="#{editProfileBODBean.update()}"/>
+                <p:commandButton id="btnUpdate" widgetVar="btnUpdate" value="Update"
+                                 action="#{editProfileBODBean.update()}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

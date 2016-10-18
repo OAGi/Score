@@ -403,8 +403,7 @@ tr {
 }
 
 .ui-inputfield {
-    min-height: 34px !important;
-    padding: 6px 8px !important;
+    padding: 0 !important;
     font-size: 14px !important;
     line-height: 20px !important;
     color: #333 !important;
@@ -629,6 +628,14 @@ span.ui-button-text {
 
 .ui-autocomplete input {
     width: 100%;
+    padding: 2px !important;
+}
+
+.ui-autocomplete-input.ui-autofield {
+    min-height: 0 !important;
+    padding: 0 !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
 }
 
 .section-label {
@@ -640,13 +647,22 @@ span.ui-button-text {
 }
 
 .section-content {
+    vertical-align: middle !important;
     margin-left: 150px !important;
     color: #333;
+}
+
+.ui-inputfield {
+    min-width: 440px;
 }
 
 .input-section {
     min-width: 440px;
     border: 1px solid #ddd;
+}
+
+.disabled {
+    border: 0;
 }
 
 .ui-chkbox.input-section {

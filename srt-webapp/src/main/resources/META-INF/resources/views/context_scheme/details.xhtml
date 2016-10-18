@@ -22,18 +22,21 @@
                         closable="true"/>
             <p:panel>
                 <h:panelGrid columns="2" cellpadding="3">
-                    <h:outputText value="Context Category" styleClass="section-label"
-                                  rendered="#{contextSchemeDetailBean.contextCategory != null}"/>
-                    <h:link value="#{contextSchemeDetailBean.contextCategory.name}" styleClass="section-content"
-                            outcome="/views/context_scheme/create_category_selection.xhtml">
-                        <f:param name="ctxSchemeId" value="#{contextSchemeDetailBean.contextScheme.ctxSchemeId}"/>
-                    </h:link>
+                    <h:outputText value="Context Category" styleClass="section-label"/>
+                    <p:autoComplete id="inputContextCategory" widgetVar="inputContextCategory"
+                                    value="#{contextSchemeDetailBean.selectedContextCategoryName}"
+                                    completeMethod="#{contextSchemeDetailBean.completeInputForContextCategory}"
+                                    dropdown="true"
+                                    required="true" requiredMessage="Please fill out 'Content Category' field."
+                                    styleClass="section-content">
+                        <p:ajax event="itemSelect" listener="#{contextSchemeDetailBean.onSelectContextCategory}"/>
+                    </p:autoComplete>
 
                     <h:outputText value="GUID" styleClass="section-label"
                                   rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"/>
-                    <h:outputText value="#{contextSchemeDetailBean.contextScheme.guid}"
-                                  rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
-                                  styleClass="section-content"/>
+                    <h:inputText value="#{contextSchemeDetailBean.contextScheme.guid}"
+                                 rendered="#{contextSchemeDetailBean.contextScheme.ctxSchemeId > 0}"
+                                 styleClass="section-content input-section disabled" disabled="true"/>
 
                     <h:outputText value="Name" styleClass="section-label"/>
                     <h:inputText id="name" value="#{contextSchemeDetailBean.contextScheme.schemeName}"

@@ -24,9 +24,9 @@
                 <h:panelGrid columns="2" cellpadding="3">
                     <h:outputText value="GUID" styleClass="section-label"
                                   rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"/>
-                    <h:outputText value="#{businessContextDetailBean.businessContext.guid}"
-                                  rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
-                                  styleClass="section-content"/>
+                    <h:inputText value="#{businessContextDetailBean.businessContext.guid}"
+                                 rendered="#{businessContextDetailBean.businessContext.bizCtxId > 0}"
+                                 styleClass="section-content input-section disabled" disabled="true"/>
 
                     <h:outputText value="Name" styleClass="section-label"/>
                     <h:inputText id="name" value="#{businessContextDetailBean.businessContext.name}"
