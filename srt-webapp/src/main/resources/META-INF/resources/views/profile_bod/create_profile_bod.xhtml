@@ -501,19 +501,6 @@
                 </p:tab>
             </p:wizard>
 
-            <p:blockUI widgetVar="loadingBlock" block="wizard">
-                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-                <span style="display: block; margin-top: 10px;">Loading...</span>
-            </p:blockUI>
-
-            <p:blockUI widgetVar="progressBlock" block="wizard">
-                <p:progressBar id="progressBar" widgetVar="progressBar" ajax="true" interval="500"
-                               value="#{createProfileBODBean.submitProgress}"
-                               labelTemplate="{value}%" global="false">
-                    <p:ajax event="complete" oncomplete="PF('progressBar').setValue(100); PF('progressBlock').hide();"/>
-                </p:progressBar>
-            </p:blockUI>
-
             <p:panel id="btnGroup">
                 <p:commandButton id="btnBack" widgetVar="btnBack" style="display: none;"
                                  value="Back" icon="ui-icon-arrowthick-1-w" oncomplete="PF('wizard').back();"/>

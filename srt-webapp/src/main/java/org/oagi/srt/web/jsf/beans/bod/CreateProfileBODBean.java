@@ -11,15 +11,12 @@ import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.model.TreeNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -36,8 +33,6 @@ import java.util.stream.Collectors;
 @ViewScoped
 @Transactional(readOnly = true)
 public class CreateProfileBODBean {
-
-    private static final Logger logger = LoggerFactory.getLogger(CreateProfileBODBean.class);
 
     @Autowired
     private TopLevelConceptRepository topLevelConceptRepository;
@@ -82,15 +77,15 @@ public class CreateProfileBODBean {
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
-    @PostConstruct
-    public void init() {
-        allTopLevelConcepts = topLevelConceptRepository.findAll();
-        setTopLevelConcepts(allTopLevelConcepts.stream()
-                .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                .collect(Collectors.toList()));
-        setBusinessContexts(
-                businessContextRepository.findAll()
-        );
+    public List<TopLevelConcept> getAllTopLevelConcepts() {
+        if (allTopLevelConcepts == null) {
+            allTopLevelConcepts = topLevelConceptRepository.findAll();
+        }
+        return allTopLevelConcepts;
+    }
+
+    public void setAllTopLevelConcepts(List<TopLevelConcept> allTopLevelConcepts) {
+        this.allTopLevelConcepts = allTopLevelConcepts;
     }
 
     public String getCurrentStep() {
@@ -126,6 +121,11 @@ public class CreateProfileBODBean {
     }
 
     public List<TopLevelConcept> getTopLevelConcepts() {
+        if (topLevelConcepts == null) {
+            setTopLevelConcepts(getAllTopLevelConcepts().stream()
+                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .collect(Collectors.toList()));
+        }
         return topLevelConcepts;
     }
 
@@ -142,7 +142,7 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInput(String query) {
-        return allTopLevelConcepts.stream()
+        return getAllTopLevelConcepts().stream()
                 .map(e -> e.getPropertyTerm())
                 .distinct()
                 .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
@@ -152,12 +152,12 @@ public class CreateProfileBODBean {
     public void search() {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setTopLevelConcepts(allTopLevelConcepts.stream()
+            setTopLevelConcepts(getAllTopLevelConcepts().stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                     .collect(Collectors.toList()));
         } else {
             setTopLevelConcepts(
-                    allTopLevelConcepts.stream()
+                    getAllTopLevelConcepts().stream()
                             .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
@@ -165,6 +165,9 @@ public class CreateProfileBODBean {
     }
 
     public List<BusinessContext> getBusinessContexts() {
+        if (businessContexts == null) {
+            setBusinessContexts(businessContextRepository.findAll());
+        }
         return businessContexts;
     }
 
@@ -263,10 +266,6 @@ public class CreateProfileBODBean {
         }
 
         return bdtPrimitiveRestrictions;
-    }
-
-    public void onNext() {
-
     }
 
     public String onFlowProcess(FlowEvent event) {
