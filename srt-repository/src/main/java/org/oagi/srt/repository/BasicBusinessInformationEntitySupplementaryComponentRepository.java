@@ -14,6 +14,9 @@ public interface BasicBusinessInformationEntitySupplementaryComponentRepository
     @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByBbieId(long bbieId);
 
+    @Query("select count(b) from BasicBusinessInformationEntitySupplementaryComponent b where b.bbieId = ?1")
+    public int countByBbieId(long bbieId);
+
     @Query("select b from BasicBusinessInformationEntitySupplementaryComponent b where b.ownerTopLevelAbieId = ?1")
     public List<BasicBusinessInformationEntitySupplementaryComponent> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 

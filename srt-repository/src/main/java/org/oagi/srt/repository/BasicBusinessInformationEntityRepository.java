@@ -13,6 +13,9 @@ public interface BasicBusinessInformationEntityRepository
     @Query("select b from BasicBusinessInformationEntity b where b.fromAbieId = ?1")
     public List<BasicBusinessInformationEntity> findByFromAbieId(long fromAbieId);
 
+    @Query("select count(b) from BasicBusinessInformationEntity b where b.fromAbieId = ?1")
+    public int countByFromAbieId(long fromAbieId);
+
     @Query("select b from BasicBusinessInformationEntity b where b.ownerTopLevelAbieId = ?1")
     public List<BasicBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 

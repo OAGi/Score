@@ -13,6 +13,9 @@ public interface AssociationBusinessInformationEntityRepository
     @Query("select a from AssociationBusinessInformationEntity a where a.fromAbieId = ?1")
     public List<AssociationBusinessInformationEntity> findByFromAbieId(long fromAbieId);
 
+    @Query("select count(a) from AssociationBusinessInformationEntity a where a.fromAbieId = ?1")
+    public int countByFromAbieId(long fromAbieId);
+
     @Query("select a from AssociationBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public List<AssociationBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 

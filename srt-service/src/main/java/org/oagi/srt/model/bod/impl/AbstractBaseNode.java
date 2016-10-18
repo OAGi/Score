@@ -1,4 +1,4 @@
-package org.oagi.srt.model.bod;
+package org.oagi.srt.model.bod.impl;
 
 import org.oagi.srt.model.Node;
 
@@ -7,20 +7,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractNode implements Node {
+public abstract class AbstractBaseNode implements Node {
 
     private final int seqKey;
     private Node parent;
     private Map<String, Object> attributes = new HashMap();
 
-    public AbstractNode(int seqKey) {
+    public AbstractBaseNode(int seqKey) {
         this.seqKey = seqKey;
     }
 
-    public AbstractNode(int seqKey, Node parent) {
+    public AbstractBaseNode(int seqKey, Node parent) {
         this.seqKey = seqKey;
+        setParent(parent);
+    }
+
+    private void setParent(Node parent) {
         this.parent = parent;
-        parent.addChild(this);
+        if (parent != null) {
+            parent.addChild(this);
+        }
     }
 
     @Override
@@ -41,6 +47,10 @@ public abstract class AbstractNode implements Node {
     @Override
     public List<? extends Node> getChildren() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public void clearChildren() {
     }
 
     @Override

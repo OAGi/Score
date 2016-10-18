@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
+import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.NodeVisitor;
 import org.oagi.srt.model.bod.ASBIENode;
@@ -9,12 +10,22 @@ import org.oagi.srt.model.bod.TopLevelNode;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-public class TreeNodeVisitor implements NodeVisitor {
+import java.util.ArrayList;
 
-    private TreeNode root = new DefaultTreeNode();
+public class LazyTreeNodeVisitor implements NodeVisitor {
 
-    public TreeNode getRoot() {
-        return root;
+    private DefaultTreeNode parent;
+
+    public TreeNode getParent() {
+        return parent;
+    }
+
+    public LazyTreeNodeVisitor() {
+        parent = new DefaultTreeNode();
+    }
+
+    public LazyTreeNodeVisitor(DefaultTreeNode parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -38,10 +49,15 @@ public class TreeNodeVisitor implements NodeVisitor {
     }
 
     private void visit(Node node, String type) {
-        Node parent = node.getParent();
-        TreeNode parentTreeNode = (parent != null) ? (TreeNode) parent.getAttribute("treeNode") : root;
-        TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);
-        node.setAttribute("treeNode", treeNode);
+        TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
+        if (node instanceof LazyNode) {
+            LazyNode lazyNode = (LazyNode) node;
+            if (!lazyNode.isFetched()) {
+                for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
+                    new DefaultTreeNode(null, treeNode);
+                }
+            }
+        }
     }
 
     @Override

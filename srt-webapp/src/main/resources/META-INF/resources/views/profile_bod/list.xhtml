@@ -24,8 +24,7 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
                     <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
-                        <h:link value="#{profileBOD.propertyTerm}" outcome="/views/profile_bod/edit_profile_bod.xhtml"
-                                onclick="PF('loadingBlock').show();">
+                        <h:link value="#{profileBOD.propertyTerm}" outcome="/views/profile_bod/edit_profile_bod.xhtml">
                             <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
                         </h:link>
                     </p:column>
@@ -50,17 +49,7 @@
                 </p:dataTable>
             </p:panel>
 
-            <p:blockUI widgetVar="loadingBlock" block="panel">
-                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-                <span style="display: block; margin-top: 10px;">Loading...</span>
-            </p:blockUI>
-
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>
-        <script>
-            $(document).ready(function () {
-                $('.fa-spin').parent().addClass('loading-block');
-            });
-        </script>
     </ui:define>
 </ui:composition>

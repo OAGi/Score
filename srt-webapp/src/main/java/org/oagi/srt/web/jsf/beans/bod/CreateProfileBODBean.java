@@ -2,7 +2,8 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bod.impl.BaseBBIENode;
+import org.oagi.srt.model.bod.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
@@ -187,9 +188,9 @@ public class CreateProfileBODBean {
         this.treeNode = treeNode;
     }
 
-    public TopLevelNode getTopLevelNode() {
+    public BaseTopLevelNode getTopLevelNode() {
         TreeNode treeNode = getTreeNode();
-        return (TopLevelNode) treeNode.getChildren().get(0).getData();
+        return (BaseTopLevelNode) treeNode.getChildren().get(0).getData();
     }
 
     public TreeNode getSelectedTreeNode() {
@@ -216,8 +217,8 @@ public class CreateProfileBODBean {
         }
 
         Node node = (Node) selectedTreeNode.getData();
-        if (node instanceof BBIENode) {
-            BBIENode bbieNode = (BBIENode) node;
+        if (node instanceof BaseBBIENode) {
+            BaseBBIENode bbieNode = (BaseBBIENode) node;
             if (bbieNode.getBbie().getBdtPriRestriId() > 0L) {
                 return "Primitive";
             } else {

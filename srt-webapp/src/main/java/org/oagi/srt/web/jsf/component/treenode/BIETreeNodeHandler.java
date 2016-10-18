@@ -1,17 +1,20 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.NodeVisitor;
 import org.oagi.srt.model.bod.ASBIENode;
 import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.BBIESCNode;
 import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bod.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -272,18 +275,29 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     public TreeNode createTreeNode(TopLevelAbie topLevelAbie) {
-        Node node = nodeService.createNode(topLevelAbie);
+        Node node = nodeService.createLazyNode(topLevelAbie);
 
-        long s = System.currentTimeMillis();
-        TreeNodeVisitor treeNodeVisitor = new TreeNodeVisitor();
-        node.accept(treeNodeVisitor);
-        logger.info("TreeNodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+        LazyTreeNodeVisitor lazyTreeNodeVisitor = new LazyTreeNodeVisitor();
+        node.accept(lazyTreeNodeVisitor);
+        return lazyTreeNodeVisitor.getParent();
+    }
 
-        return treeNodeVisitor.getRoot();
+    public void expandLazyTreeNode(DefaultTreeNode treeNode) {
+        LazyNode lazyNode = (LazyNode) treeNode.getData();
+        if (!lazyNode.isFetched()) {
+            lazyNode.fetch();
+
+            LazyTreeNodeVisitor lazyTreeNodeVisitor = new LazyTreeNodeVisitor(treeNode);
+            treeNode.setChildren(new ArrayList()); // clear children
+
+            for (Node child : lazyNode.getChildren()) {
+                child.accept(lazyTreeNodeVisitor);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void submit(TopLevelNode node, CreateProfileBODBean.ProgressListener progressListener) {
+    public void submit(BaseTopLevelNode node, CreateProfileBODBean.ProgressListener progressListener) {
         SubmitNodeVisitor submitNodeVisitor = new SubmitNodeVisitor(loadAuthentication());
         submitNodeVisitor.setProgressListener(progressListener);
         node.accept(submitNodeVisitor);
@@ -387,7 +401,7 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void update(TopLevelNode node) {
+    public void update(org.oagi.srt.model.bod.TopLevelNode node) {
         UpdateNodeVisitor updateNodeVisitor = new UpdateNodeVisitor(loadAuthentication());
         node.accept(updateNodeVisitor);
     }

@@ -14,6 +14,8 @@ public interface Node {
 
     public List<? extends Node> getChildren();
 
+    public void clearChildren();
+
     public void setAttribute(String key, Object attr);
 
     public Object getAttribute(String key);

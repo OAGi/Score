@@ -1,6 +1,5 @@
 package org.oagi.srt.model;
 
-import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bod.ASBIENode;
 import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.BBIESCNode;

@@ -1,12 +1,18 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bod.impl.BaseBBIENode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
+import org.oagi.srt.web.jsf.component.treenode.LazyTreeNodeVisitor;
+import org.oagi.srt.web.jsf.component.treenode.TreeNodeVisitor;
+import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -51,9 +57,8 @@ public class EditProfileBODBean extends UIHandler {
                 FacesContext.getCurrentInstance().getExternalContext()
                         .getRequestParameterMap().get("topLevelAbieId"));
         TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
-        setTreeNode(
-                bieTreeNodeHandler.createTreeNode(topLevelAbie)
-        );
+        TreeNode treeNode = bieTreeNodeHandler.createTreeNode(topLevelAbie);
+        setTreeNode(treeNode);
     }
 
     public TreeNode getTreeNode() {
@@ -93,8 +98,8 @@ public class EditProfileBODBean extends UIHandler {
         }
 
         Node node = (Node) selectedTreeNode.getData();
-        if (node instanceof BBIENode) {
-            BBIENode bbieNode = (BBIENode) node;
+        if (node instanceof BaseBBIENode) {
+            BaseBBIENode bbieNode = (BaseBBIENode) node;
             if (bbieNode.getBbie().getBdtPriRestriId() > 0L) {
                 return "Primitive";
             } else {
@@ -139,6 +144,11 @@ public class EditProfileBODBean extends UIHandler {
         }
 
         return bdtPrimitiveRestrictions;
+    }
+
+    public void expand(NodeExpandEvent expandEvent) {
+        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
+        bieTreeNodeHandler.expandLazyTreeNode(treeNode);
     }
 
     @Transactional(readOnly = false, rollbackFor = Throwable.class)

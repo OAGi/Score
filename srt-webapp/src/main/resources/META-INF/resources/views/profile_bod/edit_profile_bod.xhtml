@@ -17,9 +17,10 @@
                 <h:panelGroup style="width: 100%;">
                     <div class="row">
                         <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
-                            <p:treeTable value="#{editProfileBODBean.treeNode}" var="node"
+                            <p:treeTable value="#{editProfileBODBean.treeNode}" var="node" id="treeTable"
                                          selection="#{editProfileBODBean.selectedTreeNode}"
                                          selectionMode="single">
+                                <p:ajax event="expand" listener="#{editProfileBODBean.expand}" update=":form:treeTable"/>
                                 <p:ajax event="select" update=":form:details"/>
                                 <p:column headerText="BIEs">
                                     <h:outputText value="#{node.name}"/>
