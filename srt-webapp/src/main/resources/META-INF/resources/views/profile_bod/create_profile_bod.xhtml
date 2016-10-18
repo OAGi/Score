@@ -91,7 +91,7 @@
                         </f:facet>
                         <p:dataTable id="tbl1" var="topLevelConcept" value="#{createProfileBODBean.topLevelConcepts}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
                                      style="width: 100%; margin-bottom: 20px"
                                      selection="#{createProfileBODBean.selectedTopLevelConcept}"
                                      rowKey="#{topLevelConcept.asccpId}"
@@ -145,7 +145,7 @@
                         <p:dataTable id="tbl2" var="businessContext"
                                      value="#{createProfileBODBean.businessContexts}"
                                      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true" paginatorPosition="bottom" rows="10"
                                      style="width: 100%; margin-bottom:20px"
                                      selection="#{createProfileBODBean.selectedBusinessContext}"
                                      selectionMode="single"
