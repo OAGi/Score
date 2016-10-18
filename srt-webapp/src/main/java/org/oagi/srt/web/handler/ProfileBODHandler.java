@@ -1,6 +1,5 @@
 package org.oagi.srt.web.handler;
 
-import org.oagi.srt.standalone.StandaloneXMLSchema;
 import org.oagi.srt.repository.AggregateBusinessInformationEntityRepository;
 import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
@@ -9,6 +8,7 @@ import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.TopLevelAbie;
+import org.oagi.srt.standalone.StandaloneXMLSchema;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;

@@ -653,7 +653,12 @@ span.ui-button-text {
 }
 
 .ui-inputfield {
-    min-width: 440px;
+    /*min-width: 440px;*/
+    border: 0 !important;
+}
+
+.ui-datatable .ui-datatable-data td.ui-cell-editing {
+    padding: 4px 10px !important;
 }
 
 .input-section {

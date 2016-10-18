@@ -1,6 +1,5 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.TopLevelNode;
@@ -9,8 +8,6 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
-import org.oagi.srt.web.jsf.component.treenode.LazyTreeNodeVisitor;
-import org.oagi.srt.web.jsf.component.treenode.TreeNodeVisitor;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;

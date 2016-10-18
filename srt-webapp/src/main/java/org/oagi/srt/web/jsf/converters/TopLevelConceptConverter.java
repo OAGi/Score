@@ -1,9 +1,7 @@
 package org.oagi.srt.web.jsf.converters;
 
 import org.oagi.srt.repository.TopLevelConceptRepository;
-import org.oagi.srt.repository.entity.ContextCategory;
 import org.oagi.srt.repository.entity.TopLevelConcept;
-import org.oagi.srt.service.ContextCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

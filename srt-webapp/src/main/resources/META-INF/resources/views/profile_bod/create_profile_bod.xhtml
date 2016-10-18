@@ -10,64 +10,6 @@
                 <h2 class="subhead-heading">Create Profile BOD</h2>
             </div>
         </div>
-        <script>
-            //            var affix_offset_top = 210;
-            //            $(window).scroll(function () {
-            //                if (PF('wizard').currentStep !== 'step_3') {
-            //                    return;
-            //                }
-            //                var affix = $('#myAffix');
-            //                var btnGroup = $(document.getElementById('form:btnGroup'));
-            //
-            //                var height = $(window).scrollTop();
-            //                if (height >= affix_offset_top) {
-            //                    affix.css('position', 'fixed');
-            //                    affix.css('top', '10px');
-            //                } else {
-            //                    affix.css('position', 'relative');
-            //                    affix.css('top', '');
-            //                }
-            //                affix.width(affix.parent().width());
-            //            });
-
-            var disableButtons = function () {
-                var btnBack = $(document.getElementById(PF('btnBack').id));
-                var btnNext = $(document.getElementById(PF('btnNext').id));
-                var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
-
-                btnBack.prop("disabled", true).addClass('ui-state-disabled');
-                btnNext.prop("disabled", true).addClass('ui-state-disabled');
-                btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
-            };
-
-            var onBack = function () {
-                disableButtons();
-            };
-
-            var onNext = function () {
-                disableButtons();
-
-                var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
-                console.log(idx);
-
-                if (idx == 1) {
-                    PF('loadingBlock').show();
-
-                    var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
-                    $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
-                }
-            };
-            var onSubmit = function () {
-                disableButtons();
-
-                PF('progressBlock').show();
-                PF('progressBar').start();
-            };
-
-            $(document).ready(function () {
-                $('.fa-spin').parent().addClass('loading-block');
-            });
-        </script>
         <h:form id="form">
             <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
                         closable="true"/>
@@ -511,6 +453,66 @@
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+            <script>
+                //            var affix_offset_top = 210;
+                //            $(window).scroll(function () {
+                //                if (PF('wizard').currentStep !== 'step_3') {
+                //                    return;
+                //                }
+                //                var affix = $('#myAffix');
+                //                var btnGroup = $(document.getElementById('form:btnGroup'));
+                //
+                //                var height = $(window).scrollTop();
+                //                if (height >= affix_offset_top) {
+                //                    affix.css('position', 'fixed');
+                //                    affix.css('top', '10px');
+                //                } else {
+                //                    affix.css('position', 'relative');
+                //                    affix.css('top', '');
+                //                }
+                //                affix.width(affix.parent().width());
+                //            });
+
+                var disableButtons = function () {
+                    var btnBack = $(document.getElementById(PF('btnBack').id));
+                    var btnNext = $(document.getElementById(PF('btnNext').id));
+                    var btnSubmit = $(document.getElementById(PF('btnSubmit').id));
+
+                    btnBack.prop("disabled", true).addClass('ui-state-disabled');
+                    btnNext.prop("disabled", true).addClass('ui-state-disabled');
+                    btnSubmit.prop("disabled", true).addClass('ui-state-disabled');
+                };
+
+                var onBack = function () {
+                    disableButtons();
+                };
+
+                var onNext = function () {
+                    disableButtons();
+
+                    var idx = PF('wizard').getStepIndex(PF('wizard').currentStep);
+                    var selected = $('tbody.ui-datatable-data tr[aria-selected="true"]').length > 0 ? true : false;
+
+                    if (idx == 1 &amp;&amp; selected) {
+                        PF('loadingBlock').show();
+
+                        var wizardWidth = $(document.getElementById(PF('wizard').id)).width();
+                        $('.ui-progressbar').css('width', (wizardWidth * 0.8) + 'px');
+                    }
+                };
+
+                var onSubmit = function () {
+                    disableButtons();
+
+                    PF('progressBlock').show();
+                    PF('progressBar').start();
+                };
+
+                $(document).ready(function () {
+                    $('.fa-spin').parent().addClass('loading-block');
+                });
+            </script>
         </h:form>
     </ui:define>
 </ui:composition>

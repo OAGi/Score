@@ -311,10 +311,9 @@ public class CreateProfileBODBean {
                             requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                             requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                         } else {
-
                             AssociationCoreComponentProperty selectedASCCP =
                                     asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                            treeNode = bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext);
+                            setTreeNode(bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext));
 
                             requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                             requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
@@ -333,13 +332,15 @@ public class CreateProfileBODBean {
             setCurrentStep(nextStep);
             return nextStep;
         } finally {
-            /*
-             * Enable buttons
-             */
-            requestContext.execute("$(document.getElementById(PF('btnBack').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
-            requestContext.execute("$(document.getElementById(PF('btnNext').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
-            requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+            enableButtons();
         }
+    }
+
+    private void enableButtons() {
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.execute("$(document.getElementById(PF('btnBack').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+        requestContext.execute("$(document.getElementById(PF('btnNext').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
+        requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).prop(\"disabled\", false).removeClass('ui-state-disabled');");
     }
 
     public static class ProgressListener implements PersistEventListener {

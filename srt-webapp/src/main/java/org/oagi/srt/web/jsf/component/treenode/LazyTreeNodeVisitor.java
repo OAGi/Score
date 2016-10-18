@@ -10,8 +10,6 @@ import org.oagi.srt.model.bod.TopLevelNode;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-import java.util.ArrayList;
-
 public class LazyTreeNodeVisitor implements NodeVisitor {
 
     private DefaultTreeNode parent;

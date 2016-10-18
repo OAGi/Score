@@ -1,7 +1,7 @@
 package org.oagi.srt.web.jsf.component;
 
 import org.primefaces.component.api.UIData;
-import org.primefaces.component.paginator.*;
+import org.primefaces.component.paginator.PaginatorElementRenderer;
 import org.primefaces.util.MessageFactory;
 
 import javax.faces.context.FacesContext;
