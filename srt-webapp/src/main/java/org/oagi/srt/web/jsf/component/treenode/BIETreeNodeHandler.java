@@ -349,6 +349,19 @@ public class BIETreeNodeHandler extends UIHandler {
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
             BasicBusinessInformationEntity bbie = bbieNode.getBbie();
+            String restrictionType = bbieNode.getRestrictionType();
+            switch (restrictionType) {
+                case "Primitive":
+                    if (bbie.getBdtPriRestriId() > 0L) {
+                        bbie.setCodeListId(null);
+                    }
+                    break;
+                case "Code":
+                    if (bbie.getCodeListId() > 0L) {
+                        bbie.setBdtPriRestriId(null);
+                    }
+                    break;
+            }
             if (bbie.isDirty()) {
                 bbieList.add(bbie);
             }

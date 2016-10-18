@@ -19,8 +19,14 @@ public interface BBIENode extends Node {
     public DataType getBdt();
     public void setBdt(DataType bdt);
 
+    public void setRestrictionType(String restrictionType);
+    public String getRestrictionType();
+
     public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId);
     public long getBdtPrimitiveRestrictionId();
+
+    public void setCodeListId(long codeListId);
+    public long getCodeListId();
 
     public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList();
     public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList);

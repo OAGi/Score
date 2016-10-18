@@ -59,18 +59,42 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode {
         bbieNode.setBdt(bdt);
     }
 
+    @Override
+    public void setRestrictionType(String restrictionType) {
+        bbieNode.setRestrictionType(restrictionType);
+    }
+
+    @Override
+    public String getRestrictionType() {
+        return bbieNode.getRestrictionType();
+    }
+
+    @Override
     public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId) {
         bbieNode.setBdtPrimitiveRestrictionId(bdtPrimitiveRestrictionId);
     }
 
+    @Override
     public long getBdtPrimitiveRestrictionId() {
         return bbieNode.getBdtPrimitiveRestrictionId();
     }
 
+    @Override
+    public void setCodeListId(long codeListId) {
+        bbieNode.setCodeListId(codeListId);
+    }
+
+    @Override
+    public long getCodeListId() {
+        return bbieNode.getCodeListId();
+    }
+
+    @Override
     public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList() {
         return bbieNode.getBdtPriRestriList();
     }
 
+    @Override
     public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
         bbieNode.setBdtPriRestriList(bdtPriRestriList);
     }

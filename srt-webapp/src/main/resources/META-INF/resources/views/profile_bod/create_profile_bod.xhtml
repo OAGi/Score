@@ -131,13 +131,6 @@
                                                 <h:outputText value="View and Edit BIE"/>
                                             </f:facet>
 
-                                            <p:selectOneRadio id="customRadio"
-                                                              value="#{createProfileBODBean.restrictionType}"
-                                                              layout="custom">
-                                                <f:selectItem itemLabel="Primitive" itemValue="Primitive"/>
-                                                <f:selectItem itemLabel="Code" itemValue="Code"/>
-                                            </p:selectOneRadio>
-
                                             <!--
                                                 ABIE
                                             -->
@@ -330,7 +323,17 @@
                                                                 styleClass="section-content input-section"/>
                                                     </h:panelGrid>
                                                 </p:panel>
-                                                <p:panel header="BDT Primitive Restriction">
+                                                <p:panel id="bdtPriRestriPanel">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="BDT Primitive Restriction"/>
+
+                                                        <h:selectOneMenu id="selectBdtPriRestri" style="float: right;"
+                                                                         value="#{createProfileBODBean.selectedTreeNode.data.restrictionType}">
+                                                            <p:ajax update="bdtPriRestriPanel"/>
+                                                            <f:selectItem itemLabel="Primitive" itemValue="Primitive"/>
+                                                            <f:selectItem itemLabel="Code" itemValue="Code"/>
+                                                        </h:selectOneMenu>
+                                                    </f:facet>
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="BDT Name" styleClass="section-label"/>
                                                         <h:outputText
@@ -338,45 +341,29 @@
                                                                 styleClass="section-content"/>
                                                     </h:panelGrid>
 
-                                                    <h:panelGrid columns="4" cellpadding="4">
-                                                        <p:radioButton id="opt1" for="customRadio" itemIndex="0"
-                                                                       style="margin: 12px;"/>
-                                                        <h:outputText value="Primitive" styleClass="section-label"
-                                                                      style="margin-left: -48px; margin-top: 8px;"/>
-
-                                                        <p:selectOneMenu
-                                                                style="margin-left: 100px !important; margin-top: 3px;"
-                                                                value="#{createProfileBODBean.selectedTreeNode.data.bdtPrimitiveRestrictionId}">
-                                                            <f:selectItems
-                                                                    value="#{createProfileBODBean.getBdtPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
-                                                        </p:selectOneMenu>
-
+                                                    <h:panelGrid columns="3" cellpadding="3"
+                                                                 rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
+                                                        <h:outputText value="Primitive" styleClass="section-label"/>
+                                                        <h:selectOneMenu panelStyle="width:180px"
+                                                                         style="width: 160px; margin-left: 150px !important; padding: 4px;"
+                                                                         value="#{createProfileBODBean.selectedTreeNode.data.bdtPrimitiveRestrictionId}">
+                                                            <f:selectItems value="#{createProfileBODBean.getBdtPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </h:selectOneMenu>
                                                         <h:outputText
                                                                 value="#{createProfileBODBean.getPrimitiveType(createProfileBODBean.selectedTreeNode.data)}"
-                                                                style="position: absolute; margin-left: 20px; margin-top: 8px;"/>
+                                                                style="position: absolute; margin-left: 20px;"/>
                                                     </h:panelGrid>
 
-                                                    <h:panelGrid columns="4" cellpadding="4">
-                                                        <p:radioButton id="opt2" for="customRadio" itemIndex="1"
-                                                                       style="margin: 12px;"/>
-                                                        <h:outputText value="Code List" styleClass="section-label"
-                                                                      style="margin-left: -48px; margin-top: 8px;"/>
-
-                                                        <h:outputText
-                                                                value="#{createProfileBODBean.getCodeListName(createProfileBODBean.selectedTreeNode.data)}"
-                                                                styleClass="section-label"/>
-
-                                                        <h:panelGroup style="margin-left: 295px;">
-                                                            <p:commandButton value="Code List" icon="ui-icon-extlink"
-                                                                             style="margin-right: 10px;"
-                                                                             disabled="#{(createProfileBODBean.getPrimitiveType(createProfileBODBean.selectedTreeNode.data) == 'XSD Builtin Type') ? 'false' : 'true'}">
-                                                            </p:commandButton>
-
-                                                            <p:commandButton value="Derived Code List"
-                                                                             icon="ui-icon-extlink"
-                                                                             disabled="#{(createProfileBODBean.getPrimitiveType(createProfileBODBean.selectedTreeNode.data) == 'XSD Builtin Type') ? 'true' : 'false'}">
-                                                            </p:commandButton>
-                                                        </h:panelGroup>
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
+                                                        <h:outputText value="Code List" styleClass="section-label"/>
+                                                        <h:selectOneMenu panelStyle="width:180px"
+                                                                         style="width: 160px; margin-left: 150px !important; padding: 4px;"
+                                                                         value="#{createProfileBODBean.selectedTreeNode.data.codeListId}">
+                                                            <f:selectItems value="#{createProfileBODBean.getCodeLists(createProfileBODBean.selectedTreeNode.data)}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </h:selectOneMenu>
                                                     </h:panelGrid>
                                                 </p:panel>
                                             </h:panelGroup>

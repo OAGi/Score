@@ -40,13 +40,9 @@ public class BasicBusinessInformationEntity
 
     @Column
     private Long bdtPriRestriId;
-    @Transient
-    private BusinessDataTypePrimitiveRestriction bdtPriRestri;
 
     @Column
     private Long codeListId;
-    @Transient
-    private CodeList codeList;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -172,12 +168,18 @@ public class BasicBusinessInformationEntity
     }
 
     public void setBdtPriRestriId(Long bdtPriRestriId) {
-        this.bdtPriRestriId = bdtPriRestriId;
+        if (bdtPriRestriId != null && bdtPriRestriId > 0L) {
+            this.bdtPriRestriId = bdtPriRestriId;
+        } else {
+            this.bdtPriRestriId = null;
+        }
         setDirty(true);
     }
 
     public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
-        this.bdtPriRestri = bdtPriRestri;
+        if (bdtPriRestri != null) {
+            setBdtPriRestriId(bdtPriRestri.getBdtPriRestriId());
+        }
     }
 
     public long getCodeListId() {
@@ -185,12 +187,18 @@ public class BasicBusinessInformationEntity
     }
 
     public void setCodeListId(Long codeListId) {
-        this.codeListId = codeListId;
+        if (codeListId != null && codeListId > 0L) {
+            this.codeListId = codeListId;
+        } else {
+            this.codeListId = null;
+        }
         setDirty(true);
     }
 
     public void setCodeList(CodeList codeList) {
-        this.codeList = codeList;
+        if (codeList != null) {
+            setCodeListId(codeList.getCodeListId());
+        }
     }
 
     public int getCardinalityMin() {
@@ -425,12 +433,6 @@ public class BasicBusinessInformationEntity
                 if (bbie.toBbiep != null) {
                     bbie.setToBbiepId(bbie.toBbiep.getBbiepId());
                 }
-                if (bbie.bdtPriRestri != null) {
-                    bbie.setBdtPriRestriId(bbie.bdtPriRestri.getBdtPriRestriId());
-                }
-                if (bbie.codeList != null) {
-                    bbie.setCodeListId(bbie.codeList.getCodeListId());
-                }
                 if (bbie.ownerTopLevelAbie != null) {
                     bbie.setOwnerTopLevelAbieId(bbie.ownerTopLevelAbie.getTopLevelAbieId());
                 }
@@ -440,22 +442,6 @@ public class BasicBusinessInformationEntity
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
-        addUpdateEventListener(new UpdateEventListener() {
-            @Override
-            public void onPreUpdate(Object object) {
-                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
-                if (bbie.bdtPriRestri != null) {
-                    bbie.setBdtPriRestriId(bbie.bdtPriRestri.getBdtPriRestriId());
-                }
-                if (bbie.codeList != null) {
-                    bbie.setCodeListId(bbie.codeList.getCodeListId());
-                }
-            }
-            @Override
-            public void onPostUpdate(Object object) {
-
-            }
-        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

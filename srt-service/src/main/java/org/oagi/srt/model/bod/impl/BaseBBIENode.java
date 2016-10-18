@@ -15,6 +15,7 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     private BasicBusinessInformationEntityProperty bbiep;
     private BasicCoreComponentProperty bccp;
     private DataType bdt;
+    private String restrictionType;
     private List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList;
     private List<Node> children = new ArrayList();
 
@@ -30,6 +31,8 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
         this.bccp = bccp;
         this.bdt = bdt;
         this.bdtPriRestriList = bdtPriRestriList;
+
+        setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? "Primitive" : "Code");
     }
 
     public BasicBusinessInformationEntity getBbie() {
@@ -64,18 +67,42 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
         this.bdt = bdt;
     }
 
+    @Override
+    public void setRestrictionType(String restrictionType) {
+        this.restrictionType = restrictionType;
+    }
+
+    @Override
+    public String getRestrictionType() {
+        return restrictionType;
+    }
+
+    @Override
     public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId) {
         bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
     }
 
+    @Override
     public long getBdtPrimitiveRestrictionId() {
         return bbie.getBdtPriRestriId();
     }
 
+    @Override
+    public void setCodeListId(long codeListId) {
+        bbie.setCodeListId(codeListId);
+    }
+
+    @Override
+    public long getCodeListId() {
+        return bbie.getCodeListId();
+    }
+
+    @Override
     public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList() {
         return bdtPriRestriList;
     }
 
+    @Override
     public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
         this.bdtPriRestriList = bdtPriRestriList;
     }

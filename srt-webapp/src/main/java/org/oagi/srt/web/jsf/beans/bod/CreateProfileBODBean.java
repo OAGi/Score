@@ -21,9 +21,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -71,6 +69,8 @@ public class CreateProfileBODBean {
     private XSDBuiltInTypeRepository xbtRepository;
     @Autowired
     private CodeListRepository codeListRepository;
+    @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
     @Autowired
     private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
@@ -204,34 +204,6 @@ public class CreateProfileBODBean {
         this.selectedTreeNode = selectedTreeNode;
     }
 
-    public void setRestrictionType(String restrictionType) {
-        switch (restrictionType) {
-            case "Primitive":
-                break;
-            case "Code":
-                break;
-        }
-    }
-
-    public String getRestrictionType() {
-        TreeNode selectedTreeNode = getSelectedTreeNode();
-        if (selectedTreeNode == null) {
-            return null;
-        }
-
-        Node node = (Node) selectedTreeNode.getData();
-        if (node instanceof BaseBBIENode) {
-            BaseBBIENode bbieNode = (BaseBBIENode) node;
-            if (bbieNode.getBbie().getBdtPriRestriId() > 0L) {
-                return "Primitive";
-            } else {
-                return "Code";
-            }
-        } else {
-            return null;
-        }
-    }
-
     public String getPrimitiveType(BBIENode node) {
         List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
         String primitiveType = null;
@@ -243,11 +215,6 @@ public class CreateProfileBODBean {
             }
         }
         return primitiveType;
-    }
-
-    public String getCodeListName(Node node) {
-        CodeList codeList = (CodeList) node.getAttribute("codeList");
-        return (codeList != null) ? codeList.getName() : null;
     }
 
     public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
@@ -266,6 +233,17 @@ public class CreateProfileBODBean {
         }
 
         return bdtPrimitiveRestrictions;
+    }
+
+    public Map<String, Long> getCodeLists(BBIENode node) {
+        long bdtPrimitiveRestrictionId = node.getBdtPrimitiveRestrictionId();
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
+                bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(bdtPrimitiveRestrictionId);
+        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+        CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId()) : null;
+        List<CodeList> codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
+        return codeLists.stream()
+                .collect(Collectors.toMap(e -> e.getName(), e -> e.getCodeListId()));
     }
 
     public String onFlowProcess(FlowEvent event) {
