@@ -733,6 +733,8 @@ public class StandaloneXMLSchema {
             aNode.setAttribute("use", "optional");
         }
 
+        aNode.setAttribute("id", aBBIESC.getGuid());
+
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
         documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
