@@ -2,6 +2,7 @@ package org.oagi.srt.service;
 
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.model.bod.TopLevelNode;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -881,5 +882,10 @@ public class BusinessInformationEntityService {
         abieRepository.deleteByOwnerTopLevelAbieId(topLevelAbieId);
 
         topLevelAbieRepository.delete(topLevelAbieId);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void publish(long toplevelAbieId) {
+        abieRepository.updatePublish(toplevelAbieId);
     }
 }

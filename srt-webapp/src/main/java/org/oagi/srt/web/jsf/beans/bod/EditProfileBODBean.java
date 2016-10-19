@@ -4,6 +4,7 @@ import org.oagi.srt.model.bod.BBIENode;
 import org.oagi.srt.model.bod.TopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.event.NodeExpandEvent;
@@ -31,6 +32,8 @@ public class EditProfileBODBean extends UIHandler {
 
     @Autowired
     private BIETreeNodeHandler bieTreeNodeHandler;
+    @Autowired
+    private BusinessInformationEntityService bieService;
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
     @Autowired
@@ -138,6 +141,20 @@ public class EditProfileBODBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+    }
 
+    @Transactional(readOnly = false, rollbackFor = Throwable.class)
+    public String publish() {
+        try {
+            TopLevelNode topLevelNode = getTopLevelNode();
+            long topLevelAbieId = topLevelNode.getAbie().getOwnerTopLevelAbieId();
+            bieService.publish(topLevelAbieId);
+
+            return "/views/profile_bod/list.xhtml?faces-redirect=true";
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
     }
 }

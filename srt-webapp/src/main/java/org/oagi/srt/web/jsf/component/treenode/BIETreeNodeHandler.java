@@ -414,7 +414,7 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void update(org.oagi.srt.model.bod.TopLevelNode node) {
+    public void update(TopLevelNode node) {
         UpdateNodeVisitor updateNodeVisitor = new UpdateNodeVisitor(loadAuthentication());
         node.accept(updateNodeVisitor);
     }
