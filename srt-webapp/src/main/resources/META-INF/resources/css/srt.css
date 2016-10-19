@@ -153,6 +153,7 @@ body {
 
 .footer {
     position: relative;
+    height: 120px;
     padding-top: 20px;
     padding-bottom: 40px;
     margin-top: 40px;
