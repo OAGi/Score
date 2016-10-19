@@ -11,15 +11,16 @@
             </div>
         </div>
         <h:form id="listForm">
-            <p:panel id="panel">
+            <p:panel id="pPanel">
                 <f:facet name="header">
                     <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"
                                     completeMethod="#{profileBODBean.completeInput}" maxResults="20"
                                     style="width: 440px; margin-right: 20px;"/>
                     <p:commandButton value="Search" ajax="true" actionListener="#{profileBODBean.search}"
-                                     update="tbl1" icon="ui-icon-search"/>
+                                     update="tbl" icon="ui-icon-search"/>
                 </f:facet>
-                <p:dataTable id="tbl1" var="profileBOD" value="#{profileBODBean.profileBODs}"
+
+                <p:dataTable id="tbl" var="profileBOD" value="#{profileBODBean.profileBODs}"
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
@@ -46,8 +47,32 @@
                             <span class="label label-default">Published</span>
                         </h:panelGroup>
                     </p:column>
+
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                                         onclick="PF('confirmDiscard').show()">
+                            <f:setPropertyActionListener value="#{profileBOD}"
+                                                         target="#{profileBODBean.selectedProfileBOD}"/>
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
             </p:panel>
+
+            <p:confirmDialog widgetVar="confirmDiscard" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    The profile BOD will be permanently removed.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     onclick="PF('confirmDiscard').hide(); PF('loadingBlock').show();"
+                                     oncomplete="PF('loadingBlock').hide();"
+                                     actionListener="#{profileBODBean.deleteProfileBOD()}"
+                                     update="tbl" ajax="true"/>
+                    <p:commandButton value="Denied" icon="ui-icon-close"
+                                     onclick="PF('confirmDiscard').hide()"/>
+                </div>
+            </p:confirmDialog>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </h:form>

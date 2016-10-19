@@ -2,6 +2,7 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.repository.ProfileBODRepository;
 import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.service.BusinessInformationEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -22,9 +23,14 @@ public class ProfileBODBean {
     @Autowired
     private ProfileBODRepository profileBODRepository;
 
+    @Autowired
+    private BusinessInformationEntityService bieService;
+
     private List<ProfileBOD> allProfileBODs;
     private String selectedPropertyTerm;
     private List<ProfileBOD> profileBODs;
+
+    private ProfileBOD selectedProfileBOD;
 
     @PostConstruct
     public void init() {
@@ -52,6 +58,14 @@ public class ProfileBODBean {
         this.selectedPropertyTerm = selectedPropertyTerm;
     }
 
+    public ProfileBOD getSelectedProfileBOD() {
+        return selectedProfileBOD;
+    }
+
+    public void setSelectedProfileBOD(ProfileBOD selectedProfileBOD) {
+        this.selectedProfileBOD = selectedProfileBOD;
+    }
+
     public List<String> completeInput(String query) {
         return allProfileBODs.stream()
                 .map(e -> e.getPropertyTerm())
@@ -73,5 +87,15 @@ public class ProfileBODBean {
                             .collect(Collectors.toList())
             );
         }
+    }
+
+    public void deleteProfileBOD() {
+        ProfileBOD profileBOD = getSelectedProfileBOD();
+        if (profileBOD == null) {
+            return;
+        }
+
+        bieService.deleteProfileBOD(profileBOD.getTopLevelAbieId());
+        init();
     }
 }
