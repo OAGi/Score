@@ -1,4 +1,5 @@
 package org.oagi.srt.repository.entity;
+
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
@@ -34,23 +35,15 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     @Column(nullable = false, updatable = false)
     private long dtScId;
-    @Transient
-    private DataTypeSupplementaryComponent dtSc;
 
     @Column
     private Long dtScPriRestriId;
-    @Transient
-    private BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri;
 
     @Column
     private Long codeListId;
-    @Transient
-    private CodeList codeList;
 
     @Column
     private Long agencyIdListId;
-    @Transient
-    private AgencyIdList agencyIdList;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -140,7 +133,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setDtSc(DataTypeSupplementaryComponent dtSc) {
-        this.dtSc = dtSc;
+        if (dtSc != null) {
+            setDtScId(dtSc.getDtScId());
+        }
     }
 
     public long getDtScPriRestriId() {
@@ -153,7 +148,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setDtScPriRestri(BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri) {
-        this.dtScPriRestri = dtScPriRestri;
+        if (dtScPriRestri != null) {
+            setDtScPriRestriId(dtScPriRestri.getBdtScPriRestriId());
+        }
     }
 
     public long getCodeListId() {
@@ -166,7 +163,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setCodeList(CodeList codeList) {
-        this.codeList = codeList;
+        if (codeList != null) {
+            setCodeListId(codeList.getCodeListId());
+        }
     }
 
     public long getAgencyIdListId() {
@@ -179,7 +178,9 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setAgencyIdList(AgencyIdList agencyIdList) {
-        this.agencyIdList = agencyIdList;
+        if (agencyIdList != null) {
+            setAgencyIdListId(agencyIdList.getAgencyIdListId());
+        }
     }
 
     public int getCardinalityMin() {
@@ -347,18 +348,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 if (bbiesc.bbie != null) {
                     bbiesc.setBbieId(bbiesc.bbie.getBbieId());
                 }
-                if (bbiesc.dtSc != null) {
-                    bbiesc.setDtScId(bbiesc.dtSc.getDtScId());
-                }
-                if (bbiesc.dtScPriRestriId != null) {
-                    bbiesc.setDtScPriRestriId(bbiesc.dtScPriRestri.getBdtScPriRestriId());
-                }
-                if (bbiesc.codeListId != null) {
-                    bbiesc.setCodeListId(bbiesc.codeList.getCodeListId());
-                }
-                if (bbiesc.agencyIdList != null) {
-                    bbiesc.setAgencyIdListId(bbiesc.agencyIdListId);
-                }
                 if (bbiesc.bbie != null) {
                     bbiesc.setBbieId(bbiesc.bbie.getBbieId());
                 }
@@ -366,30 +355,12 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                     bbiesc.setOwnerTopLevelAbieId(bbiesc.ownerTopLevelAbie.getTopLevelAbieId());
                 }
             }
+
             @Override
             public void onPostPersist(Object object) {
             }
         });
         addUpdateEventListener(timestampAwareEventListener);
-        addUpdateEventListener(new UpdateEventListener() {
-            @Override
-            public void onPreUpdate(Object object) {
-                BasicBusinessInformationEntitySupplementaryComponent bbiesc = (BasicBusinessInformationEntitySupplementaryComponent) object;
-                if (bbiesc.dtScPriRestriId != null) {
-                    bbiesc.setDtScPriRestriId(bbiesc.dtScPriRestri.getBdtScPriRestriId());
-                }
-                if (bbiesc.codeListId != null) {
-                    bbiesc.setCodeListId(bbiesc.codeList.getCodeListId());
-                }
-                if (bbiesc.agencyIdList != null) {
-                    bbiesc.setAgencyIdListId(bbiesc.agencyIdListId);
-                }
-            }
-            @Override
-            public void onPostUpdate(Object object) {
-
-            }
-        });
     }
 
     public void addPersistEventListener(PersistEventListener persistEventListener) {

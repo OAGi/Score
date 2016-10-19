@@ -521,6 +521,9 @@ public class NodeService {
         private void appendBBIESC(BasicBusinessInformationEntity bbie, BaseBBIENode parent) {
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
                 DataTypeSupplementaryComponent dtsc = dataContainer.getDtSc(bbiesc.getDtScId());
+                if (dtsc == null) {
+                    throw new IllegalArgumentException("Can't find 'dtSc'");
+                }
                 new BaseBBIESCNode(parent, bbiesc, dtsc);
             }
         }

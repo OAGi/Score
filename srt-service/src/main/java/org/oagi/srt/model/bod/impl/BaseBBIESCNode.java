@@ -17,7 +17,13 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
                           DataTypeSupplementaryComponent dtsc) {
         super(0, parent);
         this.bbiesc = bbiesc;
+        if (bbiesc == null) {
+            throw new IllegalArgumentException("'bbieSc' argument must not be null.");
+        }
         this.dtsc = dtsc;
+        if (dtsc == null) {
+            throw new IllegalArgumentException("'dtSc' argument must not be null.");
+        }
     }
 
     public BasicBusinessInformationEntitySupplementaryComponent getBbiesc() {
@@ -39,7 +45,7 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
     @Override
     public String getName() {
         if (dtsc.getRepresentationTerm().equalsIgnoreCase("Text") ||
-            dtsc.getPropertyTerm().contains(dtsc.getRepresentationTerm())) {
+                dtsc.getPropertyTerm().contains(dtsc.getRepresentationTerm())) {
             return Utility.spaceSeparator(dtsc.getPropertyTerm());
         } else {
             return Utility.spaceSeparator(dtsc.getPropertyTerm().concat(dtsc.getRepresentationTerm()));
