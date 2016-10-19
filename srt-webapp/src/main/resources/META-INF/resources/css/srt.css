@@ -332,11 +332,12 @@ tr {
     margin: 0 !important;
 }
 
-.ui-state-focus, .ui-paginator a.ui-state-active, .ui-paginator a:hover {
+.ui-state-focus, .ui-paginator a.ui-state-active, .ui-paginator a:hover, .ui-menuitem-active a.ui-state-hover {
     z-index: 3 !important;
     color: #fff !important;
     background-color: #4078c0 !important;
     border-color: #4078c0 !important;
+    background: #4078c0 !important;
     box-shadow: none !important;
     border: 1px solid #e5e5e5 !important;
 }
@@ -784,7 +785,8 @@ h6 {
 }
 
 .ABIE, .ui-state-hover.ABIE, .ui-state-highlight.ABIE,
-.ASBIE, .ui-state-hover.ASBIE, .ui-state-highlight.ASBIE {
+.ASBIE, .ui-state-hover.ASBIE, .ui-state-highlight.ASBIE,
+.ASBIE-Extension, .ui-state-hover.ASBIE-Extension, .ui-state-highlight.ASBIE-Extension {
     color: #4078c0 !important;
 }
 

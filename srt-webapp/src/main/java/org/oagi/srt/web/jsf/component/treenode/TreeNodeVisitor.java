@@ -24,7 +24,8 @@ public class TreeNodeVisitor implements NodeVisitor {
 
     @Override
     public void visitASBIENode(ASBIENode asbieNode) {
-        visit(asbieNode, "ASBIE");
+        String type = ("Extension".equals(asbieNode.getName())) ? "ASBIE-Extension" : "ASBIE";
+        visit(asbieNode, type);
     }
 
     @Override

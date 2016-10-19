@@ -2,7 +2,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+                xmlns:p="http://primefaces.org/ui" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="../../template.xhtml">
 
     <ui:define name="content">
         <div class="settings-next">
@@ -27,6 +28,11 @@
                                     <h:outputText value="#{node.name}"/>
                                 </p:column>
                             </p:treeTable>
+
+                            <p:contextMenu for="treeTable" nodeType="ASBIE-Extension">
+                                <p:menuitem value="Create ABIE Extension Locally" style="width: 100%;"/>
+                                <p:menuitem value="Create ABIE Extension Globally" style="width: 100%;"/>
+                            </p:contextMenu>
                         </div>
                         <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
                             <div id="myAffix" style="overflow-y: auto;">
@@ -44,7 +50,7 @@
                                             ABIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'ABIE'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'ABIE')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -78,7 +84,7 @@
                                             ASBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'ASBIE'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'ASBIE')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -171,7 +177,7 @@
                                             BBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIE')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -296,7 +302,7 @@
                                             BBIE_SC
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIESC'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIESC')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -357,7 +363,7 @@
                                             ABIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'ABIE'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'ABIE')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -394,7 +400,7 @@
                                             ASBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'ASBIE'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'ASBIE')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -413,7 +419,8 @@
                                                     <h:outputText value="Min" styleClass="section-label"/>
                                                     <h:selectOneMenu
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
-                                                            styleClass="section-content input-section disabled" disabled="true">
+                                                            styleClass="section-content input-section disabled"
+                                                            disabled="true">
                                                         <f:selectItem itemLabel="0" itemValue="0"/>
                                                         <f:selectItem itemLabel="1" itemValue="1"/>
                                                     </h:selectOneMenu>
@@ -497,7 +504,7 @@
                                             BBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIE')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -516,7 +523,8 @@
                                                     <h:outputText value="Min" styleClass="section-label"/>
                                                     <h:selectOneMenu
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
-                                                            styleClass="section-content input-section disabled" disabled="true">
+                                                            styleClass="section-content input-section disabled"
+                                                            disabled="true">
                                                         <f:selectItem itemLabel="0" itemValue="0"/>
                                                         <f:selectItem itemLabel="1" itemValue="1"/>
                                                     </h:selectOneMenu>
@@ -633,7 +641,7 @@
                                             BBIE_SC
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIESC'}">
+                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIESC')}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
