@@ -150,7 +150,7 @@
                     <p:commandButton value="Accept" icon="ui-icon-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmDifferentNameButSameIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton value="Denied" icon="ui-icon-close"
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -165,7 +165,7 @@
                     <p:commandButton value="Accept" icon="ui-icon-check"
                                      actionListener="#{contextSchemeDetailBean.setConfirmSameAgencyIdButDifferentIdentity(true)}"
                                      action="#{contextSchemeDetailBean.update()}"/>
-                    <p:commandButton value="Denied" icon="ui-icon-close"
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDifferentSchemeIdButSameIdentity').hide()"/>
                 </div>
             </p:confirmDialog>
@@ -178,7 +178,7 @@
                     <p:commandButton value="Accept" icon="ui-icon-check"
                                      action="#{contextSchemeDetailBean.delete()}"
                                      oncomplete="PF('confirmDiscard').hide()"/>
-                    <p:commandButton value="Denied" icon="ui-icon-close"
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmDiscard').hide()"/>
                 </div>
             </p:confirmDialog>
