@@ -1,9 +1,10 @@
-package org.oagi.srt.model.bod.impl;
+package org.oagi.srt.model.bie.impl;
 
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.model.AbstractBaseNode;
+import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.BBIESCNode;
+import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
@@ -53,7 +54,7 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
     }
 
     @Override
-    public void accept(NodeVisitor visitor) {
+    public void accept(BIENodeVisitor visitor) {
         visitor.visitBBIESCNode(this);
     }
 }

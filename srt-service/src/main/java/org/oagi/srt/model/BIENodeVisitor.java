@@ -1,11 +1,11 @@
 package org.oagi.srt.model;
 
-import org.oagi.srt.model.bod.ASBIENode;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.BBIESCNode;
-import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIESCNode;
+import org.oagi.srt.model.bie.TopLevelNode;
 
-public interface NodeVisitor {
+public interface BIENodeVisitor {
 
     public void startNode(TopLevelNode topLevelNode);
 

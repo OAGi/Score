@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Manage Core Component</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+            <p:panel id="panel">
+                <h:panelGroup style="width: 100%;">
+                    <div class="row">
+                        <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+                            <p:treeTable value="#{manageCoreComponentBean.treeNode}" var="node" id="treeTable"
+                                         selection="#{manageCoreComponentBean.selectedTreeNode}"
+                                         selectionMode="single">
+                                <p:ajax event="expand" listener="#{manageCoreComponentBean.expand}"
+                                        update=":form:treeTable"/>
+                                <p:ajax event="select" update=":form:details"/>
+                                <p:column headerText="Core Component Tree">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:column>
+                            </p:treeTable>
+                        </div>
+                        <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
+                            <div id="myAffix" style="overflow-y: auto;">
+                                <p:panel id="details">
+                                    <f:facet name="header">
+                                        <h:outputText value="Properties"/>
+                                    </f:facet>
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:panel>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

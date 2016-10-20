@@ -1,16 +1,16 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
+import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.ASBIENode;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.BBIESCNode;
-import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIESCNode;
+import org.oagi.srt.model.bie.TopLevelNode;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-public class LazyTreeNodeVisitor implements NodeVisitor {
+public class LazyTreeBIENodeVisitor implements BIENodeVisitor {
 
     private DefaultTreeNode parent;
 
@@ -18,11 +18,11 @@ public class LazyTreeNodeVisitor implements NodeVisitor {
         return parent;
     }
 
-    public LazyTreeNodeVisitor() {
+    public LazyTreeBIENodeVisitor() {
         parent = new DefaultTreeNode();
     }
 
-    public LazyTreeNodeVisitor(DefaultTreeNode parent) {
+    public LazyTreeBIENodeVisitor(DefaultTreeNode parent) {
         this.parent = parent;
     }
 

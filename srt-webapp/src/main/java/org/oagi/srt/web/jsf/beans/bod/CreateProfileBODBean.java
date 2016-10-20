@@ -1,9 +1,7 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.Node;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.impl.BaseBBIENode;
-import org.oagi.srt.model.bod.impl.BaseTopLevelNode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;

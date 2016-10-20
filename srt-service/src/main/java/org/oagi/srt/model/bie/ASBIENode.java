@@ -1,12 +1,12 @@
-package org.oagi.srt.model.bod;
+package org.oagi.srt.model.bie;
 
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.BIENode;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 
-public interface ASBIENode extends Node {
+public interface ASBIENode extends BIENode {
 
     public AssociationBusinessInformationEntity getAsbie();
     public void setAsbie(AssociationBusinessInformationEntity asbie);

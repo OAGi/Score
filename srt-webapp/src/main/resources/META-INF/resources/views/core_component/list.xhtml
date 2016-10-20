@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Core Component</h2>
+            </div>
+        </div>
+        <h:form id="listForm">
+            <p:panel id="pPanel">
+                <f:facet name="header">
+                    <p:autoComplete id="propertyTerm" value="#{coreComponentBean.selectedPropertyTerm}"
+                                    completeMethod="#{coreComponentBean.completeInput}" maxResults="20"
+                                    style="width: 440px; margin-right: 20px;"/>
+                    <p:commandButton value="Search" ajax="true" actionListener="#{coreComponentBean.search}"
+                                     update="tbl" icon="ui-icon-search"/>
+                </f:facet>
+
+                <p:dataTable id="tbl" var="asccp" value="#{coreComponentBean.asccpList}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom:20px" rowKey="#{asccp.asccpId}">
+                    <p:column headerText="Name" sortBy="#{asccp.propertyTerm}">
+                        <h:link value="#{asccp.propertyTerm}" outcome="/views/core_component/edit_cc.xhtml">
+                            <f:param name="asccpId" value="#{asccp.asccpId}"/>
+                        </h:link>
+                        <div>
+                            <h:link value="GUID: #{asccp.guid}" outcome="/views/core_component/edit_cc.xhtml"
+                                    style="font-size: 12px !important; color: #767676 !important;">
+                                <f:param name="asccpId" value="#{asccp.asccpId}"/>
+                            </h:link>
+                        </div>
+                    </p:column>
+                    <p:column style="width: 210px; text-align: center;" headerText="Last Update Timestamp"
+                              sortBy="#{asccp.lastUpdateTimestamp}">
+                        <h:outputText value="#{asccp.lastUpdateTimestamp}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{asccp.state}">
+                        <h:panelGroup rendered="#{asccp.state == 1}">
+                            <span class="label label-primary">Editing</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{asccp.state == 2}">
+                            <span class="label label-warning">Candidate</span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{asccp.state == 3}">
+                            <span class="label label-default">Published</span>
+                        </h:panelGroup>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

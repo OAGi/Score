@@ -1,35 +1,45 @@
-package org.oagi.srt.model.bod.impl;
+package org.oagi.srt.model.bie.impl;
 
+import org.oagi.srt.model.AbstractBaseNode;
+import org.oagi.srt.model.BIENode;
+import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.ASBIENode;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
+import org.oagi.srt.repository.entity.AssociationBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
+public class BaseASBIENode extends AbstractBaseNode implements ASBIENode {
 
+    private AssociationBusinessInformationEntity asbie;
     private AssociationBusinessInformationEntityProperty asbiep;
     private AssociationCoreComponentProperty asccp;
     private AggregateBusinessInformationEntity abie;
-    private BusinessContext bizCtx;
     private List<Node> children = new ArrayList();
 
-    public BaseTopLevelNode(AssociationBusinessInformationEntityProperty asbiep,
-                            AssociationCoreComponentProperty asccp,
-                            AggregateBusinessInformationEntity abie,
-                            BusinessContext bizCtx) {
-        super(0);
+    public BaseASBIENode(int seqKey, Node parent,
+                         AssociationBusinessInformationEntity asbie,
+                         AssociationBusinessInformationEntityProperty asbiep,
+                         AssociationCoreComponentProperty asccp,
+                         AggregateBusinessInformationEntity abie) {
+        super(seqKey, parent);
+        this.asbie = asbie;
         this.asbiep = asbiep;
         this.asccp = asccp;
         this.abie = abie;
-        this.bizCtx = bizCtx;
+    }
+
+    public AssociationBusinessInformationEntity getAsbie() {
+        return asbie;
+    }
+
+    public void setAsbie(AssociationBusinessInformationEntity asbie) {
+        this.asbie = asbie;
     }
 
     public AssociationBusinessInformationEntityProperty getAsbiep() {
@@ -54,14 +64,6 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
 
     public void setAbie(AggregateBusinessInformationEntity abie) {
         this.abie = abie;
-    }
-
-    public BusinessContext getBizCtx() {
-        return bizCtx;
-    }
-
-    public void setBizCtx(BusinessContext bizCtx) {
-        this.bizCtx = bizCtx;
     }
 
     @Override
@@ -89,11 +91,10 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
     }
 
     @Override
-    public void accept(NodeVisitor visitor) {
-        visitor.startNode(this);
+    public void accept(BIENodeVisitor visitor) {
+        visitor.visitASBIENode(this);
         for (Node child : getChildren()) {
-            child.accept(visitor);
+            ((BIENode) child).accept(visitor);
         }
-        visitor.endNode();
     }
 }

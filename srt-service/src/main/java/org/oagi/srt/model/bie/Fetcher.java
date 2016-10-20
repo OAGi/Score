@@ -1,4 +1,4 @@
-package org.oagi.srt.model.bod;
+package org.oagi.srt.model.bie;
 
 import org.oagi.srt.model.Node;
 

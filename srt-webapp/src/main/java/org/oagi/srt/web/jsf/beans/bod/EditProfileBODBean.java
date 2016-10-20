@@ -1,7 +1,7 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;

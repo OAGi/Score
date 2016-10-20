@@ -1,9 +1,10 @@
-package org.oagi.srt.model.bod.impl;
+package org.oagi.srt.model.bie.impl;
 
+import org.oagi.srt.model.BIENode;
+import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.Fetcher;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.repository.entity.*;
 
 import java.util.List;
@@ -18,11 +19,11 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode {
     }
 
     @Override
-    public void accept(NodeVisitor visitor) {
+    public void accept(BIENodeVisitor visitor) {
         visitor.visitBBIENode(this);
         if (isFetched()) {
             for (Node child : getChildren()) {
-                child.accept(visitor);
+                ((BIENode) child).accept(visitor);
             }
         }
     }

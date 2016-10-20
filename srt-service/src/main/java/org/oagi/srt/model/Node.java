@@ -20,6 +20,4 @@ public interface Node {
 
     public Object getAttribute(String key);
 
-    public void accept(NodeVisitor visitor);
-
 }

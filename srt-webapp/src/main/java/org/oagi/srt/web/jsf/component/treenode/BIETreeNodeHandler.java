@@ -1,14 +1,15 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
 import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.model.BIENode;
+import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.ASBIENode;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.BBIESCNode;
-import org.oagi.srt.model.bod.TopLevelNode;
-import org.oagi.srt.model.bod.impl.BaseTopLevelNode;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIESCNode;
+import org.oagi.srt.model.bie.TopLevelNode;
+import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
@@ -62,7 +63,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
     private int batchSize = 25;
 
-    private class SubmitNodeVisitor implements NodeVisitor {
+    private class SubmitBIENodeVisitor implements BIENodeVisitor {
 
         private User user;
         private CreateProfileBODBean.ProgressListener progressListener;
@@ -75,7 +76,7 @@ public class BIETreeNodeHandler extends UIHandler {
         private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
         private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
 
-        public SubmitNodeVisitor(User user) {
+        public SubmitBIENodeVisitor(User user) {
             this.user = user;
         }
 
@@ -264,10 +265,10 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
-        Node node = nodeService.createNode(asccp, bizCtx);
+        BIENode node = nodeService.createBIENode(asccp, bizCtx);
 
         long s = System.currentTimeMillis();
-        TreeNodeVisitor treeNodeVisitor = new TreeNodeVisitor();
+        TreeBIENodeVisitor treeNodeVisitor = new TreeBIENodeVisitor();
         node.accept(treeNodeVisitor);
         logger.info("TreeNodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
@@ -275,9 +276,9 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     public TreeNode createTreeNode(TopLevelAbie topLevelAbie) {
-        Node node = nodeService.createLazyNode(topLevelAbie);
+        BIENode node = nodeService.createLazyBIENode(topLevelAbie);
 
-        LazyTreeNodeVisitor lazyTreeNodeVisitor = new LazyTreeNodeVisitor();
+        LazyTreeBIENodeVisitor lazyTreeNodeVisitor = new LazyTreeBIENodeVisitor();
         node.accept(lazyTreeNodeVisitor);
         return lazyTreeNodeVisitor.getParent();
     }
@@ -287,24 +288,24 @@ public class BIETreeNodeHandler extends UIHandler {
         if (!lazyNode.isFetched()) {
             lazyNode.fetch();
 
-            LazyTreeNodeVisitor lazyTreeNodeVisitor = new LazyTreeNodeVisitor(treeNode);
+            LazyTreeBIENodeVisitor lazyTreeNodeVisitor = new LazyTreeBIENodeVisitor(treeNode);
             treeNode.setChildren(new ArrayList()); // clear children
 
             for (Node child : lazyNode.getChildren()) {
-                child.accept(lazyTreeNodeVisitor);
+                ((BIENode) child).accept(lazyTreeNodeVisitor);
             }
         }
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void submit(BaseTopLevelNode node, CreateProfileBODBean.ProgressListener progressListener) {
-        SubmitNodeVisitor submitNodeVisitor = new SubmitNodeVisitor(loadAuthentication());
+        SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(loadAuthentication());
         submitNodeVisitor.setProgressListener(progressListener);
         node.accept(submitNodeVisitor);
     }
 
 
-    private class UpdateNodeVisitor implements NodeVisitor {
+    private class UpdateBIENodeVisitor implements BIENodeVisitor {
 
         private User user;
         private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
@@ -314,7 +315,7 @@ public class BIETreeNodeHandler extends UIHandler {
         private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
         private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
 
-        public UpdateNodeVisitor(User user) {
+        public UpdateBIENodeVisitor(User user) {
             this.user = user;
         }
 
@@ -415,7 +416,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void update(TopLevelNode node) {
-        UpdateNodeVisitor updateNodeVisitor = new UpdateNodeVisitor(loadAuthentication());
+        UpdateBIENodeVisitor updateNodeVisitor = new UpdateBIENodeVisitor(loadAuthentication());
         node.accept(updateNodeVisitor);
     }
 

@@ -1,15 +1,15 @@
-package org.oagi.srt.model.bod.visitor;
+package org.oagi.srt.model.bie.visitor;
 
+import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.ASBIENode;
-import org.oagi.srt.model.bod.BBIENode;
-import org.oagi.srt.model.bod.BBIESCNode;
-import org.oagi.srt.model.bod.TopLevelNode;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIESCNode;
+import org.oagi.srt.model.bie.TopLevelNode;
 
 import java.util.Collections;
 
-public class NodeSortVisitor implements NodeVisitor {
+public class BIENodeSortVisitor implements BIENodeVisitor {
 
     @Override
     public void startNode(TopLevelNode topLevelNode) {

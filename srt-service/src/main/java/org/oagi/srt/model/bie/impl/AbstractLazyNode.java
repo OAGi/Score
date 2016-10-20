@@ -1,15 +1,13 @@
-package org.oagi.srt.model.bod.impl;
+package org.oagi.srt.model.bie.impl;
 
-import org.oagi.srt.model.LazyNode;
+import org.oagi.srt.model.LazyBIENode;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.NodeVisitor;
-import org.oagi.srt.model.bod.Fetcher;
-import org.oagi.srt.service.NodeService;
+import org.oagi.srt.model.bie.Fetcher;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractLazyNode implements LazyNode {
+public abstract class AbstractLazyNode implements LazyBIENode {
     private Node delegate;
     private Fetcher fetcher;
     private int childrenCount;

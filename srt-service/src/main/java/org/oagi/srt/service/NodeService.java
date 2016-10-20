@@ -1,15 +1,22 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.model.LazyNode;
+import org.oagi.srt.model.BIENode;
+import org.oagi.srt.model.CCNode;
+import org.oagi.srt.model.LazyBIENode;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.bod.*;
-import org.oagi.srt.model.bod.impl.*;
-import org.oagi.srt.model.bod.impl.BaseASBIENode;
-import org.oagi.srt.model.bod.impl.BaseBBIENode;
-import org.oagi.srt.model.bod.impl.BaseBBIESCNode;
-import org.oagi.srt.model.bod.impl.BaseTopLevelNode;
-import org.oagi.srt.model.bod.visitor.NodeSortVisitor;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.Fetcher;
+import org.oagi.srt.model.bie.TopLevelNode;
+import org.oagi.srt.model.bie.impl.*;
+import org.oagi.srt.model.bie.visitor.BIENodeSortVisitor;
+import org.oagi.srt.model.cc.ACCNode;
+import org.oagi.srt.model.cc.ASCCPNode;
+import org.oagi.srt.model.cc.BCCPNode;
+import org.oagi.srt.model.cc.impl.BaseACCNode;
+import org.oagi.srt.model.cc.impl.BaseASCCPNode;
+import org.oagi.srt.model.cc.impl.BaseBCCPNode;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -101,7 +108,7 @@ public class NodeService {
         executorService.shutdownNow();
     }
 
-    public Node createNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
+    public BIENode createBIENode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         long s = System.currentTimeMillis();
         DataContainerForProfileBODBuilder dataContainer = new DataContainerForProfileBODBuilder(bizCtx);
 
@@ -118,7 +125,7 @@ public class NodeService {
         logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
         s = System.currentTimeMillis();
-        topLevelNode.accept(new NodeSortVisitor());
+        topLevelNode.accept(new BIENodeSortVisitor());
         logger.info("Node sorted - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
         return topLevelNode;
@@ -800,7 +807,7 @@ public class NodeService {
 
     }
 
-    public Node createNode(TopLevelAbie topLevelAbie) {
+    public BIENode createBIENode(TopLevelAbie topLevelAbie) {
         long s = System.currentTimeMillis();
         DataContainerForProfileBODLoader dataContainer = new DataContainerForProfileBODLoader(topLevelAbie);
         logger.info("DataContainerForProfileBODLoader instantiated - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
@@ -815,7 +822,7 @@ public class NodeService {
         logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
         s = System.currentTimeMillis();
-        topLevelNode.accept(new NodeSortVisitor());
+        topLevelNode.accept(new BIENodeSortVisitor());
         logger.info("Node sorted - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
 
         return topLevelNode;
@@ -915,7 +922,7 @@ public class NodeService {
     /*
      * Lazy Node
      */
-    public LazyNode createLazyNode(TopLevelAbie topLevelAbie) {
+    public LazyBIENode createLazyBIENode(TopLevelAbie topLevelAbie) {
         AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
         BusinessContext bizCtx = businessContextRepository.findOne(abie.getBizCtxId());
         AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
@@ -1024,5 +1031,168 @@ public class NodeService {
                 new BaseBBIESCNode(parent, bbiesc, dtsc);
             }
         }
+    }
+
+    private class DataContainerForCC implements CoreComponentProvider {
+
+        private List<AggregateCoreComponent> accList;
+        private List<AssociationCoreComponent> asccList;
+        private List<AssociationCoreComponentProperty> asccpList;
+        private List<BasicCoreComponent> bccList;
+        private List<BasicCoreComponentProperty> bccpList;
+        private List<DataType> dataTypes;
+
+        private Map<Long, AggregateCoreComponent> accMap;
+        private Map<Long, AssociationCoreComponent> asccMap;
+        private Map<Long, AssociationCoreComponentProperty> asccpMap;
+        private Map<Long, BasicCoreComponent> bccMap;
+        private Map<Long, BasicCoreComponentProperty> bccpMap;
+        private Map<Long, DataType> bdtMap;
+
+        private Map<Long, List<BasicCoreComponent>> fromAccIdToBccMap;
+        private Map<Long, List<BasicCoreComponent>> fromAccIdToBccWithoutAttributesMap;
+        private Map<Long, List<AssociationCoreComponent>> fromAccIdToAsccMap;
+
+        public DataContainerForCC() {
+            accList = accRepository.findAll();
+            asccList = asccRepository.findAll();
+            asccpList = asccpRepository.findAll();
+            bccList = bccRepository.findAll();
+            bccpList = bccpRepository.findAll();
+            dataTypes = dataTypeRepository.findAll();
+
+            accMap = accList.stream()
+                    .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
+            asccMap = asccList.stream()
+                    .collect(Collectors.toMap(e -> e.getAsccId(), Function.identity()));
+            asccpMap = asccpList.stream()
+                    .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
+            bccMap = bccList.stream()
+                    .collect(Collectors.toMap(e -> e.getBccId(), Function.identity()));
+            bccpMap = bccpList.stream()
+                    .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
+            bdtMap = dataTypes.stream()
+                    .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
+
+            fromAccIdToBccMap = bccList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+            fromAccIdToBccWithoutAttributesMap = bccList.stream()
+                    .filter(e -> e.getSeqKey() != 0)
+                    .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+            fromAccIdToAsccMap = asccList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+        }
+
+        public AggregateCoreComponent getACC(long accId) {
+            return accMap.get(accId);
+        }
+
+        public AssociationCoreComponent getASCC(long asccId) {
+            return asccMap.get(asccId);
+        }
+
+        public AssociationCoreComponentProperty getASCCP(long asccpId) {
+            return asccpMap.get(asccpId);
+        }
+
+        public BasicCoreComponent getBCC(long bccId) {
+            return bccMap.get(bccId);
+        }
+
+        public BasicCoreComponentProperty getBCCP(long bccpId) {
+            return bccpMap.get(bccpId);
+        }
+
+        public DataType getBdt(long bdtId) {
+            return bdtMap.get(bdtId);
+        }
+
+        @Override
+        public List<BasicCoreComponent> getBCCs(long accId) {
+            List<BasicCoreComponent> bccList = fromAccIdToBccMap.get(accId);
+            return (bccList != null) ? bccList : Collections.emptyList();
+        }
+
+        @Override
+        public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId) {
+            List<BasicCoreComponent> bccList = fromAccIdToBccWithoutAttributesMap.get(accId);
+            return (bccList != null) ? bccList : Collections.emptyList();
+        }
+
+        @Override
+        public List<AssociationCoreComponent> getASCCs(long accId) {
+            List<AssociationCoreComponent> asccList = fromAccIdToAsccMap.get(accId);
+            return (asccList != null) ? asccList : Collections.emptyList();
+        }
+    }
+
+    public CCNode createCCNode(long asccpId) {
+        AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
+        return createCCNode(asccp);
+    }
+
+    public CCNode createCCNode(AssociationCoreComponentProperty asccp) {
+        if (asccp == null) {
+            throw new IllegalArgumentException("'asccp' argument must not be null.");
+        }
+
+        DataContainerForCC dataContainer = new DataContainerForCC();
+        return createASCCPNode(dataContainer, asccp);
+    }
+
+    private ACCNode createACCNode(DataContainerForCC dataContainer, Node parent, AggregateCoreComponent acc) {
+        long basedAccId = acc.getBasedAccId();
+        ACCNode accNode = new BaseACCNode(parent, acc);
+
+        List<CoreComponent> coreComponentList = coreComponentService.getCoreComponents(acc, dataContainer);
+        for (CoreComponent coreComponent : coreComponentList) {
+            if (coreComponent instanceof BasicCoreComponent) {
+                createBCCPNode(dataContainer, accNode, (BasicCoreComponent) coreComponent);
+            } else if (coreComponent instanceof AssociationCoreComponent) {
+                createASCCPNode(dataContainer, accNode, (AssociationCoreComponent) coreComponent);
+            }
+        }
+
+        if (basedAccId > 0L) {
+            ACCNode basedAccNode = createACCNode(dataContainer, accNode, dataContainer.getACC(basedAccId));
+            accNode.setBasedACC(basedAccNode);
+        }
+
+        return accNode;
+    }
+
+    private BCCPNode createBCCPNode(DataContainerForCC dataContainer,
+                                    ACCNode fromAccNode, BasicCoreComponent bcc) {
+        if (fromAccNode.getACC().getAccId() != bcc.getFromAccId()) {
+            throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
+        }
+
+        BasicCoreComponentProperty bccp = dataContainer.getBCCP(bcc.getToBccpId());
+        DataType bdt = dataContainer.getBdt(bccp.getBdtId());
+
+        BCCPNode bccNode = new BaseBCCPNode(fromAccNode, bcc, bccp, bdt);
+        return bccNode;
+    }
+
+    private ASCCPNode createASCCPNode(DataContainerForCC dataContainer, AssociationCoreComponentProperty asccp) {
+        ASCCPNode asccpNode = new BaseASCCPNode(asccp);
+        return setRoleOfACC(dataContainer, asccpNode);
+    }
+
+    private ASCCPNode createASCCPNode(DataContainerForCC dataContainer,
+                                      ACCNode fromAccNode, AssociationCoreComponent ascc) {
+        if (fromAccNode.getACC().getAccId() != ascc.getFromAccId()) {
+            throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
+        }
+        ASCCPNode asccpNode = new BaseASCCPNode(fromAccNode, ascc, dataContainer.getASCCP(ascc.getToAsccpId()));
+        return setRoleOfACC(dataContainer, asccpNode);
+    }
+
+    private ASCCPNode setRoleOfACC(DataContainerForCC dataContainer, ASCCPNode asccpNode) {
+        AssociationCoreComponentProperty asccp = asccpNode.getASCCP();
+        AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
+        ACCNode roleOfAcc = createACCNode(dataContainer, asccpNode, acc);
+        asccpNode.setRoleOfACC(roleOfAcc);
+        return asccpNode;
     }
 }

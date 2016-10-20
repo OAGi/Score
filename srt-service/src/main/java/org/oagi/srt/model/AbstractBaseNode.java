@@ -1,6 +1,4 @@
-package org.oagi.srt.model.bod.impl;
-
-import org.oagi.srt.model.Node;
+package org.oagi.srt.model;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +39,6 @@ public abstract class AbstractBaseNode implements Node {
 
     @Override
     public <T extends Node> void addChild(T child) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
