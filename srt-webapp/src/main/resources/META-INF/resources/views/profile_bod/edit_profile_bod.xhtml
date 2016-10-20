@@ -2,7 +2,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 template="../../template.xhtml">
 
     <ui:define name="content">
@@ -47,7 +48,7 @@
                                         Editing
                                     -->
                                     <h:panelGroup id="editingPanel"
-                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state == 2}">
+                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}">
                                         <!--
                                             ABIE
                                         -->
@@ -360,7 +361,7 @@
                                         Published
                                     -->
                                     <h:panelGroup id="publishPanel"
-                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state == 4}">
+                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Published'}">
                                         <!--
                                             ABIE
                                         -->
@@ -706,7 +707,7 @@
                 </h:panelGroup>
             </p:panel>
 
-            <p:panel id="btnGroup" rendered="#{editProfileBODBean.topLevelNode.abie.state == 2}">
+            <p:panel id="btnGroup" rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}">
                 <p:commandButton id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{editProfileBODBean.update()}"/>
                 <p:commandButton id="btnPublish" widgetVar="btnPublish" value="Publish"

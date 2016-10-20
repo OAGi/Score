@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.OagisComponentType.Extension;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Scope(SCOPE_PROTOTYPE)
@@ -349,8 +350,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     @Override
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
         switch (accComplexType.getOagisComponentType()) {
-            case 6:
-            case 7:
+            case OAGIS10Nouns:
+            case OAGIS10BODs:
                 processOAGIS10(accComplexType);
                 break;
             default:
@@ -370,10 +371,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
         String delimiter;
         switch (accComplexType.getOagisComponentType()) {
-            case 6:
+            case OAGIS10Nouns:
                 delimiter = "Nouns";
                 break;
-            case 7:
+            case OAGIS10BODs:
                 delimiter = "BODs";
                 break;
             default:
@@ -477,7 +478,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             extensionElement.setAttribute("base", basedACC.getTypeName());
             complexContentElement.addContent(extensionElement);
 
-            if (!sequenceElement.getContent().isEmpty() || accComplexType.getOagisComponentType()==2) {
+            if (!sequenceElement.getContent().isEmpty() || accComplexType.getOagisComponentType() == Extension) {
                 extensionElement.addContent(sequenceElement);
             }
         } else {

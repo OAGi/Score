@@ -335,7 +335,7 @@ public class P_1_1_PopulateCommonData {
             cdt.setGuid(Utility.generateGUID());
             cdt.setType(0);
             cdt.setVersionNum("1.0");
-            cdt.setState(3);
+            cdt.setState(CoreComponentState.Published);
             cdt.setOwnerUserId(user.getAppUserId());
             cdt.setCreatedBy(user.getAppUserId());
             cdt.setLastUpdatedBy(user.getAppUserId());

@@ -42,13 +42,13 @@
                         </h:outputText>
                     </p:column>
                     <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{asccp.state}">
-                        <h:panelGroup rendered="#{asccp.state == 1}">
+                        <h:panelGroup rendered="#{asccp.state == 'Editing'}">
                             <span class="label label-primary">Editing</span>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{asccp.state == 2}">
+                        <h:panelGroup rendered="#{asccp.state == 'Candidate'}">
                             <span class="label label-warning">Candidate</span>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{asccp.state == 3}">
+                        <h:panelGroup rendered="#{asccp.state == 'Published'}">
                             <span class="label label-default">Published</span>
                         </h:panelGroup>
                     </p:column>

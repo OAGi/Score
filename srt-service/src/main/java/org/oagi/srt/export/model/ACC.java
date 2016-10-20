@@ -2,10 +2,9 @@ package org.oagi.srt.export.model;
 
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.ImportedDataProvider;
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.OagisComponentType;
 
 public abstract class ACC implements Component {
 
@@ -13,7 +12,7 @@ public abstract class ACC implements Component {
     private ACC basedAcc;
 
     private ImportedDataProvider importedDataProvider;
-    private int oagisComponentType;
+    private OagisComponentType oagisComponentType;
 
     ACC(AggregateCoreComponent acc, ACC basedAcc,
         ImportedDataProvider importedDataProvider) {
@@ -26,20 +25,20 @@ public abstract class ACC implements Component {
     public static ACC newInstance(AggregateCoreComponent acc,
                                   ImportedDataProvider importedDataProvider) {
         switch (acc.getOagisComponentType()) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 5:
-            case 6:
-            case 7:
+            case Base:
+            case Semantics:
+            case Extension:
+            case SemanticGroup:
+            case Embedded:
+            case OAGIS10Nouns:
+            case OAGIS10BODs:
                 ACC basedACC = null;
                 if (acc.getBasedAccId() > 0) {
                     AggregateCoreComponent basedAcc = importedDataProvider.findACC(acc.getBasedAccId());
                     basedACC = newInstance(basedAcc, importedDataProvider);
                 }
                 return new ACCComplexType(acc, basedACC, importedDataProvider);
-            case 4: // @TODO: Not yet handled
+            case UserExtensionGroup: // @TODO: Not yet handled
                 return new ACCGroup(acc, null, importedDataProvider);
             default:
                 throw new IllegalStateException();
@@ -75,7 +74,7 @@ public abstract class ACC implements Component {
         return (asccp != null) && asccp.getRoleOfAccId() == getRawId();
     }
 
-    public int getOagisComponentType() {
+    public OagisComponentType getOagisComponentType() {
         return this.oagisComponentType;
     }
 }

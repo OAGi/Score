@@ -2,6 +2,7 @@ package org.oagi.srt.web.jsf.beans.codelist;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.service.CodeListService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -27,7 +28,7 @@ public class CodeListBaseBean extends UIHandler {
     private CodeListValue selectedCodeListValue;
     private List<CodeListValue> deleteCodeListValues = new ArrayList();
 
-    private CodeList.State state;
+    private CodeListState state;
     private boolean confirmDifferentNameButSameIdentity;
     private boolean confirmSameListIdButDifferentIdentity;
 
@@ -101,12 +102,12 @@ public class CodeListBaseBean extends UIHandler {
         selectedCodeListValue = null;
     }
 
-    public CodeList.State getState() {
+    public CodeListState getState() {
         return state;
     }
 
     public void setState(String state) {
-        this.state = CodeList.State.valueOf(state);
+        this.state = CodeListState.valueOf(state);
     }
 
     @Transactional(rollbackFor = Throwable.class)

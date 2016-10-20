@@ -1,8 +1,6 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.repository.BasicCoreComponentPropertyRepository;
-import org.oagi.srt.repository.BasicCoreComponentRepository;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.springframework.beans.factory.annotation.Autowired;

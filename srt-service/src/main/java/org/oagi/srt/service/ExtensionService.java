@@ -13,6 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
+import static org.oagi.srt.repository.entity.RevisionAction.Insert;
+
 @Service
 @Transactional(readOnly = true)
 public class ExtensionService {
@@ -59,11 +64,10 @@ public class ExtensionService {
     }
 
     private boolean existsUserExtension(AggregateCoreComponent eAcc) {
-        int oagisComponentType = 4;
         for (AssociationCoreComponent ascc : asccRepository.findByFromAccId(eAcc.getAccId())) {
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
             AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
-            if (acc.getOagisComponentType() == oagisComponentType) {
+            if (acc.getOagisComponentType() == UserExtensionGroup) {
                 return true;
             }
         }
@@ -92,11 +96,11 @@ public class ExtensionService {
         ueAcc.setObjectClassTerm(Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm()));
         ueAcc.setDen((ueAcc.getObjectClassTerm() + ". Details"));
         ueAcc.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
-        ueAcc.setOagisComponentType(4);
+        ueAcc.setOagisComponentType(UserExtensionGroup);
         ueAcc.setCreatedBy(userId);
         ueAcc.setLastUpdatedBy(userId);
         ueAcc.setOwnerUserId(userId);
-        ueAcc.setState(1);
+        ueAcc.setState(Editing);
         ueAcc.setRevisionNum(0);
         ueAcc.setRevisionTrackingNum(0);
         ueAcc.setNamespaceId(namespaceRepository.findNamespaceIdByUri("http://www.openapplications.org/oagis/10"));
@@ -116,7 +120,7 @@ public class ExtensionService {
         accHistory.setState(ueAcc.getState());
         accHistory.setRevisionNum(1);
         accHistory.setRevisionTrackingNum(1);
-        accHistory.setRevisionAction(1);
+        accHistory.setRevisionAction(Insert);
         accHistory.setCurrentAccId(ueAcc.getAccId());
         accHistory.setNamespaceId(ueAcc.getNamespaceId());
         accRepository.saveAndFlush(accHistory);
@@ -135,7 +139,7 @@ public class ExtensionService {
         ueAsccp.setCreatedBy(userId);
         ueAsccp.setLastUpdatedBy(userId);
         ueAsccp.setOwnerUserId(userId);
-        ueAsccp.setState(4);
+        ueAsccp.setState(Published);
         ueAsccp.setReusableIndicator(false);
         ueAsccp.setRevisionNum(0);
         ueAsccp.setRevisionTrackingNum(0);
@@ -157,7 +161,7 @@ public class ExtensionService {
         asccpHistory.setReusableIndicator(ueAsccp.isReusableIndicator());
         asccpHistory.setRevisionNum(1);
         asccpHistory.setRevisionTrackingNum(1);
-        asccpHistory.setRevisionAction(1);
+        asccpHistory.setRevisionAction(Insert);
         asccpHistory.setCurrentAsccpId(ueAsccp.getAsccpId());
         asccpHistory.setNamespaceId(ueAsccp.getNamespaceId());
         asccpRepository.saveAndFlush(asccpHistory);
@@ -180,7 +184,7 @@ public class ExtensionService {
         ueAscc.setCreatedBy(userId);
         ueAscc.setLastUpdatedBy(userId);
         ueAscc.setOwnerUserId(userId);
-        ueAscc.setState(4);
+        ueAscc.setState(Published);
         ueAscc.setRevisionNum(0);
         ueAscc.setRevisionTrackingNum(0);
         return asccRepository.saveAndFlush(ueAscc);
@@ -202,7 +206,7 @@ public class ExtensionService {
         asccHistory.setState(ueAscc.getState());
         asccHistory.setRevisionNum(1);
         asccHistory.setRevisionTrackingNum(1);
-        asccHistory.setRevisionAction(1);
+        asccHistory.setRevisionAction(Insert);
         asccRepository.saveAndFlush(asccHistory);
     }
 }

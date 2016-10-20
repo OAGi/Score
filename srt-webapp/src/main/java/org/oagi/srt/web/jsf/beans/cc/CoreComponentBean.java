@@ -31,9 +31,7 @@ public class CoreComponentBean {
 
     @PostConstruct
     public void init() {
-        allAsccpList = asccpRepository.findAll().stream()
-                .filter(e -> e.getState() > 0 && e.getState() < 4)
-                .collect(Collectors.toList());
+        allAsccpList = asccpRepository.findAll();
         setAsccpList(
                 allAsccpList.stream()
                         .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))

@@ -3,7 +3,6 @@ package org.oagi.srt.persistence.populate;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.Table;
-import javax.persistence.TypedQuery;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;

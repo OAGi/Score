@@ -2,7 +2,9 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="../../template.xhtml">
 
     <ui:define name="content">
         <div class="settings-next">
@@ -169,7 +171,7 @@
                                                 ASBIE
                                             -->
                                             <h:panelGroup
-                                                    rendered="#{createProfileBODBean.selectedTreeNode.type eq 'ASBIE'}">
+                                                    rendered="#{fn:startsWith(createProfileBODBean.selectedTreeNode.type, 'ASBIE')}">
                                                 <p:panel>
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>

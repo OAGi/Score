@@ -1,6 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.repository.entity.BasicBusinessInformationEntity;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntityProperty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

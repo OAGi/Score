@@ -237,7 +237,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtVO.setContentComponentDen(Utility.typeToContent(typeName));
             dtVO.setDefinition(definition);
             dtVO.setContentComponentDefinition(ccDefinition);
-            dtVO.setState(3);
+            dtVO.setState(CoreComponentState.Published);
             dtVO.setCreatedBy(importUtil.getUserId());
             dtVO.setLastUpdatedBy(importUtil.getUserId());
             dtVO.setOwnerUserId(importUtil.getUserId());
@@ -312,7 +312,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             dtVO.setBasedDtId(basedDTID);
             dtVO.setDen(Utility.typeToDen(typeName));
             dtVO.setContentComponentDen(Utility.typeToContent(typeName));
-            dtVO.setState(3);
+            dtVO.setState(CoreComponentState.Published);
             dtVO.setCreatedBy(importUtil.getUserId());
             dtVO.setLastUpdatedBy(importUtil.getUserId());
             dtVO.setOwnerUserId(importUtil.getUserId());

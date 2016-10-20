@@ -20,15 +20,15 @@ public abstract class ASCCP implements Component {
                                     ImportedDataProvider importedDataProvider) {
         AggregateCoreComponent roleOfAcc = importedDataProvider.findACC(asccp.getRoleOfAccId());
         switch (roleOfAcc.getOagisComponentType()) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 5:
-            case 6:
-            case 7:
+            case Base:
+            case Semantics:
+            case Extension:
+            case SemanticGroup:
+            case Embedded:
+            case OAGIS10Nouns:
+            case OAGIS10BODs:
                 return new ASCCPComplexType(asccp, roleOfAcc);
-            case 4: // @TODO: Not yet handled
+            case UserExtensionGroup:
                 return new ASCCPGroup(asccp, roleOfAcc);
             default:
                 throw new IllegalStateException();

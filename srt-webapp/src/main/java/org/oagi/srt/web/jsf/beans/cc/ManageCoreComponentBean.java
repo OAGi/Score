@@ -1,11 +1,14 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.*;
+import org.oagi.srt.model.CCNode;
+import org.oagi.srt.model.CCNodeVisitor;
+import org.oagi.srt.model.LazyNode;
+import org.oagi.srt.model.Node;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
+import org.oagi.srt.repository.entity.CoreComponentState;
 import org.oagi.srt.service.NodeService;
-import org.oagi.srt.web.jsf.component.treenode.LazyTreeBIENodeVisitor;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -63,17 +66,17 @@ public class ManageCoreComponentBean {
         this.selectedTreeNode = selectedTreeNode;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         TreeNode treeNode = getSelectedTreeNode();
         if (treeNode == null) {
-            return 0;
+            return null;
         }
         CCNode node = (CCNode) treeNode.getData();
         if (node instanceof ASCCPNode) {
             ASCCPNode asccpNode = (ASCCPNode) node;
             return asccpNode.getAsccp().getState();
         } else {
-            return 0;
+            return null;
         }
     }
 

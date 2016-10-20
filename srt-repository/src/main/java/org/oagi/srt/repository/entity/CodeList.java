@@ -11,13 +11,6 @@ import java.util.Date;
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CodeList implements Serializable {
 
-    public enum State {
-        Editing,
-        Published,
-        Discarded,
-        Deleted
-    }
-
     public static final String SEQUENCE_NAME = "CODE_LIST_ID_SEQ";
 
     @Id
@@ -79,7 +72,7 @@ public class CodeList implements Serializable {
 
     @Column(nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
-    private State state;
+    private CodeListState state;
 
     @Transient
     private boolean editDisabled;
@@ -239,11 +232,11 @@ public class CodeList implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public State getState() {
+    public CodeListState getState() {
         return state;
     }
 
-    public void setState(State state) {
+    public void setState(CodeListState state) {
         this.state = state;
 
         switch (state) {

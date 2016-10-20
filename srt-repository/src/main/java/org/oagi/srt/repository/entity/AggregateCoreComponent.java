@@ -1,6 +1,9 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,7 +41,8 @@ public class AggregateCoreComponent implements Serializable {
     private String objectClassQualifier;
 
     @Column
-    private int oagisComponentType;
+    @Convert(attributeName = "oagisComponentType", converter = OagisComponentTypeConverter.class)
+    private OagisComponentType oagisComponentType;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
@@ -65,7 +69,8 @@ public class AggregateCoreComponent implements Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false)
     private int revisionNum;
@@ -74,7 +79,8 @@ public class AggregateCoreComponent implements Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -174,11 +180,11 @@ public class AggregateCoreComponent implements Serializable {
         this.objectClassQualifier = objectClassQualifier;
     }
 
-    public int getOagisComponentType() {
+    public OagisComponentType getOagisComponentType() {
         return oagisComponentType;
     }
 
-    public void setOagisComponentType(int oagisComponentType) {
+    public void setOagisComponentType(OagisComponentType oagisComponentType) {
         this.oagisComponentType = oagisComponentType;
     }
 
@@ -238,11 +244,11 @@ public class AggregateCoreComponent implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -262,11 +268,11 @@ public class AggregateCoreComponent implements Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -327,7 +333,7 @@ public class AggregateCoreComponent implements Serializable {
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
-        result = 31 * result + oagisComponentType;
+        result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -335,7 +341,7 @@ public class AggregateCoreComponent implements Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
         result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);

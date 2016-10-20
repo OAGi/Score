@@ -1,6 +1,5 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,6 +22,8 @@ public interface AggregateBusinessInformationEntityRepository
     public void deleteByOwnerTopLevelAbieId(long ownerTopLevelAbieId);
 
     @Modifying
-    @Query("update AggregateBusinessInformationEntity a set a.state = " + SRTConstants.TOP_LEVEL_ABIE_STATE_PUBLISHED + " where a.ownerTopLevelAbieId = ?1")
+    @Query("update AggregateBusinessInformationEntity a " +
+           "set a.state = org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Published " +
+           "where a.ownerTopLevelAbieId = ?1")
     public void updatePublish(long ownerTopLevelAbieId);
 }

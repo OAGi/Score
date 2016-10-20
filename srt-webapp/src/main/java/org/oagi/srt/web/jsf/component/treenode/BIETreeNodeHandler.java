@@ -1,6 +1,5 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
-import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.LazyNode;
@@ -27,6 +26,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
 @Component
 @Transactional(readOnly = true)
@@ -119,14 +120,14 @@ public class BIETreeNodeHandler extends UIHandler {
             AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
             tAbie.setCreatedBy(user.getAppUserId());
             tAbie.setLastUpdatedBy(user.getAppUserId());
-            tAbie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+            tAbie.setState(Editing);
             tAbie.setOwnerTopLevelAbie(topLevelAbie);
             tAbie.addPersistEventListener(progressListener);
 
             abieList.stream().forEach(abie -> {
                 abie.setCreatedBy(user.getAppUserId());
                 abie.setLastUpdatedBy(user.getAppUserId());
-                abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+                abie.setState(Editing);
                 abie.setOwnerTopLevelAbie(topLevelAbie);
                 abie.addPersistEventListener(progressListener);
             });

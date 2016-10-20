@@ -40,6 +40,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
+
 @Controller
 @Scope("view")
 @ManagedBean
@@ -697,7 +699,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAbie.setBizTerm(sourceAbie.getBizTerm());
         cloneAbie.setCreatedBy(userId);
         cloneAbie.setLastUpdatedBy(userId);
-        cloneAbie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+        cloneAbie.setState(Editing);
         cloneAbie.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
         abieRepository.saveAndFlush(cloneAbie);
@@ -845,12 +847,12 @@ public class TopLevelABIEHandler implements Serializable {
         if (ueAcc == null) {
             createNewUserExtensionGroupACC();
         } else {
-            if (ueAcc.getState() == 1/*Editing*/ && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #a in designDoc
+            if (ueAcc.getState() == CoreComponentState.Editing && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #a in designDoc
                 editUserExtensionGroupACC();
-            } else if (ueAcc.getState() == 1 && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #b in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Editing && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #b in designDoc
                 //Show message Owner User Id
                 //Return to page
-            } else if (ueAcc.getState() == 2/*need to check 2 == candidate*/ && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #c in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Candidate && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #c in designDoc
                 //do you want to edit this extension?
                 if (true) {
                     //Change state of this ACC and correspondings
@@ -859,9 +861,9 @@ public class TopLevelABIEHandler implements Serializable {
                     //Return to page
                 }
 
-            } else if (ueAcc.getState() == 2/*need to check 2 == candidate*/ && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #d in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Candidate && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #d in designDoc
 
-            } else if (ueAcc.getState() == 4/*published*/) {//case #e in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Published) {//case #e in designDoc
                 //do you want to edit already published one?
                 if (true) {
                     createNewUserExtensionGroupACCRevision();
@@ -880,9 +882,9 @@ public class TopLevelABIEHandler implements Serializable {
         List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(ueAcc.getAccId());
 
         for (AssociationCoreComponent ascc : asccList) {
-            ascc.setState(1);//Editing
+            ascc.setState(CoreComponentState.Editing);
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
-            asccp.setState(1);//Editing
+            asccp.setState(CoreComponentState.Editing);//Editing
             asccRepository.save(ascc);
             asccpRepository.save(asccp);
         }

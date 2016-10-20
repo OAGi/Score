@@ -267,6 +267,7 @@ public class Utility {
             result = result.substring(0, result.indexOf((" Code Type"))).concat(" Code Type");
         result = result.replaceAll("\\s{2,}", " ");
         result = IDtoIdentifier(result);
+        result = processBODs(result);
         return result.trim();
     }
 
@@ -280,6 +281,13 @@ public class Utility {
             ret = ret + " " + delim[i];
         }
         return ret.trim();
+    }
+
+    public static String processBODs(String str) {
+        if (str != null) {
+            str = str.replace("BOD s", "BODs");
+        }
+        return str;
     }
 
     public static String denWithoutUUID(String den) {
@@ -540,9 +548,9 @@ public class Utility {
     }
 
     public static void main(String args[]) {
-        String str = "Amount_0723C8. Type";
-        System.out.println(denToTypeName(str));
-
-        System.out.println(qualifier("TypedSequencedTextType", "Sequenced_ Open_ Text. Type", "Text"));
+        String name = "OAGIS10BODs";
+        int idx = name.lastIndexOf("Type");
+        String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
+        System.out.println(objectClassTerm);
     }
 }

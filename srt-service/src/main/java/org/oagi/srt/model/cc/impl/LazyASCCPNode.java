@@ -4,13 +4,8 @@ import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
-import org.oagi.srt.model.cc.ASCCPNode;
-import org.oagi.srt.model.cc.BCCPNode;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-
-import java.util.List;
 
 public class LazyASCCPNode extends AbstractLazyNode implements ASCCPNode, LazyCCNode {
 

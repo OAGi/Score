@@ -1,5 +1,7 @@
 package org.oagi.srt.repository.entity;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -62,7 +64,8 @@ public class DataType implements Serializable {
     private Module module;
 
     @Column
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -88,7 +91,8 @@ public class DataType implements Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -232,11 +236,11 @@ public class DataType implements Serializable {
         this.module = module;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -296,11 +300,11 @@ public class DataType implements Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -360,7 +364,7 @@ public class DataType implements Serializable {
         result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));

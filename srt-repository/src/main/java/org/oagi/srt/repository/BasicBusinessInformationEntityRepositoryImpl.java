@@ -2,7 +2,6 @@ package org.oagi.srt.repository;
 
 import org.hibernate.dialect.Dialect;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntity;
-import org.oagi.srt.repository.entity.CodeList;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;

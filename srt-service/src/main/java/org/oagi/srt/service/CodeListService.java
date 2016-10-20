@@ -4,6 +4,7 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -53,7 +54,7 @@ public class CodeListService {
         return codeListRepository.findByNameAndAgencyId(name, agencyId);
     }
 
-    public void updateState(CodeList codeList, CodeList.State state) {
+    public void updateState(CodeList codeList, CodeListState state) {
         if (codeList != null && state != null) {
             codeList.setState(state);
             codeListRepository.updateStateByCodeListId(state.toString(), codeList.getCodeListId());
@@ -96,7 +97,7 @@ public class CodeListService {
 
         private CodeList codeList;
         private long userId;
-        private CodeList.State state = CodeList.State.Editing;
+        private CodeListState state = CodeListState.Editing;
         private boolean extensibleIndicator;
         private CodeList basedCodeList;
 
@@ -110,7 +111,7 @@ public class CodeListService {
             return this;
         }
 
-        public CodeListBuilder state(CodeList.State state) {
+        public CodeListBuilder state(CodeListState state) {
             this.state = state;
             return this;
         }

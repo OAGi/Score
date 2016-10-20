@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
 import org.oagi.srt.repository.entity.listener.UpdateEventListener;
@@ -56,7 +57,8 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     private Date lastUpdateTimestamp;
 
     @Column
-    private int state;
+    @Convert(attributeName = "state", converter = AggregateBusinessInformationEntityStateConverter.class)
+    private AggregateBusinessInformationEntityState state;
 
     @Column
     private Long clientId;
@@ -173,11 +175,11 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public int getState() {
+    public AggregateBusinessInformationEntityState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(AggregateBusinessInformationEntityState state) {
         this.state = state;
         setDirty(true);
     }
@@ -276,20 +278,26 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         int result = (int) (abieId ^ (abieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (basedAccId ^ (basedAccId >>> 32));
+        result = 31 * result + (basedAcc != null ? basedAcc.hashCode() : 0);
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
+        result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (clientId != null ? clientId.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (dirty ? 1 : 0);
+        result = 31 * result + (persistEventListeners != null ? persistEventListeners.hashCode() : 0);
+        result = 31 * result + (updateEventListeners != null ? updateEventListeners.hashCode() : 0);
         return result;
     }
 

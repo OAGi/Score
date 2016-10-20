@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -65,7 +66,8 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false)
     private int revisionNum;
@@ -262,11 +264,11 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -359,7 +361,7 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
         result = 31 * result + revisionAction;

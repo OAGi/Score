@@ -1,5 +1,7 @@
 package org.oagi.srt.repository.entity;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -64,7 +66,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false)
     private int revisionNum;
@@ -73,7 +76,8 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -233,11 +237,11 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -257,11 +261,11 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -338,7 +342,7 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
         result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);

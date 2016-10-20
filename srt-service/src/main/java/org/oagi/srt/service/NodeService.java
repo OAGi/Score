@@ -1,6 +1,5 @@
 package org.oagi.srt.service;
 
-import org.hibernate.annotations.Fetch;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.ASBIENode;
@@ -31,6 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
 
 @Service
 @Transactional(readOnly = true)
@@ -356,7 +357,7 @@ public class NodeService {
             groupcheckMap = asccpMap.values().stream()
                     .collect(Collectors.toMap(e -> e.getAsccpId(), e -> {
                         AggregateCoreComponent acc = getACC(e.getRoleOfAccId());
-                        return (acc.getOagisComponentType() == 3) ? true : false;
+                        return (acc.getOagisComponentType() == SemanticGroup) ? true : false;
                     }));
         }
 

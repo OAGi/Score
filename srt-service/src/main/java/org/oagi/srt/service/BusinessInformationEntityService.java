@@ -1,6 +1,5 @@
 package org.oagi.srt.service;
 
-import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
@@ -16,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
 @Service
 public class BusinessInformationEntityService {
@@ -168,7 +169,7 @@ public class BusinessInformationEntityService {
         abie.setDefinition(acc.getDefinition());
         abie.setCreatedBy(userId);
         abie.setLastUpdatedBy(userId);
-        abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+        abie.setState(Editing);
         abie.setOwnerTopLevelAbie(topLevelAbie);
 
         abieRepository.saveAndFlush(abie);
@@ -272,7 +273,7 @@ public class BusinessInformationEntityService {
         boolean check = false;
         AssociationCoreComponentProperty asccp = createBIEContext.getASCCP(associationCoreComponent.getToAsccpId());
         AggregateCoreComponent acc = createBIEContext.getACC(asccp.getRoleOfAccId());
-        if (acc.getOagisComponentType() == 3) {
+        if (acc.getOagisComponentType() == OagisComponentType.SemanticGroup) {
             check = true;
         }
         return check;
@@ -485,7 +486,7 @@ public class BusinessInformationEntityService {
             abie.setDefinition(acc.getDefinition());
             abie.setCreatedBy(userId);
             abie.setLastUpdatedBy(userId);
-            abie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+            abie.setState(Editing);
 
             aggregateBusinessInformationEntitys.add(abie);
 

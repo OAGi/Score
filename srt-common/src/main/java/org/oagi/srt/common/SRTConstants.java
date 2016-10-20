@@ -25,14 +25,6 @@ public class SRTConstants {
 	public static final String TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE = "create_u_bie";
 	public static final String TAB_TOP_LEVEL_ABIE_COPY_UC_BIE = "edit_bod";
 
-	public static final int TOP_LEVEL_ABIE_STATE_EDITING = 2;
-	public static final int TOP_LEVEL_ABIE_STATE_PUBLISHED = 4;
-
-	public static final String CODE_LIST_STATE_EDITING = "Editing";
-	public static final String CODE_LIST_STATE_PUBLISHED = "Published";
-	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
-	public static final String CODE_LIST_STATE_DELETED = "Deleted";
-
 	public static final String AGENCY_ID_LIST_NAME = "clm63055D08B_AgencyIdentification";
 
 	public static final String DATA_PATH;

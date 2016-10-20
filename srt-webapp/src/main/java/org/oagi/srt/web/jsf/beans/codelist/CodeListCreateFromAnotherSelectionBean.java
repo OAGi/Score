@@ -1,6 +1,7 @@
 package org.oagi.srt.web.jsf.beans.codelist;
 
 import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.service.CodeListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -26,7 +27,7 @@ public class CodeListCreateFromAnotherSelectionBean extends CodeListBaseBean {
     @PostConstruct
     public void init() {
         basedCodeLists = codeListService.findAll().stream()
-                .filter(e -> e.getState() == CodeList.State.Published && e.isExtensibleIndicator())
+                .filter(e -> e.getState() == CodeListState.Published && e.isExtensibleIndicator())
                 .collect(Collectors.toList());
     }
 

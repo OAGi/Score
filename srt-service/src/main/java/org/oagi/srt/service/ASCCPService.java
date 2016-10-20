@@ -10,10 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-
-import static org.oagi.srt.common.SRTConstants.OAGI_GUID_PREFIX;
-
 @Service
 @Transactional(readOnly = true)
 public class ASCCPService {

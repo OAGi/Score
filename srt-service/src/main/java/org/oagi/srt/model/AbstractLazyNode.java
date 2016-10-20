@@ -1,7 +1,5 @@
 package org.oagi.srt.model;
 
-import org.oagi.srt.model.LazyBIENode;
-import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bie.Fetcher;
 
 import java.util.Collections;
