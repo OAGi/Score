@@ -1,12 +1,11 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.CCNode;
-import org.oagi.srt.model.CCNodeVisitor;
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.*;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.service.NodeService;
+import org.oagi.srt.web.jsf.component.treenode.LazyTreeBIENodeVisitor;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -21,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.util.ArrayList;
 
 @Controller
 @Scope("view")
@@ -39,21 +39,12 @@ public class ManageCoreComponentBean {
 
     @PostConstruct
     public void init() {
-        treeNode = new DefaultTreeNode();
-        setTreeNode(treeNode);
-
         Long asccpId = Long.parseLong(
                 FacesContext.getCurrentInstance().getExternalContext()
                         .getRequestParameterMap().get("asccpId"));
 
-        long s = System.currentTimeMillis();
-        CCNode ccNode = nodeService.createCCNode(asccpId);
-        logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
-        s = System.currentTimeMillis();
-
-        TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(treeNode);
-        ccNode.accept(treeNodeBuilder);
-        logger.info("TreeNodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+        TreeNode treeNode = createLazyTreeNode(asccpId);
+        setTreeNode(treeNode);
     }
 
     public TreeNode getTreeNode() {
@@ -86,10 +77,6 @@ public class ManageCoreComponentBean {
         }
     }
 
-    public void expand(NodeExpandEvent expandEvent) {
-        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
-    }
-
     private class TreeNodeBuilder implements CCNodeVisitor {
 
         private TreeNode root;
@@ -109,7 +96,7 @@ public class ManageCoreComponentBean {
         }
 
         @Override
-        public void visitBCCNode(BCCPNode bccNode) {
+        public void visitBCCPNode(BCCPNode bccNode) {
             visitNode(bccNode, "BCCP");
         }
 
@@ -119,6 +106,88 @@ public class ManageCoreComponentBean {
             TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);
             node.setAttribute("treeNode", treeNode);
             return treeNode;
+        }
+    }
+
+    private TreeNode createBaseTreeNode(long asccpId) {
+        TreeNode treeNode = new DefaultTreeNode();
+
+        long s = System.currentTimeMillis();
+        CCNode ccNode = nodeService.createCCNode(asccpId);
+        logger.info("Nodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+        s = System.currentTimeMillis();
+
+        TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(treeNode);
+        ccNode.accept(treeNodeBuilder);
+        logger.info("TreeNodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+
+        return treeNode;
+    }
+
+    public TreeNode createLazyTreeNode(long asccpId) {
+        CCNode ccNode = nodeService.createLazyCCNode(asccpId);
+
+        LazyTreeNodeBuilder lazyTreeNodeVisitor = new LazyTreeNodeBuilder();
+        ccNode.accept(lazyTreeNodeVisitor);
+        return lazyTreeNodeVisitor.getParent();
+    }
+
+    public void expand(NodeExpandEvent expandEvent) {
+        DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
+        LazyNode lazyNode = (LazyNode) treeNode.getData();
+        if (!lazyNode.isFetched()) {
+            lazyNode.fetch();
+
+            LazyTreeNodeBuilder lazyTreeNodeBuilder = new LazyTreeNodeBuilder(treeNode);
+            treeNode.setChildren(new ArrayList()); // clear children
+
+            for (Node child : lazyNode.getChildren()) {
+                ((CCNode) child).accept(lazyTreeNodeBuilder);
+            }
+        }
+    }
+
+    private class LazyTreeNodeBuilder implements CCNodeVisitor {
+
+        private DefaultTreeNode parent;
+
+        public TreeNode getParent() {
+            return parent;
+        }
+
+        public LazyTreeNodeBuilder() {
+            parent = new DefaultTreeNode();
+        }
+
+        public LazyTreeNodeBuilder(DefaultTreeNode parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public void visitASCCPNode(ASCCPNode asccpNode) {
+            visitNode(asccpNode, "ASCCP");
+        }
+
+        @Override
+        public void visitACCNode(ACCNode accNode) {
+            visitNode(accNode, "ACC");
+        }
+
+        @Override
+        public void visitBCCPNode(BCCPNode bccNode) {
+            visitNode(bccNode, "BCCP");
+        }
+
+        private void visitNode(CCNode node, String type) {
+            TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
+            if (node instanceof LazyNode) {
+                LazyNode lazyNode = (LazyNode) node;
+                if (!lazyNode.isFetched()) {
+                    for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
+                        new DefaultTreeNode(null, treeNode);
+                    }
+                }
+            }
         }
     }
 }

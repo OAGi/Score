@@ -30,8 +30,10 @@
                             </p:treeTable>
 
                             <p:contextMenu for="treeTable" nodeType="ASBIE-Extension">
-                                <p:menuitem value="Create ABIE Extension Locally" style="width: 100%;"/>
-                                <p:menuitem value="Create ABIE Extension Globally" style="width: 100%;"/>
+                                <p:menuitem value="Create ABIE Extension Locally" style="width: 100%;"
+                                            action="#{editProfileBODBean.createABIEExtensionLocally}"/>
+                                <p:menuitem value="Create ABIE Extension Globally" style="width: 100%;"
+                                            action="#{editProfileBODBean.createABIEExtensionGlobally}"/>
                             </p:contextMenu>
                         </div>
                         <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">

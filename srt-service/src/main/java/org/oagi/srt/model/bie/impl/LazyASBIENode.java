@@ -1,8 +1,6 @@
 package org.oagi.srt.model.bie.impl;
 
-import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.BIENodeVisitor;
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
@@ -10,7 +8,7 @@ import org.oagi.srt.repository.entity.AssociationBusinessInformationEntity;
 import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 
-public class LazyASBIENode extends AbstractLazyNode implements ASBIENode {
+public class LazyASBIENode extends AbstractLazyNode implements ASBIENode, LazyBIENode {
 
     private ASBIENode asbieNode;
 

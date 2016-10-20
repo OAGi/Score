@@ -1,10 +1,12 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
+import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.event.NodeExpandEvent;
@@ -34,6 +36,8 @@ public class EditProfileBODBean extends UIHandler {
     private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private BusinessInformationEntityService bieService;
+    @Autowired
+    private ExtensionService extensionService;
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
     @Autowired
@@ -156,5 +160,24 @@ public class EditProfileBODBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+    }
+
+    public String createABIEExtensionLocally() {
+        return createABIEExtension(true);
+    }
+
+    public String createABIEExtensionGlobally() {
+        return createABIEExtension(false);
+    }
+
+    public String createABIEExtension(boolean isLocally) {
+        TreeNode treeNode = getSelectedTreeNode();
+        ASBIENode asbieNode = (ASBIENode) treeNode.getData();
+        AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
+        User user = loadAuthentication();
+
+        extensionService.appendUserExtensionIfAbsent(asccp, user, isLocally);
+
+        return "/views/core_component/edit_cc.xhtml?asccpId=" + asccp.getAsccpId() + "&faces-redirect=true";
     }
 }

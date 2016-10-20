@@ -1,15 +1,13 @@
 package org.oagi.srt.model.bie.impl;
 
-import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.BIENodeVisitor;
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.repository.entity.*;
 
 import java.util.List;
 
-public class LazyBBIENode extends AbstractLazyNode implements BBIENode {
+public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIENode {
 
     private BBIENode bbieNode;
 

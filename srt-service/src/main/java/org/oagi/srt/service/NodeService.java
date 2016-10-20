@@ -1,10 +1,8 @@
 package org.oagi.srt.service;
 
+import org.hibernate.annotations.Fetch;
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.CCNode;
-import org.oagi.srt.model.LazyBIENode;
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.Fetcher;
@@ -14,9 +12,7 @@ import org.oagi.srt.model.bie.visitor.BIENodeSortVisitor;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
-import org.oagi.srt.model.cc.impl.BaseACCNode;
-import org.oagi.srt.model.cc.impl.BaseASCCPNode;
-import org.oagi.srt.model.cc.impl.BaseBCCPNode;
+import org.oagi.srt.model.cc.impl.*;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -1194,5 +1190,129 @@ public class NodeService {
         ACCNode roleOfAcc = createACCNode(dataContainer, asccpNode, acc);
         asccpNode.setRoleOfAcc(roleOfAcc);
         return asccpNode;
+    }
+
+    public LazyCCNode createLazyCCNode(long asccpId) {
+        AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
+        return createLazyCCNode(asccp);
+    }
+
+    public LazyCCNode createLazyCCNode(AssociationCoreComponentProperty asccp) {
+        if (asccp == null) {
+            throw new IllegalArgumentException("'asccp' argument must not be null.");
+        }
+
+        ASCCPNode asccpNode = new BaseASCCPNode(asccp);
+        ASCCPFetcher fetcher = new ASCCPFetcher(asccp);
+        return new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount());
+    }
+
+    private class ASCCPFetcher implements Fetcher {
+
+        private AssociationCoreComponentProperty asccp;
+
+        public ASCCPFetcher(AssociationCoreComponentProperty asccp) {
+            this.asccp = asccp;
+        }
+
+        @Override
+        public void fetch(Node parent) {
+            ASCCPNode asccpNode = (ASCCPNode) parent;
+            AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+            ACCNode accNode = createLazyACCNode(parent, acc);
+            asccpNode.setRoleOfAcc(accNode);
+        }
+
+        public int getChildrenCount() {
+            // ASCCP only have one ACC child
+            return 1;
+        }
+    }
+
+    private LazyACCNode createLazyACCNode(Node parent, AggregateCoreComponent acc) {
+        ACCNode accNode = new BaseACCNode(parent, acc);
+        ACCFetcher fetcher = new ACCFetcher(acc);
+        LazyACCNode lazyACCNode = new LazyACCNode(accNode, fetcher, fetcher.getChildrenCount(), parent);
+        return lazyACCNode;
+    }
+
+    private class ACCFetcher implements Fetcher {
+
+        private AggregateCoreComponent acc;
+
+        public ACCFetcher(AggregateCoreComponent acc) {
+            this.acc = acc;
+        }
+
+        @Override
+        public void fetch(Node parent) {
+            ACCNode accNode = (ACCNode) parent;
+
+            List<CoreComponent> coreComponentList = coreComponentService.getCoreComponents(
+                    acc, new CoreComponentProviderImpl());
+            for (CoreComponent coreComponent : coreComponentList) {
+                if (coreComponent instanceof BasicCoreComponent) {
+                    createBCCPNode(accNode, (BasicCoreComponent) coreComponent);
+                } else if (coreComponent instanceof AssociationCoreComponent) {
+                    createLazyASCCPNode(accNode, (AssociationCoreComponent) coreComponent);
+                }
+            }
+
+            long basedAccId = acc.getBasedAccId();
+            if (basedAccId > 0L) {
+                AggregateCoreComponent basedAcc = accRepository.findOne(basedAccId);
+                ACCNode basedAccNode = createLazyACCNode(accNode, basedAcc);
+                accNode.setBasedAcc(basedAccNode);
+            }
+        }
+
+        private void createBCCPNode(ACCNode fromAccNode, BasicCoreComponent bcc) {
+            if (fromAccNode.getAcc().getAccId() != bcc.getFromAccId()) {
+                throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
+            }
+
+            BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+            DataType bdt = dataTypeRepository.findOne(bccp.getBdtId());
+
+            new BaseBCCPNode(fromAccNode, bcc, bccp, bdt);
+        }
+
+        private void createLazyASCCPNode(ACCNode fromAccNode, AssociationCoreComponent ascc) {
+            if (fromAccNode.getAcc().getAccId() != ascc.getFromAccId()) {
+                throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
+            }
+
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            ASCCPNode asccpNode = new BaseASCCPNode(null, ascc, asccp);
+            ASCCPFetcher fetcher = new ASCCPFetcher(asccp);
+            new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount(), fromAccNode);
+        }
+
+        public int getChildrenCount() {
+            long basedAccId = acc.getBasedAccId();
+            int asccCount = asccRepository.countByFromAccId(acc.getAccId());
+            int bccCount = bccRepository.countByFromAccId(acc.getAccId());
+
+            int childrenCount = ((basedAccId > 0L) ? 1 : 0) + asccCount + bccCount;
+            return childrenCount;
+        }
+    }
+
+    private class CoreComponentProviderImpl implements CoreComponentProvider {
+
+        @Override
+        public List<BasicCoreComponent> getBCCs(long accId) {
+            return bccRepository.findByFromAccId(accId);
+        }
+
+        @Override
+        public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId) {
+            return bccRepository.findByFromAccIdAndSeqKeyIsNotZero(accId);
+        }
+
+        @Override
+        public List<AssociationCoreComponent> getASCCs(long accId) {
+            return asccRepository.findByFromAccId(accId);
+        }
     }
 }

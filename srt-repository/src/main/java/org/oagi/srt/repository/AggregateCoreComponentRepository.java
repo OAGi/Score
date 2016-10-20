@@ -21,4 +21,8 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select new AggregateCoreComponent(a.accId, a.basedAccId, a.definition) from AggregateCoreComponent a " +
             "where a.accId = ?1 and a.revisionNum = ?2")
     public AggregateCoreComponent findAccIdAndBasedAccIdAndDefinitionByAccIdAndRevisionNum(long accId, int revisionNum);
+
+    @Query("select case when count(a) > 0 then true else false end from AggregateCoreComponent a " +
+            "where a.objectClassTerm = ?1 and a.oagisComponentType = ?2")
+    public boolean existsByObjectClassTermAndOagisComponentType(String objectClassTerm, int oagisComponentType);
 }

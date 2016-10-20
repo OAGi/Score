@@ -6,6 +6,7 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.web.jsf.beans.codelist.CodeListBean;
 import org.oagi.srt.web.jsf.beans.context.business.BusinessContextHandler;
 import org.primefaces.context.RequestContext;
@@ -54,6 +55,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Autowired
     private BusinessInformationEntityService bieService;
+
+    @Autowired
+    private ExtensionService extensionService;
 
     @Autowired
     private CodeListRepository codeListRepository;
@@ -895,7 +899,7 @@ public class TopLevelABIEHandler implements Serializable {
             AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
             User currentLoginUser = new User(); //need to assign
 
-            bieService.createNewUserExtensionGroupACC(eAcc, currentLoginUser, false);
+            extensionService.createNewUserExtensionGroupACC(eAcc, currentLoginUser);
         }
     }
 
@@ -1439,12 +1443,12 @@ public class TopLevelABIEHandler implements Serializable {
 
     public void createABIEExtensionLocally() {
         User currentLoginUser = getCurrentLoginUser();
-        bieService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser, false);
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
     }
 
     public void createABIEExtensionGlobally() {
         User currentLoginUser = getCurrentLoginUser();
-        bieService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser, true);
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
     }
 
     private User getCurrentLoginUser() {

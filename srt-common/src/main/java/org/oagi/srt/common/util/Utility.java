@@ -526,15 +526,15 @@ public class Utility {
         return path.replace(".xsd", "");
     }
 
-    public static String getUserExtensionGroupObjectClassTerm(String objectClassTerm){
+    public static String getUserExtensionGroupObjectClassTerm(String objectClassTerm) {
         //Assume that we only take object class term that has 'Extension' in it
         String[] delim = objectClassTerm.split(" ");
         String out = "";
-        for(int i=0; i<delim.length; i++){
-            if(delim[i].equals("Extension")){
+        for (int i = 0; i < delim.length; i++) {
+            if (delim[i].equals("Extension")) {
                 delim[i] = "User Extension Group";
             }
-            out = out + delim[i] +" ";
+            out = out + delim[i] + " ";
         }
         return out.trim();
     }

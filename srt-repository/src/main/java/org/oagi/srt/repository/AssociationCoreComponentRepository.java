@@ -25,4 +25,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
 
     @Query("select case when count(a) > 0 then true else false end from AssociationCoreComponent a where a.guid = ?1 and a.fromAccId = ?2 and a.toAsccpId = ?3")
     public boolean existsByGuidAndFromAccIdAndToAsccpId(String guid, long fromAccId, long toAsccpId);
+
+    @Query("select count(a) from AssociationCoreComponent a where a.fromAccId = ?1")
+    public int countByFromAccId(long fromAccId);
 }

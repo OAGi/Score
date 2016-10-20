@@ -1,9 +1,7 @@
 package org.oagi.srt.model.cc.impl;
 
 import org.oagi.srt.model.AbstractBaseNode;
-import org.oagi.srt.model.CCNode;
 import org.oagi.srt.model.CCNodeVisitor;
-import org.oagi.srt.model.Node;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
@@ -75,9 +73,6 @@ public class BaseBCCPNode extends AbstractBaseNode implements BCCPNode {
 
     @Override
     public void accept(CCNodeVisitor visitor) {
-        visitor.visitBCCNode(this);
-        for (Node child : getChildren()) {
-            ((CCNode) child).accept(visitor);
-        }
+        visitor.visitBCCPNode(this);
     }
 }

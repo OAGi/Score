@@ -10,6 +10,6 @@ public interface CCNodeVisitor {
 
     public void visitACCNode(ACCNode accNode);
 
-    public void visitBCCNode(BCCPNode bccNode);
+    public void visitBCCPNode(BCCPNode bccNode);
 
 }
