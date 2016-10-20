@@ -1155,7 +1155,7 @@ public class NodeService {
 
         if (basedAccId > 0L) {
             ACCNode basedAccNode = createACCNode(dataContainer, accNode, dataContainer.getACC(basedAccId));
-            accNode.setBasedACC(basedAccNode);
+            accNode.setBasedAcc(basedAccNode);
         }
 
         return accNode;
@@ -1163,7 +1163,7 @@ public class NodeService {
 
     private BCCPNode createBCCPNode(DataContainerForCC dataContainer,
                                     ACCNode fromAccNode, BasicCoreComponent bcc) {
-        if (fromAccNode.getACC().getAccId() != bcc.getFromAccId()) {
+        if (fromAccNode.getAcc().getAccId() != bcc.getFromAccId()) {
             throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
         }
 
@@ -1181,7 +1181,7 @@ public class NodeService {
 
     private ASCCPNode createASCCPNode(DataContainerForCC dataContainer,
                                       ACCNode fromAccNode, AssociationCoreComponent ascc) {
-        if (fromAccNode.getACC().getAccId() != ascc.getFromAccId()) {
+        if (fromAccNode.getAcc().getAccId() != ascc.getFromAccId()) {
             throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
         }
         ASCCPNode asccpNode = new BaseASCCPNode(fromAccNode, ascc, dataContainer.getASCCP(ascc.getToAsccpId()));
@@ -1189,10 +1189,10 @@ public class NodeService {
     }
 
     private ASCCPNode setRoleOfACC(DataContainerForCC dataContainer, ASCCPNode asccpNode) {
-        AssociationCoreComponentProperty asccp = asccpNode.getASCCP();
+        AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
         AggregateCoreComponent acc = dataContainer.getACC(asccp.getRoleOfAccId());
         ACCNode roleOfAcc = createACCNode(dataContainer, asccpNode, acc);
-        asccpNode.setRoleOfACC(roleOfAcc);
+        asccpNode.setRoleOfAcc(roleOfAcc);
         return asccpNode;
     }
 }

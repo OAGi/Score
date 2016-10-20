@@ -7,10 +7,10 @@ import org.oagi.srt.repository.entity.DataType;
 
 public interface BCCPNode extends CCNode {
 
-    public BasicCoreComponent getBCC();
-    public BasicCoreComponentProperty getBCCP();
-    public DataType getBDT();
+    public BasicCoreComponent getBcc();
+    public BasicCoreComponentProperty getBccp();
+    public DataType getBdt();
 
-    public ACCNode getFromACC();
+    public ACCNode getFromAcc();
     
 }

@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ACCNode extends CCNode {
 
-    public AggregateCoreComponent getACC();
-    public void setBasedACC(ACCNode basedAcc);
-    public ACCNode getBasedACC();
+    public AggregateCoreComponent getAcc();
+    public void setBasedAcc(ACCNode basedAcc);
+    public ACCNode getBasedAcc();
 
     public void addASCCPNode(ASCCPNode asccpNode);
     public void addBCCNode(BCCPNode bccNode);

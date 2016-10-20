@@ -72,6 +72,20 @@ public class ManageCoreComponentBean {
         this.selectedTreeNode = selectedTreeNode;
     }
 
+    public int getState() {
+        TreeNode treeNode = getSelectedTreeNode();
+        if (treeNode == null) {
+            return 0;
+        }
+        CCNode node = (CCNode) treeNode.getData();
+        if (node instanceof ASCCPNode) {
+            ASCCPNode asccpNode = (ASCCPNode) node;
+            return asccpNode.getAsccp().getState();
+        } else {
+            return 0;
+        }
+    }
+
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
     }

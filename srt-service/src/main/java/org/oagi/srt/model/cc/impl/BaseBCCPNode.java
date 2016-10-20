@@ -29,7 +29,7 @@ public class BaseBCCPNode extends AbstractBaseNode implements BCCPNode {
         if (fromAccNode == null) {
             throw new IllegalArgumentException("'fromAccNode' argument must not be null.");
         }
-        if (bcc.getFromAccId() != fromAccNode.getACC().getAccId()) {
+        if (bcc.getFromAccId() != fromAccNode.getAcc().getAccId()) {
             throw new IllegalArgumentException("ACC ID doesn't match between parent and itself.");
         }
 
@@ -54,22 +54,22 @@ public class BaseBCCPNode extends AbstractBaseNode implements BCCPNode {
     }
 
     @Override
-    public BasicCoreComponent getBCC() {
+    public BasicCoreComponent getBcc() {
         return bcc;
     }
 
     @Override
-    public BasicCoreComponentProperty getBCCP() {
+    public BasicCoreComponentProperty getBccp() {
         return bccp;
     }
 
     @Override
-    public DataType getBDT() {
+    public DataType getBdt() {
         return bdt;
     }
 
     @Override
-    public ACCNode getFromACC() {
+    public ACCNode getFromAcc() {
         return (ACCNode) getParent();
     }
 

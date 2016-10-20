@@ -47,28 +47,28 @@ public class BaseASCCPNode extends AbstractBaseNode implements ASCCPNode {
     }
 
     @Override
-    public AssociationCoreComponentProperty getASCCP() {
+    public AssociationCoreComponentProperty getAsccp() {
         return asccp;
     }
 
     @Override
-    public AssociationCoreComponent getASCC() {
+    public AssociationCoreComponent getAscc() {
         return ascc;
     }
 
     @Override
-    public void setRoleOfACC(ACCNode roleOfAcc) {
+    public void setRoleOfAcc(ACCNode roleOfAcc) {
         if (roleOfAcc != null) {
             this.roleOfAcc = roleOfAcc;
 
-            if (asccp.getRoleOfAccId() != roleOfAcc.getACC().getAccId()) {
+            if (asccp.getRoleOfAccId() != roleOfAcc.getAcc().getAccId()) {
                 throw new IllegalArgumentException("ACC ID doesn't match between parent and itself.");
             }
         }
     }
 
     @Override
-    public ACCNode getRoleOfACC() {
+    public ACCNode getRoleOfAcc() {
         return roleOfAcc;
     }
 

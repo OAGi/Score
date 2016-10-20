@@ -33,23 +33,23 @@ public class BaseACCNode extends AbstractBaseNode implements ACCNode {
     }
 
     @Override
-    public AggregateCoreComponent getACC() {
+    public AggregateCoreComponent getAcc() {
         return acc;
     }
 
     @Override
-    public void setBasedACC(ACCNode basedAcc) {
+    public void setBasedAcc(ACCNode basedAcc) {
         if (basedAcc != null) {
             this.basedAcc = basedAcc;
 
-            if (acc.getBasedAccId() != basedAcc.getACC().getAccId()) {
+            if (acc.getBasedAccId() != basedAcc.getAcc().getAccId()) {
                 throw new IllegalArgumentException("Based ACC ID doesn't match between parent and itself.");
             }
         }
     }
 
     @Override
-    public ACCNode getBasedACC() {
+    public ACCNode getBasedAcc() {
         return basedAcc;
     }
 

@@ -6,11 +6,11 @@ import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 
 public interface ASCCPNode extends CCNode {
 
-    public AssociationCoreComponentProperty getASCCP();
-    public AssociationCoreComponent getASCC();
+    public AssociationCoreComponentProperty getAsccp();
+    public AssociationCoreComponent getAscc();
 
-    public void setRoleOfACC(ACCNode roleOfAcc);
-    public ACCNode getRoleOfACC();
+    public void setRoleOfAcc(ACCNode roleOfAcc);
+    public ACCNode getRoleOfAcc();
     public ACCNode getType();
 
 }
