@@ -59,9 +59,15 @@ public class ExtensionService {
     }
 
     private boolean existsUserExtension(AggregateCoreComponent eAcc) {
-        String expectedObjectClassTerm = Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm());
         int oagisComponentType = 4;
-        return accRepository.existsByObjectClassTermAndOagisComponentType(expectedObjectClassTerm, oagisComponentType);
+        for (AssociationCoreComponent ascc : asccRepository.findByFromAccId(eAcc.getAccId())) {
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
+            if (acc.getOagisComponentType() == oagisComponentType) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Transactional(rollbackFor = Throwable.class)
