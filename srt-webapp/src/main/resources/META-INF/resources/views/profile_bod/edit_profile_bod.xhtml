@@ -179,7 +179,7 @@
                                             BBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIE')}">
+                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -304,7 +304,7 @@
                                             BBIE_SC
                                         -->
                                         <h:panelGroup
-                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIESC')}">
+                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIESC'}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -506,7 +506,7 @@
                                             BBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIE')}">
+                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -643,7 +643,7 @@
                                             BBIE_SC
                                         -->
                                         <h:panelGroup
-                                                rendered="#{fn:startsWith(editProfileBODBean.selectedTreeNode.type, 'BBIESC')}">
+                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIESC'}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
