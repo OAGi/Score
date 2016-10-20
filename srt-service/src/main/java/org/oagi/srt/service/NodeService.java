@@ -303,14 +303,14 @@ public class NodeService {
         public DataContainerForProfileBODBuilder(BusinessContext businessContext) {
             this.businessContext = businessContext;
 
-            basicCoreComponents = bccRepository.findAll();
+            basicCoreComponents = bccRepository.findAllWithRevisionNum(0);
             fromAccIdToBccMap = basicCoreComponents.stream()
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
             fromAccIdToBccWithoutAttributesMap = basicCoreComponents.stream()
                     .filter(e -> e.getSeqKey() != 0)
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
 
-            associationCoreComponents = asccRepository.findAll();
+            associationCoreComponents = asccRepository.findAllWithRevisionNum(0);
             fromAccIdToAsccMap = associationCoreComponents.stream()
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
 
@@ -319,11 +319,11 @@ public class NodeService {
             dataTypes = dataTypeRepository.findAll();
             dataTypeSupplementaryComponents = dtScRepository.findAll();
 
-            accMap = accRepository.findAll().stream()
+            accMap = accRepository.findAllWithRevisionNum(0).stream()
                     .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
-            asccpMap = asccpRepository.findAll().stream()
+            asccpMap = asccpRepository.findAllWithRevisionNum(0).stream()
                     .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
-            bccpMap = bccpRepository.findAll().stream()
+            bccpMap = bccpRepository.findAllWithRevisionNum(0).stream()
                     .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
 
             bdtPriRestriMap = bdtPriRestriList.stream()
@@ -657,19 +657,19 @@ public class NodeService {
             }, null);
 
             executorCompletionService.submit(() -> {
-                bccList = bccRepository.findAll();
+                bccList = bccRepository.findAllWithRevisionNum(0);
                 bccIdMap = bccList.stream()
                         .collect(Collectors.toMap(e -> e.getBccId(), Function.identity()));
             }, null);
 
             executorCompletionService.submit(() -> {
-                asccpList = asccpRepository.findAll();
+                asccpList = asccpRepository.findAllWithRevisionNum(0);
                 asccpIdMap = asccpList.stream()
                         .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
             }, null);
 
             executorCompletionService.submit(() -> {
-                bccpList = bccpRepository.findAll();
+                bccpList = bccpRepository.findAllWithRevisionNum(0);
                 bccpIdMap = bccpList.stream()
                         .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
             }, null);
@@ -1050,11 +1050,11 @@ public class NodeService {
         private Map<Long, List<AssociationCoreComponent>> fromAccIdToAsccMap;
 
         public DataContainerForCC() {
-            accList = accRepository.findAll();
-            asccList = asccRepository.findAll();
-            asccpList = asccpRepository.findAll();
-            bccList = bccRepository.findAll();
-            bccpList = bccpRepository.findAll();
+            accList = accRepository.findAllWithRevisionNum(0);
+            asccList = asccRepository.findAllWithRevisionNum(0);
+            asccpList = asccpRepository.findAllWithRevisionNum(0);
+            bccList = bccRepository.findAllWithRevisionNum(0);
+            bccpList = bccpRepository.findAllWithRevisionNum(0);
             dataTypes = dataTypeRepository.findAll();
 
             accMap = accList.stream()

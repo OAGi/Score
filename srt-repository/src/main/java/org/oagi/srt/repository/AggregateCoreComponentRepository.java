@@ -1,10 +1,16 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
+import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface AggregateCoreComponentRepository extends JpaRepository<AggregateCoreComponent, Long> {
+
+    @Query("select a from AggregateCoreComponent a where a.revisionNum = ?1")
+    public List<AggregateCoreComponent> findAllWithRevisionNum(int revisionNum);
 
     @Query("select a from AggregateCoreComponent a where a.guid = ?1")
     public AggregateCoreComponent findOneByGuid(String guid);
@@ -21,8 +27,4 @@ public interface AggregateCoreComponentRepository extends JpaRepository<Aggregat
     @Query("select new AggregateCoreComponent(a.accId, a.basedAccId, a.definition) from AggregateCoreComponent a " +
             "where a.accId = ?1 and a.revisionNum = ?2")
     public AggregateCoreComponent findAccIdAndBasedAccIdAndDefinitionByAccIdAndRevisionNum(long accId, int revisionNum);
-
-    @Query("select case when count(a) > 0 then true else false end from AggregateCoreComponent a " +
-            "where a.objectClassTerm = ?1 and a.oagisComponentType = ?2")
-    public boolean existsByObjectClassTermAndOagisComponentType(String objectClassTerm, int oagisComponentType);
 }

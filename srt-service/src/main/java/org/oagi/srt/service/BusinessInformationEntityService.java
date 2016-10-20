@@ -346,19 +346,16 @@ public class BusinessInformationEntityService {
             this.createBIEsResult = createBIEsResult;
 
             aggregateCoreComponentMap =
-                    accRepository.findAll().stream()
-                            .filter(acc -> acc.getRevisionNum() == 0)
+                    accRepository.findAllWithRevisionNum(0).stream()
                             .collect(Collectors.toMap(acc -> acc.getAccId(), Function.identity()));
             associationCoreComponentPropertyMap =
-                    asccpRepository.findAll().stream()
-                            .filter(asccp -> asccp.getRevisionNum() == 0)
+                    asccpRepository.findAllWithRevisionNum(0).stream()
                             .collect(Collectors.toMap(asccp -> asccp.getAsccpId(), Function.identity()));
-            basicCoreComponents = bccRepository.findAll();
-            associationCoreComponents = asccRepository.findAll();
+            basicCoreComponents = bccRepository.findAllWithRevisionNum(0);
+            associationCoreComponents = asccRepository.findAllWithRevisionNum(0);
             dataTypeSupplementaryComponents = dtScRepository.findAll();
 
-            basicCoreComponentPropertyMap = bccpRepository.findAll().stream()
-                    .filter(bccp -> bccp.getRevisionNum() == 0)
+            basicCoreComponentPropertyMap = bccpRepository.findAllWithRevisionNum(0).stream()
                     .collect(Collectors.toMap(bccp -> bccp.getBccpId(), Function.identity()));
 
             bdtPriRestriList = bdtPriRestriRepository.findAll();

@@ -10,6 +10,9 @@ import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
 
 public interface AssociationCoreComponentPropertyRepository extends JpaRepository<AssociationCoreComponentProperty, Long> {
 
+    @Query("select a from AssociationCoreComponentProperty a where a.revisionNum = ?1")
+    public List<AssociationCoreComponentProperty> findAllWithRevisionNum(int revisionNum);
+
     @Query("select a from AssociationCoreComponentProperty a order by a.propertyTerm asc")
     public List<AssociationCoreComponentProperty> findAllOrderByPropertyTermAsc();
 

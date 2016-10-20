@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface AssociationCoreComponentRepository extends JpaRepository<AssociationCoreComponent, Long> {
 
+    @Query("select a from AssociationCoreComponent a where a.revisionNum = ?1")
+    public List<AssociationCoreComponent> findAllWithRevisionNum(int revisionNum);
+
     @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1")
     public List<AssociationCoreComponent> findByFromAccId(long fromAccId);
 

@@ -9,6 +9,7 @@ import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -62,6 +63,9 @@ public class EditProfileBODBean extends UIHandler {
                 FacesContext.getCurrentInstance().getExternalContext()
                         .getRequestParameterMap().get("topLevelAbieId"));
         TopLevelAbie topLevelAbie = topLevelAbieRepository.findOne(topLevelAbieId);
+        if (topLevelAbie == null) {
+            return;
+        }
         TreeNode treeNode = bieTreeNodeHandler.createTreeNode(topLevelAbie);
         setTreeNode(treeNode);
     }
