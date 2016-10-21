@@ -18,21 +18,18 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     private BasicCoreComponentProperty bccp;
     private DataType bdt;
     private String restrictionType;
-    private List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList;
     private List<Node> children = new ArrayList();
 
     public BaseBBIENode(int seqKey, Node parent,
                         BasicBusinessInformationEntity bbie,
                         BasicBusinessInformationEntityProperty bbiep,
                         BasicCoreComponentProperty bccp,
-                        DataType bdt,
-                        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
+                        DataType bdt) {
         super(seqKey, parent);
         this.bbie = bbie;
         this.bbiep = bbiep;
         this.bccp = bccp;
         this.bdt = bdt;
-        this.bdtPriRestriList = bdtPriRestriList;
 
         setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? "Primitive" : "Code");
     }
@@ -97,16 +94,6 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     @Override
     public long getCodeListId() {
         return bbie.getCodeListId();
-    }
-
-    @Override
-    public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList() {
-        return bdtPriRestriList;
-    }
-
-    @Override
-    public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
-        this.bdtPriRestriList = bdtPriRestriList;
     }
 
     @Override

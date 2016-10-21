@@ -1,25 +1,28 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
 @Service
+@Transactional(readOnly = true)
 public class BusinessInformationEntityService {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private DataTypeSupplementaryComponentRepository dtScRepository;
@@ -65,6 +68,15 @@ public class BusinessInformationEntityService {
 
     @Autowired
     private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
+
+    @Autowired
+    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
+
+    @Autowired
+    private XSDBuiltInTypeRepository xbtRepository;
+
+    @Autowired
+    private CodeListRepository codeListRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -748,5 +760,54 @@ public class BusinessInformationEntityService {
     @Transactional(rollbackFor = Throwable.class)
     public void publish(long toplevelAbieId) {
         abieRepository.updatePublish(toplevelAbieId);
+    }
+
+
+    public Map<String, String> getAvailablePrimitiveRestrictions(BBIENode node) {
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node);
+        Map<String, String> availablePrimitiveRestrictions = new HashMap();
+        bdtPriRestriList.stream().forEach(e -> {
+            if (e.getCdtAwdPriXpsTypeMapId() > 0L) {
+                availablePrimitiveRestrictions.put("Primitive", "Primitive");
+            } else if (e.getCodeListId() > 0L) {
+                availablePrimitiveRestrictions.put("Code", "Code");
+            }
+        });
+        return availablePrimitiveRestrictions;
+    }
+
+    public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node).stream()
+                .filter(e -> e.getCdtAwdPriXpsTypeMapId() > 0L)
+                .collect(Collectors.toList());
+        BusinessDataTypePrimitiveRestriction bdtPriRestri = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtPriTypeMap =
+                (bdtPriRestri != null) ? cdtAwdPriXpsTypeMapRepository.findOne(bdtPriRestri.getCdtAwdPriXpsTypeMapId()) : null;
+        XSDBuiltInType xbt = (cdtPriTypeMap != null) ? xbtRepository.findOne(cdtPriTypeMap.getXbtId()) : null;
+
+        Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
+        bdtPrimitiveRestrictions.put(xbt.getName(), bdtPriRestri.getBdtPriRestriId());
+        return bdtPrimitiveRestrictions;
+    }
+
+    public Map<String, Long> getCodeLists(BBIENode node) {
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node).stream()
+                        .filter(e -> e.getCodeListId() > 0L)
+                        .collect(Collectors.toList());
+        BusinessDataTypePrimitiveRestriction bdtPriRestri = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
+        CodeList codeList = (bdtPriRestri != null) ? codeListRepository.findOne(bdtPriRestri.getCodeListId()) : null;
+
+        Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
+        bdtPrimitiveRestrictions.put(codeList.getName(), codeList.getCodeListId());
+        return bdtPrimitiveRestrictions;
+    }
+
+    private List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList(BBIENode node) {
+        BasicBusinessInformationEntity bbie = node.getBbie();
+        BasicCoreComponent bcc = bccRepository.findOne(bbie.getBasedBccId());
+        BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+        long bdtId = bccp.getBdtId();
+        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findByBdtId(bdtId);
+        return bdtPriRestriList;
     }
 }

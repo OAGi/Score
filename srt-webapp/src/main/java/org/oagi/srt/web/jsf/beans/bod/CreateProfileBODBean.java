@@ -3,12 +3,18 @@ package org.oagi.srt.web.jsf.beans.bod;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
-import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.BusinessContext;
+import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
+import org.oagi.srt.repository.entity.TopLevelConcept;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -19,7 +25,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -29,6 +36,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 @Transactional(readOnly = true)
 public class CreateProfileBODBean {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private TopLevelConceptRepository topLevelConceptRepository;
@@ -60,17 +69,11 @@ public class CreateProfileBODBean {
      * for 'Create BIE' Step
      */
     @Autowired
+    private BusinessInformationEntityService bieService;
+    @Autowired
     private BIETreeNodeHandler bieTreeNodeHandler;
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
-    @Autowired
-    private XSDBuiltInTypeRepository xbtRepository;
-    @Autowired
-    private CodeListRepository codeListRepository;
-    @Autowired
-    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
-    @Autowired
-    private CoreDataTypeAllowedPrimitiveExpressionTypeMapRepository cdtAwdPriXpsTypeMapRepository;
 
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
@@ -202,46 +205,16 @@ public class CreateProfileBODBean {
         this.selectedTreeNode = selectedTreeNode;
     }
 
-    public String getPrimitiveType(BBIENode node) {
-        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
-        String primitiveType = null;
-        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
-            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
-                primitiveType = "XSD Builtin Type";
-            } else {
-                primitiveType = "Code List";
-            }
-        }
-        return primitiveType;
+    public Map<String, String> getAvailablePrimitiveRestrictions(BBIENode node) {
+        return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
     public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
-        List<BusinessDataTypePrimitiveRestriction> ccs = node.getBdtPriRestriList();
-        Map<String, Long> bdtPrimitiveRestrictions = new HashMap();
-        for (BusinessDataTypePrimitiveRestriction cc : ccs) {
-            if (cc.getCdtAwdPriXpsTypeMapId() > 0L) {
-                CoreDataTypeAllowedPrimitiveExpressionTypeMap vo =
-                        cdtAwdPriXpsTypeMapRepository.findOne(cc.getCdtAwdPriXpsTypeMapId());
-                XSDBuiltInType xbt = xbtRepository.findOne(vo.getXbtId());
-                bdtPrimitiveRestrictions.put(xbt.getName(), cc.getBdtPriRestriId());
-            } else {
-                CodeList code = codeListRepository.findOne(cc.getCodeListId());
-                bdtPrimitiveRestrictions.put(code.getName(), cc.getBdtPriRestriId());
-            }
-        }
-
-        return bdtPrimitiveRestrictions;
+        return bieService.getBdtPrimitiveRestrictions(node);
     }
 
     public Map<String, Long> getCodeLists(BBIENode node) {
-        long bdtPrimitiveRestrictionId = node.getBdtPrimitiveRestrictionId();
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList =
-                bdtPriRestriRepository.findByCdtAwdPriXpsTypeMapId(bdtPrimitiveRestrictionId);
-        BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestrictionVO = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
-        CodeList codeList = (aBDTPrimitiveRestrictionVO != null) ? codeListRepository.findOne(aBDTPrimitiveRestrictionVO.getCodeListId()) : null;
-        List<CodeList> codeLists = (codeList != null) ? Arrays.asList(codeList) : Collections.emptyList();
-        return codeLists.stream()
-                .collect(Collectors.toMap(e -> e.getName(), e -> e.getCodeListId()));
+        return bieService.getCodeLists(node);
     }
 
     public String onFlowProcess(FlowEvent event) {

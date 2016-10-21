@@ -261,8 +261,7 @@
                                                                      style="margin-left: 20px;"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                         <p:ajax update="bdtPriRestriPanelForEditing"/>
-                                                        <f:selectItem itemLabel="Primitive" itemValue="Primitive"/>
-                                                        <f:selectItem itemLabel="Code" itemValue="Code"/>
+                                                        <f:selectItems value="#{editProfileBODBean.getAvailablePrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
                                                     </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
@@ -272,7 +271,7 @@
                                                             styleClass="section-content"/>
                                                 </h:panelGrid>
 
-                                                <h:panelGrid columns="3" cellpadding="3"
+                                                <h:panelGrid columns="2" cellpadding="2"
                                                              rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                     <h:outputText value="Primitive" styleClass="section-label"/>
                                                     <h:selectOneMenu panelStyle="width:180px"
@@ -282,9 +281,6 @@
                                                                 value="#{editProfileBODBean.getBdtPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
                                                         <f:ajax render="bdtPriRestriPanelForEditing"/>
                                                     </h:selectOneMenu>
-                                                    <h:outputText
-                                                            value="#{editProfileBODBean.getPrimitiveType(editProfileBODBean.selectedTreeNode.data)}"
-                                                            style="position: absolute; margin-left: 20px;"/>
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"
@@ -598,8 +594,8 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
                                                                      disabled="true">
                                                         <p:ajax update="bdtPriRestriPanelForEditing"/>
-                                                        <f:selectItem itemLabel="Primitive" itemValue="Primitive"/>
-                                                        <f:selectItem itemLabel="Code" itemValue="Code"/>
+                                                        <f:selectItems
+                                                                value="#{editProfileBODBean.getBdtPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
                                                     </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
@@ -609,7 +605,7 @@
                                                             styleClass="section-content"/>
                                                 </h:panelGrid>
 
-                                                <h:panelGrid columns="3" cellpadding="3"
+                                                <h:panelGrid columns="2" cellpadding="2"
                                                              rendered="#{editProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                     <h:outputText value="Primitive" styleClass="section-label"/>
                                                     <h:selectOneMenu panelStyle="width:180px"
@@ -620,9 +616,6 @@
                                                                 value="#{editProfileBODBean.getBdtPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
                                                         <f:ajax render="bdtPriRestriPanelForPublished"/>
                                                     </h:selectOneMenu>
-                                                    <h:outputText
-                                                            value="#{editProfileBODBean.getPrimitiveType(editProfileBODBean.selectedTreeNode.data)}"
-                                                            style="position: absolute; margin-left: 20px;"/>
                                                 </h:panelGrid>
 
                                                 <h:panelGrid columns="2" cellpadding="2"

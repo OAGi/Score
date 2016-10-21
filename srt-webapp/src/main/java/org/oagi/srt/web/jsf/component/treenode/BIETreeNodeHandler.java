@@ -101,7 +101,8 @@ public class BIETreeNodeHandler extends UIHandler {
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
-            bbieList.add(bbieNode.getBbie());
+            BasicBusinessInformationEntity bbie = handleBbieBdtPriRestri(bbieNode);
+            bbieList.add(bbie);
             bbiepList.add(bbieNode.getBbiep());
         }
 
@@ -265,6 +266,24 @@ public class BIETreeNodeHandler extends UIHandler {
         }
     }
 
+    private BasicBusinessInformationEntity handleBbieBdtPriRestri(BBIENode bbieNode) {
+        BasicBusinessInformationEntity bbie = bbieNode.getBbie();
+        String restrictionType = bbieNode.getRestrictionType();
+        switch (restrictionType) {
+            case "Primitive":
+                if (bbie.getBdtPriRestriId() > 0L) {
+                    bbie.setCodeListId(null);
+                }
+                break;
+            case "Code":
+                if (bbie.getCodeListId() > 0L) {
+                    bbie.setBdtPriRestriId(null);
+                }
+                break;
+        }
+        return bbie;
+    }
+
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
         BIENode node = nodeService.createBIENode(asccp, bizCtx);
 
@@ -350,20 +369,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
-            BasicBusinessInformationEntity bbie = bbieNode.getBbie();
-            String restrictionType = bbieNode.getRestrictionType();
-            switch (restrictionType) {
-                case "Primitive":
-                    if (bbie.getBdtPriRestriId() > 0L) {
-                        bbie.setCodeListId(null);
-                    }
-                    break;
-                case "Code":
-                    if (bbie.getCodeListId() > 0L) {
-                        bbie.setBdtPriRestriId(null);
-                    }
-                    break;
-            }
+            BasicBusinessInformationEntity bbie = handleBbieBdtPriRestri(bbieNode);
             if (bbie.isDirty()) {
                 bbieList.add(bbie);
             }

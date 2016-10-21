@@ -87,14 +87,4 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIEN
     public long getCodeListId() {
         return bbieNode.getCodeListId();
     }
-
-    @Override
-    public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList() {
-        return bbieNode.getBdtPriRestriList();
-    }
-
-    @Override
-    public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList) {
-        bbieNode.setBdtPriRestriList(bdtPriRestriList);
-    }
 }

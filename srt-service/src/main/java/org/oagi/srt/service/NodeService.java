@@ -545,9 +545,7 @@ public class NodeService {
             createBBIE(bdtPriRestri, codeListId);
             createBBIESC(bdtId);
 
-            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainer.getBdtPriRestriByBdtId(bdtId);
-
-            BaseBBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bbiep, bccp, bdt, bdtPriRestriList);
+            BaseBBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bbiep, bccp, bdt);
             appendBBIESC(bbie, bbieNode);
             return bbieNode;
         }
@@ -889,10 +887,9 @@ public class NodeService {
 
         long bdtId = bccp.getBdtId();
         DataType bdt = dataContainer.findDt(bdtId);
-        List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = dataContainer.findBdtPriRestriByBdtId(bdtId);
 
         int seqKey = (int) bbie.getSeqKey();
-        BBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bbiep, bccp, bdt, bdtPriRestriList);
+        BBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bbiep, bccp, bdt);
         appendBBIESC(dataContainer, bbie, bbieNode);
     }
 
@@ -987,10 +984,9 @@ public class NodeService {
 
             long bdtId = bccp.getBdtId();
             DataType bdt = dataTypeRepository.findOne(bdtId);
-            List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = bdtPriRestriRepository.findByBdtId(bdtId);
 
             int seqKey = (int) bbie.getSeqKey();
-            BBIENode bbieNode = new BaseBBIENode(seqKey, null, bbie, bbiep, bccp, bdt, bdtPriRestriList);
+            BBIENode bbieNode = new BaseBBIENode(seqKey, null, bbie, bbiep, bccp, bdt);
             BBIESCFetcher fetcher = new BBIESCFetcher(bbie);
             new LazyBBIENode(bbieNode, fetcher, fetcher.getChildrenCount(), parent);
         }

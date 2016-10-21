@@ -27,7 +27,4 @@ public interface BBIENode extends BIENode {
 
     public void setCodeListId(long codeListId);
     public long getCodeListId();
-
-    public List<BusinessDataTypePrimitiveRestriction> getBdtPriRestriList();
-    public void setBdtPriRestriList(List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList);
 }
