@@ -182,17 +182,6 @@
     </p:blockUI>
 
     <script>
-        var adjustMainHeight = function () {
-            var headerHeight = $('.header').outerHeight();
-            var footerHeight = $('.footer').parent().parent().parent().outerHeight();
-            var height = $(this).height();
-
-            var mainHeight = height - headerHeight - footerHeight;
-            $('.main').css('min-height', mainHeight + "px");
-        };
-        adjustMainHeight();
-        $(window).resize(adjustMainHeight);
-
         $(document).ready(function () {
             $('.fa-spin').parent().addClass('loading-block');
         });
