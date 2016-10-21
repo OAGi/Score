@@ -1,11 +1,8 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
-import org.oagi.srt.model.bie.ASBIENode;
-import org.oagi.srt.model.bie.BBIENode;
-import org.oagi.srt.model.bie.TopLevelNode;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.model.bie.*;
+import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.entity.TopLevelAbie;
 import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -27,7 +24,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -87,7 +83,7 @@ public class EditProfileBODBean extends UIHandler {
         this.selectedTreeNode = selectedTreeNode;
     }
 
-    public Map<String, String> getAvailablePrimitiveRestrictions(BBIENode node) {
+    public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIENode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
@@ -97,6 +93,22 @@ public class EditProfileBODBean extends UIHandler {
 
     public Map<String, Long> getCodeLists(BBIENode node) {
         return bieService.getCodeLists(node);
+    }
+
+    public Map<BBIERestrictionType, BBIERestrictionType> getAvailableScPrimitiveRestrictions(BBIESCNode node) {
+        return bieService.getAvailablePrimitiveRestrictions(node);
+    }
+
+    public Map<String, Long> getBdtScPrimitiveRestrictions(BBIESCNode node) {
+        return bieService.getBdtScPrimitiveRestrictions(node);
+    }
+
+    public Map<String, Long> getCodeLists(BBIESCNode node) {
+        return bieService.getCodeLists(node);
+    }
+
+    public Map<String, Long> getAgencyIdListIds(BBIESCNode node) {
+        return bieService.getAgencyIdListIds(node);
     }
 
     public void expand(NodeExpandEvent expandEvent) {

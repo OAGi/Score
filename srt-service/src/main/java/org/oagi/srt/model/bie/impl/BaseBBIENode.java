@@ -5,11 +5,15 @@ import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.repository.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.oagi.srt.model.bie.BBIERestrictionType.Code;
+import static org.oagi.srt.model.bie.BBIERestrictionType.Primitive;
 
 public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
 
@@ -17,7 +21,7 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     private BasicBusinessInformationEntityProperty bbiep;
     private BasicCoreComponentProperty bccp;
     private DataType bdt;
-    private String restrictionType;
+    private BBIERestrictionType restrictionType;
     private List<Node> children = new ArrayList();
 
     public BaseBBIENode(int seqKey, Node parent,
@@ -31,7 +35,7 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
         this.bccp = bccp;
         this.bdt = bdt;
 
-        setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? "Primitive" : "Code");
+        setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? Primitive : Code);
     }
 
     public BasicBusinessInformationEntity getBbie() {
@@ -67,12 +71,12 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     }
 
     @Override
-    public void setRestrictionType(String restrictionType) {
+    public void setRestrictionType(BBIERestrictionType restrictionType) {
         this.restrictionType = restrictionType;
     }
 
     @Override
-    public String getRestrictionType() {
+    public BBIERestrictionType getRestrictionType() {
         return restrictionType;
     }
 

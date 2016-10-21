@@ -1,11 +1,14 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIERestrictionType;
+import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
-import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
+import org.oagi.srt.repository.BusinessContextRepository;
+import org.oagi.srt.repository.TopLevelConceptRepository;
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.oagi.srt.repository.entity.BusinessContext;
-import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
 import org.oagi.srt.repository.entity.TopLevelConcept;
 import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.service.BusinessInformationEntityService;
@@ -205,7 +208,7 @@ public class CreateProfileBODBean {
         this.selectedTreeNode = selectedTreeNode;
     }
 
-    public Map<String, String> getAvailablePrimitiveRestrictions(BBIENode node) {
+    public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIENode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
@@ -215,6 +218,22 @@ public class CreateProfileBODBean {
 
     public Map<String, Long> getCodeLists(BBIENode node) {
         return bieService.getCodeLists(node);
+    }
+
+    public Map<BBIERestrictionType, BBIERestrictionType> getAvailableScPrimitiveRestrictions(BBIESCNode node) {
+        return bieService.getAvailablePrimitiveRestrictions(node);
+    }
+
+    public Map<String, Long> getBdtScPrimitiveRestrictions(BBIESCNode node) {
+        return bieService.getBdtScPrimitiveRestrictions(node);
+    }
+
+    public Map<String, Long> getCodeLists(BBIESCNode node) {
+        return bieService.getCodeLists(node);
+    }
+
+    public Map<String, Long> getAgencyIdListIds(BBIESCNode node) {
+        return bieService.getAgencyIdListIds(node);
     }
 
     public String onFlowProcess(FlowEvent event) {

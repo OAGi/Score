@@ -4,52 +4,99 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.AbstractBaseNode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.Node;
+import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
+import static org.oagi.srt.model.bie.BBIERestrictionType.*;
+
 public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
 
-    private BasicBusinessInformationEntitySupplementaryComponent bbiesc;
-    private DataTypeSupplementaryComponent dtsc;
+    private BasicBusinessInformationEntitySupplementaryComponent bbieSc;
+    private DataTypeSupplementaryComponent bdtSc;
+    private BBIERestrictionType restrictionType;
 
     public BaseBBIESCNode(Node parent,
-                          BasicBusinessInformationEntitySupplementaryComponent bbiesc,
-                          DataTypeSupplementaryComponent dtsc) {
+                          BasicBusinessInformationEntitySupplementaryComponent bbieSc,
+                          DataTypeSupplementaryComponent bdtSc) {
         super(0, parent);
-        this.bbiesc = bbiesc;
-        if (bbiesc == null) {
+        this.bbieSc = bbieSc;
+        if (bbieSc == null) {
             throw new IllegalArgumentException("'bbieSc' argument must not be null.");
         }
-        this.dtsc = dtsc;
-        if (dtsc == null) {
-            throw new IllegalArgumentException("'dtSc' argument must not be null.");
+        this.bdtSc = bdtSc;
+        if (bdtSc == null) {
+            throw new IllegalArgumentException("'bdtSc' argument must not be null.");
         }
+
+
+        setRestrictionType((bbieSc.getDtScPriRestriId() > 0L) ? Primitive : (bbieSc.getCodeListId() > 0L) ? Code : Agency);
     }
 
-    public BasicBusinessInformationEntitySupplementaryComponent getBbiesc() {
-        return bbiesc;
+    public BasicBusinessInformationEntitySupplementaryComponent getBbieSc() {
+        return bbieSc;
     }
 
-    public void setBbiesc(BasicBusinessInformationEntitySupplementaryComponent bbiesc) {
-        this.bbiesc = bbiesc;
+    public void setBbieSc(BasicBusinessInformationEntitySupplementaryComponent bbiesc) {
+        this.bbieSc = bbiesc;
     }
 
-    public DataTypeSupplementaryComponent getDtsc() {
-        return dtsc;
+    public DataTypeSupplementaryComponent getBdtSc() {
+        return bdtSc;
     }
 
-    public void setDtsc(DataTypeSupplementaryComponent dtsc) {
-        this.dtsc = dtsc;
+    public void setBdtSc(DataTypeSupplementaryComponent bdtSc) {
+        this.bdtSc = bdtSc;
+    }
+
+    @Override
+    public void setRestrictionType(BBIERestrictionType restrictionType) {
+        this.restrictionType = restrictionType;
+    }
+
+    @Override
+    public BBIERestrictionType getRestrictionType() {
+        return restrictionType;
+    }
+
+    @Override
+    public void setBdtScPrimitiveRestrictionId(long bdtScPrimitiveRestrictionId) {
+        bbieSc.setDtScPriRestriId(bdtScPrimitiveRestrictionId);
+    }
+
+    @Override
+    public long getBdtScPrimitiveRestrictionId() {
+        return bbieSc.getDtScPriRestriId();
+    }
+
+    @Override
+    public void setCodeListId(long codeListId) {
+        bbieSc.setCodeListId(codeListId);
+    }
+
+    @Override
+    public long getCodeListId() {
+        return bbieSc.getCodeListId();
+    }
+
+    @Override
+    public void setAgencyIdListId(long agencyIdListId) {
+        bbieSc.setAgencyIdListId(agencyIdListId);
+    }
+
+    @Override
+    public long getAgencyIdListId() {
+        return bbieSc.getAgencyIdListId();
     }
 
     @Override
     public String getName() {
-        if (dtsc.getRepresentationTerm().equalsIgnoreCase("Text") ||
-                dtsc.getPropertyTerm().contains(dtsc.getRepresentationTerm())) {
-            return Utility.spaceSeparator(dtsc.getPropertyTerm());
+        if (bdtSc.getRepresentationTerm().equalsIgnoreCase("Text") ||
+                bdtSc.getPropertyTerm().contains(bdtSc.getRepresentationTerm())) {
+            return Utility.spaceSeparator(bdtSc.getPropertyTerm());
         } else {
-            return Utility.spaceSeparator(dtsc.getPropertyTerm().concat(dtsc.getRepresentationTerm()));
+            return Utility.spaceSeparator(bdtSc.getPropertyTerm().concat(bdtSc.getRepresentationTerm()));
         }
     }
 

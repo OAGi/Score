@@ -19,8 +19,8 @@ public interface BBIENode extends BIENode {
     public DataType getBdt();
     public void setBdt(DataType bdt);
 
-    public void setRestrictionType(String restrictionType);
-    public String getRestrictionType();
+    public void setRestrictionType(BBIERestrictionType restrictionType);
+    public BBIERestrictionType getRestrictionType();
 
     public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId);
     public long getBdtPrimitiveRestrictionId();

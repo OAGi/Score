@@ -2,6 +2,7 @@ package org.oagi.srt.model.bie.impl;
 
 import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.BBIENode;
+import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.repository.entity.*;
 
@@ -59,12 +60,12 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIEN
     }
 
     @Override
-    public void setRestrictionType(String restrictionType) {
+    public void setRestrictionType(BBIERestrictionType restrictionType) {
         bbieNode.setRestrictionType(restrictionType);
     }
 
     @Override
-    public String getRestrictionType() {
+    public BBIERestrictionType getRestrictionType() {
         return bbieNode.getRestrictionType();
     }
 

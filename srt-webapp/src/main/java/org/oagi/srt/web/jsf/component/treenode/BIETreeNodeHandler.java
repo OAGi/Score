@@ -4,10 +4,7 @@ import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
-import org.oagi.srt.model.bie.ASBIENode;
-import org.oagi.srt.model.bie.BBIENode;
-import org.oagi.srt.model.bie.BBIESCNode;
-import org.oagi.srt.model.bie.TopLevelNode;
+import org.oagi.srt.model.bie.*;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -101,14 +98,15 @@ public class BIETreeNodeHandler extends UIHandler {
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
-            BasicBusinessInformationEntity bbie = handleBbieBdtPriRestri(bbieNode);
+            BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
             bbieList.add(bbie);
             bbiepList.add(bbieNode.getBbiep());
         }
 
         @Override
         public void visitBBIESCNode(BBIESCNode bbiescNode) {
-            bbiescList.add(bbiescNode.getBbiesc());
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
+            bbiescList.add(bbieSc);
         }
 
         @Override
@@ -266,22 +264,48 @@ public class BIETreeNodeHandler extends UIHandler {
         }
     }
 
-    private BasicBusinessInformationEntity handleBbieBdtPriRestri(BBIENode bbieNode) {
+    private BasicBusinessInformationEntity handleBBIEBdtPriRestri(BBIENode bbieNode) {
         BasicBusinessInformationEntity bbie = bbieNode.getBbie();
-        String restrictionType = bbieNode.getRestrictionType();
+        BBIERestrictionType restrictionType = bbieNode.getRestrictionType();
         switch (restrictionType) {
-            case "Primitive":
+            case Primitive:
                 if (bbie.getBdtPriRestriId() > 0L) {
                     bbie.setCodeListId(null);
                 }
                 break;
-            case "Code":
+            case Code:
                 if (bbie.getCodeListId() > 0L) {
                     bbie.setBdtPriRestriId(null);
                 }
                 break;
         }
         return bbie;
+    }
+
+    private BasicBusinessInformationEntitySupplementaryComponent handleBBIEScBdtScPriRestri(BBIESCNode bbiescNode) {
+        BasicBusinessInformationEntitySupplementaryComponent bbieSc = bbiescNode.getBbieSc();
+        BBIERestrictionType restrictionType = bbiescNode.getRestrictionType();
+        switch (restrictionType) {
+            case Primitive:
+                if (bbieSc.getDtScPriRestriId() > 0L) {
+                    bbieSc.setCodeListId(null);
+                    bbieSc.setAgencyIdListId(null);
+                }
+                break;
+            case Code:
+                if (bbieSc.getCodeListId() > 0L) {
+                    bbieSc.setDtScPriRestriId(null);
+                    bbieSc.setAgencyIdListId(null);
+                }
+                break;
+            case Agency:
+                if (bbieSc.getAgencyIdListId() > 0L) {
+                    bbieSc.setDtScPriRestriId(null);
+                    bbieSc.setCodeListId(null);
+                }
+                break;
+        }
+        return bbieSc;
     }
 
     public TreeNode createTreeNode(AssociationCoreComponentProperty asccp, BusinessContext bizCtx) {
@@ -369,7 +393,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
-            BasicBusinessInformationEntity bbie = handleBbieBdtPriRestri(bbieNode);
+            BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
             if (bbie.isDirty()) {
                 bbieList.add(bbie);
             }
@@ -381,9 +405,9 @@ public class BIETreeNodeHandler extends UIHandler {
 
         @Override
         public void visitBBIESCNode(BBIESCNode bbiescNode) {
-            BasicBusinessInformationEntitySupplementaryComponent bbiesc = bbiescNode.getBbiesc();
-            if (bbiesc.isDirty()) {
-                bbiescList.add(bbiesc);
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
+            if (bbieSc.isDirty()) {
+                bbiescList.add(bbieSc);
             }
         }
 
