@@ -1,0 +1,213 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Profile BOD Generation</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:panel id="panel">
+                <h:outputText value="Selected Top-Level ABIEs" styleClass="option-header"/>
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-md-12 col-sm-12">
+                        <p:panel>
+                            <f:facet name="header">
+                                <p:autoComplete id="propertyTerm" value="#{profileBODGenerationBean.selectedPropertyTerm}"
+                                                completeMethod="#{profileBODGenerationBean.completeInput}" maxResults="20"
+                                                style="width: 440px; margin-right: 20px;"/>
+                                <p:commandButton value="Search" ajax="true" actionListener="#{profileBODGenerationBean.search}"
+                                                 update="tbl" icon="ui-icon-search"/>
+                            </f:facet>
+                            <p:dataTable id="tbl" var="profileBOD" value="#{profileBODGenerationBean.profileBODs}"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                         paginator="true" paginatorPosition="bottom" rows="10"
+                                         style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.topLevelAbieId}"
+                                         selection="#{profileBODGenerationBean.selectedProfileBODs}">
+                                <p:column selectionMode="multiple" styleClass="table-checkbox"/>
+                                <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                                    <h:outputText value="#{profileBOD.propertyTerm}"/>
+                                </p:column>
+                                <p:column style="width: 200px; text-align: center;" headerText="Business Context"
+                                          sortBy="#{profileBOD.bizCtxName}">
+                                    <h:outputText value="#{profileBOD.bizCtxName}"/>
+                                </p:column>
+                                <p:column style="width: 100px; text-align: center;" headerText="State"
+                                          sortBy="#{profileBOD.state}">
+                                    <h:panelGroup rendered="#{profileBOD.state == 2}">
+                                        <span class="label label-primary">Editing</span>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{profileBOD.state == 4}">
+                                        <span class="label label-default">Published</span>
+                                    </h:panelGroup>
+                                </p:column>
+                                <p:ajax event="rowSelectCheckbox" update=":form:btnPanel"/>
+                                <p:ajax event="rowUnselectCheckbox" update=":form:btnPanel"/>
+                                <p:ajax event="toggleSelect" update=":form:btnPanel"/>
+                            </p:dataTable>
+                        </p:panel>
+                    </div>
+                </div>
+            </p:panel>
+
+            <p:panel id="optPanel1">
+                <h:outputText value="Select annotation to generate" styleClass="option-header"/>
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-md-6 col-sm-6">
+                        <p:panel id="bieDocumentationOption" header="BIE Documentation Options">
+                            <h:panelGrid columns="2" styleClass="option-panel">
+                                <h:panelGroup styleClass="option-left">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="BIE Definition"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="option-right">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.remarkAndStatus}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="Remark &amp; Status"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup styleClass="option-left"
+                                              style="left: 20px; #{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false ? 'text-decoration: line-through;' : ''}">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.inheritIfEmpty}"
+                                                             disabled="#{profileBODGenerationBean.option.bieDocumentationOption.bieDefinition == false}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="Inherit if empty"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="option-right">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieVersion}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="BIE Version"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup styleClass="option-left">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.bieGuid}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="BIE GUID"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="option-right">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.businessTerm}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="Business Term"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup styleClass="option-left">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.businessContext}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="Business Context"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="option-right">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.bieDocumentationOption.others}">
+                                        <f:ajax render="bieDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="Others (DEN, etc.)"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </p:panel>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <p:panel id="ccDocumentationOption" header="CC Documentations Options">
+                            <h:panelGrid columns="2" styleClass="option-panel">
+                                <h:panelGroup styleClass="option-left">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccDefinition}">
+                                        <f:ajax render="ccDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="CC Definition"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="option-right">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccVersion}">
+                                        <f:ajax render="ccDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="CC Version"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup styleClass="option-left">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.ccGuid}">
+                                        <f:ajax render="ccDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="CC GUID"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="option-right">
+                                    <h:selectBooleanCheckbox styleClass="boolean-checkbox"
+                                                             value="#{profileBODGenerationBean.option.ccDocumentationOption.others}">
+                                        <f:ajax render="ccDocumentationOption"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputText value="Others (DEN, etc.)"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </p:panel>
+                    </div>
+                </div>
+            </p:panel>
+
+            <p:panel id="optPanel2">
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-md-4 col-sm-4">
+                        <h:outputText value="Select Expressions" styleClass="option-header"/>
+                        <h:panelGrid id="schemaExpressionOption"
+                                     columns="1" styleClass="option-panel" style="margin-top: 15px;">
+                            <h:selectOneRadio styleClass="option-radio"
+                                              value="#{profileBODGenerationBean.option.schemaExpression}">
+                                <f:selectItem itemValue="XML" itemLabel="XML Schema"/>
+                                <f:selectItem itemValue="JSON" itemLabel="JSON Schema" itemDisabled="true"/>
+                                <f:ajax render="schemaExpressionOption"/>
+                            </h:selectOneRadio>
+                        </h:panelGrid>
+                    </div>
+                    <div class="col-md-8 col-sm-8">
+                        <h:outputText value="Schema Package Option" styleClass="option-header"/>
+                        <h:panelGrid id="schemaPackageOption"
+                                     columns="1" styleClass="option-panel" style="margin-top: 15px;">
+                            <h:selectOneRadio styleClass="option-radio"
+                                              value="#{profileBODGenerationBean.option.schemaPackage}">
+                                <f:selectItem itemValue="All" itemLabel="Put all schemas in the same package"/>
+                                <f:selectItem itemValue="Each" itemLabel="Put each schemas in the different package"
+                                              itemDisabled="true"/>
+                                <f:ajax render="schemaPackageOption"/>
+                            </h:selectOneRadio>
+                        </h:panelGrid>
+                    </div>
+                </div>
+            </p:panel>
+
+            <h:panelGroup id="btnPanel" style="display: inline-block; margin-top: 20px;">
+                <p:commandButton id="btnGenerate" ajax="false" value="Generate" icon="ui-icon-extlink"
+                                 onclick="PrimeFaces.monitorDownload(function() { PF('loadingBlock').show(); }, function() { PF('loadingBlock').hide(); })"
+                                 actionListener="#{profileBODGenerationBean.generate}"
+                                 disabled="#{profileBODGenerationBean.selectedProfileBODs.isEmpty() == true}">
+                    <p:fileDownload value="#{profileBODGenerationBean.file}"/>
+                </p:commandButton>
+            </h:panelGroup>
+
+            <script>
+                var btnGenerate = $(document.getElementById('form:btnGenerate'));
+                btnGenerate.prop("disabled", true).addClass('ui-state-disabled');
+            </script>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

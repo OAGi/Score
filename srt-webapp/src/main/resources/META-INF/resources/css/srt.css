@@ -806,3 +806,51 @@ h6 {
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
 }
+
+.table-checkbox {
+    width: 48px;
+    text-align: center;
+}
+
+.table-checkbox > .ui-chkbox-all {
+    margin-bottom: 3px !important;
+}
+
+.option-left {
+    position: relative;
+}
+
+.option-right {
+    position: absolute;
+    left: 170px;
+}
+
+.boolean-checkbox {
+    margin-right: 10px !important;
+}
+
+.option-panel tr {
+    border: 0 !important;
+}
+
+.option-header {
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 5px;
+}
+
+.option-radio td {
+    display: inline-block;
+    width: 100%;
+}
+
+.option-radio input[type=radio] {
+    margin-right: 10px;
+}
+
+.option-radio label {
+    font-weight: normal;
+}
+
+.option-radio input[type=radio]:disabled + label {
+    text-decoration: line-through;
+}

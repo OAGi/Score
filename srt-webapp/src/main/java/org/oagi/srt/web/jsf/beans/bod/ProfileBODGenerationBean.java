@@ -1,8 +1,14 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.ProfileBODRepository;
 import org.oagi.srt.repository.entity.ProfileBOD;
-import org.oagi.srt.service.BusinessInformationEntityService;
+import org.oagi.srt.standalone.StandaloneXMLSchema;
+import org.primefaces.context.RequestContext;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -12,6 +18,11 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,19 +31,21 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ProfileBODBean {
+public class ProfileBODGenerationBean {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ProfileBODRepository profileBODRepository;
-
     @Autowired
-    private BusinessInformationEntityService bieService;
+    private StandaloneXMLSchema standaloneXMLSchema;
+
+    private ProfileBODGenerationOption option = new ProfileBODGenerationOption();
 
     private List<ProfileBOD> allProfileBODs;
     private String selectedPropertyTerm;
     private List<ProfileBOD> profileBODs;
-
-    private ProfileBOD selectedProfileBOD;
+    private List<ProfileBOD> selectedProfileBODs;
 
     @PostConstruct
     public void init() {
@@ -44,12 +57,20 @@ public class ProfileBODBean {
         );
     }
 
-    public List<ProfileBOD> getProfileBODs() {
-        return profileBODs;
+    public ProfileBODGenerationOption getOption() {
+        return option;
     }
 
-    public void setProfileBODs(List<ProfileBOD> profileBODs) {
-        this.profileBODs = profileBODs;
+    public void setOption(ProfileBODGenerationOption option) {
+        this.option = option;
+    }
+
+    public List<ProfileBOD> getAllProfileBODs() {
+        return allProfileBODs;
+    }
+
+    public void setAllProfileBODs(List<ProfileBOD> allProfileBODs) {
+        this.allProfileBODs = allProfileBODs;
     }
 
     public String getSelectedPropertyTerm() {
@@ -60,12 +81,20 @@ public class ProfileBODBean {
         this.selectedPropertyTerm = selectedPropertyTerm;
     }
 
-    public ProfileBOD getSelectedProfileBOD() {
-        return selectedProfileBOD;
+    public List<ProfileBOD> getProfileBODs() {
+        return profileBODs;
     }
 
-    public void setSelectedProfileBOD(ProfileBOD selectedProfileBOD) {
-        this.selectedProfileBOD = selectedProfileBOD;
+    public void setProfileBODs(List<ProfileBOD> profileBODs) {
+        this.profileBODs = profileBODs;
+    }
+
+    public List<ProfileBOD> getSelectedProfileBODs() {
+        return selectedProfileBODs;
+    }
+
+    public void setSelectedProfileBODs(List<ProfileBOD> selectedProfileBODs) {
+        this.selectedProfileBODs = selectedProfileBODs;
     }
 
     public List<String> completeInput(String query) {
@@ -91,13 +120,23 @@ public class ProfileBODBean {
         }
     }
 
-    public void deleteProfileBOD() {
-        ProfileBOD profileBOD = getSelectedProfileBOD();
-        if (profileBOD == null) {
-            return;
+    private String filePath;
+
+    public void generate() throws Exception {
+        List<Long> al = new ArrayList();
+        for (ProfileBOD selectedProfileBOD : getSelectedProfileBODs()) {
+            al.add(selectedProfileBOD.getTopLevelAbieId());
         }
 
-        bieService.deleteProfileBOD(profileBOD.getTopLevelAbieId());
-        init();
+        filePath = standaloneXMLSchema.generateXMLSchema(al, true);
+    }
+
+    public StreamedContent getFile() throws Exception {
+        return toStreamedContent(filePath);
+    }
+
+    public StreamedContent toStreamedContent(String filePath) throws IOException {
+        InputStream stream = new FileInputStream(new File(filePath));
+        return new DefaultStreamedContent(stream, "text/xml", filePath.substring(filePath.lastIndexOf("/") + 1));
     }
 }
