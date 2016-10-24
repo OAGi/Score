@@ -60,6 +60,12 @@ logging:
 jsf:
   project-stage: Development
 
+server:
+  session:
+    timeout: 6000000
+    cookie:
+      max-age: 6000000
+
 # Staging environment
 ---
 spring:
@@ -75,3 +81,9 @@ spring:
 
 jsf:
   project-stage: Production
+
+server:
+  session:
+    timeout: 6000000
+    cookie:
+      max-age: 6000000
