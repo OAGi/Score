@@ -46,6 +46,8 @@
                                         <span class="label label-default">Published</span>
                                     </h:panelGroup>
                                 </p:column>
+                                <p:ajax event="rowSelect" update=":form:btnPanel"/>
+                                <p:ajax event="rowUnselect" update=":form:btnPanel"/>
                                 <p:ajax event="rowSelectCheckbox" update=":form:btnPanel"/>
                                 <p:ajax event="rowUnselectCheckbox" update=":form:btnPanel"/>
                                 <p:ajax event="toggleSelect" update=":form:btnPanel"/>
