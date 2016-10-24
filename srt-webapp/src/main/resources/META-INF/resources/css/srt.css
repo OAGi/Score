@@ -852,5 +852,6 @@ h6 {
 }
 
 .option-radio input[type=radio]:disabled + label {
-    text-decoration: line-through;
+    text-shadow: 3px 3px 2px rgba(150, 150, 150, 0.5);
+    color: rgba(102, 102, 102, 0.5);
 }
