@@ -7,6 +7,7 @@ import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.repository.entity.BasicBusinessInformationEntitySupplementaryComponent;
+import org.oagi.srt.repository.entity.BusinessDataTypeSupplementaryComponentPrimitiveRestriction;
 import org.oagi.srt.repository.entity.DataTypeSupplementaryComponent;
 
 import static org.oagi.srt.model.bie.BBIERestrictionType.*;
@@ -14,22 +15,26 @@ import static org.oagi.srt.model.bie.BBIERestrictionType.*;
 public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
 
     private BasicBusinessInformationEntitySupplementaryComponent bbieSc;
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri;
     private DataTypeSupplementaryComponent bdtSc;
     private BBIERestrictionType restrictionType;
 
     public BaseBBIESCNode(Node parent,
                           BasicBusinessInformationEntitySupplementaryComponent bbieSc,
+                          BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri,
                           DataTypeSupplementaryComponent bdtSc) {
         super(0, parent);
-        this.bbieSc = bbieSc;
         if (bbieSc == null) {
             throw new IllegalArgumentException("'bbieSc' argument must not be null.");
         }
-        this.bdtSc = bdtSc;
+        this.bbieSc = bbieSc;
+
+        this.bdtScPriRestri = bdtScPriRestri;
+
         if (bdtSc == null) {
             throw new IllegalArgumentException("'bdtSc' argument must not be null.");
         }
-
+        this.bdtSc = bdtSc;
 
         setRestrictionType((bbieSc.getDtScPriRestriId() > 0L) ? Primitive : (bbieSc.getCodeListId() > 0L) ? Code : Agency);
     }
@@ -61,13 +66,16 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
     }
 
     @Override
-    public void setBdtScPrimitiveRestrictionId(long bdtScPrimitiveRestrictionId) {
-        bbieSc.setDtScPriRestriId(bdtScPrimitiveRestrictionId);
+    public void setBdtScPriRestri(BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri) {
+        this.bdtScPriRestri = bdtScPriRestri;
+        if (bdtScPriRestri != null) {
+            bbieSc.setDtScPriRestriId(bdtScPriRestri.getBdtScPriRestriId());
+        }
     }
 
     @Override
-    public long getBdtScPrimitiveRestrictionId() {
-        return bbieSc.getDtScPriRestriId();
+    public BusinessDataTypeSupplementaryComponentPrimitiveRestriction getBdtScPriRestri() {
+        return bdtScPriRestri;
     }
 
     @Override

@@ -524,11 +524,17 @@ public class NodeService {
 
         private void appendBBIESC(BasicBusinessInformationEntity bbie, BaseBBIENode parent) {
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbieScList) {
-                DataTypeSupplementaryComponent dtsc = dataContainer.getDtSc(bbiesc.getDtScId());
+                long dtScId = bbiesc.getDtScId();
+                DataTypeSupplementaryComponent dtsc = dataContainer.getDtSc(dtScId);
                 if (dtsc == null) {
                     throw new IllegalArgumentException("Can't find 'dtSc'");
                 }
-                new BaseBBIESCNode(parent, bbiesc, dtsc);
+
+                long bdtScPriRestriId = dataContainer.getDefaultBdtScPriRestriId(dtScId);
+                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri
+                        = dataContainer.getBdtScPriRestri(bdtScPriRestriId);
+
+                new BaseBBIESCNode(parent, bbiesc, bdtScPriRestri, dtsc);
             }
         }
 
@@ -545,7 +551,7 @@ public class NodeService {
             createBBIE(bdtPriRestri, codeListId);
             createBBIESC(bdtId);
 
-            BaseBBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bbiep, bccp, bdt);
+            BaseBBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bdtPriRestri, bbiep, bccp, bdt);
             appendBBIESC(bbie, bbieNode);
             return bbieNode;
         }
@@ -887,18 +893,24 @@ public class NodeService {
 
         long bdtId = bccp.getBdtId();
         DataType bdt = dataContainer.findDt(bdtId);
+        BusinessDataTypePrimitiveRestriction bdtPriRestri = bdtPriRestriRepository.findOne(bbie.getBdtPriRestriId());
 
         int seqKey = (int) bbie.getSeqKey();
-        BBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bbiep, bccp, bdt);
+        BBIENode bbieNode = new BaseBBIENode(seqKey, parent, bbie, bdtPriRestri, bbiep, bccp, bdt);
         appendBBIESC(dataContainer, bbie, bbieNode);
     }
 
     private void appendBBIESC(DataContainerForProfileBODLoader dataContainer,
                               BasicBusinessInformationEntity bbie, BBIENode parent) {
-        List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = dataContainer.findBbieScByBbieId(bbie.getBbieId());
+        List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList =
+                dataContainer.findBbieScByBbieId(bbie.getBbieId());
         for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbiescList) {
-            DataTypeSupplementaryComponent dtsc = dataContainer.findDtSc(bbiesc.getDtScId());
-            new BaseBBIESCNode(parent, bbiesc, dtsc);
+            long dtScId = bbiesc.getDtScId();
+            DataTypeSupplementaryComponent dtsc = dataContainer.findDtSc(dtScId);
+            BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtPriRestri =
+                    bdtScPriRestriRepository.findOne(bbiesc.getDtScPriRestriId());
+
+            new BaseBBIESCNode(parent, bbiesc, bdtPriRestri, dtsc);
         }
     }
 
@@ -984,9 +996,10 @@ public class NodeService {
 
             long bdtId = bccp.getBdtId();
             DataType bdt = dataTypeRepository.findOne(bdtId);
+            BusinessDataTypePrimitiveRestriction bdtPriRestri = bdtPriRestriRepository.findOne(bbie.getBdtPriRestriId());
 
             int seqKey = (int) bbie.getSeqKey();
-            BBIENode bbieNode = new BaseBBIENode(seqKey, null, bbie, bbiep, bccp, bdt);
+            BBIENode bbieNode = new BaseBBIENode(seqKey, null, bbie, bdtPriRestri, bbiep, bccp, bdt);
             BBIESCFetcher fetcher = new BBIESCFetcher(bbie);
             new LazyBBIENode(bbieNode, fetcher, fetcher.getChildrenCount(), parent);
         }
@@ -1020,8 +1033,12 @@ public class NodeService {
             List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList =
                     bbiescRepository.findByBbieId(bbie.getBbieId());
             for (BasicBusinessInformationEntitySupplementaryComponent bbiesc : bbiescList) {
-                DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(bbiesc.getDtScId());
-                new BaseBBIESCNode(parent, bbiesc, dtsc);
+                long dtScId = bbiesc.getDtScId();
+                DataTypeSupplementaryComponent dtsc = dtScRepository.findOne(dtScId);
+                BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtPriRestri =
+                        bdtScPriRestriRepository.findOne(bbiesc.getDtScPriRestriId());
+
+                new BaseBBIESCNode(parent, bbiesc, bdtPriRestri, dtsc);
             }
         }
     }

@@ -2,14 +2,13 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bie.*;
 import org.oagi.srt.repository.TopLevelAbieRepository;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.TopLevelAbie;
-import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -18,13 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @Scope("view")
@@ -83,34 +86,207 @@ public class EditProfileBODBean extends UIHandler {
         this.selectedTreeNode = selectedTreeNode;
     }
 
+    /*
+     * handle BBIE Type
+     */
     public Map<BBIERestrictionType, BBIERestrictionType> getAvailablePrimitiveRestrictions(BBIENode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
-    public Map<String, Long> getBdtPrimitiveRestrictions(BBIENode node) {
-        return bieService.getBdtPrimitiveRestrictions(node);
+    private BBIENode getSelectedBBIENode() {
+        TreeNode treeNode = getSelectedTreeNode();
+        Object data = treeNode.getData();
+        if (!(data instanceof BBIENode)) {
+            return null;
+        }
+        return (BBIENode) data;
     }
 
-    public Map<String, Long> getCodeLists(BBIENode node) {
-        return bieService.getCodeLists(node);
+    public String getBbieXbtName() {
+        return bieService.getBdtPrimitiveRestrictionName(getSelectedBBIENode());
     }
 
+    public void setBbieXbtName(String name) {
+        bieService.setBdtPrimitiveRestriction(getSelectedBBIENode(), name);
+    }
+
+    public void onSelectBbieXbtName(SelectEvent event) {
+        setBbieXbtName(event.getObject().toString());
+    }
+
+    public List<String> completeInputForBbieXbt(String query) {
+        BBIENode node = getSelectedBBIENode();
+        Map<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions =
+                bieService.getBdtPrimitiveRestrictions(node);
+        if (StringUtils.isEmpty(query)) {
+            return new ArrayList(bdtPrimitiveRestrictions.keySet());
+        } else {
+            return bdtPrimitiveRestrictions.keySet().stream()
+                    .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public String getBbieCodeListName() {
+        return bieService.getCodeListName(getSelectedBBIENode());
+    }
+
+    public void setBbieCodeListName(String name) {
+        BBIENode node = getSelectedBBIENode();
+        Map<String, CodeList> codeListMap = bieService.getCodeLists(node);
+        CodeList codeList = codeListMap.get(name);
+        if (codeList != null) {
+            node.setCodeListId(codeList.getCodeListId());
+        }
+    }
+
+    public void onSelectBbieCodeListName(SelectEvent event) {
+        setBbieCodeListName(event.getObject().toString());
+    }
+
+    public List<String> completeInputForBbieCodeList(String query) {
+        BBIENode node = getSelectedBBIENode();
+        Map<String, CodeList> codeLists = bieService.getCodeLists(node);
+        if (StringUtils.isEmpty(query)) {
+            return new ArrayList(codeLists.keySet());
+        } else {
+            return codeLists.keySet().stream()
+                    .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public String getBbieAgencyIdListName() {
+        return bieService.getBbieAgencyIdListName(getSelectedBBIENode());
+    }
+
+    public void setBbieAgencyIdListName(String name) {
+        BBIENode node = getSelectedBBIENode();
+        Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
+        AgencyIdList agencyIdList = agencyIdListMap.get(name);
+        if (agencyIdList != null) {
+            node.setAgencyIdListId(agencyIdList.getAgencyIdListId());
+        }
+    }
+
+    public void onSelectBbieAgencyIdListName(SelectEvent event) {
+        setBbieAgencyIdListName(event.getObject().toString());
+    }
+
+    public List<String> completeInputForBbieAgencyIdList(String query) {
+        BBIENode node = getSelectedBBIENode();
+        Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
+        if (StringUtils.isEmpty(query)) {
+            return new ArrayList(agencyIdListMap.keySet());
+        } else {
+            return agencyIdListMap.keySet().stream()
+                    .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    /*
+     * handle BBIESC Type
+     */
     public Map<BBIERestrictionType, BBIERestrictionType> getAvailableScPrimitiveRestrictions(BBIESCNode node) {
         return bieService.getAvailablePrimitiveRestrictions(node);
     }
 
-    public Map<String, Long> getBdtScPrimitiveRestrictions(BBIESCNode node) {
-        return bieService.getBdtScPrimitiveRestrictions(node);
+    private BBIESCNode getSelectedBBIESCNode() {
+        TreeNode treeNode = getSelectedTreeNode();
+        Object data = treeNode.getData();
+        if (!(data instanceof BBIESCNode)) {
+            return null;
+        }
+        return (BBIESCNode) data;
     }
 
-    public Map<String, Long> getCodeLists(BBIESCNode node) {
-        return bieService.getCodeLists(node);
+    public String getBbieScXbtName() {
+        return bieService.getBdtScPrimitiveRestrictionName(getSelectedBBIESCNode());
     }
 
-    public Map<String, Long> getAgencyIdListIds(BBIESCNode node) {
-        return bieService.getAgencyIdListIds(node);
+    public void setBbieScXbtName(String name) {
+        bieService.setBdtScPrimitiveRestriction(getSelectedBBIESCNode(), name);
     }
 
+    public void onSelectBbieScXbtName(SelectEvent event) {
+        setBbieScXbtName(event.getObject().toString());
+    }
+
+    public List<String> completeInputForBbieScXbt(String query) {
+        BBIESCNode node = getSelectedBBIESCNode();
+        Map<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> bdtScPrimitiveRestrictions =
+                bieService.getBdtScPrimitiveRestrictions(node);
+        if (StringUtils.isEmpty(query)) {
+            return new ArrayList(bdtScPrimitiveRestrictions.keySet());
+        } else {
+            return bdtScPrimitiveRestrictions.keySet().stream()
+                    .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public String getBbieScCodeListName() {
+        return bieService.getCodeListName(getSelectedBBIESCNode());
+    }
+
+    public void setBbieScCodeListName(String name) {
+        BBIESCNode node = getSelectedBBIESCNode();
+        Map<String, CodeList> codeListMap = bieService.getCodeLists(node);
+        CodeList codeList = codeListMap.get(name);
+        if (codeList != null) {
+            node.setCodeListId(codeList.getCodeListId());
+        }
+    }
+
+    public void onSelectBbieScCodeListName(SelectEvent event) {
+        setBbieScCodeListName(event.getObject().toString());
+    }
+
+    public List<String> completeInputForBbieScCodeList(String query) {
+        BBIESCNode node = getSelectedBBIESCNode();
+        Map<String, CodeList> codeLists = bieService.getCodeLists(node);
+        if (StringUtils.isEmpty(query)) {
+            return new ArrayList(codeLists.keySet());
+        } else {
+            return codeLists.keySet().stream()
+                    .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public String getBbieScAgencyIdListName() {
+        return bieService.getBbieAgencyIdListName(getSelectedBBIESCNode());
+    }
+
+    public void setBbieScAgencyIdListName(String name) {
+        BBIESCNode node = getSelectedBBIESCNode();
+        Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
+        AgencyIdList agencyIdList = agencyIdListMap.get(name);
+        if (agencyIdList != null) {
+            node.setAgencyIdListId(agencyIdList.getAgencyIdListId());
+        }
+    }
+
+    public void onSelectBbieScAgencyIdListName(SelectEvent event) {
+        setBbieScAgencyIdListName(event.getObject().toString());
+    }
+
+    public List<String> completeInputForBbieScAgencyIdList(String query) {
+        BBIESCNode node = getSelectedBBIESCNode();
+        Map<String, AgencyIdList> agencyIdListMap = bieService.getAgencyIdListIds(node);
+        if (StringUtils.isEmpty(query)) {
+            return new ArrayList(agencyIdListMap.keySet());
+        } else {
+            return agencyIdListMap.keySet().stream()
+                    .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    /*
+     * handle command buttons.
+     */
     public void expand(NodeExpandEvent expandEvent) {
         DefaultTreeNode treeNode = (DefaultTreeNode) expandEvent.getTreeNode();
         bieTreeNodeHandler.expandLazyTreeNode(treeNode);

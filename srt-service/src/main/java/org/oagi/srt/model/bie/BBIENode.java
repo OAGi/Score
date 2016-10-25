@@ -10,6 +10,15 @@ public interface BBIENode extends BIENode {
     public BasicBusinessInformationEntity getBbie();
     public void setBbie(BasicBusinessInformationEntity bbie);
 
+    public BusinessDataTypePrimitiveRestriction getBdtPriRestri();
+    public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri);
+
+    public void setCodeListId(long codeListId);
+    public long getCodeListId();
+
+    public long getAgencyIdListId();
+    public void setAgencyIdListId(long agencyIdListId);
+
     public BasicBusinessInformationEntityProperty getBbiep();
     public void setBbiep(BasicBusinessInformationEntityProperty bbiep);
 
@@ -21,10 +30,4 @@ public interface BBIENode extends BIENode {
 
     public void setRestrictionType(BBIERestrictionType restrictionType);
     public BBIERestrictionType getRestrictionType();
-
-    public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId);
-    public long getBdtPrimitiveRestrictionId();
-
-    public void setCodeListId(long codeListId);
-    public long getCodeListId();
 }

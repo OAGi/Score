@@ -12,12 +12,12 @@ import org.oagi.srt.repository.entity.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.oagi.srt.model.bie.BBIERestrictionType.Code;
-import static org.oagi.srt.model.bie.BBIERestrictionType.Primitive;
+import static org.oagi.srt.model.bie.BBIERestrictionType.*;
 
 public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
 
     private BasicBusinessInformationEntity bbie;
+    private BusinessDataTypePrimitiveRestriction bdtPriRestri;
     private BasicBusinessInformationEntityProperty bbiep;
     private BasicCoreComponentProperty bccp;
     private DataType bdt;
@@ -26,16 +26,34 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
 
     public BaseBBIENode(int seqKey, Node parent,
                         BasicBusinessInformationEntity bbie,
+                        BusinessDataTypePrimitiveRestriction bdtPriRestri,
                         BasicBusinessInformationEntityProperty bbiep,
                         BasicCoreComponentProperty bccp,
                         DataType bdt) {
         super(seqKey, parent);
+        if (bbie == null) {
+            throw new IllegalArgumentException("'bbie' parameter must not be null.");
+        }
         this.bbie = bbie;
+
+        this.bdtPriRestri = bdtPriRestri;
+
+        if (bbiep == null) {
+            throw new IllegalArgumentException("'bbiep' parameter must not be null.");
+        }
         this.bbiep = bbiep;
+
+        if (bccp == null) {
+            throw new IllegalArgumentException("'bccp' parameter must not be null.");
+        }
         this.bccp = bccp;
+
+        if (bdt == null) {
+            throw new IllegalArgumentException("'bdt' parameter must not be null.");
+        }
         this.bdt = bdt;
 
-        setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? Primitive : Code);
+        setRestrictionType((bbie.getBdtPriRestriId() > 0L) ? Primitive : (bbie.getCodeListId() > 0L) ? Code : Agency);
     }
 
     public BasicBusinessInformationEntity getBbie() {
@@ -44,6 +62,38 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
 
     public void setBbie(BasicBusinessInformationEntity bbie) {
         this.bbie = bbie;
+    }
+
+    public BusinessDataTypePrimitiveRestriction getBdtPriRestri() {
+        return bdtPriRestri;
+    }
+
+    @Override
+    public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
+        this.bdtPriRestri = bdtPriRestri;
+        if (bdtPriRestri != null) {
+            bbie.setBdtPriRestriId(bdtPriRestri.getBdtPriRestriId());
+        }
+    }
+
+    @Override
+    public void setCodeListId(long codeListId) {
+        bbie.setCodeListId(codeListId);
+    }
+
+    @Override
+    public long getCodeListId() {
+        return bbie.getCodeListId();
+    }
+
+    @Override
+    public long getAgencyIdListId() {
+        return bbie.getAgencyIdListId();
+    }
+
+    @Override
+    public void setAgencyIdListId(long agencyIdListId) {
+        bbie.setAgencyIdListId(agencyIdListId);
     }
 
     public BasicBusinessInformationEntityProperty getBbiep() {
@@ -78,26 +128,6 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     @Override
     public BBIERestrictionType getRestrictionType() {
         return restrictionType;
-    }
-
-    @Override
-    public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId) {
-        bbie.setBdtPriRestriId(bdtPrimitiveRestrictionId);
-    }
-
-    @Override
-    public long getBdtPrimitiveRestrictionId() {
-        return bbie.getBdtPriRestriId();
-    }
-
-    @Override
-    public void setCodeListId(long codeListId) {
-        bbie.setCodeListId(codeListId);
-    }
-
-    @Override
-    public long getCodeListId() {
-        return bbie.getCodeListId();
     }
 
     @Override

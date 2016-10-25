@@ -35,6 +35,41 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIEN
         bbieNode.setBbie(bbie);
     }
 
+    @Override
+    public BusinessDataTypePrimitiveRestriction getBdtPriRestri() {
+        return bbieNode.getBdtPriRestri();
+    }
+
+    @Override
+    public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
+        bbieNode.setBdtPriRestri(bdtPriRestri);
+    }
+
+    @Override
+    public BBIERestrictionType getRestrictionType() {
+        return bbieNode.getRestrictionType();
+    }
+
+    @Override
+    public void setCodeListId(long codeListId) {
+        bbieNode.setCodeListId(codeListId);
+    }
+
+    @Override
+    public long getCodeListId() {
+        return bbieNode.getCodeListId();
+    }
+
+    @Override
+    public long getAgencyIdListId() {
+        return bbieNode.getAgencyIdListId();
+    }
+
+    @Override
+    public void setAgencyIdListId(long agencyIdListId) {
+        bbieNode.setAgencyIdListId(agencyIdListId);
+    }
+
     public BasicBusinessInformationEntityProperty getBbiep() {
         return bbieNode.getBbiep();
     }
@@ -62,30 +97,5 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIEN
     @Override
     public void setRestrictionType(BBIERestrictionType restrictionType) {
         bbieNode.setRestrictionType(restrictionType);
-    }
-
-    @Override
-    public BBIERestrictionType getRestrictionType() {
-        return bbieNode.getRestrictionType();
-    }
-
-    @Override
-    public void setBdtPrimitiveRestrictionId(long bdtPrimitiveRestrictionId) {
-        bbieNode.setBdtPrimitiveRestrictionId(bdtPrimitiveRestrictionId);
-    }
-
-    @Override
-    public long getBdtPrimitiveRestrictionId() {
-        return bbieNode.getBdtPrimitiveRestrictionId();
-    }
-
-    @Override
-    public void setCodeListId(long codeListId) {
-        bbieNode.setCodeListId(codeListId);
-    }
-
-    @Override
-    public long getCodeListId() {
-        return bbieNode.getCodeListId();
     }
 }

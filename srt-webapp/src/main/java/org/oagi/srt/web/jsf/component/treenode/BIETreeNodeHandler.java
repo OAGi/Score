@@ -48,10 +48,16 @@ public class BIETreeNodeHandler extends UIHandler {
     private BasicBusinessInformationEntityRepository bbieRepository;
 
     @Autowired
+    private BusinessDataTypePrimitiveRestrictionRepository bdtPriRestriRepository;
+
+    @Autowired
     private BasicBusinessInformationEntityPropertyRepository bbiepRepository;
 
     @Autowired
     private BasicBusinessInformationEntitySupplementaryComponentRepository bbiescRepository;
+
+    @Autowired
+    private BusinessDataTypeSupplementaryComponentPrimitiveRestrictionRepository bdtScPriRestriRepository;
 
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
@@ -271,11 +277,19 @@ public class BIETreeNodeHandler extends UIHandler {
             case Primitive:
                 if (bbie.getBdtPriRestriId() > 0L) {
                     bbie.setCodeListId(null);
+                    bbie.setAgencyIdListId(null);
                 }
                 break;
             case Code:
                 if (bbie.getCodeListId() > 0L) {
                     bbie.setBdtPriRestriId(null);
+                    bbie.setAgencyIdListId(null);
+                }
+                break;
+            case Agency:
+                if (bbie.getAgencyIdListId() > 0L) {
+                    bbie.setBdtPriRestriId(null);
+                    bbie.setCodeListId(null);
                 }
                 break;
         }

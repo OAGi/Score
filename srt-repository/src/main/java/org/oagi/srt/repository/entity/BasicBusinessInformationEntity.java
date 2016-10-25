@@ -44,6 +44,9 @@ public class BasicBusinessInformationEntity
     @Column
     private Long codeListId;
 
+    @Column
+    private Long agencyIdListId;
+
     @Column(nullable = false)
     private int cardinalityMin;
 
@@ -198,6 +201,25 @@ public class BasicBusinessInformationEntity
     public void setCodeList(CodeList codeList) {
         if (codeList != null) {
             setCodeListId(codeList.getCodeListId());
+        }
+    }
+
+    public long getAgencyIdListId() {
+        return (agencyIdListId == null) ? 0L : agencyIdListId;
+    }
+
+    public void setAgencyIdListId(Long agencyIdListId) {
+        if (agencyIdListId != null && agencyIdListId > 0L) {
+            this.agencyIdListId = agencyIdListId;
+        } else {
+            this.agencyIdListId = null;
+        }
+        setDirty(true);
+    }
+
+    public void setAgencyIdList(AgencyIdList agencyIdList) {
+        if (agencyIdList != null) {
+            setAgencyIdListId(agencyIdList.getAgencyIdListId());
         }
     }
 
@@ -367,6 +389,7 @@ public class BasicBusinessInformationEntity
         result = 31 * result + (int) (toBbiepId ^ (toBbiepId >>> 32));
         result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
         result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -396,6 +419,7 @@ public class BasicBusinessInformationEntity
                 ", toBbiepId=" + toBbiepId +
                 ", bdtPriRestriId=" + bdtPriRestriId +
                 ", codeListId=" + codeListId +
+                ", agencyIdListId=" + agencyIdListId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +

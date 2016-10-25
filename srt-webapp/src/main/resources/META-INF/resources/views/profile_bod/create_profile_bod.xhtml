@@ -387,10 +387,12 @@
                                                     <f:facet name="header">
                                                         <h:outputText value="BDT Primitive Restriction"/>
 
-                                                        <h:selectOneMenu id="selectBdtPriRestri" style="margin-left: 20px;"
+                                                        <h:selectOneMenu id="selectBdtPriRestri"
+                                                                         style="width: 100px; margin-left: 20px;"
                                                                          value="#{createProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                             <p:ajax update="bdtPriRestriPanel"/>
-                                                            <f:selectItems value="#{createProfileBODBean.getAvailablePrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
+                                                            <f:selectItems
+                                                                    value="#{createProfileBODBean.getAvailablePrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
                                                         </h:selectOneMenu>
                                                     </f:facet>
                                                     <h:panelGrid columns="2" cellpadding="2">
@@ -403,25 +405,45 @@
                                                     <h:panelGrid columns="2" cellpadding="2"
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                         <h:outputText value="Primitive" styleClass="section-label"/>
-                                                        <h:selectOneMenu panelStyle="width:180px"
-                                                                         style="width: 160px; margin-left: 150px !important; padding: 4px;"
-                                                                         value="#{createProfileBODBean.selectedTreeNode.data.bdtPrimitiveRestrictionId}">
-                                                            <f:selectItem itemLabel="" itemValue="---" noSelectionOption="true"/>
-                                                            <f:selectItems value="#{createProfileBODBean.getBdtPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
-                                                            <p:ajax update="bdtPriRestriPanel"/>
-                                                        </h:selectOneMenu>
+
+                                                        <p:autoComplete value="#{createProfileBODBean.bbieXbtName}"
+                                                                        completeMethod="#{createProfileBODBean.completeInputForBbieXbt}"
+                                                                        dropdown="true"
+                                                                        style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{createProfileBODBean.onSelectBbieXbtName}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </p:autoComplete>
                                                     </h:panelGrid>
 
                                                     <h:panelGrid columns="2" cellpadding="2"
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
                                                         <h:outputText value="Code List" styleClass="section-label"/>
-                                                        <h:selectOneMenu panelStyle="width:180px"
-                                                                         style="width: 160px; margin-left: 150px !important; padding: 4px;"
-                                                                         value="#{createProfileBODBean.selectedTreeNode.data.codeListId}">
-                                                            <f:selectItem itemLabel="" itemValue="---" noSelectionOption="true"/>
-                                                            <f:selectItems value="#{createProfileBODBean.getCodeLists(createProfileBODBean.selectedTreeNode.data)}"/>
-                                                            <p:ajax update="bdtPriRestriPanel"/>
-                                                        </h:selectOneMenu>
+
+                                                        <p:autoComplete value="#{createProfileBODBean.bbieCodeListName}"
+                                                                        completeMethod="#{createProfileBODBean.completeInputForBbieCodeList}"
+                                                                        dropdown="true"
+                                                                        style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{createProfileBODBean.onSelectBbieCodeListName}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </p:autoComplete>
+                                                    </h:panelGrid>
+
+                                                    <h:panelGrid columns="2" cellpadding="2"
+                                                                 rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Agency'}">
+                                                        <h:outputText value="Agency ID List"
+                                                                      styleClass="section-label"/>
+
+                                                        <p:autoComplete
+                                                                value="#{createProfileBODBean.bbieAgencyIdListName}"
+                                                                completeMethod="#{createProfileBODBean.completeInputForBbieAgencyIdList}"
+                                                                dropdown="true"
+                                                                style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{createProfileBODBean.onSelectBbieAgencyIdListName}"/>
+                                                            <f:ajax render="bdtPriRestriPanel"/>
+                                                        </p:autoComplete>
                                                     </h:panelGrid>
                                                 </p:panel>
                                             </h:panelGroup>
@@ -497,10 +519,11 @@
                                                         <h:outputText value="BDT SC Primitive Restriction"/>
 
                                                         <h:selectOneMenu id="selectBdtScPriRestri"
-                                                                         style="margin-left: 20px;"
+                                                                         style="width: 100px; margin-left: 20px;"
                                                                          value="#{createProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                             <p:ajax update="bdtScPriRestriPanel"/>
-                                                            <f:selectItems value="#{createProfileBODBean.getAvailableScPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
+                                                            <f:selectItems
+                                                                    value="#{createProfileBODBean.getAvailableScPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
                                                         </h:selectOneMenu>
                                                     </f:facet>
                                                     <h:panelGrid columns="2" cellpadding="3">
@@ -513,40 +536,46 @@
                                                     <h:panelGrid columns="2" cellpadding="2"
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Primitive'}">
                                                         <h:outputText value="Primitive" styleClass="section-label"/>
-                                                        <h:selectOneMenu panelStyle="width:180px"
-                                                                         style="width: 160px; margin-left: 150px !important; padding: 4px;"
-                                                                         value="#{createProfileBODBean.selectedTreeNode.data.bdtScPrimitiveRestrictionId}">
-                                                            <f:selectItem itemLabel="" itemValue="---" noSelectionOption="true"/>
-                                                            <f:selectItems
-                                                                    value="#{createProfileBODBean.getBdtScPrimitiveRestrictions(createProfileBODBean.selectedTreeNode.data)}"/>
+
+                                                        <p:autoComplete value="#{createProfileBODBean.bbieScXbtName}"
+                                                                        completeMethod="#{createProfileBODBean.completeInputForBbieScXbt}"
+                                                                        dropdown="true"
+                                                                        style="margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{createProfileBODBean.onSelectBbieScXbtName}"/>
                                                             <f:ajax render="bdtScPriRestriPanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:autoComplete>
                                                     </h:panelGrid>
 
                                                     <h:panelGrid columns="2" cellpadding="2"
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Code'}">
                                                         <h:outputText value="Code List" styleClass="section-label"/>
-                                                        <h:selectOneMenu panelStyle="width:180px"
-                                                                         style="width: 160px; margin-left: 150px !important; padding: 4px;"
-                                                                         value="#{createProfileBODBean.selectedTreeNode.data.codeListId}">
-                                                            <f:selectItem itemLabel="" itemValue="---" noSelectionOption="true"/>
-                                                            <f:selectItems
-                                                                    value="#{createProfileBODBean.getCodeLists(createProfileBODBean.selectedTreeNode.data)}"/>
+
+                                                        <p:autoComplete
+                                                                value="#{createProfileBODBean.bbieScCodeListName}"
+                                                                completeMethod="#{createProfileBODBean.completeInputForBbieScCodeList}"
+                                                                dropdown="true"
+                                                                style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{createProfileBODBean.onSelectBbieScCodeListName}"/>
                                                             <f:ajax render="bdtScPriRestriPanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:autoComplete>
                                                     </h:panelGrid>
 
                                                     <h:panelGrid columns="2" cellpadding="2"
                                                                  rendered="#{createProfileBODBean.selectedTreeNode.data.restrictionType eq 'Agency'}">
-                                                        <h:outputText value="Agency ID List" styleClass="section-label"/>
-                                                        <h:selectOneMenu panelStyle="width:180px"
-                                                                         style="width: 230px; margin-left: 150px !important; padding: 4px;"
-                                                                         value="#{createProfileBODBean.selectedTreeNode.data.agencyIdListId}">
-                                                            <f:selectItem itemLabel="" itemValue="---" noSelectionOption="true"/>
-                                                            <f:selectItems
-                                                                    value="#{createProfileBODBean.getAgencyIdListIds(createProfileBODBean.selectedTreeNode.data)}"/>
+                                                        <h:outputText value="Agency ID List"
+                                                                      styleClass="section-label"/>
+
+                                                        <p:autoComplete
+                                                                value="#{createProfileBODBean.bbieScAgencyIdListName}"
+                                                                completeMethod="#{createProfileBODBean.completeInputForBbieScAgencyIdList}"
+                                                                dropdown="true"
+                                                                style="width: 100%; margin-left: 150px !important; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <p:ajax event="itemSelect"
+                                                                    listener="#{createProfileBODBean.onSelectBbieScAgencyIdListName}"/>
                                                             <f:ajax render="bdtScPriRestriPanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:autoComplete>
                                                     </h:panelGrid>
                                                 </p:panel>
                                             </h:panelGroup>

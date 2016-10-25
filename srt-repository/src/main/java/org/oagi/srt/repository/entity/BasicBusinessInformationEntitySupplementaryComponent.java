@@ -173,7 +173,11 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setAgencyIdListId(Long agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+        if (agencyIdListId != null && agencyIdListId > 0L) {
+            this.agencyIdListId = agencyIdListId;
+        } else {
+            this.agencyIdListId = null;
+        }
         setDirty(true);
     }
 
