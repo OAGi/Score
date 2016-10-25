@@ -7,6 +7,7 @@ import org.oagi.srt.service.BusinessContextService;
 import org.oagi.srt.service.ContextCategoryService;
 import org.oagi.srt.service.ContextSchemeService;
 import org.oagi.srt.web.handler.UIHandler;
+import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,7 +73,6 @@ public class BusinessContextDetailBean extends UIHandler {
 
         public void setContextCategory(ContextCategory contextCategory) {
             this.contextCategory = contextCategory;
-            setContextScheme(new ContextScheme());
         }
 
         public ContextScheme getContextScheme() {
@@ -80,7 +81,6 @@ public class BusinessContextDetailBean extends UIHandler {
 
         public void setContextScheme(ContextScheme contextScheme) {
             this.contextScheme = contextScheme;
-            setContextSchemeValue(new ContextSchemeValue());
         }
 
         public ContextSchemeValue getContextSchemeValue() {
@@ -133,6 +133,10 @@ public class BusinessContextDetailBean extends UIHandler {
     }
 
     public BCV getSelectedBusinessContextValue() {
+        if (selectedBusinessContextValue == null) {
+            FacesContext context = FacesContext.getCurrentInstance();
+            setSelectedBusinessContextValue((BCV) UIComponent.getCurrentComponent(context).getAttributes().get("businessContextValue"));
+        }
         return selectedBusinessContextValue;
     }
 
@@ -148,6 +152,22 @@ public class BusinessContextDetailBean extends UIHandler {
         return contextCategoryService.findAll(Sort.Direction.ASC, "name");
     }
 
+    public List<ContextCategory> completeContextCategory(String query) {
+        List<ContextCategory> contextCategories = getContextCategories();
+        if (StringUtils.isEmpty(query)) {
+            return contextCategories;
+        } else {
+            return contextCategories.stream()
+                    .filter(e -> e.getName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public void onSelectContextCategory(SelectEvent event) {
+        BCV selectedBusinessContextValue = getSelectedBusinessContextValue();
+        selectedBusinessContextValue.setContextCategory((ContextCategory) event.getObject());
+    }
+
     public List<ContextScheme> getContextSchemes(Long ctxCategoryId) {
         if (ctxCategoryId == null || ctxCategoryId <= 0L) {
             return Collections.emptyList();
@@ -155,11 +175,49 @@ public class BusinessContextDetailBean extends UIHandler {
         return contextSchemeService.findByCtxCategoryId(ctxCategoryId);
     }
 
+    public List<ContextScheme> completeContextScheme(String query) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Long ctxCategoryId = (Long) UIComponent.getCurrentComponent(context).getAttributes().get("ctxCategoryId");
+
+        List<ContextScheme> contextSchemes = getContextSchemes(ctxCategoryId);
+        if (StringUtils.isEmpty(query)) {
+            return contextSchemes;
+        } else {
+            return contextSchemes.stream()
+                    .filter(e -> e.getSchemeName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public void onSelectContextScheme(SelectEvent event) {
+        BCV selectedBusinessContextValue = getSelectedBusinessContextValue();
+        selectedBusinessContextValue.setContextScheme((ContextScheme) event.getObject());
+    }
+
     public List<ContextSchemeValue> getContextSchemeValues(Long ctxSchemeId) {
         if (ctxSchemeId == null || ctxSchemeId <= 0L) {
             return Collections.emptyList();
         }
         return contextSchemeService.findByOwnerCtxSchemeId(ctxSchemeId);
+    }
+
+    public List<ContextSchemeValue> completeContextSchemeValue(String query) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Long ctxSchemeId = (Long) UIComponent.getCurrentComponent(context).getAttributes().get("ctxSchemeId");
+
+        List<ContextSchemeValue> contextSchemeValues = getContextSchemeValues(ctxSchemeId);
+        if (StringUtils.isEmpty(query)) {
+            return contextSchemeValues;
+        } else {
+            return contextSchemeValues.stream()
+                    .filter(e -> e.getValue().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public void onSelectContextSchemeValue(SelectEvent event) {
+        BCV selectedBusinessContextValue = getSelectedBusinessContextValue();
+        selectedBusinessContextValue.setContextSchemeValue((ContextSchemeValue) event.getObject());
     }
 
     public void deleteBusinessContextValue() {

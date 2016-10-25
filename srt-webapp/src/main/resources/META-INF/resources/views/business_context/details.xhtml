@@ -56,68 +56,59 @@
 
                     <p:column style="width: 30%; height: 30px;" headerText="Context Category"
                               sortBy="#{businessContextValue.contextCategory.name}">
-                        <p:cellEditor>
-                            <f:facet name="output">
-                                <h:outputText
-                                        value="#{businessContextValue.contextCategory.name}"/>
-                            </f:facet>
-                            <f:facet name="input">
-                                <h:selectOneMenu style="width: 100%"
-                                                 value="#{businessContextValue.contextCategory}">
-                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
-                                    <f:selectItems value="#{businessContextDetailBean.contextCategories}"
-                                                   var="contextCategory"
-                                                   itemLabel="#{contextCategory.name}"
-                                                   itemValue="#{contextCategory}"/>
-                                    <f:converter binding="#{contextCategoryConverter}"/>
-                                    <f:ajax render="tbl"/>
-                                </h:selectOneMenu>
-                            </f:facet>
-                        </p:cellEditor>
+                        <p:autoComplete
+                                value="#{businessContextValue.contextCategory}"
+                                completeMethod="#{businessContextDetailBean.completeContextCategory}"
+                                var="contextCategory" style="width: 100%" dropdown="true"
+                                itemLabel="#{contextCategory.name}" itemValue="#{contextCategory}">
+                            <f:attribute name="businessContextValue" value="#{businessContextValue}"/>
+                            <f:converter binding="#{contextCategoryConverter}"/>
+                            <p:ajax event="itemSelect" update="tbl"
+                                    listener="#{businessContextDetailBean.onSelectContextCategory}"/>
+                            <f:ajax render="tbl"/>
+                        </p:autoComplete>
                     </p:column>
 
                     <p:column style="width: 30%" headerText="Context Scheme Name"
                               sortBy="#{businessContextValue.contextScheme.schemeName}">
-                        <p:cellEditor>
-                            <f:facet name="output">
-                                <h:outputText
-                                        value="#{businessContextValue.contextScheme.schemeName}"/>
-                            </f:facet>
-                            <f:facet name="input">
-                                <h:selectOneMenu style="width: 100%"
-                                                 value="#{businessContextValue.contextScheme}">
-                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
-                                    <f:selectItems
-                                            value="#{businessContextDetailBean.getContextSchemes(businessContextValue.contextCategory.ctxCategoryId)}"
-                                            var="contextScheme"
-                                            itemLabel="#{contextScheme.schemeName}"
-                                            itemValue="#{contextScheme}"/>
-                                    <f:converter binding="#{contextSchemeConverter}"/>
-                                    <f:ajax render="tbl"/>
-                                </h:selectOneMenu>
-                            </f:facet>
-                        </p:cellEditor>
+                        <p:autoComplete rendered="#{businessContextValue.contextCategory != null}"
+                                        value="#{businessContextValue.contextScheme}"
+                                        completeMethod="#{businessContextDetailBean.completeContextScheme}"
+                                        var="contextScheme" style="width: 100%" dropdown="true"
+                                        itemLabel="#{contextScheme.schemeName}" itemValue="#{contextScheme}">
+                            <f:converter binding="#{contextSchemeConverter}"/>
+                            <f:attribute name="ctxCategoryId"
+                                         value="#{businessContextValue.contextCategory.ctxCategoryId}"/>
+                            <f:attribute name="businessContextValue" value="#{businessContextValue}"/>
+                            <p:ajax event="itemSelect" update="tbl"
+                                    listener="#{businessContextDetailBean.onSelectContextScheme}">
+                            </p:ajax>
+                            <f:ajax render="tbl"/>
+                        </p:autoComplete>
                     </p:column>
 
                     <p:column style="width: 30%" headerText="Context Scheme Value"
                               sortBy="#{businessContextValue.contextSchemeValue.value}">
-                        <p:cellEditor>
-                            <f:facet name="output">
-                                <h:outputText value="#{businessContextValue.contextSchemeValue.value}"/>
+                        <p:autoComplete rendered="#{businessContextValue.contextScheme != null}"
+                                        value="#{businessContextValue.contextSchemeValue}"
+                                        completeMethod="#{businessContextDetailBean.completeContextSchemeValue}"
+                                        var="contextSchemeValue" style="width: 100%" dropdown="true"
+                                        itemLabel="#{contextSchemeValue.value}" itemValue="#{contextSchemeValue}">
+                            <f:converter binding="#{contextSchemeValueConverter}"/>
+                            <f:attribute name="businessContextValue" value="#{businessContextValue}"/>
+                            <f:attribute name="ctxSchemeId"
+                                         value="#{businessContextValue.contextScheme.ctxSchemeId}">
+                            </f:attribute>
+                            <f:facet name="itemtip">
+                                <h:panelGrid columns="2" cellpadding="2" styleClass="itemtip">
+                                    <h:outputText value="Meaning" style="color: #4078c0; font-size: 14px; line-height: 1.2;"/>
+                                    <h:outputText value="#{contextSchemeValue.meaning}" style="padding: 0; margin: 0; font-size: 12px; color: #555;"/>
+                                </h:panelGrid>
                             </f:facet>
-                            <f:facet name="input">
-                                <h:selectOneMenu style="width: 100%" value="#{businessContextValue.contextSchemeValue}">
-                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true"/>
-                                    <f:selectItems
-                                            value="#{businessContextDetailBean.getContextSchemeValues(businessContextValue.contextScheme.ctxSchemeId)}"
-                                            var="contextSchemeValue"
-                                            itemLabel="#{contextSchemeValue.value}"
-                                            itemValue="#{contextSchemeValue}"/>
-                                    <f:converter binding="#{contextSchemeValueConverter}"/>
-                                    <f:ajax render="tbl"/>
-                                </h:selectOneMenu>
-                            </f:facet>
-                        </p:cellEditor>
+                            <p:ajax event="itemSelect" update="tbl"
+                                    listener="#{businessContextDetailBean.onSelectContextSchemeValue}"/>
+                            <f:ajax render="tbl"/>
+                        </p:autoComplete>
                     </p:column>
 
                     <p:column style="text-align: center; width: 65px;">
