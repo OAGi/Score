@@ -25,7 +25,12 @@ public class ContextSchemeConverter implements Converter {
         if (StringUtils.isEmpty(value)) {
             return NULL_INSTANCE;
         }
-        long ctxSchemeId = Long.valueOf(value);
+        long ctxSchemeId;
+        try {
+            ctxSchemeId = Long.valueOf(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
         if (ctxSchemeId <= 0L) {
             return NULL_INSTANCE;
         }

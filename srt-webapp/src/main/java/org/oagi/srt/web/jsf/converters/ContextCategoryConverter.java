@@ -25,7 +25,12 @@ public class ContextCategoryConverter implements Converter {
         if (StringUtils.isEmpty(value)) {
             return NULL_INSTANCE;
         }
-        long ctxCategoryId = Long.valueOf(value);
+        long ctxCategoryId;
+        try {
+            ctxCategoryId = Long.valueOf(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
         if (ctxCategoryId <= 0L) {
             return NULL_INSTANCE;
         }
