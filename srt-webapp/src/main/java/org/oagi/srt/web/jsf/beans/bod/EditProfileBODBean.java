@@ -336,6 +336,6 @@ public class EditProfileBODBean extends UIHandler {
 
         extensionService.appendUserExtensionIfAbsent(asccp, user, isLocally);
 
-        return "/views/core_component/edit_cc.xhtml?asccpId=" + asccp.getAsccpId() + "&faces-redirect=true";
+        return "/views/core_component/edit_cc.xhtml?accId=" + asccp.getRoleOfAccId() + "&faces-redirect=true";
     }
 }

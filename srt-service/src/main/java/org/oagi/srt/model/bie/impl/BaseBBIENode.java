@@ -136,6 +136,11 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
     }
 
     @Override
+    public String getType() {
+        return "BBIE";
+    }
+
+    @Override
     public <T extends Node> void addChild(T child) {
         if (child instanceof BBIESCNode) {
             children.add(child);

@@ -19,7 +19,7 @@ public class TreeBIENodeVisitor implements BIENodeVisitor {
 
     @Override
     public void startNode(TopLevelNode topLevelNode) {
-        visit(topLevelNode, "ABIE");
+        visit(topLevelNode);
     }
 
     @Override
@@ -30,15 +30,23 @@ public class TreeBIENodeVisitor implements BIENodeVisitor {
 
     @Override
     public void visitBBIENode(BBIENode bbieNode) {
-        visit(bbieNode, "BBIE");
+        visit(bbieNode);
     }
 
     @Override
     public void visitBBIESCNode(BBIESCNode bbiescNode) {
-        visit(bbiescNode, "BBIESC");
+        visit(bbiescNode);
+    }
+
+    private void visit(Node node) {
+        visit(node, null);
     }
 
     private void visit(Node node, String type) {
+        if (type == null) {
+            type = node.getType();
+        }
+
         Node parent = node.getParent();
         TreeNode parentTreeNode = (parent != null) ? (TreeNode) parent.getAttribute("treeNode") : root;
         TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);

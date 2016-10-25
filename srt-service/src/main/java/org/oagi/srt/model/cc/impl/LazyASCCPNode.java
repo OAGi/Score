@@ -49,9 +49,4 @@ public class LazyASCCPNode extends AbstractLazyNode implements ASCCPNode, LazyCC
     public ACCNode getRoleOfAcc() {
         return asccpNode.getRoleOfAcc();
     }
-
-    @Override
-    public ACCNode getType() {
-        return asccpNode.getType();
-    }
 }

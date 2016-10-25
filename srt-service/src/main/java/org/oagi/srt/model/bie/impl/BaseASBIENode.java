@@ -72,6 +72,11 @@ public class BaseASBIENode extends AbstractBaseNode implements ASBIENode {
     }
 
     @Override
+    public String getType() {
+        return "ASBIE";
+    }
+
+    @Override
     public <T extends Node> void addChild(T child) {
         if (child instanceof BBIENode || child instanceof ASBIENode) {
             children.add(child);

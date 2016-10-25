@@ -29,7 +29,12 @@ public class BaseACCNode extends AbstractBaseNode implements ACCNode {
 
     @Override
     public String getName() {
-        return acc.getDen();
+        return acc.getObjectClassTerm();
+    }
+
+    @Override
+    public String getType() {
+        return "ACC";
     }
 
     @Override

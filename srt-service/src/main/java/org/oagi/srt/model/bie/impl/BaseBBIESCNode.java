@@ -109,6 +109,11 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
     }
 
     @Override
+    public String getType() {
+        return "BBIESC";
+    }
+
+    @Override
     public void accept(BIENodeVisitor visitor) {
         visitor.visitBBIESCNode(this);
     }

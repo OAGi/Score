@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 
@@ -42,11 +43,18 @@ public class ManageCoreComponentBean {
 
     @PostConstruct
     public void init() {
-        Long asccpId = Long.parseLong(
-                FacesContext.getCurrentInstance().getExternalContext()
-                        .getRequestParameterMap().get("asccpId"));
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 
-        TreeNode treeNode = createLazyTreeNode(asccpId);
+        TreeNode treeNode = null;
+        String asccpId = externalContext.getRequestParameterMap().get("asccpId");
+        if (asccpId != null) {
+            treeNode = createLazyTreeNodeByAsccpId(Long.parseLong(asccpId));
+        } else {
+            String accId = externalContext.getRequestParameterMap().get("accId");
+            if (accId != null) {
+                treeNode = createLazyTreeNodeByAccId(Long.parseLong(accId));
+            }
+        }
         setTreeNode(treeNode);
     }
 
@@ -90,23 +98,23 @@ public class ManageCoreComponentBean {
 
         @Override
         public void visitASCCPNode(ASCCPNode asccpNode) {
-            visitNode(asccpNode, "ASCCP");
+            visitNode(asccpNode);
         }
 
         @Override
         public void visitACCNode(ACCNode accNode) {
-            visitNode(accNode, "ACC");
+            visitNode(accNode);
         }
 
         @Override
         public void visitBCCPNode(BCCPNode bccNode) {
-            visitNode(bccNode, "BCCP");
+            visitNode(bccNode);
         }
 
-        private TreeNode visitNode(CCNode node, String type) {
+        private TreeNode visitNode(CCNode node) {
             Node parent = node.getParent();
             TreeNode parentTreeNode = (parent != null) ? (TreeNode) parent.getAttribute("treeNode") : root;
-            TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);
+            TreeNode treeNode = new DefaultTreeNode(node.getType(), node, parentTreeNode);
             node.setAttribute("treeNode", treeNode);
             return treeNode;
         }
@@ -127,9 +135,17 @@ public class ManageCoreComponentBean {
         return treeNode;
     }
 
-    public TreeNode createLazyTreeNode(long asccpId) {
-        CCNode ccNode = nodeService.createLazyCCNode(asccpId);
+    public TreeNode createLazyTreeNodeByAsccpId(long asccpId) {
+        CCNode ccNode = nodeService.createLazyCCNodeByAsccpId(asccpId);
+        return createLazyTreeNode(ccNode);
+    }
 
+    public TreeNode createLazyTreeNodeByAccId(long accId) {
+        CCNode ccNode = nodeService.createLazyCCNodeByAccId(accId);
+        return createLazyTreeNode(ccNode);
+    }
+
+    private TreeNode createLazyTreeNode(CCNode ccNode) {
         LazyTreeNodeBuilder lazyTreeNodeVisitor = new LazyTreeNodeBuilder();
         ccNode.accept(lazyTreeNodeVisitor);
         return lazyTreeNodeVisitor.getParent();
@@ -168,21 +184,21 @@ public class ManageCoreComponentBean {
 
         @Override
         public void visitASCCPNode(ASCCPNode asccpNode) {
-            visitNode(asccpNode, "ASCCP");
+            visitNode(asccpNode);
         }
 
         @Override
         public void visitACCNode(ACCNode accNode) {
-            visitNode(accNode, "ACC");
+            visitNode(accNode);
         }
 
         @Override
         public void visitBCCPNode(BCCPNode bccNode) {
-            visitNode(bccNode, "BCCP");
+            visitNode(bccNode);
         }
 
-        private void visitNode(CCNode node, String type) {
-            TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
+        private void visitNode(CCNode node) {
+            TreeNode treeNode = new DefaultTreeNode(node.getType(), node, this.parent);
             if (node instanceof LazyNode) {
                 LazyNode lazyNode = (LazyNode) node;
                 if (!lazyNode.isFetched()) {

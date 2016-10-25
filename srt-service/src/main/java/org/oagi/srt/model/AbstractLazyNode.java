@@ -37,6 +37,11 @@ public abstract class AbstractLazyNode implements LazyNode {
     }
 
     @Override
+    public String getType() {
+        return delegate.getType();
+    }
+
+    @Override
     public int getSeqKey() {
         return delegate.getSeqKey();
     }

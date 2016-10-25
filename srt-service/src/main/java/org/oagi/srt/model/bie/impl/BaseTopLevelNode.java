@@ -72,6 +72,11 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
     }
 
     @Override
+    public String getType() {
+        return "ABIE";
+    }
+
+    @Override
     public <T extends Node> void addChild(T child) {
         if (child instanceof BBIENode || child instanceof ASBIENode) {
             children.add(child);

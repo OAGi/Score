@@ -52,6 +52,11 @@ public class BaseBCCPNode extends AbstractBaseNode implements BCCPNode {
     }
 
     @Override
+    public String getType() {
+        return "BCCP";
+    }
+
+    @Override
     public BasicCoreComponent getBcc() {
         return bcc;
     }

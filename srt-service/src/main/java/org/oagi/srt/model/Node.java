@@ -6,6 +6,8 @@ public interface Node {
 
     public String getName();
 
+    public String getType();
+
     public int getSeqKey();
 
     public Node getParent();

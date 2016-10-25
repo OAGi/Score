@@ -1206,7 +1206,7 @@ public class NodeService {
         return asccpNode;
     }
 
-    public LazyCCNode createLazyCCNode(long asccpId) {
+    public LazyCCNode createLazyCCNodeByAsccpId(long asccpId) {
         AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
         return createLazyCCNode(asccp);
     }
@@ -1219,6 +1219,20 @@ public class NodeService {
         ASCCPNode asccpNode = new BaseASCCPNode(asccp);
         ASCCPFetcher fetcher = new ASCCPFetcher(asccp);
         return new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount());
+    }
+
+    public LazyCCNode createLazyCCNodeByAccId(long accId) {
+        AggregateCoreComponent acc = accRepository.findOne(accId);
+        return createLazyCCNode(acc);
+    }
+
+    public LazyCCNode createLazyCCNode(AggregateCoreComponent acc) {
+        if (acc == null) {
+            throw new IllegalArgumentException("'acc' argument must not be null.");
+        }
+        ACCNode accNode = new BaseACCNode(null, acc);
+        ACCFetcher fetcher = new ACCFetcher(acc);
+        return new LazyACCNode(accNode, fetcher, fetcher.getChildrenCount(), null);
     }
 
     private class ASCCPFetcher implements Fetcher {

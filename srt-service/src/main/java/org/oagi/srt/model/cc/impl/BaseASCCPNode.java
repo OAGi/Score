@@ -47,6 +47,11 @@ public class BaseASCCPNode extends AbstractBaseNode implements ASCCPNode {
     }
 
     @Override
+    public String getType() {
+        return "ASCCP";
+    }
+
+    @Override
     public AssociationCoreComponentProperty getAsccp() {
         return asccp;
     }
@@ -69,11 +74,6 @@ public class BaseASCCPNode extends AbstractBaseNode implements ASCCPNode {
 
     @Override
     public ACCNode getRoleOfAcc() {
-        return roleOfAcc;
-    }
-
-    @Override
-    public ACCNode getType() {
         return roleOfAcc;
     }
 

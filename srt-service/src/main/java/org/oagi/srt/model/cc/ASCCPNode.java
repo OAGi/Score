@@ -11,6 +11,5 @@ public interface ASCCPNode extends CCNode {
 
     public void setRoleOfAcc(ACCNode roleOfAcc);
     public ACCNode getRoleOfAcc();
-    public ACCNode getType();
 
 }
