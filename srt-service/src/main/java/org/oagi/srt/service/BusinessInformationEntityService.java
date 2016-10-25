@@ -825,9 +825,9 @@ public class BusinessInformationEntityService {
             return null;
         }
 
-        Map<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions =
+        Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions =
                 getBdtPrimitiveRestrictions(node);
-        for (Map.Entry<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> e : bdtPrimitiveRestrictions.entrySet()) {
+        for (Map.Entry<String, BusinessDataTypePrimitiveRestriction> e : bdtPrimitiveRestrictions.entrySet()) {
             if (e.getValue().getCdtAwdPriXpsTypeMapId() == bdtPriRestri.getCdtAwdPriXpsTypeMapId()) {
                 return e.getKey();
             }
@@ -837,52 +837,28 @@ public class BusinessInformationEntityService {
 
     @Transactional(rollbackFor = Throwable.class)
     public void setBdtPrimitiveRestriction(BBIENode node, String name) {
-        Map<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions =
+        Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions =
                 getBdtPrimitiveRestrictions(node);
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
-                bdtPrimitiveRestrictions.get(name);
-        if (cdtAwdPriXpsTypeMap == null) {
-            return;
-        }
-
-        BasicCoreComponentProperty bccp = node.getBccp();
-        long bdtId = bccp.getBdtId();
-        long cdtAwdPriXpsTypeMapId = cdtAwdPriXpsTypeMap.getCdtAwdPriXpsTypeMapId();
         BusinessDataTypePrimitiveRestriction bdtPriRestri =
-                bdtPriRestriRepository.findOneByBdtIdAndCdtAwdPriXpsTypeMapId(bccp.getBdtId(), cdtAwdPriXpsTypeMapId);
-        if (bdtPriRestri == null) {
-            bdtPriRestri = new BusinessDataTypePrimitiveRestriction();
-            bdtPriRestri.setBdtId(bdtId);
-            bdtPriRestri.setCdtAwdPriXpsTypeMapId(cdtAwdPriXpsTypeMapId);
-            bdtPriRestri.setDefault(false);
-            bdtPriRestriRepository.saveAndFlush(bdtPriRestri);
-        }
+                bdtPrimitiveRestrictions.get(name);
         node.setBdtPriRestri(bdtPriRestri);
     }
 
-    public Map<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> getBdtPrimitiveRestrictions(BBIENode node) {
+    public Map<String, BusinessDataTypePrimitiveRestriction> getBdtPrimitiveRestrictions(BBIENode node) {
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestriList = getBdtPriRestriList(node).stream()
                 .filter(e -> e.getCdtAwdPriXpsTypeMapId() > 0L)
                 .collect(Collectors.toList());
-        BusinessDataTypePrimitiveRestriction bdtPriRestri = (bdtPriRestriList.isEmpty()) ? null : bdtPriRestriList.get(0);
-        CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriTypeMap =
-                (bdtPriRestri != null) ? cdtAwdPriXpsTypeMapRepository.findOne(bdtPriRestri.getCdtAwdPriXpsTypeMapId()) : null;
-        CoreDataTypeAllowedPrimitive cdtAwdPri = (cdtAwdPriTypeMap != null) ? cdtAwdPriRepository.findOne(cdtAwdPriTypeMap.getCdtAwdPriId()) : null;
-        List<CoreDataTypeAllowedPrimitive> cdtAwdPriList =
-                (cdtAwdPri != null) ? cdtAwdPriRepository.findByCdtId(cdtAwdPri.getCdtId()) : Collections.emptyList();
 
-        List<CoreDataTypeAllowedPrimitiveExpressionTypeMap> cdtAwdPriTypeMapList =
-                cdtAwdPriXpsTypeMapRepository.findByCdtAwdPriIdIn(
-                        cdtAwdPriList.stream().map(e -> e.getCdtAwdPriId()).collect(Collectors.toList()));
-        Map<Long, XSDBuiltInType> xbtMap = xbtRepository.findByXbtIdIn(
-                cdtAwdPriTypeMapList.stream().map(e -> e.getXbtId()).collect(Collectors.toList())).stream()
-                .collect(Collectors.toMap(e -> e.getXbtId(), Function.identity()));
-
-        Map<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions = new LinkedHashMap();
-        for (CoreDataTypeAllowedPrimitiveExpressionTypeMap e : cdtAwdPriTypeMapList) {
-            XSDBuiltInType xbt = xbtMap.get(e.getXbtId());
+        Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions = new LinkedHashMap();
+        for (BusinessDataTypePrimitiveRestriction e : bdtPriRestriList) {
+            long cdtAwdPriXpsTypeMapId = e.getCdtAwdPriXpsTypeMapId();
+            CoreDataTypeAllowedPrimitiveExpressionTypeMap cdtAwdPriXpsTypeMap =
+                    cdtAwdPriXpsTypeMapRepository.findOne(cdtAwdPriXpsTypeMapId);
+            long xbtId = cdtAwdPriXpsTypeMap.getXbtId();
+            XSDBuiltInType xbt = xbtRepository.findOne(xbtId);
             bdtPrimitiveRestrictions.put(xbt.getName(), e);
         }
+
         return bdtPrimitiveRestrictions;
     }
 
@@ -1007,9 +983,9 @@ public class BusinessInformationEntityService {
             return null;
         }
 
-        Map<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> bdtScPrimitiveRestrictions =
+        Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPrimitiveRestrictions =
                 getBdtScPrimitiveRestrictions(node);
-        for (Map.Entry<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> e : bdtScPrimitiveRestrictions.entrySet()) {
+        for (Map.Entry<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> e : bdtScPrimitiveRestrictions.entrySet()) {
             if (e.getValue().getCdtScAwdPriXpsTypeMapId() == bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()) {
                 return e.getKey();
             }
@@ -1019,52 +995,31 @@ public class BusinessInformationEntityService {
 
     @Transactional(rollbackFor = Throwable.class)
     public void setBdtScPrimitiveRestriction(BBIESCNode node, String name) {
-        Map<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions =
+        Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtPrimitiveRestrictions =
                 getBdtScPrimitiveRestrictions(node);
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriXpsTypeMap =
-                bdtPrimitiveRestrictions.get(name);
-        if (cdtScAwdPriXpsTypeMap == null) {
-            return;
-        }
-
-        BasicBusinessInformationEntitySupplementaryComponent bbieSc = node.getBbieSc();
-        long bdtScId = bbieSc.getDtScId();
-        long cdtScAwdPriXpsTypeMapId = cdtScAwdPriXpsTypeMap.getCdtScAwdPriXpsTypeMapId();
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri =
-                bdtScPriRestriRepository.findOneByBdtScIdAndCdtScAwdPriXpsTypeMapId(bdtScId, cdtScAwdPriXpsTypeMapId);
+                bdtPrimitiveRestrictions.get(name);
         if (bdtScPriRestri == null) {
-            bdtScPriRestri = new BusinessDataTypeSupplementaryComponentPrimitiveRestriction();
-            bdtScPriRestri.setBdtScId(bdtScId);
-            bdtScPriRestri.setCdtScAwdPriXpsTypeMapId(cdtScAwdPriXpsTypeMapId);
-            bdtScPriRestri.setDefault(false);
-            bdtScPriRestriRepository.saveAndFlush(bdtScPriRestri);
+            return;
         }
         node.setBdtScPriRestri(bdtScPriRestri);
     }
 
-    public Map<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> getBdtScPrimitiveRestrictions(BBIESCNode node) {
+    public Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> getBdtScPrimitiveRestrictions(BBIESCNode node) {
         List<BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPriRestriList = getBdtScPriRestriList(node).stream()
                 .filter(e -> e.getCdtScAwdPriXpsTypeMapId() > 0L)
                 .collect(Collectors.toList());
-        BusinessDataTypeSupplementaryComponentPrimitiveRestriction bdtScPriRestri = (bdtScPriRestriList.isEmpty()) ? null : bdtScPriRestriList.get(0);
-        CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriTypeMap =
-                (bdtScPriRestri != null) ? cdtScAwdPriXpsTypeMapRepository.findOne(bdtScPriRestri.getCdtScAwdPriXpsTypeMapId()) : null;
-        CoreDataTypeSupplementaryComponentAllowedPrimitive cdtScAwdPri = (cdtScAwdPriTypeMap != null) ? cdtScAwdPriRepository.findOne(cdtScAwdPriTypeMap.getCdtScAwdPriId()) : null;
-        List<CoreDataTypeSupplementaryComponentAllowedPrimitive> cdtScAwdPriList =
-                (cdtScAwdPri != null) ? cdtScAwdPriRepository.findByCdtScId(cdtScAwdPri.getCdtScId()) : Collections.emptyList();
 
-        List<CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> cdtScAwdPriTypeMapList =
-                cdtScAwdPriXpsTypeMapRepository.findByCdtScAwdPriIdIn(
-                        cdtScAwdPriList.stream().map(e -> e.getCdtScAwdPriId()).collect(Collectors.toList()));
-        Map<Long, XSDBuiltInType> xbtMap = xbtRepository.findByXbtIdIn(
-                cdtScAwdPriTypeMapList.stream().map(e -> e.getXbtId()).collect(Collectors.toList())).stream()
-                .collect(Collectors.toMap(e -> e.getXbtId(), Function.identity()));
-
-        Map<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions = new LinkedHashMap();
-        for (CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap e : cdtScAwdPriTypeMapList) {
-            XSDBuiltInType xbt = xbtMap.get(e.getXbtId());
+        Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtPrimitiveRestrictions = new LinkedHashMap();
+        for (BusinessDataTypeSupplementaryComponentPrimitiveRestriction e : bdtScPriRestriList) {
+            long cdtScAwdPriXpsTypeMapId = e.getCdtScAwdPriXpsTypeMapId();
+            CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap cdtScAwdPriTypeMap =
+                    cdtScAwdPriXpsTypeMapRepository.findOne(cdtScAwdPriXpsTypeMapId);
+            long xbtId = cdtScAwdPriTypeMap.getXbtId();
+            XSDBuiltInType xbt = xbtRepository.findOne(xbtId);
             bdtPrimitiveRestrictions.put(xbt.getName(), e);
         }
+
         return bdtPrimitiveRestrictions;
     }
 

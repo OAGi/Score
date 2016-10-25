@@ -116,7 +116,7 @@ public class EditProfileBODBean extends UIHandler {
 
     public List<String> completeInputForBbieXbt(String query) {
         BBIENode node = getSelectedBBIENode();
-        Map<String, CoreDataTypeAllowedPrimitiveExpressionTypeMap> bdtPrimitiveRestrictions =
+        Map<String, BusinessDataTypePrimitiveRestriction> bdtPrimitiveRestrictions =
                 bieService.getBdtPrimitiveRestrictions(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(bdtPrimitiveRestrictions.keySet());
@@ -215,7 +215,7 @@ public class EditProfileBODBean extends UIHandler {
 
     public List<String> completeInputForBbieScXbt(String query) {
         BBIESCNode node = getSelectedBBIESCNode();
-        Map<String, CoreDataTypeSupplementaryComponentAllowedPrimitiveExpressionTypeMap> bdtScPrimitiveRestrictions =
+        Map<String, BusinessDataTypeSupplementaryComponentPrimitiveRestriction> bdtScPrimitiveRestrictions =
                 bieService.getBdtScPrimitiveRestrictions(node);
         if (StringUtils.isEmpty(query)) {
             return new ArrayList(bdtScPrimitiveRestrictions.keySet());

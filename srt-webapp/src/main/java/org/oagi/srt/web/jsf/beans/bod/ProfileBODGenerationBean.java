@@ -4,7 +4,6 @@ import org.oagi.srt.model.bod.ProfileBODGenerationOption;
 import org.oagi.srt.repository.ProfileBODRepository;
 import org.oagi.srt.repository.entity.ProfileBOD;
 import org.oagi.srt.standalone.StandaloneXMLSchema;
-import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
