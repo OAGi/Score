@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.entity.converter.BasicCoreComponentEntityTypeConverter;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
@@ -41,7 +42,8 @@ public class BasicCoreComponent
     private int seqKey;
 
     @Column
-    private int entityType;
+    @Convert(attributeName = "entityType", converter = BasicCoreComponentEntityTypeConverter.class)
+    private BasicCoreComponentEntityType entityType;
 
     @Column(nullable = false)
     private String den;
@@ -173,11 +175,11 @@ public class BasicCoreComponent
         this.seqKey = seqKey;
     }
 
-    public int getEntityType() {
+    public BasicCoreComponentEntityType getEntityType() {
         return entityType;
     }
 
-    public void setEntityType(int entityType) {
+    public void setEntityType(BasicCoreComponentEntityType entityType) {
         this.entityType = entityType;
     }
 
@@ -334,8 +336,12 @@ public class BasicCoreComponent
         clone.setRevisionNum(this.revisionNum);
         clone.setRevisionTrackingNum(this.revisionTrackingNum);
         clone.setRevisionAction(this.revisionAction);
-        clone.setReleaseId(this.releaseId);
-        clone.setCurrentBccId(this.currentBccId);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentBccId != null) {
+            clone.setCurrentBccId(this.currentBccId);
+        }
         clone.setNillable(this.nillable);
         clone.setDefaultValue(this.defaultValue);
         return clone;
@@ -366,7 +372,7 @@ public class BasicCoreComponent
         result = 31 * result + (int) (fromAccId ^ (fromAccId >>> 32));
         result = 31 * result + (int) (toBccpId ^ (toBccpId >>> 32));
         result = 31 * result + seqKey;
-        result = 31 * result + entityType;
+        result = 31 * result + (entityType != null ? entityType.hashCode() : 0);
         result = 31 * result + (den != null ? den.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));

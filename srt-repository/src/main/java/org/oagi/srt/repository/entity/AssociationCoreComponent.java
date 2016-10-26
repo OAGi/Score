@@ -298,8 +298,12 @@ public class AssociationCoreComponent
         clone.setRevisionNum(this.revisionNum);
         clone.setRevisionTrackingNum(this.revisionTrackingNum);
         clone.setRevisionAction(this.revisionAction);
-        clone.setReleaseId(this.releaseId);
-        clone.setCurrentAsccId(this.currentAsccId);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentAsccId != null) {
+            clone.setCurrentAsccId(this.currentAsccId);
+        }
         return clone;
     }
 

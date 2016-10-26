@@ -41,6 +41,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 
 @Controller
 @Scope("view")
@@ -1007,7 +1008,7 @@ public class TopLevelABIEHandler implements Serializable {
 
         for (BasicBusinessInformationEntity bbieVO : list_01) {
             double sk = bbieVO.getSeqKey();
-            if (getEntityType(bbieVO.getBasedBccId()) == 0L)
+            if (getEntityType(bbieVO.getBasedBccId()) == Attribute)
                 showBBIETree(bbieVO, tNode);
             else
                 sequence.put(bbieVO, sk);
@@ -1400,7 +1401,7 @@ public class TopLevelABIEHandler implements Serializable {
         this.codeListName = codeListName;
     }
 
-    public int getEntityType(long bccId) {
+    public BasicCoreComponentEntityType getEntityType(long bccId) {
         BasicCoreComponent basicCoreComponent = bccRepository.findOne(bccId);
         return basicCoreComponent.getEntityType();
     }

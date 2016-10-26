@@ -354,8 +354,12 @@ public class BasicCoreComponentProperty
         clone.setRevisionNum(this.revisionNum);
         clone.setRevisionTrackingNum(this.revisionTrackingNum);
         clone.setRevisionAction(this.revisionAction);
-        clone.setReleaseId(this.releaseId);
-        clone.setCurrentBccpId(this.currentBccpId);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentBccpId != null) {
+            clone.setCurrentBccpId(this.currentBccpId);
+        }
         clone.setNillable(this.nillable);
         clone.setDefaultValue(this.defaultValue);
         return clone;

@@ -32,8 +32,8 @@ public class AssociationCoreComponentProperty
     @Column(length = 10 * 1024)
     private String definition;
 
-    @Column(nullable = false)
-    private long roleOfAccId;
+    @Column
+    private Long roleOfAccId;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -151,10 +151,10 @@ public class AssociationCoreComponentProperty
     }
 
     public long getRoleOfAccId() {
-        return roleOfAccId;
+        return (roleOfAccId != null) ? roleOfAccId : 0L;
     }
 
-    public void setRoleOfAccId(long roleOfAccId) {
+    public void setRoleOfAccId(Long roleOfAccId) {
         this.roleOfAccId = roleOfAccId;
     }
 
@@ -316,8 +316,12 @@ public class AssociationCoreComponentProperty
         clone.setRevisionNum(this.revisionNum);
         clone.setRevisionTrackingNum(this.revisionTrackingNum);
         clone.setRevisionAction(this.revisionAction);
-        clone.setReleaseId(this.releaseId);
-        clone.setCurrentAsccpId(this.currentAsccpId);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentAsccpId != null) {
+            clone.setCurrentAsccpId(this.currentAsccpId);
+        }
         clone.setNillable(this.nillable);
         return clone;
     }

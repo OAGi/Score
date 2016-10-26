@@ -184,7 +184,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
 
         int sumOfEntityTypes = bccList.stream()
-                .mapToInt(e -> e.getEntityType())
+                .mapToInt(e -> e.getEntityType().getValue())
                 .sum();
         return sumOfEntityTypes != 0;
     }

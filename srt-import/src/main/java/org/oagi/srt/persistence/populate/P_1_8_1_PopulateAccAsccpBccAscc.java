@@ -109,6 +109,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyASCCP.setRoleOfAccId(anyACC.getAccId());
         anyASCCP.setDen(ANY_ASCCP_DEN);
         anyASCCP.setReusableIndicator(true);
+        anyASCCP.setState(CoreComponentState.Published);
         anyASCCP.setOwnerUserId(importUtil.getUserId());
         anyASCCP.setCreatedBy(importUtil.getUserId());
         anyASCCP.setLastUpdatedBy(importUtil.getUserId());
@@ -424,14 +425,14 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByGuid(guid);
                 if (bccp != null) {
                     Declaration particle = (isLocalElement) ? asccOrBccElement : refDecl;
-                    createBCC(acc, bccp, particle, sequenceKey++);
+                    createBCC(acc, bccp, particle, sequenceKey++, BasicCoreComponentEntityType.Element);
                 } else {
                     if (asccOrBccElement.canBeAscc()) {
                         if (createASCC(acc, asccOrBccElement, sequenceKey) != null) {
                             sequenceKey++;
                         }
                     } else {
-                        createBCC(acc, asccOrBccElement, sequenceKey++, 1);
+                        createBCC(acc, asccOrBccElement, sequenceKey++, BasicCoreComponentEntityType.Element);
                     }
                 }
             }
@@ -439,7 +440,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         for (AttrDecl bccpAttr : declaration.getAttributes()) {
             BasicCoreComponentProperty bccp = getOrCreateBCCP(bccpAttr, true);
-            createBCC(acc, bccp, bccpAttr, 0);
+            createBCC(acc, bccp, bccpAttr, BasicCoreComponentEntityType.Attribute);
         }
 
         return acc;
@@ -559,20 +560,22 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
-                              Declaration declaration, int sequenceKey, int entityType) {
+                              Declaration declaration, int sequenceKey,
+                              BasicCoreComponentEntityType entityType) {
         BasicCoreComponentProperty bccp = getBCCP(declaration);
         return createBCC(fromAcc, bccp, declaration, sequenceKey, entityType);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
                               BasicCoreComponentProperty toBccp,
-                              Declaration declaration, int entityType) {
+                              Declaration declaration,
+                              BasicCoreComponentEntityType entityType) {
         return createBCC(fromAcc, toBccp, declaration, 0, entityType);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
                               BasicCoreComponentProperty toBccp,
-                              Declaration declaration, int sequenceKey, int entityType) {
+                              Declaration declaration, int sequenceKey, BasicCoreComponentEntityType entityType) {
         String guid = declaration.getId();
         long fromAccId = fromAcc.getAccId();
         long toBccpId = toBccp.getBccpId();

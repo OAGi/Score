@@ -501,7 +501,7 @@ public class StandaloneXMLSchema {
         Element eNode = null;
         eNode = newElement("element");
         eNode = handleBBIE_Elementvalue(gBBIE, eNode, generationContext);
-        if (gBCC.getEntityType() == 1) {
+        if (gBCC.getEntityType() == BasicCoreComponentEntityType.Element) {
             while (!gPNode.getName().equals("sequence")) {
                 gPNode = (Element) gPNode.getParentElement();
             }

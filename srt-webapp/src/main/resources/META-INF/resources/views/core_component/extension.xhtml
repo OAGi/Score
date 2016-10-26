@@ -21,9 +21,9 @@
 
                             <p:contextMenu for="treeTable" nodeType="ACC-Extension">
                                 <p:menuitem value="Append ASCC" style="width: 100%;"
-                                            action="#{extensionBean.appendAscc}"/>
+                                            actionListener="#{extensionBean.prepareAppendAscc}" update=":form:details"/>
                                 <p:menuitem value="Append BCC" style="width: 100%;"
-                                            action="#{extensionBean.appendBcc}"/>
+                                            actionListener="#{extensionBean.prepareAppendBcc}" update=":form:details"/>
                             </p:contextMenu>
 
                             <p:treeTable value="#{extensionBean.treeNode}" var="node" id="treeTable"
@@ -40,9 +40,79 @@
                         <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
-                                    <f:facet name="header">
-                                        <h:outputText value="Properties"/>
-                                    </f:facet>
+                                    <!--
+                                        To append ASCC
+                                    -->
+                                    <h:panelGroup rendered="#{extensionBean.preparedAppendAscc}">
+                                        <p:panel>
+                                            <f:facet name="header">
+                                                <p:autoComplete id="asccpPropertyTerm"
+                                                                value="#{extensionBean.selectedAsccpPropertyTerm}"
+                                                                completeMethod="#{extensionBean.completeInputAsccp}"
+                                                                maxResults="20"
+                                                                style="width: 440px; margin-right: 20px;">
+                                                    <p:ajax event="itemSelect"
+                                                            listener="#{extensionBean.onSelectAsccpPropertyTerm}"/>
+                                                </p:autoComplete>
+                                                <p:commandButton value="Search" ajax="true"
+                                                                 actionListener="#{extensionBean.searchAsccp}"
+                                                                 update=":form:details" icon="ui-icon-search"/>
+                                            </f:facet>
+
+                                            <p:dataTable id="tblAsccp" var="asccp" value="#{extensionBean.asccpList}"
+                                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                                         paginator="true" paginatorPosition="bottom" rows="5"
+                                                         style="width: 100%; margin-bottom:20px"
+                                                         rowKey="#{asccp.asccpId}"
+                                                         selection="#{extensionBean.selectedAsccp}"
+                                                         selectionMode="single">
+                                                <p:column headerText="ASCCP Property Term" sortBy="#{asccp.propertyTerm}">
+                                                    <h:outputText value="#{asccp.propertyTerm}"/>
+                                                    <div>
+                                                        <h:outputText value="GUID: #{asccp.guid}"
+                                                                      style="font-size: 12px !important; color: #767676 !important;"/>
+                                                    </div>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        To append BCC
+                                    -->
+                                    <h:panelGroup rendered="#{extensionBean.preparedAppendBcc}">
+                                        <p:panel>
+                                            <f:facet name="header">
+                                                <p:autoComplete id="bccpPropertyTerm"
+                                                                value="#{extensionBean.selectedBccpPropertyTerm}"
+                                                                completeMethod="#{extensionBean.completeInputBccp}"
+                                                                maxResults="20"
+                                                                style="width: 440px; margin-right: 20px;">
+                                                    <p:ajax event="itemSelect"
+                                                            listener="#{extensionBean.onSelectBccpPropertyTerm}"/>
+                                                </p:autoComplete>
+                                                <p:commandButton value="Search" ajax="true"
+                                                                 actionListener="#{extensionBean.searchBccp}"
+                                                                 update=":form:details" icon="ui-icon-search"/>
+                                            </f:facet>
+
+                                            <p:dataTable id="tblBccp" var="bccp" value="#{extensionBean.bccpList}"
+                                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                                         paginator="true" paginatorPosition="bottom" rows="5"
+                                                         style="width: 100%; margin-bottom:20px"
+                                                         rowKey="#{bccp.bccpId}"
+                                                         selection="#{extensionBean.selectedBccp}"
+                                                         selectionMode="single">
+                                                <p:column headerText="BCCP Property Term" sortBy="#{bccp.propertyTerm}">
+                                                    <h:outputText value="#{bccp.propertyTerm}"/>
+                                                    <div>
+                                                        <h:outputText value="GUID: #{bccp.guid}"
+                                                                      style="font-size: 12px !important; color: #767676 !important;"/>
+                                                    </div>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </p:panel>
+                                    </h:panelGroup>
 
                                     <!--
                                         ACC

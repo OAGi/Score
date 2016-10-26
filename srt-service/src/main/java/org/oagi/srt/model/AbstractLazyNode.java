@@ -74,6 +74,9 @@ public abstract class AbstractLazyNode implements LazyNode {
 
     @Override
     public void fetch() {
+        if (isFetched()) {
+            return;
+        }
         fetcher.fetch(this);
         setAttribute("fetched", true);
     }

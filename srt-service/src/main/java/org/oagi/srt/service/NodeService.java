@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
 
 @Service
@@ -840,7 +841,7 @@ public class NodeService {
 
         for (BasicBusinessInformationEntity bbie : bbieList) {
             double sk = bbie.getSeqKey();
-            if (getEntityType(dataContainer, bbie.getBasedBccId()) == 0L)
+            if (getEntityType(dataContainer, bbie.getBasedBccId()) == Attribute)
                 appendBBIENode(dataContainer, bbie, parent);
             else
                 sequence.put(bbie, sk);
@@ -881,7 +882,7 @@ public class NodeService {
         }
     }
 
-    public int getEntityType(DataContainerForProfileBODLoader dataContainer, long bccId) {
+    public BasicCoreComponentEntityType getEntityType(DataContainerForProfileBODLoader dataContainer, long bccId) {
         BasicCoreComponent basicCoreComponent = dataContainer.findBcc(bccId);
         return basicCoreComponent.getEntityType();
     }
@@ -962,7 +963,7 @@ public class NodeService {
 
             for (BasicBusinessInformationEntity bbie : bbieList) {
                 double sk = bbie.getSeqKey();
-                if (getEntityType(bbie.getBasedBccId()) == 0L)
+                if (getEntityType(bbie.getBasedBccId()) == Attribute)
                     appendBBIELazyNode(bbie, parent);
                 else
                     sequence.put(bbie, sk);
@@ -985,7 +986,7 @@ public class NodeService {
             }
         }
 
-        private int getEntityType(long bccId) {
+        private BasicCoreComponentEntityType getEntityType(long bccId) {
             BasicCoreComponent basicCoreComponent = bccRepository.findOne(bccId);
             return basicCoreComponent.getEntityType();
         }
@@ -1246,14 +1247,16 @@ public class NodeService {
         @Override
         public void fetch(Node parent) {
             ASCCPNode asccpNode = (ASCCPNode) parent;
-            AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
-            ACCNode accNode = createLazyACCNode(parent, acc);
-            asccpNode.setRoleOfAcc(accNode);
+            long roleOfAccId = asccp.getRoleOfAccId();
+            if (roleOfAccId > 0L) {
+                AggregateCoreComponent acc = accRepository.findOne(roleOfAccId);
+                ACCNode accNode = createLazyACCNode(parent, acc);
+                asccpNode.setRoleOfAcc(accNode);
+            }
         }
 
         public int getChildrenCount() {
-            // ASCCP only have one ACC child
-            return 1;
+            return (asccp.getRoleOfAccId() > 0L) ? 1 : 0;
         }
     }
 

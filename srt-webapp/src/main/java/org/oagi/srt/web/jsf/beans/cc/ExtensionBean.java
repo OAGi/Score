@@ -1,21 +1,21 @@
 package org.oagi.srt.web.jsf.beans.cc;
 
-import org.oagi.srt.model.CCNode;
-import org.oagi.srt.model.CCNodeVisitor;
-import org.oagi.srt.model.LazyNode;
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.*;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.model.cc.impl.BaseASCCPNode;
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.AssociationCoreComponentRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.AssociationCoreComponentPropertyForLookup;
+import org.oagi.srt.repository.AssociationCoreComponentPropertyForLookupRepository;
+import org.oagi.srt.repository.entity.BasicCoreComponentPropertyForLookup;
+import org.oagi.srt.repository.BasicCoreComponentPropertyForLookupRepository;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -31,7 +32,11 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -57,6 +62,9 @@ public class ExtensionBean extends UIHandler {
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
 
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
+
     private AggregateCoreComponent targetAcc;
     private AssociationCoreComponentProperty rootAsccp;
     private AggregateCoreComponent userExtensionAcc;
@@ -75,7 +83,7 @@ public class ExtensionBean extends UIHandler {
         AggregateCoreComponent targetAcc = accRepository.findOne(Long.parseLong(accId));
         setTargetAcc(targetAcc);
 
-        TreeNode treeNode = createLazyTreeNode(targetAcc);
+        TreeNode treeNode = createTreeNode(targetAcc);
         setTreeNode(treeNode);
 
         String rootAsccpId = requestParameterMap.get("rootAsccpId");
@@ -116,12 +124,18 @@ public class ExtensionBean extends UIHandler {
         this.treeNode = treeNode;
     }
 
+    public TreeNode getRootNode() {
+        return treeNode.getChildren().get(0);
+    }
+
     public TreeNode getSelectedTreeNode() {
         return selectedTreeNode;
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
         this.selectedTreeNode = selectedTreeNode;
+        setPreparedAppendAscc(false);
+        setPreparedAppendBcc(false);
     }
 
     public CoreComponentState getState() {
@@ -138,7 +152,7 @@ public class ExtensionBean extends UIHandler {
         }
     }
 
-    public TreeNode createLazyTreeNode(AggregateCoreComponent acc) {
+    public TreeNode createTreeNode(AggregateCoreComponent acc) {
         CCNode ccNode = nodeService.createLazyCCNode(acc);
         return createLazyTreeNode(ccNode);
     }
@@ -187,12 +201,7 @@ public class ExtensionBean extends UIHandler {
 
         @Override
         public void visitACCNode(ACCNode accNode) {
-            AggregateCoreComponent acc = accNode.getAcc();
-            if (acc.equals(targetAcc)) {
-                visitNode(accNode, accNode.getType() + "-Extension");
-            } else {
-                visitNode(accNode);
-            }
+            visitNode(accNode);
         }
 
         @Override
@@ -205,37 +214,215 @@ public class ExtensionBean extends UIHandler {
         }
 
         private void visitNode(CCNode node, String type) {
-            TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
-            if (node instanceof LazyNode) {
+            LazyCCNode lazyCCNode = (LazyCCNode) node;
+            if (node.getName().contains("User Extension")) { // To hide 'User Extension' nodes
+                lazyCCNode.fetch();
+
+                List<? extends Node> children = lazyCCNode.getChildren();
+                for (Node child : children) {
+                    visitNode((CCNode) child);
+                }
+            } else {
+                TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
                 LazyNode lazyNode = (LazyNode) node;
-                if (!lazyNode.isFetched()) {
-                    for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
-                        new DefaultTreeNode(null, treeNode);
-                    }
+                for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
+                    new DefaultTreeNode(null, treeNode);
                 }
             }
         }
     }
 
-    public void prepareAppendAscc() {
-        ASCCPNode asccpNode = new BaseASCCPNode()
-        TreeNode treeNode = new DefaultTreeNode();
+    /*
+     * Begin Append ASCC
+     */
 
+    @Autowired
+    private AssociationCoreComponentPropertyForLookupRepository asccpLookupRepository;
+    private boolean preparedAppendAscc;
+    private List<AssociationCoreComponentPropertyForLookup> allAsccpList;
+    private List<AssociationCoreComponentPropertyForLookup> asccpList;
+    private String selectedAsccpPropertyTerm;
+    private AssociationCoreComponentPropertyForLookup selectedAsccp;
+
+    public boolean isPreparedAppendAscc() {
+        return preparedAppendAscc;
     }
 
-    public void appendAscc() {
-        AggregateCoreComponent ueAcc = getUserExtensionAcc();
-        User user = loadAuthentication();
-        AssociationCoreComponent ueAscc = extensionService.appendAsccTo(ueAcc, user);
+    public void setPreparedAppendAscc(boolean preparedAppendAscc) {
+        this.preparedAppendAscc = preparedAppendAscc;
+    }
+
+    public List<AssociationCoreComponentPropertyForLookup> getAsccpList() {
+        return asccpList;
+    }
+
+    public void setAsccpList(List<AssociationCoreComponentPropertyForLookup> asccpList) {
+        this.asccpList = asccpList;
+    }
+
+    public String getSelectedAsccpPropertyTerm() {
+        return selectedAsccpPropertyTerm;
+    }
+
+    public void setSelectedAsccpPropertyTerm(String selectedAsccpPropertyTerm) {
+        this.selectedAsccpPropertyTerm = selectedAsccpPropertyTerm;
+    }
+
+    public AssociationCoreComponentPropertyForLookup getSelectedAsccp() {
+        return selectedAsccp;
+    }
+
+    public void setSelectedAsccp(AssociationCoreComponentPropertyForLookup selectedAsccp) {
+        this.selectedAsccp = selectedAsccp;
+    }
+
+    public void prepareAppendAscc() {
+        allAsccpList = asccpLookupRepository.findAll().stream()
+                .filter(e -> e.getState() == Published)
+                .filter(e -> e.isReusableIndicator())
+                .collect(Collectors.toList());
+        setAsccpList(
+                allAsccpList.stream()
+                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                        .collect(Collectors.toList())
+        );
+        setPreparedAppendAscc(true);
+    }
+
+    public List<String> completeInputAsccp(String query) {
+        return allAsccpList.stream()
+                .map(e -> e.getPropertyTerm())
+                .distinct()
+                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public void onSelectAsccpPropertyTerm(SelectEvent event) {
+        setSelectedAsccpPropertyTerm(event.getObject().toString());
+    }
+
+    public void searchAsccp() {
+        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedAsccpPropertyTerm());
+        if (StringUtils.isEmpty(selectedPropertyTerm)) {
+            setAsccpList(allAsccpList.stream()
+                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .collect(Collectors.toList()));
+        } else {
+            setAsccpList(
+                    allAsccpList.stream()
+                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
+                            .collect(Collectors.toList())
+            );
+        }
+        setPreparedAppendAscc(true);
+    }
+
+    // End Append ASCC
+
+
+
+    /*
+     * Begin Append BCC
+     */
+
+    @Autowired
+    private BasicCoreComponentPropertyForLookupRepository bccpLookupRepository;
+    private boolean preparedAppendBcc;
+    private List<BasicCoreComponentPropertyForLookup> allBccpList;
+    private List<BasicCoreComponentPropertyForLookup> bccpList;
+    private String selectedBccpPropertyTerm;
+    private BasicCoreComponentPropertyForLookup selectedBccp;
+
+    public boolean isPreparedAppendBcc() {
+        return preparedAppendBcc;
+    }
+
+    public void setPreparedAppendBcc(boolean preparedAppendBcc) {
+        this.preparedAppendBcc = preparedAppendBcc;
+    }
+
+    public List<BasicCoreComponentPropertyForLookup> getBccpList() {
+        return bccpList;
+    }
+
+    public void setBccpList(List<BasicCoreComponentPropertyForLookup> bccpList) {
+        this.bccpList = bccpList;
+    }
+
+    public String getSelectedBccpPropertyTerm() {
+        return selectedBccpPropertyTerm;
+    }
+
+    public void setSelectedBccpPropertyTerm(String selectedBccpPropertyTerm) {
+        this.selectedBccpPropertyTerm = selectedBccpPropertyTerm;
+    }
+
+    public BasicCoreComponentPropertyForLookup getSelectedBccp() {
+        return selectedBccp;
+    }
+
+    public void setSelectedBccp(BasicCoreComponentPropertyForLookup selectedBccp) {
+        this.selectedBccp = selectedBccp;
     }
 
     public void prepareAppendBcc() {
+        allBccpList = bccpLookupRepository.findAll().stream()
+                .filter(e -> e.getState() == Published)
+                .collect(Collectors.toList());
+        setBccpList(
+                allBccpList.stream()
+                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                        .collect(Collectors.toList())
+        );
+        setPreparedAppendBcc(true);
+    }
 
+    public List<String> completeInputBccp(String query) {
+        return allBccpList.stream()
+                .map(e -> e.getPropertyTerm())
+                .distinct()
+                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public void onSelectBccpPropertyTerm(SelectEvent event) {
+        setSelectedBccpPropertyTerm(event.getObject().toString());
+    }
+
+    public void searchBccp() {
+        String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedBccpPropertyTerm());
+        if (StringUtils.isEmpty(selectedPropertyTerm)) {
+            setBccpList(allBccpList.stream()
+                    .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                    .collect(Collectors.toList()));
+        } else {
+            setBccpList(
+                    allBccpList.stream()
+                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
+                            .collect(Collectors.toList())
+            );
+        }
+        setPreparedAppendBcc(true);
+    }
+
+    // End Append BCC
+
+
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void appendAscc() {
+        User user = loadAuthentication();
+        TreeNode rootNode = getRootNode();
+        ACCNode rootAccNode = (ACCNode) rootNode.getData();
+        ExtensionService.AppendAsccResult result =
+                extensionService.appendAsccTo(getUserExtensionAcc(), user);
+        ASCCPNode asccpNode = new BaseASCCPNode(rootAccNode, result.getAscc(), result.getAsccp());
+        TreeNode child = new DefaultTreeNode(asccpNode.getType() + "-Extension", asccpNode, rootNode);
+        setSelectedTreeNode(child);
     }
 
     public void appendBcc() {
         AggregateCoreComponent ueAcc = getUserExtensionAcc();
         User user = loadAuthentication();
-        BasicCoreComponent ueBcc = extensionService.appendBccTo(ueAcc, user, selectedBdt);
     }
 }
