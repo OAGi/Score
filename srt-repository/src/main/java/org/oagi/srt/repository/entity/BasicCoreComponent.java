@@ -1,5 +1,6 @@
 package org.oagi.srt.repository.entity;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
@@ -11,7 +12,8 @@ import java.util.Date;
 @Entity
 @Table(name = "bcc")
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
-public class BasicCoreComponent implements CoreComponent, Serializable {
+public class BasicCoreComponent
+        implements CoreComponent, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "BCC_ID_SEQ";
 
@@ -307,6 +309,36 @@ public class BasicCoreComponent implements CoreComponent, Serializable {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @Override
+    public BasicCoreComponent clone() {
+        BasicCoreComponent clone = new BasicCoreComponent();
+        clone.setGuid(Utility.generateGUID());
+        clone.setCardinalityMin(this.cardinalityMin);
+        clone.setCardinalityMax(this.cardinalityMax);
+        clone.setFromAccId(this.fromAccId);
+        clone.setToBccpId(this.toBccpId);
+        clone.setSeqKey(this.seqKey);
+        clone.setEntityType(this.entityType);
+        clone.setDen(this.den);
+        clone.setDefinition(this.definition);
+        clone.setCreatedBy(this.createdBy);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setDeprecated(this.deprecated);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        clone.setReleaseId(this.releaseId);
+        clone.setCurrentBccId(this.currentBccId);
+        clone.setNillable(this.nillable);
+        clone.setDefaultValue(this.defaultValue);
+        return clone;
     }
 
     @Override

@@ -1,17 +1,15 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.repository.AggregateCoreComponentRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.AssociationCoreComponentRepository;
-import org.oagi.srt.repository.NamespaceRepository;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.User;
+import org.oagi.srt.repository.*;
+import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Editing;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -30,6 +28,12 @@ public class ExtensionService {
 
     @Autowired
     private AssociationCoreComponentRepository asccRepository;
+
+    @Autowired
+    private BasicCoreComponentRepository bccRepository;
+
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
 
     @Autowired
     private NamespaceRepository namespaceRepository;
@@ -84,7 +88,7 @@ public class ExtensionService {
         createASCCPHistoryForExtension(ueAsccp);
 
         AssociationCoreComponent ueAscc = createASCCForExtension(eAcc, currentLoginUser, ueAcc, ueAsccp);
-        createASCCPHistoryForExtension(ueAscc);
+        createASCCHistoryForExtension(ueAscc);
 
         return ueAcc;
     }
@@ -129,41 +133,15 @@ public class ExtensionService {
     private AssociationCoreComponentProperty createASCCPForExtension(AggregateCoreComponent eAcc,
                                                                      User currentLoginUser,
                                                                      AggregateCoreComponent ueAcc) {
-        long userId = currentLoginUser.getAppUserId();
-        AssociationCoreComponentProperty ueAsccp = new AssociationCoreComponentProperty();
-        ueAsccp.setGuid(Utility.generateGUID());
+        AssociationCoreComponentProperty ueAsccp = createASCCP(ueAcc, currentLoginUser);
         ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
         ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
-        ueAsccp.setRoleOfAccId(ueAcc.getAccId());
-        ueAsccp.setDen(ueAsccp.getPropertyTerm() + ". " + ueAcc.getObjectClassTerm());
-        ueAsccp.setCreatedBy(userId);
-        ueAsccp.setLastUpdatedBy(userId);
-        ueAsccp.setOwnerUserId(userId);
         ueAsccp.setState(Published);
-        ueAsccp.setReusableIndicator(false);
-        ueAsccp.setRevisionNum(0);
-        ueAsccp.setRevisionTrackingNum(0);
-        ueAsccp.setNamespaceId(ueAcc.getNamespaceId());
         return asccpRepository.saveAndFlush(ueAsccp);
     }
 
     private void createASCCPHistoryForExtension(AssociationCoreComponentProperty ueAsccp) {
-        AssociationCoreComponentProperty asccpHistory = new AssociationCoreComponentProperty();
-        asccpHistory.setGuid(Utility.generateGUID());
-        asccpHistory.setPropertyTerm(ueAsccp.getPropertyTerm());
-        asccpHistory.setDefinition(ueAsccp.getDefinition());
-        asccpHistory.setRoleOfAccId(ueAsccp.getRoleOfAccId());
-        asccpHistory.setDen(ueAsccp.getDen());
-        asccpHistory.setCreatedBy(ueAsccp.getCreatedBy());
-        asccpHistory.setLastUpdatedBy(ueAsccp.getLastUpdatedBy());
-        asccpHistory.setOwnerUserId(ueAsccp.getOwnerUserId());
-        asccpHistory.setState(ueAsccp.getState());
-        asccpHistory.setReusableIndicator(ueAsccp.isReusableIndicator());
-        asccpHistory.setRevisionNum(1);
-        asccpHistory.setRevisionTrackingNum(1);
-        asccpHistory.setRevisionAction(Insert);
-        asccpHistory.setCurrentAsccpId(ueAsccp.getAsccpId());
-        asccpHistory.setNamespaceId(ueAsccp.getNamespaceId());
+        AssociationCoreComponentProperty asccpHistory = createASCCPHistory(ueAsccp);
         asccpRepository.saveAndFlush(asccpHistory);
     }
 
@@ -171,42 +149,199 @@ public class ExtensionService {
                                                             User currentLoginUser,
                                                             AggregateCoreComponent ueAcc,
                                                             AssociationCoreComponentProperty ueAsccp) {
-        long userId = currentLoginUser.getAppUserId();
-        AssociationCoreComponent ueAscc = new AssociationCoreComponent();
-        ueAscc.setGuid(Utility.generateGUID());
+        AssociationCoreComponent ueAscc = createASCC(eAcc, ueAsccp, currentLoginUser, 1);
         ueAscc.setCardinalityMin(1);
-        ueAscc.setCardinalityMax(1);
-        ueAscc.setSeqKey(1);
-        ueAscc.setFromAccId(eAcc.getAccId());
-        ueAscc.setToAsccpId(ueAsccp.getAsccpId());
-        ueAscc.setDen(eAcc.getObjectClassTerm() + ". " + ueAsccp.getDen());
         ueAscc.setDefinition("System created association to the system created user extension group component - " + ueAcc.getObjectClassTerm() + ".");
-        ueAscc.setCreatedBy(userId);
-        ueAscc.setLastUpdatedBy(userId);
-        ueAscc.setOwnerUserId(userId);
         ueAscc.setState(Published);
-        ueAscc.setRevisionNum(0);
-        ueAscc.setRevisionTrackingNum(0);
         return asccRepository.saveAndFlush(ueAscc);
     }
 
-    private void createASCCPHistoryForExtension(AssociationCoreComponent ueAscc) {
-        AssociationCoreComponent asccHistory = new AssociationCoreComponent();
-        asccHistory.setGuid(Utility.generateGUID());
-        asccHistory.setCardinalityMin(ueAscc.getCardinalityMin());
-        asccHistory.setCardinalityMax(ueAscc.getCardinalityMax());
-        asccHistory.setSeqKey(ueAscc.getSeqKey());
-        asccHistory.setFromAccId(ueAscc.getFromAccId());
-        asccHistory.setToAsccpId(ueAscc.getToAsccpId());
-        asccHistory.setDen(ueAscc.getDen());
-        asccHistory.setDefinition(ueAscc.getDefinition());
-        asccHistory.setCreatedBy(ueAscc.getCreatedBy());
-        asccHistory.setLastUpdatedBy(ueAscc.getLastUpdatedBy());
-        asccHistory.setOwnerUserId(ueAscc.getOwnerUserId());
-        asccHistory.setState(ueAscc.getState());
+    private void createASCCHistoryForExtension(AssociationCoreComponent ueAscc) {
+        AssociationCoreComponent asccHistory = createASCCHistory(ueAscc);
+        asccRepository.saveAndFlush(asccHistory);
+    }
+
+    private AssociationCoreComponentProperty createASCCP(AggregateCoreComponent ueAcc, User owner) {
+        long userId = owner.getAppUserId();
+        AssociationCoreComponentProperty ueAsccp = new AssociationCoreComponentProperty();
+        ueAsccp.setGuid(Utility.generateGUID());
+        ueAsccp.setPropertyTerm("A new ASCCP property");
+        ueAsccp.setRoleOfAccId(ueAcc.getAccId());
+        ueAsccp.setDen(ueAsccp.getPropertyTerm() + ". " + ueAcc.getObjectClassTerm());
+        ueAsccp.setCreatedBy(userId);
+        ueAsccp.setLastUpdatedBy(userId);
+        ueAsccp.setOwnerUserId(userId);
+        ueAsccp.setReusableIndicator(false);
+        ueAsccp.setRevisionNum(0);
+        ueAsccp.setRevisionTrackingNum(0);
+        ueAsccp.setNamespaceId(ueAcc.getNamespaceId());
+        return ueAsccp;
+    }
+
+    private AssociationCoreComponentProperty createASCCPHistory(AssociationCoreComponentProperty tAsccp) {
+        AssociationCoreComponentProperty asccpHistory = tAsccp.clone();
+        asccpHistory.setRevisionNum(1);
+        asccpHistory.setRevisionTrackingNum(1);
+        asccpHistory.setRevisionAction(Insert);
+        return asccpHistory;
+    }
+
+    private AssociationCoreComponent createASCC(AggregateCoreComponent pAcc,
+                                                AssociationCoreComponentProperty tAsccp,
+                                                User owner, int seqKey) {
+        long userId = owner.getAppUserId();
+        AssociationCoreComponent ascc = new AssociationCoreComponent();
+        ascc.setGuid(Utility.generateGUID());
+        ascc.setCardinalityMin(0);
+        ascc.setCardinalityMax(1);
+        ascc.setSeqKey(seqKey);
+        ascc.setFromAccId(pAcc.getAccId());
+        ascc.setToAsccpId(tAsccp.getAsccpId());
+        ascc.setDen(pAcc.getObjectClassTerm() + ". " + tAsccp.getDen());
+        ascc.setDefinition(null);
+        ascc.setDeprecated(false);
+        ascc.setCreatedBy(userId);
+        ascc.setLastUpdatedBy(userId);
+        ascc.setOwnerUserId(userId);
+        ascc.setState(Editing);
+        ascc.setRevisionNum(0);
+        ascc.setRevisionTrackingNum(0);
+        return ascc;
+    }
+
+    private AssociationCoreComponent createASCCHistory(AssociationCoreComponent tAscc) {
+        AssociationCoreComponent asccHistory = tAscc.clone();
         asccHistory.setRevisionNum(1);
         asccHistory.setRevisionTrackingNum(1);
         asccHistory.setRevisionAction(Insert);
-        asccRepository.saveAndFlush(asccHistory);
+        return asccHistory;
+    }
+
+
+    private BasicCoreComponentProperty createBCCP(AggregateCoreComponent tAcc, User owner, DataType tBdt) {
+        long userId = owner.getAppUserId();
+        BasicCoreComponentProperty bccp = new BasicCoreComponentProperty();
+        bccp.setGuid(Utility.generateGUID());
+        bccp.setPropertyTerm("A new BCCP property");
+        bccp.setRepresentationTerm(tBdt.getDataTypeTerm());
+        bccp.setBdtId(tBdt.getDtId());
+        bccp.setDen(bccp.getPropertyTerm() + ". " + tAcc.getObjectClassTerm());
+        bccp.setCreatedBy(userId);
+        bccp.setLastUpdatedBy(userId);
+        bccp.setOwnerUserId(userId);
+        bccp.setState(Editing);
+        bccp.setRevisionNum(0);
+        bccp.setRevisionTrackingNum(0);
+        bccp.setNamespaceId(tAcc.getNamespaceId());
+        return bccp;
+    }
+
+    private BasicCoreComponentProperty createBCCPHistory(BasicCoreComponentProperty tBccp) {
+        BasicCoreComponentProperty bccpHistory = tBccp.clone();
+        bccpHistory.setRevisionNum(1);
+        bccpHistory.setRevisionTrackingNum(1);
+        bccpHistory.setRevisionAction(Insert);
+        return bccpHistory;
+    }
+
+    private BasicCoreComponent createBCC(AggregateCoreComponent pAcc,
+                                                BasicCoreComponentProperty tBccp,
+                                                User owner, int seqKey) {
+        long userId = owner.getAppUserId();
+        BasicCoreComponent bcc = new BasicCoreComponent();
+        bcc.setGuid(Utility.generateGUID());
+        bcc.setCardinalityMin(0);
+        bcc.setCardinalityMax(1);
+        bcc.setSeqKey(seqKey);
+        bcc.setEntityType(1);
+        bcc.setFromAccId(pAcc.getAccId());
+        bcc.setToBccpId(tBccp.getBccpId());
+        bcc.setDen(pAcc.getObjectClassTerm() + ". " + tBccp.getDen());
+        bcc.setDefinition(null);
+        bcc.setDeprecated(false);
+        bcc.setCreatedBy(userId);
+        bcc.setLastUpdatedBy(userId);
+        bcc.setOwnerUserId(userId);
+        bcc.setState(Editing);
+        bcc.setRevisionNum(0);
+        bcc.setRevisionTrackingNum(0);
+        return bcc;
+    }
+
+    private BasicCoreComponent createBCCHistory(BasicCoreComponent tBcc) {
+        BasicCoreComponent bccHistory = tBcc.clone();
+        bccHistory.setRevisionNum(1);
+        bccHistory.setRevisionTrackingNum(1);
+        bccHistory.setRevisionAction(Insert);
+        return bccHistory;
+    }
+
+    public AggregateCoreComponent findUserExtensionAcc(AggregateCoreComponent acc) {
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getAccId());
+        String term = Utility.getUserExtensionGroupObjectClassTerm(acc.getObjectClassTerm());
+
+        asccList = asccList.stream()
+                .filter(e -> e.getRevisionNum() == 0 && e.getDen().contains(term))
+                .collect(Collectors.toList());
+        if (asccList.isEmpty()) {
+            return null;
+        } else if (asccList.size() > 1) {
+            throw new IllegalStateException();
+        }
+
+        AssociationCoreComponent ascc = asccList.get(0);
+        AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+        if (asccp == null) {
+            throw new IllegalStateException();
+        }
+        return accRepository.findOne(asccp.getRoleOfAccId());
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public AssociationCoreComponent appendAsccTo(AggregateCoreComponent pAcc, User user) {
+        AssociationCoreComponentProperty tAsccp = createASCCP(pAcc, user);
+        AssociationCoreComponentProperty tAsccpHistory = createASCCPHistory(tAsccp);
+        asccpRepository.save(Arrays.asList(tAsccp, tAsccpHistory));
+
+        int seqKey = nextSeqKey(pAcc);
+        AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
+        AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc);
+        asccRepository.save(Arrays.asList(tAscc, tAsccHistory));
+
+        return tAscc;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public BasicCoreComponent appendBccTo(AggregateCoreComponent pAcc, User user, DataType tBdt) {
+        BasicCoreComponentProperty tBccp = createBCCP(pAcc, user, tBdt);
+        BasicCoreComponentProperty tBccpHistory = createBCCPHistory(tBccp);
+        bccpRepository.save(Arrays.asList(tBccp, tBccpHistory));
+
+        int seqKey = nextSeqKey(pAcc);
+        BasicCoreComponent tBcc = createBCC(pAcc, tBccp, user, seqKey);
+        BasicCoreComponent tBccHistory = createBCCHistory(tBcc);
+        bccRepository.save(Arrays.asList(tBcc, tBccHistory));
+
+        return tBcc;
+    }
+
+    private int nextSeqKey(AggregateCoreComponent acc) {
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getAccId());
+        List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(acc.getAccId());
+
+        int nextSeqKey = asccList.size() + bccList.size() + 1;
+        ensureNextSeqKey(nextSeqKey, asccList, bccList);
+
+        return nextSeqKey;
+    }
+
+    private void ensureNextSeqKey(int nextSeqKey,
+                                  List<AssociationCoreComponent> asccList,
+                                  List<BasicCoreComponent> bccList) {
+        int maxSeqKey = Math.max(asccList.stream().mapToInt(e -> e.getSeqKey()).max().getAsInt(),
+                bccList.stream().mapToInt(e -> e.getSeqKey()).max().getAsInt());
+        if (nextSeqKey != (maxSeqKey + 1)) {
+            throw new IllegalStateException();
+        }
     }
 }

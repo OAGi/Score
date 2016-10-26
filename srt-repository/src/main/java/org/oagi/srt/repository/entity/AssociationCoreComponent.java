@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 
@@ -11,7 +12,8 @@ import java.util.Date;
 @Entity
 @Table(name = "ascc")
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
-public class AssociationCoreComponent implements CoreComponent, Serializable {
+public class AssociationCoreComponent
+        implements CoreComponent, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
 
@@ -272,6 +274,33 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
 
     public void setCurrentAsccId(long currentAsccId) {
         this.currentAsccId = currentAsccId;
+    }
+
+    @Override
+    public AssociationCoreComponent clone() {
+        AssociationCoreComponent clone = new AssociationCoreComponent();
+        clone.setGuid(Utility.generateGUID());
+        clone.setCardinalityMin(this.cardinalityMin);
+        clone.setCardinalityMax(this.cardinalityMax);
+        clone.setSeqKey(this.seqKey);
+        clone.setFromAccId(this.fromAccId);
+        clone.setToAsccpId(this.toAsccpId);
+        clone.setDen(this.den);
+        clone.setDefinition(this.definition);
+        clone.setDeprecated(this.deprecated);
+        clone.setCreatedBy(this.createdBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        clone.setReleaseId(this.releaseId);
+        clone.setCurrentAsccId(this.currentAsccId);
+        return clone;
     }
 
     @Override

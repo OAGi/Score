@@ -797,7 +797,8 @@ h6 {
 }
 
 .BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC,
-.ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC {
+.ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
+.ACC-Extension, .ui-state-hover.ACC-Extension, .ui-state-highlight.ACC-Extension {
     color: #bd2c00 !important;
 }
 

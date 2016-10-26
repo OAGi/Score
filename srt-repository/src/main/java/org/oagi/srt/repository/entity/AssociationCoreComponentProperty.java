@@ -1,5 +1,6 @@
 package org.oagi.srt.repository.entity;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
 import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
@@ -11,7 +12,8 @@ import java.util.Date;
 @Entity
 @Table(name = "asccp")
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
-public class AssociationCoreComponentProperty implements CoreComponentProperty, Serializable {
+public class AssociationCoreComponentProperty
+        implements CoreComponentProperty, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 
@@ -290,6 +292,34 @@ public class AssociationCoreComponentProperty implements CoreComponentProperty, 
 
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
+    }
+
+    @Override
+    public AssociationCoreComponentProperty clone() {
+        AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
+        clone.setGuid(Utility.generateGUID());
+        clone.setPropertyTerm(this.propertyTerm);
+        clone.setDefinition(this.definition);
+        clone.setRoleOfAccId(this.roleOfAccId);
+        clone.setDen(this.den);
+        clone.setCreatedBy(this.createdBy);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setModule(this.module);
+        clone.setNamespaceId(this.namespaceId);
+        clone.setReusableIndicator(this.reusableIndicator);
+        clone.setDeprecated(this.deprecated);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        clone.setReleaseId(this.releaseId);
+        clone.setCurrentAsccpId(this.currentAsccpId);
+        clone.setNillable(this.nillable);
+        return clone;
     }
 
     @Override

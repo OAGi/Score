@@ -1,7 +1,9 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +12,8 @@ import java.util.Date;
 @Entity
 @Table(name = "bccp")
 @org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
-public class BasicCoreComponentProperty implements CoreComponentProperty, Serializable {
+public class BasicCoreComponentProperty
+        implements CoreComponentProperty, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 
@@ -76,7 +79,8 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
     private int revisionTrackingNum;
 
     @Column
-    private int revisionAction = 1;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction = RevisionAction.Insert;
 
     @Column
     private Long releaseId;
@@ -288,11 +292,11 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
+    public RevisionAction getRevisionAction() {
         return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -326,6 +330,35 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    @Override
+    public BasicCoreComponentProperty clone() {
+        BasicCoreComponentProperty clone = new BasicCoreComponentProperty();
+        clone.setGuid(Utility.generateGUID());
+        clone.setPropertyTerm(this.propertyTerm);
+        clone.setRepresentationTerm(this.representationTerm);
+        clone.setBdtId(this.bdtId);
+        clone.setDefinition(this.definition);
+        clone.setDen(this.den);
+        clone.setCreatedBy(this.createdBy);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setModule(this.module);
+        clone.setNamespaceId(this.namespaceId);
+        clone.setDeprecated(this.deprecated);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        clone.setReleaseId(this.releaseId);
+        clone.setCurrentBccpId(this.currentBccpId);
+        clone.setNillable(this.nillable);
+        clone.setDefaultValue(this.defaultValue);
+        return clone;
     }
 
     @Override
@@ -364,7 +397,7 @@ public class BasicCoreComponentProperty implements CoreComponentProperty, Serial
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
-        result = 31 * result + revisionAction;
+        result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (currentBccpId != null ? currentBccpId.hashCode() : 0);
         result = 31 * result + (nillable ? 1 : 0);

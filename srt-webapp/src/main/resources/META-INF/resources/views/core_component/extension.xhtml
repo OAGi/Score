@@ -1,0 +1,273 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">#{extensionBean.rootAsccp.propertyTerm} - #{extensionBean.targetAcc.objectClassTerm}</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                        closable="true"/>
+            <p:panel id="panel">
+                <h:panelGroup style="width: 100%;">
+                    <div class="row">
+                        <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+
+                            <p:contextMenu for="treeTable" nodeType="ACC-Extension">
+                                <p:menuitem value="Append ASCC" style="width: 100%;"
+                                            action="#{extensionBean.appendAscc}"/>
+                                <p:menuitem value="Append BCC" style="width: 100%;"
+                                            action="#{extensionBean.appendBcc}"/>
+                            </p:contextMenu>
+
+                            <p:treeTable value="#{extensionBean.treeNode}" var="node" id="treeTable"
+                                         selection="#{extensionBean.selectedTreeNode}"
+                                         selectionMode="single">
+                                <p:ajax event="expand" listener="#{extensionBean.expand}"
+                                        update=":form:treeTable"/>
+                                <p:ajax event="select" update=":form:details"/>
+                                <p:column headerText="#{extensionBean.rootAsccp.propertyTerm}">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:column>
+                            </p:treeTable>
+                        </div>
+                        <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
+                            <div id="myAffix" style="overflow-y: auto;">
+                                <p:panel id="details">
+                                    <f:facet name="header">
+                                        <h:outputText value="Properties"/>
+                                    </f:facet>
+
+                                    <!--
+                                        ACC
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{fn:startsWith(extensionBean.selectedTreeNode.type, 'ACC')}">
+                                        <p:panel header="ACC">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.acc.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Object Class Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.acc.objectClassTerm}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="DEN" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.acc.den}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.acc.definition}"
+                                                        rows="6" autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+                                    <!--
+                                        ASCCP
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{fn:startsWith(extensionBean.selectedTreeNode.type, 'ASCCP')}">
+                                        <p:panel header="ASCC"
+                                                 rendered="#{extensionBean.selectedTreeNode.data.ascc != null}">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.ascc.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="DEN" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.ascc.den}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:selectOneMenu
+                                                        value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMin}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                    <f:selectItem itemLabel="0" itemValue="0"/>
+                                                    <f:selectItem itemLabel="1" itemValue="1"/>
+                                                </h:selectOneMenu>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMax}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.ascc.definition}"
+                                                        rows="6" autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        <p:panel header="ASCCP">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.asccp.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Property Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.asccp.propertyTerm}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="DEN" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.asccp.den}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.asccp.definition}"
+                                                        rows="6" autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+
+
+                                    <!--
+                                        BCCP
+                                    -->
+                                    <h:panelGroup
+                                            rendered="#{fn:startsWith(extensionBean.selectedTreeNode.type, 'BCCP')}">
+                                        <p:panel header="BCC">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="DEN" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.den}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <h:selectOneMenu
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMin}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                    <f:selectItem itemLabel="0" itemValue="0"/>
+                                                    <f:selectItem itemLabel="1" itemValue="1"/>
+                                                </h:selectOneMenu>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMax}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.definition}"
+                                                        rows="6" autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+
+                                        <p:panel header="BCCP">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bccp.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Property Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bccp.propertyTerm}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="DEN" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bccp.den}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.bccp.definition}"
+                                                        rows="6" autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+
+                                        <p:panel header="Data Type">
+                                            <h:panelGrid columns="2" cellpadding="3">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdt.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Data Type Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdt.dataTypeTerm}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Qualifier" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdt.qualifier}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="DEN" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdt.den}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.bdt.definition}"
+                                                        rows="6" autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:panel>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>
