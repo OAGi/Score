@@ -87,6 +87,17 @@
                                                                       style="font-size: 12px !important; color: #767676 !important;"/>
                                                     </div>
                                                 </p:column>
+                                                <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{asccp.state}">
+                                                    <h:panelGroup rendered="#{asccp.state == 'Editing'}">
+                                                        <span class="label label-primary">Editing</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{asccp.state == 'Candidate'}">
+                                                        <span class="label label-warning">Candidate</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{asccp.state == 'Published'}">
+                                                        <span class="label label-default">Published</span>
+                                                    </h:panelGroup>
+                                                </p:column>
                                             </p:dataTable>
 
                                             <p:commandButton value="Append"
@@ -138,6 +149,17 @@
                                                                       style="font-size: 12px !important; color: #767676 !important;"/>
                                                     </div>
                                                 </p:column>
+                                                <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{bccp.state}">
+                                                    <h:panelGroup rendered="#{bccp.state == 'Editing'}">
+                                                        <span class="label label-primary">Editing</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{bccp.state == 'Candidate'}">
+                                                        <span class="label label-warning">Candidate</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{bccp.state == 'Published'}">
+                                                        <span class="label label-default">Published</span>
+                                                    </h:panelGroup>
+                                                </p:column>
                                             </p:dataTable>
 
                                             <p:commandButton value="Append"
@@ -157,7 +179,8 @@
                                         ACC
                                     -->
                                     <h:panelGroup
-                                            rendered="#{fn:startsWith(extensionBean.selectedTreeNode.type, 'ACC')}">
+                                            rendered="#{extensionBean.preparedAppend eq false and
+                                                        fn:startsWith(extensionBean.selectedTreeNode.type, 'ACC')}">
                                         <p:panel header="ACC">
                                             <h:panelGrid columns="2" cellpadding="3">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
@@ -192,7 +215,8 @@
                                         ASCCP
                                     -->
                                     <h:panelGroup
-                                            rendered="#{fn:startsWith(extensionBean.selectedTreeNode.type, 'ASCCP')}">
+                                            rendered="#{extensionBean.preparedAppend eq false and
+                                                        fn:startsWith(extensionBean.selectedTreeNode.type, 'ASCCP')}">
                                         <p:panel header="ASCC"
                                                  rendered="#{extensionBean.selectedTreeNode.data.ascc != null}">
                                             <h:panelGrid columns="2" cellpadding="3">
@@ -266,7 +290,8 @@
                                         BCCP
                                     -->
                                     <h:panelGroup
-                                            rendered="#{fn:startsWith(extensionBean.selectedTreeNode.type, 'BCCP')}">
+                                            rendered="#{extensionBean.preparedAppend eq false and
+                                                        fn:startsWith(extensionBean.selectedTreeNode.type, 'BCCP')}">
                                         <p:panel header="BCC">
                                             <h:panelGrid columns="2" cellpadding="3">
                                                 <h:outputText value="GUID" styleClass="section-label"/>

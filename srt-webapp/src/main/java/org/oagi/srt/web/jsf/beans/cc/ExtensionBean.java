@@ -254,6 +254,16 @@ public class ExtensionBean extends UIHandler {
         }
     }
 
+    private boolean preparedAppend;
+
+    public boolean isPreparedAppend() {
+        return preparedAppend;
+    }
+
+    public void setPreparedAppend(boolean preparedAppend) {
+        this.preparedAppend = preparedAppend;
+    }
+
     /*
      * Begin Append ASCC
      */
@@ -272,6 +282,7 @@ public class ExtensionBean extends UIHandler {
 
     public void setPreparedAppendAscc(boolean preparedAppendAscc) {
         this.preparedAppendAscc = preparedAppendAscc;
+        setPreparedAppend(preparedAppendAscc);
     }
 
     public List<AssociationCoreComponentPropertyForLookup> getAsccpList() {
@@ -392,6 +403,7 @@ public class ExtensionBean extends UIHandler {
 
     public void setPreparedAppendBcc(boolean preparedAppendBcc) {
         this.preparedAppendBcc = preparedAppendBcc;
+        setPreparedAppend(preparedAppendBcc);
     }
 
     public List<BasicCoreComponentPropertyForLookup> getBccpList() {
