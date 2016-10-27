@@ -61,7 +61,7 @@ public class EditProfileBODBean extends UIHandler {
         if (topLevelAbie == null) {
             return;
         }
-        TreeNode treeNode = bieTreeNodeHandler.createTreeNode(topLevelAbie);
+        TreeNode treeNode = bieTreeNodeHandler.createLazyTreeNode(topLevelAbie);
         setTreeNode(treeNode);
     }
 

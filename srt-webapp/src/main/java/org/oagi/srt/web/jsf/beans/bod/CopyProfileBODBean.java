@@ -6,9 +6,9 @@ import org.oagi.srt.model.bie.BBIESCNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
-import org.oagi.srt.repository.TopLevelConceptRepository;
+import org.oagi.srt.repository.ProfileBODRepository;
+import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
@@ -30,7 +30,6 @@ import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
@@ -38,12 +37,12 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class CreateProfileBODBean {
+public class CopyProfileBODBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private TopLevelConceptRepository topLevelConceptRepository;
+    private ProfileBODRepository profileBODRepository;
     private String currentStep;
 
     /*
@@ -53,12 +52,12 @@ public class CreateProfileBODBean {
     private boolean btnNextDisable;
 
     /*
-     * for 'Select Top-Level Concept' Step
+     * for 'Select Top-Level ABIE' Step
      */
-    private List<TopLevelConcept> allTopLevelConcepts;
+    private List<ProfileBOD> allProfileBODs;
     private String selectedPropertyTerm;
-    private List<TopLevelConcept> topLevelConcepts;
-    private TopLevelConcept selectedTopLevelConcept;
+    private List<ProfileBOD> topLevelConcepts;
+    private ProfileBOD selectedProfileBOD;
 
     /*
      * for 'Select Business Context' Step
@@ -69,8 +68,10 @@ public class CreateProfileBODBean {
     private BusinessContext selectedBusinessContext;
 
     /*
-     * for 'Create BIE' Step
+     * for 'Copy BIE' Step
      */
+    @Autowired
+    private TopLevelAbieRepository topLevelAbieRepository;
     @Autowired
     private BusinessInformationEntityService bieService;
     @Autowired
@@ -81,15 +82,15 @@ public class CreateProfileBODBean {
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
-    public List<TopLevelConcept> getAllTopLevelConcepts() {
-        if (allTopLevelConcepts == null) {
-            allTopLevelConcepts = topLevelConceptRepository.findAll();
+    public List<ProfileBOD> getAllProfileBODs() {
+        if (allProfileBODs == null) {
+            allProfileBODs = profileBODRepository.findAll();
         }
-        return allTopLevelConcepts;
+        return allProfileBODs;
     }
 
-    public void setAllTopLevelConcepts(List<TopLevelConcept> allTopLevelConcepts) {
-        this.allTopLevelConcepts = allTopLevelConcepts;
+    public void setAllProfileBODs(List<ProfileBOD> allProfileBODs) {
+        this.allProfileBODs = allProfileBODs;
     }
 
     public String getCurrentStep() {
@@ -124,29 +125,29 @@ public class CreateProfileBODBean {
         this.selectedPropertyTerm = selectedPropertyTerm;
     }
 
-    public List<TopLevelConcept> getTopLevelConcepts() {
+    public List<ProfileBOD> getProfileBODs() {
         if (topLevelConcepts == null) {
-            setTopLevelConcepts(getAllTopLevelConcepts().stream()
+            setProfileBODs(getAllProfileBODs().stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                     .collect(Collectors.toList()));
         }
         return topLevelConcepts;
     }
 
-    public void setTopLevelConcepts(List<TopLevelConcept> topLevelConcepts) {
+    public void setProfileBODs(List<ProfileBOD> topLevelConcepts) {
         this.topLevelConcepts = topLevelConcepts;
     }
 
-    public TopLevelConcept getSelectedTopLevelConcept() {
-        return selectedTopLevelConcept;
+    public ProfileBOD getSelectedProfileBOD() {
+        return selectedProfileBOD;
     }
 
-    public void setSelectedTopLevelConcept(TopLevelConcept selectedTopLevelConcept) {
-        this.selectedTopLevelConcept = selectedTopLevelConcept;
+    public void setSelectedProfileBOD(ProfileBOD selectedProfileBOD) {
+        this.selectedProfileBOD = selectedProfileBOD;
     }
 
     public List<String> completeInput(String query) {
-        return getAllTopLevelConcepts().stream()
+        return getAllProfileBODs().stream()
                 .map(e -> e.getPropertyTerm())
                 .distinct()
                 .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
@@ -156,12 +157,12 @@ public class CreateProfileBODBean {
     public void search() {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setTopLevelConcepts(getAllTopLevelConcepts().stream()
+            setProfileBODs(getAllProfileBODs().stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
                     .collect(Collectors.toList()));
         } else {
-            setTopLevelConcepts(
-                    getAllTopLevelConcepts().stream()
+            setProfileBODs(
+                    getAllProfileBODs().stream()
                             .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
                             .collect(Collectors.toList())
             );
@@ -424,10 +425,10 @@ public class CreateProfileBODBean {
                     break;
 
                 case "step_2":
-                    if (selectedTopLevelConcept == null) {
+                    if (selectedProfileBOD == null) {
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                                        "'Top-Level Concept' must be selected."));
+                                        "'Profile BOD' must be selected."));
                         nextStep = event.getOldStep();
                         requestContext.execute("$(document.getElementById(PF('btnBack').id)).hide()");
                         requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
@@ -452,9 +453,9 @@ public class CreateProfileBODBean {
                             requestContext.execute("$(document.getElementById(PF('btnNext').id)).show()");
                             requestContext.execute("$(document.getElementById(PF('btnSubmit').id)).hide()");
                         } else {
-                            AssociationCoreComponentProperty selectedASCCP =
-                                    asccpRepository.findOne(selectedTopLevelConcept.getAsccpId());
-                            setTreeNode(bieTreeNodeHandler.createTreeNode(selectedASCCP, selectedBusinessContext));
+                            TopLevelAbie topLevelAbie =
+                                    topLevelAbieRepository.findOne(selectedProfileBOD.getTopLevelAbieId());
+                            setTreeNode(bieTreeNodeHandler.createTreeNode(topLevelAbie));
 
                             requestContext.execute("$(document.getElementById(PF('btnBack').id)).show()");
                             requestContext.execute("$(document.getElementById(PF('btnNext').id)).hide()");
@@ -503,9 +504,9 @@ public class CreateProfileBODBean {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public String submit() {
+    public String copy() {
         progressListener = new ProgressListener();
-        bieTreeNodeHandler.submit(getTopLevelNode(), progressListener);
+        bieTreeNodeHandler.copy(getTopLevelNode(), getSelectedBusinessContext(), progressListener);
 
         return "/views/profile_bod/list.xhtml?faces-redirect=true";
     }

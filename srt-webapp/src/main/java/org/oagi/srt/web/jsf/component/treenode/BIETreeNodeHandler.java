@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.LazyNode;
@@ -11,6 +12,7 @@ import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
+import org.oagi.srt.web.jsf.beans.bod.ProgressListener;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -70,7 +72,7 @@ public class BIETreeNodeHandler extends UIHandler {
     private class SubmitBIENodeVisitor implements BIENodeVisitor {
 
         private User user;
-        private CreateProfileBODBean.ProgressListener progressListener;
+        private ProgressListener progressListener;
 
         private TopLevelAbie topLevelAbie;
         private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
@@ -84,7 +86,7 @@ public class BIETreeNodeHandler extends UIHandler {
             this.user = user;
         }
 
-        public void setProgressListener(CreateProfileBODBean.ProgressListener progressListener) {
+        public void setProgressListener(ProgressListener progressListener) {
             this.progressListener = progressListener;
         }
 
@@ -334,6 +336,17 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     public TreeNode createTreeNode(TopLevelAbie topLevelAbie) {
+        BIENode node = nodeService.createBIENode(topLevelAbie);
+
+        long s = System.currentTimeMillis();
+        TreeBIENodeVisitor treeNodeVisitor = new TreeBIENodeVisitor();
+        node.accept(treeNodeVisitor);
+        logger.info("TreeNodes are structured - elapsed time: " + (System.currentTimeMillis() - s) + " ms");
+
+        return treeNodeVisitor.getRoot();
+    }
+
+    public TreeNode createLazyTreeNode(TopLevelAbie topLevelAbie) {
         BIENode node = nodeService.createLazyBIENode(topLevelAbie);
 
         LazyTreeBIENodeVisitor lazyTreeNodeVisitor = new LazyTreeBIENodeVisitor();
@@ -356,7 +369,7 @@ public class BIETreeNodeHandler extends UIHandler {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void submit(BaseTopLevelNode node, CreateProfileBODBean.ProgressListener progressListener) {
+    public void submit(BaseTopLevelNode node, ProgressListener progressListener) {
         SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(loadAuthentication());
         submitNodeVisitor.setProgressListener(progressListener);
         node.accept(submitNodeVisitor);
@@ -463,6 +476,181 @@ public class BIETreeNodeHandler extends UIHandler {
     public void update(TopLevelNode node) {
         UpdateBIENodeVisitor updateNodeVisitor = new UpdateBIENodeVisitor(loadAuthentication());
         node.accept(updateNodeVisitor);
+    }
+
+    private class CopyBIENodeVisitor implements BIENodeVisitor {
+
+        private User user;
+        private BusinessContext bizCtx;
+        private ProgressListener progressListener;
+
+        private TopLevelAbie topLevelAbie;
+        private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
+        private List<AssociationBusinessInformationEntity> asbieList = new ArrayList();
+        private List<AssociationBusinessInformationEntityProperty> asbiepList = new ArrayList();
+        private List<BasicBusinessInformationEntity> bbieList = new ArrayList();
+        private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
+        private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
+
+        public CopyBIENodeVisitor(User user, BusinessContext bizCtx) {
+            this.user = user;
+            this.bizCtx = bizCtx;
+        }
+
+        public void setProgressListener(ProgressListener progressListener) {
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public void startNode(TopLevelNode topLevelNode) {
+            topLevelAbie = new TopLevelAbie();
+            topLevelAbie.setAbie(topLevelNode.getAbie());
+            asbiepList.add(topLevelNode.getAsbiep());
+        }
+
+        @Override
+        public void visitASBIENode(ASBIENode asbieNode) {
+            abieList.add(asbieNode.getAbie());
+            asbieList.add(asbieNode.getAsbie());
+            asbiepList.add(asbieNode.getAsbiep());
+        }
+
+        @Override
+        public void visitBBIENode(BBIENode bbieNode) {
+            BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
+            bbieList.add(bbie);
+            bbiepList.add(bbieNode.getBbiep());
+        }
+
+        @Override
+        public void visitBBIESCNode(BBIESCNode bbiescNode) {
+            BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
+            bbiescList.add(bbieSc);
+        }
+
+        @Override
+        public void endNode() {
+            adjust();
+            save();
+        }
+
+        private void adjust() {
+            AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
+            tAbie.setAbieId(0L);
+            tAbie.setGuid(Utility.generateGUID());
+            tAbie.setCreatedBy(user.getAppUserId());
+            tAbie.setLastUpdatedBy(user.getAppUserId());
+            tAbie.setState(Editing);
+            tAbie.setOwnerTopLevelAbie(topLevelAbie);
+            tAbie.addPersistEventListener(progressListener);
+
+            abieList.stream().forEach(abie -> {
+                abie.setAbieId(0L);
+                abie.setGuid(Utility.generateGUID());
+                abie.setCreatedBy(user.getAppUserId());
+                abie.setLastUpdatedBy(user.getAppUserId());
+                abie.setState(Editing);
+                abie.setOwnerTopLevelAbie(topLevelAbie);
+                abie.addPersistEventListener(progressListener);
+            });
+            asbieList.stream().forEach(asbie -> {
+                asbie.setAsbieId(0L);
+                asbie.setGuid(Utility.generateGUID());
+                asbie.setCreatedBy(user.getAppUserId());
+                asbie.setLastUpdatedBy(user.getAppUserId());
+                asbie.setOwnerTopLevelAbie(topLevelAbie);
+                asbie.addPersistEventListener(progressListener);
+            });
+            asbiepList.stream().forEach(asbiep -> {
+                asbiep.setAsbiepId(0L);
+                asbiep.setGuid(Utility.generateGUID());
+                asbiep.setCreatedBy(user.getAppUserId());
+                asbiep.setLastUpdatedBy(user.getAppUserId());
+                asbiep.setOwnerTopLevelAbie(topLevelAbie);
+                asbiep.addPersistEventListener(progressListener);
+            });
+            bbieList.stream().forEach(bbie -> {
+                bbie.setBbieId(0L);
+                bbie.setGuid(Utility.generateGUID());
+                bbie.setCreatedBy(user.getAppUserId());
+                bbie.setLastUpdatedBy(user.getAppUserId());
+                bbie.setOwnerTopLevelAbie(topLevelAbie);
+                bbie.addPersistEventListener(progressListener);
+            });
+            bbiepList.stream().forEach(bbiep -> {
+                bbiep.setBbiepId(0L);
+                bbiep.setGuid(Utility.generateGUID());
+                bbiep.setCreatedBy(user.getAppUserId());
+                bbiep.setLastUpdatedBy(user.getAppUserId());
+                bbiep.setOwnerTopLevelAbie(topLevelAbie);
+                bbiep.addPersistEventListener(progressListener);
+            });
+            bbiescList.stream().forEach(bbiesc -> {
+                bbiesc.setBbieScId(0L);
+                bbiesc.setGuid(Utility.generateGUID());
+                bbiesc.setOwnerTopLevelAbie(topLevelAbie);
+                bbiesc.addPersistEventListener(progressListener);
+            });
+
+            if (progressListener != null) {
+                int maxCount = abieList.size() + asbieList.size() + asbiepList.size() + bbieList.size() + bbiepList.size() + bbiescList.size();
+                progressListener.setMaxCount(maxCount);
+            }
+        }
+
+        private void save() {
+            saveTopLevelAbie();
+            saveAbieList();
+            saveBbiepList();
+            saveBbieList();
+            saveBbieScList();
+            saveAsbiepList();
+            saveAsbieList();
+        }
+
+        private void saveTopLevelAbie() {
+            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+            topLevelAbie.setAbie(null);
+
+            topLevelAbieRepository.saveAndFlush(topLevelAbie);
+            abie.setOwnerTopLevelAbie(topLevelAbie);
+
+            abieRepository.saveAndFlush(abie);
+
+            topLevelAbie.setAbie(abie);
+            topLevelAbieRepository.save(topLevelAbie);
+        }
+
+        private void saveAbieList() {
+            abieRepository.save(abieList);
+        }
+
+        private void saveBbiepList() {
+            bbiepRepository.save(bbiepList);
+        }
+
+        private void saveBbieList() {
+            bbieRepository.save(bbieList);
+        }
+
+        private void saveBbieScList() {
+            bbiescRepository.save(bbiescList);
+        }
+
+        private void saveAsbiepList() {
+            asbiepRepository.save(asbiepList);
+        }
+
+        private void saveAsbieList() {
+            asbieRepository.save(asbieList);
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void copy(BaseTopLevelNode node, BusinessContext bizCtx, ProgressListener progressListener) {
+        CopyBIENodeVisitor copyNodeVisitor = new CopyBIENodeVisitor(loadAuthentication(), bizCtx);
+        copyNodeVisitor.setProgressListener(progressListener);
+        node.accept(copyNodeVisitor);
     }
 
 }
