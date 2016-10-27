@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface BusinessContextRepository extends JpaRepository<BusinessContext, Long> {
 
+    @Query("select b from BusinessContext b where b.createdBy = ?1")
+    public List<BusinessContext> findAllByCreatedBy(long createdBy);
+
     @Query("select b from BusinessContext b where b.name = ?1")
     public List<BusinessContext> findByName(String name);
 }

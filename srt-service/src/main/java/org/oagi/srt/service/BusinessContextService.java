@@ -25,9 +25,7 @@ public class BusinessContextService {
     private BusinessContextValueRepository businessContextValueRepository;
 
     public List<BusinessContext> findAll(Sort.Direction direction, String property) {
-        return Collections.unmodifiableList(
-                businessContextRepository.findAll(new Sort(new Sort.Order(direction, property)))
-        );
+        return businessContextRepository.findAll(new Sort(new Sort.Order(direction, property)));
     }
 
     public List<BusinessContext> findByName(String name) {

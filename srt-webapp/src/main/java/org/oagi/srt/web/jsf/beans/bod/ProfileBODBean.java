@@ -2,7 +2,9 @@ package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.repository.ProfileBODRepository;
 import org.oagi.srt.repository.entity.ProfileBOD;
+import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.BusinessInformationEntityService;
+import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 @Transactional(readOnly = true)
-public class ProfileBODBean {
+public class ProfileBODBean extends UIHandler {
 
     @Autowired
     private ProfileBODRepository profileBODRepository;
@@ -36,7 +38,8 @@ public class ProfileBODBean {
 
     @PostConstruct
     public void init() {
-        allProfileBODs = profileBODRepository.findAll();
+        User user = loadAuthentication();
+        allProfileBODs = profileBODRepository.findAllByCreatedBy(user.getAppUserId());
         setProfileBODs(
                 allProfileBODs.stream()
                         .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))

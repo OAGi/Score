@@ -48,7 +48,7 @@
                         </h:panelGroup>
                     </p:column>
 
-                    <p:column style="text-align: center; width: 65px;">
+                    <p:column style="text-align: center; width: 65px;" rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
                         <p:commandButton icon="ui-icon-cancel" styleClass="delete"
                                          onclick="PF('confirmDiscard').show()">
                             <f:setPropertyActionListener value="#{profileBOD}"
