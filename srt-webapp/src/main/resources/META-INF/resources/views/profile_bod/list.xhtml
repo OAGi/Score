@@ -33,6 +33,10 @@
                               sortBy="#{profileBOD.bizCtxName}">
                         <h:outputText value="#{profileBOD.bizCtxName}"/>
                     </p:column>
+                    <p:column style="width: 100px; text-align: right;" headerText="Owner"
+                              sortBy="#{profileBOD.createdUsername}">
+                        <h:outputText value="#{profileBOD.createdUsername}"/>
+                    </p:column>
                     <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
                               sortBy="#{profileBOD.creationTimestamp}">
                         <h:outputText value="#{profileBOD.creationTimestamp}">
@@ -48,7 +52,8 @@
                         </h:panelGroup>
                     </p:column>
 
-                    <p:column style="text-align: center; width: 65px;" rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
+                    <p:column style="text-align: center; width: 65px;"
+                              rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
                         <p:commandButton icon="ui-icon-cancel" styleClass="delete"
                                          onclick="PF('confirmDiscard').show()">
                             <f:setPropertyActionListener value="#{profileBOD}"
