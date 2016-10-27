@@ -24,7 +24,9 @@ public class UIHandler {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             currentUser = userService.findByAuthentication(authentication);
-        } else {
+        }
+
+        if (currentUser == null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
                 if (facesContext != null) {
@@ -37,6 +39,7 @@ public class UIHandler {
                 throw new IllegalStateException(e);
             }
         }
+
         return currentUser;
     }
 
