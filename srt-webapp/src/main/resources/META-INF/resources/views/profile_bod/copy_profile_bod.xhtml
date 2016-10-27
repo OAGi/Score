@@ -43,11 +43,12 @@
                             <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
                                 <h:outputText value="#{profileBOD.propertyTerm}"/>
                             </p:column>
-                            <p:column style="width: 200px; text-align: center;" headerText="Business Context"
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                                      headerText="Business Context"
                                       sortBy="#{profileBOD.bizCtxName}">
                                 <h:outputText value="#{profileBOD.bizCtxName}"/>
                             </p:column>
-                            <p:column style="width: 100px; text-align: right;" headerText="Owner"
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                                       sortBy="#{profileBOD.createdUsername}">
                                 <h:outputText value="#{profileBOD.createdUsername}"/>
                             </p:column>
@@ -57,7 +58,8 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
+                            <p:column style="width: 100px; text-align: center;" headerText="State"
+                                      sortBy="#{profileBOD.state}">
                                 <h:panelGroup rendered="#{profileBOD.state == 2}">
                                     <span class="label label-primary">Editing</span>
                                 </h:panelGroup>
@@ -83,11 +85,12 @@
                             <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
                                 <h:outputText value="#{profileBOD.propertyTerm}"/>
                             </p:column>
-                            <p:column style="width: 200px; text-align: center;" headerText="Business Context"
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                                      headerText="Business Context"
                                       sortBy="#{profileBOD.bizCtxName}">
                                 <h:outputText value="#{profileBOD.bizCtxName}"/>
                             </p:column>
-                            <p:column style="width: 100px; text-align: right;" headerText="Owner"
+                            <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                                       sortBy="#{profileBOD.createdUsername}">
                                 <h:outputText value="#{profileBOD.createdUsername}"/>
                             </p:column>
@@ -97,7 +100,8 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column style="width: 100px; text-align: center;" headerText="State" sortBy="#{profileBOD.state}">
+                            <p:column style="width: 100px; text-align: center;" headerText="State"
+                                      sortBy="#{profileBOD.state}">
                                 <h:panelGroup rendered="#{profileBOD.state == 2}">
                                     <span class="label label-primary">Editing</span>
                                 </h:panelGroup>

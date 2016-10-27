@@ -29,11 +29,12 @@
                             <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
                         </h:link>
                     </p:column>
-                    <p:column style="width: 200px; text-align: center;" headerText="Business Context"
+                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
+                              headerText="Business Context"
                               sortBy="#{profileBOD.bizCtxName}">
                         <h:outputText value="#{profileBOD.bizCtxName}"/>
                     </p:column>
-                    <p:column style="width: 100px; text-align: right;" headerText="Owner"
+                    <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{profileBOD.createdUsername}">
                         <h:outputText value="#{profileBOD.createdUsername}"/>
                     </p:column>
