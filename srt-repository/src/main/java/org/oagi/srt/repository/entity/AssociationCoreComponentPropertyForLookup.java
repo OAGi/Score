@@ -23,12 +23,18 @@ public class AssociationCoreComponentPropertyForLookup {
     @Column(nullable = false)
     private String propertyTerm;
 
+    @Column
+    private Long roleOfAccId;
+
     @Column(nullable = false)
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
 
     @Column(nullable = false)
     private boolean reusableIndicator;
+
+    @Column(nullable = false)
+    private int revisionNum;
 
     public long getAsccpId() {
         return asccpId;
@@ -54,6 +60,14 @@ public class AssociationCoreComponentPropertyForLookup {
         this.propertyTerm = propertyTerm;
     }
 
+    public long getRoleOfAccId() {
+        return (roleOfAccId != null) ? roleOfAccId : 0L;
+    }
+
+    public void setRoleOfAccId(Long roleOfAccId) {
+        this.roleOfAccId = roleOfAccId;
+    }
+
     public CoreComponentState getState() {
         return state;
     }
@@ -70,6 +84,14 @@ public class AssociationCoreComponentPropertyForLookup {
         this.reusableIndicator = reusableIndicator;
     }
 
+    public int getRevisionNum() {
+        return revisionNum;
+    }
+
+    public void setRevisionNum(int revisionNum) {
+        this.revisionNum = revisionNum;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -79,8 +101,10 @@ public class AssociationCoreComponentPropertyForLookup {
 
         if (asccpId != that.asccpId) return false;
         if (reusableIndicator != that.reusableIndicator) return false;
+        if (revisionNum != that.revisionNum) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
+        if (roleOfAccId != null ? !roleOfAccId.equals(that.roleOfAccId) : that.roleOfAccId != null) return false;
         return state == that.state;
 
     }
@@ -90,8 +114,10 @@ public class AssociationCoreComponentPropertyForLookup {
         int result = (int) (asccpId ^ (asccpId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
+        result = 31 * result + (roleOfAccId != null ? roleOfAccId.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (reusableIndicator ? 1 : 0);
+        result = 31 * result + revisionNum;
         return result;
     }
 
@@ -101,8 +127,10 @@ public class AssociationCoreComponentPropertyForLookup {
                 "asccpId=" + asccpId +
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
+                ", roleOfAccId=" + roleOfAccId +
                 ", state=" + state +
                 ", reusableIndicator=" + reusableIndicator +
+                ", revisionNum=" + revisionNum +
                 '}';
     }
 }

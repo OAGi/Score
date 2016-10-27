@@ -4,18 +4,17 @@ import org.oagi.srt.model.*;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
+import org.oagi.srt.model.cc.impl.BaseACCNode;
 import org.oagi.srt.model.cc.impl.BaseASCCPNode;
+import org.oagi.srt.model.cc.impl.BaseBCCPNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.repository.entity.AssociationCoreComponentPropertyForLookup;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyForLookupRepository;
-import org.oagi.srt.repository.entity.BasicCoreComponentPropertyForLookup;
-import org.oagi.srt.repository.BasicCoreComponentPropertyForLookupRepository;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
@@ -27,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
@@ -64,6 +64,9 @@ public class ExtensionBean extends UIHandler {
 
     @Autowired
     private BasicCoreComponentPropertyRepository bccpRepository;
+
+    @Autowired
+    private DataTypeRepository dataTypeRepository;
 
     private AggregateCoreComponent targetAcc;
     private AssociationCoreComponentProperty rootAsccp;
@@ -201,7 +204,12 @@ public class ExtensionBean extends UIHandler {
 
         @Override
         public void visitACCNode(ACCNode accNode) {
-            visitNode(accNode);
+            AggregateCoreComponent acc = accNode.getAcc();
+            if (targetAcc.equals(acc)) {
+                visitNode(accNode, accNode.getType() + "-Extension");
+            } else {
+                visitNode(accNode);
+            }
         }
 
         @Override
@@ -214,21 +222,35 @@ public class ExtensionBean extends UIHandler {
         }
 
         private void visitNode(CCNode node, String type) {
-            LazyCCNode lazyCCNode = (LazyCCNode) node;
-            if (node.getName().contains("User Extension")) { // To hide 'User Extension' nodes
-                lazyCCNode.fetch();
+            if (exists(node)) {
+                return;
+            }
 
-                List<? extends Node> children = lazyCCNode.getChildren();
+            if (node.getName().contains("User Extension")) { // To hide 'User Extension' nodes
+                ((LazyCCNode) node).fetch();
+
+                List<? extends Node> children = node.getChildren();
                 for (Node child : children) {
                     visitNode((CCNode) child);
                 }
             } else {
                 TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
-                LazyNode lazyNode = (LazyNode) node;
-                for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
-                    new DefaultTreeNode(null, treeNode);
+                if (node instanceof LazyNode) {
+                    LazyNode lazyNode = (LazyNode) node;
+                    for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
+                        new DefaultTreeNode(null, treeNode);
+                    }
                 }
             }
+        }
+
+        private boolean exists(CCNode node) {
+            for (TreeNode child : this.parent.getChildren()) {
+                if (node.equals(child.getData())) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -276,6 +298,14 @@ public class ExtensionBean extends UIHandler {
         this.selectedAsccp = selectedAsccp;
     }
 
+    public void onAsccpRowSelect(SelectEvent event) {
+        setSelectedAsccp((AssociationCoreComponentPropertyForLookup) event.getObject());
+    }
+
+    public void onAsccpRowUnselect(UnselectEvent event) {
+        setSelectedAsccp(null);
+    }
+
     public void prepareAppendAscc() {
         allAsccpList = asccpLookupRepository.findAll().stream()
                 .filter(e -> e.getState() == Published)
@@ -315,6 +345,29 @@ public class ExtensionBean extends UIHandler {
             );
         }
         setPreparedAppendAscc(true);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void appendAscc() {
+        AssociationCoreComponentPropertyForLookup selectedAsccpLookup = getSelectedAsccp();
+        if (selectedAsccpLookup == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                            "You have to choose valid association core component."));
+            return;
+        }
+
+        AssociationCoreComponentProperty tAsccp = asccpRepository.findOne(selectedAsccpLookup.getAsccpId());
+        AggregateCoreComponent pAcc = getUserExtensionAcc();
+
+        User user = loadAuthentication();
+        TreeNode rootNode = getRootNode();
+        ACCNode rootAccNode = (ACCNode) rootNode.getData();
+        ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, user);
+        ASCCPNode asccpNode = new BaseASCCPNode(
+                new BaseACCNode(rootAccNode, pAcc), result.getAscc(), tAsccp);
+        TreeNode child = new DefaultTreeNode(asccpNode.getType(), asccpNode, rootNode);
+        setSelectedTreeNode(child);
     }
 
     // End Append ASCC
@@ -365,6 +418,14 @@ public class ExtensionBean extends UIHandler {
         this.selectedBccp = selectedBccp;
     }
 
+    public void onBccpRowSelect(SelectEvent event) {
+        setSelectedBccp((BasicCoreComponentPropertyForLookup) event.getObject());
+    }
+
+    public void onBccpRowUnselect(UnselectEvent event) {
+        setSelectedBccp(null);
+    }
+
     public void prepareAppendBcc() {
         allBccpList = bccpLookupRepository.findAll().stream()
                 .filter(e -> e.getState() == Published)
@@ -405,24 +466,30 @@ public class ExtensionBean extends UIHandler {
         setPreparedAppendBcc(true);
     }
 
-    // End Append BCC
-
-
-
     @Transactional(rollbackFor = Throwable.class)
-    public void appendAscc() {
+    public void appendBcc() {
+        BasicCoreComponentPropertyForLookup selectedBccpLookup = getSelectedBccp();
+        if (selectedBccpLookup == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                            "You have to choose valid basic core component."));
+            return;
+        }
+
+        BasicCoreComponentProperty tBccp = bccpRepository.findOne(selectedBccpLookup.getBccpId());
+        AggregateCoreComponent pAcc = getUserExtensionAcc();
+
         User user = loadAuthentication();
         TreeNode rootNode = getRootNode();
         ACCNode rootAccNode = (ACCNode) rootNode.getData();
-        ExtensionService.AppendAsccResult result =
-                extensionService.appendAsccTo(getUserExtensionAcc(), user);
-        ASCCPNode asccpNode = new BaseASCCPNode(rootAccNode, result.getAscc(), result.getAsccp());
-        TreeNode child = new DefaultTreeNode(asccpNode.getType() + "-Extension", asccpNode, rootNode);
+        ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, user);
+
+        DataType bdt = dataTypeRepository.findOne(tBccp.getBdtId());
+        BCCPNode bccpNode = new BaseBCCPNode(
+                new BaseACCNode(rootAccNode, pAcc), result.getBcc(), tBccp, bdt);
+        TreeNode child = new DefaultTreeNode(bccpNode.getType(), bccpNode, rootNode);
         setSelectedTreeNode(child);
     }
 
-    public void appendBcc() {
-        AggregateCoreComponent ueAcc = getUserExtensionAcc();
-        User user = loadAuthentication();
-    }
+    // End Append BCC
 }

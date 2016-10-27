@@ -14,29 +14,38 @@
         <h:form id="form">
             <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
                         closable="true"/>
+
+            <p:blockUI block="leftPanel" widgetVar="leftBlockUI"/>
+
             <p:panel id="panel">
                 <h:panelGroup style="width: 100%;">
                     <div class="row">
-                        <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+                        <div class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+                            <p:panel id="leftPanel">
+                                <p:treeTable value="#{extensionBean.treeNode}" var="node" id="treeTable"
+                                             selection="#{extensionBean.selectedTreeNode}"
+                                             selectionMode="single">
+                                    <p:ajax event="expand" listener="#{extensionBean.expand}"
+                                            update=":form:treeTable"/>
+                                    <p:ajax event="select" update=":form:details"/>
+                                    <p:column headerText="#{extensionBean.rootAsccp.propertyTerm}">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:column>
+                                </p:treeTable>
 
-                            <p:contextMenu for="treeTable" nodeType="ACC-Extension">
-                                <p:menuitem value="Append ASCC" style="width: 100%;"
-                                            actionListener="#{extensionBean.prepareAppendAscc}" update=":form:details"/>
-                                <p:menuitem value="Append BCC" style="width: 100%;"
-                                            actionListener="#{extensionBean.prepareAppendBcc}" update=":form:details"/>
-                            </p:contextMenu>
-
-                            <p:treeTable value="#{extensionBean.treeNode}" var="node" id="treeTable"
-                                         selection="#{extensionBean.selectedTreeNode}"
-                                         selectionMode="single">
-                                <p:ajax event="expand" listener="#{extensionBean.expand}"
-                                        update=":form:treeTable"/>
-                                <p:ajax event="select" update=":form:details"/>
-                                <p:column headerText="#{extensionBean.rootAsccp.propertyTerm}">
-                                    <h:outputText value="#{node.name}"/>
-                                </p:column>
-                            </p:treeTable>
+                                <p:contextMenu for="treeTable" nodeType="ACC-Extension">
+                                    <p:menuitem value="Append ASCC" style="width: 100%;"
+                                                actionListener="#{extensionBean.prepareAppendAscc}"
+                                                onclick="PF('leftBlockUI').show()"
+                                                update=":form:details"/>
+                                    <p:menuitem value="Append BCC" style="width: 100%;"
+                                                actionListener="#{extensionBean.prepareAppendBcc}"
+                                                onclick="PF('leftBlockUI').show()"
+                                                update=":form:details"/>
+                                </p:contextMenu>
+                            </p:panel>
                         </div>
+
                         <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
@@ -66,7 +75,12 @@
                                                          rowKey="#{asccp.asccpId}"
                                                          selection="#{extensionBean.selectedAsccp}"
                                                          selectionMode="single">
-                                                <p:column headerText="ASCCP Property Term" sortBy="#{asccp.propertyTerm}">
+                                                <p:ajax event="rowSelect" listener="#{extensionBean.onAsccpRowSelect}"/>
+                                                <p:ajax event="rowUnselect"
+                                                        listener="#{extensionBean.onAsccpRowUnselect}"/>
+
+                                                <p:column headerText="ASCCP Property Term"
+                                                          sortBy="#{asccp.propertyTerm}">
                                                     <h:outputText value="#{asccp.propertyTerm}"/>
                                                     <div>
                                                         <h:outputText value="GUID: #{asccp.guid}"
@@ -74,6 +88,17 @@
                                                     </div>
                                                 </p:column>
                                             </p:dataTable>
+
+                                            <p:commandButton value="Append"
+                                                             actionListener="#{extensionBean.setPreparedAppendAscc(false)}"
+                                                             action="#{extensionBean.appendAscc()}"
+                                                             onclick="PF('leftBlockUI').hide()"
+                                                             update=":form"/>
+                                            <p:commandButton value="Discard"
+                                                             styleClass="danger"
+                                                             actionListener="#{extensionBean.setPreparedAppendAscc(false)}"
+                                                             onclick="PF('leftBlockUI').hide()"
+                                                             update=":form:details"/>
                                         </p:panel>
                                     </h:panelGroup>
 
@@ -103,6 +128,9 @@
                                                          rowKey="#{bccp.bccpId}"
                                                          selection="#{extensionBean.selectedBccp}"
                                                          selectionMode="single">
+                                                <p:ajax event="rowSelect" listener="#{extensionBean.onBccpRowSelect}"/>
+                                                <p:ajax event="rowUnselect"
+                                                        listener="#{extensionBean.onBccpRowUnselect}"/>
                                                 <p:column headerText="BCCP Property Term" sortBy="#{bccp.propertyTerm}">
                                                     <h:outputText value="#{bccp.propertyTerm}"/>
                                                     <div>
@@ -111,6 +139,17 @@
                                                     </div>
                                                 </p:column>
                                             </p:dataTable>
+
+                                            <p:commandButton value="Append"
+                                                             actionListener="#{extensionBean.setPreparedAppendBcc(false)}"
+                                                             action="#{extensionBean.appendBcc()}"
+                                                             onclick="PF('leftBlockUI').hide()"
+                                                             update=":form"/>
+                                            <p:commandButton value="Discard"
+                                                             styleClass="danger"
+                                                             actionListener="#{extensionBean.setPreparedAppendBcc(false)}"
+                                                             onclick="PF('leftBlockUI').hide()"
+                                                             update=":form:details"/>
                                         </p:panel>
                                     </h:panelGroup>
 
@@ -173,7 +212,7 @@
                                                 <h:selectOneMenu
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
-                                                        disabled="true">
+                                                        disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
                                                 </h:selectOneMenu>
@@ -182,14 +221,14 @@
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMax}"
                                                         styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}"/>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.definition}"
                                                         rows="6" autoResize="false"
                                                         styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
                                         <p:panel header="ASCCP">
@@ -246,7 +285,7 @@
                                                 <h:selectOneMenu
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
-                                                        disabled="true">
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
                                                 </h:selectOneMenu>
@@ -255,14 +294,14 @@
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMax}"
                                                         styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.definition}"
                                                         rows="6" autoResize="false"
                                                         styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
 

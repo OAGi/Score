@@ -1,5 +1,6 @@
 package org.oagi.srt.repository;
 
+import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,9 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1")
     public List<BasicCoreComponent> findByFromAccId(long fromAccId);
+
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
+    public List<BasicCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.seqKey != 0")
     public List<BasicCoreComponent> findByFromAccIdAndSeqKeyIsNotZero(long fromAccId);

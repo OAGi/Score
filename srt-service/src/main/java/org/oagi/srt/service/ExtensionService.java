@@ -248,8 +248,8 @@ public class ExtensionService {
     }
 
     private BasicCoreComponent createBCC(AggregateCoreComponent pAcc,
-                                                BasicCoreComponentProperty tBccp,
-                                                User owner, int seqKey) {
+                                         BasicCoreComponentProperty tBccp,
+                                         User owner, int seqKey) {
         long userId = owner.getAppUserId();
         BasicCoreComponent bcc = new BasicCoreComponent();
         bcc.setGuid(Utility.generateGUID());
@@ -301,16 +301,51 @@ public class ExtensionService {
     }
 
     public static class AppendAsccResult {
+
+        private final AssociationCoreComponent ascc;
+        private final AssociationCoreComponent asccHistory;
+
+        public AppendAsccResult(AssociationCoreComponent ascc,
+                                AssociationCoreComponent asccHistory) {
+            this.ascc = ascc;
+            this.asccHistory = asccHistory;
+        }
+
+        public AssociationCoreComponent getAscc() {
+            return ascc;
+        }
+
+        public AssociationCoreComponent getAsccHistory() {
+            return asccHistory;
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public AppendAsccResult appendAsccTo(AggregateCoreComponent pAcc,
+                                         AssociationCoreComponentProperty tAsccp,
+                                         User user) {
+
+        int seqKey = nextSeqKey(pAcc);
+        AssociationCoreComponent tAscc = createASCC(pAcc, tAsccp, user, seqKey);
+        asccRepository.saveAndFlush(tAscc);
+
+        AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc);
+        asccRepository.saveAndFlush(tAsccHistory);
+
+        return new AppendAsccResult(tAscc, tAsccHistory);
+    }
+
+    public static class CreateAsccResult {
         private final AssociationCoreComponentProperty asccp;
         private final AssociationCoreComponentProperty asccpHistory;
 
         private final AssociationCoreComponent ascc;
         private final AssociationCoreComponent asccHistory;
 
-        private AppendAsccResult(AssociationCoreComponentProperty asccp,
-                                AssociationCoreComponentProperty asccpHistory,
-                                AssociationCoreComponent ascc,
-                                AssociationCoreComponent asccHistory) {
+        private CreateAsccResult(AssociationCoreComponentProperty asccp,
+                                 AssociationCoreComponentProperty asccpHistory,
+                                 AssociationCoreComponent ascc,
+                                 AssociationCoreComponent asccHistory) {
             this.asccp = asccp;
             this.asccpHistory = asccpHistory;
             this.ascc = ascc;
@@ -335,7 +370,7 @@ public class ExtensionService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public AppendAsccResult appendAsccTo(AggregateCoreComponent pAcc, User user) {
+    public CreateAsccResult createAsccTo(AggregateCoreComponent pAcc, User user) {
         AssociationCoreComponentProperty tAsccp = createASCCP(pAcc, user);
         asccpRepository.saveAndFlush(tAsccp);
 
@@ -349,20 +384,53 @@ public class ExtensionService {
         AssociationCoreComponent tAsccHistory = createASCCHistory(tAscc);
         asccRepository.saveAndFlush(tAsccHistory);
 
-        return new AppendAsccResult(tAsccp, tAsccpHistory, tAscc, tAsccHistory);
+        return new CreateAsccResult(tAsccp, tAsccpHistory, tAscc, tAsccHistory);
     }
 
     public static class AppendBccResult {
+
+        private final BasicCoreComponent bcc;
+        private final BasicCoreComponent bccHistory;
+
+        public AppendBccResult(BasicCoreComponent bcc, BasicCoreComponent bccHistory) {
+            this.bcc = bcc;
+            this.bccHistory = bccHistory;
+        }
+
+        public BasicCoreComponent getBcc() {
+            return bcc;
+        }
+
+        public BasicCoreComponent getBccHistory() {
+            return bccHistory;
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public AppendBccResult appendBccTo(AggregateCoreComponent pAcc,
+                                       BasicCoreComponentProperty tBccp,
+                                       User user) {
+        int seqKey = nextSeqKey(pAcc);
+        BasicCoreComponent tBcc = createBCC(pAcc, tBccp, user, seqKey);
+        bccRepository.saveAndFlush(tBcc);
+
+        BasicCoreComponent tBccHistory = createBCCHistory(tBcc);
+        bccRepository.saveAndFlush(tBccHistory);
+
+        return new AppendBccResult(tBcc, tBccHistory);
+    }
+
+    public static class CreateBccResult {
         private final BasicCoreComponentProperty bccp;
         private final BasicCoreComponentProperty bccpHistory;
 
         private final BasicCoreComponent bcc;
         private final BasicCoreComponent bccHistory;
 
-        private AppendBccResult(BasicCoreComponentProperty bccp,
-                               BasicCoreComponentProperty bccpHistory,
-                               BasicCoreComponent bcc,
-                               BasicCoreComponent bccHistory) {
+        private CreateBccResult(BasicCoreComponentProperty bccp,
+                                BasicCoreComponentProperty bccpHistory,
+                                BasicCoreComponent bcc,
+                                BasicCoreComponent bccHistory) {
             this.bccp = bccp;
             this.bccpHistory = bccpHistory;
             this.bcc = bcc;
@@ -387,7 +455,7 @@ public class ExtensionService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public AppendBccResult appendBccTo(AggregateCoreComponent pAcc, User user, DataType tBdt) {
+    public CreateBccResult createBccTo(AggregateCoreComponent pAcc, User user, DataType tBdt) {
         BasicCoreComponentProperty tBccp = createBCCP(pAcc, user, tBdt);
         BasicCoreComponentProperty tBccpHistory = createBCCPHistory(tBccp);
         bccpRepository.save(Arrays.asList(tBccp, tBccpHistory));
@@ -397,12 +465,12 @@ public class ExtensionService {
         BasicCoreComponent tBccHistory = createBCCHistory(tBcc);
         bccRepository.save(Arrays.asList(tBcc, tBccHistory));
 
-        return new AppendBccResult(tBccp, tBccpHistory, tBcc, tBccHistory);
+        return new CreateBccResult(tBccp, tBccpHistory, tBcc, tBccHistory);
     }
 
     private int nextSeqKey(AggregateCoreComponent acc) {
-        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccId(acc.getAccId());
-        List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(acc.getAccId());
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
+        List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(acc.getAccId(), 0);
 
         int nextSeqKey = asccList.size() + bccList.size() + 1;
         ensureNextSeqKey(nextSeqKey, asccList, bccList);
