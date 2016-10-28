@@ -137,7 +137,7 @@ public class ExtensionService {
         AssociationCoreComponentProperty ueAsccp = createASCCP(ueAcc, currentLoginUser);
         ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
         ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
-        ueAsccp.setState(Editing);
+        ueAsccp.setState(Published);
         return asccpRepository.saveAndFlush(ueAsccp);
     }
 
@@ -153,7 +153,7 @@ public class ExtensionService {
         AssociationCoreComponent ueAscc = createASCC(eAcc, ueAsccp, currentLoginUser, 1);
         ueAscc.setCardinalityMin(1);
         ueAscc.setDefinition("System created association to the system created user extension group component - " + ueAcc.getObjectClassTerm() + ".");
-        ueAscc.setState(Editing);
+        ueAscc.setState(Published);
         return asccRepository.saveAndFlush(ueAscc);
     }
 
