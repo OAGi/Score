@@ -1,8 +1,6 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
-import org.oagi.srt.model.BIENodeVisitor;
-import org.oagi.srt.model.LazyNode;
-import org.oagi.srt.model.Node;
+import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.BBIESCNode;
@@ -48,15 +46,42 @@ public class LazyTreeBIENodeVisitor implements BIENodeVisitor {
     }
 
     private void visit(Node node, String type) {
-        TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
-        if (node instanceof LazyNode) {
-            LazyNode lazyNode = (LazyNode) node;
-            if (!lazyNode.isFetched()) {
-                for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
-                    new DefaultTreeNode(null, treeNode);
+        if (exists(node)) {
+            return;
+        }
+
+        if (node.getName().contains("User Extension")) { // To hide 'User Extension' nodes
+            if (node instanceof LazyNode) {
+                LazyNode lazyNode = (LazyNode) node;
+                if (!lazyNode.isFetched()) {
+                    lazyNode.fetch();
+                }
+            }
+
+            for (Node child : node.getChildren()) {
+                ((BIENode) child).accept(this);
+            }
+
+        } else {
+            TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
+            if (node instanceof LazyNode) {
+                LazyNode lazyNode = (LazyNode) node;
+                if (!lazyNode.isFetched()) {
+                    for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
+                        new DefaultTreeNode(null, treeNode);
+                    }
                 }
             }
         }
+    }
+
+    private boolean exists(Node node) {
+        for (TreeNode child : this.parent.getChildren()) {
+            if (node.equals(child.getData())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

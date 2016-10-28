@@ -26,6 +26,9 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.den like %?1%")
     public List<AssociationCoreComponent> findByDenContaining(String den);
 
+    @Query("select a from AssociationCoreComponent a where a.fromAccId = ?1 and a.toAsccpId = ?2")
+    public List<AssociationCoreComponent> findByFromAccIdAndToAsccpId(long fromAccId, long toAsccpId);
+
     @Query("select a from AssociationCoreComponent a where a.guid = ?1 and a.fromAccId = ?2 and a.toAsccpId = ?3")
     public AssociationCoreComponent findOneByGuidAndFromAccIdAndToAsccpId(String guid, long fromAccId, long toAsccpId);
 

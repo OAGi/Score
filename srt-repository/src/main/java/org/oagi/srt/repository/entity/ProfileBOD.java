@@ -1,5 +1,7 @@
 package org.oagi.srt.repository.entity;
 
+import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -29,7 +31,8 @@ public class ProfileBOD {
     private String bizCtxName;
 
     @Column
-    private int state;
+    @Convert(attributeName = "state", converter = AggregateBusinessInformationEntityStateConverter.class)
+    private AggregateBusinessInformationEntityState state;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -97,11 +100,11 @@ public class ProfileBOD {
         this.bizCtxName = bizCtxName;
     }
 
-    public int getState() {
+    public AggregateBusinessInformationEntityState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(AggregateBusinessInformationEntityState state) {
         this.state = state;
     }
 
@@ -149,7 +152,7 @@ public class ProfileBOD {
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (createdUsername != null ? createdUsername.hashCode() : 0);
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);

@@ -4,6 +4,8 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -244,6 +246,7 @@ public class ExtensionService {
         bccpHistory.setRevisionNum(1);
         bccpHistory.setRevisionTrackingNum(1);
         bccpHistory.setRevisionAction(Insert);
+        bccpHistory.setCurrentBccpId(tBccp.getBccpId());
         return bccpHistory;
     }
 
@@ -276,6 +279,7 @@ public class ExtensionService {
         bccHistory.setRevisionNum(1);
         bccHistory.setRevisionTrackingNum(1);
         bccHistory.setRevisionAction(Insert);
+        bccHistory.setCurrentBccId(tBcc.getBccId());
         return bccHistory;
     }
 
@@ -333,6 +337,10 @@ public class ExtensionService {
         asccRepository.saveAndFlush(tAsccHistory);
 
         return new AppendAsccResult(tAscc, tAsccHistory);
+    }
+
+    public boolean exists(AggregateCoreComponent pAcc, AssociationCoreComponentProperty tAsccp) {
+        return !asccRepository.findByFromAccIdAndToAsccpId(pAcc.getAccId(), tAsccp.getAsccpId()).isEmpty();
     }
 
     public static class CreateAsccResult {
@@ -418,6 +426,10 @@ public class ExtensionService {
         bccRepository.saveAndFlush(tBccHistory);
 
         return new AppendBccResult(tBcc, tBccHistory);
+    }
+
+    public boolean exists(AggregateCoreComponent pAcc, BasicCoreComponentProperty tBccp) {
+        return !bccRepository.findByFromAccIdAndToBccpId(pAcc.getAccId(), tBccp.getBccpId()).isEmpty();
     }
 
     public static class CreateBccResult {

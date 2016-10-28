@@ -33,6 +33,9 @@ public class AssociationCoreComponentPropertyForLookup {
     @Column(nullable = false)
     private boolean reusableIndicator;
 
+    @Column(name = "is_deprecated", nullable = false)
+    private boolean deprecated;
+
     @Column(nullable = false)
     private int revisionNum;
 
@@ -84,6 +87,14 @@ public class AssociationCoreComponentPropertyForLookup {
         this.reusableIndicator = reusableIndicator;
     }
 
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
+    }
+
     public int getRevisionNum() {
         return revisionNum;
     }
@@ -101,6 +112,7 @@ public class AssociationCoreComponentPropertyForLookup {
 
         if (asccpId != that.asccpId) return false;
         if (reusableIndicator != that.reusableIndicator) return false;
+        if (deprecated != that.deprecated) return false;
         if (revisionNum != that.revisionNum) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
@@ -117,6 +129,7 @@ public class AssociationCoreComponentPropertyForLookup {
         result = 31 * result + (roleOfAccId != null ? roleOfAccId.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (reusableIndicator ? 1 : 0);
+        result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + revisionNum;
         return result;
     }
@@ -130,6 +143,7 @@ public class AssociationCoreComponentPropertyForLookup {
                 ", roleOfAccId=" + roleOfAccId +
                 ", state=" + state +
                 ", reusableIndicator=" + reusableIndicator +
+                ", deprecated=" + deprecated +
                 ", revisionNum=" + revisionNum +
                 '}';
     }

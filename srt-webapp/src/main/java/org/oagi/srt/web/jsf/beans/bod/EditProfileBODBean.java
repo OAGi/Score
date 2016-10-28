@@ -306,11 +306,11 @@ public class EditProfileBODBean extends UIHandler {
     }
 
     @Transactional(readOnly = false, rollbackFor = Throwable.class)
-    public String publish() {
+    public String updateState(AggregateBusinessInformationEntityState state) {
         try {
             TopLevelNode topLevelNode = getTopLevelNode();
             long topLevelAbieId = topLevelNode.getAbie().getOwnerTopLevelAbieId();
-            bieService.publish(topLevelAbieId);
+            bieService.updateState(topLevelAbieId, state);
 
             return "/views/profile_bod/list.xhtml?faces-redirect=true";
         } catch (Throwable t) {

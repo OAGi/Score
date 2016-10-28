@@ -222,8 +222,18 @@
                                     <h:panelGroup
                                             rendered="#{extensionBean.preparedAppend eq false and
                                                         fn:startsWith(extensionBean.selectedTreeNode.type, 'ASCCP')}">
-                                        <p:panel header="ASCC"
-                                                 rendered="#{extensionBean.selectedTreeNode.data.ascc != null}">
+                                        <p:panel rendered="#{extensionBean.selectedTreeNode.data.ascc != null}">
+                                            <f:facet name="header">
+                                                <h:outputText value="ASCC"/>
+                                                <span style="float: right;">
+                                                    <p:commandButton
+                                                            rendered="#{extensionBean.selectedTreeNode.data.ascc.state == 'Editing'}"
+                                                            value="Update" ajax="true"
+                                                            actionListener="#{extensionBean.updateAsccp}"
+                                                            update=":form:details"/>
+                                                </span>
+                                            </f:facet>
+
                                             <h:panelGrid columns="2" cellpadding="3">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
@@ -306,7 +316,18 @@
                                     <h:panelGroup
                                             rendered="#{extensionBean.preparedAppend eq false and
                                                         fn:startsWith(extensionBean.selectedTreeNode.type, 'BCCP')}">
-                                        <p:panel header="BCC">
+                                        <p:panel rendered="#{extensionBean.selectedTreeNode.data.bcc != null}">
+                                            <f:facet name="header">
+                                                <h:outputText value="BCC"/>
+                                                <span style="float: right;">
+                                                    <p:commandButton
+                                                            rendered="#{extensionBean.selectedTreeNode.data.bcc.state == 'Editing'}"
+                                                            value="Update" ajax="true"
+                                                            actionListener="#{extensionBean.updateBcc}"
+                                                            update=":form:details"/>
+                                                </span>
+                                            </f:facet>
+
                                             <h:panelGrid columns="2" cellpadding="3">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
@@ -395,6 +416,28 @@
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.den}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
+
+                                                <h:outputText value="Nillable" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.bccp.nillable}"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Deprecated" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.bccp.deprecated}"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}">
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Default Value" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.bccp.defaultValue}"
+                                                        rows="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}"/>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea

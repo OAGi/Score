@@ -26,6 +26,9 @@ public class BasicCoreComponentPropertyForLookup {
     @Column(nullable = false)
     private long bdtId;
 
+    @Column(name = "is_deprecated", nullable = false)
+    private boolean deprecated;
+
     @Column(nullable = false)
     @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
     private CoreComponentState state;
@@ -62,6 +65,14 @@ public class BasicCoreComponentPropertyForLookup {
         this.bdtId = bdtId;
     }
 
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
+    }
+
     public CoreComponentState getState() {
         return state;
     }
@@ -79,6 +90,7 @@ public class BasicCoreComponentPropertyForLookup {
 
         if (bccpId != that.bccpId) return false;
         if (bdtId != that.bdtId) return false;
+        if (deprecated != that.deprecated) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
         return state == that.state;
@@ -91,6 +103,7 @@ public class BasicCoreComponentPropertyForLookup {
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
         result = 31 * result + (int) (bdtId ^ (bdtId >>> 32));
+        result = 31 * result + (deprecated ? 1 : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         return result;
     }
@@ -102,6 +115,7 @@ public class BasicCoreComponentPropertyForLookup {
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
                 ", bdtId=" + bdtId +
+                ", deprecated=" + deprecated +
                 ", state=" + state +
                 '}';
     }

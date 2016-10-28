@@ -319,7 +319,7 @@ public class ExtensionBean extends UIHandler {
 
     public void prepareAppendAscc() {
         allAsccpList = asccpLookupRepository.findAll().stream()
-                .filter(e -> e.getState() == Published)
+                .filter(e -> !e.isDeprecated())
                 .filter(e -> e.isReusableIndicator())
                 .collect(Collectors.toList());
         setAsccpList(
@@ -370,6 +370,13 @@ public class ExtensionBean extends UIHandler {
 
         AssociationCoreComponentProperty tAsccp = asccpRepository.findOne(selectedAsccpLookup.getAsccpId());
         AggregateCoreComponent pAcc = getUserExtensionAcc();
+
+        if (extensionService.exists(pAcc, tAsccp)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                            "You cannot append to an existing association core component."));
+            return;
+        }
 
         User user = loadAuthentication();
         TreeNode rootNode = getRootNode();
@@ -440,7 +447,7 @@ public class ExtensionBean extends UIHandler {
 
     public void prepareAppendBcc() {
         allBccpList = bccpLookupRepository.findAll().stream()
-                .filter(e -> e.getState() == Published)
+                .filter(e -> !e.isDeprecated())
                 .collect(Collectors.toList());
         setBccpList(
                 allBccpList.stream()
@@ -490,6 +497,13 @@ public class ExtensionBean extends UIHandler {
 
         BasicCoreComponentProperty tBccp = bccpRepository.findOne(selectedBccpLookup.getBccpId());
         AggregateCoreComponent pAcc = getUserExtensionAcc();
+
+        if (extensionService.exists(pAcc, tBccp)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                            "You cannot append to an existing basic core component."));
+            return;
+        }
 
         User user = loadAuthentication();
         TreeNode rootNode = getRootNode();

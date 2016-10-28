@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
 
 @Service
@@ -305,14 +306,16 @@ public class NodeService {
         public DataContainerForProfileBODBuilder(BusinessContext businessContext) {
             this.businessContext = businessContext;
 
-            basicCoreComponents = bccRepository.findAllWithRevisionNum(0);
+            basicCoreComponents = bccRepository.findAllWithRevisionNum(0).stream()
+                    .filter(e -> e.getState() == Published).collect(Collectors.toList());
             fromAccIdToBccMap = basicCoreComponents.stream()
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
             fromAccIdToBccWithoutAttributesMap = basicCoreComponents.stream()
                     .filter(e -> e.getSeqKey() != 0)
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
 
-            associationCoreComponents = asccRepository.findAllWithRevisionNum(0);
+            associationCoreComponents = asccRepository.findAllWithRevisionNum(0).stream()
+                    .filter(e -> e.getState() == Published).collect(Collectors.toList());
             fromAccIdToAsccMap = associationCoreComponents.stream()
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
 
@@ -324,8 +327,10 @@ public class NodeService {
             accMap = accRepository.findAllWithRevisionNum(0).stream()
                     .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
             asccpMap = asccpRepository.findAllWithRevisionNum(0).stream()
+                    .filter(e -> e.getState() == Published)
                     .collect(Collectors.toMap(e -> e.getAsccpId(), Function.identity()));
             bccpMap = bccpRepository.findAllWithRevisionNum(0).stream()
+                    .filter(e -> e.getState() == Published)
                     .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
 
             bdtPriRestriMap = bdtPriRestriList.stream()

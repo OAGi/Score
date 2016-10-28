@@ -494,10 +494,10 @@
 
 
                                     <!--
-                                        Published
+                                        Candidate or Published
                                     -->
                                     <h:panelGroup id="publishPanel"
-                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Published'}">
+                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state != 'Editing'}">
                                         <!--
                                             ABIE
                                         -->
@@ -918,11 +918,20 @@
                 </h:panelGroup>
             </p:panel>
 
-            <p:panel id="btnGroup" rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}">
-                <p:commandButton id="btnUpdate" widgetVar="btnUpdate" value="Update"
+            <p:panel id="btnGroup">
+                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}"
+                                 id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{editProfileBODBean.update()}"/>
-                <p:commandButton id="btnPublish" widgetVar="btnPublish" value="Publish"
-                                 action="#{editProfileBODBean.publish()}"/>
+                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}"
+                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
+                                 action="#{editProfileBODBean.updateState('Candidate')}"/>
+
+                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Candidate'}"
+                                 id="btnEditing" widgetVar="btnEditing" value="Editing"
+                                 action="#{editProfileBODBean.updateState('Editing')}"/>
+                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Candidate'}"
+                                 id="btnPublish" widgetVar="btnPublish" value="Publish"
+                                 action="#{editProfileBODBean.updateState('Published')}"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

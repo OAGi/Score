@@ -3,6 +3,7 @@ package org.oagi.srt.repository.entity;
 public enum AggregateBusinessInformationEntityState {
 
     Editing(2),
+    Candidate(3),
     Published(4);
 
     private final int value;
