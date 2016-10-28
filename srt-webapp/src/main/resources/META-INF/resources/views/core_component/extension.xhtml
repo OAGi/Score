@@ -208,9 +208,10 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.acc.definition}"
-                                                        rows="6" autoResize="false"
-                                                        styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        rows="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
                                     </h:panelGroup>
@@ -239,7 +240,7 @@
                                                 <h:outputText value="Min" styleClass="section-label"/>
                                                 <h:selectOneMenu
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMin}"
-                                                        styleClass="section-content input-section disabled"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
@@ -248,14 +249,22 @@
                                                 <h:outputText value="Max" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.cardinalityMax}"
-                                                        styleClass="section-content input-section disabled"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}"/>
+
+                                                <h:outputText value="Deprecated" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.ascc.deprecated}"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
+                                                </h:selectBooleanCheckbox>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.definition}"
-                                                        rows="6" autoResize="false"
-                                                        styleClass="section-content input-section disabled"
+                                                        rows="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -282,9 +291,10 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.asccp.definition}"
-                                                        rows="6" autoResize="false"
-                                                        styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        rows="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
                                     </h:panelGroup>
@@ -310,10 +320,19 @@
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
 
+                                                <h:outputText value="Entity Type" styleClass="section-label"/>
+                                                <h:selectOneMenu
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.entityType}"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                    <f:selectItem itemLabel="Attribute" itemValue="Attribute"/>
+                                                    <f:selectItem itemLabel="Element" itemValue="Element"/>
+                                                </h:selectOneMenu>
+
                                                 <h:outputText value="Min" styleClass="section-label"/>
                                                 <h:selectOneMenu
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMin}"
-                                                        styleClass="section-content input-section disabled"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
@@ -322,14 +341,37 @@
                                                 <h:outputText value="Max" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.cardinalityMax}"
-                                                        styleClass="section-content input-section disabled"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
+
+                                                <h:outputText value="Nillable" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.bcc.nillable}"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Deprecated" styleClass="section-label"/>
+                                                <h:selectBooleanCheckbox
+                                                        value="${extensionBean.selectedTreeNode.data.bcc.deprecated}"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                </h:selectBooleanCheckbox>
+
+                                                <h:outputText value="Default Value" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.bcc.defaultValue}"
+                                                        rows="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.definition}"
-                                                        rows="6" autoResize="false"
-                                                        styleClass="section-content input-section disabled"
+                                                        rows="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
@@ -357,9 +399,10 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.definition}"
-                                                        rows="6" autoResize="false"
-                                                        styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                        rows="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' and
+                                                                extensionBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}" autoResize="false"
+                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}"/>
                                             </h:panelGrid>
                                         </p:panel>
 
@@ -392,7 +435,7 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bdt.definition}"
-                                                        rows="6" autoResize="false"
+                                                        rows="#{extensionBean.selectedTreeNode.data.bdt.definition == null ? '2' : '6'}" autoResize="false"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
                                             </h:panelGrid>

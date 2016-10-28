@@ -654,6 +654,10 @@ span.ui-button-text {
     color: #333;
 }
 
+.ui-panel-content input[type=checkbox] {
+    margin-bottom: 5px !important;
+}
+
 .ui-inputfield {
     /*min-width: 440px;*/
     border: 0 !important;

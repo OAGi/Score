@@ -735,7 +735,7 @@
                                                                      disabled="true">
                                                         <p:ajax update="bdtPriRestriPanelForPublished"/>
                                                         <f:selectItems
-                                                                value="#{editProfileBODBean.getBdtPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
+                                                                value="#{editProfileBODBean.getAvailablePrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
                                                     </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
