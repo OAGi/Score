@@ -125,7 +125,7 @@ public class CodeListBaseBean extends UIHandler {
     @Transactional(rollbackFor = Throwable.class)
     public String forceUpdate() {
         codeList = codeListService.newCodeListBuilder(codeList)
-                .userId(loadAuthentication().getAppUserId())
+                .userId(getCurrentUser().getAppUserId())
                 .state(state)
                 .build();
 

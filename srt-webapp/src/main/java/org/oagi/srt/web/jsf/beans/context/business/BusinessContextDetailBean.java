@@ -241,9 +241,9 @@ public class BusinessContextDetailBean extends UIHandler {
 
         if (businessContext.getBizCtxId() <= 0L) {
             businessContext.setGuid(Utility.generateGUID());
-            businessContext.setCreatedBy(loadAuthentication().getAppUserId());
+            businessContext.setCreatedBy(getCurrentUser().getAppUserId());
         }
-        businessContext.setLastUpdatedBy(loadAuthentication().getAppUserId());
+        businessContext.setLastUpdatedBy(getCurrentUser().getAppUserId());
 
         Map<Long, BusinessContextValue> bcvs = new HashMap();
         for (BCV bcv : businessContextValues) {

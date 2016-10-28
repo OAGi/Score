@@ -183,7 +183,7 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
     public void createBusinessContext() {
         businessContextService.newBusinessContextBuilder()
                 .name(this.name)
-                .userId(loadAuthentication().getAppUserId())
+                .userId(getCurrentUser().getAppUserId())
                 .contextSchemeValues(
                         bcValues.stream()
                                 .flatMap(e -> e.getCsList().stream())

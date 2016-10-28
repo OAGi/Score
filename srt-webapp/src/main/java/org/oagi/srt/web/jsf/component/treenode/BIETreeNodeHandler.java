@@ -11,7 +11,6 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
-import org.oagi.srt.web.jsf.beans.bod.CreateProfileBODBean;
 import org.oagi.srt.web.jsf.beans.bod.ProgressListener;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -370,7 +369,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void submit(BaseTopLevelNode node, ProgressListener progressListener) {
-        SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(loadAuthentication());
+        SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(getCurrentUser());
         submitNodeVisitor.setProgressListener(progressListener);
         node.accept(submitNodeVisitor);
     }
@@ -474,7 +473,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void update(TopLevelNode node) {
-        UpdateBIENodeVisitor updateNodeVisitor = new UpdateBIENodeVisitor(loadAuthentication());
+        UpdateBIENodeVisitor updateNodeVisitor = new UpdateBIENodeVisitor(getCurrentUser());
         node.accept(updateNodeVisitor);
     }
 
@@ -648,7 +647,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void copy(BaseTopLevelNode node, BusinessContext bizCtx, ProgressListener progressListener) {
-        CopyBIENodeVisitor copyNodeVisitor = new CopyBIENodeVisitor(loadAuthentication(), bizCtx);
+        CopyBIENodeVisitor copyNodeVisitor = new CopyBIENodeVisitor(getCurrentUser(), bizCtx);
         copyNodeVisitor.setProgressListener(progressListener);
         node.accept(copyNodeVisitor);
     }

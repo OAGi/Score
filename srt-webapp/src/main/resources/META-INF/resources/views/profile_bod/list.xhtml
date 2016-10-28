@@ -25,9 +25,13 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
                     <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
-                        <h:link value="#{profileBOD.propertyTerm}" outcome="/views/profile_bod/edit_profile_bod.xhtml">
+                        <h:link rendered="#{profileBODBean.currentUser.appUserId == profileBOD.createdBy}"
+                                value="#{profileBOD.propertyTerm}"
+                                outcome="/views/profile_bod/edit_profile_bod.xhtml">
                             <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
                         </h:link>
+                        <h:outputText rendered="#{profileBODBean.currentUser.appUserId != profileBOD.createdBy}"
+                                      value="#{profileBOD.propertyTerm}"/>
                     </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"

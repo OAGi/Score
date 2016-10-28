@@ -38,8 +38,8 @@ public class ProfileBODBean extends UIHandler {
 
     @PostConstruct
     public void init() {
-        User user = loadAuthentication();
-        allProfileBODs = profileBODRepository.findAllByCreatedBy(user.getAppUserId());
+        User user = getCurrentUser();
+        allProfileBODs = profileBODRepository.findAll();
         setProfileBODs(
                 allProfileBODs.stream()
                         .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))

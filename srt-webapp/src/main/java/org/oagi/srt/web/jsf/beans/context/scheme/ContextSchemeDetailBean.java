@@ -188,9 +188,9 @@ public class ContextSchemeDetailBean extends UIHandler {
             contextScheme.setGuid(Utility.generateGUID());
         }
         if (contextScheme.getCtxSchemeId() == 0L) {
-            contextScheme.setCreatedBy(loadAuthentication().getAppUserId());
+            contextScheme.setCreatedBy(getCurrentUser().getAppUserId());
         }
-        contextScheme.setLastUpdatedBy(loadAuthentication().getAppUserId());
+        contextScheme.setLastUpdatedBy(getCurrentUser().getAppUserId());
         contextScheme.setContextCategory(contextCategory);
         contextSchemeValues.stream().filter(e -> e.getGuid() == null).forEach(e -> e.setGuid(Utility.generateGUID()));
 

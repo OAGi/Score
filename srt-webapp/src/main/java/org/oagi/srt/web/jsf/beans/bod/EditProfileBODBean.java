@@ -332,7 +332,7 @@ public class EditProfileBODBean extends UIHandler {
         TreeNode treeNode = getSelectedTreeNode();
         ASBIENode asbieNode = (ASBIENode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
-        User user = loadAuthentication();
+        User user = getCurrentUser();
 
         extensionService.appendUserExtensionIfAbsent(asccp, user, isLocally);
 

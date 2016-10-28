@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.repository.entity.CoreComponentState.Published;
-
 @Controller
 @Scope("view")
 @ManagedBean
@@ -378,7 +376,7 @@ public class ExtensionBean extends UIHandler {
             return;
         }
 
-        User user = loadAuthentication();
+        User user = getCurrentUser();
         TreeNode rootNode = getRootNode();
         ACCNode rootAccNode = (ACCNode) rootNode.getData();
         ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, user);
@@ -505,7 +503,7 @@ public class ExtensionBean extends UIHandler {
             return;
         }
 
-        User user = loadAuthentication();
+        User user = getCurrentUser();
         TreeNode rootNode = getRootNode();
         ACCNode rootAccNode = (ACCNode) rootNode.getData();
         ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, user);
