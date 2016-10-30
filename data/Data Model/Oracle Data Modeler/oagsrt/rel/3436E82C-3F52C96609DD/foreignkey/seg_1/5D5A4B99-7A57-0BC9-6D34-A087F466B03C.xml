@@ -1,7 +1,7 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="87DAEAB9-BF6F-D74B-E63B-9C779090400D" containerWithKeyObject="62784CB3-2B23-A1BB-C6D2-59AC6B43E818" localFKIndex="1EFAA121-31AB-D8B7-E039-F7AD056C6E43" name="ABIE_LAST_UPDATED_BY_FK">
-<createdBy>hno2</createdBy>
-<createdTime>2016-08-08 20:16:35 UTC</createdTime>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_1" id="5D5A4B99-7A57-0BC9-6D34-A087F466B03C" containerWithKeyObject="B66FD1EF-BE3E-85E8-AA50-2C36B1A57813" localFKIndex="B84AB047-BB5B-EEF1-4071-BC3E77BAC46F" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2016-10-30 07:28:05 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <deleteRule>NO ACTION</deleteRule>
 <referredTableID>629839AE-F8C3-6544-3090-0E21DF98F56A</referredTableID>
