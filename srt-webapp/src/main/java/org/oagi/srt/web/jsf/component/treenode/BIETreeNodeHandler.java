@@ -123,41 +123,45 @@ public class BIETreeNodeHandler extends UIHandler {
         }
 
         private void adjust() {
+            long owner = user.getAppUserId();
+            topLevelAbie.setOwner(owner);
+            topLevelAbie.setState(Editing);
+
             AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
-            tAbie.setCreatedBy(user.getAppUserId());
-            tAbie.setLastUpdatedBy(user.getAppUserId());
+            tAbie.setCreatedBy(owner);
+            tAbie.setLastUpdatedBy(owner);
             tAbie.setState(Editing);
             tAbie.setOwnerTopLevelAbie(topLevelAbie);
             tAbie.addPersistEventListener(progressListener);
 
             abieList.stream().forEach(abie -> {
-                abie.setCreatedBy(user.getAppUserId());
-                abie.setLastUpdatedBy(user.getAppUserId());
+                abie.setCreatedBy(owner);
+                abie.setLastUpdatedBy(owner);
                 abie.setState(Editing);
                 abie.setOwnerTopLevelAbie(topLevelAbie);
                 abie.addPersistEventListener(progressListener);
             });
             asbieList.stream().forEach(asbie -> {
-                asbie.setCreatedBy(user.getAppUserId());
-                asbie.setLastUpdatedBy(user.getAppUserId());
+                asbie.setCreatedBy(owner);
+                asbie.setLastUpdatedBy(owner);
                 asbie.setOwnerTopLevelAbie(topLevelAbie);
                 asbie.addPersistEventListener(progressListener);
             });
             asbiepList.stream().forEach(asbiep -> {
-                asbiep.setCreatedBy(user.getAppUserId());
-                asbiep.setLastUpdatedBy(user.getAppUserId());
+                asbiep.setCreatedBy(owner);
+                asbiep.setLastUpdatedBy(owner);
                 asbiep.setOwnerTopLevelAbie(topLevelAbie);
                 asbiep.addPersistEventListener(progressListener);
             });
             bbieList.stream().forEach(bbie -> {
-                bbie.setCreatedBy(user.getAppUserId());
-                bbie.setLastUpdatedBy(user.getAppUserId());
+                bbie.setCreatedBy(owner);
+                bbie.setLastUpdatedBy(owner);
                 bbie.setOwnerTopLevelAbie(topLevelAbie);
                 bbie.addPersistEventListener(progressListener);
             });
             bbiepList.stream().forEach(bbiep -> {
-                bbiep.setCreatedBy(user.getAppUserId());
-                bbiep.setLastUpdatedBy(user.getAppUserId());
+                bbiep.setCreatedBy(owner);
+                bbiep.setLastUpdatedBy(owner);
                 bbiep.setOwnerTopLevelAbie(topLevelAbie);
                 bbiep.addPersistEventListener(progressListener);
             });
@@ -444,20 +448,22 @@ public class BIETreeNodeHandler extends UIHandler {
         }
 
         private void adjust() {
+            long owner = user.getAppUserId();
+
             abieList.stream().forEach(abie -> {
-                abie.setLastUpdatedBy(user.getAppUserId());
+                abie.setLastUpdatedBy(owner);
             });
             asbieList.stream().forEach(asbie -> {
-                asbie.setLastUpdatedBy(user.getAppUserId());
+                asbie.setLastUpdatedBy(owner);
             });
             asbiepList.stream().forEach(asbiep -> {
-                asbiep.setLastUpdatedBy(user.getAppUserId());
+                asbiep.setLastUpdatedBy(owner);
             });
             bbieList.stream().forEach(bbie -> {
-                bbie.setLastUpdatedBy(user.getAppUserId());
+                bbie.setLastUpdatedBy(owner);
             });
             bbiepList.stream().forEach(bbiep -> {
-                bbiep.setLastUpdatedBy(user.getAppUserId());
+                bbiep.setLastUpdatedBy(owner);
             });
         }
 
@@ -534,53 +540,59 @@ public class BIETreeNodeHandler extends UIHandler {
         }
 
         private void adjust() {
+            long owner = user.getAppUserId();
+            topLevelAbie.setOwner(owner);
+            topLevelAbie.setState(Editing);
+
             AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
             tAbie.setAbieId(0L);
             tAbie.setGuid(Utility.generateGUID());
-            tAbie.setCreatedBy(user.getAppUserId());
-            tAbie.setLastUpdatedBy(user.getAppUserId());
+            tAbie.setCreatedBy(owner);
+            tAbie.setLastUpdatedBy(owner);
             tAbie.setState(Editing);
             tAbie.setOwnerTopLevelAbie(topLevelAbie);
+            tAbie.setBizCtxId(bizCtx.getBizCtxId());
             tAbie.addPersistEventListener(progressListener);
 
             abieList.stream().forEach(abie -> {
                 abie.setAbieId(0L);
                 abie.setGuid(Utility.generateGUID());
-                abie.setCreatedBy(user.getAppUserId());
-                abie.setLastUpdatedBy(user.getAppUserId());
+                abie.setCreatedBy(owner);
+                abie.setLastUpdatedBy(owner);
                 abie.setState(Editing);
                 abie.setOwnerTopLevelAbie(topLevelAbie);
+                abie.setBizCtxId(bizCtx.getBizCtxId());
                 abie.addPersistEventListener(progressListener);
             });
             asbieList.stream().forEach(asbie -> {
                 asbie.setAsbieId(0L);
                 asbie.setGuid(Utility.generateGUID());
-                asbie.setCreatedBy(user.getAppUserId());
-                asbie.setLastUpdatedBy(user.getAppUserId());
+                asbie.setCreatedBy(owner);
+                asbie.setLastUpdatedBy(owner);
                 asbie.setOwnerTopLevelAbie(topLevelAbie);
                 asbie.addPersistEventListener(progressListener);
             });
             asbiepList.stream().forEach(asbiep -> {
                 asbiep.setAsbiepId(0L);
                 asbiep.setGuid(Utility.generateGUID());
-                asbiep.setCreatedBy(user.getAppUserId());
-                asbiep.setLastUpdatedBy(user.getAppUserId());
+                asbiep.setCreatedBy(owner);
+                asbiep.setLastUpdatedBy(owner);
                 asbiep.setOwnerTopLevelAbie(topLevelAbie);
                 asbiep.addPersistEventListener(progressListener);
             });
             bbieList.stream().forEach(bbie -> {
                 bbie.setBbieId(0L);
                 bbie.setGuid(Utility.generateGUID());
-                bbie.setCreatedBy(user.getAppUserId());
-                bbie.setLastUpdatedBy(user.getAppUserId());
+                bbie.setCreatedBy(owner);
+                bbie.setLastUpdatedBy(owner);
                 bbie.setOwnerTopLevelAbie(topLevelAbie);
                 bbie.addPersistEventListener(progressListener);
             });
             bbiepList.stream().forEach(bbiep -> {
                 bbiep.setBbiepId(0L);
                 bbiep.setGuid(Utility.generateGUID());
-                bbiep.setCreatedBy(user.getAppUserId());
-                bbiep.setLastUpdatedBy(user.getAppUserId());
+                bbiep.setCreatedBy(owner);
+                bbiep.setLastUpdatedBy(owner);
                 bbiep.setOwnerTopLevelAbie(topLevelAbie);
                 bbiep.addPersistEventListener(progressListener);
             });

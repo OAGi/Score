@@ -774,6 +774,7 @@ public class BusinessInformationEntityService {
 
     @Transactional(rollbackFor = Throwable.class)
     public void updateState(long toplevelAbieId, AggregateBusinessInformationEntityState state) {
+        topLevelAbieRepository.updateState(toplevelAbieId, state);
         abieRepository.updateState(toplevelAbieId, state);
     }
 

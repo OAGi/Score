@@ -19,7 +19,7 @@ import java.util.Date;
                         fields = {
                                 @FieldResult(name = "abieId", column = "abie_id"),
                                 @FieldResult(name = "state", column = "state"),
-                                @FieldResult(name = "createdBy", column = "created_by"),
+                                @FieldResult(name = "owner", column = "owner"),
                                 @FieldResult(name = "creationTimestamp", column = "creation_timestamp"),
                         }
                 ),
@@ -46,7 +46,7 @@ import java.util.Date;
                 @EntityResult(
                         entityClass = User.class,
                         fields = {
-                                @FieldResult(name = "owner", column = "owner"),
+                                @FieldResult(name = "ownerName", column = "owner_name"),
                         }
                 )
         }
@@ -80,10 +80,10 @@ public class ProfileBOD {
     private AggregateBusinessInformationEntityState state;
 
     @Column(nullable = false, updatable = false)
-    private long createdBy;
+    private long owner;
 
     @Column(length = 100)
-    private String owner;
+    private String ownerName;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -153,20 +153,20 @@ public class ProfileBOD {
         this.state = state;
     }
 
-    public long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(long createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getOwner() {
+    public long getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(long owner) {
         this.owner = owner;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public Date getCreationTimestamp() {
@@ -198,8 +198,8 @@ public class ProfileBOD {
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (int) (owner ^ (owner >>> 32));
+        result = 31 * result + (ownerName != null ? ownerName.hashCode() : 0);
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         return result;
     }
@@ -215,8 +215,8 @@ public class ProfileBOD {
                 ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
                 ", state=" + state +
-                ", createdBy=" + createdBy +
-                ", owner='" + owner + '\'' +
+                ", owner=" + owner +
+                ", ownerName='" + ownerName + '\'' +
                 ", creationTimestamp=" + creationTimestamp +
                 '}';
     }

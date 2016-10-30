@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,6 +22,13 @@ public class TopLevelAbie implements Serializable {
     @JoinColumn(name = "abie_id")
     private AggregateBusinessInformationEntity abie;
 
+    @Column(nullable = false)
+    @Convert(attributeName = "state", converter = AggregateBusinessInformationEntityStateConverter.class)
+    private AggregateBusinessInformationEntityState state;
+
+    @Column(nullable = false)
+    private long owner;
+
     public long getTopLevelAbieId() {
         return topLevelAbieId;
     }
@@ -37,6 +45,22 @@ public class TopLevelAbie implements Serializable {
         this.abie = abie;
     }
 
+    public AggregateBusinessInformationEntityState getState() {
+        return state;
+    }
+
+    public void setState(AggregateBusinessInformationEntityState state) {
+        this.state = state;
+    }
+
+    public long getOwner() {
+        return owner;
+    }
+
+    public void setOwner(long owner) {
+        this.owner = owner;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,7 +74,11 @@ public class TopLevelAbie implements Serializable {
 
     @Override
     public int hashCode() {
-        return (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
+        int result = (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
+        result = 31 * result + (abie != null ? (int) (abie.getAbieId() ^ (abie.getAbieId() >>> 32)) : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (int) (owner ^ (owner >>> 32));
+        return result;
     }
 
     @Override
@@ -58,6 +86,8 @@ public class TopLevelAbie implements Serializable {
         return "TopLevelAbie{" +
                 "topLevelAbieId=" + topLevelAbieId +
                 ", abie=" + abie +
+                ", state=" + state +
+                ", owner=" + owner +
                 '}';
     }
 }
