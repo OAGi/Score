@@ -37,12 +37,25 @@
                                           sortBy="#{profileBOD.bizCtxName}">
                                     <h:outputText value="#{profileBOD.bizCtxName}"/>
                                 </p:column>
+                                <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
+                                          sortBy="#{profileBOD.ownerName}">
+                                    <h:outputText value="#{profileBOD.ownerName}"/>
+                                </p:column>
+                                <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
+                                          sortBy="#{profileBOD.creationTimestamp}">
+                                    <h:outputText value="#{profileBOD.creationTimestamp}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                           sortBy="#{profileBOD.state}">
-                                    <h:panelGroup rendered="#{profileBOD.state == 2}">
+                                    <h:panelGroup rendered="#{profileBOD.state == 'Editing'}">
                                         <span class="label label-primary">Editing</span>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{profileBOD.state == 4}">
+                                    <h:panelGroup rendered="#{profileBOD.state == 'Candidate'}">
+                                        <span class="label label-warning">Candidate</span>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{profileBOD.state == 'Published'}">
                                         <span class="label label-default">Published</span>
                                     </h:panelGroup>
                                 </p:column>
