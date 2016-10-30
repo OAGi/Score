@@ -162,7 +162,9 @@ public class TopLevelABIEHandler implements Serializable {
         maxBIEID = bbieRepository.count();
         maxBBIESCID = bbiescRepository.count();
 
-        asccpVOs = topLevelConceptRepository.findAllOrderByPropertyTermAsc();
+        asccpVOs = topLevelConceptRepository.findAll().stream()
+                .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                .collect(Collectors.toList());
     }
 
     public BarChartModel getBarModel() {

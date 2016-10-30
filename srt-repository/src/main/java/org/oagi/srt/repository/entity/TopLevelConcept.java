@@ -3,8 +3,26 @@ package org.oagi.srt.repository.entity;
 import javax.persistence.*;
 import java.util.Date;
 
+@SqlResultSetMapping(
+        name = "top_level_concept",
+        entities = {
+                @EntityResult(
+                        entityClass = AssociationCoreComponentProperty.class,
+                        fields = {
+                                @FieldResult(name = "asccpId", column = "asccp_id"),
+                                @FieldResult(name = "propertyTerm", column = "property_term"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = Module.class,
+                        fields = {
+                                @FieldResult(name = "module", column = "module"),
+                                @FieldResult(name = "lastUpdateTimestamp", column = "last_update_timestamp"),
+                        }
+                )
+        }
+)
 @Entity
-@Table(name = "v_top_level_concept")
 public class TopLevelConcept {
 
     @Id

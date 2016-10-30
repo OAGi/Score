@@ -5,8 +5,53 @@ import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEnti
 import javax.persistence.*;
 import java.util.Date;
 
+@SqlResultSetMapping(
+        name="profile_bod",
+        entities = {
+                @EntityResult(
+                        entityClass = TopLevelAbie.class,
+                        fields = {
+                                @FieldResult(name = "topLevelAbieId", column = "top_level_abie_id"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = AggregateBusinessInformationEntity.class,
+                        fields = {
+                                @FieldResult(name = "abieId", column = "abie_id"),
+                                @FieldResult(name = "state", column = "state"),
+                                @FieldResult(name = "createdBy", column = "created_by"),
+                                @FieldResult(name = "creationTimestamp", column = "creation_timestamp"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = AssociationBusinessInformationEntityProperty.class,
+                        fields = {
+                                @FieldResult(name = "asbiepId", column = "asbiep_id"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = AssociationCoreComponentProperty.class,
+                        fields = {
+                                @FieldResult(name = "asccpId", column = "asccp_id"),
+                                @FieldResult(name = "propertyTerm", column = "property_term"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = BusinessContext.class,
+                        fields = {
+                                @FieldResult(name = "bizCtxId", column = "biz_ctx_id"),
+                                @FieldResult(name = "bizCtxName", column = "biz_ctx_name"),
+                        }
+                ),
+                @EntityResult(
+                        entityClass = User.class,
+                        fields = {
+                                @FieldResult(name = "owner", column = "owner"),
+                        }
+                )
+        }
+)
 @Entity
-@Table(name = "v_profile_bod")
 public class ProfileBOD {
 
     @Id
@@ -38,7 +83,7 @@ public class ProfileBOD {
     private long createdBy;
 
     @Column(length = 100)
-    private String createdUsername;
+    private String owner;
 
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
@@ -116,12 +161,12 @@ public class ProfileBOD {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedUsername() {
-        return createdUsername;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setCreatedUsername(String createdUsername) {
-        this.createdUsername = createdUsername;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public Date getCreationTimestamp() {
@@ -154,7 +199,7 @@ public class ProfileBOD {
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (createdUsername != null ? createdUsername.hashCode() : 0);
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         return result;
     }
@@ -171,7 +216,7 @@ public class ProfileBOD {
                 ", bizCtxName='" + bizCtxName + '\'' +
                 ", state=" + state +
                 ", createdBy=" + createdBy +
-                ", createdUsername='" + createdUsername + '\'' +
+                ", owner='" + owner + '\'' +
                 ", creationTimestamp=" + creationTimestamp +
                 '}';
     }
