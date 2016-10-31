@@ -1266,6 +1266,10 @@ public class NodeService {
     }
 
     private LazyACCNode createLazyACCNode(Node parent, AggregateCoreComponent acc) {
+        if (acc.getRevisionNum() != 0) {
+            throw new IllegalStateException();
+        }
+
         ACCNode accNode = new BaseACCNode(parent, acc);
         ACCFetcher fetcher = new ACCFetcher(acc);
         LazyACCNode lazyACCNode = new LazyACCNode(accNode, fetcher, fetcher.getChildrenCount(), parent);
@@ -1303,6 +1307,10 @@ public class NodeService {
         }
 
         private void createBCCPNode(ACCNode fromAccNode, BasicCoreComponent bcc) {
+            if (bcc.getRevisionNum() != 0) {
+                throw new IllegalStateException();
+            }
+
             if (fromAccNode.getAcc().getAccId() != bcc.getFromAccId()) {
                 throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
             }
@@ -1314,6 +1322,10 @@ public class NodeService {
         }
 
         private void createLazyASCCPNode(ACCNode fromAccNode, AssociationCoreComponent ascc) {
+            if (ascc.getRevisionNum() != 0) {
+                throw new IllegalStateException();
+            }
+
             if (fromAccNode.getAcc().getAccId() != ascc.getFromAccId()) {
                 throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
             }
@@ -1338,17 +1350,17 @@ public class NodeService {
 
         @Override
         public List<BasicCoreComponent> getBCCs(long accId) {
-            return bccRepository.findByFromAccId(accId);
+            return bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
         }
 
         @Override
         public List<BasicCoreComponent> getBCCsWithoutAttributes(long accId) {
-            return bccRepository.findByFromAccIdAndSeqKeyIsNotZero(accId);
+            return bccRepository.findByFromAccIdAndRevisionNumAndSeqKeyIsNotZero(accId, 0);
         }
 
         @Override
         public List<AssociationCoreComponent> getASCCs(long accId) {
-            return asccRepository.findByFromAccId(accId);
+            return asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
         }
     }
 }

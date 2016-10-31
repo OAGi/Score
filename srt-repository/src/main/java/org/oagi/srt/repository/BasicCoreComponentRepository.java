@@ -18,8 +18,8 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2")
     public List<BasicCoreComponent> findByFromAccIdAndRevisionNum(long fromAccId, int revisionNum);
 
-    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.seqKey != 0")
-    public List<BasicCoreComponent> findByFromAccIdAndSeqKeyIsNotZero(long fromAccId);
+    @Query("select b from BasicCoreComponent b where b.fromAccId = ?1 and b.revisionNum = ?2 and b.seqKey != 0")
+    public List<BasicCoreComponent> findByFromAccIdAndRevisionNumAndSeqKeyIsNotZero(long fromAccId, int revisionNum);
 
     @Query("select b from BasicCoreComponent b where b.toBccpId = ?1 and b.entityType = ?2")
     public List<BasicCoreComponent> findByToBccpIdAndEntityType(long toBccpId, int entityType);
@@ -41,4 +41,8 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
 
     @Query("select count(a) from BasicCoreComponent a where a.fromAccId = ?1")
     public int countByFromAccId(long fromAccId);
+
+    @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionTrackingNum = (" +
+            "select MAX(b.revisionTrackingNum) from BasicCoreComponent b where b.currentBccId = ?1 group by b.currentBccId)")
+    public BasicCoreComponent findLatestOneByCurrentBccId(long currentBccId);
 }

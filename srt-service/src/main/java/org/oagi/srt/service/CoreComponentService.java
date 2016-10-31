@@ -1,18 +1,30 @@
 package org.oagi.srt.service;
 
+import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.CoreComponentProvider;
-import org.oagi.srt.repository.entity.AggregateCoreComponent;
-import org.oagi.srt.repository.entity.AssociationCoreComponent;
-import org.oagi.srt.repository.entity.BasicCoreComponent;
-import org.oagi.srt.repository.entity.CoreComponent;
+import org.oagi.srt.repository.AssociationCoreComponentRepository;
+import org.oagi.srt.repository.BasicCoreComponentRepository;
+import org.oagi.srt.repository.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
+import static org.oagi.srt.repository.entity.RevisionAction.Update;
+
 @Service
+@Transactional(readOnly = true)
 public class CoreComponentService {
+
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
+
+    @Autowired
+    private BasicCoreComponentRepository bccRepository;
 
     public List<CoreComponent> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
@@ -75,5 +87,80 @@ public class CoreComponentService {
         }
 
         return new ArrayList(coreComponents);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void update(AssociationCoreComponent ascc, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = ascc.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
+        }
+        long currentAsccId = ascc.getAsccId();
+        AssociationCoreComponent latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
+        if (latestAscc == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        asccRepository.save(ascc);
+
+        int nextRevisionTrackingNum = latestAscc.getRevisionTrackingNum() + 1;
+        AssociationCoreComponent asccHistory = ascc.clone();
+        asccHistory.setRevisionNum(latestAscc.getRevisionNum());
+        asccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
+        asccHistory.setRevisionAction(Update);
+        asccHistory.setLastUpdatedBy(requesterId);
+        asccHistory.setCurrentAsccId(currentAsccId);
+
+        asccRepository.saveAndFlush(asccHistory);
+
+        // to check RevisionTrackingNum
+        latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
+        long actualRevisionTrackingNum = latestAscc.getRevisionTrackingNum();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("AssociationCoreComponent was modified outside of this operation");
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void update(BasicCoreComponent bcc, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = bcc.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new IllegalStateException("This operation only allows for the owner of this element.");
+        }
+        long currentBccId = bcc.getBccId();
+        BasicCoreComponent latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);
+        if (latestBcc == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        switch (bcc.getEntityType()) {
+            case Element:
+                // TODO: find appropriate seqKey
+                break;
+            case Attribute:
+                bcc.setSeqKey(0);
+                break;
+        }
+
+        bccRepository.save(bcc);
+
+        int nextRevisionTrackingNum = latestBcc.getRevisionTrackingNum() + 1;
+        BasicCoreComponent bccHistory = bcc.clone();
+        bccHistory.setRevisionNum(latestBcc.getRevisionNum());
+        bccHistory.setRevisionTrackingNum(nextRevisionTrackingNum);
+        bccHistory.setRevisionAction(Update);
+        bccHistory.setLastUpdatedBy(requesterId);
+        bccHistory.setCurrentBccId(currentBccId);
+
+        bccRepository.saveAndFlush(bccHistory);
+
+        // to check RevisionTrackingNum
+        latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);
+        long actualRevisionTrackingNum = latestBcc.getRevisionTrackingNum();
+        if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
+            throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
+        }
     }
 }

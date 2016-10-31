@@ -92,19 +92,21 @@
                                                         disabled="true"/>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:selectOneMenu
+                                                <p:selectOneMenu
                                                         value="#{manageCoreComponentBean.selectedTreeNode.data.ascc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
-                                                </h:selectOneMenu>
+                                                </p:selectOneMenu>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText
-                                                        value="#{manageCoreComponentBean.selectedTreeNode.data.ascc.cardinalityMax}"
-                                                        styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                <p:selectOneMenu editable="true"
+                                                                 value="#{manageCoreComponentBean.selectedTreeNode.data.ascc.cardinalityMax}"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                    <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                </p:selectOneMenu>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
@@ -165,19 +167,21 @@
                                                         disabled="true"/>
 
                                                 <h:outputText value="Min" styleClass="section-label"/>
-                                                <h:selectOneMenu
+                                                <p:selectOneMenu
                                                         value="#{manageCoreComponentBean.selectedTreeNode.data.bcc.cardinalityMin}"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true">
                                                     <f:selectItem itemLabel="0" itemValue="0"/>
                                                     <f:selectItem itemLabel="1" itemValue="1"/>
-                                                </h:selectOneMenu>
+                                                </p:selectOneMenu>
 
                                                 <h:outputText value="Max" styleClass="section-label"/>
-                                                <h:inputText
-                                                        value="#{manageCoreComponentBean.selectedTreeNode.data.bcc.cardinalityMax}"
-                                                        styleClass="section-content input-section disabled"
-                                                        disabled="true"/>
+                                                <p:selectOneMenu editable="true"
+                                                                 value="#{manageCoreComponentBean.selectedTreeNode.data.bcc.cardinalityMax}"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                    <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                </p:selectOneMenu>
 
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea

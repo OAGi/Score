@@ -228,29 +228,30 @@
                                                 <p:panel id="asbiePanel" header="ASBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <h:selectOneMenu
+                                                        <p:selectOneMenu
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMin}"
                                                                 styleClass="section-content input-section">
                                                             <f:selectItem itemLabel="0" itemValue="0"/>
                                                             <f:selectItem itemLabel="1" itemValue="1"/>
                                                             <f:ajax render="asbiePanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:selectOneMenu>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <h:inputText
-                                                                value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
-                                                                styleClass="section-content input-section">
+                                                        <p:selectOneMenu editable="true"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
+                                                                         styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                             <f:ajax render="asbiePanel"/>
-                                                        </h:inputText>
+                                                        </p:selectOneMenu>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
-                                                        <h:selectOneMenu
+                                                        <p:selectOneMenu
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                                 styleClass="section-content input-section">
                                                             <f:selectItem itemLabel="true" itemValue="true"/>
                                                             <f:selectItem itemLabel="false" itemValue="false"/>
                                                             <f:ajax render="asbiePanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:selectOneMenu>
 
                                                         <h:outputText value="Remark" styleClass="section-label"/>
                                                         <h:inputText
@@ -343,29 +344,30 @@
                                                 <p:panel id="bbiePanel" header="BBIE">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Min" styleClass="section-label"/>
-                                                        <h:selectOneMenu
+                                                        <p:selectOneMenu
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMin}"
                                                                 styleClass="section-content input-section">
                                                             <f:selectItem itemLabel="0" itemValue="0"/>
                                                             <f:selectItem itemLabel="1" itemValue="1"/>
                                                             <f:ajax render="bbiePanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:selectOneMenu>
 
                                                         <h:outputText value="Max" styleClass="section-label"/>
-                                                        <h:inputText
-                                                                value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
-                                                                styleClass="section-content input-section">
+                                                        <p:selectOneMenu editable="true"
+                                                                         value="#{copyProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
+                                                                         styleClass="section-content input-section">
+                                                            <f:selectItem itemLabel="unbounded" itemValue="-1"/>
                                                             <f:ajax render="bbiePanel"/>
-                                                        </h:inputText>
+                                                        </p:selectOneMenu>
 
                                                         <h:outputText value="Nillable" styleClass="section-label"/>
-                                                        <h:selectOneMenu
+                                                        <p:selectOneMenu
                                                                 value="#{copyProfileBODBean.selectedTreeNode.data.bbie.nillable}"
                                                                 styleClass="section-content input-section">
                                                             <f:selectItem itemLabel="true" itemValue="true"/>
                                                             <f:selectItem itemLabel="false" itemValue="false"/>
                                                             <f:ajax render="bbiePanel"/>
-                                                        </h:selectOneMenu>
+                                                        </p:selectOneMenu>
 
                                                         <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                         <h:inputText
@@ -419,13 +421,13 @@
                                                     <f:facet name="header">
                                                         <h:outputText value="BDT Primitive Restriction"/>
 
-                                                        <h:selectOneMenu id="selectBdtPriRestri"
+                                                        <p:selectOneMenu id="selectBdtPriRestri"
                                                                          style="width: 100px; margin-left: 20px;"
                                                                          value="#{copyProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                             <p:ajax update="bdtPriRestriPanel"/>
                                                             <f:selectItems
                                                                     value="#{copyProfileBODBean.getAvailablePrimitiveRestrictions(copyProfileBODBean.selectedTreeNode.data)}"/>
-                                                        </h:selectOneMenu>
+                                                        </p:selectOneMenu>
                                                     </f:facet>
                                                     <h:panelGrid columns="2" cellpadding="2">
                                                         <h:outputText value="BDT Name" styleClass="section-label"/>
@@ -550,13 +552,13 @@
                                                     <f:facet name="header">
                                                         <h:outputText value="BDT SC Primitive Restriction"/>
 
-                                                        <h:selectOneMenu id="selectBdtScPriRestri"
+                                                        <p:selectOneMenu id="selectBdtScPriRestri"
                                                                          style="width: 100px; margin-left: 20px;"
                                                                          value="#{copyProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                             <p:ajax update="bdtScPriRestriPanel"/>
                                                             <f:selectItems
                                                                     value="#{copyProfileBODBean.getAvailableScPrimitiveRestrictions(copyProfileBODBean.selectedTreeNode.data)}"/>
-                                                        </h:selectOneMenu>
+                                                        </p:selectOneMenu>
                                                     </f:facet>
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="BDT SC Name" styleClass="section-label"/>

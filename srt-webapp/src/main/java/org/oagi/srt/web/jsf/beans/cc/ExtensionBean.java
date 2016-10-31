@@ -9,6 +9,7 @@ import org.oagi.srt.model.cc.impl.BaseASCCPNode;
 import org.oagi.srt.model.cc.impl.BaseBCCPNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.service.CoreComponentService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
@@ -44,6 +45,9 @@ import java.util.stream.Collectors;
 public class ExtensionBean extends UIHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private CoreComponentService coreComponentService;
 
     @Autowired
     private ExtensionService extensionService;
@@ -516,4 +520,32 @@ public class ExtensionBean extends UIHandler {
     }
 
     // End Append BCC
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateAscc(ASCCPNode asccpNode) {
+        AssociationCoreComponent ascc = asccpNode.getAscc();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.update(ascc, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateBcc(BCCPNode bccpNode) {
+        BasicCoreComponent bcc = bccpNode.getBcc();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.update(bcc, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+    }
 }
