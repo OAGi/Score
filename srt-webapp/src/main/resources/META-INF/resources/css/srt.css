@@ -880,3 +880,7 @@ h6 {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+.menu-first {
+    margin-left: 15px;
+}

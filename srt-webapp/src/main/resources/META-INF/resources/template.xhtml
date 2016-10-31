@@ -54,7 +54,7 @@
                         <div class="collapse navbar-collapse" id="navbar-collapse-1">
                             <ul class="nav navbar-nav">
                                 <h:panelGroup rendered="#{authenticationBean.oagisDeveloper eq false}">
-                                    <li class="dropdown" style="margin-left: 15px;">
+                                    <li class="dropdown menu-first">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                            aria-haspopup="true" aria-expanded="false">BODs <span
                                                 class="caret"></span></a>
@@ -70,7 +70,7 @@
                                         </ul>
                                     </li>
                                 </h:panelGroup>
-                                <li class="dropdown">
+                                <li class="dropdown #{authenticationBean.oagisDeveloper ? 'menu-first' : ''}">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Profile OAGIS <span
                                             class="caret"></span></a>
