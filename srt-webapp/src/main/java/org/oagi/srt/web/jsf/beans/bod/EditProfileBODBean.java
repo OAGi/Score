@@ -334,11 +334,12 @@ public class EditProfileBODBean extends UIHandler {
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
 
-        extensionService.appendUserExtensionIfAbsent(asccp, user, isLocally);
+        AggregateCoreComponent eAcc =
+                extensionService.appendUserExtensionIfAbsent(asccp, user, isLocally);
 
         TopLevelNode topLevelNode = getTopLevelNode();
 
-        return "/views/core_component/extension.xhtml?accId=" + asccp.getRoleOfAccId() +
+        return "/views/core_component/extension.xhtml?accId=" + eAcc.getAccId() +
                 "&rootAsccpId=" + topLevelNode.getAsccp().getAsccpId() + "&faces-redirect=true";
     }
 }

@@ -4,8 +4,6 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +40,8 @@ public class ExtensionService {
     private NamespaceRepository namespaceRepository;
 
     @Transactional(rollbackFor = Throwable.class)
-    public void appendUserExtensionIfAbsent(AssociationCoreComponentProperty asccp,
-                                            User user, boolean isLocally) {
+    public AggregateCoreComponent appendUserExtensionIfAbsent(AssociationCoreComponentProperty asccp,
+                                                              User user, boolean isLocally) {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
@@ -56,6 +54,8 @@ public class ExtensionService {
         if (!existsUserExtension(eAcc)) {
             createNewUserExtensionGroupACC(eAcc, user);
         }
+
+        return eAcc;
     }
 
     private AggregateCoreComponent getAllExtensionAcc(AggregateCoreComponent eAcc) {

@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{extensionBean.rootAsccp.propertyTerm} - #{extensionBean.targetAcc.objectClassTerm}</h2>
+                <h2 class="subhead-heading">#{extensionBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : extensionBean.rootAsccp.propertyTerm} - #{extensionBean.targetAcc.objectClassTerm}</h2>
             </div>
         </div>
         <h:form id="form">
@@ -209,7 +209,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.acc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -273,7 +274,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -302,7 +304,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.asccp.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -383,7 +386,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.defaultValue}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.bcc.defaultValue == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
 
@@ -391,7 +395,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -435,7 +440,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.defaultValue}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.bccp.defaultValue == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}"/>
 
@@ -443,7 +449,8 @@
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' and
-                                                                extensionBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}" autoResize="false"
+                                                                extensionBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -478,7 +485,8 @@
                                                 <h:outputText value="Definition" styleClass="section-label"/>
                                                 <h:inputTextarea
                                                         value="#{extensionBean.selectedTreeNode.data.bdt.definition}"
-                                                        rows="#{extensionBean.selectedTreeNode.data.bdt.definition == null ? '2' : '6'}" autoResize="false"
+                                                        rows="#{extensionBean.selectedTreeNode.data.bdt.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
                                                         styleClass="section-content input-section disabled"
                                                         disabled="true"/>
                                             </h:panelGrid>
