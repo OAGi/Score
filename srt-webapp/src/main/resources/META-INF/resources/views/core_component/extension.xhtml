@@ -265,6 +265,8 @@
                                                                  styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                                  disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                    <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     <f:ajax render="asccPanel"/>
                                                 </p:selectOneMenu>
 
@@ -381,6 +383,8 @@
                                                                  styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                                  disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                    <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     <f:ajax render="bccPanel"/>
                                                 </p:selectOneMenu>
 

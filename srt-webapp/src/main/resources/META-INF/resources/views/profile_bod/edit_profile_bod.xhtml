@@ -125,17 +125,17 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.asbie.cardinalityMax}"
                                                                      styleClass="section-content input-section">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                         <f:ajax render="asbiePanelForEditing"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
-                                                    <p:selectOneMenu
+                                                    <h:selectBooleanCheckbox
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                             styleClass="section-content input-section">
-                                                        <f:selectItem itemLabel="true" itemValue="true"/>
-                                                        <f:selectItem itemLabel="false" itemValue="false"/>
                                                         <f:ajax render="asbiePanelForEditing"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
@@ -241,17 +241,17 @@
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.bbie.cardinalityMax}"
                                                                      styleClass="section-content input-section">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
-                                                    <p:selectOneMenu
+                                                    <h:selectBooleanCheckbox
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.nillable}"
                                                             styleClass="section-content input-section">
-                                                        <f:selectItem itemLabel="true" itemValue="true"/>
-                                                        <f:selectItem itemLabel="false" itemValue="false"/>
                                                         <f:ajax render="bbiePanelForEditing"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                     <h:inputText
@@ -305,13 +305,13 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="BDT Primitive Restriction"/>
 
-                                                    <p:selectOneMenu id="selectBdtPriRestriForEditing"
-                                                                     style="width: 100px; margin-left: 20px;"
+                                                    <h:selectOneMenu id="selectBdtPriRestriForEditing"
+                                                                     style="width: 100px; margin-left: 20px; font-weight: normal !important;"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                         <p:ajax update="bdtPriRestriPanelForEditing"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailablePrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="BDT Name" styleClass="section-label"/>
@@ -386,12 +386,24 @@
                                             </p:panel>
                                             <p:panel id="bbieScPanelForEditing" header="BBIE SC">
                                                 <h:panelGrid columns="2" cellpadding="3">
-                                                    <h:outputText value="Max" styleClass="section-label"/>
-                                                    <h:inputText
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                    <h:outputText value="Min" styleClass="section-label"/>
+                                                    <p:selectOneMenu
+                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
                                                             styleClass="section-content input-section">
+                                                        <f:selectItem itemLabel="0" itemValue="0"/>
+                                                        <f:selectItem itemLabel="1" itemValue="1"/>
                                                         <f:ajax render="bbieScPanelForEditing"/>
-                                                    </h:inputText>
+                                                    </p:selectOneMenu>
+
+                                                    <h:outputText value="Max" styleClass="section-label"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                                     styleClass="section-content input-section">
+                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                        <f:ajax render="bbieScPanelForEditing"/>
+                                                    </p:selectOneMenu>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                     <h:inputText
@@ -434,13 +446,13 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="BDT SC Primitive Restriction"/>
 
-                                                    <p:selectOneMenu id="selectBdtScPriRestriForEditing"
-                                                                     style="width: 100px; margin-left: 20px;"
+                                                    <h:selectOneMenu id="selectBdtScPriRestriForEditing"
+                                                                     style="width: 100px; margin-left: 20px; font-weight: normal !important;"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}">
                                                         <p:ajax update="bdtScPriRestriPanelForEditing"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailableScPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="BDT SC Name" styleClass="section-label"/>
@@ -572,16 +584,16 @@
                                                                      styleClass="section-content input-section disabled"
                                                                      disabled="true">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
-                                                    <p:selectOneMenu
+                                                    <h:selectBooleanCheckbox
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.nillable}"
                                                             styleClass="section-content input-section disabled"
                                                             disabled="true">
-                                                        <f:selectItem itemLabel="true" itemValue="true"/>
-                                                        <f:selectItem itemLabel="false" itemValue="false"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Remark" styleClass="section-label"/>
                                                     <h:inputText
@@ -678,16 +690,16 @@
                                                                      styleClass="section-content input-section disabled"
                                                                      disabled="true">
                                                         <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
                                                     </p:selectOneMenu>
 
                                                     <h:outputText value="Nillable" styleClass="section-label"/>
-                                                    <p:selectOneMenu
+                                                    <h:selectBooleanCheckbox
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.nillable}"
                                                             styleClass="section-content input-section disabled"
                                                             disabled="true">
-                                                        <f:selectItem itemLabel="true" itemValue="true"/>
-                                                        <f:selectItem itemLabel="false" itemValue="false"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectBooleanCheckbox>
 
                                                     <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                     <h:inputText
@@ -735,14 +747,14 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="BDT Primitive Restriction"/>
 
-                                                    <p:selectOneMenu id="selectBdtPriRestriForPublished"
-                                                                     style="width: 100px; margin-left: 20px;"
+                                                    <h:selectOneMenu id="selectBdtPriRestriForPublished"
+                                                                     style="width: 100px; margin-left: 20px; font-weight: normal !important;"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
                                                                      disabled="true">
                                                         <p:ajax update="bdtPriRestriPanelForPublished"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailablePrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="BDT Name" styleClass="section-label"/>
@@ -815,13 +827,26 @@
                                             </p:panel>
                                             <p:panel header="BBIE SC">
                                                 <h:panelGrid columns="2" cellpadding="3">
-                                                    <h:outputText value="Max" styleClass="section-label"/>
-                                                    <h:inputText
-                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                    <h:outputText value="Min" styleClass="section-label"/>
+                                                    <p:selectOneMenu
+                                                            value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMin}"
                                                             styleClass="section-content input-section disabled"
-                                                            disabled="true"/>
-                                                    <h:outputText value="Fixed Value" styleClass="section-label"/>
+                                                            disabled="true">
+                                                        <f:selectItem itemLabel="0" itemValue="0"/>
+                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                    </p:selectOneMenu>
 
+                                                    <h:outputText value="Max" styleClass="section-label"/>
+                                                    <p:selectOneMenu editable="true"
+                                                                     value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.cardinalityMax}"
+                                                                     styleClass="section-content input-section disabled"
+                                                                     disabled="true">
+                                                        <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                        <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                        <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                    </p:selectOneMenu>
+
+                                                    <h:outputText value="Fixed Value" styleClass="section-label"/>
                                                     <h:inputText
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.fixedValue}"
                                                             styleClass="section-content input-section disabled"
@@ -857,14 +882,14 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="BDT SC Primitive Restriction"/>
 
-                                                    <p:selectOneMenu id="selectBdtScPriRestriForPublished"
-                                                                     style="width: 100px; margin-left: 20px;"
+                                                    <h:selectOneMenu id="selectBdtScPriRestriForPublished"
+                                                                     style="width: 100px; margin-left: 20px; font-weight: normal !important;"
                                                                      value="#{editProfileBODBean.selectedTreeNode.data.restrictionType}"
                                                                      disabled="true">
                                                         <p:ajax update="bdtScPriRestriPanelForPublished"/>
                                                         <f:selectItems
                                                                 value="#{editProfileBODBean.getAvailableScPrimitiveRestrictions(editProfileBODBean.selectedTreeNode.data)}"/>
-                                                    </p:selectOneMenu>
+                                                    </h:selectOneMenu>
                                                 </f:facet>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="BDT SC Name" styleClass="section-label"/>
