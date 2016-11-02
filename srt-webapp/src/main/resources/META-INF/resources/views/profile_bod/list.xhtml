@@ -30,8 +30,10 @@
                                 outcome="/views/profile_bod/edit_profile_bod.xhtml">
                             <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
                         </h:link>
-                        <h:outputText rendered="#{profileBODBean.currentUser.appUserId != profileBOD.owner}"
-                                      value="#{profileBOD.propertyTerm}"/>
+
+                        <h:outputText rendered="#{profileBODBean.currentUser.appUserId != profileBOD.owner and profileBOD.state == 'Editing'}"
+                                      id="focus" value="#{profileBOD.propertyTerm}"/>
+                        <p:tooltip id="toolTipFade" for="focus" value="This profile BOD only can access by an owner." trackMouse="true"/>
                     </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"
