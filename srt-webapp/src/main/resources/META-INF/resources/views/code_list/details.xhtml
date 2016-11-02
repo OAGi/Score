@@ -50,11 +50,16 @@
                             <h:outputText value="#{codeListDetailBean.codeList.remark}" styleClass="section-content"/>
 
                             <h:outputText value="State" styleClass="section-label"/>
-                            <h:outputText value="#{codeListDetailBean.codeList.state}" styleClass="section-content"/>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Editing'}">
+                                <span class="label label-primary section-content" style="color: #fff !important;">Editing</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Published'}">
+                                <span class="label label-default section-content" style="color: #fff !important;">Published</span>
+                            </h:panelGroup>
 
                             <h:outputText value="Extensible" styleClass="section-label"/>
-                            <h:outputText value="#{codeListDetailBean.codeList.extensibleIndicator}"
-                                          styleClass="section-content"/>
+                            <h:selectBooleanCheckbox value="#{codeListDetailBean.codeList.extensibleIndicator}"
+                                                     styleClass="section-content" style="text-align: left;"/>
                         </h:panelGrid>
                         <p:separator/>
                         <p:panel header="Code List Values">
@@ -146,10 +151,15 @@
                             </h:inputText>
 
                             <h:outputText value="State" styleClass="section-label"/>
-                            <h:outputText value="#{codeListDetailBean.codeList.state}" styleClass="section-content"/>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Editing'}">
+                                <span class="label label-primary section-content" style="color: #fff !important;">Editing</span>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{codeListDetailBean.codeList.state == 'Published'}">
+                                <span class="label label-default section-content" style="color: #fff !important;">Published</span>
+                            </h:panelGroup>
 
-                            <h:outputText for="name" value="Extensible?" styleClass="section-label"/>
-                            <p:selectBooleanCheckbox
+                            <h:outputText for="name" value="Extensible" styleClass="section-label"/>
+                            <h:selectBooleanCheckbox
                                     value="#{codeListDetailBean.codeList.extensibleIndicator}"
                                     styleClass="section-content input-section" style="text-align: left;"/>
                         </h:panelGrid>
@@ -169,11 +179,11 @@
                                      paginator="true" paginatorPosition="bottom"
                                      style="width: 100%; margin-bottom: 20px;">
                             <p:column style="text-align: center; width: 65px;" headerText="Used">
-                                <p:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
+                                <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
                                                          rendered="#{codeListValue.color ne 'BrightRed'}">
                                     <p:ajax update="tbl"
                                             listener="#{codeListDetailBean.toggleColor(codeListValue.codeListValueId)}"/>
-                                </p:selectBooleanCheckbox>
+                                </h:selectBooleanCheckbox>
                             </p:column>
 
                             <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
@@ -182,7 +192,8 @@
                                         <h:outputText value="#{codeListValue.value}"/>
                                     </f:facet>
                                     <f:facet name="input">
-                                        <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%" maxlength="100">
+                                        <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%"
+                                                     maxlength="100">
                                             <f:validateLength maximum="100"/>
                                         </p:inputText>
                                     </f:facet>

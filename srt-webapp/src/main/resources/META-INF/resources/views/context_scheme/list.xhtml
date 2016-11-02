@@ -28,7 +28,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{contextScheme.guid}">
-                    <p:column style="width: 40%" headerText="Name" sortBy="#{contextScheme.schemeName}">
+                    <p:column style="width: 40%" styleClass="ellipsis" headerText="Name" sortBy="#{contextScheme.schemeName}">
                         <h:link value="#{contextScheme.schemeName}" outcome="/views/context_scheme/details.xhtml">
                             <f:param name="ctxSchemeId" value="#{contextScheme.ctxSchemeId}"/>
                         </h:link>
@@ -39,16 +39,16 @@
                             </h:link>
                         </div>
                     </p:column>
-                    <p:column headerText="Scheme ID" sortBy="#{contextScheme.schemeId}">
+                    <p:column headerText="Scheme ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeId}">
                         <h:outputText value="#{contextScheme.schemeId}"/>
                     </p:column>
-                    <p:column headerText="Agency ID" sortBy="#{contextScheme.schemeAgencyId}">
+                    <p:column headerText="Agency ID" styleClass="ellipsis" sortBy="#{contextScheme.schemeAgencyId}">
                         <h:outputText value="#{contextScheme.schemeAgencyId}"/>
                     </p:column>
-                    <p:column headerText="Version" sortBy="#{contextScheme.schemeVersionId}">
+                    <p:column headerText="Version" styleClass="ellipsis" sortBy="#{contextScheme.schemeVersionId}">
                         <h:outputText value="#{contextScheme.schemeVersionId}"/>
                     </p:column>
-                    <p:column headerText="Description" sortBy="#{contextScheme.description}">
+                    <p:column headerText="Description" styleClass="ellipsis" sortBy="#{contextScheme.description}">
                         <h:outputText value="#{contextScheme.description}"/>
                     </p:column>
                 </p:dataTable>

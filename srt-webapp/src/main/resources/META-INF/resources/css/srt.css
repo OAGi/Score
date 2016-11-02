@@ -634,7 +634,7 @@ span.ui-button-text {
 }
 
 input[type=text], .ui-autocomplete input[type=text] {
-    padding: 0 9px 0 9px !important;
+    padding: 1px 30px 1px 9px !important;
 }
 
 textarea {

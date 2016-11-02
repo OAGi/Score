@@ -45,7 +45,7 @@
                                 <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                             </p:column>
 
-                            <p:column headerText="Module" sortBy="#{topLevelConcept.module}">
+                            <p:column headerText="Module" styleClass="ellipsis" sortBy="#{topLevelConcept.module}">
                                 <h:outputText value="#{topLevelConcept.module}"/>
                             </p:column>
 
@@ -74,7 +74,7 @@
                                 <h:outputText value="#{topLevelConcept.propertyTerm}"/>
                             </p:column>
 
-                            <p:column headerText="Module">
+                            <p:column headerText="Module" styleClass="ellipsis">
                                 <h:outputText value="#{topLevelConcept.module}"/>
                             </p:column>
 
@@ -165,7 +165,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.abie.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="topLevelBiePanel"/>
                                                         </h:inputTextarea>
@@ -231,7 +232,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbie.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="asbiePanel"/>
                                                         </h:inputTextarea>
@@ -256,7 +258,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.asbiep.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="asbiepPanel"/>
                                                         </h:inputTextarea>
@@ -281,7 +284,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.abie.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="abiePanel"/>
                                                         </h:inputTextarea>
@@ -354,7 +358,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbie.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="bbiePanel"/>
                                                         </h:inputTextarea>
@@ -379,7 +384,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbiep.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="bbiepPanel"/>
                                                         </h:inputTextarea>
@@ -522,7 +528,8 @@
                                                         <h:outputText value="Definition" styleClass="section-label"/>
                                                         <h:inputTextarea
                                                                 value="#{createProfileBODBean.selectedTreeNode.data.bbieSc.definition}"
-                                                                rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                                rows="6" autoResize="false"
+                                                                a:placeholder="Leave a definition"
                                                                 styleClass="section-content input-section">
                                                             <f:ajax render="bbieScPanel"/>
                                                         </h:inputTextarea>

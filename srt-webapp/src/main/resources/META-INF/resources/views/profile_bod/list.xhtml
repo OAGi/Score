@@ -24,7 +24,7 @@
                              paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
-                    <p:column headerText="Name" sortBy="#{profileBOD.propertyTerm}">
+                    <p:column headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
                         <h:link rendered="#{profileBODBean.currentUser.appUserId == profileBOD.owner}"
                                 value="#{profileBOD.propertyTerm}"
                                 outcome="/views/profile_bod/edit_profile_bod.xhtml">

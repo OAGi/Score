@@ -61,7 +61,7 @@
                     </h:inputText>
 
                     <h:outputText for="name" value="Extensible?" styleClass="section-label"/>
-                    <p:selectBooleanCheckbox value="#{codeListCreateWithoutBaseBean.codeList.extensibleIndicator}"
+                    <h:selectBooleanCheckbox value="#{codeListCreateWithoutBaseBean.codeList.extensibleIndicator}"
                                              styleClass="section-content input-section" style="text-align: left;"/>
                 </h:panelGrid>
             </p:panel>
@@ -81,11 +81,11 @@
                         <f:facet name="header">
                             <h:outputText value="Select"/>
                         </f:facet>
-                        <p:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
+                        <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
                                                  rendered="#{codeListValue.color ne 'BrightRed'}">
                             <p:ajax update="tbl"
                                     listener="#{codeListCreateWithoutBaseBean.toggleColor(codeListValue.codeListValueId)}"/>
-                        </p:selectBooleanCheckbox>
+                        </h:selectBooleanCheckbox>
                     </p:column>
 
                     <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
