@@ -6,6 +6,8 @@ import org.oagi.srt.repository.AssociationCoreComponentRepository;
 import org.oagi.srt.repository.BasicCoreComponentRepository;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,7 +96,8 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = ascc.getCreatedBy();
         if (requesterId != ownerId) {
-            throw new IllegalStateException("This operation only allows for the owner of this element.");
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentAsccId = ascc.getAsccId();
         AssociationCoreComponent latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
@@ -127,7 +130,8 @@ public class CoreComponentService {
         long requesterId = requester.getAppUserId();
         long ownerId = bcc.getCreatedBy();
         if (requesterId != ownerId) {
-            throw new IllegalStateException("This operation only allows for the owner of this element.");
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
         long currentBccId = bcc.getBccId();
         BasicCoreComponent latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);

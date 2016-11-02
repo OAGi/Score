@@ -688,6 +688,14 @@ textarea {
     border: 1px solid #ddd;
 }
 
+input[type="checkbox"].input-section {
+    min-width: 0px !important;
+}
+
+input[type="checkbox"].section-content {
+    margin-left: 157px !important;
+}
+
 .disabled {
     border: 0;
 }

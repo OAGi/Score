@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -26,6 +27,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityExistsException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -338,7 +340,7 @@ public class EditProfileBODBean extends UIHandler {
         AggregateCoreComponent eAcc;
         try {
             eAcc = extensionService.appendUserExtension(asccp, user, isLocally);
-        } catch (EntityExistsException e) {
+        } catch (PermissionDeniedDataAccessException e) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "This user extension is already taken by other user."));
             throw e;

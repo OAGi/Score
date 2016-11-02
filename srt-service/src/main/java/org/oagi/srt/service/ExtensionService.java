@@ -4,6 +4,7 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ public class ExtensionService {
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(
-            AssociationCoreComponentProperty asccp, User user, boolean isLocally) throws EntityExistsException {
+            AssociationCoreComponentProperty asccp, User user, boolean isLocally) throws PermissionDeniedDataAccessException {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
@@ -52,8 +53,16 @@ public class ExtensionService {
             eAcc = getAllExtensionAcc(eAcc);
         }
 
-        if (existsUserExtension(eAcc)) {
-            throw new EntityExistsException();
+        AggregateCoreComponent ueAcc = getExistsUserExtension(eAcc);
+        if (ueAcc != null) {
+            long ownerId = ueAcc.getCreatedBy();
+            long requesterId = user.getAppUserId();
+            if (ownerId != requesterId) {
+                throw new PermissionDeniedDataAccessException(
+                        "This operation only allows for the owner of this element.", new IllegalStateException());
+            } else {
+                return eAcc;
+            }
         }
 
         createNewUserExtensionGroupACC(eAcc, user);
@@ -72,15 +81,15 @@ public class ExtensionService {
         return eAcc;
     }
 
-    private boolean existsUserExtension(AggregateCoreComponent eAcc) {
+    private AggregateCoreComponent getExistsUserExtension(AggregateCoreComponent eAcc) {
         for (AssociationCoreComponent ascc : asccRepository.findByFromAccIdAndRevisionNum(eAcc.getAccId(), 0)) {
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
             AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
             if (acc.getOagisComponentType() == UserExtensionGroup) {
-                return true;
+                return acc;
             }
         }
-        return false;
+        return null;
     }
 
     @Transactional(rollbackFor = Throwable.class)
