@@ -1,7 +1,6 @@
 package org.oagi.srt.repository.entity.converter;
 
 import org.oagi.srt.repository.entity.BasicCoreComponentEntityType;
-import org.oagi.srt.repository.entity.BasicCoreComponentEntityType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

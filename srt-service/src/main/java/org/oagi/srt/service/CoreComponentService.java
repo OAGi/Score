@@ -1,12 +1,10 @@
 package org.oagi.srt.service;
 
-import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.AssociationCoreComponentRepository;
 import org.oagi.srt.repository.BasicCoreComponentRepository;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,7 +139,10 @@ public class CoreComponentService {
 
         switch (bcc.getEntityType()) {
             case Element:
-                // TODO: find appropriate seqKey
+                int seqKey = findAppropriateSeqKey(bcc);
+                bcc.setSeqKey(seqKey);
+                long fromAccId = bcc.getFromAccId();
+                increaseSeqKeyGreaterThan(fromAccId, seqKey);
                 break;
             case Attribute:
                 bcc.setSeqKey(0);
@@ -166,5 +167,16 @@ public class CoreComponentService {
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
         }
+    }
+
+    private int findAppropriateSeqKey(BasicCoreComponent latestBcc) {
+        long bccId = latestBcc.getBccId();
+        BasicCoreComponent latestHistory = bccRepository.findLatestOneByCurrentBccIdAndSeqKeyIsNotZero(bccId);
+        return (latestHistory != null) ? latestHistory.getSeqKey() : 0;
+    }
+
+    private void increaseSeqKeyGreaterThan(long fromAccId, int seqKey) {
+        asccRepository.increaseSeqKeyByFromAccIdAndSeqKey(fromAccId, seqKey);
+        bccRepository.increaseSeqKeyByFromAccIdAndSeqKey(fromAccId, seqKey);
     }
 }

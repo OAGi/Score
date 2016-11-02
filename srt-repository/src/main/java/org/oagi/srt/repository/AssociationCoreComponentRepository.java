@@ -2,6 +2,7 @@ package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -41,4 +42,9 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("select a from AssociationCoreComponent a where a.currentAsccId = ?1 and a.revisionTrackingNum = (" +
             "select MAX(a.revisionTrackingNum) from AssociationCoreComponent a where a.currentAsccId = ?1 group by a.currentAsccId)")
     public AssociationCoreComponent findLatestOneByCurrentAsccId(long currentAsccId);
+
+    @Modifying
+    @Query("update AssociationCoreComponent a set a.seqKey = a.seqKey + 1 " +
+            "where a.fromAccId = ?1 and a.seqKey > ?2 and a.revisionNum = 0")
+    public void increaseSeqKeyByFromAccIdAndSeqKey(long fromAccId, int seqKey);
 }

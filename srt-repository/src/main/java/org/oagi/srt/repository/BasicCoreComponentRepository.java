@@ -1,8 +1,8 @@
 package org.oagi.srt.repository;
 
-import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -45,4 +45,13 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionTrackingNum = (" +
             "select MAX(b.revisionTrackingNum) from BasicCoreComponent b where b.currentBccId = ?1 group by b.currentBccId)")
     public BasicCoreComponent findLatestOneByCurrentBccId(long currentBccId);
+
+    @Query("select b from BasicCoreComponent b where b.currentBccId = ?1 and b.revisionTrackingNum = (" +
+            "select MAX(b.revisionTrackingNum) from BasicCoreComponent b where b.currentBccId = ?1 and b.seqKey > 0 group by b.currentBccId)")
+    public BasicCoreComponent findLatestOneByCurrentBccIdAndSeqKeyIsNotZero(long currentBccId);
+
+    @Modifying
+    @Query("update BasicCoreComponent b set b.seqKey = b.seqKey + 1 " +
+            "where b.fromAccId = ?1 and b.seqKey > ?2 and b.revisionNum = 0")
+    public void increaseSeqKeyByFromAccIdAndSeqKey(long fromAccId, int seqKey);
 }

@@ -33,6 +33,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -547,5 +548,49 @@ public class ExtensionBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+
+        TreeNode treeNode = getTreeNode();
+        reorderTreeNode(treeNode);
+    }
+
+    private void reorderTreeNode(TreeNode treeNode) {
+        List<TreeNode> children = new ArrayList(treeNode.getChildren());
+        Collections.sort(children, (a, b) -> {
+            int s1 = getSeqKey(a);
+            int s2 = getSeqKey(b);
+            int compareTo = s1 - s2;
+            if (compareTo != 0) {
+                return compareTo;
+            } else {
+                return getTerm(a).compareTo(getTerm(b));
+            }
+        });
+        ((DefaultTreeNode) treeNode).setChildren(children);
+
+        for (TreeNode child : children) {
+            reorderTreeNode(child);
+        }
+    }
+
+    private int getSeqKey(TreeNode treeNode) {
+        Object data = treeNode.getData();
+        if (data instanceof ASCCPNode) {
+            return ((ASCCPNode) data).getAscc().getSeqKey();
+        } else if (data instanceof BCCPNode) {
+            return ((BCCPNode) data).getBcc().getSeqKey();
+        }
+        return -1;
+    }
+
+    private String getTerm(TreeNode treeNode) {
+        Object data = treeNode.getData();
+        if (data instanceof ASCCPNode) {
+            return ((ASCCPNode) data).getAsccp().getPropertyTerm();
+        } else if (data instanceof BCCPNode) {
+            return ((BCCPNode) data).getBccp().getPropertyTerm();
+        } else if (data instanceof ACCNode) {
+            return ((ACCNode) data).getAcc().getObjectClassTerm();
+        }
+        return "";
     }
 }
