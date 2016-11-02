@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,8 +41,8 @@ public class ExtensionService {
     private NamespaceRepository namespaceRepository;
 
     @Transactional(rollbackFor = Throwable.class)
-    public AggregateCoreComponent appendUserExtensionIfAbsent(AssociationCoreComponentProperty asccp,
-                                                              User user, boolean isLocally) {
+    public AggregateCoreComponent appendUserExtension(
+            AssociationCoreComponentProperty asccp, User user, boolean isLocally) throws EntityExistsException {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
@@ -51,10 +52,11 @@ public class ExtensionService {
             eAcc = getAllExtensionAcc(eAcc);
         }
 
-        if (!existsUserExtension(eAcc)) {
-            createNewUserExtensionGroupACC(eAcc, user);
+        if (existsUserExtension(eAcc)) {
+            throw new EntityExistsException();
         }
 
+        createNewUserExtensionGroupACC(eAcc, user);
         return eAcc;
     }
 
@@ -71,7 +73,7 @@ public class ExtensionService {
     }
 
     private boolean existsUserExtension(AggregateCoreComponent eAcc) {
-        for (AssociationCoreComponent ascc : asccRepository.findByFromAccId(eAcc.getAccId())) {
+        for (AssociationCoreComponent ascc : asccRepository.findByFromAccIdAndRevisionNum(eAcc.getAccId(), 0)) {
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
             AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
             if (acc.getOagisComponentType() == UserExtensionGroup) {

@@ -628,6 +628,11 @@ span.ui-button-text {
     background-color: #900 !important;
 }
 
+.ui-inputfield {
+    /*min-width: 440px;*/
+    border: 0 !important;
+}
+
 .ui-autocomplete input {
     width: 100%;
     padding: 2px !important;
@@ -635,6 +640,10 @@ span.ui-button-text {
 
 input[type=text], .ui-autocomplete input[type=text] {
     padding: 1px 30px 1px 9px !important;
+}
+
+.ui-panel-title input[type="text"].ui-inputfield {
+    border: 1px solid #e5e5e5 !important;
 }
 
 textarea {
@@ -668,11 +677,6 @@ textarea {
 
 .ui-panel-content input[type=checkbox] {
     margin-bottom: 5px !important;
-}
-
-.ui-inputfield {
-    /*min-width: 440px;*/
-    border: 0 !important;
 }
 
 .ui-datatable .ui-datatable-data td.ui-cell-editing {

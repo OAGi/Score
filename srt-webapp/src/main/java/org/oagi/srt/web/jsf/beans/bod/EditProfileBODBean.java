@@ -24,6 +24,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.persistence.EntityExistsException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -334,8 +335,18 @@ public class EditProfileBODBean extends UIHandler {
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
 
-        AggregateCoreComponent eAcc =
-                extensionService.appendUserExtensionIfAbsent(asccp, user, isLocally);
+        AggregateCoreComponent eAcc;
+        try {
+            eAcc = extensionService.appendUserExtension(asccp, user, isLocally);
+        } catch (EntityExistsException e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "This user extension is already taken by other user."));
+            throw e;
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
 
         TopLevelNode topLevelNode = getTopLevelNode();
 
