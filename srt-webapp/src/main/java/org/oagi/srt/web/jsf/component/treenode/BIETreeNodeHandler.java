@@ -17,9 +17,13 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
@@ -28,6 +32,9 @@ import java.util.List;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
 @Component
+@Scope("view")
+@ManagedBean
+@ViewScoped
 @Transactional(readOnly = true)
 public class BIETreeNodeHandler extends UIHandler {
 
@@ -373,7 +380,8 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void submit(BaseTopLevelNode node, ProgressListener progressListener) {
-        SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(getCurrentUser());
+        User currentUser = getCurrentUser();
+        SubmitBIENodeVisitor submitNodeVisitor = new SubmitBIENodeVisitor(currentUser);
         submitNodeVisitor.setProgressListener(progressListener);
         node.accept(submitNodeVisitor);
     }

@@ -4,15 +4,23 @@ import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.service.UserService;
 import org.primefaces.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 
 @Component
+@Scope("view")
+@ManagedBean
+@ViewScoped
+@Transactional(readOnly = true)
 public class UIHandler {
 
     @Autowired
