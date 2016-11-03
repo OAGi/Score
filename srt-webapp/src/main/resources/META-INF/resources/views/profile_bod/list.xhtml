@@ -25,13 +25,13 @@
                              paginator="true" paginatorPosition="bottom" rows="10"
                              style="width: 100%; margin-bottom:20px" rowKey="#{profileBOD.asccpId}">
                     <p:column headerText="Name" styleClass="ellipsis" sortBy="#{profileBOD.propertyTerm}">
-                        <h:link rendered="#{profileBODBean.currentUser.appUserId == profileBOD.owner}"
+                        <h:link rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.owner or profileBOD.state ne 'Editing'}"
                                 value="#{profileBOD.propertyTerm}"
                                 outcome="/views/profile_bod/edit_profile_bod.xhtml">
                             <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
                         </h:link>
 
-                        <h:outputText rendered="#{profileBODBean.currentUser.appUserId != profileBOD.owner and profileBOD.state == 'Editing'}"
+                        <h:outputText rendered="#{profileBODBean.currentUser.appUserId ne profileBOD.owner and profileBOD.state eq 'Editing'}"
                                       id="focus" value="#{profileBOD.propertyTerm}"/>
                         <p:tooltip id="toolTipFade" for="focus" value="This profile BOD only can access by an owner." trackMouse="true"/>
                     </p:column>
@@ -65,6 +65,7 @@
                     <p:column style="text-align: center; width: 65px;"
                               rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
                         <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                                         disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.owner}"
                                          onclick="PF('confirmDiscard').show()">
                             <f:setPropertyActionListener value="#{profileBOD}"
                                                          target="#{profileBODBean.selectedProfileBOD}"/>

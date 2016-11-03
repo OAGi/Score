@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">Edit Profile BOD</h2>
+                <h2 class="subhead-heading">#{editProfileBODBean.topLevelAbie.state == 'Editing' ? 'Edit' : (editProfileBODBean.topLevelAbie.state eq 'Candidate' ? 'Review' : 'View')} Profile BOD</h2>
             </div>
         </div>
         <h:form id="form">
@@ -25,7 +25,7 @@
                                 <p:ajax event="expand" listener="#{editProfileBODBean.expand}"
                                         update=":form:treeTable"/>
                                 <p:ajax event="select" update=":form:details"/>
-                                <p:column headerText="BIEs">
+                                <p:column headerText="#{editProfileBODBean.topLevelNode.asccp.module.module}">
                                     <h:outputText value="#{node.name}"/>
                                 </p:column>
                             </p:treeTable>
@@ -41,14 +41,14 @@
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
                                     <f:facet name="header">
-                                        <h:outputText value="View and Edit BIE"/>
+                                        <h:outputText value="#{editProfileBODBean.topLevelAbie.state == 'Editing' ? 'View and Edit' : 'View'} BIE"/>
                                     </f:facet>
 
                                     <!--
                                         Editing
                                     -->
                                     <h:panelGroup id="editingPanel"
-                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}">
+                                                  rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}">
                                         <!--
                                             ABIE
                                         -->
@@ -512,7 +512,7 @@
                                         Candidate or Published
                                     -->
                                     <h:panelGroup id="publishPanel"
-                                                  rendered="#{editProfileBODBean.topLevelNode.abie.state != 'Editing'}">
+                                                  rendered="#{editProfileBODBean.topLevelAbie.state != 'Editing'}">
                                         <!--
                                             ABIE
                                         -->
@@ -951,18 +951,18 @@
                 </h:panelGroup>
             </p:panel>
 
-            <p:panel id="btnGroup">
-                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}"
+            <p:panel id="btnGroup" rendered="#{editProfileBODBean.currentUser.appUserId eq editProfileBODBean.topLevelAbie.owner}">
+                <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{editProfileBODBean.update()}"/>
-                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Editing'}"
+                <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
                                  id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
                                  action="#{editProfileBODBean.updateState('Candidate')}"/>
 
-                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Candidate'}"
+                <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
                                  id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
                                  action="#{editProfileBODBean.updateState('Editing')}"/>
-                <p:commandButton rendered="#{editProfileBODBean.topLevelNode.abie.state == 'Candidate'}"
+                <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Candidate'}"
                                  id="btnPublish" widgetVar="btnPublish" value="Publish"
                                  action="#{editProfileBODBean.updateState('Published')}"/>
             </p:panel>

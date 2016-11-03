@@ -50,6 +50,7 @@ public class EditProfileBODBean extends UIHandler {
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
 
+    private TopLevelAbie topLevelAbie;
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
@@ -64,8 +65,18 @@ public class EditProfileBODBean extends UIHandler {
         if (topLevelAbie == null) {
             return;
         }
+        setTopLevelAbie(topLevelAbie);
+
         TreeNode treeNode = bieTreeNodeHandler.createLazyTreeNode(topLevelAbie);
         setTreeNode(treeNode);
+    }
+
+    public TopLevelAbie getTopLevelAbie() {
+        return topLevelAbie;
+    }
+
+    public void setTopLevelAbie(TopLevelAbie topLevelAbie) {
+        this.topLevelAbie = topLevelAbie;
     }
 
     public TreeNode getTreeNode() {
