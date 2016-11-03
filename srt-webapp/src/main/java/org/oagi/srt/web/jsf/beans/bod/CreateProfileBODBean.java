@@ -8,7 +8,6 @@ import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.TopLevelConceptRepository;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
@@ -30,7 +29,6 @@ import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller

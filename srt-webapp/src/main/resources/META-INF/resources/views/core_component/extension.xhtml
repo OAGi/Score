@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{extensionBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : extensionBean.rootAsccp.propertyTerm} - #{extensionBean.targetAcc.objectClassTerm}</h2>
+                <h2 class="subhead-heading">#{extensionBean.currentUser.appUserId eq extensionBean.userExtensionAcc.createdBy ? '' : '(Review)'} #{extensionBean.targetAcc.objectClassTerm == 'All Extension' ? 'Global' : extensionBean.rootAsccp.propertyTerm} - #{extensionBean.targetAcc.objectClassTerm}</h2>
             </div>
         </div>
         <h:form id="form">

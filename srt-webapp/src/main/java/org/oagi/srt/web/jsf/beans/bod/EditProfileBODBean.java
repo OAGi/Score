@@ -25,9 +25,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.persistence.EntityExistsException;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -319,7 +317,7 @@ public class EditProfileBODBean extends UIHandler {
         }
     }
 
-    @Transactional(readOnly = false, rollbackFor = Throwable.class)
+    @Transactional(rollbackFor = Throwable.class)
     public String updateState(AggregateBusinessInformationEntityState state) {
         try {
             TopLevelNode topLevelNode = getTopLevelNode();
@@ -334,21 +332,25 @@ public class EditProfileBODBean extends UIHandler {
         }
     }
 
-    public String createABIEExtensionLocally() {
-        return createABIEExtension(true);
-    }
-
-    public String createABIEExtensionGlobally() {
-        return createABIEExtension(false);
-    }
-
     public String createABIEExtension(boolean isLocally) {
         TreeNode treeNode = getSelectedTreeNode();
         ASBIENode asbieNode = (ASBIENode) treeNode.getData();
         AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
         User user = getCurrentUser();
 
-        AggregateCoreComponent eAcc;
+        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
+        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
+        if (ueAcc != null) {
+            CoreComponentState ueAccState = ueAcc.getState();
+            if (ueAccState == CoreComponentState.Candidate || ueAccState == CoreComponentState.Published) {
+                return redirectABIEExtension(isLocally, eAcc);
+            }
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "This user extension is already taken by other user."));
+            return null;
+        }
+
         try {
             eAcc = extensionService.appendUserExtension(asccp, user, isLocally);
         } catch (PermissionDeniedDataAccessException e) {
@@ -361,8 +363,36 @@ public class EditProfileBODBean extends UIHandler {
             throw t;
         }
 
-        TopLevelNode topLevelNode = getTopLevelNode();
+        return redirectABIEExtension(isLocally, eAcc);
+    }
 
+    public CoreComponentState getABIEExtensionState(boolean isLocally) {
+        TreeNode treeNode = getSelectedTreeNode();
+        if (treeNode == null) {
+            return null;
+        }
+        ASBIENode asbieNode = (ASBIENode) treeNode.getData();
+        AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
+
+        AggregateCoreComponent eAcc = extensionService.getExtensionAcc(asccp, isLocally);
+        AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
+        return (ueAcc != null) ? ueAcc.getState() : null;
+    }
+
+    public String redirectABIEExtension(boolean isLocally) {
+        return redirectABIEExtension(isLocally, null);
+    }
+
+    public String redirectABIEExtension(boolean isLocally, AggregateCoreComponent eAcc) {
+        TreeNode treeNode = getSelectedTreeNode();
+        ASBIENode asbieNode = (ASBIENode) treeNode.getData();
+        AssociationCoreComponentProperty asccp = asbieNode.getAsccp();
+
+        if (eAcc == null) {
+            eAcc = extensionService.getExtensionAcc(asccp, isLocally);
+        }
+
+        TopLevelNode topLevelNode = getTopLevelNode();
         return "/views/core_component/extension.xhtml?accId=" + eAcc.getAccId() +
                 "&rootAsccpId=" + topLevelNode.getAsccp().getAsccpId() + "&faces-redirect=true";
     }

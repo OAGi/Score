@@ -8,7 +8,6 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,18 +41,13 @@ public class ExtensionService {
     private NamespaceRepository namespaceRepository;
 
     @Transactional(rollbackFor = Throwable.class)
-    public AggregateCoreComponent appendUserExtension(
-            AssociationCoreComponentProperty asccp, User user, boolean isLocally) throws PermissionDeniedDataAccessException {
+    public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
+                                                      AssociationCoreComponentProperty asccp, User user)
+            throws PermissionDeniedDataAccessException {
         if (!"Extension".equals(asccp.getPropertyTerm())) {
             throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
         }
 
-        AggregateCoreComponent eAcc = accRepository.findOne(asccp.getRoleOfAccId());
-        if (!isLocally) { // isGlobally
-            eAcc = getAllExtensionAcc(eAcc);
-        }
-
-        AggregateCoreComponent ueAcc = getExistsUserExtension(eAcc);
         if (ueAcc != null) {
             long ownerId = ueAcc.getCreatedBy();
             long requesterId = user.getAppUserId();
@@ -69,6 +63,27 @@ public class ExtensionService {
         return eAcc;
     }
 
+    @Transactional(rollbackFor = Throwable.class)
+    public AggregateCoreComponent appendUserExtension(
+            AssociationCoreComponentProperty asccp, User user, boolean isLocally) throws PermissionDeniedDataAccessException {
+        if (!"Extension".equals(asccp.getPropertyTerm())) {
+            throw new IllegalArgumentException("Can't append user extension on this ASCCP: " + asccp);
+        }
+
+        AggregateCoreComponent eAcc = getExtensionAcc(asccp, isLocally);
+        AggregateCoreComponent ueAcc = getExistsUserExtension(eAcc);
+
+        return appendUserExtension(eAcc, ueAcc, asccp, user);
+    }
+
+    public AggregateCoreComponent getExtensionAcc(AssociationCoreComponentProperty asccp, boolean isLocally) {
+        AggregateCoreComponent eAcc = accRepository.findOne(asccp.getRoleOfAccId());
+        if (!isLocally) { // isGlobally
+            eAcc = getAllExtensionAcc(eAcc);
+        }
+        return eAcc;
+    }
+
     private AggregateCoreComponent getAllExtensionAcc(AggregateCoreComponent eAcc) {
         while (!"All Extension".equals(eAcc.getObjectClassTerm())) {
             long basedAccId = eAcc.getBasedAccId();
@@ -81,7 +96,7 @@ public class ExtensionService {
         return eAcc;
     }
 
-    private AggregateCoreComponent getExistsUserExtension(AggregateCoreComponent eAcc) {
+    public AggregateCoreComponent getExistsUserExtension(AggregateCoreComponent eAcc) {
         for (AssociationCoreComponent ascc : asccRepository.findByFromAccIdAndRevisionNum(eAcc.getAccId(), 0)) {
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
             AggregateCoreComponent acc = accRepository.findOne(asccp.getRoleOfAccId());
