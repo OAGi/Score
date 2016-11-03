@@ -81,9 +81,6 @@ public class AssociationBusinessInformationEntity
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
-    @Transient
-    private boolean dirty;
-
     @Override
     public long getId() {
         return getAsbieId();
@@ -92,14 +89,6 @@ public class AssociationBusinessInformationEntity
     @Override
     public void setId(long id) {
         setAsbieId(id);
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public long getAsbieId() {
@@ -160,7 +149,6 @@ public class AssociationBusinessInformationEntity
 
     public void setDefinition(String definition) {
         this.definition = definition;
-        setDirty(true);
     }
 
     public int getCardinalityMin() {
@@ -172,7 +160,6 @@ public class AssociationBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
         }
         this.cardinalityMin = cardinalityMin;
-        setDirty(true);
     }
 
     public int getCardinalityMax() {
@@ -184,7 +171,6 @@ public class AssociationBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
         }
         this.cardinalityMax = cardinalityMax;
-        setDirty(true);
     }
 
     public boolean isNillable() {
@@ -193,7 +179,6 @@ public class AssociationBusinessInformationEntity
 
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
-        setDirty(true);
     }
 
     public String getRemark() {
@@ -202,7 +187,6 @@ public class AssociationBusinessInformationEntity
 
     public void setRemark(String remark) {
         this.remark = remark;
-        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -251,7 +235,6 @@ public class AssociationBusinessInformationEntity
 
     public void setUsed(boolean used) {
         this.used = used;
-        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {
@@ -394,5 +377,17 @@ public class AssociationBusinessInformationEntity
         for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
             updateEventListener.onPostUpdate(this);
         }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

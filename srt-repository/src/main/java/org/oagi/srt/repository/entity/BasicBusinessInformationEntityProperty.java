@@ -58,9 +58,6 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
-    @Transient
-    private boolean dirty;
-
     @Override
     public long getId() {
         return getBbiepId();
@@ -69,14 +66,6 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
     @Override
     public void setId(long id) {
         setBbiepId(id);
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public long getBbiepId() {
@@ -113,7 +102,6 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     public void setDefinition(String definition) {
         this.definition = definition;
-        setDirty(true);
     }
 
     public String getRemark() {
@@ -122,7 +110,6 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     public void setRemark(String remark) {
         this.remark = remark;
-        setDirty(true);
     }
 
     public String getBizTerm() {
@@ -131,7 +118,6 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
-        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -312,5 +298,17 @@ public class BasicBusinessInformationEntityProperty implements Serializable, Tim
         for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
             updateEventListener.onPostUpdate(this);
         }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

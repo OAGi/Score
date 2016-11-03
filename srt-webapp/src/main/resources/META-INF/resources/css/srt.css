@@ -639,7 +639,7 @@ span.ui-button-text {
 }
 
 input[type=text], .ui-autocomplete input[type=text] {
-    padding: 1px 30px 1px 9px !important;
+    padding: 1px 30px 1px 5px !important;
 }
 
 .ui-panel-title input[type="text"].ui-inputfield {
@@ -647,7 +647,7 @@ input[type=text], .ui-autocomplete input[type=text] {
 }
 
 textarea {
-    padding: 1px 9px 1px 9px !important;
+    padding: 1px 5px 1px 5px !important;
 }
 
 .ui-autocomplete .ui-autocomplete-dropdown {
@@ -693,7 +693,7 @@ input[type="checkbox"].input-section {
 }
 
 input[type="checkbox"].section-content {
-    margin-left: 157px !important;
+    margin-left: 152px !important;
 }
 
 .disabled {
@@ -929,7 +929,7 @@ textarea:focus, .ui-selectonemenu input:focus, .ui-panel-content input:focus {
 }
 
 .ui-selectonemenu input[type="text"], .ui-selectonemenu label {
-    padding-left: 9px !important;
+    padding-left: 5px !important;
 }
 
 .ui-selectonemenu input:focus {

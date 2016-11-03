@@ -80,9 +80,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
-    @Transient
-    private boolean dirty;
-
     @Override
     public long getId() {
         return getAbieId();
@@ -91,14 +88,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
     @Override
     public void setId(long id) {
         setAbieId(id);
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public long getAbieId() {
@@ -139,7 +128,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setBizCtx(BusinessContext bizCtx) {
         this.bizCtx = bizCtx;
-        setDirty(true);
     }
 
     public String getBizCtxName() {
@@ -156,7 +144,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setDefinition(String definition) {
         this.definition = definition;
-        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -181,7 +168,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setState(AggregateBusinessInformationEntityState state) {
         this.state = state;
-        setDirty(true);
     }
 
     public Date getCreationTimestamp() {
@@ -206,7 +192,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setClientId(long clientId) {
         this.clientId = clientId;
-        setDirty(true);
     }
 
     public String getVersion() {
@@ -215,7 +200,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setVersion(String version) {
         this.version = version;
-        setDirty(true);
     }
 
     public String getStatus() {
@@ -224,7 +208,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setStatus(String status) {
         this.status = status;
-        setDirty(true);
     }
 
     public String getRemark() {
@@ -233,7 +216,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setRemark(String remark) {
         this.remark = remark;
-        setDirty(true);
     }
 
     public String getBizTerm() {
@@ -242,7 +224,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
-        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {
@@ -295,7 +276,6 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
         result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
-        result = 31 * result + (dirty ? 1 : 0);
         result = 31 * result + (persistEventListeners != null ? persistEventListeners.hashCode() : 0);
         result = 31 * result + (updateEventListeners != null ? updateEventListeners.hashCode() : 0);
         return result;
@@ -359,6 +339,7 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
                     throw new IllegalStateException("'ownerTopLevelAbieId' parameter must not be null.");
                 }
             }
+
             @Override
             public void onPostPersist(Object object) {
             }
@@ -420,5 +401,17 @@ public class AggregateBusinessInformationEntity implements Serializable, Timesta
         for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
             updateEventListener.onPostUpdate(this);
         }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

@@ -23,7 +23,7 @@ public class BasicCoreComponent
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bccId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
     @Column(nullable = false)
@@ -420,5 +420,17 @@ public class BasicCoreComponent
                 ", nillable=" + nillable +
                 ", defaultValue='" + defaultValue + '\'' +
                 '}';
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

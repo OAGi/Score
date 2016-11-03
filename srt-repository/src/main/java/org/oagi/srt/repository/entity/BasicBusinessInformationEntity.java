@@ -97,9 +97,6 @@ public class BasicBusinessInformationEntity
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
-    @Transient
-    private boolean dirty;
-
     @Override
     public long getId() {
         return getBbieId();
@@ -108,14 +105,6 @@ public class BasicBusinessInformationEntity
     @Override
     public void setId(long id) {
         setBbieId(id);
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public long getBbieId() {
@@ -176,7 +165,6 @@ public class BasicBusinessInformationEntity
         } else {
             this.bdtPriRestriId = null;
         }
-        setDirty(true);
     }
 
     public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
@@ -195,7 +183,6 @@ public class BasicBusinessInformationEntity
         } else {
             this.codeListId = null;
         }
-        setDirty(true);
     }
 
     public void setCodeList(CodeList codeList) {
@@ -214,7 +201,6 @@ public class BasicBusinessInformationEntity
         } else {
             this.agencyIdListId = null;
         }
-        setDirty(true);
     }
 
     public void setAgencyIdList(AgencyIdList agencyIdList) {
@@ -232,7 +218,6 @@ public class BasicBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMin' argument must be 0 or greater: " + cardinalityMin);
         }
         this.cardinalityMin = cardinalityMin;
-        setDirty(true);
     }
 
     public int getCardinalityMax() {
@@ -244,7 +229,6 @@ public class BasicBusinessInformationEntity
             throw new IllegalArgumentException("'cardinalityMax' argument must be -1 or greater: " + cardinalityMax);
         }
         this.cardinalityMax = cardinalityMax;
-        setDirty(true);
     }
 
     public String getDefaultValue() {
@@ -253,7 +237,6 @@ public class BasicBusinessInformationEntity
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
-        setDirty(true);
     }
 
     public boolean isNillable() {
@@ -262,7 +245,6 @@ public class BasicBusinessInformationEntity
 
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
-        setDirty(true);
     }
 
     public String getFixedValue() {
@@ -271,7 +253,6 @@ public class BasicBusinessInformationEntity
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
-        setDirty(true);
     }
 
     public boolean isNill() {
@@ -280,7 +261,6 @@ public class BasicBusinessInformationEntity
 
     public void setNill(boolean nill) {
         this.nill = nill;
-        setDirty(true);
     }
 
     public String getDefinition() {
@@ -289,7 +269,6 @@ public class BasicBusinessInformationEntity
 
     public void setDefinition(String definition) {
         this.definition = definition;
-        setDirty(true);
     }
 
     public String getRemark() {
@@ -298,7 +277,6 @@ public class BasicBusinessInformationEntity
 
     public void setRemark(String remark) {
         this.remark = remark;
-        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -347,7 +325,6 @@ public class BasicBusinessInformationEntity
 
     public void setUsed(boolean used) {
         this.used = used;
-        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {
@@ -522,5 +499,17 @@ public class BasicBusinessInformationEntity
         for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
             updateEventListener.onPostUpdate(this);
         }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

@@ -3,6 +3,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui" xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
                 template="../../template.xhtml">
 
     <ui:define name="content">
@@ -186,7 +187,7 @@
                                             rendered="#{extensionBean.preparedAppend eq false and
                                                         fn:startsWith(extensionBean.selectedTreeNode.type, 'ACC')}">
                                         <p:panel header="ACC">
-                                            <h:panelGrid columns="2" cellpadding="3">
+                                            <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.acc.guid}"
@@ -210,7 +211,7 @@
                                                         value="#{extensionBean.selectedTreeNode.data.acc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
-                                                        autoResize="false"
+                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -232,11 +233,12 @@
                                                             rendered="#{extensionBean.selectedTreeNode.data.ascc.state == 'Editing'}"
                                                             value="Update" ajax="true"
                                                             actionListener="#{extensionBean.updateAscc(extensionBean.selectedTreeNode.data)}"
+                                                            disabled="#{extensionBean.selectedTreeNode.data.ascc.isDirty() eq false}"
                                                             update=":form:details"/>
                                                 </span>
                                             </f:facet>
 
-                                            <h:panelGrid columns="2" cellpadding="3">
+                                            <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.guid}"
@@ -283,7 +285,7 @@
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
-                                                        autoResize="false"
+                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:ajax render="asccPanel"/>
@@ -291,7 +293,7 @@
                                             </h:panelGrid>
                                         </p:panel>
                                         <p:panel id="asccpPanel" header="ASCCP">
-                                            <h:panelGrid columns="2" cellpadding="3">
+                                            <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.asccp.guid}"
@@ -315,7 +317,7 @@
                                                         value="#{extensionBean.selectedTreeNode.data.asccp.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
-                                                        autoResize="false"
+                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing'}">
                                                     <f:ajax render="asccpPanel"/>
@@ -340,11 +342,12 @@
                                                             rendered="#{extensionBean.selectedTreeNode.data.bcc.state == 'Editing'}"
                                                             value="Update" ajax="true"
                                                             actionListener="#{extensionBean.updateBcc(extensionBean.selectedTreeNode.data)}"
+                                                            disabled="#{extensionBean.selectedTreeNode.data.ascc.isDirty() eq false}"
                                                             update=":form"/>
                                                 </span>
                                             </f:facet>
 
-                                            <h:panelGrid columns="2" cellpadding="3">
+                                            <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.guid}"
@@ -420,7 +423,7 @@
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
-                                                        autoResize="false"
+                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:ajax render="bccPanel"/>
@@ -429,7 +432,7 @@
                                         </p:panel>
 
                                         <p:panel id="bccpPanel" header="BCCP">
-                                            <h:panelGrid columns="2" cellpadding="3">
+                                            <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.guid}"
@@ -480,7 +483,7 @@
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
-                                                        autoResize="false"
+                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}">
                                                     <f:ajax render="bccpPanel"/>
@@ -489,7 +492,7 @@
                                         </p:panel>
 
                                         <p:panel header="Data Type">
-                                            <h:panelGrid columns="2" cellpadding="3">
+                                            <h:panelGrid columns="2">
                                                 <h:outputText value="GUID" styleClass="section-label"/>
                                                 <h:inputText
                                                         value="#{extensionBean.selectedTreeNode.data.bdt.guid}"

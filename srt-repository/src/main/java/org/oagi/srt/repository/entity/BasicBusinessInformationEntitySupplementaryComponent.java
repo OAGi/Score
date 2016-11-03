@@ -75,9 +75,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
-    @Transient
-    private boolean dirty;
-
     @Override
     public long getId() {
         return getBbieScId();
@@ -86,14 +83,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Override
     public void setId(long id) {
         setBbieScId(id);
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public long getBbieScId() {
@@ -144,7 +133,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setDtScPriRestriId(Long dtScPriRestriId) {
         this.dtScPriRestriId = dtScPriRestriId;
-        setDirty(true);
     }
 
     public void setDtScPriRestri(BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri) {
@@ -159,7 +147,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setCodeListId(Long codeListId) {
         this.codeListId = codeListId;
-        setDirty(true);
     }
 
     public void setCodeList(CodeList codeList) {
@@ -178,7 +165,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         } else {
             this.agencyIdListId = null;
         }
-        setDirty(true);
     }
 
     public void setAgencyIdList(AgencyIdList agencyIdList) {
@@ -193,7 +179,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setCardinalityMin(int cardinalityMin) {
         this.cardinalityMin = cardinalityMin;
-        setDirty(true);
     }
 
     public int getCardinalityMax() {
@@ -202,7 +187,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setCardinalityMax(int cardinalityMax) {
         this.cardinalityMax = cardinalityMax;
-        setDirty(true);
     }
 
     public String getDefaultValue() {
@@ -211,7 +195,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
-        setDirty(true);
     }
 
     public String getFixedValue() {
@@ -220,7 +203,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
-        setDirty(true);
     }
 
     public String getDefinition() {
@@ -235,7 +217,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
             definition = null;
         }
         this.definition = definition;
-        setDirty(true);
     }
 
     public String getRemark() {
@@ -244,7 +225,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setRemark(String remark) {
         this.remark = remark;
-        setDirty(true);
     }
 
     public String getBizTerm() {
@@ -253,7 +233,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
-        setDirty(true);
     }
 
     public boolean isUsed() {
@@ -262,7 +241,6 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
     public void setUsed(boolean used) {
         this.used = used;
-        setDirty(true);
     }
 
     public long getOwnerTopLevelAbieId() {
@@ -421,5 +399,17 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
             updateEventListener.onPostUpdate(this);
         }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

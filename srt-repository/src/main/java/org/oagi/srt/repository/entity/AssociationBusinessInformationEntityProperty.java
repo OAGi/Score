@@ -65,9 +65,6 @@ public class AssociationBusinessInformationEntityProperty
     @Transient
     private TopLevelAbie ownerTopLevelAbie;
 
-    @Transient
-    private boolean dirty;
-
     @Override
     public long getId() {
         return getAsbiepId();
@@ -76,14 +73,6 @@ public class AssociationBusinessInformationEntityProperty
     @Override
     public void setId(long id) {
         setAsbiepId(id);
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public long getAsbiepId() {
@@ -138,7 +127,6 @@ public class AssociationBusinessInformationEntityProperty
             definition = null;
         }
         this.definition = definition;
-        setDirty(true);
     }
 
     public String getRemark() {
@@ -147,7 +135,6 @@ public class AssociationBusinessInformationEntityProperty
 
     public void setRemark(String remark) {
         this.remark = remark;
-        setDirty(true);
     }
 
     public String getBizTerm() {
@@ -156,7 +143,6 @@ public class AssociationBusinessInformationEntityProperty
 
     public void setBizTerm(String bizTerm) {
         this.bizTerm = bizTerm;
-        setDirty(true);
     }
 
     public long getCreatedBy() {
@@ -303,5 +289,17 @@ public class AssociationBusinessInformationEntityProperty
         for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
             updateEventListener.onPostUpdate(this);
         }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

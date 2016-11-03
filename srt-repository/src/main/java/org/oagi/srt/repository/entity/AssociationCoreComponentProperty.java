@@ -22,7 +22,7 @@ public class AssociationCoreComponentProperty
     @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long asccpId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
     @Column(nullable = false)
@@ -395,5 +395,17 @@ public class AssociationCoreComponentProperty
                 ", currentAsccpId=" + currentAsccpId +
                 ", nillable=" + nillable +
                 '}';
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }
