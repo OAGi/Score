@@ -14,10 +14,12 @@ import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.primefaces.event.NodeExpandEvent;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.TreeNodeChildren;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,6 +144,10 @@ public class ExtensionBean extends UIHandler {
         this.selectedTreeNode = selectedTreeNode;
         setPreparedAppendAscc(false);
         setPreparedAppendBcc(false);
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent selectEvent) {
+        setSelectedTreeNode(selectEvent.getTreeNode());
     }
 
     public CoreComponentState getState() {
@@ -523,12 +529,14 @@ public class ExtensionBean extends UIHandler {
     // End Append BCC
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateAscc(ASCCPNode asccpNode) {
+    public void updateAscc(TreeNode treeNode) {
+        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
         AssociationCoreComponent ascc = asccpNode.getAscc();
         User requester = getCurrentUser();
 
         try {
             coreComponentService.update(ascc, requester);
+            ascc.afterLoaded();
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
@@ -537,24 +545,28 @@ public class ExtensionBean extends UIHandler {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateBcc(BCCPNode bccpNode) {
+    public void updateBcc(TreeNode treeNode) {
+        BCCPNode bccpNode = (BCCPNode) treeNode.getData();
         BasicCoreComponent bcc = bccpNode.getBcc();
         User requester = getCurrentUser();
 
         try {
             coreComponentService.update(bcc, requester);
+            bcc.afterLoaded();
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
 
-        TreeNode treeNode = getTreeNode();
-        reorderTreeNode(treeNode);
+        treeNode.setType(bccpNode.getType());
+
+        TreeNode root = getTreeNode();
+        reorderTreeNode(root);
     }
 
     private void reorderTreeNode(TreeNode treeNode) {
-        List<TreeNode> children = new ArrayList(treeNode.getChildren());
+        List<TreeNode> children = treeNode.getChildren();
         Collections.sort(children, (a, b) -> {
             int s1 = getSeqKey(a);
             int s2 = getSeqKey(b);
@@ -565,7 +577,15 @@ public class ExtensionBean extends UIHandler {
                 return getTerm(a).compareTo(getTerm(b));
             }
         });
-        ((DefaultTreeNode) treeNode).setChildren(children);
+        /*
+         * This implementations bring from {@code org.primefaces.model.TreeNodeChildren}
+         * to clarify children's order for node selection
+         */
+        for (int i = 0, len = children.size(); i < len; ++i) {
+            TreeNode child = children.get(i);
+            String childRowKey = (treeNode.getParent() == null) ? String.valueOf(i) : treeNode.getRowKey() + "_" + i;
+            child.setRowKey(childRowKey);
+        }
 
         for (TreeNode child : children) {
             reorderTreeNode(child);

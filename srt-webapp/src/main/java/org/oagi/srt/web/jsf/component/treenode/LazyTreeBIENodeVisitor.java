@@ -37,7 +37,9 @@ public class LazyTreeBIENodeVisitor implements BIENodeVisitor {
 
     @Override
     public void visitBBIENode(BBIENode bbieNode) {
-        visit(bbieNode, "BBIE");
+        boolean isAttribute = (bbieNode.getBbie().getSeqKey() == 0);
+        String type = (isAttribute ? "BBIE-Attribute" : "BBIE");
+        visit(bbieNode, type);
     }
 
     @Override

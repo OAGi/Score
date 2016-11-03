@@ -824,6 +824,11 @@ h6 {
     color: #006400 !important;
 }
 
+.BBIE-Attribute, .ui-state-hover.BBIE-Attribute, .ui-state-highlight.BBIE-Attribute,
+.BCCP-Attribute, .ui-state-hover.BCCP-Attribute, .ui-state-highlight.BCCP-Attribute {
+    color: #666 !important;
+}
+
 .BBIESC, .ui-state-hover.BBIESC, .ui-state-highlight.BBIESC,
 .ACC, .ui-state-hover.ACC, .ui-state-highlight.ACC,
 .ACC-Extension, .ui-state-hover.ACC-Extension, .ui-state-highlight.ACC-Extension {

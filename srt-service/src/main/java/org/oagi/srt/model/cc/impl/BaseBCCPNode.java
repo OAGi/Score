@@ -5,6 +5,7 @@ import org.oagi.srt.model.CCNodeVisitor;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
+import org.oagi.srt.repository.entity.BasicCoreComponentEntityType;
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
 import org.oagi.srt.repository.entity.DataType;
 
@@ -53,7 +54,7 @@ public class BaseBCCPNode extends AbstractBaseNode implements BCCPNode {
 
     @Override
     public String getType() {
-        return "BCCP";
+        return "BCCP" + (bcc.getEntityType() == BasicCoreComponentEntityType.Attribute ? "-Attribute" : "");
     }
 
     @Override

@@ -232,7 +232,7 @@
                                                     <p:commandButton
                                                             rendered="#{extensionBean.selectedTreeNode.data.ascc.state == 'Editing'}"
                                                             value="Update" ajax="true"
-                                                            actionListener="#{extensionBean.updateAscc(extensionBean.selectedTreeNode.data)}"
+                                                            action="#{extensionBean.updateAscc(extensionBean.selectedTreeNode)}"
                                                             disabled="#{extensionBean.selectedTreeNode.data.ascc.isDirty() eq false}"
                                                             update=":form:details"/>
                                                 </span>
@@ -341,9 +341,9 @@
                                                     <p:commandButton
                                                             rendered="#{extensionBean.selectedTreeNode.data.bcc.state == 'Editing'}"
                                                             value="Update" ajax="true"
-                                                            actionListener="#{extensionBean.updateBcc(extensionBean.selectedTreeNode.data)}"
-                                                            disabled="#{extensionBean.selectedTreeNode.data.ascc.isDirty() eq false}"
-                                                            update=":form"/>
+                                                            action="#{extensionBean.updateBcc(extensionBean.selectedTreeNode)}"
+                                                            disabled="#{extensionBean.selectedTreeNode.data.bcc.isDirty() eq false}"
+                                                            update=":form:treeTable,:form:details"/>
                                                 </span>
                                             </f:facet>
 
