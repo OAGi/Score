@@ -112,7 +112,7 @@ public class ExtensionService {
         AggregateCoreComponent ueAcc = new AggregateCoreComponent();
         ueAcc.setGuid(Utility.generateGUID());
         ueAcc.setObjectClassTerm(Utility.getUserExtensionGroupObjectClassTerm(eAcc.getObjectClassTerm()));
-        ueAcc.setDen((ueAcc.getObjectClassTerm() + ". Details"));
+        ueAcc.setDen(ueAcc.getObjectClassTerm() + ". Details");
         ueAcc.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAcc.setOagisComponentType(UserExtensionGroup);
         ueAcc.setCreatedBy(userId);
@@ -149,6 +149,7 @@ public class ExtensionService {
                                                                      AggregateCoreComponent ueAcc) {
         AssociationCoreComponentProperty ueAsccp = createASCCP(ueAcc, currentLoginUser);
         ueAsccp.setPropertyTerm(ueAcc.getObjectClassTerm());
+        ueAsccp.setDen(ueAsccp.getPropertyTerm() + ". " + ueAcc.getObjectClassTerm());
         ueAsccp.setDefinition("A system created component containing user extension to the " + eAcc.getObjectClassTerm() + ".");
         ueAsccp.setState(Published);
         return asccpRepository.saveAndFlush(ueAsccp);
