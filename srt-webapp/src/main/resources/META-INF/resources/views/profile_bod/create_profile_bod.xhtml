@@ -116,7 +116,7 @@
                     <p:panel>
                         <h:panelGroup style="width: 100%;">
                             <div class="row">
-                                <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+                                <div id="left_panel" class="col-md-5" style="max-height: 470px; overflow-y: scroll;">
                                     <p:treeTable value="#{createProfileBODBean.treeNode}" var="node"
                                                  selection="#{createProfileBODBean.selectedTreeNode}"
                                                  selectionMode="single">
@@ -126,7 +126,7 @@
                                         </p:column>
                                     </p:treeTable>
                                 </div>
-                                <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
+                                <div id="main_panel" class="col-md-7" style="max-height: 470px; overflow-y: scroll">
                                     <div id="myAffix" style="overflow-y: auto;">
                                         <p:panel id="details">
                                             <f:facet name="header">
@@ -297,7 +297,8 @@
                                                 BBIE
                                             -->
                                             <h:panelGroup
-                                                    rendered="#{createProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                                    rendered="#{createProfileBODBean.selectedTreeNode.type eq 'BBIE' or
+                                                                createProfileBODBean.selectedTreeNode.type eq 'BBIE-Attribute'}">
                                                 <p:panel id="bbieHeaderPanel">
                                                     <h:panelGrid columns="2" cellpadding="3">
                                                         <h:outputText value="Name" styleClass="section-label"/>

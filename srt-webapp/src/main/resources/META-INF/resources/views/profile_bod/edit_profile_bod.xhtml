@@ -18,7 +18,7 @@
             <p:panel id="panel">
                 <h:panelGroup style="width: 100%;">
                     <div class="row">
-                        <div id="left_panel" class="col-md-4" style="max-height: 470px; overflow-y: scroll;">
+                        <div id="left_panel" class="col-md-5" style="max-height: 470px; overflow-y: scroll;">
                             <p:treeTable value="#{editProfileBODBean.treeNode}" var="node" id="treeTable"
                                          selection="#{editProfileBODBean.selectedTreeNode}"
                                          selectionMode="single">
@@ -37,7 +37,7 @@
                                             action="#{editProfileBODBean.createABIEExtensionGlobally}"/>
                             </p:contextMenu>
                         </div>
-                        <div id="main_panel" class="col-md-8" style="max-height: 470px; overflow-y: scroll">
+                        <div id="main_panel" class="col-md-7" style="max-height: 470px; overflow-y: scroll">
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
                                     <f:facet name="header">
@@ -209,7 +209,8 @@
                                             BBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE' or
+                                                            editProfileBODBean.selectedTreeNode.type eq 'BBIE-Attribute'}">
                                             <p:panel id="bbieHeaderPanelForEditing">
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>
@@ -659,7 +660,8 @@
                                             BBIE
                                         -->
                                         <h:panelGroup
-                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE'}">
+                                                rendered="#{editProfileBODBean.selectedTreeNode.type eq 'BBIE' or
+                                                            editProfileBODBean.selectedTreeNode.type eq 'BBIE-Attribute'}">
                                             <p:panel>
                                                 <h:panelGrid columns="2" cellpadding="3">
                                                     <h:outputText value="Name" styleClass="section-label"/>

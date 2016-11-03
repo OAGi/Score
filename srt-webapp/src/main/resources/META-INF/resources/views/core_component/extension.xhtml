@@ -21,7 +21,7 @@
             <p:panel id="panel">
                 <h:panelGroup style="width: 100%;">
                     <div class="row">
-                        <div class="col-md-4"
+                        <div class="col-md-5"
                              style="max-height: 470px; overflow-y: scroll; #{extensionBean.preparedAppend ? 'display: none;' : ''} ">
                             <p:panel id="leftPanel">
                                 <p:treeTable value="#{extensionBean.treeNode}" var="node" id="treeTable"
@@ -48,7 +48,7 @@
                             </p:panel>
                         </div>
 
-                        <div id="main_panel" class="#{extensionBean.preparedAppend ? 'col-md-12' : 'col-md-8'}"
+                        <div id="main_panel" class="#{extensionBean.preparedAppend ? 'col-md-12' : 'col-md-7'}"
                              style="max-height: 470px; overflow-y: scroll">
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
