@@ -19,7 +19,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-import org.primefaces.model.TreeNodeChildren;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +38,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
 @Scope("view")
@@ -612,5 +613,73 @@ public class ExtensionBean extends UIHandler {
             return ((ACCNode) data).getAcc().getObjectClassTerm();
         }
         return "";
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateState(CoreComponentState state) {
+        User requester = getCurrentUser();
+        try {
+            coreComponentService.updateState(userExtensionAcc, state, requester);
+
+            TreeNode root = getTreeNode();
+            updateState(root, state, requester);
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "State changed to '" + state + "' successfully."));
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+    }
+
+    private void updateState(TreeNode treeNode, CoreComponentState state, User requester) {
+        long lastUpdatedBy = requester.getAppUserId();
+        Object data = treeNode.getData();
+
+        if (data instanceof ACCNode) {
+            ACCNode accNode = ((ACCNode) data);
+            AggregateCoreComponent acc = accNode.getAcc();
+            if (acc.getState() != Published) {
+                acc.setState(state);
+                acc.setLastUpdatedBy(lastUpdatedBy);
+                acc.afterLoaded();
+            }
+        } else if (data instanceof ASCCPNode) {
+            ASCCPNode asccpNode = ((ASCCPNode) data);
+            AssociationCoreComponent ascc = asccpNode.getAscc();
+            if (ascc.getState() != Published) {
+                ascc.setState(state);
+                ascc.setLastUpdatedBy(lastUpdatedBy);
+                ascc.afterLoaded();
+            }
+
+            AssociationCoreComponentProperty asccp = asccpNode.getAsccp();
+            if (asccp.getState() != Published) {
+                asccp.setState(state);
+                asccp.setLastUpdatedBy(lastUpdatedBy);
+                asccp.afterLoaded();
+            }
+        } else if (data instanceof BCCPNode) {
+            BCCPNode bccpNode = ((BCCPNode) data);
+
+            BasicCoreComponent bcc = bccpNode.getBcc();
+            if (bcc.getState() != Published) {
+                bcc.setState(state);
+                bcc.setLastUpdatedBy(lastUpdatedBy);
+                bcc.afterLoaded();
+            }
+
+            BasicCoreComponentProperty bccp = bccpNode.getBccp();
+            if (bccp.getState() != Published) {
+                bccp.setState(state);
+                bccp.setLastUpdatedBy(lastUpdatedBy);
+                bccp.afterLoaded();
+            }
+        }
+
+        for (TreeNode child : treeNode.getChildren()) {
+            updateState(child, state, requester);
+        }
     }
 }

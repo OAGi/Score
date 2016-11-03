@@ -22,7 +22,7 @@
                 <h:panelGroup style="width: 100%;">
                     <div class="row">
                         <div class="col-md-5"
-                             style="max-height: 470px; overflow-y: scroll; #{extensionBean.preparedAppend ? 'display: none;' : ''} ">
+                             style="max-height: 470px; overflow-y: scroll; #{extensionBean.preparedAppend ? 'display: none;' : ''}">
                             <p:panel id="leftPanel">
                                 <p:treeTable value="#{extensionBean.treeNode}" var="node" id="treeTable"
                                              selection="#{extensionBean.selectedTreeNode}"
@@ -39,11 +39,11 @@
                                     <p:menuitem value="Append ASCC" style="width: 100%;"
                                                 actionListener="#{extensionBean.prepareAppendAscc}"
                                                 onclick="PF('leftBlockUI').show()"
-                                                update=":form:panel"/>
+                                                update=":form"/>
                                     <p:menuitem value="Append BCC" style="width: 100%;"
                                                 actionListener="#{extensionBean.prepareAppendBcc}"
                                                 onclick="PF('leftBlockUI').show()"
-                                                update=":form:panel"/>
+                                                update=":form"/>
                                 </p:contextMenu>
                             </p:panel>
                         </div>
@@ -211,7 +211,8 @@
                                                         value="#{extensionBean.selectedTreeNode.data.acc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.acc.definition == null ? '2' : '6'}"
-                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
+                                                        autoResize="false"
+                                                        a:placeholder="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.acc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.acc.state != 'Editing'}"/>
                                             </h:panelGrid>
@@ -285,7 +286,8 @@
                                                         value="#{extensionBean.selectedTreeNode.data.ascc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.ascc.definition == null ? '2' : '6'}"
-                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? '' : 'Leave a definition'}"
+                                                        autoResize="false"
+                                                        a:placeholder="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.ascc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.ascc.state != 'Editing'}">
                                                     <f:ajax render="asccPanel"/>
@@ -317,7 +319,8 @@
                                                         value="#{extensionBean.selectedTreeNode.data.asccp.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.asccp.definition == null ? '2' : '6'}"
-                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
+                                                        autoResize="false"
+                                                        a:placeholder="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.asccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.asccp.state != 'Editing'}">
                                                     <f:ajax render="asccpPanel"/>
@@ -423,7 +426,8 @@
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.bcc.definition == null ? '2' : '6'}"
-                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? '' : 'Leave a definition'}"
+                                                        autoResize="false"
+                                                        a:placeholder="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
                                                     <f:ajax render="bccPanel"/>
@@ -483,7 +487,8 @@
                                                         value="#{extensionBean.selectedTreeNode.data.bccp.definition}"
                                                         rows="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' and
                                                                 extensionBean.selectedTreeNode.data.bccp.definition == null ? '2' : '6'}"
-                                                        autoResize="false" a:placeholder="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? '' : 'Leave a definition'}"
+                                                        autoResize="false"
+                                                        a:placeholder="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? '' : 'Leave a definition'}"
                                                         styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bccp.state != 'Editing' ? 'disabled' : ''}"
                                                         disabled="#{extensionBean.selectedTreeNode.data.bccp.state != 'Editing'}">
                                                     <f:ajax render="bccpPanel"/>
@@ -532,6 +537,24 @@
                         </div>
                     </div>
                 </h:panelGroup>
+            </p:panel>
+
+            <p:panel id="btnGroup"
+                     rendered="#{(extensionBean.currentUser.appUserId eq extensionBean.userExtensionAcc.createdBy) and
+                                 (extensionBean.preparedAppend eq false)}">
+                <p:commandButton rendered="#{extensionBean.userExtensionAcc.state == 'Editing'}"
+                                 id="btnCandidate" widgetVar="btnCandidate" value="Candidate"
+                                 action="#{extensionBean.updateState('Candidate')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+
+                <p:commandButton rendered="#{extensionBean.userExtensionAcc.state == 'Candidate'}"
+                                 id="btnEditing" widgetVar="btnEditing" value="Back to Editing"
+                                 action="#{extensionBean.updateState('Editing')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
+                <p:commandButton rendered="#{extensionBean.userExtensionAcc.state == 'Candidate'}"
+                                 id="btnPublish" widgetVar="btnPublish" value="Publish"
+                                 action="#{extensionBean.updateState('Published')}"
+                                 update=":form:treeTable, :form:details, :form:btnGroup"/>
             </p:panel>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

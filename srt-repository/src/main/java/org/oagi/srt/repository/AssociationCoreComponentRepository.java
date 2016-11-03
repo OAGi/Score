@@ -1,6 +1,7 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -47,4 +48,7 @@ public interface AssociationCoreComponentRepository extends JpaRepository<Associ
     @Query("update AssociationCoreComponent a set a.seqKey = a.seqKey + 1 " +
             "where a.fromAccId = ?1 and a.seqKey > ?2 and a.revisionNum = 0")
     public void increaseSeqKeyByFromAccIdAndSeqKey(long fromAccId, int seqKey);
+
+    @Query("select a from AssociationCoreComponent a where a.toAsccpId = ?1 and a.revisionNum = ?2")
+    public List<AssociationCoreComponent> findByToAsccpIdAndRevisionNum(long toAsccpId, int revisionNum);
 }

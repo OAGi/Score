@@ -1,8 +1,7 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.provider.CoreComponentProvider;
-import org.oagi.srt.repository.AssociationCoreComponentRepository;
-import org.oagi.srt.repository.BasicCoreComponentRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.PermissionDeniedDataAccessException;
@@ -13,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.oagi.srt.repository.entity.RevisionAction.Update;
 
 @Service
@@ -21,10 +22,19 @@ import static org.oagi.srt.repository.entity.RevisionAction.Update;
 public class CoreComponentService {
 
     @Autowired
+    private AggregateCoreComponentRepository accRepository;
+
+    @Autowired
     private AssociationCoreComponentRepository asccRepository;
 
     @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
+
+    @Autowired
     private BasicCoreComponentRepository bccRepository;
+
+    @Autowired
+    private BasicCoreComponentPropertyRepository bccpRepository;
 
     public List<CoreComponent> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
@@ -178,5 +188,97 @@ public class CoreComponentService {
     private void increaseSeqKeyGreaterThan(long fromAccId, int seqKey) {
         asccRepository.increaseSeqKeyByFromAccIdAndSeqKey(fromAccId, seqKey);
         bccRepository.increaseSeqKeyByFromAccIdAndSeqKey(fromAccId, seqKey);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateState(AggregateCoreComponent acc,
+                            CoreComponentState state,
+                            User requester) {
+        if (acc.getCreatedBy() != requester.getAppUserId()) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+
+        updateChildrenState(acc, state, requester);
+        updateAccState(acc, state, requester);
+    }
+
+    private void updateChildrenState(AggregateCoreComponent acc,
+                                     CoreComponentState state,
+                                     User requester) {
+        long fromAccId = acc.getAccId();
+        long lastUpdatedBy = requester.getAppUserId();
+
+        List<AssociationCoreComponent> asccList = asccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
+        List<AssociationCoreComponentProperty> asccpList = new ArrayList();
+        for (AssociationCoreComponent ascc : asccList) {
+            if (ascc.getState() != Published) {
+                ascc.setState(state);
+                ascc.setLastUpdatedBy(lastUpdatedBy);
+            }
+
+            long toAsccpId = ascc.getToAsccpId();
+            AssociationCoreComponentProperty toAsccp = asccpRepository.findOne(toAsccpId);
+            if (toAsccp.getState() != Published) {
+                toAsccp.setState(state);
+                toAsccp.setLastUpdatedBy(lastUpdatedBy);
+                asccpList.add(toAsccp);
+            }
+        }
+        asccRepository.save(asccList.stream()
+                .filter(e -> e.isDirty()).collect(Collectors.toList()));
+        asccpRepository.save(asccpList);
+
+        List<BasicCoreComponent> bccList = bccRepository.findByFromAccIdAndRevisionNum(fromAccId, 0);
+        List<BasicCoreComponentProperty> bccpList = new ArrayList();
+        for (BasicCoreComponent bcc : bccList) {
+            if (bcc.getState() != Published) {
+                bcc.setState(state);
+                bcc.setLastUpdatedBy(lastUpdatedBy);
+            }
+
+            long toBccpId = bcc.getToBccpId();
+            BasicCoreComponentProperty toBccp = bccpRepository.findOne(toBccpId);
+            if (toBccp.getState() != Published) {
+                toBccp.setState(state);
+                toBccp.setLastUpdatedBy(lastUpdatedBy);
+                bccpList.add(toBccp);
+            }
+        }
+        bccRepository.save(bccList.stream()
+                .filter(e -> e.isDirty()).collect(Collectors.toList()));
+        bccpRepository.save(bccpList);
+    }
+
+    private void updateAccState(AggregateCoreComponent acc,
+                                CoreComponentState state,
+                                User requester) {
+        long roleOfAccId = acc.getAccId();
+        long lastUpdatedBy = requester.getAppUserId();
+
+        if (acc.getState() != Published) {
+            acc.setState(state);
+            acc.setLastUpdatedBy(lastUpdatedBy);
+            accRepository.save(acc);
+        }
+
+        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
+        if (asccp.getState() != Published) {
+            asccp.setState(state);
+            asccp.setLastUpdatedBy(lastUpdatedBy);
+            asccpRepository.save(asccp);
+        }
+
+        long asccpId = asccp.getAsccpId();
+        List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNum(asccpId, 0);
+        for (AssociationCoreComponent ascc : asccList) {
+            if (ascc.getState() != Published) {
+                ascc.setState(state);
+                ascc.setLastUpdatedBy(lastUpdatedBy);
+            }
+        }
+
+        asccRepository.save(asccList.stream()
+                .filter(e -> e.isDirty()).collect(Collectors.toList()));
     }
 }
