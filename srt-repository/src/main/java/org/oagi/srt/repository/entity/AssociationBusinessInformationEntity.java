@@ -32,6 +32,7 @@ public class AssociationBusinessInformationEntity
 
     @Column(nullable = false, updatable = false)
     private long toAsbiepId;
+
     @Transient
     private AssociationBusinessInformationEntityProperty toAsbiep;
 
