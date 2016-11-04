@@ -1,12 +1,14 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bie.*;
+import org.oagi.srt.repository.BusinessInformationEntityUserExtensionRevisionRepository;
 import org.oagi.srt.repository.TopLevelAbieRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -47,8 +49,11 @@ public class EditProfileBODBean extends UIHandler {
     private ExtensionService extensionService;
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
+    @Autowired
+    private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
 
     private TopLevelAbie topLevelAbie;
+    private List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList;
     private TreeNode treeNode;
     private TreeNode selectedTreeNode;
 
@@ -67,6 +72,14 @@ public class EditProfileBODBean extends UIHandler {
 
         TreeNode treeNode = bieTreeNodeHandler.createLazyTreeNode(topLevelAbie);
         setTreeNode(treeNode);
+
+        List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList =
+                bieUserExtRevisionRepository.findByTopLevelAbieId(topLevelAbieId);
+        setBieUserExtRevisionList(bieUserExtRevisionList);
+
+        if (!bieUserExtRevisionList.isEmpty()) {
+            RequestContext.getCurrentInstance().execute("PF('confirmExtensionUptake').show()");
+        }
     }
 
     public TopLevelAbie getTopLevelAbie() {
@@ -75,6 +88,29 @@ public class EditProfileBODBean extends UIHandler {
 
     public void setTopLevelAbie(TopLevelAbie topLevelAbie) {
         this.topLevelAbie = topLevelAbie;
+    }
+
+    public List<BusinessInformationEntityUserExtensionRevision> getBieUserExtRevisionList() {
+        return bieUserExtRevisionList;
+    }
+
+    public void setBieUserExtRevisionList(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
+        this.bieUserExtRevisionList = bieUserExtRevisionList;
+    }
+
+    public String getBieUserExtRevisionListString() {
+        List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList = getBieUserExtRevisionList();
+        if (bieUserExtRevisionList == null || bieUserExtRevisionList.isEmpty()) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
+            sb.append(bieUserExtRevision.getExtAcc().getDen());
+            sb.append(", ");
+        }
+        String str = sb.toString();
+        return str.substring(0, str.length() - 2);
     }
 
     public TreeNode getTreeNode() {
