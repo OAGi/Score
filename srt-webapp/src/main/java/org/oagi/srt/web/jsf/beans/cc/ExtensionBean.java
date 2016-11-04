@@ -619,7 +619,10 @@ public class ExtensionBean extends UIHandler {
     public void updateState(CoreComponentState state) {
         User requester = getCurrentUser();
         try {
-            coreComponentService.updateState(userExtensionAcc, state, requester);
+            AggregateCoreComponent eAcc = getTargetAcc();
+            AggregateCoreComponent ueAcc = getUserExtensionAcc();
+
+            coreComponentService.updateState(eAcc, ueAcc, state, requester);
 
             TreeNode root = getTreeNode();
             updateState(root, state, requester);

@@ -342,7 +342,12 @@ public class EditProfileBODBean extends UIHandler {
         AggregateCoreComponent ueAcc = extensionService.getExistsUserExtension(eAcc);
         if (ueAcc != null) {
             CoreComponentState ueAccState = ueAcc.getState();
-            if (ueAccState == CoreComponentState.Candidate || ueAccState == CoreComponentState.Published) {
+
+            if ( user.getAppUserId() == ueAcc.getOwnerUserId() ) {
+                return redirectABIEExtension(isLocally, eAcc);
+            }
+
+            if ( (ueAccState == CoreComponentState.Candidate || ueAccState == CoreComponentState.Published) ) {
                 return redirectABIEExtension(isLocally, eAcc);
             }
 

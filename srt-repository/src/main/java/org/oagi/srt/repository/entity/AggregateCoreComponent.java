@@ -308,6 +308,14 @@ public class AggregateCoreComponent implements Serializable {
         isAbstract = anAbstract;
     }
 
+    public boolean isExtension() {
+        return OagisComponentType.Extension == getOagisComponentType();
+    }
+
+    public boolean isGlobalExtension() {
+        return isExtension() && "All Extension".equals(getObjectClassTerm());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -36,6 +36,15 @@ public class CoreComponentService {
     @Autowired
     private BasicCoreComponentPropertyRepository bccpRepository;
 
+    @Autowired
+    private TopLevelAbieRepository topLevelAbieRepository;
+
+    @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
+
+    @Autowired
+    private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
+
     public List<CoreComponent> getCoreComponents(
             AggregateCoreComponent acc, CoreComponentProvider coreComponentProvider) {
         long accId = acc.getAccId();
@@ -191,16 +200,21 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void updateState(AggregateCoreComponent acc,
+    public void updateState(AggregateCoreComponent eAcc,
+                            AggregateCoreComponent ueAcc,
                             CoreComponentState state,
                             User requester) {
-        if (acc.getCreatedBy() != requester.getAppUserId()) {
+        if (ueAcc.getCreatedBy() != requester.getAppUserId()) {
             throw new PermissionDeniedDataAccessException(
                     "This operation only allows for the owner of this element.", new IllegalArgumentException());
         }
 
-        updateChildrenState(acc, state, requester);
-        updateAccState(acc, state, requester);
+        updateChildrenState(ueAcc, state, requester);
+        updateAccState(ueAcc, state, requester);
+
+        if (state == Published) {
+            storeBieUserExtRevisions(eAcc, ueAcc);
+        }
     }
 
     private void updateChildrenState(AggregateCoreComponent acc,
@@ -280,5 +294,47 @@ public class CoreComponentService {
 
         asccRepository.save(asccList.stream()
                 .filter(e -> e.isDirty()).collect(Collectors.toList()));
+    }
+
+    private void storeBieUserExtRevisions(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc) {
+        if (!eAcc.isExtension()) {
+            return;
+        }
+
+        List<TopLevelAbie> topLevelAbies = topLevelAbieRepository.findAll().stream()
+                .filter(e -> e.getState() != AggregateBusinessInformationEntityState.Published)
+                .collect(Collectors.toList());
+
+        List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList = new ArrayList();
+        for (TopLevelAbie topLevelAbie : topLevelAbies) {
+            long ownerTopLevelAbieId = topLevelAbie.getTopLevelAbieId();
+            long basedAccId = eAcc.getAccId();
+
+            if (eAcc.isGlobalExtension()) {
+                BusinessInformationEntityUserExtensionRevision bieUserExtRevision =
+                        new BusinessInformationEntityUserExtensionRevision();
+                bieUserExtRevision.setTopLevelAbie(topLevelAbie);
+                bieUserExtRevision.setExtAcc(eAcc);
+                bieUserExtRevision.setUserExtAcc(ueAcc);
+                bieUserExtRevision.setRevisedIndicator(false);
+                bieUserExtRevisionList.add(bieUserExtRevision);
+            } else {
+                List<AggregateBusinessInformationEntity> abieList =
+                        abieRepository.findByOwnerTopLevelAbieIdAndBasedAccId(ownerTopLevelAbieId, basedAccId);
+
+                for (AggregateBusinessInformationEntity abie : abieList) {
+                    BusinessInformationEntityUserExtensionRevision bieUserExtRevision =
+                            new BusinessInformationEntityUserExtensionRevision();
+                    bieUserExtRevision.setTopLevelAbie(topLevelAbie);
+                    bieUserExtRevision.setExtAbie(abie);
+                    bieUserExtRevision.setExtAcc(eAcc);
+                    bieUserExtRevision.setUserExtAcc(ueAcc);
+                    bieUserExtRevision.setRevisedIndicator(false);
+                    bieUserExtRevisionList.add(bieUserExtRevision);
+                }
+            }
+        }
+
+        bieUserExtRevisionRepository.save(bieUserExtRevisionList);
     }
 }
