@@ -384,7 +384,7 @@ public class ExtensionBean extends UIHandler {
         if (extensionService.exists(pAcc, tAsccp)) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                            "You cannot append to an existing association core component."));
+                            "You cannot associate the same component."));
             return;
         }
 
@@ -511,7 +511,7 @@ public class ExtensionBean extends UIHandler {
         if (extensionService.exists(pAcc, tBccp)) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
-                            "You cannot append to an existing basic core component."));
+                            "You cannot associate the same component."));
             return;
         }
 
