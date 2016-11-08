@@ -19,8 +19,13 @@
             <p:confirmDialog widgetVar="confirmExtensionUptake" showEffect="fade"
                              hideEffect="fade" closable="false" header="Extension">
                 <f:facet name="message">
-                    There is an update to the extension content of the [eACC.DEN].
-                    <br/>
+                    There is an update to the extension content of the following ASCCP#{editProfileBODBean.bieUserExtRevisionList.size() > 1 ? "s" : ""}.
+                    <div style="padding: 10px 0 10px 0;">
+                        <ui:repeat value="#{editProfileBODBean.bieUserExtRevisionList}" var="bieUserExtRevision">
+                            <li><h:outputText value="#{editProfileBODBean.encode(bieUserExtRevision)}" escape="false"/>
+                            </li>
+                        </ui:repeat>
+                    </div>
                     Would you like to uptake the extension?
                 </f:facet>
                 <div style="text-align: center;">

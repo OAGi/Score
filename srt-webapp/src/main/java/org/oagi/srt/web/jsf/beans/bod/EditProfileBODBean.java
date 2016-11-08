@@ -1,8 +1,7 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
 import org.oagi.srt.model.bie.*;
-import org.oagi.srt.repository.BusinessInformationEntityUserExtensionRevisionRepository;
-import org.oagi.srt.repository.TopLevelAbieRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
@@ -30,6 +29,7 @@ import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 @Controller
@@ -49,6 +49,14 @@ public class EditProfileBODBean extends UIHandler {
     private ExtensionService extensionService;
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
+    @Autowired
+    private AggregateBusinessInformationEntityRepository abieRepository;
+    @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
+    @Autowired
+    private AssociationBusinessInformationEntityRepository asbieRepository;
+    @Autowired
+    private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
 
@@ -98,19 +106,69 @@ public class EditProfileBODBean extends UIHandler {
         this.bieUserExtRevisionList = bieUserExtRevisionList;
     }
 
-    public String getBieUserExtRevisionListString() {
-        List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList = getBieUserExtRevisionList();
-        if (bieUserExtRevisionList == null || bieUserExtRevisionList.isEmpty()) {
-            return null;
-        }
+    public String encode(BusinessInformationEntityUserExtensionRevision bieUserExtRevision) {
+        TopLevelAbie topLevelAbie = bieUserExtRevision.getTopLevelAbie();
+        AssociationCoreComponentProperty asccp = getAsccpOfTopLevelNode(topLevelAbie);
+
+        Stack<AssociationCoreComponentProperty> asccpStack = new Stack();
+        asccpStack.push(asccp);
+
+        AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+        AggregateBusinessInformationEntity eAbie = bieUserExtRevision.getExtAbie();
+        traverseToFindTargetAbie(asccpStack, abie, eAbie);
 
         StringBuilder sb = new StringBuilder();
-        for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
-            sb.append(bieUserExtRevision.getExtAcc().getDen());
-            sb.append(", ");
+        for (int i = 0, len = asccpStack.size(); i < len; ++i) {
+            asccp = asccpStack.get(i);
+            sb.append("<span class=\"ASCCP\">" + asccp.getPropertyTerm() + "</span>");
+            if ((i + 1) != len) {
+                sb.append("<i class=\"fa fa-angle-double-right\" aria-hidden=\"true\" style=\"padding: 0 5px 0 5px;\"></i>");
+            }
         }
-        String str = sb.toString();
-        return str.substring(0, str.length() - 2);
+
+        return sb.toString();
+    }
+
+    private AssociationCoreComponentProperty getAsccpOfTopLevelNode(TopLevelAbie topLevelAbie) {
+        AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
+        AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOneByRoleOfAbieId(abie.getAbieId());
+        AssociationCoreComponentProperty asccp = asccpRepository.findOne(asbiep.getBasedAsccpId());
+        return asccp;
+    }
+
+    private boolean traverseToFindTargetAbie(Stack<AssociationCoreComponentProperty> asccpStack,
+                                             AggregateBusinessInformationEntity sourceAbie,
+                                             AggregateBusinessInformationEntity targetAbie) {
+
+        long targetAbieId = targetAbie.getAbieId();
+        long fromAbieId = sourceAbie.getAbieId();
+
+        List<AssociationBusinessInformationEntity> asbieList = asbieRepository.findByFromAbieId(fromAbieId);
+        for (AssociationBusinessInformationEntity asbie : asbieList) {
+            long asbiepId = asbie.getToAsbiepId();
+            AssociationBusinessInformationEntityProperty asbiep = asbiepRepository.findOne(asbiepId);
+            long roleOfAbieId = asbiep.getRoleOfAbieId();
+
+            long asccpId = asbiep.getBasedAsccpId();
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
+            asccpStack.push(asccp);
+
+            if (targetAbieId == roleOfAbieId) {
+                // we've found it
+                return true;
+
+            } else {
+                sourceAbie = abieRepository.findOne(roleOfAbieId);
+                boolean result = traverseToFindTargetAbie(asccpStack, sourceAbie, targetAbie);
+                if (result) {
+                    return true;
+                } else {
+                    asccpStack.pop();
+                }
+            }
+        }
+
+        return false;
     }
 
     public TreeNode getTreeNode() {
