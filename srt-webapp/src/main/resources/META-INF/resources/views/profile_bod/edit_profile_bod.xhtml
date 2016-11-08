@@ -65,7 +65,7 @@
                     <p:commandButton value="Keep" icon="ui-icon-check"
                                      onclick="PF('confirmKeepNotification').hide()"/>
                     <p:commandButton value="Discard" icon="ui-icon-close"
-                                     action="#{editProfileBODBean.discard(bieUserExtRevisionList)}"
+                                     action="#{editProfileBODBean.discard(editProfileBODBean.bieUserExtRevisionList)}"
                                      onclick="PF('confirmKeepNotification').hide()"/>
                 </div>
             </p:confirmDialog>

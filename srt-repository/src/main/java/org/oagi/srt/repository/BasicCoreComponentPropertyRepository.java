@@ -1,6 +1,7 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
+import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,6 +11,9 @@ public interface BasicCoreComponentPropertyRepository extends JpaRepository<Basi
 
     @Query("select a from BasicCoreComponentProperty a where a.revisionNum = ?1")
     public List<BasicCoreComponentProperty> findAllWithRevisionNum(int revisionNum);
+
+    @Query("select a from BasicCoreComponentProperty a where a.bccpId = ?1 and a.revisionNum = ?2 and a.state = ?3")
+    public BasicCoreComponentProperty findOneByBccpIdAndRevisionNumAndState(long bccpId, int revisionNum, CoreComponentState state);
 
     @Query("select new BasicCoreComponentProperty(b.bccpId, b.den) from BasicCoreComponentProperty b where b.propertyTerm = ?1 and b.bdtId = ?2")
     public BasicCoreComponentProperty findBccpIdAndDenByPropertyTermAndBdtId(String propertyTerm, long bdtId);

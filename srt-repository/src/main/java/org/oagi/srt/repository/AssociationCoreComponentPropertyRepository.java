@@ -1,6 +1,7 @@
 package org.oagi.srt.repository;
 
 import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.CoreComponentState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,8 +20,8 @@ public interface AssociationCoreComponentPropertyRepository extends JpaRepositor
     @Query("select a from AssociationCoreComponentProperty a where a.propertyTerm = ?1")
     public List<AssociationCoreComponentProperty> findByPropertyTermContaining(String propertyTerm);
 
-    @Query("select a from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2")
-    public AssociationCoreComponentProperty findOneByAsccpIdAndRevisionNum(long asccpId, int revisionNum);
+    @Query("select a from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2 and a.state = ?3")
+    public AssociationCoreComponentProperty findOneByAsccpIdAndRevisionNumAndState(long asccpId, int revisionNum, CoreComponentState state);
 
     @Query("select new AssociationCoreComponentProperty(a.asccpId, a.roleOfAccId, a.definition) " +
             "from AssociationCoreComponentProperty a where a.asccpId = ?1 and a.revisionNum = ?2")

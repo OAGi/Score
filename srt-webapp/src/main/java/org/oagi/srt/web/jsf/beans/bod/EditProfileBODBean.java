@@ -1,10 +1,12 @@
 package org.oagi.srt.web.jsf.beans.bod;
 
+import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.bie.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.ExtensionService;
+import org.oagi.srt.service.NodeService;
 import org.oagi.srt.web.handler.UIHandler;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
@@ -49,6 +51,8 @@ public class EditProfileBODBean extends UIHandler {
     private BusinessInformationEntityService bieService;
     @Autowired
     private ExtensionService extensionService;
+    @Autowired
+    private NodeService nodeService;
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
     @Autowired
@@ -138,8 +142,11 @@ public class EditProfileBODBean extends UIHandler {
             RequestContext.getCurrentInstance().execute("PF('confirmChangeStateToEditing').show()");
         } else {
             for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
-                extensionService.uptake(bieUserExtRevision);
+                BIENode userExtBieNode = nodeService.createBIENode(bieUserExtRevision);
+                bieTreeNodeHandler.append(userExtBieNode, topLevelAbie);
             }
+
+            discard(bieUserExtRevisionList);
         }
     }
 

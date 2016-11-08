@@ -1,6 +1,8 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.model.BIENode;
+import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,9 @@ public class ExtensionService {
 
     @Autowired
     private NamespaceRepository namespaceRepository;
+
+    @Autowired
+    private NodeService nodeService;
 
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
@@ -525,10 +530,5 @@ public class ExtensionService {
         if (nextSeqKey != (maxSeqKey + 1)) {
             throw new IllegalStateException();
         }
-    }
-
-    @Transactional(rollbackFor = Throwable.class)
-    public void uptake(BusinessInformationEntityUserExtensionRevision bieUserExtRevision) {
-
     }
 }
