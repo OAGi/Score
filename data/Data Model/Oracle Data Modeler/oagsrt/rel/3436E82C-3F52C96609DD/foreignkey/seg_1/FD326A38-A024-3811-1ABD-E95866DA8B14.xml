@@ -4,11 +4,11 @@
 <createdTime>2016-08-08 21:23:29 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <deleteRule>NO ACTION</deleteRule>
-<referredTableID>62784CB3-2B23-A1BB-C6D2-59AC6B43E818</referredTableID>
-<keyObject>408A5EA7-DB83-FEE6-910C-A373C48B9DCB</keyObject>
-<referredKeyID>408A5EA7-DB83-FEE6-910C-A373C48B9DCB</referredKeyID>
+<referredTableID>B66FD1EF-BE3E-85E8-AA50-2C36B1A57813</referredTableID>
+<keyObject>0DCAF93A-849A-A2B1-C075-8AA7CDA840F7</keyObject>
+<referredKeyID>0DCAF93A-849A-A2B1-C075-8AA7CDA840F7</referredKeyID>
 <mandatory>true</mandatory>
 <transferable>true</transferable>
 <rely>false</rely>
-<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+<columnDependencyConstraintGenerateInDDL>false</columnDependencyConstraintGenerateInDDL>
 </FKIndexAssociation>

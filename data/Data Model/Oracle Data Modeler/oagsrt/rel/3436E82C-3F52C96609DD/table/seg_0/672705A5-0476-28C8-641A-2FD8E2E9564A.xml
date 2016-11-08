@@ -34,7 +34,7 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="FD326A38-A024-3811-1ABD-E95866DA8B14" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
+<colAssociation fkAssociation="FD326A38-A024-3811-1ABD-E95866DA8B14" referredColumn="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
 </associations>
 </Column>
 <Column name="EXT_ABIE_ID" id="ABAB5E96-8470-5DB9-222A-3510C440554C">
