@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="settings-next">
             <div class="subhead">
-                <h2 class="subhead-heading">#{editProfileBODBean.topLevelAbie.state == 'Editing' ? 'Edit' : (editProfileBODBean.topLevelAbie.state eq 'Candidate' ? 'Review' : 'View')} Profile BOD</h2>
+                <h2 class="subhead-heading">#{editProfileBODBean.topLevelAbie.state eq 'Editing' ? 'Edit' : (editProfileBODBean.topLevelAbie.state eq 'Candidate' ? 'Review' : 'View')} Profile BOD</h2>
             </div>
         </div>
         <h:form id="form">
@@ -17,9 +17,9 @@
                         closable="true"/>
 
             <p:confirmDialog widgetVar="confirmExtensionUptake" showEffect="fade"
-                             hideEffect="fade" closable="false" header="Extension">
+                             hideEffect="fade" closable="false" header="Uptake extension">
                 <f:facet name="message">
-                    There is an update to the extension content of the following ASCCP#{editProfileBODBean.bieUserExtRevisionList.size() > 1 ? "s" : ""}.
+                    There is an update to the extension content of the following extension#{editProfileBODBean.bieUserExtRevisionList.size() > 1 ? "s" : ""}.
                     <div style="padding: 10px 0 10px 0;">
                         <ui:repeat value="#{editProfileBODBean.bieUserExtRevisionList}" var="bieUserExtRevision">
                             <li><h:outputText value="#{editProfileBODBean.encode(bieUserExtRevision)}" escape="false"/>
@@ -30,9 +30,43 @@
                 </f:facet>
                 <div style="text-align: center;">
                     <p:commandButton value="Accept" icon="ui-icon-check"
-                                     onclick="PF('confirmExtensionUptake').hide()"/>
+                                     action="#{editProfileBODBean.uptakeExtensions(editProfileBODBean.bieUserExtRevisionList)}"
+                                     onclick="PF('confirmExtensionUptake').hide();"/>
                     <p:commandButton value="Cancel" icon="ui-icon-close"
-                                     onclick="PF('confirmExtensionUptake').hide()"/>
+                                     onclick="PF('confirmExtensionUptake').hide(); PF('confirmKeepNotification').show();"/>
+                </div>
+            </p:confirmDialog>
+
+            <p:confirmDialog widgetVar="confirmChangeStateToEditing" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Change state to editing">
+                <f:facet name="message">
+                    This profile BOD's state is in 'Candidate'. It needs to change the state to 'Editing'.
+                    <br/>
+                    Would you like to accept it?
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     action="#{editProfileBODBean.uptakeExtensionsWithChangingState(editProfileBODBean.bieUserExtRevisionList, 'Editing')}"
+                                     update=":form:panel, :form:btnGroup"
+                                     onclick="PF('confirmChangeStateToEditing').hide();"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmChangeStateToEditing').hide(); PF('confirmKeepNotification').show();"/>
+                </div>
+            </p:confirmDialog>
+
+            <p:confirmDialog widgetVar="confirmKeepNotification" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Keep or discard notification">
+                <f:facet name="message">
+                    Would you like to keep or disregard this notification?
+                    <br/>
+                    Keeping the notification allows you to review the content of the extension first.
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Keep" icon="ui-icon-check"
+                                     onclick="PF('confirmKeepNotification').hide()"/>
+                    <p:commandButton value="Discard" icon="ui-icon-close"
+                                     action="#{editProfileBODBean.discard(bieUserExtRevisionList)}"
+                                     onclick="PF('confirmKeepNotification').hide()"/>
                 </div>
             </p:confirmDialog>
 

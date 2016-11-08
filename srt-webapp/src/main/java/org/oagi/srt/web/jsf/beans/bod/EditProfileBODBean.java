@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Candidate;
+
 @Controller
 @Scope("view")
 @ManagedBean
@@ -127,6 +129,36 @@ public class EditProfileBODBean extends UIHandler {
         }
 
         return sb.toString();
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void uptakeExtensions(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
+        TopLevelAbie topLevelAbie = getTopLevelAbie();
+        if (Candidate == topLevelAbie.getState()) {
+            RequestContext.getCurrentInstance().execute("PF('confirmChangeStateToEditing').show()");
+        } else {
+            for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
+                extensionService.uptake(bieUserExtRevision);
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void uptakeExtensionsWithChangingState(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList,
+                                                  AggregateBusinessInformationEntityState state) {
+        updateState(state);
+
+        TopLevelAbie topLevelAbie = getTopLevelAbie();
+        topLevelAbie = topLevelAbieRepository.findOne(topLevelAbie.getTopLevelAbieId());
+        setTopLevelAbie(topLevelAbie);
+
+        uptakeExtensions(bieUserExtRevisionList);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
+        bieUserExtRevisionRepository.delete(bieUserExtRevisionList);
+        setBieUserExtRevisionList(null);
     }
 
     private AssociationCoreComponentProperty getAsccpOfTopLevelNode(TopLevelAbie topLevelAbie) {

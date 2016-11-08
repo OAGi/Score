@@ -526,4 +526,9 @@ public class ExtensionService {
             throw new IllegalStateException();
         }
     }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void uptake(BusinessInformationEntityUserExtensionRevision bieUserExtRevision) {
+
+    }
 }

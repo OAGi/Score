@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,11 +66,6 @@ public class BIETreeNodeHandler extends UIHandler {
 
     @Autowired
     private TopLevelAbieRepository topLevelAbieRepository;
-
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
-
-    private int batchSize = 25;
 
     private class SubmitBIENodeVisitor implements BIENodeVisitor {
 
@@ -190,29 +183,6 @@ public class BIETreeNodeHandler extends UIHandler {
             saveBbieScList();
             saveAsbiepList();
             saveAsbieList();
-
-//            EntityManager entityManager = null;
-//            EntityTransaction txn = null;
-//            try {
-//                entityManager = entityManagerFactory.createEntityManager();
-//                txn = entityManager.getTransaction();
-//                txn.begin();
-//
-//                saveTopLevelAbie(entityManager);
-//                saveBatch(entityManager, abieList);
-//                saveBatch(entityManager, bbiepList);
-//                saveBatch(entityManager, bbieList);
-//                saveBatch(entityManager, bbiescList);
-//                saveBatch(entityManager, asbiepList);
-//                saveBatch(entityManager, asbieList);
-//
-//                txn.commit();
-//            } catch (RuntimeException e) {
-//                if (txn != null && txn.isActive()) txn.rollback();
-//                throw e;
-//            } finally {
-//                entityManager.close();
-//            }
         }
 
         private void saveTopLevelAbie() {
@@ -226,34 +196,6 @@ public class BIETreeNodeHandler extends UIHandler {
 
             topLevelAbie.setAbie(abie);
             topLevelAbieRepository.save(topLevelAbie);
-        }
-
-        private void saveTopLevelAbie(EntityManager entityManager) {
-            AggregateBusinessInformationEntity abie = topLevelAbie.getAbie();
-            topLevelAbie.setAbie(null);
-
-            entityManager.persist(topLevelAbie);
-            entityManager.flush();
-            abie.setOwnerTopLevelAbie(topLevelAbie);
-
-            entityManager.persist(abie);
-            entityManager.flush();
-
-            topLevelAbie.setAbie(abie);
-            entityManager.persist(topLevelAbie);
-            entityManager.flush();
-        }
-
-        private void saveBatch(EntityManager entityManager, List list) {
-            for (int i = 0, len = list.size(); i < len; ++i) {
-                entityManager.persist(list.get(i));
-
-                if (i % batchSize == 0) {
-                    // flush a batch of inserts and release memory
-                    entityManager.flush();
-                    entityManager.clear();
-                }
-            }
         }
 
         private void saveAbieList() {
