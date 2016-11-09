@@ -156,15 +156,21 @@ public class CoreComponentService {
             throw new IllegalStateException("There is no history for this element.");
         }
 
+        int seqKey;
+        long fromAccId = bcc.getFromAccId();
+
         switch (bcc.getEntityType()) {
             case Element:
-                int seqKey = findAppropriateSeqKey(bcc);
+                seqKey = findAppropriateSeqKey(bcc);
                 bcc.setSeqKey(seqKey);
-                long fromAccId = bcc.getFromAccId();
-                increaseSeqKeyGreaterThan(fromAccId, seqKey);
+
+                increaseSeqKeyGreaterThan(fromAccId, seqKey - 1);
                 break;
             case Attribute:
+                seqKey = bcc.getSeqKey();
                 bcc.setSeqKey(0);
+
+                decreaseSeqKeyGreaterThan(fromAccId, seqKey);
                 break;
         }
 
@@ -195,8 +201,13 @@ public class CoreComponentService {
     }
 
     private void increaseSeqKeyGreaterThan(long fromAccId, int seqKey) {
-        asccRepository.increaseSeqKeyByFromAccIdAndSeqKey(fromAccId, seqKey);
-        bccRepository.increaseSeqKeyByFromAccIdAndSeqKey(fromAccId, seqKey);
+        asccRepository.increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
+        bccRepository.increaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
+    }
+
+    private void decreaseSeqKeyGreaterThan(long fromAccId, int seqKey) {
+        asccRepository.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
+        bccRepository.decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(fromAccId, seqKey);
     }
 
     @Transactional(rollbackFor = Throwable.class)
