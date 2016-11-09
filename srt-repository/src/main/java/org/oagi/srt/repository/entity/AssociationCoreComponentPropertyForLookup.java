@@ -2,6 +2,7 @@ package org.oagi.srt.repository.entity;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 
@@ -22,6 +23,10 @@ public class AssociationCoreComponentPropertyForLookup {
 
     @Column(nullable = false)
     private String propertyTerm;
+
+    @Lob
+    @Column(length = 10 * 1024)
+    private String definition;
 
     @Column
     private Long roleOfAccId;
@@ -61,6 +66,16 @@ public class AssociationCoreComponentPropertyForLookup {
 
     public void setPropertyTerm(String propertyTerm) {
         this.propertyTerm = propertyTerm;
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        if (!StringUtils.isEmpty(definition)) {
+            this.definition = definition;
+        }
     }
 
     public long getRoleOfAccId() {
@@ -116,6 +131,7 @@ public class AssociationCoreComponentPropertyForLookup {
         if (revisionNum != that.revisionNum) return false;
         if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
+        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
         if (roleOfAccId != null ? !roleOfAccId.equals(that.roleOfAccId) : that.roleOfAccId != null) return false;
         return state == that.state;
 
@@ -126,6 +142,7 @@ public class AssociationCoreComponentPropertyForLookup {
         int result = (int) (asccpId ^ (asccpId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (propertyTerm != null ? propertyTerm.hashCode() : 0);
+        result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (roleOfAccId != null ? roleOfAccId.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (reusableIndicator ? 1 : 0);
@@ -140,6 +157,7 @@ public class AssociationCoreComponentPropertyForLookup {
                 "asccpId=" + asccpId +
                 ", guid='" + guid + '\'' +
                 ", propertyTerm='" + propertyTerm + '\'' +
+                ", definition='" + definition + '\'' +
                 ", roleOfAccId=" + roleOfAccId +
                 ", state=" + state +
                 ", reusableIndicator=" + reusableIndicator +

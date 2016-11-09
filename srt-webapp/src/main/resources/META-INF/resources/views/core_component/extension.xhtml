@@ -51,7 +51,7 @@
                         </div>
 
                         <div id="main_panel" class="#{extensionBean.preparedAppend ? 'col-md-12' : 'col-md-7'}"
-                             style="max-height: 470px; overflow-y: scroll">
+                             style="#{extensionBean.preparedAppend ? '' : 'max-height: 470px;'} overflow-y: scroll">
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
                                     <!--
@@ -90,6 +90,9 @@
                                                         <h:outputText value="GUID: #{asccp.guid}"
                                                                       style="font-size: 12px !important; color: #767676 !important;"/>
                                                     </div>
+                                                </p:column>
+                                                <p:column headerText="Definition" sortBy="#{asccp.definition}">
+                                                    <h:outputText value="#{asccp.definition}"/>
                                                 </p:column>
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{asccp.state}">
@@ -152,6 +155,9 @@
                                                         <h:outputText value="GUID: #{bccp.guid}"
                                                                       style="font-size: 12px !important; color: #767676 !important;"/>
                                                     </div>
+                                                </p:column>
+                                                <p:column headerText="Definition" sortBy="#{bccp.definition}">
+                                                    <h:outputText value="#{bccp.definition}"/>
                                                 </p:column>
                                                 <p:column style="width: 100px; text-align: center;" headerText="State"
                                                           sortBy="#{bccp.state}">
