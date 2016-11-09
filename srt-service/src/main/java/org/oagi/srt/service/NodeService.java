@@ -874,4 +874,11 @@ public class NodeService {
             return asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
         }
     }
+
+    public LazyASCCPNode createLazyASCCPNode(ACCNode parent, AssociationCoreComponent ascc, AssociationCoreComponentProperty asccp) {
+        ASCCPNode asccpNode = new BaseASCCPNode(parent, ascc, asccp);
+        ASCCPFetcher fetcher = new ASCCPFetcher(asccp);
+        LazyASCCPNode lazyASCCPNode = new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount());
+        return lazyASCCPNode;
+    }
 }

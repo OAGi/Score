@@ -7,6 +7,7 @@ import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.model.cc.impl.BaseACCNode;
 import org.oagi.srt.model.cc.impl.BaseASCCPNode;
 import org.oagi.srt.model.cc.impl.BaseBCCPNode;
+import org.oagi.srt.model.cc.impl.LazyASCCPNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
@@ -392,9 +393,13 @@ public class ExtensionBean extends UIHandler {
         TreeNode rootNode = getRootNode();
         ACCNode rootAccNode = (ACCNode) rootNode.getData();
         ExtensionService.AppendAsccResult result = extensionService.appendAsccTo(pAcc, tAsccp, user);
-        ASCCPNode asccpNode = new BaseASCCPNode(
+
+        LazyASCCPNode asccpNode = nodeService.createLazyASCCPNode(
                 new BaseACCNode(rootAccNode, pAcc), result.getAscc(), tAsccp);
         TreeNode child = new DefaultTreeNode(asccpNode.getType(), asccpNode, rootNode);
+        for (int i = 0, len = asccpNode.getChildrenCount(); i < len; ++i) {
+            new DefaultTreeNode(null, child);
+        }
         setSelectedTreeNode(child);
     }
 
