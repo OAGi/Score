@@ -33,7 +33,7 @@
 
                         <h:outputText rendered="#{profileBODBean.currentUser.appUserId ne profileBOD.owner and profileBOD.state eq 'Editing'}"
                                       id="focus" value="#{profileBOD.propertyTerm}"/>
-                        <p:tooltip id="toolTipFade" for="focus" value="This profile BOD only can access by an owner." trackMouse="true"/>
+                        <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner." position="bottom"/>
                     </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"
@@ -43,6 +43,15 @@
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis" headerText="Owner"
                               sortBy="#{profileBOD.ownerName}">
                         <h:outputText value="#{profileBOD.ownerName}"/>
+
+                        <h:link rendered="#{profileBODBean.currentUser.appUserId eq profileBOD.owner and profileBOD.state eq 'Editing'}"
+                                outcome="/views/profile_bod/transfer_profile_bod_ownership.xhtml">
+                            <f:param name="topLevelAbieId" value="#{profileBOD.topLevelAbieId}"/>
+                            <h:panelGroup id="exchangeOwner" style="float: right; cursor: pointer;">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                            </h:panelGroup>
+                        </h:link>
+                        <p:tooltip id="toolTipExchangeOwner" for="exchangeOwner" value="Click to transfer the ownership." position="bottom"/>
                     </p:column>
                     <p:column style="width: 200px; text-align: center;" headerText="Creation Timestamp"
                               sortBy="#{profileBOD.creationTimestamp}">

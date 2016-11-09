@@ -1096,4 +1096,16 @@ public class BusinessInformationEntityService {
                 bdtScPriRestriRepository.findByBdtScId(bdtScId);
         return bdtScPriRestriList;
     }
+
+    public void transferOwner(TopLevelAbie topLevelAbie, User newOwner) {
+        long oldOwnerId = topLevelAbie.getOwner();
+        long newOwnerId = newOwner.getAppUserId();
+
+        if (oldOwnerId == newOwnerId) {
+            return;
+        }
+
+        topLevelAbie.setOwner(newOwnerId);
+        topLevelAbieRepository.save(topLevelAbie);
+    }
 }

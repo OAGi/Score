@@ -409,7 +409,7 @@ public class ExtensionBean extends UIHandler {
         for (int i = 0, len = asccpNode.getChildrenCount(); i < len; ++i) {
             new DefaultTreeNode(null, child);
         }
-        
+
         getSelectedTreeNode().setSelected(false);
         child.setSelected(true);
         setSelectedTreeNode(child);
