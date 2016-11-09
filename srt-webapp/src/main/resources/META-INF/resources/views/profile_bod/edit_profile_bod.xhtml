@@ -79,6 +79,8 @@
                                          selectionMode="single">
                                 <p:ajax event="expand" listener="#{editProfileBODBean.expand}"
                                         update=":form:treeTable"/>
+                                <p:ajax event="collapse"
+                                        update=":form:treeTable"/>
                                 <p:ajax event="select" update=":form:details"/>
                                 <p:column headerText="#{editProfileBODBean.topLevelNode.asccp.module.module}">
                                     <h:outputText value="#{node.name}"/>

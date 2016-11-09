@@ -29,6 +29,8 @@
                                              selectionMode="single">
                                     <p:ajax event="expand" listener="#{extensionBean.expand}"
                                             update=":form:treeTable"/>
+                                    <p:ajax event="collapse"
+                                            update=":form:treeTable"/>
                                     <p:ajax event="select" update=":form:details"/>
                                     <p:column headerText="#{extensionBean.rootAsccp.propertyTerm}">
                                         <h:outputText value="#{node.name}"/>
