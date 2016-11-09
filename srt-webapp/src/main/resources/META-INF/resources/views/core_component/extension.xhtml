@@ -242,6 +242,11 @@
                                                             action="#{extensionBean.updateAscc(extensionBean.selectedTreeNode)}"
                                                             disabled="#{extensionBean.selectedTreeNode.data.ascc.isDirty() eq false}"
                                                             update=":form:details"/>
+                                                    <p:commandButton
+                                                            rendered="#{extensionBean.selectedTreeNode.data.ascc.state == 'Editing'}"
+                                                            value="Discard" ajax="true" styleClass="danger"
+                                                            action="#{extensionBean.discardAscc(extensionBean.selectedTreeNode)}"
+                                                            update=":form:treeTable, :form:details"/>
                                                 </span>
                                             </f:facet>
 
@@ -352,6 +357,11 @@
                                                             value="Update" ajax="true"
                                                             action="#{extensionBean.updateBcc(extensionBean.selectedTreeNode)}"
                                                             disabled="#{extensionBean.selectedTreeNode.data.bcc.isDirty() eq false}"
+                                                            update=":form:treeTable,:form:details"/>
+                                                    <p:commandButton
+                                                            rendered="#{extensionBean.selectedTreeNode.data.bcc.state == 'Editing'}"
+                                                            value="Discard" ajax="true" styleClass="danger"
+                                                            action="#{extensionBean.discardBcc(extensionBean.selectedTreeNode)}"
                                                             update=":form:treeTable,:form:details"/>
                                                 </span>
                                             </f:facet>

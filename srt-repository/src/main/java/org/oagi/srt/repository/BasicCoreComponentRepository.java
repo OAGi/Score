@@ -63,4 +63,8 @@ public interface BasicCoreComponentRepository extends JpaRepository<BasicCoreCom
     @Query("update BasicCoreComponent b set b.seqKey = b.seqKey - 1 " +
             "where b.fromAccId = ?1 and b.seqKey > ?2 and b.revisionNum = 0")
     public void decreaseSeqKeyByFromAccIdAndSeqKeyGreaterThan(long fromAccId, int seqKey);
+
+    @Modifying
+    @Query("delete from BasicCoreComponent b where b.currentBccId = ?1")
+    public void deleteByCurrentBccId(long currentBccId);
 }

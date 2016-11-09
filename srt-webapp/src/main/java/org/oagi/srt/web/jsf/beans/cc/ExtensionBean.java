@@ -565,6 +565,28 @@ public class ExtensionBean extends UIHandler {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public void discardAscc(TreeNode treeNode) {
+        ASCCPNode asccpNode = (ASCCPNode) treeNode.getData();
+        AssociationCoreComponent ascc = asccpNode.getAscc();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.discard(ascc, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+
+        TreeNode parent = treeNode.getParent();
+        List<TreeNode> children = parent.getChildren();
+        children.remove(treeNode);
+
+        TreeNode root = getTreeNode();
+        reorderTreeNode(root);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void updateBcc(TreeNode treeNode) {
         BCCPNode bccpNode = (BCCPNode) treeNode.getData();
         BasicCoreComponent bcc = bccpNode.getBcc();
@@ -580,6 +602,28 @@ public class ExtensionBean extends UIHandler {
         }
 
         treeNode.setType(bccpNode.getType());
+
+        TreeNode root = getTreeNode();
+        reorderTreeNode(root);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discardBcc(TreeNode treeNode) {
+        BCCPNode bccpNode = (BCCPNode) treeNode.getData();
+        BasicCoreComponent bcc = bccpNode.getBcc();
+        User requester = getCurrentUser();
+
+        try {
+            coreComponentService.discard(bcc, requester);
+        } catch (Throwable t) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
+            throw t;
+        }
+
+        TreeNode parent = treeNode.getParent();
+        List<TreeNode> children = parent.getChildren();
+        children.remove(treeNode);
 
         TreeNode root = getTreeNode();
         reorderTreeNode(root);

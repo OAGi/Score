@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
+import static org.oagi.srt.repository.entity.RevisionAction.Delete;
 import static org.oagi.srt.repository.entity.RevisionAction.Update;
 
 @Service
@@ -143,6 +144,29 @@ public class CoreComponentService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    public void discard(AssociationCoreComponent ascc, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = ascc.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentAsccId = ascc.getAsccId();
+        AssociationCoreComponent latestAscc = asccRepository.findLatestOneByCurrentAsccId(currentAsccId);
+        if (latestAscc == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        long asccId = ascc.getAsccId();
+        asccRepository.deleteByCurrentAsccId(asccId); // To remove history
+        int seqKey = ascc.getSeqKey();
+        asccRepository.delete(ascc);
+
+        long fromAccId = ascc.getFromAccId();
+        decreaseSeqKeyGreaterThan(fromAccId, seqKey);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public void update(BasicCoreComponent bcc, User requester) {
         long requesterId = requester.getAppUserId();
         long ownerId = bcc.getCreatedBy();
@@ -191,6 +215,31 @@ public class CoreComponentService {
         long actualRevisionTrackingNum = latestBcc.getRevisionTrackingNum();
         if (actualRevisionTrackingNum != nextRevisionTrackingNum) {
             throw new ConcurrentModificationException("BasicCoreComponent was modified outside of this operation");
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void discard(BasicCoreComponent bcc, User requester) {
+        long requesterId = requester.getAppUserId();
+        long ownerId = bcc.getCreatedBy();
+        if (requesterId != ownerId) {
+            throw new PermissionDeniedDataAccessException(
+                    "This operation only allows for the owner of this element.", new IllegalArgumentException());
+        }
+        long currentBccId = bcc.getBccId();
+        BasicCoreComponent latestBcc = bccRepository.findLatestOneByCurrentBccId(currentBccId);
+        if (latestBcc == null) {
+            throw new IllegalStateException("There is no history for this element.");
+        }
+
+        long bccId = bcc.getBccId();
+        bccRepository.deleteByCurrentBccId(bccId); // To remove history
+        int seqKey = bcc.getSeqKey();
+        bccRepository.delete(bcc);
+
+        if (seqKey > 0) {
+            long fromAccId = bcc.getFromAccId();
+            decreaseSeqKeyGreaterThan(fromAccId, seqKey);
         }
     }
 
