@@ -344,6 +344,8 @@ public class ExtensionService {
         public AppendAsccResult(AssociationCoreComponent ascc,
                                 AssociationCoreComponent asccHistory) {
             this.ascc = ascc;
+            this.ascc.afterLoaded();
+
             this.asccHistory = asccHistory;
         }
 
@@ -434,6 +436,8 @@ public class ExtensionService {
 
         public AppendBccResult(BasicCoreComponent bcc, BasicCoreComponent bccHistory) {
             this.bcc = bcc;
+            this.bcc.afterLoaded();
+
             this.bccHistory = bccHistory;
         }
 

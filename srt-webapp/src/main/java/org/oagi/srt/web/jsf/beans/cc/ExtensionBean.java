@@ -409,6 +409,9 @@ public class ExtensionBean extends UIHandler {
         for (int i = 0, len = asccpNode.getChildrenCount(); i < len; ++i) {
             new DefaultTreeNode(null, child);
         }
+        
+        getSelectedTreeNode().setSelected(false);
+        child.setSelected(true);
         setSelectedTreeNode(child);
     }
 
@@ -543,6 +546,9 @@ public class ExtensionBean extends UIHandler {
         for (int i = 0, len = bccpNode.getChildrenCount(); i < len; ++i) {
             new DefaultTreeNode(null, child);
         }
+
+        getSelectedTreeNode().setSelected(false);
+        child.setSelected(true);
         setSelectedTreeNode(child);
     }
 
@@ -577,6 +583,8 @@ public class ExtensionBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+
+        setSelectedTreeNode(null);
 
         TreeNode parent = treeNode.getParent();
         List<TreeNode> children = parent.getChildren();
@@ -620,6 +628,8 @@ public class ExtensionBean extends UIHandler {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", t.getMessage()));
             throw t;
         }
+
+        setSelectedTreeNode(null);
 
         TreeNode parent = treeNode.getParent();
         List<TreeNode> children = parent.getChildren();
