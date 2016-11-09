@@ -12,6 +12,9 @@ public interface BusinessContextValueRepository extends JpaRepository<BusinessCo
     @Query("select b from BusinessContextValue b where b.businessContext.bizCtxId = ?1")
     public List<BusinessContextValue> findByBizCtxId(long bizCtxId);
 
+    @Query("select b from BusinessContextValue b where b.contextSchemeValue.ctxSchemeValueId = ?1")
+    public List<BusinessContextValue> findByCtxSchemeValueId(long ctxSchemeValueId);
+
     @Modifying
     @Query("delete from BusinessContextValue b where b.businessContext.bizCtxId = ?1")
     public void deleteByBizCtxId(long bizCtxId);

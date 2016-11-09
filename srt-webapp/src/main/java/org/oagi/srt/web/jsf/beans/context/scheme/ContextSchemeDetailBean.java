@@ -2,6 +2,7 @@ package org.oagi.srt.web.jsf.beans.context.scheme;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.BusinessContextValueRepository;
 import org.oagi.srt.repository.entity.ContextCategory;
 import org.oagi.srt.repository.entity.ContextScheme;
 import org.oagi.srt.repository.entity.ContextSchemeValue;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @Scope("view")
 @ManagedBean
 @ViewScoped
+@Transactional(readOnly = true)
 public class ContextSchemeDetailBean extends UIHandler {
 
     @Autowired
@@ -38,6 +40,9 @@ public class ContextSchemeDetailBean extends UIHandler {
 
     @Autowired
     private ContextSchemeService contextSchemeService;
+
+    @Autowired
+    private BusinessContextValueRepository businessContextValueRepository;
 
     @PostConstruct
     public void init() {
@@ -162,10 +167,24 @@ public class ContextSchemeDetailBean extends UIHandler {
         this.confirmSameAgencyIdButDifferentIdentity = confirmSameAgencyIdButDifferentIdentity;
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public void deleteContextSchemeValue() {
-        contextSchemeValues.remove(selectedContextSchemeValue);
-        deletedContextSchemeValues.add(selectedContextSchemeValue);
-        selectedContextSchemeValue = null;
+        ContextSchemeValue selectedContextSchemeValue = getSelectedContextSchemeValue();
+        if (selectedContextSchemeValue == null) {
+            return;
+        }
+
+        long ctxSchemeValueId = selectedContextSchemeValue.getCtxSchemeValueId();
+        if (businessContextValueRepository.findByCtxSchemeValueId(ctxSchemeValueId).isEmpty()) {
+            contextSchemeValues.remove(selectedContextSchemeValue);
+            deletedContextSchemeValues.add(selectedContextSchemeValue);
+
+            setSelectedContextSchemeValue(null);
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                            "Used context scheme value can't delete."));
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)
