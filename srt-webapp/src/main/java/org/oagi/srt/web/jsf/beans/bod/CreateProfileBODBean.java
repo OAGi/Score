@@ -8,7 +8,6 @@ import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
 import org.oagi.srt.repository.BusinessContextRepository;
 import org.oagi.srt.repository.TopLevelConceptRepository;
 import org.oagi.srt.repository.entity.*;
-import org.oagi.srt.repository.entity.listener.PersistEventListener;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.web.jsf.component.treenode.BIETreeNodeHandler;
 import org.primefaces.context.RequestContext;
@@ -30,7 +29,6 @@ import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
@@ -146,11 +144,29 @@ public class CreateProfileBODBean {
     }
 
     public List<String> completeInput(String query) {
-        return getAllTopLevelConcepts().stream()
-                .map(e -> e.getPropertyTerm())
-                .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+
+        if (StringUtils.isEmpty(q)) {
+            return getAllTopLevelConcepts().stream()
+                    .map(e -> e.getPropertyTerm())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return getAllTopLevelConcepts().stream()
+                    .map(e -> e.getPropertyTerm())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public void search() {

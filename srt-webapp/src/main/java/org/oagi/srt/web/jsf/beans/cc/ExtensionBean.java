@@ -6,7 +6,6 @@ import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.model.cc.BDTSCNode;
 import org.oagi.srt.model.cc.impl.BaseACCNode;
-import org.oagi.srt.model.cc.impl.BaseBCCPNode;
 import org.oagi.srt.model.cc.impl.LazyASCCPNode;
 import org.oagi.srt.model.cc.impl.LazyBCCPNode;
 import org.oagi.srt.repository.*;

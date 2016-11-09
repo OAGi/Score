@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @Scope("view")
@@ -107,7 +109,30 @@ public class ProfileBODHandler extends UIHandler implements Serializable {
     }
     
     public List<String> completeInput(String query) {
-		return asccpRepository.findPropertyTermByPropertyTermContains(query);
+		String q = (query != null) ? query.trim() : null;
+		List<AssociationCoreComponentProperty> asccpList = asccpRepository.findAll();
+
+		if (StringUtils.isEmpty(q)) {
+			return asccpList.stream()
+					.map(e -> e.getPropertyTerm())
+					.collect(Collectors.toList());
+		} else {
+			String[] split = q.split(" ");
+
+			return asccpList.stream()
+					.map(e -> e.getPropertyTerm())
+					.distinct()
+					.filter(e -> {
+						e = e.toLowerCase();
+						for (String s : split) {
+							if (!e.contains(s.toLowerCase())) {
+								return false;
+							}
+						}
+						return true;
+					})
+					.collect(Collectors.toList());
+		}
 	}
 	
 	public void search() {

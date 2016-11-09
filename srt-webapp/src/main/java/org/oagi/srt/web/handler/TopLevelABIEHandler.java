@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -923,11 +924,30 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public List<String> completeInput(String query) {
-        return topLevelConceptRepository.findAll().stream()
-                .map(e -> e.getPropertyTerm())
-                .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+        List<TopLevelConcept> topLevelConcepts = topLevelConceptRepository.findAll();
+
+        if (StringUtils.isEmpty(q)) {
+            return topLevelConcepts.stream()
+                    .map(e -> e.getPropertyTerm())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return topLevelConcepts.stream()
+                    .map(e -> e.getPropertyTerm())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public TopLevelConcept getSelected() {
@@ -1417,9 +1437,30 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public List<String> completeCodeListInput(String query) {
-        return codeListRepository.findByNameContaining(query).stream()
-                .map(codeList -> codeList.getName())
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+        List<CodeList> codeLists = codeListRepository.findAll();
+
+        if (StringUtils.isEmpty(q)) {
+            return codeLists.stream()
+                    .map(e -> e.getName())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return codeLists.stream()
+                    .map(e -> e.getName())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     private void saveBBIESCChanges(ABIEView aABIEView) {

@@ -147,11 +147,29 @@ public class CopyProfileBODBean {
     }
 
     public List<String> completeInput(String query) {
-        return getAllProfileBODs().stream()
-                .map(e -> e.getPropertyTerm())
-                .distinct()
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+
+        if (StringUtils.isEmpty(q)) {
+            return getAllProfileBODs().stream()
+                    .map(e -> e.getPropertyTerm())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return getAllProfileBODs().stream()
+                    .map(e -> e.getPropertyTerm())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public void search() {

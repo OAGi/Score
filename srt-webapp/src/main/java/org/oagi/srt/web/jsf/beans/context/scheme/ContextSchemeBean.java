@@ -54,10 +54,29 @@ public class ContextSchemeBean {
     }
 
     public List<String> completeInput(String query) {
-        return allContextSchemes().stream()
-                .map(e -> e.getSchemeName())
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+
+        if (StringUtils.isEmpty(q)) {
+            return allContextSchemes().stream()
+                    .map(e -> e.getSchemeName())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return allContextSchemes().stream()
+                    .map(e -> e.getSchemeName())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public void search() {

@@ -55,10 +55,29 @@ public class BusinessContextBean extends UIHandler {
     }
 
     public List<String> completeInput(String query) {
-        return allBusinessContexts().stream()
-                .map(e -> e.getName())
-                .filter(e -> e.toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+
+        if (StringUtils.isEmpty(q)) {
+            return allBusinessContexts().stream()
+                    .map(e -> e.getName())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return allBusinessContexts().stream()
+                    .map(e -> e.getName())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public void search() {

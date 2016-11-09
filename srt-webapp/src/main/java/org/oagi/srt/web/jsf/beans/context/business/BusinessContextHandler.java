@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.beans.context.business;
 
+import org.oagi.srt.repository.ContextCategoryRepository;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessContextService;
 import org.oagi.srt.service.ContextCategoryService;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 @Scope("view")
 @ManagedBean
 @ViewScoped
+@Transactional(readOnly = true)
 public class BusinessContextHandler extends UIHandler implements Serializable {
 
     private static final long serialVersionUID = 8706516047982751653L;
@@ -41,6 +44,9 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
 
     @Autowired
     private ContextSchemeService contextSchemeService;
+
+    @Autowired
+    private ContextCategoryRepository contextCategoryRepository;
 
     private String name;
     private String ccName;
@@ -193,10 +199,30 @@ public class BusinessContextHandler extends UIHandler implements Serializable {
     }
 
     public List<String> completeInput(String query) {
-        return contextCategoryService.findByNameContaining(query).stream()
-                .map(e -> e.getName())
-                .distinct()
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+        List<ContextCategory> contextCategories = contextCategoryRepository.findAll();
+
+        if (StringUtils.isEmpty(q)) {
+            return contextCategories.stream()
+                    .map(e -> e.getName())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return contextCategories.stream()
+                    .map(e -> e.getName())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public void search() {
