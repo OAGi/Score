@@ -534,6 +534,69 @@
                                             </h:panelGrid>
                                         </p:panel>
                                     </h:panelGroup>
+
+
+                                    <!--
+                                        BDT SC
+                                    -->
+                                    <h:panelGroup id="bdtScPanelGroup"
+                                                  rendered="#{extensionBean.preparedAppend eq false and
+                                                              fn:startsWith(extensionBean.selectedTreeNode.type, 'BDTSC')}">
+                                        <p:panel id="bdtScPanel"
+                                                 rendered="#{extensionBean.selectedTreeNode.data.bdtSc != null}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Data Type Supplementary Component"/>
+                                            </f:facet>
+
+                                            <h:panelGrid columns="2">
+                                                <h:outputText value="GUID" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdtSc.guid}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Property Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdtSc.propertyTerm}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Representation Term" styleClass="section-label"/>
+                                                <h:inputText
+                                                        value="#{extensionBean.selectedTreeNode.data.bdtSc.representationTerm}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true"/>
+
+                                                <h:outputText value="Min" styleClass="section-label"/>
+                                                <p:selectOneMenu
+                                                        value="#{extensionBean.selectedTreeNode.data.bdtSc.cardinalityMin}"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                    <f:selectItem itemLabel="0" itemValue="0"/>
+                                                    <f:selectItem itemLabel="1" itemValue="1"/>
+                                                </p:selectOneMenu>
+
+                                                <h:outputText value="Max" styleClass="section-label"/>
+                                                <p:selectOneMenu editable="true"
+                                                                 value="#{extensionBean.selectedTreeNode.data.bdtSc.cardinalityMax}"
+                                                                 styleClass="section-content input-section disabled"
+                                                                 disabled="true">
+                                                    <f:selectItem itemLabel="unbounded" itemValue="-1"/>
+                                                    <f:converter binding="#{cardinalityMaxConverter}"/>
+                                                    <f:validator binding="#{cardinalityMaxConverter}"/>
+                                                </p:selectOneMenu>
+
+                                                <h:outputText value="Definition" styleClass="section-label"/>
+                                                <h:inputTextarea
+                                                        value="#{extensionBean.selectedTreeNode.data.bdtSc.definition}"
+                                                        rows="#{extensionBean.selectedTreeNode.data.bdtSc.definition == null ? '2' : '6'}"
+                                                        autoResize="false"
+                                                        styleClass="section-content input-section disabled"
+                                                        disabled="true">
+                                                </h:inputTextarea>
+                                            </h:panelGrid>
+                                        </p:panel>
+                                    </h:panelGroup>
                                 </p:panel>
                             </div>
                         </div>

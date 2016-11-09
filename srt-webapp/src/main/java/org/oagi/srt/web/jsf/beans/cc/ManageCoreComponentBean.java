@@ -7,6 +7,7 @@ import org.oagi.srt.model.Node;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
+import org.oagi.srt.model.cc.BDTSCNode;
 import org.oagi.srt.repository.entity.CoreComponentState;
 import org.oagi.srt.service.NodeService;
 import org.primefaces.event.NodeExpandEvent;
@@ -107,8 +108,13 @@ public class ManageCoreComponentBean {
         }
 
         @Override
-        public void visitBCCPNode(BCCPNode bccNode) {
-            visitNode(bccNode);
+        public void visitBCCPNode(BCCPNode bccpNode) {
+            visitNode(bccpNode);
+        }
+
+        @Override
+        public void visitBDTSCNode(BDTSCNode bdtscNode) {
+            visitNode(bdtscNode);
         }
 
         private TreeNode visitNode(CCNode node) {
@@ -193,8 +199,13 @@ public class ManageCoreComponentBean {
         }
 
         @Override
-        public void visitBCCPNode(BCCPNode bccNode) {
-            visitNode(bccNode);
+        public void visitBCCPNode(BCCPNode bccpNode) {
+            visitNode(bccpNode);
+        }
+
+        @Override
+        public void visitBDTSCNode(BDTSCNode bdtscNode) {
+            visitNode(bdtscNode);
         }
 
         private void visitNode(CCNode node) {

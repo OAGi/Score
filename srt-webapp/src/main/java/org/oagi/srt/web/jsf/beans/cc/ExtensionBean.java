@@ -4,10 +4,11 @@ import org.oagi.srt.model.*;
 import org.oagi.srt.model.cc.ACCNode;
 import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
+import org.oagi.srt.model.cc.BDTSCNode;
 import org.oagi.srt.model.cc.impl.BaseACCNode;
-import org.oagi.srt.model.cc.impl.BaseASCCPNode;
 import org.oagi.srt.model.cc.impl.BaseBCCPNode;
 import org.oagi.srt.model.cc.impl.LazyASCCPNode;
+import org.oagi.srt.model.cc.impl.LazyBCCPNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
@@ -74,6 +75,9 @@ public class ExtensionBean extends UIHandler {
 
     @Autowired
     private DataTypeRepository dataTypeRepository;
+
+    @Autowired
+    private DataTypeSupplementaryComponentRepository dtScRepository;
 
     private AggregateCoreComponent targetAcc;
     private AssociationCoreComponentProperty rootAsccp;
@@ -186,7 +190,8 @@ public class ExtensionBean extends UIHandler {
             LazyTreeNodeBuilder lazyTreeNodeBuilder = new LazyTreeNodeBuilder(treeNode);
             treeNode.setChildren(new ArrayList()); // clear children
 
-            for (Node child : lazyNode.getChildren()) {
+            List<? extends Node> children = lazyNode.getChildren();
+            for (Node child : children) {
                 ((CCNode) child).accept(lazyTreeNodeBuilder);
             }
         }
@@ -224,8 +229,13 @@ public class ExtensionBean extends UIHandler {
         }
 
         @Override
-        public void visitBCCPNode(BCCPNode bccNode) {
-            visitNode(bccNode);
+        public void visitBCCPNode(BCCPNode bccpNode) {
+            visitNode(bccpNode);
+        }
+
+        @Override
+        public void visitBDTSCNode(BDTSCNode bdtscNode) {
+            visitNode(bdtscNode);
         }
 
         private void visitNode(CCNode node) {
@@ -525,10 +535,15 @@ public class ExtensionBean extends UIHandler {
         ACCNode rootAccNode = (ACCNode) rootNode.getData();
         ExtensionService.AppendBccResult result = extensionService.appendBccTo(pAcc, tBccp, user);
 
-        DataType bdt = dataTypeRepository.findOne(tBccp.getBdtId());
-        BCCPNode bccpNode = new BaseBCCPNode(
+        long bdtId = tBccp.getBdtId();
+        DataType bdt = dataTypeRepository.findOne(bdtId);
+
+        LazyBCCPNode bccpNode = nodeService.createLazyBCCPNode(
                 new BaseACCNode(rootAccNode, pAcc), result.getBcc(), tBccp, bdt);
         TreeNode child = new DefaultTreeNode(bccpNode.getType(), bccpNode, rootNode);
+        for (int i = 0, len = bccpNode.getChildrenCount(); i < len; ++i) {
+            new DefaultTreeNode(null, child);
+        }
         setSelectedTreeNode(child);
     }
 

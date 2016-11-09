@@ -568,6 +568,7 @@ public class NodeService {
         private List<BasicCoreComponent> bccList;
         private List<BasicCoreComponentProperty> bccpList;
         private List<DataType> dataTypes;
+        private List<DataTypeSupplementaryComponent> dtScList;
 
         private Map<Long, AggregateCoreComponent> accMap;
         private Map<Long, AssociationCoreComponent> asccMap;
@@ -575,6 +576,7 @@ public class NodeService {
         private Map<Long, BasicCoreComponent> bccMap;
         private Map<Long, BasicCoreComponentProperty> bccpMap;
         private Map<Long, DataType> bdtMap;
+        private Map<Long, List<DataTypeSupplementaryComponent>> bdtScByOwnerDtIdMap;
 
         private Map<Long, List<BasicCoreComponent>> fromAccIdToBccMap;
         private Map<Long, List<BasicCoreComponent>> fromAccIdToBccWithoutAttributesMap;
@@ -587,6 +589,7 @@ public class NodeService {
             bccList = bccRepository.findAllWithRevisionNum(0);
             bccpList = bccpRepository.findAllWithRevisionNum(0);
             dataTypes = dataTypeRepository.findAll();
+            dtScList = dtScRepository.findAll();
 
             accMap = accList.stream()
                     .collect(Collectors.toMap(e -> e.getAccId(), Function.identity()));
@@ -600,6 +603,8 @@ public class NodeService {
                     .collect(Collectors.toMap(e -> e.getBccpId(), Function.identity()));
             bdtMap = dataTypes.stream()
                     .collect(Collectors.toMap(e -> e.getDtId(), Function.identity()));
+            bdtScByOwnerDtIdMap = dtScList.stream()
+                    .collect(Collectors.groupingBy(e -> e.getOwnerDtId()));
 
             fromAccIdToBccMap = bccList.stream()
                     .collect(Collectors.groupingBy(e -> e.getFromAccId()));
@@ -632,6 +637,11 @@ public class NodeService {
 
         public DataType getBdt(long bdtId) {
             return bdtMap.get(bdtId);
+        }
+
+        public List<DataTypeSupplementaryComponent> getBdtScByBdtId(long bdtId) {
+            List<DataTypeSupplementaryComponent> bdtScList = bdtScByOwnerDtIdMap.get(bdtId);
+            return (bdtScList != null) ? bdtScList : Collections.emptyList();
         }
 
         @Override
@@ -695,10 +705,20 @@ public class NodeService {
         }
 
         BasicCoreComponentProperty bccp = dataContainer.getBCCP(bcc.getToBccpId());
-        DataType bdt = dataContainer.getBdt(bccp.getBdtId());
+        long bdtId = bccp.getBdtId();
+        DataType bdt = dataContainer.getBdt(bdtId);
+        BCCPNode bccpNode = new BaseBCCPNode(fromAccNode, bcc, bccp, bdt);
+        appendBDTSCNode(dataContainer, bccpNode);
+        return bccpNode;
+    }
 
-        BCCPNode bccNode = new BaseBCCPNode(fromAccNode, bcc, bccp, bdt);
-        return bccNode;
+    private void appendBDTSCNode(DataContainerForCC dataContainer, BCCPNode bccpNode) {
+        DataType bdt = bccpNode.getBdt();
+        long bdtId = bdt.getDtId();
+        List<DataTypeSupplementaryComponent> bdtScList = dataContainer.getBdtScByBdtId(bdtId);
+        for (DataTypeSupplementaryComponent bdtSc : bdtScList) {
+            new BaseBDTSCNode(bccpNode, bdtSc);
+        }
     }
 
     private ASCCPNode createASCCPNode(DataContainerForCC dataContainer, AssociationCoreComponentProperty asccp) {
@@ -776,6 +796,31 @@ public class NodeService {
         }
     }
 
+    private class BCCPFetcher implements Fetcher {
+
+        private DataType bdt;
+        private List<DataTypeSupplementaryComponent> bdtScList;
+
+        public BCCPFetcher(DataType bdt) {
+            this.bdt = bdt;
+
+            long bdtId = bdt.getDtId();
+            this.bdtScList = dtScRepository.findByOwnerDtId(bdtId);
+        }
+
+        @Override
+        public void fetch(Node parent) {
+            BCCPNode bccpNode = (BCCPNode) parent;
+            for (DataTypeSupplementaryComponent bdtSc : bdtScList) {
+                new BaseBDTSCNode(bccpNode, bdtSc);
+            }
+        }
+
+        public int getChildrenCount() {
+            return bdtScList.size();
+        }
+    }
+
     private LazyACCNode createLazyACCNode(Node parent, AggregateCoreComponent acc) {
         if (acc.getRevisionNum() != 0) {
             throw new IllegalStateException();
@@ -803,7 +848,7 @@ public class NodeService {
                     acc, new CoreComponentProviderImpl());
             for (CoreComponent coreComponent : coreComponentList) {
                 if (coreComponent instanceof BasicCoreComponent) {
-                    createBCCPNode(accNode, (BasicCoreComponent) coreComponent);
+                    createLazyBCCPNode(accNode, (BasicCoreComponent) coreComponent);
                 } else if (coreComponent instanceof AssociationCoreComponent) {
                     createLazyASCCPNode(accNode, (AssociationCoreComponent) coreComponent);
                 }
@@ -827,9 +872,28 @@ public class NodeService {
             }
 
             BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
-            DataType bdt = dataTypeRepository.findOne(bccp.getBdtId());
+            long bdtId = bccp.getBdtId();
+            DataType bdt = dataTypeRepository.findOne(bdtId);
 
             new BaseBCCPNode(fromAccNode, bcc, bccp, bdt);
+        }
+
+        private void createLazyBCCPNode(ACCNode fromAccNode, BasicCoreComponent bcc) {
+            if (bcc.getRevisionNum() != 0) {
+                throw new IllegalStateException();
+            }
+
+            if (fromAccNode.getAcc().getAccId() != bcc.getFromAccId()) {
+                throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
+            }
+
+            BasicCoreComponentProperty bccp = bccpRepository.findOne(bcc.getToBccpId());
+            long bdtId = bccp.getBdtId();
+            DataType bdt = dataTypeRepository.findOne(bdtId);
+
+            BaseBCCPNode bccpNode = new BaseBCCPNode(null, bcc, bccp, bdt);
+            BCCPFetcher fetcher = new BCCPFetcher(bdt);
+            new LazyBCCPNode(bccpNode, fetcher, fetcher.getChildrenCount(), fromAccNode);
         }
 
         private void createLazyASCCPNode(ACCNode fromAccNode, AssociationCoreComponent ascc) {
@@ -841,7 +905,8 @@ public class NodeService {
                 throw new IllegalArgumentException("ACC ID doesn't match between relative and itself.");
             }
 
-            AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
+            long asccpId = ascc.getToAsccpId();
+            AssociationCoreComponentProperty asccp = asccpRepository.findOne(asccpId);
             ASCCPNode asccpNode = new BaseASCCPNode(null, ascc, asccp);
             ASCCPFetcher fetcher = new ASCCPFetcher(asccp);
             new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount(), fromAccNode);
@@ -878,7 +943,14 @@ public class NodeService {
     public LazyASCCPNode createLazyASCCPNode(ACCNode parent, AssociationCoreComponent ascc, AssociationCoreComponentProperty asccp) {
         ASCCPNode asccpNode = new BaseASCCPNode(parent, ascc, asccp);
         ASCCPFetcher fetcher = new ASCCPFetcher(asccp);
-        LazyASCCPNode lazyASCCPNode = new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount());
+        LazyASCCPNode lazyASCCPNode = new LazyASCCPNode(asccpNode, fetcher, fetcher.getChildrenCount(), parent);
         return lazyASCCPNode;
+    }
+
+    public LazyBCCPNode createLazyBCCPNode(ACCNode parent, BasicCoreComponent bcc, BasicCoreComponentProperty bccp, DataType bdt) {
+        BCCPNode bccpNode = new BaseBCCPNode(null, bcc, bccp, bdt);
+        BCCPFetcher fetcher = new BCCPFetcher(bdt);
+        LazyBCCPNode lazyBCCPNode = new LazyBCCPNode(bccpNode, fetcher, fetcher.getChildrenCount(), parent);
+        return lazyBCCPNode;
     }
 }
