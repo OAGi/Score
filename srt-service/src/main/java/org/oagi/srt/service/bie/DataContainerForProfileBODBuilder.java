@@ -9,6 +9,8 @@ public interface DataContainerForProfileBODBuilder extends CoreComponentProvider
 
     public AggregateCoreComponent getACC(long accId);
 
+    public AssociationCoreComponent getASCCByFromAccIdAndToAsccpId(long accId, long toAsccpId);
+
     public AssociationCoreComponentProperty getASCCP(long asccpId);
 
     public BasicCoreComponentProperty getBCCP(long bccpId);

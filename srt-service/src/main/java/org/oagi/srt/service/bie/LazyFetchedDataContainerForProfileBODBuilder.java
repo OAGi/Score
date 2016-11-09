@@ -45,6 +45,11 @@ public class LazyFetchedDataContainerForProfileBODBuilder implements DataContain
         return accRepository.findOneByAccIdAndRevisionNumAndState(accId, 0, Published);
     }
 
+    @Override
+    public AssociationCoreComponent getASCCByFromAccIdAndToAsccpId(long fromAccId, long toAsccpId) {
+        return asccRepository.findByFromAccIdAndToAsccpIdAndRevisionNumAndState(fromAccId, toAsccpId, 0, Published);
+    }
+
     public AssociationCoreComponentProperty getASCCP(long asccpId) {
         return asccpRepository.findOneByAsccpIdAndRevisionNumAndState(asccpId, 0, Published);
     }

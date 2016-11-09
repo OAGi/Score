@@ -639,6 +639,7 @@ public class BIETreeNodeHandler extends UIHandler {
         @Override
         public void startNode(TopLevelNode topLevelNode) {
             abieList.add(topLevelNode.getAbie());
+            asbieList.addAll(topLevelNode.getAsbieList());
             asbiepList.add(topLevelNode.getAsbiep());
         }
 

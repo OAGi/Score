@@ -31,7 +31,7 @@
                 <div style="text-align: center;">
                     <p:commandButton value="Accept" icon="ui-icon-check"
                                      action="#{editProfileBODBean.uptakeExtensions(editProfileBODBean.bieUserExtRevisionList)}"
-                                     onclick="PF('confirmExtensionUptake').hide();"/>
+                                     onclick="PF('confirmExtensionUptake').hide(); PF('loadingBlock').show();"/>
                     <p:commandButton value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmExtensionUptake').hide(); PF('confirmKeepNotification').show();"/>
                 </div>
@@ -48,7 +48,7 @@
                     <p:commandButton value="Accept" icon="ui-icon-check"
                                      action="#{editProfileBODBean.uptakeExtensionsWithChangingState(editProfileBODBean.bieUserExtRevisionList, 'Editing')}"
                                      update=":form:panel, :form:btnGroup"
-                                     onclick="PF('confirmChangeStateToEditing').hide();"/>
+                                     onclick="PF('confirmChangeStateToEditing').hide(); PF('loadingBlock').show();"/>
                     <p:commandButton value="Cancel" icon="ui-icon-close"
                                      onclick="PF('confirmChangeStateToEditing').hide(); PF('confirmKeepNotification').show();"/>
                 </div>
@@ -96,7 +96,8 @@
                             <div id="myAffix" style="overflow-y: auto;">
                                 <p:panel id="details">
                                     <f:facet name="header">
-                                        <h:outputText value="#{editProfileBODBean.topLevelAbie.state == 'Editing' ? 'View and Edit' : 'View'} BIE"/>
+                                        <h:outputText
+                                                value="#{editProfileBODBean.topLevelAbie.state == 'Editing' ? 'View and Edit' : 'View'} BIE"/>
                                     </f:facet>
 
                                     <!--
@@ -136,7 +137,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.abie.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="topLevelBiePanelForEditing"/>
                                                     </h:inputTextarea>
@@ -202,7 +204,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbie.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="asbiePanelForEditing"/>
                                                     </h:inputTextarea>
@@ -227,7 +230,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.asbiep.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="asbiepPanelForEditing"/>
                                                     </h:inputTextarea>
@@ -252,7 +256,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.abie.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="abiePanelForEditing"/>
                                                     </h:inputTextarea>
@@ -326,7 +331,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbie.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="bbiePanelForEditing"/>
                                                     </h:inputTextarea>
@@ -351,7 +357,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbiep.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="bbiepPanelForEditing"/>
                                                     </h:inputTextarea>
@@ -492,7 +499,8 @@
                                                     <h:outputText value="Definition" styleClass="section-label"/>
                                                     <h:inputTextarea
                                                             value="#{editProfileBODBean.selectedTreeNode.data.bbieSc.definition}"
-                                                            rows="6" autoResize="false" a:placeholder="Leave a definition"
+                                                            rows="6" autoResize="false"
+                                                            a:placeholder="Leave a definition"
                                                             styleClass="section-content input-section">
                                                         <f:ajax render="bbieScPanelForEditing"/>
                                                     </h:inputTextarea>
@@ -1006,7 +1014,8 @@
                 </h:panelGroup>
             </p:panel>
 
-            <p:panel id="btnGroup" rendered="#{editProfileBODBean.currentUser.appUserId eq editProfileBODBean.topLevelAbie.owner}">
+            <p:panel id="btnGroup"
+                     rendered="#{editProfileBODBean.currentUser.appUserId eq editProfileBODBean.topLevelAbie.owner}">
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{editProfileBODBean.update()}"/>

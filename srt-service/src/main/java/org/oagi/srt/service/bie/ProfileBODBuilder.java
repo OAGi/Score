@@ -3,15 +3,13 @@ package org.oagi.srt.service.bie;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.Node;
+import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.model.bie.impl.BaseASBIENode;
 import org.oagi.srt.model.bie.impl.BaseBBIENode;
 import org.oagi.srt.model.bie.impl.BaseBBIESCNode;
 import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.model.bie.visitor.BIENodeSortVisitor;
-import org.oagi.srt.repository.AssociationBusinessInformationEntityPropertyRepository;
-import org.oagi.srt.repository.AssociationCoreComponentPropertyRepository;
-import org.oagi.srt.repository.AssociationCoreComponentRepository;
-import org.oagi.srt.repository.BusinessContextRepository;
+import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.slf4j.Logger;
@@ -20,11 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Component
@@ -41,6 +40,10 @@ public class ProfileBODBuilder {
 
     private final AssociationCoreComponentPropertyRepository asccpRepository;
 
+    private final AssociationBusinessInformationEntityRepository asbieRepository;
+
+    private final BasicBusinessInformationEntityRepository bbieRepository;
+
     private final AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
 
     private DataContainerForProfileBODBuilder dataContainer;
@@ -50,11 +53,15 @@ public class ProfileBODBuilder {
                              BusinessContextRepository bizCtxRepository,
                              AssociationCoreComponentRepository asccRepository,
                              AssociationCoreComponentPropertyRepository asccpRepository,
+                             AssociationBusinessInformationEntityRepository asbieRepository,
+                             BasicBusinessInformationEntityRepository bbieRepository,
                              AssociationBusinessInformationEntityPropertyRepository asbiepRepository) {
         this.coreComponentService = coreComponentService;
         this.bizCtxRepository = bizCtxRepository;
         this.asccRepository = asccRepository;
         this.asccpRepository = asccpRepository;
+        this.asbieRepository = asbieRepository;
+        this.bbieRepository = bbieRepository;
         this.asbiepRepository = asbiepRepository;
     }
 
@@ -90,14 +97,28 @@ public class ProfileBODBuilder {
         long bizCtxId = eAbie.getBizCtxId();
         BusinessContext bizCtx = bizCtxRepository.findOne(bizCtxId);
 
-        AggregateBusinessInformationEntity abie = createABIE(ueAcc, bizCtx);
-        List<AssociationCoreComponent> asccList = asccRepository.findByToAsccpIdAndRevisionNumAndState(asccp.getAsccpId(), 0, Published);
-        if (asccList.isEmpty() || asccList.size() > 1) {
-            throw new IllegalStateException();
-        }
-        AssociationCoreComponent ascc = asccList.get(0);
+        TopLevelNode topLevelNode = (TopLevelNode) createBIENode(asccp, bizCtx);
 
-        return new ASBIENodeBuilder(null, bizCtx, ascc, abie, 1).build();
+        AggregateCoreComponent eAcc = bieUserExtRevision.getExtAcc();
+        AggregateBusinessInformationEntity fromAbie = bieUserExtRevision.getExtAbie();
+        AssociationBusinessInformationEntityProperty toAsbiep = topLevelNode.getAsbiep();
+        AssociationCoreComponent ascc = dataContainer.getASCCByFromAccIdAndToAsccpId(eAcc.getAccId(), asccp.getAsccpId());
+
+        double nextSeqKey = getNextSeqKey(fromAbie);
+        AssociationBusinessInformationEntity asbie = createASBIE(fromAbie, toAsbiep, ascc, nextSeqKey);
+        topLevelNode.setAsbieList(Arrays.asList(asbie));
+
+        return topLevelNode;
+    }
+
+    private double getNextSeqKey(AggregateBusinessInformationEntity abie) {
+        long fromAbieId = abie.getAbieId();
+        List<AssociationBusinessInformationEntity> asbieList = asbieRepository.findByFromAbieId(fromAbieId);
+        List<BasicBusinessInformationEntity> bbieList = bbieRepository.findByFromAbieId(fromAbieId);
+
+        double maxSeqKey = Math.max(asbieList.stream().mapToDouble(e -> e.getSeqKey()).max().orElse(0),
+                bbieList.stream().mapToDouble(e -> e.getSeqKey()).max().orElse(0));
+        return maxSeqKey + 1;
     }
 
     private AggregateBusinessInformationEntity createABIE(AggregateCoreComponent acc, BusinessContext bizCtx) {
@@ -135,6 +156,22 @@ public class ProfileBODBuilder {
         asbiep.setDefinition(asccp.getDefinition());
 
         return asbiep;
+    }
+
+    private AssociationBusinessInformationEntity createASBIE(AggregateBusinessInformationEntity fromAbie,
+                                                             AssociationBusinessInformationEntityProperty asbiep,
+                                                             AssociationCoreComponent ascc, double seqKey) {
+        AssociationBusinessInformationEntity asbie = new AssociationBusinessInformationEntity();
+        asbie.setGuid(Utility.generateGUID());
+        asbie.setFromAbie(fromAbie);
+        asbie.setToAsbiep(asbiep);
+        asbie.setBasedAscc(ascc);
+        asbie.setCardinalityMax(ascc.getCardinalityMax());
+        asbie.setCardinalityMin(ascc.getCardinalityMin());
+        asbie.setDefinition(ascc.getDefinition());
+        asbie.setSeqKey(seqKey);
+
+        return asbie;
     }
 
     private void appendChildren(AggregateCoreComponent acc, AggregateBusinessInformationEntity abie,

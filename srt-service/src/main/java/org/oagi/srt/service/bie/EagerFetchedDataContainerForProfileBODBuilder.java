@@ -27,6 +27,7 @@ public class EagerFetchedDataContainerForProfileBODBuilder implements DataContai
     private Map<Long, List<BasicCoreComponent>> fromAccIdToBccMap;
     private Map<Long, List<BasicCoreComponent>> fromAccIdToBccWithoutAttributesMap;
     private Map<Long, List<AssociationCoreComponent>> fromAccIdToAsccMap;
+    private Map<String, AssociationCoreComponent> fromAccIdAndToAsccpIdToAsccMap;
     private Map<Long, BasicCoreComponentProperty> bccpMap;
 
     private Map<Long, DataType> dtMap;
@@ -72,6 +73,8 @@ public class EagerFetchedDataContainerForProfileBODBuilder implements DataContai
                 .filter(e -> e.getState() == Published).collect(Collectors.toList());
         fromAccIdToAsccMap = associationCoreComponents.stream()
                 .collect(Collectors.groupingBy(e -> e.getFromAccId()));
+        fromAccIdAndToAsccpIdToAsccMap = associationCoreComponents.stream()
+                .collect(Collectors.toMap(e -> e.getFromAccId() + "/" + e.getToAsccpId(), Function.identity()));
 
         bdtPriRestriList = bdtPriRestriRepository.findAll();
         bdtScPriRestriList = bdtScPriRestriRepository.findAll();
@@ -123,6 +126,11 @@ public class EagerFetchedDataContainerForProfileBODBuilder implements DataContai
 
     public AggregateCoreComponent getACC(long accId) {
         return accMap.get(accId);
+    }
+
+    @Override
+    public AssociationCoreComponent getASCCByFromAccIdAndToAsccpId(long fromAccId, long toAsccpId) {
+        return fromAccIdAndToAsccpIdToAsccMap.get(fromAccId + "/" + toAsccpId);
     }
 
     public AssociationCoreComponentProperty getASCCP(long asccpId) {

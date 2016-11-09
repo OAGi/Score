@@ -7,10 +7,7 @@ import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.TopLevelNode;
-import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
-import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
-import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
-import org.oagi.srt.repository.entity.BusinessContext;
+import org.oagi.srt.repository.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +17,7 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
     private AssociationBusinessInformationEntityProperty asbiep;
     private AssociationCoreComponentProperty asccp;
     private AggregateBusinessInformationEntity abie;
+    private List<AssociationBusinessInformationEntity> asbieList;
     private BusinessContext bizCtx;
     private List<Node> children = new ArrayList();
 
@@ -27,10 +25,19 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
                             AssociationCoreComponentProperty asccp,
                             AggregateBusinessInformationEntity abie,
                             BusinessContext bizCtx) {
+        this(asbiep, asccp, abie, null, bizCtx);
+    }
+
+    public BaseTopLevelNode(AssociationBusinessInformationEntityProperty asbiep,
+                            AssociationCoreComponentProperty asccp,
+                            AggregateBusinessInformationEntity abie,
+                            List<AssociationBusinessInformationEntity> asbieList,
+                            BusinessContext bizCtx) {
         super(0);
         this.asbiep = asbiep;
         this.asccp = asccp;
         this.abie = abie;
+        this.asbieList = asbieList;
         this.bizCtx = bizCtx;
     }
 
@@ -56,6 +63,14 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
 
     public void setAbie(AggregateBusinessInformationEntity abie) {
         this.abie = abie;
+    }
+
+    public List<AssociationBusinessInformationEntity> getAsbieList() {
+        return asbieList;
+    }
+
+    public void setAsbieList(List<AssociationBusinessInformationEntity> asbieList) {
+        this.asbieList = asbieList;
     }
 
     public BusinessContext getBizCtx() {

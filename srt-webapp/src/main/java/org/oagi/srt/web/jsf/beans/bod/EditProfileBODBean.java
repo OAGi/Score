@@ -137,16 +137,20 @@ public class EditProfileBODBean extends UIHandler {
 
     @Transactional(rollbackFor = Throwable.class)
     public void uptakeExtensions(List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList) {
-        TopLevelAbie topLevelAbie = getTopLevelAbie();
-        if (Candidate == topLevelAbie.getState()) {
-            RequestContext.getCurrentInstance().execute("PF('confirmChangeStateToEditing').show()");
-        } else {
-            for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
-                BIENode userExtBieNode = nodeService.createBIENode(bieUserExtRevision);
-                bieTreeNodeHandler.append(userExtBieNode, topLevelAbie);
-            }
+        try {
+            TopLevelAbie topLevelAbie = getTopLevelAbie();
+            if (Candidate == topLevelAbie.getState()) {
+                RequestContext.getCurrentInstance().execute("PF('confirmChangeStateToEditing').show()");
+            } else {
+                for (BusinessInformationEntityUserExtensionRevision bieUserExtRevision : bieUserExtRevisionList) {
+                    BIENode userExtBieNode = nodeService.createBIENode(bieUserExtRevision);
+                    bieTreeNodeHandler.append(userExtBieNode, topLevelAbie);
+                }
 
-            discard(bieUserExtRevisionList);
+                discard(bieUserExtRevisionList);
+            }
+        } finally {
+            RequestContext.getCurrentInstance().execute("PF('loadingBlock').hide()");
         }
     }
 
