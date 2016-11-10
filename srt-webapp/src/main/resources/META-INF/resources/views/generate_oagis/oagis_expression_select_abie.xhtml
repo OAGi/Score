@@ -23,8 +23,7 @@
                 <h:outputLabel for="ccName" value="Name:" style="font-weight:bold"/>
                 <p:autoComplete id="ccName" value="#{profileBODHandler.abieName}"
                                 completeMethod="#{profileBODHandler.completeInput}">
-                    <p:ajax event="keyup"
-                            listener="#{profileBODHandler.abieName}"/>
+                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                 </p:autoComplete>
                 <p:commandButton value="Search" ajax="true" actionListener="#{profileBODHandler.search}" update="tbl"
                                  icon="ui-icon-search"/>

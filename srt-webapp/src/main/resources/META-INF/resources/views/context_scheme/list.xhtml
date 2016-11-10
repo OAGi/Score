@@ -17,8 +17,7 @@
                                     style="min-width: 440px; margin-right: 20px;"
                                     maxResults="10"
                                     completeMethod="#{contextSchemeBean.completeInput}">
-                        <p:ajax event="keyup"
-                                listener="#{contextSchemeBean.name}"/>
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
                     <p:commandButton value="Search" ajax="true" actionListener="#{contextSchemeBean.search}"
                                      update="tbl1"

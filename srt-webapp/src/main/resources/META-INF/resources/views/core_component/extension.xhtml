@@ -66,8 +66,7 @@
                                                                 style="width: 440px; margin-right: 20px;">
                                                     <p:ajax event="itemSelect"
                                                             listener="#{extensionBean.onSelectAsccpPropertyTerm}"/>
-                                                    <p:ajax event="keyup"
-                                                            listener="#{extensionBean.selectedAsccpPropertyTerm}"/>
+                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                                                 </p:autoComplete>
                                                 <p:commandButton value="Search" ajax="true"
                                                                  action="#{extensionBean.searchAsccp}"
@@ -135,8 +134,7 @@
                                                                 style="width: 440px; margin-right: 20px;">
                                                     <p:ajax event="itemSelect"
                                                             listener="#{extensionBean.onSelectBccpPropertyTerm}"/>
-                                                    <p:ajax event="keyup"
-                                                            listener="#{extensionBean.selectedBccpPropertyTerm}"/>
+                                                    <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                                                 </p:autoComplete>
                                                 <p:commandButton value="Search" ajax="true"
                                                                  actionListener="#{extensionBean.searchBccp}"

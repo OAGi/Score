@@ -16,8 +16,7 @@
                     <p:autoComplete id="propertyTerm" value="#{profileBODBean.selectedPropertyTerm}"
                                     completeMethod="#{profileBODBean.completeInput}" maxResults="20"
                                     style="width: 440px; margin-right: 20px;">
-                        <p:ajax event="keyup"
-                                listener="#{profileBODBean.selectedPropertyTerm}"/>
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
                     <p:commandButton value="Search" ajax="true" actionListener="#{profileBODBean.search}"
                                      update="tbl" icon="ui-icon-search"/>

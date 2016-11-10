@@ -18,8 +18,7 @@
                                     style="min-width: 440px; margin-right: 20px;"
                                     maxResults="10"
                                     completeMethod="#{codeListBean.completeInput}">
-                        <p:ajax event="keyup"
-                                listener="#{codeListBean.basedCodeListName}"/>
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
                     <p:commandButton value="Search" ajax="true" actionListener="#{codeListBean.search}" update="tbl"
                                      icon="ui-icon-search"/>

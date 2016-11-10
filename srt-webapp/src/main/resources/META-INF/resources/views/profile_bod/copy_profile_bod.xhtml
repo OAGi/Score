@@ -30,8 +30,7 @@
                             <p:autoComplete id="propertyTerm" value="#{copyProfileBODBean.selectedPropertyTerm}"
                                             completeMethod="#{copyProfileBODBean.completeInput}"
                                             style="width: 440px; margin-right: 20px;">
-                                <p:ajax event="keyup"
-                                        listener="#{copyProfileBODBean.selectedPropertyTerm}"/>
+                                <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                             </p:autoComplete>
                             <p:commandButton value="Search" ajax="true" actionListener="#{copyProfileBODBean.search}"
                                              update="tbl1" icon="ui-icon-search"/>

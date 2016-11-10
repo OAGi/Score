@@ -16,8 +16,7 @@
                     <p:autoComplete id="loginId" value="#{transferProfileBODOwnershipBean.selectedLoginId}"
                                     completeMethod="#{transferProfileBODOwnershipBean.completeInput}" maxResults="20"
                                     style="width: 440px; margin-right: 20px;">
-                        <p:ajax event="keyup"
-                                listener="#{transferProfileBODOwnershipBean.selectedLoginId}"/>
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
                     </p:autoComplete>
                     <p:commandButton value="Search" ajax="true"
                                      actionListener="#{transferProfileBODOwnershipBean.search}"
