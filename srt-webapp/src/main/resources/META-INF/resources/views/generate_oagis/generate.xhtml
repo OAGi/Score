@@ -20,7 +20,10 @@
                             <f:facet name="header">
                                 <p:autoComplete id="propertyTerm" value="#{profileBODGenerationBean.selectedPropertyTerm}"
                                                 completeMethod="#{profileBODGenerationBean.completeInput}" maxResults="20"
-                                                style="width: 440px; margin-right: 20px;"/>
+                                                style="width: 440px; margin-right: 20px;">
+                                    <p:ajax event="keyup"
+                                            listener="#{profileBODGenerationBean.selectedPropertyTerm}"/>
+                                </p:autoComplete>
                                 <p:commandButton value="Search" ajax="true" actionListener="#{profileBODGenerationBean.search}"
                                                  update="tbl" icon="ui-icon-search"/>
                             </f:facet>

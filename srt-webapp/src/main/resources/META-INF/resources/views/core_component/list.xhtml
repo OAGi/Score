@@ -16,7 +16,10 @@
                 <f:facet name="header">
                     <p:autoComplete id="propertyTerm" value="#{coreComponentBean.selectedPropertyTerm}"
                                     completeMethod="#{coreComponentBean.completeInput}" maxResults="20"
-                                    style="width: 440px; margin-right: 20px;"/>
+                                    style="width: 440px; margin-right: 20px;">
+                        <p:ajax event="keyup"
+                                listener="#{coreComponentBean.selectedPropertyTerm}"/>
+                    </p:autoComplete>
                     <p:commandButton value="Search" ajax="true" actionListener="#{coreComponentBean.search}"
                                      update="tbl" icon="ui-icon-search"/>
                 </f:facet>

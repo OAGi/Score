@@ -60,15 +60,17 @@
                                     <h:panelGroup rendered="#{extensionBean.preparedAppendAscc}">
                                         <p:panel>
                                             <f:facet name="header">
-                                                <p:autoComplete id="asccpPropertyTerm"
+                                                <p:autoComplete id="asccpPropertyTerm" widgetVar="asccpPropertyTerm"
                                                                 value="#{extensionBean.selectedAsccpPropertyTerm}"
                                                                 completeMethod="#{extensionBean.completeInputAsccp}"
                                                                 style="width: 440px; margin-right: 20px;">
                                                     <p:ajax event="itemSelect"
                                                             listener="#{extensionBean.onSelectAsccpPropertyTerm}"/>
+                                                    <p:ajax event="keyup"
+                                                            listener="#{extensionBean.selectedAsccpPropertyTerm}"/>
                                                 </p:autoComplete>
                                                 <p:commandButton value="Search" ajax="true"
-                                                                 actionListener="#{extensionBean.searchAsccp}"
+                                                                 action="#{extensionBean.searchAsccp}"
                                                                  update=":form:details" icon="ui-icon-search"/>
                                             </f:facet>
 
@@ -127,12 +129,14 @@
                                     <h:panelGroup rendered="#{extensionBean.preparedAppendBcc}">
                                         <p:panel>
                                             <f:facet name="header">
-                                                <p:autoComplete id="bccpPropertyTerm"
+                                                <p:autoComplete id="bccpPropertyTerm" widgetVar="bccpPropertyTerm"
                                                                 value="#{extensionBean.selectedBccpPropertyTerm}"
                                                                 completeMethod="#{extensionBean.completeInputBccp}"
                                                                 style="width: 440px; margin-right: 20px;">
                                                     <p:ajax event="itemSelect"
                                                             listener="#{extensionBean.onSelectBccpPropertyTerm}"/>
+                                                    <p:ajax event="keyup"
+                                                            listener="#{extensionBean.selectedBccpPropertyTerm}"/>
                                                 </p:autoComplete>
                                                 <p:commandButton value="Search" ajax="true"
                                                                  actionListener="#{extensionBean.searchBccp}"

@@ -22,7 +22,10 @@
             <h:panelGrid id="grid" columns="5" cellpadding="5">
                 <h:outputLabel for="ccName" value="Name:" style="font-weight:bold"/>
                 <p:autoComplete id="ccName" value="#{profileBODHandler.abieName}"
-                                completeMethod="#{profileBODHandler.completeInput}"/>
+                                completeMethod="#{profileBODHandler.completeInput}">
+                    <p:ajax event="keyup"
+                            listener="#{profileBODHandler.abieName}"/>
+                </p:autoComplete>
                 <p:commandButton value="Search" ajax="true" actionListener="#{profileBODHandler.search}" update="tbl"
                                  icon="ui-icon-search"/>
             </h:panelGrid>

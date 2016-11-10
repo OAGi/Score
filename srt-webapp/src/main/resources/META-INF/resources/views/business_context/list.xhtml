@@ -16,7 +16,10 @@
                     <p:autoComplete id="name" value="#{businessContextBean.name}"
                                     style="min-width: 440px; margin-right: 20px;"
                                     maxResults="10"
-                                    completeMethod="#{businessContextBean.completeInput}"/>
+                                    completeMethod="#{businessContextBean.completeInput}">
+                        <p:ajax event="keyup"
+                                listener="#{businessContextBean.name}"/>
+                    </p:autoComplete>
                     <p:commandButton value="Search" ajax="true" actionListener="#{businessContextBean.search}"
                                      update="tbl1"
                                      icon="ui-icon-search"/>

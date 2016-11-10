@@ -29,7 +29,10 @@
                         <f:facet name="header">
                             <p:autoComplete id="propertyTerm" value="#{createProfileBODBean.selectedPropertyTerm}"
                                             completeMethod="#{createProfileBODBean.completeInput}"
-                                            style="width: 440px; margin-right: 20px;"/>
+                                            style="width: 440px; margin-right: 20px;">
+                                <p:ajax event="keyup"
+                                        listener="#{createProfileBODBean.selectedPropertyTerm}"/>
+                            </p:autoComplete>
                             <p:commandButton value="Search" ajax="true" actionListener="#{createProfileBODBean.search}"
                                              update="tbl1" icon="ui-icon-search"/>
                         </f:facet>
