@@ -21,6 +21,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -109,10 +111,13 @@ public class BusinessContextDetailBean extends UIHandler {
                         .map(e -> new BCV(e)).collect(Collectors.toList()));
             }
         }
+
+        businessContextValueModel = new ListDataModel(businessContextValues);
     }
 
     private BusinessContext businessContext;
     private LinkedList<BCV> businessContextValues = new LinkedList();
+    private DataModel<BCV> businessContextValueModel;
     private BCV selectedBusinessContextValue;
     private List<BCV> deleteBusinessContextValues = new ArrayList();
 
@@ -132,11 +137,11 @@ public class BusinessContextDetailBean extends UIHandler {
         this.businessContextValues = new LinkedList(businessContextValues);
     }
 
+    public DataModel<BCV> getBusinessContextValueModel() {
+        return businessContextValueModel;
+    }
+
     public BCV getSelectedBusinessContextValue() {
-        if (selectedBusinessContextValue == null) {
-            FacesContext context = FacesContext.getCurrentInstance();
-            setSelectedBusinessContextValue((BCV) UIComponent.getCurrentComponent(context).getAttributes().get("businessContextValue"));
-        }
         return selectedBusinessContextValue;
     }
 
@@ -164,8 +169,8 @@ public class BusinessContextDetailBean extends UIHandler {
     }
 
     public void onSelectContextCategory(SelectEvent event) {
-        BCV selectedBusinessContextValue = getSelectedBusinessContextValue();
-        selectedBusinessContextValue.setContextCategory((ContextCategory) event.getObject());
+        BCV currentBusinessContextValue = businessContextValueModel.getRowData();
+        currentBusinessContextValue.setContextCategory((ContextCategory) event.getObject());
     }
 
     public List<ContextScheme> getContextSchemes(Long ctxCategoryId) {
@@ -190,8 +195,8 @@ public class BusinessContextDetailBean extends UIHandler {
     }
 
     public void onSelectContextScheme(SelectEvent event) {
-        BCV selectedBusinessContextValue = getSelectedBusinessContextValue();
-        selectedBusinessContextValue.setContextScheme((ContextScheme) event.getObject());
+        BCV currentBusinessContextValue = businessContextValueModel.getRowData();
+        currentBusinessContextValue.setContextScheme((ContextScheme) event.getObject());
     }
 
     public List<ContextSchemeValue> getContextSchemeValues(Long ctxSchemeId) {
@@ -216,8 +221,8 @@ public class BusinessContextDetailBean extends UIHandler {
     }
 
     public void onSelectContextSchemeValue(SelectEvent event) {
-        BCV selectedBusinessContextValue = getSelectedBusinessContextValue();
-        selectedBusinessContextValue.setContextSchemeValue((ContextSchemeValue) event.getObject());
+        BCV currentBusinessContextValue = businessContextValueModel.getRowData();
+        currentBusinessContextValue.setContextSchemeValue((ContextSchemeValue) event.getObject());
     }
 
     public void deleteBusinessContextValue() {
