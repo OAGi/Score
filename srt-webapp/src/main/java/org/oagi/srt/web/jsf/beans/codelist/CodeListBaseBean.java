@@ -15,6 +15,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -118,6 +119,9 @@ public class CodeListBaseBean extends UIHandler {
         if (!checkDifferentListIdButSameIdentity()) {
             return null;
         }
+        if (!validateCodeListValues()) {
+            return null;
+        }
 
         return forceUpdate();
     }
@@ -142,6 +146,30 @@ public class CodeListBaseBean extends UIHandler {
         );
 
         return "/views/code_list/list.xhtml?faces-redirect=true";
+    }
+
+    private boolean validateCodeListValues() {
+        Map<String, Long> result = codeListValues.stream().collect(
+                Collectors.groupingBy(e -> e.getValue() == null ? "" : e.getValue(), Collectors.counting()));
+
+        for (String value : result.keySet()) {
+            if (StringUtils.isEmpty(value)) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "Please fill out 'Code' field."));
+                return false;
+            }
+        }
+        for (Long value : result.values()) {
+            if (value > 1) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "It doesn't allow duplicate 'Code' fields."));
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private boolean checkDifferentNameButSameIdentity() {

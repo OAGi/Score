@@ -239,7 +239,7 @@ public class ContextSchemeDetailBean extends UIHandler {
 
     private boolean validateContextSchemeValues() {
         Map<String, Long> result = contextSchemeValues.stream().collect(
-                Collectors.groupingBy(e -> e.getValue(), Collectors.counting()));
+                Collectors.groupingBy(e -> e.getValue() == null ? "" : e.getValue(), Collectors.counting()));
         for (String value : result.keySet()) {
             if (StringUtils.isEmpty(value)) {
                 FacesContext.getCurrentInstance().addMessage(null,
