@@ -21,7 +21,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +67,13 @@ public class ContextSchemeDetailBean extends UIHandler {
             ContextCategory contextCategory = contextCategoryService.findById(ctxCategoryId);
             setContextCategory(contextCategory);
         }
+
+        contextSchemeValueModels = new ListDataModel(contextSchemeValues);
     }
 
     private ContextScheme contextScheme;
     private List<ContextSchemeValue> contextSchemeValues = new ArrayList();
+    private DataModel<ContextSchemeValue> contextSchemeValueModels;
     private List<ContextSchemeValue> deletedContextSchemeValues = new ArrayList();
 
     private List<ContextCategory> allContextCategories;
@@ -106,6 +112,10 @@ public class ContextSchemeDetailBean extends UIHandler {
         this.contextSchemeValues = contextSchemeValues;
     }
 
+    public DataModel<ContextSchemeValue> getContextSchemeValueModels() {
+        return contextSchemeValueModels;
+    }
+
     public String getSelectedContextCategoryName() {
         return (contextCategory != null) ? contextCategory.getName() : null;
     }
@@ -138,9 +148,10 @@ public class ContextSchemeDetailBean extends UIHandler {
         setSelectedContextCategoryName(event.getObject().toString());
     }
 
-    public void addContextSchemeValue() {
+    public ContextSchemeValue addContextSchemeValue() {
         ContextSchemeValue contextSchemeValue = new ContextSchemeValue();
         contextSchemeValues.add(contextSchemeValue);
+        return contextSchemeValue;
     }
 
     public ContextSchemeValue getSelectedContextSchemeValue() {
@@ -202,6 +213,9 @@ public class ContextSchemeDetailBean extends UIHandler {
         if (!checkSameAgencyIdButDifferentIdentity()) {
             return null;
         }
+        if (!validateContextSchemeValues()) {
+            return null;
+        }
 
         if (StringUtils.isEmpty(contextScheme.getGuid())) {
             contextScheme.setGuid(Utility.generateGUID());
@@ -221,6 +235,29 @@ public class ContextSchemeDetailBean extends UIHandler {
         );
 
         return "/views/context_scheme/list.xhtml?faces-redirect=true";
+    }
+
+    private boolean validateContextSchemeValues() {
+        Map<String, Long> result = contextSchemeValues.stream().collect(
+                Collectors.groupingBy(e -> e.getValue(), Collectors.counting()));
+        for (String value : result.keySet()) {
+            if (StringUtils.isEmpty(value)) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "Please fill out 'Value' field."));
+                return false;
+            }
+        }
+        for (Long value : result.values()) {
+            if (value > 1) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "It doesn't allow duplicate 'Value' fields."));
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private boolean checkDifferentNameButSameIdentity() {

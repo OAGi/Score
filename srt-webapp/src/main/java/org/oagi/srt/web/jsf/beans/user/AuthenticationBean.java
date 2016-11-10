@@ -1,5 +1,6 @@
 package org.oagi.srt.web.jsf.beans.user;
 
+import org.oagi.srt.repository.entity.User;
 import org.oagi.srt.web.handler.UIHandler;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import javax.faces.bean.ViewScoped;
 public class AuthenticationBean extends UIHandler {
 
     public boolean isOagisDeveloper() {
-        return getCurrentUser().isOagisDeveloperIndicator();
+        User user = getCurrentUser();
+        return (user != null) ? user.isOagisDeveloperIndicator() : false;
     }
 }

@@ -81,10 +81,10 @@
                         <h:outputText value="Context Scheme Values"/>
                         <p:commandButton value="Add" style="float: right;"
                                          actionListener="#{contextSchemeDetailBean.addContextSchemeValue}"
-                                         update="tbl"/>
+                                         update=":form:tbl"/>
                     </f:facet>
                     <p:dataTable id="tbl" var="contextSchemeValue"
-                                 value="#{contextSchemeDetailBean.contextSchemeValues}"
+                                 value="#{contextSchemeDetailBean.contextSchemeValueModels}"
                                  paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                  paginator="true" paginatorPosition="bottom" rows="10" editable="true" editMode="cell"
                                  style="width: 100%; margin-bottom: 20px;">
