@@ -192,8 +192,7 @@ public class StandaloneXMLSchema {
     public Element generateBIEs(AggregateBusinessInformationEntity gABIE, Element gPNode,
                                 Element gSchemaNode, GenerationContext generationContext) {
         AggregateCoreComponent gACC = generationContext.queryBasedACC(gABIE);
-        String accDen = gACC.getDen();
-        if (accDen.equalsIgnoreCase("Any User Area. Details") || accDen.equalsIgnoreCase("Signature. Details")) {
+        if (OagisComponentType.Embedded == gACC.getOagisComponentType()) {
             Element any = newElement("any");
             any.setAttribute("namespace", "##any");
             gPNode.addContent(any);
