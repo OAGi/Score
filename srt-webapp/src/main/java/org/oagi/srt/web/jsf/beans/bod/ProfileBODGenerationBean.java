@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,11 +50,7 @@ public class ProfileBODGenerationBean {
     @PostConstruct
     public void init() {
         allProfileBODs = profileBODRepository.findAll();
-        setProfileBODs(
-                allProfileBODs.stream()
-                        .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                        .collect(Collectors.toList())
-        );
+        search();
     }
 
     public ProfileBODGenerationOption getOption() {
@@ -124,17 +121,20 @@ public class ProfileBODGenerationBean {
 
     public void search() {
         String selectedPropertyTerm = StringUtils.trimWhitespace(getSelectedPropertyTerm());
+        List<ProfileBOD> profileBODs;
         if (StringUtils.isEmpty(selectedPropertyTerm)) {
-            setProfileBODs(allProfileBODs.stream()
+            profileBODs = allProfileBODs.stream()
                     .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         } else {
-            setProfileBODs(
-                    allProfileBODs.stream()
-                            .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
-                            .collect(Collectors.toList())
-            );
+            profileBODs = allProfileBODs.stream()
+                    .filter(e -> e.getPropertyTerm().toLowerCase().contains(selectedPropertyTerm.toLowerCase()))
+                    .collect(Collectors.toList());
         }
+
+        Collections.sort(profileBODs, (a, b) ->
+                (int) (b.getCreationTimestamp().getTime() - a.getCreationTimestamp().getTime()));
+        setProfileBODs(profileBODs);
     }
 
     private String filePath;
