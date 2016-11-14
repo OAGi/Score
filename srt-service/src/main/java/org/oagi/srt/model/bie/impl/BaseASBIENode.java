@@ -101,5 +101,8 @@ public class BaseASBIENode extends AbstractBaseNode implements ASBIENode {
         for (Node child : getChildren()) {
             ((BIENode) child).accept(visitor);
         }
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
 }

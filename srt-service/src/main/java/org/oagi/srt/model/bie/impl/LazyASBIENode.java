@@ -25,6 +25,9 @@ public class LazyASBIENode extends AbstractLazyNode implements ASBIENode, LazyBI
                 ((BIENode) child).accept(visitor);
             }
         }
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
 
     public AssociationBusinessInformationEntity getAsbie() {

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.srt.model.bie.BBIERestrictionType.*;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
@@ -254,8 +255,8 @@ public class BusinessInformationEntityService {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
-                    if (bcc.getSeqKey() == 0) {
-                        createBIEContext.createBBIETree(bcc, abie, skb);
+                    if (Attribute == bcc.getEntityType()) {
+                        createBIEContext.createBBIETree(bcc, abie, 0);
                     }
                 }
             }

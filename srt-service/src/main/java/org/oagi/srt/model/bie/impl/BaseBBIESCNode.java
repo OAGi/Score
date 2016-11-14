@@ -116,5 +116,8 @@ public class BaseBBIESCNode extends AbstractBaseNode implements BBIESCNode {
     @Override
     public void accept(BIENodeVisitor visitor) {
         visitor.visitBBIESCNode(this);
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
 }

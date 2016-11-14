@@ -3,6 +3,8 @@ package org.oagi.srt.service.bie;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.Node;
+import org.oagi.srt.model.bie.ASBIENode;
+import org.oagi.srt.model.bie.BBIENode;
 import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.model.bie.impl.BaseASBIENode;
 import org.oagi.srt.model.bie.impl.BaseBBIENode;
@@ -18,12 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Component
@@ -32,38 +34,31 @@ public class ProfileBODBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final CoreComponentService coreComponentService;
-
-    private final BusinessContextRepository bizCtxRepository;
-
-    private final AssociationCoreComponentRepository asccRepository;
-
-    private final AssociationCoreComponentPropertyRepository asccpRepository;
-
-    private final AssociationBusinessInformationEntityRepository asbieRepository;
-
-    private final BasicBusinessInformationEntityRepository bbieRepository;
-
-    private final AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
-
-    private DataContainerForProfileBODBuilder dataContainer;
+    @Autowired
+    private CoreComponentService coreComponentService;
 
     @Autowired
-    public ProfileBODBuilder(CoreComponentService coreComponentService,
-                             BusinessContextRepository bizCtxRepository,
-                             AssociationCoreComponentRepository asccRepository,
-                             AssociationCoreComponentPropertyRepository asccpRepository,
-                             AssociationBusinessInformationEntityRepository asbieRepository,
-                             BasicBusinessInformationEntityRepository bbieRepository,
-                             AssociationBusinessInformationEntityPropertyRepository asbiepRepository) {
-        this.coreComponentService = coreComponentService;
-        this.bizCtxRepository = bizCtxRepository;
-        this.asccRepository = asccRepository;
-        this.asccpRepository = asccpRepository;
-        this.asbieRepository = asbieRepository;
-        this.bbieRepository = bbieRepository;
-        this.asbiepRepository = asbiepRepository;
-    }
+    private BusinessContextRepository bizCtxRepository;
+
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
+
+    @Autowired
+    private BasicCoreComponentRepository bccRepository;
+
+    @Autowired
+    private AssociationCoreComponentPropertyRepository asccpRepository;
+
+    @Autowired
+    private AssociationBusinessInformationEntityRepository asbieRepository;
+
+    @Autowired
+    private BasicBusinessInformationEntityRepository bbieRepository;
+
+    @Autowired
+    private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
+
+    private DataContainerForProfileBODBuilder dataContainer;
 
     public void setDataContainer(DataContainerForProfileBODBuilder dataContainer) {
         this.dataContainer = dataContainer;
@@ -89,26 +84,37 @@ public class ProfileBODBuilder {
     }
 
     public BIENode createBIENode(BusinessInformationEntityUserExtensionRevision bieUserExtRevision) {
-        AggregateCoreComponent ueAcc = bieUserExtRevision.getUserExtAcc();
-        long roleOfAccId = ueAcc.getAccId();
-        AssociationCoreComponentProperty asccp = asccpRepository.findOneByRoleOfAccId(roleOfAccId);
-
         AggregateBusinessInformationEntity eAbie = bieUserExtRevision.getExtAbie();
         long bizCtxId = eAbie.getBizCtxId();
         BusinessContext bizCtx = bizCtxRepository.findOne(bizCtxId);
 
-        TopLevelNode topLevelNode = (TopLevelNode) createBIENode(asccp, bizCtx);
+        ASBIENode asbieNode = new BaseASBIENode(0, null, null, null, null, eAbie);
 
-        AggregateCoreComponent eAcc = bieUserExtRevision.getExtAcc();
-        AggregateBusinessInformationEntity fromAbie = bieUserExtRevision.getExtAbie();
-        AssociationBusinessInformationEntityProperty toAsbiep = topLevelNode.getAsbiep();
-        AssociationCoreComponent ascc = dataContainer.getASCCByFromAccIdAndToAsccpId(eAcc.getAccId(), asccp.getAsccpId());
+        AggregateCoreComponent ueAcc = bieUserExtRevision.getUserExtAcc();
+        appendChildren(ueAcc, eAbie, asbieNode, bizCtx);
 
-        double nextSeqKey = getNextSeqKey(fromAbie);
-        AssociationBusinessInformationEntity asbie = createASBIE(fromAbie, toAsbiep, ascc, nextSeqKey);
-        topLevelNode.setAsbieList(Arrays.asList(asbie));
+        double nextSeqKey = getNextSeqKey(eAbie);
+        for (Node child : asbieNode.getChildren().stream()
+                .filter(e -> {
+                    if (e instanceof BBIENode) {
+                        BasicBusinessInformationEntity bbie = ((BBIENode) e).getBbie();
+                        long bccId = bbie.getBasedBccId();
+                        BasicCoreComponent bcc = bccRepository.findOne(bccId);
+                        return bcc.getEntityType() == Element;
+                    }
+                    return true;
+                }).collect(Collectors.toList())) {
+            if (child instanceof ASBIENode) {
+                AssociationBusinessInformationEntity asbie = ((ASBIENode) child).getAsbie();
+                asbie.setSeqKey(nextSeqKey);
+            } else if (child instanceof BBIENode) {
+                BasicBusinessInformationEntity bbie = ((BBIENode) child).getBbie();
+                bbie.setSeqKey(nextSeqKey);
+            }
+            nextSeqKey += 1.0;
+        }
 
-        return topLevelNode;
+        return asbieNode;
     }
 
     private double getNextSeqKey(AggregateBusinessInformationEntity abie) {
@@ -185,6 +191,7 @@ public class ProfileBODBuilder {
 
         while (!accList.isEmpty()) {
             acc = accList.pollFirst();
+
             int skb = 0;
             for (AggregateCoreComponent cnt_acc : accList) {
                 skb += queryNestedChildAssoc_wo_attribute(cnt_acc).size(); //here
@@ -196,8 +203,8 @@ public class ProfileBODBuilder {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
-                    if (bcc.getSeqKey() == 0) {
-                        new BBIENodeBuilder(parent, bcc, abie, skb).build();
+                    if (Attribute == bcc.getEntityType()) {
+                        new BBIENodeBuilder(parent, bcc, abie, 0).build();
                     }
                 }
             }

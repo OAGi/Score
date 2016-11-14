@@ -116,6 +116,8 @@ public class BaseTopLevelNode extends AbstractBaseNode implements TopLevelNode {
         for (Node child : getChildren()) {
             ((BIENode) child).accept(visitor);
         }
-        visitor.endNode();
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
 }

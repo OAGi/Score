@@ -638,29 +638,50 @@ public class BIETreeNodeHandler extends UIHandler {
 
         @Override
         public void startNode(TopLevelNode topLevelNode) {
-            abieList.add(topLevelNode.getAbie());
-            asbieList.addAll(topLevelNode.getAsbieList());
-            asbiepList.add(topLevelNode.getAsbiep());
+            AggregateBusinessInformationEntity abie = topLevelNode.getAbie();
+            if (abie != null) {
+                abieList.add(abie);
+            }
+            AssociationBusinessInformationEntityProperty asbiep = topLevelNode.getAsbiep();
+            if (asbiep != null) {
+                asbiepList.add(asbiep);
+            }
         }
 
         @Override
         public void visitASBIENode(ASBIENode asbieNode) {
-            abieList.add(asbieNode.getAbie());
-            asbieList.add(asbieNode.getAsbie());
-            asbiepList.add(asbieNode.getAsbiep());
+            AggregateBusinessInformationEntity abie = asbieNode.getAbie();
+            if (abie != null) {
+                abieList.add(abie);
+            }
+            AssociationBusinessInformationEntity asbie = asbieNode.getAsbie();
+            if (asbie != null) {
+                asbieList.add(asbie);
+            }
+            AssociationBusinessInformationEntityProperty asbiep = asbieNode.getAsbiep();
+            if (asbiep != null) {
+                asbiepList.add(asbiep);
+            }
         }
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
             BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
-            bbieList.add(bbie);
-            bbiepList.add(bbieNode.getBbiep());
+            if (bbie != null) {
+                bbieList.add(bbie);
+            }
+            BasicBusinessInformationEntityProperty bbiep = bbieNode.getBbiep();
+            if (bbiep != null) {
+                bbiepList.add(bbiep);
+            }
         }
 
         @Override
         public void visitBBIESCNode(BBIESCNode bbiescNode) {
             BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
-            bbiescList.add(bbieSc);
+            if (bbieSc != null) {
+                bbiescList.add(bbieSc);
+            }
         }
 
         @Override

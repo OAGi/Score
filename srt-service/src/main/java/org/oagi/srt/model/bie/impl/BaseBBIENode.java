@@ -164,5 +164,8 @@ public class BaseBBIENode extends AbstractBaseNode implements BBIENode {
         for (Node child : getChildren()) {
             ((BIENode) child).accept(visitor);
         }
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
 }

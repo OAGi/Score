@@ -3,9 +3,10 @@ package org.oagi.srt.model.bie.impl;
 import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.model.bie.TopLevelNode;
-import org.oagi.srt.repository.entity.*;
-
-import java.util.List;
+import org.oagi.srt.repository.entity.AggregateBusinessInformationEntity;
+import org.oagi.srt.repository.entity.AssociationBusinessInformationEntityProperty;
+import org.oagi.srt.repository.entity.AssociationCoreComponentProperty;
+import org.oagi.srt.repository.entity.BusinessContext;
 
 public class LazyTopLevelNode extends AbstractLazyNode implements TopLevelNode, LazyBIENode {
 
@@ -24,7 +25,9 @@ public class LazyTopLevelNode extends AbstractLazyNode implements TopLevelNode, 
                 ((BIENode) child).accept(visitor);
             }
         }
-        visitor.endNode();
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
     public AssociationBusinessInformationEntityProperty getAsbiep() {
         return topLevelNode.getAsbiep();
@@ -32,16 +35,6 @@ public class LazyTopLevelNode extends AbstractLazyNode implements TopLevelNode, 
 
     public void setAsbiep(AssociationBusinessInformationEntityProperty asbiep) {
         topLevelNode.setAsbiep(asbiep);
-    }
-
-    @Override
-    public List<AssociationBusinessInformationEntity> getAsbieList() {
-        return topLevelNode.getAsbieList();
-    }
-
-    @Override
-    public void setAsbieList(List<AssociationBusinessInformationEntity> asbieList) {
-        topLevelNode.setAsbieList(asbieList);
     }
 
     public AssociationCoreComponentProperty getAsccp() {

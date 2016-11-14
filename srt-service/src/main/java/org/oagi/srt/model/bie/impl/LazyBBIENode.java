@@ -25,6 +25,9 @@ public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIEN
                 ((BIENode) child).accept(visitor);
             }
         }
+        if (getParent() == null) {
+            visitor.endNode();
+        }
     }
 
     public BasicBusinessInformationEntity getBbie() {
