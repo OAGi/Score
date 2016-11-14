@@ -52,12 +52,8 @@ public class TreeBIENodeVisitor implements BIENodeVisitor {
         Node parent = node.getParent();
         TreeNode parentTreeNode = (parent != null) ? (TreeNode) parent.getAttribute("treeNode") : root;
 
-        if (node.getName().contains("User Extension")) { // To hide 'User Extension' nodes
-            node.setAttribute("treeNode", parentTreeNode);
-        } else {
-            TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);
-            node.setAttribute("treeNode", treeNode);
-        }
+        TreeNode treeNode = new DefaultTreeNode(type, node, parentTreeNode);
+        node.setAttribute("treeNode", treeNode);
     }
 
     @Override

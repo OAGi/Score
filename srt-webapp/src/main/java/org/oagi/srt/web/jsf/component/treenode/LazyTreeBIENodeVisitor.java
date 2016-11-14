@@ -51,42 +51,15 @@ public class LazyTreeBIENodeVisitor implements BIENodeVisitor {
     }
 
     private void visit(Node node, String type) {
-        if (exists(node)) {
-            return;
-        }
-
-        if (node.getName().contains("User Extension")) { // To hide 'User Extension' nodes
-            if (node instanceof LazyNode) {
-                LazyNode lazyNode = (LazyNode) node;
-                if (!lazyNode.isFetched()) {
-                    lazyNode.fetch();
-                }
-            }
-
-            for (Node child : node.getChildren()) {
-                ((BIENode) child).accept(this);
-            }
-
-        } else {
-            TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
-            if (node instanceof LazyNode) {
-                LazyNode lazyNode = (LazyNode) node;
-                if (!lazyNode.isFetched()) {
-                    for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
-                        new DefaultTreeNode(null, treeNode);
-                    }
+        TreeNode treeNode = new DefaultTreeNode(type, node, this.parent);
+        if (node instanceof LazyNode) {
+            LazyNode lazyNode = (LazyNode) node;
+            if (!lazyNode.isFetched()) {
+                for (int i = 0, len = lazyNode.getChildrenCount(); i < len; ++i) {
+                    new DefaultTreeNode(null, treeNode);
                 }
             }
         }
-    }
-
-    private boolean exists(Node node) {
-        for (TreeNode child : this.parent.getChildren()) {
-            if (node.equals(child.getData())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
