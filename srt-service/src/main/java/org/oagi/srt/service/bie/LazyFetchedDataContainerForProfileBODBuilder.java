@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Component
 public class LazyFetchedDataContainerForProfileBODBuilder implements DataContainerForProfileBODBuilder {
@@ -119,7 +120,8 @@ public class LazyFetchedDataContainerForProfileBODBuilder implements DataContain
     public boolean groupcheck(AssociationCoreComponent ascc) {
         AssociationCoreComponentProperty asccp = getASCCP(ascc.getToAsccpId());
         AggregateCoreComponent acc = getACC(asccp.getRoleOfAccId());
-        return (acc.getOagisComponentType() == SemanticGroup) ? true : false;
+        OagisComponentType oagisComponentType = acc.getOagisComponentType();
+        return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
 
     @Override

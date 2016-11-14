@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static org.oagi.srt.model.bie.BBIERestrictionType.*;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
+import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
 @Service
 @Transactional(readOnly = true)
@@ -297,13 +299,10 @@ public class BusinessInformationEntityService {
     }
 
     private boolean groupcheck(CreateBIEContext createBIEContext, AssociationCoreComponent associationCoreComponent) {
-        boolean check = false;
         AssociationCoreComponentProperty asccp = createBIEContext.getASCCP(associationCoreComponent.getToAsccpId());
         AggregateCoreComponent acc = createBIEContext.getACC(asccp.getRoleOfAccId());
-        if (acc.getOagisComponentType() == OagisComponentType.SemanticGroup) {
-            check = true;
-        }
-        return check;
+        OagisComponentType oagisComponentType = acc.getOagisComponentType();
+        return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
     }
 
     private List<CoreComponent> handleNestedGroup(CreateBIEContext createBIEContext,

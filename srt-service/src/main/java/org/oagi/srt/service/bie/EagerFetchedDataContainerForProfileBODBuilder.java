@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
+import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Component
@@ -120,7 +121,8 @@ public class EagerFetchedDataContainerForProfileBODBuilder implements DataContai
         groupcheckMap = asccpMap.values().stream()
                 .collect(Collectors.toMap(e -> e.getAsccpId(), e -> {
                     AggregateCoreComponent acc = getACC(e.getRoleOfAccId());
-                    return (acc.getOagisComponentType() == SemanticGroup) ? true : false;
+                    OagisComponentType oagisComponentType = acc.getOagisComponentType();
+                    return (oagisComponentType == SemanticGroup || oagisComponentType == UserExtensionGroup) ? true : false;
                 }));
     }
 
