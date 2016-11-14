@@ -5,7 +5,6 @@ import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.bie.ASBIENode;
 import org.oagi.srt.model.bie.BBIENode;
-import org.oagi.srt.model.bie.TopLevelNode;
 import org.oagi.srt.model.bie.impl.BaseASBIENode;
 import org.oagi.srt.model.bie.impl.BaseBBIENode;
 import org.oagi.srt.model.bie.impl.BaseBBIESCNode;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -189,16 +189,11 @@ public class ProfileBODBuilder {
             accList.add(acc);
         }
 
+        int seqKey = 1;
         while (!accList.isEmpty()) {
-            acc = accList.pollFirst();
-
-            int skb = 0;
-            for (AggregateCoreComponent cnt_acc : accList) {
-                skb += queryNestedChildAssoc_wo_attribute(cnt_acc).size(); //here
-            }
+            acc = accList.pollLast();
 
             List<CoreComponent> childAssoc = queryNestedChildAssoc(acc);
-            int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(acc).size();
             for (int i = 0; i < childAssoc.size(); i++) {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
@@ -209,16 +204,15 @@ public class ProfileBODBuilder {
                 }
             }
 
-            for (int i = 0; i < childAssoc.size(); i++) {
-                CoreComponent assoc = childAssoc.get(i);
+            for (CoreComponent assoc : childAssoc) {
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
-                    if (bcc.getSeqKey() > 0) {
-                        new BBIENodeBuilder(parent, bcc, abie, skb + i - attr_cnt).build();
+                    if (Element == bcc.getEntityType()) {
+                        new BBIENodeBuilder(parent, bcc, abie, seqKey++).build();
                     }
                 } else if (assoc instanceof AssociationCoreComponent) {
                     AssociationCoreComponent ascc = (AssociationCoreComponent) assoc;
-                    new ASBIENodeBuilder(parent, bizCtx, ascc, abie, skb + i - attr_cnt).build();
+                    new ASBIENodeBuilder(parent, bizCtx, ascc, abie, seqKey++).build();
                 }
             }
         }
@@ -295,6 +289,9 @@ public class ProfileBODBuilder {
             this.bcc = bcc;
             this.abie = abie;
             this.seqKey = seqKey;
+            if (Element == bcc.getEntityType() && seqKey <= 0) {
+                throw new IllegalStateException();
+            }
         }
 
         private void createBBIEP(BasicCoreComponentProperty bccp) {
@@ -404,6 +401,9 @@ public class ProfileBODBuilder {
             this.ascc = ascc;
             this.fromAbie = fromAbie;
             this.seqKey = seqKey;
+            if (seqKey <= 0) {
+                throw new IllegalStateException();
+            }
 
             this.asccp = dataContainer.getASCCP(ascc.getToAsccpId());
         }

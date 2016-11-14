@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 @Controller
@@ -598,6 +599,10 @@ public class ExtensionBean extends UIHandler {
     public void updateBcc(TreeNode treeNode) {
         BCCPNode bccpNode = (BCCPNode) treeNode.getData();
         BasicCoreComponent bcc = bccpNode.getBcc();
+        if (!bccpNode.getChildren().isEmpty() && Element == bcc.getEntityType()) {
+            throw new IllegalStateException("Only BBIE without SCs can be made Attribute.");
+        }
+
         User requester = getCurrentUser();
 
         try {

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static org.oagi.srt.model.bie.BBIERestrictionType.*;
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Element;
 import static org.oagi.srt.repository.entity.OagisComponentType.SemanticGroup;
 import static org.oagi.srt.repository.entity.OagisComponentType.UserExtensionGroup;
 
@@ -242,15 +243,11 @@ public class BusinessInformationEntityService {
             accList.add(aggregateCoreComponent);
         }
 
+        int seqKey = 1;
         while (!accList.isEmpty()) {
-            aggregateCoreComponent = accList.pollFirst();
-            int skb = 0;
-            for (AggregateCoreComponent cnt_acc : accList) {
-                skb += queryNestedChildAssoc_wo_attribute(createBIEContext, cnt_acc).size(); //here
-            }
+            aggregateCoreComponent = accList.pollLast();
 
             List<CoreComponent> childAssoc = queryNestedChildAssoc(createBIEContext, aggregateCoreComponent);
-            int attr_cnt = childAssoc.size() - queryNestedChildAssoc_wo_attribute(createBIEContext, aggregateCoreComponent).size();
             for (int i = 0; i < childAssoc.size(); i++) {
                 CoreComponent assoc = childAssoc.get(i);
                 if (assoc instanceof BasicCoreComponent) {
@@ -261,16 +258,15 @@ public class BusinessInformationEntityService {
                 }
             }
 
-            for (int i = 0; i < childAssoc.size(); i++) {
-                CoreComponent assoc = childAssoc.get(i);
+            for (CoreComponent assoc : childAssoc) {
                 if (assoc instanceof BasicCoreComponent) {
                     BasicCoreComponent bcc = (BasicCoreComponent) assoc;
-                    if (bcc.getSeqKey() > 0) {
-                        createBIEContext.createBBIETree(bcc, abie, skb + i - attr_cnt);
+                    if (Element == bcc.getEntityType()) {
+                        createBIEContext.createBBIETree(bcc, abie, seqKey++);
                     }
                 } else if (assoc instanceof AssociationCoreComponent) {
                     AssociationCoreComponent ascc = (AssociationCoreComponent) assoc;
-                    createBIEContext.createASBIETree(ascc, abie, skb + i - attr_cnt);
+                    createBIEContext.createASBIETree(ascc, abie, seqKey++);
                 }
             }
         }

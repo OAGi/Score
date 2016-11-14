@@ -28,9 +28,9 @@
                                              selection="#{extensionBean.selectedTreeNode}"
                                              selectionMode="single">
                                     <p:ajax event="expand" listener="#{extensionBean.expand}"
-                                            update=":form:treeTable"/>
+                                            update=":form:treeTable, :form:details"/>
                                     <p:ajax event="collapse"
-                                            update=":form:treeTable"/>
+                                            update=":form:treeTable, :form:details"/>
                                     <p:ajax event="select" update=":form:details"/>
                                     <p:column headerText="#{extensionBean.rootAsccp.propertyTerm}">
                                         <h:outputText value="#{node.name}"/>
@@ -384,8 +384,11 @@
                                                 <h:outputText value="Entity Type" styleClass="section-label"/>
                                                 <p:selectOneMenu
                                                         value="#{extensionBean.selectedTreeNode.data.bcc.entityType}"
-                                                        styleClass="section-content input-section #{extensionBean.selectedTreeNode.data.bcc.state != 'Editing' ? 'disabled' : ''}"
-                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state != 'Editing'}">
+                                                        styleClass="section-content input-section
+                                                                   #{extensionBean.selectedTreeNode.data.bcc.state ne 'Editing' or
+                                                                     extensionBean.selectedTreeNode.children.isEmpty() ne true ? 'disabled' : ''}"
+                                                        disabled="#{extensionBean.selectedTreeNode.data.bcc.state ne 'Editing' or
+                                                                    extensionBean.selectedTreeNode.children.isEmpty() ne true}">
                                                     <f:selectItem itemLabel="Attribute" itemValue="Attribute"/>
                                                     <f:selectItem itemLabel="Element" itemValue="Element"/>
                                                     <f:ajax render="bccPanel"/>

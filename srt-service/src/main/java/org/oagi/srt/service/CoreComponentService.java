@@ -1,5 +1,6 @@
 package org.oagi.srt.service;
 
+import org.jdom2.Attribute;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -8,10 +9,7 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
@@ -83,30 +81,28 @@ public class CoreComponentService {
         List<CoreComponent> tmp_assoc = new ArrayList(size);
         tmp_assoc.addAll(bccList);
         tmp_assoc.addAll(asccList);
+        Collections.sort(tmp_assoc, (a, b) -> a.getSeqKey() - b.getSeqKey());
 
-        List<CoreComponent> coreComponents = Arrays.asList(new CoreComponent[size]);
-
-        int attribute_cnt = 0;
+        List<CoreComponent> coreComponents = new ArrayList(size);
         for (BasicCoreComponent basicCoreComponent : bccList) {
-            if (basicCoreComponent.getSeqKey() == 0) {
-                coreComponents.set(attribute_cnt, basicCoreComponent);
-                attribute_cnt++;
+            if (BasicCoreComponentEntityType.Attribute == basicCoreComponent.getEntityType()) {
+                coreComponents.add(basicCoreComponent);
             }
         }
 
         for (CoreComponent coreComponent : tmp_assoc) {
             if (coreComponent instanceof BasicCoreComponent) {
                 BasicCoreComponent basicCoreComponent = (BasicCoreComponent) coreComponent;
-                if (basicCoreComponent.getSeqKey() > 0) {
-                    coreComponents.set(basicCoreComponent.getSeqKey() - 1 + attribute_cnt, basicCoreComponent);
+                if (BasicCoreComponentEntityType.Element == basicCoreComponent.getEntityType()) {
+                    coreComponents.add(basicCoreComponent);
                 }
             } else {
                 AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) coreComponent;
-                coreComponents.set(associationCoreComponent.getSeqKey() - 1 + attribute_cnt, associationCoreComponent);
+                coreComponents.add(associationCoreComponent);
             }
         }
 
-        return new ArrayList(coreComponents);
+        return coreComponents;
     }
 
     @Transactional(rollbackFor = Throwable.class)
