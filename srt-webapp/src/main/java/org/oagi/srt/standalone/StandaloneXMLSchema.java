@@ -191,12 +191,6 @@ public class StandaloneXMLSchema {
 
     public Element generateBIEs(AggregateBusinessInformationEntity gABIE, Element gPNode,
                                 Element gSchemaNode, GenerationContext generationContext) {
-        AggregateCoreComponent gACC = generationContext.queryBasedACC(gABIE);
-        if (OagisComponentType.Embedded == gACC.getOagisComponentType()) {
-            Element any = newElement("any");
-            any.setAttribute("namespace", "##any");
-            gPNode.addContent(any);
-        }
 
         List<BusinessInformationEntity> childBIEs = generationContext.queryChildBIEs(gABIE);
         for (BusinessInformationEntity aSRTObject : childBIEs) {
@@ -206,16 +200,59 @@ public class StandaloneXMLSchema {
                 generateBBIE(childBIE, aBDT, gPNode, gSchemaNode, generationContext);
             } else {
                 AssociationBusinessInformationEntity childBIE = (AssociationBusinessInformationEntity) aSRTObject;
-                Element node = generateASBIE(childBIE, gPNode, generationContext);
-                AssociationBusinessInformationEntityProperty anASBIEP = generationContext.queryAssocToASBIEP(childBIE);
-                node = generateASBIEP(generationContext, anASBIEP, node);
-                AggregateBusinessInformationEntity anABIE = generationContext.queryTargetABIE2(anASBIEP);
-                node = generateABIE(anABIE, node, gSchemaNode, generationContext);
-                node = generateBIEs(anABIE, node, gSchemaNode, generationContext);
+
+                if (isAnyProperty(childBIE, generationContext)) {
+                    generateAnyABIE(childBIE, gPNode, generationContext);
+                } else {
+                    Element node = generateASBIE(childBIE, gPNode, generationContext);
+                    AssociationBusinessInformationEntityProperty anASBIEP = generationContext.queryAssocToASBIEP(childBIE);
+                    node = generateASBIEP(generationContext, anASBIEP, node);
+                    AggregateBusinessInformationEntity anABIE = generationContext.queryTargetABIE2(anASBIEP);
+                    node = generateABIE(anABIE, node, gSchemaNode, generationContext);
+                    node = generateBIEs(anABIE, node, gSchemaNode, generationContext);
+                }
             }
 
         }
+
         return gSchemaNode;
+    }
+
+    private boolean isAnyProperty(AssociationBusinessInformationEntity gASBIE,
+                                  GenerationContext generationContext) {
+        AssociationBusinessInformationEntityProperty gASBIEP = generationContext.queryAssocToASBIEP(gASBIE);
+        AssociationCoreComponentProperty asccp = generationContext.findASCCP(gASBIEP.getBasedAsccpId());
+        if (!"AnyProperty".equals(Utility.first(asccp.getDen(), true))) {
+            return false;
+        }
+
+        AggregateBusinessInformationEntity gABIE = generationContext.queryTargetABIE2(gASBIEP);
+        AggregateCoreComponent gACC = generationContext.queryBasedACC(gABIE);
+        return OagisComponentType.Embedded == gACC.getOagisComponentType();
+    }
+
+    private Element generateAnyABIE(AssociationBusinessInformationEntity gASBIE,
+                                    Element gPNode, GenerationContext generationContext) {
+        AssociationCoreComponent gASCC = generationContext.queryBasedASCC(gASBIE);
+
+        Element element = newElement("any");
+        element.setAttribute("namespace", "##any");
+        element.setAttribute("processContents", "strict");
+
+        element.setAttribute("minOccurs", String.valueOf(gASBIE.getCardinalityMin()));
+        if (gASBIE.getCardinalityMax() == -1)
+            element.setAttribute("maxOccurs", "unbounded");
+        else
+            element.setAttribute("maxOccurs", String.valueOf(gASBIE.getCardinalityMax()));
+        if (gASBIE.isNillable())
+            element.setAttribute("nillable", String.valueOf(gASBIE.isNillable()));
+
+        element.setAttribute("id", gASBIE.getGuid());
+
+        gPNode.addContent(element);
+        generationContext.addCCGuidIntoStoredCC(gASCC.getGuid());//check
+
+        return element;
     }
 
     public Element generateBDT(BasicBusinessInformationEntity gBBIE, Element eNode, Element gSchemaNode,
@@ -348,7 +385,7 @@ public class StandaloneXMLSchema {
             element.setAttribute("nillable", String.valueOf(gASBIE.isNillable()));
 
         while (!gPNode.getName().equals("sequence")) {
-            gPNode = (Element) gPNode.getParentElement();
+            gPNode = gPNode.getParentElement();
         }
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
