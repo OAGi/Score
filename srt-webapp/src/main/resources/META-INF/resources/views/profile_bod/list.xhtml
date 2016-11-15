@@ -76,7 +76,7 @@
                     <p:column style="text-align: center; width: 65px;"
                               rendered="#{profileBODBean.profileBODs.isEmpty() == false}">
                         <p:commandButton icon="ui-icon-cancel" styleClass="delete"
-                                         disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.owner}"
+                                         disabled="#{profileBODBean.currentUser.appUserId ne profileBOD.owner or profileBOD.state eq 'Published'}"
                                          onclick="PF('confirmDiscard').show()">
                             <f:setPropertyActionListener value="#{profileBOD}"
                                                          target="#{profileBODBean.selectedProfileBOD}"/>
