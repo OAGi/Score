@@ -49,15 +49,18 @@ public class SignUpBean {
     }
 
     @Transactional(readOnly = false)
-    public void signUp() {
+    public String signUp() {
         if (userService.exists(username)) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Username is already taken by other user."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "'" + username + "' username is already used."));
+            return null;
         } else if (!password.equals(confirmPassword)) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Password doesn't match the confirmation."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Passwords do not match."));
+            return null;
         } else {
             userService.register(username, password);
+            return "/views/user/login.xhtml?faces-redirect=true";
         }
     }
 }

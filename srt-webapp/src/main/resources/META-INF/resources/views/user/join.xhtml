@@ -32,8 +32,7 @@
                                 requiredMessage="Please fill out 'Confirm password' field."/>
 
                     <p:commandButton value="Create an account" id="create_account"
-                                     action="/views/user/login.xhtml?faces-redirect=true"
-                                     actionListener="#{signUpBean.signUp}"
+                                     action="#{signUpBean.signUp}"
                                      update="sign_up_form"/>
                 </h:panelGrid>
             </p:panel>
