@@ -37,7 +37,7 @@
                                     </p:column>
                                 </p:treeTable>
 
-                                <p:contextMenu for="treeTable" nodeType="ACC-Extension">
+                                <p:contextMenu for="treeTable" nodeType="ACC-Extension" rendered="#{extensionBean.userExtensionAcc.state == 'Editing'}">
                                     <p:menuitem value="Append ASCC" style="width: 100%;"
                                                 actionListener="#{extensionBean.prepareAppendAscc}"
                                                 onclick="PF('leftBlockUI').show()"
