@@ -19,9 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
@@ -231,20 +232,46 @@ public class ProfileBODBuilder {
     }
 
     private List<CoreComponent> getAssocList(List<CoreComponent> list) {
+        Map<Integer, Boolean> hashCodes = new HashMap();
+
         for (int i = 0; i < list.size(); i++) {
             CoreComponent srt = list.get(i);
             if (srt instanceof AssociationCoreComponent && dataContainer.groupcheck((AssociationCoreComponent) srt)) {
-                AssociationCoreComponent associationCoreComponent = (AssociationCoreComponent) srt;
-                AssociationCoreComponentProperty associationCoreComponentProperty = dataContainer.getASCCP(associationCoreComponent.getToAsccpId());
-                AggregateCoreComponent aggregateCoreComponent = dataContainer.getACC(associationCoreComponentProperty.getRoleOfAccId());
-                list = handleNestedGroup(aggregateCoreComponent, list, i);
+                AssociationCoreComponent ascc = (AssociationCoreComponent) srt;
+                long toAsccpId = ascc.getToAsccpId();
+                AssociationCoreComponentProperty toAsccp = dataContainer.getASCCP(toAsccpId);
+                long roleOfAccId = toAsccp.getRoleOfAccId();
+                AggregateCoreComponent roleOfAcc = dataContainer.getACC(roleOfAccId);
+                list = handleNestedGroup(roleOfAcc, list, i, hashCodes);
             }
         }
         return list;
     }
 
+    private boolean ensureCircularReference(AggregateCoreComponent acc, List<CoreComponent> coreComponents,
+                                            int gPosition, Map<Integer, Boolean> hashCodes) {
+        int hashCode = acc.hashCode() + coreComponents.hashCode() + gPosition;
+        Boolean check = hashCodes.get(hashCode);
+        if (check == null) {
+            check = false;
+            hashCodes.put(hashCode, true);
+
+        }
+        return check;
+    }
+
     private List<CoreComponent> handleNestedGroup(AggregateCoreComponent acc,
-                                                  List<CoreComponent> coreComponents, int gPosition) {
+                                                  List<CoreComponent> coreComponents, int gPosition,
+                                                  Map<Integer, Boolean> hashCodes) {
+        /*
+         * TODO: FIX ME
+         * As of Nov 15th, 2016, When the User Extension is in Editing state
+         * Circular Reference Problem occurred in this code.
+         */
+        if (ensureCircularReference(acc, coreComponents, gPosition, hashCodes)) {
+            coreComponents.remove(gPosition);
+            return coreComponents;
+        }
 
         List<CoreComponent> bList = queryChildAssoc(acc);
         if (!bList.isEmpty()) {
@@ -258,8 +285,12 @@ public class ProfileBODBuilder {
                     dataContainer.groupcheck((AssociationCoreComponent) coreComponent)) {
 
                 AssociationCoreComponent ascc = (AssociationCoreComponent) coreComponent;
-                AssociationCoreComponentProperty asccp = dataContainer.getASCCP(ascc.getToAsccpId());
-                coreComponents = handleNestedGroup(dataContainer.getACC(asccp.getRoleOfAccId()), coreComponents, i);
+                long toAsccpId = ascc.getToAsccpId();
+                AssociationCoreComponentProperty asccp = dataContainer.getASCCP(toAsccpId);
+                long roleOfAccId = asccp.getRoleOfAccId();
+                AggregateCoreComponent roleOfAcc = dataContainer.getACC(roleOfAccId);
+
+                coreComponents = handleNestedGroup(roleOfAcc, coreComponents, i, hashCodes);
             }
         }
 
