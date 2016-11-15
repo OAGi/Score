@@ -45,6 +45,9 @@ public class ExtensionService {
     @Autowired
     private NodeService nodeService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional(rollbackFor = Throwable.class)
     public AggregateCoreComponent appendUserExtension(AggregateCoreComponent eAcc, AggregateCoreComponent ueAcc,
                                                       AssociationCoreComponentProperty asccp, User user)
@@ -57,8 +60,9 @@ public class ExtensionService {
             long ownerId = ueAcc.getCreatedBy();
             long requesterId = user.getAppUserId();
             if (ownerId != requesterId) {
+                User owner = userRepository.findOne(ownerId);
                 throw new PermissionDeniedDataAccessException(
-                        "This operation only allows for the owner of this element.", new IllegalStateException());
+                        "The component is currently edited by another user - " + owner.getName(), new IllegalStateException());
             } else {
                 return eAcc;
             }

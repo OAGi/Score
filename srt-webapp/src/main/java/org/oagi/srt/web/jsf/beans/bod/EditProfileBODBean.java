@@ -65,6 +65,8 @@ public class EditProfileBODBean extends UIHandler {
     private AssociationBusinessInformationEntityPropertyRepository asbiepRepository;
     @Autowired
     private BusinessInformationEntityUserExtensionRevisionRepository bieUserExtRevisionRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     private TopLevelAbie topLevelAbie;
     private List<BusinessInformationEntityUserExtensionRevision> bieUserExtRevisionList;
@@ -488,8 +490,9 @@ public class EditProfileBODBean extends UIHandler {
                 return redirectABIEExtension(isLocally, eAcc);
             }
 
+            User ueAccOwner = userRepository.findOne(ueAcc.getOwnerUserId());
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "This user extension is already taken by other user."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "The component is currently edited by another user - " + ueAccOwner.getName()));
             return null;
         }
 
@@ -497,7 +500,7 @@ public class EditProfileBODBean extends UIHandler {
             eAcc = extensionService.appendUserExtension(asccp, user, isLocally);
         } catch (PermissionDeniedDataAccessException e) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "This user extension is already taken by other user."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage()));
             throw e;
         } catch (Throwable t) {
             FacesContext.getCurrentInstance().addMessage(null,
