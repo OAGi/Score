@@ -19,6 +19,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.common.SRTConstants.OAGI_NS;
+
 @Component
 public class StandaloneXMLSchema {
 
@@ -106,9 +108,9 @@ public class StandaloneXMLSchema {
 
     public Element generateSchema(Document doc) {
         Element schemaNode = newElement("schema");
-        schemaNode.addNamespaceDeclaration(org.jdom2.Namespace.getNamespace("", "http://www.openapplications.org/oagis/10"));
+        schemaNode.addNamespaceDeclaration(org.jdom2.Namespace.getNamespace("", OAGI_NS));
         schemaNode.addNamespaceDeclaration(org.jdom2.Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace"));
-        schemaNode.setAttribute("targetNamespace", "http://www.openapplications.org/oagis/10");
+        schemaNode.setAttribute("targetNamespace", OAGI_NS);
         schemaNode.setAttribute("elementFormDefault", "qualified");
         schemaNode.setAttribute("attributeFormDefault", "unqualified");
         doc.addContent(schemaNode);
@@ -146,7 +148,7 @@ public class StandaloneXMLSchema {
         //rootEleNode.setAttribute("type", Utility.second(asccpVO.getDen()).replaceAll(" ", "")+"Type");
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
-        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
+        documentation.setAttribute("source", OAGI_NS);
         //documentation.setTextContent(asccpVO.getDefinition());
         rootEleNode.addContent(annotation);
         annotation.addContent(documentation);
@@ -180,7 +182,7 @@ public class StandaloneXMLSchema {
         generationContext.addCCGuidIntoStoredCC(gACC.getGuid());
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
-        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        documentation.setAttribute("source", OAGI_NS + "/platform/2");
         //documentation.setTextContent(gACC.getDefinition());
         complexType.addContent(annotation);
         annotation.addContent(documentation);
@@ -270,7 +272,7 @@ public class StandaloneXMLSchema {
         if (bDT.getDefinition() != null) {
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
-            documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
+            documentation.setAttribute("source", OAGI_NS);
             //documentation.setTextContent(bDT.getDefinition());
             complexType.addContent(annotation);
         }
@@ -348,7 +350,7 @@ public class StandaloneXMLSchema {
         if (bDT.getDefinition() != null) {
             Element annotation = newElement("annotation");
             Element documentation = newElement("documentation");
-            documentation.setAttribute("source", "http://www.openapplications.org/oagis/10");
+            documentation.setAttribute("source", OAGI_NS);
             //documentation.setTextContent(bDT.getDefinition());
             complexType.addContent(annotation);
         }
@@ -389,7 +391,7 @@ public class StandaloneXMLSchema {
         }
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
-        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        documentation.setAttribute("source", OAGI_NS + "/platform/2");
         //documentation.setTextContent(gASBIE.getDefinition());
         annotation.addContent(documentation);
         element.addContent(annotation);
@@ -436,7 +438,7 @@ public class StandaloneXMLSchema {
 
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
-        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        documentation.setAttribute("source", OAGI_NS + "/platform/2");
         //documentation.setTextContent(gBBIE.getDefinition());
         annotation.addContent(documentation);
         eNode.addContent(annotation);
@@ -469,7 +471,7 @@ public class StandaloneXMLSchema {
             eNode.setAttribute("use", "optional");
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
-        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        documentation.setAttribute("source", OAGI_NS + "/platform/2");
         //documentation.setTextContent(gBBIE.getDefinition());
         annotation.addContent(documentation);
         eNode.addContent(annotation);
@@ -486,7 +488,7 @@ public class StandaloneXMLSchema {
         if (aCL == null) {
             BusinessDataTypePrimitiveRestriction aBDTPrimitiveRestriction =
                     generationContext.findBdtPriRestri(gBBIE.getBdtPriRestriId());
-            if (aBDTPrimitiveRestriction.getCodeListId() != 0) {
+            if (aBDTPrimitiveRestriction != null && aBDTPrimitiveRestriction.getCodeListId() != 0) {
                 aCL = generationContext.findCodeList(aBDTPrimitiveRestriction.getCodeListId());
             }
         }
@@ -510,6 +512,7 @@ public class StandaloneXMLSchema {
                 generationContext.findCdtAwdPriXpsTypeMap(aBDTPrimitiveRestriction.getCdtAwdPriXpsTypeMapId());
         XSDBuiltInType aXSDBuiltInType =
                 generationContext.findXSDBuiltInType(aDTAllowedPrimitiveExpressionTypeMap.getXbtId());
+
         if (aXSDBuiltInType.getBuiltInType() != null)
             gNode.setAttribute("type", aXSDBuiltInType.getBuiltInType());
 
@@ -534,12 +537,12 @@ public class StandaloneXMLSchema {
                                 Element gSchemaNode, GenerationContext generationContext) {
 
         BasicCoreComponent gBCC = generationContext.queryBasedBCC(gBBIE);
-        Element eNode = null;
+        Element eNode;
         eNode = newElement("element");
         eNode = handleBBIE_Elementvalue(gBBIE, eNode, generationContext);
         if (gBCC.getEntityType() == BasicCoreComponentEntityType.Element) {
             while (!gPNode.getName().equals("sequence")) {
-                gPNode = (Element) gPNode.getParentElement();
+                gPNode = gPNode.getParentElement();
             }
 
             gPNode.addContent(eNode);
@@ -773,7 +776,7 @@ public class StandaloneXMLSchema {
 
         Element annotation = newElement("annotation");
         Element documentation = newElement("documentation");
-        documentation.setAttribute("source", "http://www.openapplications.org/oagis/10/platform/2");
+        documentation.setAttribute("source", OAGI_NS + "/platform/2");
         //documentation.setTextContent(aBBIESC.getDefinition());
         annotation.addContent(documentation);
         aNode.addContent(annotation);
@@ -890,9 +893,7 @@ public class StandaloneXMLSchema {
     }
 
     public String getAgencyListTypeName(AgencyIdList gAL) {
-        String AgencyListTypeName = "clm" + gAL.getAgencyIdListValueId() + gAL.getListId() + gAL.getVersionId() + "_" + Utility.toCamelCase(gAL.getName()) + "ContentType";
-        AgencyListTypeName = AgencyListTypeName.replaceAll(" ", "");
-        return AgencyListTypeName;
+        return gAL.getName() + "ContentType";
     }
 
     public Element generateAgencyList(AgencyIdList gAL, BasicBusinessInformationEntitySupplementaryComponent gSC,
@@ -913,8 +914,25 @@ public class StandaloneXMLSchema {
             AgencyIdListValue aAgencyIdListValue = gALVs.get(i);
             Element enumeration = newElement("enumeration");
             stNode.addContent(enumeration);
-            stNode.setAttribute("value", aAgencyIdListValue.getValue());
+            enumeration.setAttribute("value", aAgencyIdListValue.getValue());
+
+            Element annotation = newElement("annotation");
+            Element documentation = newElement("documentation");
+            documentation.setAttribute("source", OAGI_NS);
+
+            Element cctsName = new Element("ccts_Name", OAGI_NS);
+            String name = aAgencyIdListValue.getName();
+            cctsName.setText(name);
+            documentation.addContent(cctsName);
+            Element cctsDefinition = new Element("ccts_Definition", OAGI_NS);
+            String definition = aAgencyIdListValue.getDefinition();
+            cctsDefinition.setText(definition);
+            documentation.addContent(cctsDefinition);
+
+            annotation.addContent(documentation);
+            enumeration.addContent(annotation);
         }
+
         gSchemaNode.addContent(stNode);
         generationContext.addGuidIntoGuidArrayList(gAL.getGuid());
         return stNode;
