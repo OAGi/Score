@@ -38,7 +38,7 @@
 <colAssociation fkAssociation="636F2D66-BBFA-B0D5-0282-7E474A140BED" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
 </associations>
 </Column>
-<Column name="OWNER" id="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9">
+<Column name="OWNER_USER_ID" id="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9">
 <createdBy>hakju</createdBy>
 <createdTime>2016-10-30 07:49:50 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
@@ -87,6 +87,16 @@
 <colUsage columnID="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="E16D57AF-9FB7-3110-9773-82A7930A4DE0" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2016-10-30 07:48:26 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="D8981E67-31C8-981B-F9EF-B9F1BD814F9F" name="TOP_LEVEL_ABIE_ABIE_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 18:05:54 UTC</createdTime>
@@ -97,9 +107,9 @@
 <colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="E16D57AF-9FB7-3110-9773-82A7930A4DE0" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<ind_PK_UK id="36F5E526-7C1E-3BE6-3E11-69B703D8E6A0" name="TOP_LEVEL_ABIE_APP_USER_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2016-10-30 07:48:26 UTC</createdTime>
+<createdTime>2016-11-16 14:10:23 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
