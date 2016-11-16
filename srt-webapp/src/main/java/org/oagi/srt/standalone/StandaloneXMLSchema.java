@@ -913,7 +913,7 @@ public class StandaloneXMLSchema {
         for (int i = 0; i < gALVs.size(); i++) {
             AgencyIdListValue aAgencyIdListValue = gALVs.get(i);
             Element enumeration = newElement("enumeration");
-            stNode.addContent(enumeration);
+            rtNode.addContent(enumeration);
             enumeration.setAttribute("value", aAgencyIdListValue.getValue());
 
             Element annotation = newElement("annotation");
