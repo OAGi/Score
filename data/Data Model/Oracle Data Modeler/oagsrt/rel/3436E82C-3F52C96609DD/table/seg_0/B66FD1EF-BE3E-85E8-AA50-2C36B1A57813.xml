@@ -41,6 +41,7 @@
 <Column name="OWNER" id="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9">
 <createdBy>hakju</createdBy>
 <createdTime>2016-10-30 07:49:50 UTC</createdTime>
+<commentInRDBMS>The user who is the current owner of the top-level ABIE. In the current implementation ABIEs are managed at the top-level ABIE level only. It descendants cannot be independently managed. See more detail in the STATE column description.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
@@ -55,6 +56,7 @@
 <Column name="STATE" id="9CC3621F-462A-CC4B-1E1A-ACF0A25B518A">
 <createdBy>hakju</createdBy>
 <createdTime>2016-10-30 07:49:50 UTC</createdTime>
+<commentInRDBMS>In the Editing state, only the owner can view, edit, and change the state of the top-level ABIE and its descendants. In the Candidate state the owner and other users can only view the top-level ABIE and its descendants; the owner can additionally change the state back to Editing or Published. The owner cannot edit but can delete. In the  Publish state, the owner and other users can only view the top-level ABIE and its descendant; they cannot be deleted and their state cannot be changed.&lt;br/&gt;&lt;br/&gt;This column is a denormalization from the ABIE table for performance purpose. Also at this point we don&apos;t use the state column in the ABIE table, because all descendants of the top-level ABIE are considered intrinsic to the top-level ABIE in the current implementation. In other words, those descendants cannot be managed independently.</commentInRDBMS>
 <ownerDesignName>oagsrt</ownerDesignName>
 <nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
@@ -87,6 +89,16 @@
 <colUsage columnID="6B43181B-0C4C-AB1E-9BA5-3EF898ED3F45"/>
 </indexColumnUsage>
 </ind_PK_UK>
+<ind_PK_UK id="E16D57AF-9FB7-3110-9773-82A7930A4DE0" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<createdBy>hakju</createdBy>
+<createdTime>2016-10-30 07:48:26 UTC</createdTime>
+<ownerDesignName>oagsrt</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
+</indexColumnUsage>
+</ind_PK_UK>
 <ind_PK_UK id="D8981E67-31C8-981B-F9EF-B9F1BD814F9F" name="TOP_LEVEL_ABIE_ABIE_ID_FK">
 <createdBy>hno2</createdBy>
 <createdTime>2016-08-18 18:05:54 UTC</createdTime>
@@ -97,9 +109,9 @@
 <colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="E16D57AF-9FB7-3110-9773-82A7930A4DE0" name="TOP_LEVEL_ABIE_APP_USER_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2016-10-30 07:48:26 UTC</createdTime>
+<ind_PK_UK id="B69F652E-76D6-7D07-D9BB-53FF317A8458" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<createdBy>bnk1</createdBy>
+<createdTime>2016-11-16 11:41:38 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
