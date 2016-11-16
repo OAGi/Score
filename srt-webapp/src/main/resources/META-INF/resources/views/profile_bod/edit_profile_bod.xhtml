@@ -1017,7 +1017,7 @@
             </p:panel>
 
             <p:panel id="btnGroup"
-                     rendered="#{editProfileBODBean.currentUser.appUserId eq editProfileBODBean.topLevelAbie.owner}">
+                     rendered="#{editProfileBODBean.currentUser.appUserId eq editProfileBODBean.topLevelAbie.ownerUserId}">
                 <p:commandButton rendered="#{editProfileBODBean.topLevelAbie.state == 'Editing'}"
                                  id="btnUpdate" widgetVar="btnUpdate" value="Update"
                                  action="#{editProfileBODBean.update()}"/>

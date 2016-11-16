@@ -123,7 +123,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
         private void adjust() {
             long owner = user.getAppUserId();
-            topLevelAbie.setOwner(owner);
+            topLevelAbie.setOwnerUserId(owner);
             topLevelAbie.setState(Editing);
 
             AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
@@ -490,7 +490,7 @@ public class BIETreeNodeHandler extends UIHandler {
 
         private void adjust() {
             long owner = user.getAppUserId();
-            topLevelAbie.setOwner(owner);
+            topLevelAbie.setOwnerUserId(owner);
             topLevelAbie.setState(Editing);
 
             AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();

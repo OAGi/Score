@@ -27,7 +27,7 @@ public class TopLevelAbie implements Serializable {
     private AggregateBusinessInformationEntityState state;
 
     @Column(nullable = false)
-    private long owner;
+    private long ownerUserId;
 
     public long getTopLevelAbieId() {
         return topLevelAbieId;
@@ -53,12 +53,12 @@ public class TopLevelAbie implements Serializable {
         this.state = state;
     }
 
-    public long getOwner() {
-        return owner;
+    public long getOwnerUserId() {
+        return ownerUserId;
     }
 
-    public void setOwner(long owner) {
-        this.owner = owner;
+    public void setOwnerUserId(long ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class TopLevelAbie implements Serializable {
         int result = (int) (topLevelAbieId ^ (topLevelAbieId >>> 32));
         result = 31 * result + (abie != null ? (int) (abie.getAbieId() ^ (abie.getAbieId() >>> 32)) : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (int) (owner ^ (owner >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         return result;
     }
 
@@ -87,7 +87,7 @@ public class TopLevelAbie implements Serializable {
                 "topLevelAbieId=" + topLevelAbieId +
                 ", abie=" + abie +
                 ", state=" + state +
-                ", owner=" + owner +
+                ", ownerUserId=" + ownerUserId +
                 '}';
     }
 }

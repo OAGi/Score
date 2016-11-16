@@ -12,14 +12,14 @@ import java.util.Date;
                         entityClass = TopLevelAbie.class,
                         fields = {
                                 @FieldResult(name = "topLevelAbieId", column = "top_level_abie_id"),
+                                @FieldResult(name = "state", column = "state"),
+                                @FieldResult(name = "ownerUserId", column = "owner_user_id"),
                         }
                 ),
                 @EntityResult(
                         entityClass = AggregateBusinessInformationEntity.class,
                         fields = {
                                 @FieldResult(name = "abieId", column = "abie_id"),
-                                @FieldResult(name = "state", column = "state"),
-                                @FieldResult(name = "owner", column = "owner"),
                                 @FieldResult(name = "creationTimestamp", column = "creation_timestamp"),
                         }
                 ),
@@ -80,7 +80,7 @@ public class ProfileBOD {
     private AggregateBusinessInformationEntityState state;
 
     @Column(nullable = false, updatable = false)
-    private long owner;
+    private long ownerUserId;
 
     @Column(length = 100)
     private String ownerName;
@@ -153,12 +153,12 @@ public class ProfileBOD {
         this.state = state;
     }
 
-    public long getOwner() {
-        return owner;
+    public long getOwnerUserId() {
+        return ownerUserId;
     }
 
-    public void setOwner(long owner) {
-        this.owner = owner;
+    public void setOwnerUserId(long ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
     public String getOwnerName() {
@@ -198,7 +198,7 @@ public class ProfileBOD {
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (int) (owner ^ (owner >>> 32));
+        result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (ownerName != null ? ownerName.hashCode() : 0);
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         return result;
@@ -215,7 +215,7 @@ public class ProfileBOD {
                 ", bizCtxId=" + bizCtxId +
                 ", bizCtxName='" + bizCtxName + '\'' +
                 ", state=" + state +
-                ", owner=" + owner +
+                ", ownerUserId=" + ownerUserId +
                 ", ownerName='" + ownerName + '\'' +
                 ", creationTimestamp=" + creationTimestamp +
                 '}';

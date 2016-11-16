@@ -1094,14 +1094,14 @@ public class BusinessInformationEntityService {
     }
 
     public void transferOwner(TopLevelAbie topLevelAbie, User newOwner) {
-        long oldOwnerId = topLevelAbie.getOwner();
+        long oldOwnerId = topLevelAbie.getOwnerUserId();
         long newOwnerId = newOwner.getAppUserId();
 
         if (oldOwnerId == newOwnerId) {
             return;
         }
 
-        topLevelAbie.setOwner(newOwnerId);
+        topLevelAbie.setOwnerUserId(newOwnerId);
         topLevelAbieRepository.save(topLevelAbie);
     }
 }
