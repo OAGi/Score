@@ -35,7 +35,7 @@
 
                         <h:outputText rendered="#{profileBODBean.currentUser.appUserId ne profileBOD.ownerUserId and profileBOD.state eq 'Editing'}"
                                       id="focus" value="#{profileBOD.propertyTerm}"/>
-                        <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an ownerUserId." position="bottom"/>
+                        <p:tooltip id="toolTipFocus" for="focus" value="This profile BOD only can access by an owner." position="bottom"/>
                     </p:column>
                     <p:column style="width: 150px; text-align: center;" styleClass="ellipsis"
                               headerText="Business Context"
