@@ -107,9 +107,9 @@
 <colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="36F5E526-7C1E-3BE6-3E11-69B703D8E6A0" name="TOP_LEVEL_ABIE_APP_USER_FK">
+<ind_PK_UK id="1F1CBB83-B356-3DAE-83D4-A3BFA1D89D30" name="TOP_LEVEL_ABIE_APP_USER_FK">
 <createdBy>hakju</createdBy>
-<createdTime>2016-11-16 14:10:23 UTC</createdTime>
+<createdTime>2016-11-18 00:23:05 UTC</createdTime>
 <ownerDesignName>oagsrt</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
