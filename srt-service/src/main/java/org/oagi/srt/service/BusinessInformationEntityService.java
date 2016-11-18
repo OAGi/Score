@@ -623,11 +623,7 @@ public class BusinessInformationEntityService {
                                 new BasicBusinessInformationEntitySupplementaryComponent();
                         bbieSc.setBbie(bbie);
                         long bdtScId = dtSc.getDtScId();
-<<<<<<< HEAD
-                        bbieSc.setDtScId(bdtScId);
-=======
                         bbieSc.setDtSc(dtSc);
->>>>>>> develop
                         bbieSc.setGuid(Utility.generateGUID());
                         long bdtScPriRestriId = createBIEContext.getDefaultBdtScPriRestriId(bdtScId);
                         if (bdtScPriRestriId > 0L) {
