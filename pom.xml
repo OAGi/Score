@@ -21,9 +21,18 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<spring.framework.version>4.3.2.RELEASE</spring.framework.version>
-		<spring.boot.version>1.4.0.RELEASE</spring.boot.version>
-		<spring.data.jpa.version>1.10.2.RELEASE</spring.data.jpa.version>
-		<hibernate.version>5.0.9.Final</hibernate.version>
+		<spring.framework.version>4.3.3.RELEASE</spring.framework.version>
+		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
+		<spring.data.jpa.version>1.10.4.RELEASE</spring.data.jpa.version>
+		<spring.data.commons.version>1.12.4.RELEASE</spring.data.commons.version>
+		<spring.data.rest.version>2.5.3.RELEASE</spring.data.rest.version>
+		<spring.hateoas.version>0.20.0.RELEASE</spring.hateoas.version>
+		<spring.plugin.core.version>1.2.0.RELEASE</spring.plugin.core.version>
+		<spring.loaded.version>1.2.6.RELEASE</spring.loaded.version>
+		<commons.logging.version>1.2</commons.logging.version>
+		<guava.version>19.0</guava.version>
+		<hibernate.version>5.0.11.Final</hibernate.version>
+		<org.ow2.asm.version>5.0.4</org.ow2.asm.version>
+		<xml.apis.version>1.4.01</xml.apis.version>
 	</properties>
 </project>

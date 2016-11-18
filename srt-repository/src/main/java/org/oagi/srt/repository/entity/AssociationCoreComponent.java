@@ -1,21 +1,28 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "ascc")
-public class AssociationCoreComponent implements CoreComponent, Serializable {
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
+public class AssociationCoreComponent
+        implements CoreComponent, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ASCC_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long asccId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
     @Column(nullable = false)
@@ -61,7 +68,8 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false)
     private int revisionNum;
@@ -70,7 +78,8 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -219,11 +228,11 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -243,11 +252,11 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -268,37 +277,50 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
     }
 
     @Override
+    public AssociationCoreComponent clone() {
+        AssociationCoreComponent clone = new AssociationCoreComponent();
+        clone.setGuid(Utility.generateGUID());
+        clone.setCardinalityMin(this.cardinalityMin);
+        clone.setCardinalityMax(this.cardinalityMax);
+        clone.setSeqKey(this.seqKey);
+        clone.setFromAccId(this.fromAccId);
+        clone.setToAsccpId(this.toAsccpId);
+        clone.setDen(this.den);
+        clone.setDefinition(this.definition);
+        clone.setDeprecated(this.deprecated);
+        clone.setCreatedBy(this.createdBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentAsccId != null) {
+            clone.setCurrentAsccId(this.currentAsccId);
+        }
+        return clone;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         AssociationCoreComponent that = (AssociationCoreComponent) o;
 
-        if (asccId != that.asccId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (seqKey != that.seqKey) return false;
-        if (fromAccId != that.fromAccId) return false;
-        if (toAsccpId != that.toAsccpId) return false;
-        if (deprecated != that.deprecated) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentAsccId != null ? currentAsccId.equals(that.currentAsccId) : that.currentAsccId == null;
-
+        if (asccId != 0L && asccId == that.asccId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -318,7 +340,7 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
         result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
@@ -352,5 +374,17 @@ public class AssociationCoreComponent implements CoreComponent, Serializable {
                 ", releaseId=" + releaseId +
                 ", currentAsccId=" + currentAsccId +
                 '}';
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

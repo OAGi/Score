@@ -32,7 +32,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="636F2D66-BBFA-B0D5-0282-7E474A140BED" referredColumn="C59E5D9E-2C77-185D-7AFC-7C43FA943385"/>
@@ -46,7 +46,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>19</dataTypePrecision>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
+<ownDataTypeParameters>,19,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
 <colAssociation fkAssociation="5D5A4B99-7A57-0BC9-6D34-A087F466B03C" referredColumn="0F407506-2FE3-AC47-2F58-3B1949647DAD"/>
@@ -105,16 +105,6 @@
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
 <colUsage columnID="FC3F2E0C-9E5D-CE9D-236E-24F0D2B6EC1B"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="1F1CBB83-B356-3DAE-83D4-A3BFA1D89D30" name="TOP_LEVEL_ABIE_APP_USER_FK">
-<createdBy>hakju</createdBy>
-<createdTime>2016-11-18 00:23:05 UTC</createdTime>
-<ownerDesignName>oagsrt</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="D591FA81-F11C-CF92-CEB0-BE3520C1FDB9"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

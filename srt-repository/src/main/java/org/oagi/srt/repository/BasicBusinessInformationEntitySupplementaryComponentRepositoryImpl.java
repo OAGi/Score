@@ -41,8 +41,8 @@ public class BasicBusinessInformationEntitySupplementaryComponentRepositoryImpl
         args.add(entity.getDtScId());
         args.add(entity.getDtScPriRestriId() == 0 ? null : entity.getDtScPriRestriId());
         args.add(entity.getFixedValue());
-        args.add(entity.getCardinalityMax());
         args.add(entity.getCardinalityMin());
+        args.add(entity.getCardinalityMax());
         args.add(entity.getRemark());
         args.add(entity.isUsed() ? 1 : 0);
     }

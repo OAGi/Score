@@ -19,18 +19,11 @@ public class SRTConstants {
 	public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
 
 	public static final String OAGI_NS = "http://www.openapplications.org/oagis/10";
+	public static final String OAGI_GUID_PREFIX = "oagis-id-";
 
 	public static final String TAB_TOP_LEVEL_ABIE_SELECT_BC = "select_bc";
 	public static final String TAB_TOP_LEVEL_ABIE_CREATE_UC_BIE = "create_u_bie";
 	public static final String TAB_TOP_LEVEL_ABIE_COPY_UC_BIE = "edit_bod";
-
-	public static final int TOP_LEVEL_ABIE_STATE_EDITING = 2;
-	public static final int TOP_LEVEL_ABIE_STATE_PUBLISHED = 4;
-
-	public static final String CODE_LIST_STATE_EDITING = "Editing";
-	public static final String CODE_LIST_STATE_PUBLISHED = "Published";
-	public static final String CODE_LIST_STATE_DISCARDED = "Discarded";
-	public static final String CODE_LIST_STATE_DELETED = "Deleted";
 
 	public static final String AGENCY_ID_LIST_NAME = "clm63055D08B_AgencyIdentification";
 
@@ -79,6 +72,8 @@ public class SRTConstants {
 	public static final String MODEL_FOLDER_PATH = BASE_DATA_PATH + "/Model";
 	public static final String BOD_FILE_PATH_01 = MODEL_FOLDER_PATH + PLATFORM_PATH + "/BODs/";
 	public static final String BOD_FILE_PATH_02 = MODEL_FOLDER_PATH + "/BODs/";
+	public static final String NOUN_FILE_PATH_01 = MODEL_FOLDER_PATH + "/Nouns/";
+	public static final String NOUN_FILE_PATH_02 = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Nouns/";
 
 	public static final String FIELDS_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Fields.xsd";
 	public static final String META_XSD_FILE_PATH = MODEL_FOLDER_PATH + PLATFORM_PATH + "/Common/Components/Meta.xsd";

@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                    closable="true"/>
+
+        <h:form id="change_password_form">
+            <p:panel header="Change password">
+                <h:panelGrid columns="1" styleClass="boxed-group-inner">
+                    <label for="user_old_password">Old password</label>
+                    <p:password id="user_old_password" name="user[old_password]"
+                                value="#{changePasswordBean.oldPassword}" required="true"
+                                styleClass="form-control" requiredMessage="Please fill out 'Old password' field."/>
+
+                    <label for="user_new_password">New password</label>
+                    <p:password id="user_new_password" name="user[password]"
+                                value="#{changePasswordBean.newPassword}" required="true" styleClass="form-control"
+                                requiredMessage="Please fill out 'New password' field."
+                                validatorMessage="New password is too short (minimum is 5 characters)">
+                        <f:validateLength minimum="5"/>
+                    </p:password>
+
+                    <label for="user_confirm_new_password">Confirm new password</label>
+                    <p:password id="user_confirm_new_password" name="user[password_confirmation]"
+                                value="#{changePasswordBean.confirmNewPassword}" required="true"
+                                styleClass="form-control"
+                                requiredMessage="Please fill out 'Confirm new password' field."/>
+
+                    <p:commandButton value="Update Password" id="update_password"
+                                     actionListener="#{changePasswordBean.updatePassword}"
+                                     update="change_password_form"/>
+                </h:panelGrid>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+
+        <!--
+        <h:form id="delete_account_form">
+            <p:panel header="Delete Account" styleClass="danger">
+                <h:panelGrid columns="1" styleClass="boxed-group-inner">
+                    <p>Once you delete your account, there is no going back. Please be certain.</p>
+
+                    <p:commandButton value="Delete your account" id="delete_account"
+                                     actionListener="#{settingsHandler.deleteAccount}"/>
+                </h:panelGrid>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+        -->
+    </ui:define>
+</ui:composition>

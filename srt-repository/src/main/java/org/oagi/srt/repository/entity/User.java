@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "app_user")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User implements Serializable {
 
     public static final String SEQUENCE_NAME = "APP_USER_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long appUserId;
 
     @Column(nullable = false, length = 45)
@@ -82,15 +85,10 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        User that = (User) o;
 
-        if (appUserId != user.appUserId) return false;
-        if (oagisDeveloperIndicator != user.oagisDeveloperIndicator) return false;
-        if (loginId != null ? !loginId.equals(user.loginId) : user.loginId != null) return false;
-        if (password != null ? !password.equals(user.password) : user.password != null) return false;
-        if (name != null ? !name.equals(user.name) : user.name != null) return false;
-        return organization != null ? organization.equals(user.organization) : user.organization == null;
-
+        if (appUserId != 0L && appUserId == that.appUserId) return true;
+        return false;
     }
 
     @Override

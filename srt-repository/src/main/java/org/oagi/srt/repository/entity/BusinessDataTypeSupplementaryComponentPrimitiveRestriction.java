@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "bdt_sc_pri_restri")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implements Serializable {
 
     public static final String SEQUENCE_NAME = "BDT_SC_PRI_RESTRI_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bdtScPriRestriId;
 
     @Column(nullable = false)
@@ -90,14 +93,8 @@ public class BusinessDataTypeSupplementaryComponentPrimitiveRestriction implemen
 
         BusinessDataTypeSupplementaryComponentPrimitiveRestriction that = (BusinessDataTypeSupplementaryComponentPrimitiveRestriction) o;
 
-        if (bdtScPriRestriId != that.bdtScPriRestriId) return false;
-        if (bdtScId != that.bdtScId) return false;
-        if (isDefault != that.isDefault) return false;
-        if (cdtScAwdPriXpsTypeMapId != null ? !cdtScAwdPriXpsTypeMapId.equals(that.cdtScAwdPriXpsTypeMapId) : that.cdtScAwdPriXpsTypeMapId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        return agencyIdListId != null ? agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId == null;
-
+        if (bdtScPriRestriId != 0L && bdtScPriRestriId == that.bdtScPriRestriId) return true;
+        return false;
     }
 
     @Override

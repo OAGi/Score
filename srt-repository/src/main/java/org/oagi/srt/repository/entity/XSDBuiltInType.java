@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "xbt")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class XSDBuiltInType implements Serializable {
 
     public static final String SEQUENCE_NAME = "XBT_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long xbtId;
 
     @Column(length = 45)
@@ -62,11 +65,8 @@ public class XSDBuiltInType implements Serializable {
 
         XSDBuiltInType that = (XSDBuiltInType) o;
 
-        if (xbtId != that.xbtId) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (builtInType != null ? !builtInType.equals(that.builtInType) : that.builtInType != null) return false;
-        return subtypeOfXbtId != null ? subtypeOfXbtId.equals(that.subtypeOfXbtId) : that.subtypeOfXbtId == null;
-
+        if (xbtId != 0L && xbtId == that.xbtId) return true;
+        return false;
     }
 
     @Override

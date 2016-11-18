@@ -1,21 +1,28 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "bccp")
-public class BasicCoreComponentProperty implements Serializable {
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
+public class BasicCoreComponentProperty
+        implements CoreComponentProperty, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "BCCP_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bccpId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
     @Column(nullable = false, length = 60)
@@ -62,7 +69,8 @@ public class BasicCoreComponentProperty implements Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false)
     private int revisionNum;
@@ -71,7 +79,8 @@ public class BasicCoreComponentProperty implements Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private int revisionAction = 1;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction = RevisionAction.Insert;
 
     @Column
     private Long releaseId;
@@ -85,7 +94,8 @@ public class BasicCoreComponentProperty implements Serializable {
     @Column
     private String defaultValue;
 
-    public BasicCoreComponentProperty() {}
+    public BasicCoreComponentProperty() {
+    }
 
     public BasicCoreComponentProperty(long bccpId, String den) {
         this.bccpId = bccpId;
@@ -96,6 +106,35 @@ public class BasicCoreComponentProperty implements Serializable {
         this.bccpId = bccpId;
         this.bdtId = bdtId;
         this.definition = definition;
+    }
+
+    /*
+     * Copy constructor
+     */
+    public BasicCoreComponentProperty(BasicCoreComponentProperty bccp) {
+        this.bccpId = bccp.getBccpId();
+        this.guid = bccp.getGuid();
+        this.propertyTerm = bccp.getPropertyTerm();
+        this.representationTerm = bccp.getRepresentationTerm();
+        this.bdtId = bccp.getBdtId();
+        this.den = bccp.getDen();
+        this.definition = bccp.getDefinition();
+        this.module = bccp.getModule();
+        this.namespaceId = bccp.getNamespaceId();
+        this.deprecated = bccp.isDeprecated();
+        this.createdBy = bccp.getCreatedBy();
+        this.ownerUserId = bccp.getOwnerUserId();
+        this.lastUpdatedBy = bccp.getLastUpdatedBy();
+        this.creationTimestamp = bccp.getCreationTimestamp();
+        this.lastUpdateTimestamp = bccp.getLastUpdateTimestamp();
+        this.state = bccp.getState();
+        this.revisionNum = bccp.getRevisionNum();
+        this.revisionTrackingNum = bccp.getRevisionTrackingNum();
+        this.revisionAction = bccp.getRevisionAction();
+        this.releaseId = bccp.getReleaseId();
+        this.currentBccpId = bccp.getCurrentBccpId();
+        this.nillable = bccp.isNillable();
+        this.defaultValue = bccp.getDefaultValue();
     }
 
     @PrePersist
@@ -229,11 +268,11 @@ public class BasicCoreComponentProperty implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -253,11 +292,11 @@ public class BasicCoreComponentProperty implements Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
+    public RevisionAction getRevisionAction() {
         return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -294,40 +333,52 @@ public class BasicCoreComponentProperty implements Serializable {
     }
 
     @Override
+    public BasicCoreComponentProperty clone() {
+        BasicCoreComponentProperty clone = new BasicCoreComponentProperty();
+        clone.setGuid(Utility.generateGUID());
+        clone.setPropertyTerm(this.propertyTerm);
+        clone.setRepresentationTerm(this.representationTerm);
+        clone.setBdtId(this.bdtId);
+        clone.setDefinition(this.definition);
+        clone.setDen(this.den);
+        clone.setCreatedBy(this.createdBy);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setModule(this.module);
+        clone.setNamespaceId(this.namespaceId);
+        clone.setDeprecated(this.deprecated);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentBccpId != null) {
+            clone.setCurrentBccpId(this.currentBccpId);
+        }
+        clone.setNillable(this.nillable);
+        clone.setDefaultValue(this.defaultValue);
+        return clone;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         BasicCoreComponentProperty that = (BasicCoreComponentProperty) o;
 
-        if (bccpId != that.bccpId) return false;
-        if (bdtId != that.bdtId) return false;
-        if (deprecated != that.deprecated) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (revisionAction != that.revisionAction) return false;
-        if (nillable != that.nillable) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
-            return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        if (namespaceId != null ? !namespaceId.equals(that.namespaceId) : that.namespaceId != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        if (currentBccpId != null ? !currentBccpId.equals(that.currentBccpId) : that.currentBccpId != null)
-            return false;
-        return defaultValue != null ? defaultValue.equals(that.defaultValue) : that.defaultValue == null;
-
+        if (bccpId != 0L && bccpId == that.bccpId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -347,10 +398,10 @@ public class BasicCoreComponentProperty implements Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
-        result = 31 * result + revisionAction;
+        result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
         result = 31 * result + (releaseId != null ? releaseId.hashCode() : 0);
         result = 31 * result + (currentBccpId != null ? currentBccpId.hashCode() : 0);
         result = 31 * result + (nillable ? 1 : 0);
@@ -385,5 +436,17 @@ public class BasicCoreComponentProperty implements Serializable {
                 ", nillable=" + nillable +
                 ", defaultValue='" + defaultValue + '\'' +
                 '}';
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

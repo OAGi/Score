@@ -1,0 +1,199 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Create a code list without base</h2>
+            </div>
+        </div>
+        <h:form id="form">
+            <p:panel>
+                <p:messages id="messages" showIcon="false" showDetail="true" showSummary="false" autoUpdate="true"
+                            closable="true"/>
+                <h:panelGrid id="grid" columns="2">
+                    <h:outputText for="name" value="Name" styleClass="section-label"/>
+                    <h:inputText id="name" value="#{codeListCreateWithoutBaseBean.codeList.name}"
+                                 required="true" maxlength="100"
+                                 requiredMessage="Please fill out 'Name' field."
+                                 label="Name" styleClass="section-content input-section">
+                        <f:validateLength maximum="100"/>
+                    </h:inputText>
+
+                    <h:outputText for="listID" value="List ID" styleClass="section-label"/>
+                    <h:inputText id="listID" value="#{codeListCreateWithoutBaseBean.codeList.listId}"
+                                 required="true" maxlength="100"
+                                 requiredMessage="Please fill out 'List ID' field."
+                                 label="List ID" styleClass="section-content input-section">
+                        <f:validateLength maximum="100"/>
+                    </h:inputText>
+
+                    <h:outputText for="agencyIdListValueID" value="Agency ID" styleClass="section-label"/>
+                    <h:inputText id="agencyIdListValueID" value="#{codeListCreateWithoutBaseBean.codeList.agencyId}"
+                                 label="Agency ID" styleClass="section-content input-section"/>
+
+                    <h:outputText for="version" value="Version" styleClass="section-label"/>
+                    <h:inputText id="version" value="#{codeListCreateWithoutBaseBean.codeList.versionId}"
+                                 required="true" requiredMessage="Please fill out 'Version' field." maxlength="10"
+                                 label="Version" styleClass="section-content input-section">
+                        <f:validateLength maximum="10"/>
+                    </h:inputText>
+
+                    <h:outputText for="definition" value="Definition" styleClass="section-label"/>
+                    <h:inputText id="definition" value="#{codeListCreateWithoutBaseBean.codeList.definition}"
+                                 label="Definition" styleClass="section-content input-section"/>
+
+                    <h:outputText for="definitionSource" value="Definition Source"
+                                  styleClass="section-label"/>
+                    <h:inputText id="definitionSource" maxlength="100"
+                                 value="#{codeListCreateWithoutBaseBean.codeList.definitionSource}"
+                                 label="Definition Source" styleClass="section-content input-section">
+                        <f:validateLength maximum="100"/>
+                    </h:inputText>
+
+                    <h:outputText for="remark" value="Remark" styleClass="section-label"/>
+                    <h:inputText id="remark" value="#{codeListCreateWithoutBaseBean.codeList.remark}"
+                                 label="Remark" styleClass="section-content input-section" maxlength="225">
+                        <f:validateLength maximum="225"/>
+                    </h:inputText>
+
+                    <h:outputText for="name" value="Extensible?" styleClass="section-label"/>
+                    <h:selectBooleanCheckbox value="#{codeListCreateWithoutBaseBean.codeList.extensibleIndicator}"
+                                             styleClass="section-content input-section" style="text-align: left;"/>
+                </h:panelGrid>
+            </p:panel>
+            <p:panel>
+                <f:facet name="header">
+                    <h:outputText value="Code List Values"/>
+                    <p:commandButton value="Add" style="float: right;"
+                                     actionListener="#{codeListCreateWithoutBaseBean.addCodeListValue}" update="tbl"/>
+                </f:facet>
+
+                <p:dataTable id="tbl" var="codeListValue" value="#{codeListCreateWithoutBaseBean.codeListValues}"
+                             editable="true" editMode="cell" widgetVar="codeListValues" rows="10"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom"
+                             style="width: 100%; margin-bottom: 20px;">
+                    <p:column style="text-align: center; width: 65px;">
+                        <f:facet name="header">
+                            <h:outputText value="Select"/>
+                        </f:facet>
+                        <h:selectBooleanCheckbox value="#{codeListValue.usedIndicator}"
+                                                 rendered="#{codeListValue.color ne 'BrightRed'}">
+                            <p:ajax update="tbl"
+                                    listener="#{codeListCreateWithoutBaseBean.toggleColor(codeListValue.codeListValueId)}"/>
+                        </h:selectBooleanCheckbox>
+                    </p:column>
+
+                    <p:column style="width: 150px" headerText="Code" sortBy="#{codeListValue.value}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.value}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.value}" label="Code" style="width: 100%" maxlength="100">
+                                    <f:validateLength maximum="100"/>
+                                </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="width: 150px" headerText="Short Name" sortBy="#{codeListValue.name}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.name}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.name}" label="Short Name" style="width: 100%"
+                                             maxlength="100">
+                                    <f:validateLength maximum="100"/>
+                                </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="width: 400px" headerText="Definition" sortBy="#{codeListValue.definition}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.definition}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.definition}" label="Definition"
+                                             style="width: 100%"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Definition Source" sortBy="#{codeListValue.definitionSource}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{codeListValue.definitionSource}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{codeListValue.definitionSource}" label="Definition Source"
+                                             style="width: 100%" maxlength="100">
+                                    <f:validateLength maximum="100"/>
+                                </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column style="text-align: center; width: 65px;">
+                        <p:commandButton icon="ui-icon-cancel" styleClass="delete"
+                                         action="#{codeListCreateWithoutBaseBean.deleteCodeListValue}"
+                                         update="tbl" rendered="#{codeListValue.color == 'Green'}">
+                            <f:setPropertyActionListener value="#{codeListValue}"
+                                                         target="#{codeListCreateWithoutBaseBean.selectedCodeListValue}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:separator/>
+
+                <p:commandButton ajax="true" value="Save"
+                                 actionListener="#{codeListCreateWithoutBaseBean.setState('Editing')}"
+                                 action="#{codeListCreateWithoutBaseBean.update()}"/>
+
+                <p:commandButton ajax="true" value="Publish"
+                                 actionListener="#{codeListCreateWithoutBaseBean.setState('Published')}"
+                                 action="#{codeListCreateWithoutBaseBean.update()}"/>
+            </p:panel>
+
+            <p:confirmDialog widgetVar="confirmDifferentNameButSameIdentity" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    You are about to create a code list with the different name but same identity
+                    <br/>
+                    (i.e., same Agency ID and List ID but different name).
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     actionListener="#{codeListCreateWithoutBaseBean.setConfirmDifferentNameButSameIdentity(true)}"
+                                     action="#{codeListCreateWithoutBaseBean.update()}"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmDifferentNameButSameIdentity').hide()"/>
+                </div>
+            </p:confirmDialog>
+            <p:confirmDialog widgetVar="confirmDifferentListIdButSameIdentity" showEffect="fade"
+                             hideEffect="fade" closable="false" header="Warning">
+                <f:facet name="message">
+                    You are about to create a code list with the same List ID but different name and Agency ID
+                    <br/>
+                    (i.e., same name and Agency ID but different List ID).
+                </f:facet>
+                <div style="text-align: center;">
+                    <p:commandButton value="Accept" icon="ui-icon-check"
+                                     actionListener="#{codeListCreateWithoutBaseBean.setConfirmSameListIdButDifferentIdentity(true)}"
+                                     action="#{codeListCreateWithoutBaseBean.update()}"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-close"
+                                     onclick="PF('confirmDifferentListIdButSameIdentity').hide()"/>
+                </div>
+            </p:confirmDialog>
+
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

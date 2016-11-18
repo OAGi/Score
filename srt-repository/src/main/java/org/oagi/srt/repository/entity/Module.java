@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "module")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class Module implements Serializable {
 
     public static final String SEQUENCE_NAME = "MODULE_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long moduleId;
 
     @Column(length = 100, nullable = false)
@@ -73,14 +76,10 @@ public class Module implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Module module1 = (Module) o;
+        Module that = (Module) o;
 
-        if (moduleId != module1.moduleId) return false;
-        if (module != null ? !module.equals(module1.module) : module1.module != null) return false;
-        if (release != null ? !release.equals(module1.release) : module1.release != null) return false;
-        if (namespace != null ? !namespace.equals(module1.namespace) : module1.namespace != null) return false;
-        return versionNum != null ? versionNum.equals(module1.versionNum) : module1.versionNum == null;
-
+        if (moduleId != 0L && moduleId == that.moduleId) return true;
+        return false;
     }
 
     @Override

@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "cdt_awd_pri_xps_type_map")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializable {
 
     public static final String SEQUENCE_NAME = "CDT_AWD_PRI_XPS_TYP_MAP_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long cdtAwdPriXpsTypeMapId;
 
     @Column(nullable = false)
@@ -51,10 +54,8 @@ public class CoreDataTypeAllowedPrimitiveExpressionTypeMap implements Serializab
 
         CoreDataTypeAllowedPrimitiveExpressionTypeMap that = (CoreDataTypeAllowedPrimitiveExpressionTypeMap) o;
 
-        if (cdtAwdPriXpsTypeMapId != that.cdtAwdPriXpsTypeMapId) return false;
-        if (cdtAwdPriId != that.cdtAwdPriId) return false;
-        return xbtId == that.xbtId;
-
+        if (cdtAwdPriXpsTypeMapId != 0L && cdtAwdPriXpsTypeMapId == that.cdtAwdPriXpsTypeMapId) return true;
+        return false;
     }
 
     @Override

@@ -1,25 +1,21 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "code_list")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CodeList implements Serializable {
-
-    public enum State {
-        Editing,
-        Published,
-        Discarded,
-        Deleted
-    }
 
     public static final String SEQUENCE_NAME = "CODE_LIST_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long codeListId;
 
     @Column(nullable = false, length = 41)
@@ -76,7 +72,7 @@ public class CodeList implements Serializable {
 
     @Column(nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
-    private State state;
+    private CodeListState state;
 
     @Transient
     private boolean editDisabled;
@@ -236,11 +232,11 @@ public class CodeList implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public State getState() {
+    public CodeListState getState() {
         return state;
     }
 
-    public void setState(State state) {
+    public void setState(CodeListState state) {
         this.state = state;
 
         switch (state) {
@@ -290,35 +286,15 @@ public class CodeList implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CodeList codeList = (CodeList) o;
+        CodeList that = (CodeList) o;
 
-        if (codeListId != codeList.codeListId) return false;
-        if (extensibleIndicator != codeList.extensibleIndicator) return false;
-        if (createdBy != codeList.createdBy) return false;
-        if (lastUpdatedBy != codeList.lastUpdatedBy) return false;
-        if (editDisabled != codeList.editDisabled) return false;
-        if (deleteDisabled != codeList.deleteDisabled) return false;
-        if (discardDisabled != codeList.discardDisabled) return false;
-        if (guid != null ? !guid.equals(codeList.guid) : codeList.guid != null) return false;
-        if (enumTypeGuid != null ? !enumTypeGuid.equals(codeList.enumTypeGuid) : codeList.enumTypeGuid != null)
-            return false;
-        if (name != null ? !name.equals(codeList.name) : codeList.name != null) return false;
-        if (listId != null ? !listId.equals(codeList.listId) : codeList.listId != null) return false;
-        if (agencyId != null ? !agencyId.equals(codeList.agencyId) : codeList.agencyId != null) return false;
-        if (versionId != null ? !versionId.equals(codeList.versionId) : codeList.versionId != null) return false;
-        if (definition != null ? !definition.equals(codeList.definition) : codeList.definition != null) return false;
-        if (remark != null ? !remark.equals(codeList.remark) : codeList.remark != null) return false;
-        if (definitionSource != null ? !definitionSource.equals(codeList.definitionSource) : codeList.definitionSource != null)
-            return false;
-        if (basedCodeListId != null ? !basedCodeListId.equals(codeList.basedCodeListId) : codeList.basedCodeListId != null)
-            return false;
-        if (module != null ? !module.equals(codeList.module) : codeList.module != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(codeList.creationTimestamp) : codeList.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(codeList.lastUpdateTimestamp) : codeList.lastUpdateTimestamp != null)
-            return false;
-        return state == codeList.state;
-
+        if (codeListId != 0L && codeListId == that.codeListId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -341,9 +317,6 @@ public class CodeList implements Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (editDisabled ? 1 : 0);
-        result = 31 * result + (deleteDisabled ? 1 : 0);
-        result = 31 * result + (discardDisabled ? 1 : 0);
         return result;
     }
 

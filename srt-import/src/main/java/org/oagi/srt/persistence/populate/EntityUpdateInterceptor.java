@@ -107,7 +107,10 @@ public class EntityUpdateInterceptor extends EmptyInterceptor {
         throw new IllegalStateException();
     }
 
-    private int getEnumValue(Object enumObj) {
+    private Integer getEnumValue(Object enumObj) {
+        if (enumObj == null) {
+            return null;
+        }
         Class<?> clazz = enumObj.getClass();
         try {
             Method getValueMethod = clazz.getDeclaredMethod("getValue", new Class[0]);

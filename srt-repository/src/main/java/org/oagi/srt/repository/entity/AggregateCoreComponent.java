@@ -1,21 +1,27 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.OagisComponentTypeConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "acc")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AggregateCoreComponent implements Serializable {
 
     public static final String SEQUENCE_NAME = "ACC_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long accId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
     @Column(nullable = false, length = 100)
@@ -35,7 +41,8 @@ public class AggregateCoreComponent implements Serializable {
     private String objectClassQualifier;
 
     @Column
-    private int oagisComponentType;
+    @Convert(attributeName = "oagisComponentType", converter = OagisComponentTypeConverter.class)
+    private OagisComponentType oagisComponentType;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
@@ -62,7 +69,8 @@ public class AggregateCoreComponent implements Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false)
     private int revisionNum;
@@ -71,7 +79,8 @@ public class AggregateCoreComponent implements Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -85,7 +94,8 @@ public class AggregateCoreComponent implements Serializable {
     @Column(name = "is_abstract", nullable = false)
     private boolean isAbstract;
 
-    public AggregateCoreComponent() {}
+    public AggregateCoreComponent() {
+    }
 
     public AggregateCoreComponent(long accId, String den) {
         this.accId = accId;
@@ -170,11 +180,11 @@ public class AggregateCoreComponent implements Serializable {
         this.objectClassQualifier = objectClassQualifier;
     }
 
-    public int getOagisComponentType() {
+    public OagisComponentType getOagisComponentType() {
         return oagisComponentType;
     }
 
-    public void setOagisComponentType(int oagisComponentType) {
+    public void setOagisComponentType(OagisComponentType oagisComponentType) {
         this.oagisComponentType = oagisComponentType;
     }
 
@@ -234,11 +244,11 @@ public class AggregateCoreComponent implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -258,11 +268,11 @@ public class AggregateCoreComponent implements Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -298,6 +308,14 @@ public class AggregateCoreComponent implements Serializable {
         isAbstract = anAbstract;
     }
 
+    public boolean isExtension() {
+        return OagisComponentType.Extension == getOagisComponentType();
+    }
+
+    public boolean isGlobalExtension() {
+        return isExtension() && "All Extension".equals(getObjectClassTerm());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -305,35 +323,13 @@ public class AggregateCoreComponent implements Serializable {
 
         AggregateCoreComponent that = (AggregateCoreComponent) o;
 
-        if (accId != that.accId) return false;
-        if (oagisComponentType != that.oagisComponentType) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (deprecated != that.deprecated) return false;
-        if (isAbstract != that.isAbstract) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (objectClassTerm != null ? !objectClassTerm.equals(that.objectClassTerm) : that.objectClassTerm != null)
-            return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (basedAccId != null ? !basedAccId.equals(that.basedAccId) : that.basedAccId != null) return false;
-        if (objectClassQualifier != null ? !objectClassQualifier.equals(that.objectClassQualifier) : that.objectClassQualifier != null)
-            return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        if (namespaceId != null ? !namespaceId.equals(that.namespaceId) : that.namespaceId != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentAccId != null ? currentAccId.equals(that.currentAccId) : that.currentAccId == null;
-
+        if (accId != 0L && accId == that.accId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -345,7 +341,7 @@ public class AggregateCoreComponent implements Serializable {
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (basedAccId != null ? basedAccId.hashCode() : 0);
         result = 31 * result + (objectClassQualifier != null ? objectClassQualifier.hashCode() : 0);
-        result = 31 * result + oagisComponentType;
+        result = 31 * result + (oagisComponentType != null ? oagisComponentType.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (namespaceId != null ? namespaceId.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -353,7 +349,7 @@ public class AggregateCoreComponent implements Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + revisionNum;
         result = 31 * result + revisionTrackingNum;
         result = 31 * result + (revisionAction != null ? revisionAction.hashCode() : 0);
@@ -391,5 +387,17 @@ public class AggregateCoreComponent implements Serializable {
                 ", deprecated=" + deprecated +
                 ", isAbstract=" + isAbstract +
                 '}';
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

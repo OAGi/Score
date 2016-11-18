@@ -10,9 +10,22 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate.dialect: org.hibernate.dialect.Oracle12cDialect
+      hibernate.id.new_generator_mappings: true
+      hibernate.jdbc.fetch_size: 100
+      hibernate.jdbc.batch_size: 25
+      hibernate.jdbc.batch_versioned_data: true
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.cache.use_second_level_cache: false
 
   batch:
     initializer:
+      enabled: false
+
+  mvc:
+    favicon:
       enabled: false
 
 jsf:
@@ -34,7 +47,7 @@ spring:
 # DataSource
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@docker:1521/xe
+    url: jdbc:oracle:thin:@docker:1521/xe.oracle.docker
     username: oagi
     password: oagi
     platform: oracle
@@ -47,6 +60,12 @@ logging:
 
 jsf:
   project-stage: Development
+
+server:
+  session:
+    timeout: 6000000
+    cookie:
+      max-age: 6000000
 
 # Staging environment
 ---
@@ -63,3 +82,9 @@ spring:
 
 jsf:
   project-stage: Production
+
+server:
+  session:
+    timeout: 6000000
+    cookie:
+      max-age: 6000000

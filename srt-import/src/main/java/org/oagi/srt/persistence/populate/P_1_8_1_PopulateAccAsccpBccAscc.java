@@ -32,6 +32,7 @@ import java.util.List;
 import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
 import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.repository.entity.OagisComponentType.*;
 
 @Component
 public class P_1_8_1_PopulateAccAsccpBccAscc {
@@ -93,7 +94,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyACC.setObjectClassTerm("Any Structured Content");
         anyACC.setDen(anyACC.getObjectClassTerm() + ". Details");
         anyACC.setDefinition("This is corresponding to the xsd:any with the processContents = “strict” and any namespace.");
-        anyACC.setOagisComponentType(5);
+        anyACC.setOagisComponentType(Embedded);
+        anyACC.setState(CoreComponentState.Published);
         anyACC.setOwnerUserId(importUtil.getUserId());
         anyACC.setCreatedBy(importUtil.getUserId());
         anyACC.setLastUpdatedBy(importUtil.getUserId());
@@ -107,6 +109,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         anyASCCP.setRoleOfAccId(anyACC.getAccId());
         anyASCCP.setDen(ANY_ASCCP_DEN);
         anyASCCP.setReusableIndicator(true);
+        anyASCCP.setState(CoreComponentState.Published);
         anyASCCP.setOwnerUserId(importUtil.getUserId());
         anyASCCP.setCreatedBy(importUtil.getUserId());
         anyASCCP.setLastUpdatedBy(importUtil.getUserId());
@@ -372,7 +375,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         asccp.setDefinition(definition);
         asccp.setRoleOfAccId(roleOfAccId);
         asccp.setDen(den);
-        asccp.setState(3);
+        asccp.setState(CoreComponentState.Published);
         asccp.setModule(module);
         asccp.setCreatedBy(importUtil.getUserId());
         asccp.setLastUpdatedBy(importUtil.getUserId());
@@ -422,14 +425,14 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
                 BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByGuid(guid);
                 if (bccp != null) {
                     Declaration particle = (isLocalElement) ? asccOrBccElement : refDecl;
-                    createBCC(acc, bccp, particle, sequenceKey++);
+                    createBCC(acc, bccp, particle, sequenceKey++, BasicCoreComponentEntityType.Element);
                 } else {
                     if (asccOrBccElement.canBeAscc()) {
                         if (createASCC(acc, asccOrBccElement, sequenceKey) != null) {
                             sequenceKey++;
                         }
                     } else {
-                        createBCC(acc, asccOrBccElement, sequenceKey++, 1);
+                        createBCC(acc, asccOrBccElement, sequenceKey++, BasicCoreComponentEntityType.Element);
                     }
                 }
             }
@@ -437,13 +440,13 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         for (AttrDecl bccpAttr : declaration.getAttributes()) {
             BasicCoreComponentProperty bccp = getOrCreateBCCP(bccpAttr, true);
-            createBCC(acc, bccp, bccpAttr, 0);
+            createBCC(acc, bccp, bccpAttr, BasicCoreComponentEntityType.Attribute);
         }
 
         return acc;
     }
 
-    AggregateCoreComponent doCreateACC(Declaration declaration, int oagisComponentType) {
+    AggregateCoreComponent doCreateACC(Declaration declaration, OagisComponentType oagisComponentType) {
         String name = declaration.getName();
         int idx = name.lastIndexOf("Type");
         String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
@@ -478,7 +481,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         acc.setCreatedBy(importUtil.getUserId());
         acc.setLastUpdatedBy(importUtil.getUserId());
         acc.setOwnerUserId(importUtil.getUserId());
-        acc.setState(3);
+        acc.setState(CoreComponentState.Published);
         acc.setModule(module);
         acc.setDeprecated(false);
         if (declaration instanceof TypeDecl) {
@@ -496,16 +499,16 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         int idx = name.lastIndexOf("Type");
         String objectClassTerm = Utility.spaceSeparator((idx == -1) ? name : name.substring(0, idx));
 
-        int oagisComponentType = 1;
+        OagisComponentType oagisComponentType = Semantics;
         if (objectClassTerm.endsWith("Base")) {
-            oagisComponentType = 0;
+            oagisComponentType = Base;
         } else if (objectClassTerm.endsWith("Extension") ||
                 objectClassTerm.equals("Open User Area") ||
                 objectClassTerm.equals("Any User Area") ||
                 objectClassTerm.equals("All Extension")) {
-            oagisComponentType = 2;
+            oagisComponentType = Extension;
         } else if (objectClassTerm.endsWith("Group")) {
-            oagisComponentType = 3;
+            oagisComponentType = SemanticGroup;
         }
 
         return doCreateACC(declaration, oagisComponentType);
@@ -545,7 +548,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         ascc.setToAsccpId(toAsccp.getAsccpId());
         ascc.setDen(den);
         ascc.setDefinition(definition);
-        ascc.setState(3);
+        ascc.setState(CoreComponentState.Published);
         ascc.setDeprecated(false);
         ascc.setReleaseId(importUtil.getReleaseId());
         ascc.setCreatedBy(importUtil.getUserId());
@@ -557,20 +560,22 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
-                              Declaration declaration, int sequenceKey, int entityType) {
+                              Declaration declaration, int sequenceKey,
+                              BasicCoreComponentEntityType entityType) {
         BasicCoreComponentProperty bccp = getBCCP(declaration);
         return createBCC(fromAcc, bccp, declaration, sequenceKey, entityType);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
                               BasicCoreComponentProperty toBccp,
-                              Declaration declaration, int entityType) {
+                              Declaration declaration,
+                              BasicCoreComponentEntityType entityType) {
         return createBCC(fromAcc, toBccp, declaration, 0, entityType);
     }
 
     private boolean createBCC(AggregateCoreComponent fromAcc,
                               BasicCoreComponentProperty toBccp,
-                              Declaration declaration, int sequenceKey, int entityType) {
+                              Declaration declaration, int sequenceKey, BasicCoreComponentEntityType entityType) {
         String guid = declaration.getId();
         long fromAccId = fromAcc.getAccId();
         long toBccpId = toBccp.getBccpId();
@@ -597,7 +602,7 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         }
         bcc.setEntityType(entityType);
         bcc.setDen(den);
-        bcc.setState(3);
+        bcc.setState(CoreComponentState.Published);
         bcc.setDefinition(declaration.getDefinition());
         bcc.setDeprecated(false);
         bcc.setReleaseId(importUtil.getReleaseId());
@@ -605,7 +610,11 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
         bcc.setLastUpdatedBy(importUtil.getUserId());
         bcc.setOwnerUserId(importUtil.getUserId());
         bcc.setNillable(declaration.isNillable());
-        bcc.setDefaultValue(declaration.getDefaultValue());
+        String defaultValue = declaration.getDefaultValue();
+        if (StringUtils.isEmpty(defaultValue)) {
+            defaultValue = toBccp.getDefaultValue();
+        }
+        bcc.setDefaultValue(defaultValue);
         bccRepository.saveAndFlush(bcc);
 
         return true;
@@ -647,10 +656,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
 
         BasicCoreComponentProperty bccp = bccpRepository.findBccpIdAndDenByPropertyTermAndBdtId(propertyTerm, bdtId);
         if (bccp != null) {
-            return bccp;
-        }
 
-        if (createIfAbsent) {
+        } else if (createIfAbsent) {
             String representationTerm = dt.getDataTypeTerm();
             String den = Utility.firstToUpperCase(propertyTerm) + ". " + representationTerm;
 
@@ -661,21 +668,26 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
             bccp.setBdtId(bdtId);
             bccp.setRepresentationTerm(representationTerm);
             bccp.setDen(den);
-            bccp.setState(3);
+            bccp.setState(CoreComponentState.Published);
             bccp.setCreatedBy(importUtil.getUserId());
             bccp.setLastUpdatedBy(importUtil.getUserId());
             bccp.setOwnerUserId(importUtil.getUserId());
             bccp.setDeprecated(false);
             bccp.setReleaseId(importUtil.getReleaseId());
             bccp.setNamespaceId(importUtil.getNamespaceId());
-            Module module = declaration.getModule();
-            bccp.setModule(module);
             bccp.setNillable(declaration.isNillable());
-            bccp.setDefaultValue(declaration.getDefaultValue());
             bccpRepository.saveAndFlush(bccp);
-            return bccp;
         } else {
             throw new IllegalStateException("Could not find BCCP by property term '" + propertyTerm + "' and type GUID " + typeGuid);
         }
+
+        /*
+         * Issue #98
+         *
+         * BCCP's default value moves to BCC
+         */
+        bccp = new BasicCoreComponentProperty(bccp); // To prevent unexpected update data by Hibernate
+        bccp.setDefaultValue(declaration.getDefaultValue());
+        return bccp;
     }
 }

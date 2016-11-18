@@ -1,28 +1,49 @@
 package org.oagi.srt.repository.entity;
 
+<<<<<<< HEAD
+=======
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+>>>>>>> develop
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "bbie_sc")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BasicBusinessInformationEntitySupplementaryComponent implements Serializable, IdEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_SC_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 5000)
     private long bbieScId;
 
+<<<<<<< HEAD
     @Column(nullable = false, length = 41)
     private String guid;
 
     @Column(nullable = false)
-    private long bbieId;
+=======
+    @Column(nullable = false, length = 41, updatable = false)
+    private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
+>>>>>>> develop
+    private long bbieId;
+    @Transient
+    private BasicBusinessInformationEntity bbie;
+
+    @Column(nullable = false, updatable = false)
     private long dtScId;
 
     @Column
@@ -59,8 +80,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
+    @Transient
+    private TopLevelAbie ownerTopLevelAbie;
 
     @Override
     public long getId() {
@@ -96,6 +119,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.bbieId = bbieId;
     }
 
+    public void setBbie(BasicBusinessInformationEntity bbie) {
+        this.bbie = bbie;
+    }
+
     public long getDtScId() {
         return dtScId;
     }
@@ -104,28 +131,56 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.dtScId = dtScId;
     }
 
+    public void setDtSc(DataTypeSupplementaryComponent dtSc) {
+        if (dtSc != null) {
+            setDtScId(dtSc.getDtScId());
+        }
+    }
+
     public long getDtScPriRestriId() {
         return (dtScPriRestriId == null) ? 0L : dtScPriRestriId;
     }
 
-    public void setDtScPriRestriId(long dtScPriRestriId) {
+    public void setDtScPriRestriId(Long dtScPriRestriId) {
         this.dtScPriRestriId = dtScPriRestriId;
+    }
+
+    public void setDtScPriRestri(BusinessDataTypeSupplementaryComponentPrimitiveRestriction dtScPriRestri) {
+        if (dtScPriRestri != null) {
+            setDtScPriRestriId(dtScPriRestri.getBdtScPriRestriId());
+        }
     }
 
     public long getCodeListId() {
         return (codeListId == null) ? 0L : codeListId;
     }
 
-    public void setCodeListId(long codeListId) {
+    public void setCodeListId(Long codeListId) {
         this.codeListId = codeListId;
+    }
+
+    public void setCodeList(CodeList codeList) {
+        if (codeList != null) {
+            setCodeListId(codeList.getCodeListId());
+        }
     }
 
     public long getAgencyIdListId() {
         return (agencyIdListId == null) ? 0L : agencyIdListId;
     }
 
-    public void setAgencyIdListId(long agencyIdListId) {
-        this.agencyIdListId = agencyIdListId;
+    public void setAgencyIdListId(Long agencyIdListId) {
+        if (agencyIdListId != null && agencyIdListId > 0L) {
+            this.agencyIdListId = agencyIdListId;
+        } else {
+            this.agencyIdListId = null;
+        }
+    }
+
+    public void setAgencyIdList(AgencyIdList agencyIdList) {
+        if (agencyIdList != null) {
+            setAgencyIdListId(agencyIdList.getAgencyIdListId());
+        }
     }
 
     public int getCardinalityMin() {
@@ -165,9 +220,13 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
     }
 
     public void setDefinition(String definition) {
-        if (!StringUtils.isEmpty(definition)) {
-            this.definition = definition;
+        if (definition != null) {
+            definition = definition.trim();
         }
+        if (StringUtils.isEmpty(definition)) {
+            definition = null;
+        }
+        this.definition = definition;
     }
 
     public String getRemark() {
@@ -202,6 +261,10 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -209,6 +272,7 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
 
         BasicBusinessInformationEntitySupplementaryComponent that = (BasicBusinessInformationEntitySupplementaryComponent) o;
 
+<<<<<<< HEAD
         if (bbieScId != that.bbieScId) return false;
         if (bbieId != that.bbieId) return false;
         if (dtScId != that.dtScId) return false;
@@ -228,6 +292,15 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
         if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
         return bizTerm != null ? bizTerm.equals(that.bizTerm) : that.bizTerm == null;
 
+=======
+        if (bbieScId != 0L && bbieScId == that.bbieScId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
+>>>>>>> develop
     }
 
     @Override
@@ -271,5 +344,104 @@ public class BasicBusinessInformationEntitySupplementaryComponent implements Ser
                 ", used=" + used +
                 ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public BasicBusinessInformationEntitySupplementaryComponent() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                BasicBusinessInformationEntitySupplementaryComponent bbiesc = (BasicBusinessInformationEntitySupplementaryComponent) object;
+                if (bbiesc.bbie != null) {
+                    bbiesc.setBbieId(bbiesc.bbie.getBbieId());
+                }
+                if (bbiesc.bbie != null) {
+                    bbiesc.setBbieId(bbiesc.bbie.getBbieId());
+                }
+                if (bbiesc.ownerTopLevelAbie != null) {
+                    bbiesc.setOwnerTopLevelAbieId(bbiesc.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

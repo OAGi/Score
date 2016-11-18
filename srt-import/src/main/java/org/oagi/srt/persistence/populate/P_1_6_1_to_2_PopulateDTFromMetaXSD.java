@@ -7,6 +7,7 @@ import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
 import org.oagi.srt.repository.DataTypeRepository;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.BusinessDataTypePrimitiveRestriction;
+import org.oagi.srt.repository.entity.CoreComponentState;
 import org.oagi.srt.repository.entity.DataType;
 import org.oagi.srt.repository.entity.Module;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
 
             dataType.setContentComponentDefinition(null);
             dataType.setRevisionDoc(null);
-            dataType.setState(3);
+            dataType.setState(CoreComponentState.Published);
             dataType.setCreatedBy(importUtil.getUserId());
             dataType.setLastUpdatedBy(importUtil.getUserId());
             dataType.setOwnerUserId(importUtil.getUserId());

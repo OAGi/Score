@@ -119,13 +119,13 @@ public class DefaultImportedDataProvider implements ImportedDataProvider, Initia
         findBccpMap = findBCCPList.stream()
                 .collect(Collectors.toMap(BasicCoreComponentProperty::getBccpId, Function.identity()));
 
-        List<BasicCoreComponent> bccList = bccRepository.findAll();
+        List<BasicCoreComponent> bccList = bccRepository.findAllWithRevisionNum(0);
         findBCCByToBccpIdMap = bccList.stream()
                 .collect(Collectors.groupingBy(BasicCoreComponent::getToBccpId));
         findBccByFromAccIdMap = bccList.stream()
                 .collect(Collectors.groupingBy(BasicCoreComponent::getFromAccId));
 
-        findAsccByFromAccIdMap = asccRepository.findAll().stream()
+        findAsccByFromAccIdMap = asccRepository.findAllWithRevisionNum(0).stream()
                 .collect(Collectors.groupingBy(AssociationCoreComponent::getFromAccId));
 
         logger.info("Ready for " + getClass().getSimpleName() + " in " + (System.currentTimeMillis() - s) / 1000d + " seconds");

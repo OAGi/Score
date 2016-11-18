@@ -1,17 +1,27 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "code_list_value")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CodeListValue implements Serializable {
 
     public static final String SEQUENCE_NAME = "CODE_LIST_VALUE_ID_SEQ";
 
+    public enum Color {
+        Blue,
+        BrightRed,
+        DullRed,
+        Green
+    }
+
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long codeListValueId;
 
     @Column
@@ -40,7 +50,7 @@ public class CodeListValue implements Serializable {
     private boolean extensionIndicator;
 
     @Transient
-    private String color;
+    private Color color;
 
     @Transient
     private boolean disabled;
@@ -117,12 +127,56 @@ public class CodeListValue implements Serializable {
         this.extensionIndicator = extensionIndicator;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
+        if (Color.BrightRed.equals(this.color)) {
+            throw new IllegalStateException("Can't change status of this object.");
+        }
+
         this.color = color;
+
+        switch (color) {
+            case Blue:
+                setUsedIndicator(true);
+                setLockedIndicator(false);
+                setExtensionIndicator(false);
+                break;
+            case BrightRed:
+                setUsedIndicator(false);
+                setLockedIndicator(true);
+                setExtensionIndicator(false);
+                break;
+            case DullRed:
+                setUsedIndicator(false);
+                setLockedIndicator(false);
+                setExtensionIndicator(false);
+                break;
+            case Green:
+                setUsedIndicator(true);
+                setLockedIndicator(false);
+                setExtensionIndicator(true);
+                break;
+        }
+    }
+
+    @PostLoad
+    public void afterLoaded() {
+        if (isLockedIndicator()) {
+            this.color = Color.BrightRed;
+        } else {
+            if (isExtensionIndicator()) {
+                this.color = Color.Green;
+            } else {
+                if (isUsedIndicator()) {
+                    this.color = Color.Blue;
+                } else {
+                    this.color = Color.DullRed;
+                }
+            }
+        }
     }
 
     public boolean isDisabled() {
@@ -140,19 +194,8 @@ public class CodeListValue implements Serializable {
 
         CodeListValue that = (CodeListValue) o;
 
-        if (codeListValueId != that.codeListValueId) return false;
-        if (codeListId != that.codeListId) return false;
-        if (usedIndicator != that.usedIndicator) return false;
-        if (lockedIndicator != that.lockedIndicator) return false;
-        if (extensionIndicator != that.extensionIndicator) return false;
-        if (disabled != that.disabled) return false;
-        if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (definitionSource != null ? !definitionSource.equals(that.definitionSource) : that.definitionSource != null)
-            return false;
-        return color != null ? color.equals(that.color) : that.color == null;
-
+        if (codeListValueId != 0L && codeListValueId == that.codeListValueId) return true;
+        return false;
     }
 
     @Override
@@ -166,8 +209,6 @@ public class CodeListValue implements Serializable {
         result = 31 * result + (usedIndicator ? 1 : 0);
         result = 31 * result + (lockedIndicator ? 1 : 0);
         result = 31 * result + (extensionIndicator ? 1 : 0);
-        result = 31 * result + (color != null ? color.hashCode() : 0);
-        result = 31 * result + (disabled ? 1 : 0);
         return result;
     }
 

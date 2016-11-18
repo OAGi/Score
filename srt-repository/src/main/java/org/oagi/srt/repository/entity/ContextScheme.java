@@ -1,18 +1,21 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "ctx_scheme")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ContextScheme implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_SCHEME_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long ctxSchemeId;
 
     @Column(nullable = false, length = 41)
@@ -34,8 +37,9 @@ public class ContextScheme implements Serializable {
     @Column(nullable = false, length = 45)
     private String schemeVersionId;
 
-    @Column(nullable = false)
-    private long ctxCategoryId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ctx_category_id", nullable = false)
+    private ContextCategory contextCategory;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -118,12 +122,12 @@ public class ContextScheme implements Serializable {
         this.schemeVersionId = schemeVersionId;
     }
 
-    public long getCtxCategoryId() {
-        return ctxCategoryId;
+    public ContextCategory getContextCategory() {
+        return contextCategory;
     }
 
-    public void setCtxCategoryId(long ctxCategoryId) {
-        this.ctxCategoryId = ctxCategoryId;
+    public void setContextCategory(ContextCategory contextCategory) {
+        this.contextCategory = contextCategory;
     }
 
     public long getCreatedBy() {
@@ -165,22 +169,13 @@ public class ContextScheme implements Serializable {
 
         ContextScheme that = (ContextScheme) o;
 
-        if (ctxSchemeId != that.ctxSchemeId) return false;
-        if (ctxCategoryId != that.ctxCategoryId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (schemeId != null ? !schemeId.equals(that.schemeId) : that.schemeId != null) return false;
-        if (schemeName != null ? !schemeName.equals(that.schemeName) : that.schemeName != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (schemeAgencyId != null ? !schemeAgencyId.equals(that.schemeAgencyId) : that.schemeAgencyId != null)
-            return false;
-        if (schemeVersionId != null ? !schemeVersionId.equals(that.schemeVersionId) : that.schemeVersionId != null)
-            return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (ctxSchemeId != 0L && ctxSchemeId == that.ctxSchemeId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -192,7 +187,7 @@ public class ContextScheme implements Serializable {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (schemeAgencyId != null ? schemeAgencyId.hashCode() : 0);
         result = 31 * result + (schemeVersionId != null ? schemeVersionId.hashCode() : 0);
-        result = 31 * result + (int) (ctxCategoryId ^ (ctxCategoryId >>> 32));
+        result = 31 * result + (contextCategory != null ? contextCategory.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
@@ -210,7 +205,7 @@ public class ContextScheme implements Serializable {
                 ", description='" + description + '\'' +
                 ", schemeAgencyId='" + schemeAgencyId + '\'' +
                 ", schemeVersionId='" + schemeVersionId + '\'' +
-                ", ctxCategoryId=" + ctxCategoryId +
+                ", contextCategory=" + contextCategory +
                 ", createdBy=" + createdBy +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", creationTimestamp=" + creationTimestamp +

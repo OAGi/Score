@@ -11,6 +11,7 @@ import org.jdom2.output.XMLOutputter;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.export.model.*;
+import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.oagi.srt.repository.entity.OagisComponentType.Extension;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 @Scope(SCOPE_PROTOTYPE)
@@ -46,6 +48,9 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
     private final Namespace OAGI_NS = Namespace.getNamespace("", SRTConstants.OAGI_NS);
     private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
+
+    @Autowired
+    private CoreComponentProvider coreComponentProvider;
 
     @Autowired
     private CoreComponentService coreComponentService;
@@ -149,16 +154,6 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         enumerationTypeElement.addContent(restrictionElement);
 
         restrictionElement.setAttribute("base", "xsd:token");
-
-        Element minLengthElement = new Element("minLength", XSD_NS);
-        restrictionElement.addContent(minLengthElement);
-
-        minLengthElement.setAttribute("value", "" + agencyId.getMinLengthOfValues());
-
-        Element maxLengthElement = new Element("maxLength", XSD_NS);
-        restrictionElement.addContent(maxLengthElement);
-
-        maxLengthElement.setAttribute("value", "" + agencyId.getMaxLengthOfValues());
 
         for (AgencyIdValue value : agencyId.getValues()) {
             Element enumerationElement = new Element("enumeration", XSD_NS);
@@ -355,8 +350,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     @Override
     public void visitACCComplexType(ACCComplexType accComplexType) throws Exception {
         switch (accComplexType.getOagisComponentType()) {
-            case 6:
-            case 7:
+            case OAGIS10Nouns:
+            case OAGIS10BODs:
                 processOAGIS10(accComplexType);
                 break;
             default:
@@ -376,10 +371,10 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
 
         String delimiter;
         switch (accComplexType.getOagisComponentType()) {
-            case 6:
+            case OAGIS10Nouns:
                 delimiter = "Nouns";
                 break;
-            case 7:
+            case OAGIS10BODs:
                 delimiter = "BODs";
                 break;
             default:
@@ -418,7 +413,8 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
         complexTypeElement.setAttribute("id", accComplexType.getGuid());
 
         Element sequenceElement = new Element("sequence", XSD_NS);
-        List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(accComplexType.getRawId());
+        List<CoreComponent> coreComponents = coreComponentService.getCoreComponents(
+                accComplexType.getRawId(), coreComponentProvider);
         // for ASCC or BCC (Sequence Key != 0)
         for (CoreComponent coreComponent : coreComponents) {
             if (coreComponent.getDen().endsWith("Any Structured Content")) {
@@ -482,7 +478,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
             extensionElement.setAttribute("base", basedACC.getTypeName());
             complexContentElement.addContent(extensionElement);
 
-            if (!sequenceElement.getContent().isEmpty() || accComplexType.getOagisComponentType()==2) {
+            if (!sequenceElement.getContent().isEmpty() || accComplexType.getOagisComponentType() == Extension) {
                 extensionElement.addContent(sequenceElement);
             }
         } else {

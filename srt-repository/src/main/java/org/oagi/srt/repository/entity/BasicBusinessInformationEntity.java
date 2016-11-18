@@ -1,37 +1,51 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "bbie")
-public class BasicBusinessInformationEntity implements Serializable, BusinessInformationEntity, IdEntity, IGuidEntity {
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
+public class BasicBusinessInformationEntity
+        implements Serializable, TimestampAware, BusinessInformationEntity, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "BBIE_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 5000)
     private long bbieId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedBccId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long fromAbieId;
+    @Transient
+    private AggregateBusinessInformationEntity fromAbie;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long toBbiepId;
+    @Transient
+    private BasicBusinessInformationEntityProperty toBbiep;
 
     @Column
     private Long bdtPriRestriId;
 
     @Column
     private Long codeListId;
+
+    @Column
+    private Long agencyIdListId;
 
     @Column(nullable = false)
     private int cardinalityMin;
@@ -72,25 +86,16 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private double seqKey;
 
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
-
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
-    }
+    @Transient
+    private TopLevelAbie ownerTopLevelAbie;
 
     @Override
     public long getId() {
@@ -134,6 +139,10 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.fromAbieId = fromAbieId;
     }
 
+    public void setFromAbie(AggregateBusinessInformationEntity fromAbie) {
+        this.fromAbie = fromAbie;
+    }
+
     public long getToBbiepId() {
         return toBbiepId;
     }
@@ -142,12 +151,26 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.toBbiepId = toBbiepId;
     }
 
+    public void setToBbiep(BasicBusinessInformationEntityProperty toBbiep) {
+        this.toBbiep = toBbiep;
+    }
+
     public long getBdtPriRestriId() {
         return (bdtPriRestriId == null) ? 0L : bdtPriRestriId;
     }
 
     public void setBdtPriRestriId(Long bdtPriRestriId) {
-        this.bdtPriRestriId = bdtPriRestriId;
+        if (bdtPriRestriId != null && bdtPriRestriId > 0L) {
+            this.bdtPriRestriId = bdtPriRestriId;
+        } else {
+            this.bdtPriRestriId = null;
+        }
+    }
+
+    public void setBdtPriRestri(BusinessDataTypePrimitiveRestriction bdtPriRestri) {
+        if (bdtPriRestri != null) {
+            setBdtPriRestriId(bdtPriRestri.getBdtPriRestriId());
+        }
     }
 
     public long getCodeListId() {
@@ -155,7 +178,35 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
     }
 
     public void setCodeListId(Long codeListId) {
-        this.codeListId = codeListId;
+        if (codeListId != null && codeListId > 0L) {
+            this.codeListId = codeListId;
+        } else {
+            this.codeListId = null;
+        }
+    }
+
+    public void setCodeList(CodeList codeList) {
+        if (codeList != null) {
+            setCodeListId(codeList.getCodeListId());
+        }
+    }
+
+    public long getAgencyIdListId() {
+        return (agencyIdListId == null) ? 0L : agencyIdListId;
+    }
+
+    public void setAgencyIdListId(Long agencyIdListId) {
+        if (agencyIdListId != null && agencyIdListId > 0L) {
+            this.agencyIdListId = agencyIdListId;
+        } else {
+            this.agencyIdListId = null;
+        }
+    }
+
+    public void setAgencyIdList(AgencyIdList agencyIdList) {
+        if (agencyIdList != null) {
+            setAgencyIdListId(agencyIdList.getAgencyIdListId());
+        }
     }
 
     public int getCardinalityMin() {
@@ -284,6 +335,10 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -291,31 +346,13 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
 
         BasicBusinessInformationEntity that = (BasicBusinessInformationEntity) o;
 
-        if (bbieId != that.bbieId) return false;
-        if (basedBccId != that.basedBccId) return false;
-        if (fromAbieId != that.fromAbieId) return false;
-        if (toBbiepId != that.toBbiepId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (nillable != that.nillable) return false;
-        if (nill != that.nill) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (Double.compare(that.seqKey, seqKey) != 0) return false;
-        if (used != that.used) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (bdtPriRestriId != null ? !bdtPriRestriId.equals(that.bdtPriRestriId) : that.bdtPriRestriId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        if (defaultValue != null ? !defaultValue.equals(that.defaultValue) : that.defaultValue != null) return false;
-        if (fixedValue != null ? !fixedValue.equals(that.fixedValue) : that.fixedValue != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (bbieId != 0L && bbieId == that.bbieId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -329,6 +366,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
         result = 31 * result + (int) (toBbiepId ^ (toBbiepId >>> 32));
         result = 31 * result + (bdtPriRestriId != null ? bdtPriRestriId.hashCode() : 0);
         result = 31 * result + (codeListId != null ? codeListId.hashCode() : 0);
+        result = 31 * result + (agencyIdListId != null ? agencyIdListId.hashCode() : 0);
         result = 31 * result + cardinalityMin;
         result = 31 * result + cardinalityMax;
         result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
@@ -358,6 +396,7 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
                 ", toBbiepId=" + toBbiepId +
                 ", bdtPriRestriId=" + bdtPriRestriId +
                 ", codeListId=" + codeListId +
+                ", agencyIdListId=" + agencyIdListId +
                 ", cardinalityMin=" + cardinalityMin +
                 ", cardinalityMax=" + cardinalityMax +
                 ", defaultValue='" + defaultValue + '\'' +
@@ -374,5 +413,103 @@ public class BasicBusinessInformationEntity implements Serializable, BusinessInf
                 ", used=" + used +
                 ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public BasicBusinessInformationEntity() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                BasicBusinessInformationEntity bbie = (BasicBusinessInformationEntity) object;
+                if (bbie.fromAbie != null) {
+                    bbie.setFromAbieId(bbie.fromAbie.getAbieId());
+                }
+                if (bbie.toBbiep != null) {
+                    bbie.setToBbiepId(bbie.toBbiep.getBbiepId());
+                }
+                if (bbie.ownerTopLevelAbie != null) {
+                    bbie.setOwnerTopLevelAbieId(bbie.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

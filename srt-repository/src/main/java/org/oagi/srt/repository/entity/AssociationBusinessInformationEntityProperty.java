@@ -1,28 +1,40 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+import org.springframework.util.StringUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "asbiep")
-public class AssociationBusinessInformationEntityProperty implements Serializable, IdEntity, IGuidEntity {
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
+public class AssociationBusinessInformationEntityProperty
+        implements Serializable, TimestampAware, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "ASBIEP_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
     private long asbiepId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedAsccpId;
+    @Transient
+    private AssociationCoreComponentProperty basedAsccp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long roleOfAbieId;
+    @Transient
+    private AggregateBusinessInformationEntity roleOfAbie;
 
     @Lob
     @Column(length = 10 * 1024)
@@ -48,19 +60,10 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateTimestamp;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
-
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
-    }
+    @Transient
+    private TopLevelAbie ownerTopLevelAbie;
 
     @Override
     public long getId() {
@@ -96,6 +99,10 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
         this.basedAsccpId = basedAsccpId;
     }
 
+    public void setBasedAsccp(AssociationCoreComponentProperty basedAsccp) {
+        this.basedAsccp = basedAsccp;
+    }
+
     public long getRoleOfAbieId() {
         return roleOfAbieId;
     }
@@ -104,11 +111,21 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
         this.roleOfAbieId = roleOfAbieId;
     }
 
+    public void setRoleOfAbie(AggregateBusinessInformationEntity roleOfAbie) {
+        this.roleOfAbie = roleOfAbie;
+    }
+
     public String getDefinition() {
         return definition;
     }
 
     public void setDefinition(String definition) {
+        if (definition != null) {
+            definition = definition.trim();
+        }
+        if (StringUtils.isEmpty(definition)) {
+            definition = null;
+        }
         this.definition = definition;
     }
 
@@ -168,6 +185,10 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -175,54 +196,110 @@ public class AssociationBusinessInformationEntityProperty implements Serializabl
 
         AssociationBusinessInformationEntityProperty that = (AssociationBusinessInformationEntityProperty) o;
 
-        if (asbiepId != that.asbiepId) return false;
-        if (basedAsccpId != that.basedAsccpId) return false;
-        if (roleOfAbieId != that.roleOfAbieId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        if (bizTerm != null ? !bizTerm.equals(that.bizTerm) : that.bizTerm != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        return lastUpdateTimestamp != null ? lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp == null;
-
+        if (asbiepId != 0L && asbiepId == that.asbiepId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    @Override
-    public int hashCode() {
-        int result = (int) (asbiepId ^ (asbiepId >>> 32));
-        result = 31 * result + (guid != null ? guid.hashCode() : 0);
-        result = 31 * result + (int) (basedAsccpId ^ (basedAsccpId >>> 32));
-        result = 31 * result + (int) (roleOfAbieId ^ (roleOfAbieId >>> 32));
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        result = 31 * result + (remark != null ? remark.hashCode() : 0);
-        result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
-        result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
-        result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
-        return result;
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public AssociationBusinessInformationEntityProperty() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                AssociationBusinessInformationEntityProperty asbiep = (AssociationBusinessInformationEntityProperty) object;
+                if (asbiep.basedAsccp != null) {
+                    asbiep.setBasedAsccpId(asbiep.basedAsccp.getAsccpId());
+                }
+                if (asbiep.roleOfAbie != null) {
+                    asbiep.setRoleOfAbieId(asbiep.roleOfAbie.getAbieId());
+                }
+                if (asbiep.ownerTopLevelAbie != null) {
+                    asbiep.setOwnerTopLevelAbieId(asbiep.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+            }
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
+        addUpdateEventListener(timestampAwareEventListener);
     }
 
-    @Override
-    public String toString() {
-        return "AssociationBusinessInformationEntityProperty{" +
-                "asbiepId=" + asbiepId +
-                ", guid='" + guid + '\'' +
-                ", basedAsccpId=" + basedAsccpId +
-                ", roleOfAbieId=" + roleOfAbieId +
-                ", definition='" + definition + '\'' +
-                ", remark='" + remark + '\'' +
-                ", bizTerm='" + bizTerm + '\'' +
-                ", createdBy=" + createdBy +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                ", creationTimestamp=" + creationTimestamp +
-                ", lastUpdateTimestamp=" + lastUpdateTimestamp +
-                ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
-                '}';
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

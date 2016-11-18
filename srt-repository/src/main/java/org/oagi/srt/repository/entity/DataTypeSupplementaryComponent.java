@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "dt_sc")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class DataTypeSupplementaryComponent implements Serializable {
 
     public static final String SEQUENCE_NAME = "DT_SC_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long dtScId;
 
     @Column(nullable = false, length = 41)
@@ -118,17 +121,13 @@ public class DataTypeSupplementaryComponent implements Serializable {
 
         DataTypeSupplementaryComponent that = (DataTypeSupplementaryComponent) o;
 
-        if (dtScId != that.dtScId) return false;
-        if (ownerDtId != that.ownerDtId) return false;
-        if (cardinalityMin != that.cardinalityMin) return false;
-        if (cardinalityMax != that.cardinalityMax) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (representationTerm != null ? !representationTerm.equals(that.representationTerm) : that.representationTerm != null)
-            return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        return basedDtScId != null ? basedDtScId.equals(that.basedDtScId) : that.basedDtScId == null;
-
+        if (dtScId != 0L && dtScId == that.dtScId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -162,11 +162,18 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
             List<BasicCoreComponent> bccList = importedDataProvider.findBCCByToBccpId(bccp.getBccpId());
             if (isAvailable(bccList)) {
                 DataType bdt = importedDataProvider.findDT(bccp.getBdtId());
-
-                SchemaModule schemaModule = moduleMap.get(bccp.getModule().getModuleId());
-                schemaModule.addBCCP(
-                        new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen(),
-                                bccp.isNillable(), bccp.getDefaultValue()));
+                Module module = bccp.getModule();
+                /*
+                 * Issue #98
+                 *
+                 * BCCP attribute has no module_id.
+                 */
+                if (module != null) {
+                    SchemaModule schemaModule = moduleMap.get(module.getModuleId());
+                    schemaModule.addBCCP(
+                            new BCCP(bccp.getGuid(), bccp.getPropertyTerm(), bdt.getDen(),
+                                    bccp.isNillable(), bccp.getDefaultValue()));
+                }
             }
         }
     }
@@ -177,7 +184,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
         }
 
         int sumOfEntityTypes = bccList.stream()
-                .mapToInt(e -> e.getEntityType())
+                .mapToInt(e -> e.getEntityType().getValue())
                 .sum();
         return sumOfEntityTypes != 0;
     }

@@ -37,6 +37,7 @@ import java.util.*;
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
 import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
+import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
 /**
  * @author Yunsu Lee
@@ -435,7 +436,7 @@ public class P_1_7_PopulateQBDTInDT {
 
         String definition = dataTypeInfoHolder.getDefinition();
         dataType.setDefinition(definition);
-        dataType.setState(3);
+        dataType.setState(Published);
         dataType.setCreatedBy(importUtil.getUserId());
         dataType.setLastUpdatedBy(importUtil.getUserId());
         dataType.setOwnerUserId(importUtil.getUserId());
@@ -519,7 +520,7 @@ public class P_1_7_PopulateQBDTInDT {
         bccp.setBdtId(dataType.getDtId());
         bccp.setDen(Utility.firstToUpperCase(propertyTerm) + ". " + dataType.getDataTypeTerm());
         bccp.setDefinition(definition);
-        bccp.setState(3);
+        bccp.setState(Published);
         bccp.setCreatedBy(importUtil.getUserId());
         bccp.setLastUpdatedBy(importUtil.getUserId());
         bccp.setOwnerUserId(importUtil.getUserId());
@@ -870,7 +871,7 @@ public class P_1_7_PopulateQBDTInDT {
         dataType.setContentComponentDen(den.substring(0, den.indexOf(".")) + ". Content");
         String definition = dataTypeInfoHolder.getDefinition();
         dataType.setDefinition(definition);
-        dataType.setState(3);
+        dataType.setState(Published);
         dataType.setCreatedBy(importUtil.getUserId());
         dataType.setLastUpdatedBy(importUtil.getUserId());
         dataType.setOwnerUserId(importUtil.getUserId());

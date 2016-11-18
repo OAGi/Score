@@ -6,6 +6,9 @@ import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.BusinessInformationEntityService;
 import org.oagi.srt.service.CoreComponentService;
+import org.oagi.srt.service.ExtensionService;
+import org.oagi.srt.web.jsf.beans.codelist.CodeListBean;
+import org.oagi.srt.web.jsf.beans.context.business.BusinessContextHandler;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
@@ -22,15 +25,24 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
+import static org.oagi.srt.repository.entity.BasicCoreComponentEntityType.Attribute;
 
 @Controller
 @Scope("view")
@@ -49,6 +61,9 @@ public class TopLevelABIEHandler implements Serializable {
     private BusinessInformationEntityService bieService;
 
     @Autowired
+    private ExtensionService extensionService;
+
+    @Autowired
     private CodeListRepository codeListRepository;
 
     @Autowired
@@ -65,6 +80,9 @@ public class TopLevelABIEHandler implements Serializable {
 
     @Autowired
     private AssociationCoreComponentPropertyRepository asccpRepository;
+
+    @Autowired
+    private TopLevelConceptRepository topLevelConceptRepository;
 
     @Autowired
     private BasicCoreComponentRepository bccRepository;
@@ -126,9 +144,9 @@ public class TopLevelABIEHandler implements Serializable {
     private String propertyTerm;
     private String den;
     private String definition;
-    private List<AssociationCoreComponentProperty> asccpVOs;
+    private List<TopLevelConcept> asccpVOs;
 
-    private AssociationCoreComponentProperty selected;
+    private TopLevelConcept selected;
     private BusinessContext bCSelected;
 
     private long maxABIEId;
@@ -145,7 +163,9 @@ public class TopLevelABIEHandler implements Serializable {
         maxBIEID = bbieRepository.count();
         maxBBIESCID = bbiescRepository.count();
 
-        asccpVOs = asccpRepository.findAllOrderByPropertyTermAsc();
+        asccpVOs = topLevelConceptRepository.findAll().stream()
+                .sorted((a, b) -> a.getPropertyTerm().compareTo(b.getPropertyTerm()))
+                .collect(Collectors.toList());
     }
 
     public BarChartModel getBarModel() {
@@ -296,7 +316,6 @@ public class TopLevelABIEHandler implements Serializable {
 
                 BusinessContext businessContext =
                         businessContextRepository.findOne(abie.getBizCtxId());
-
                 abie.setBizCtxName(businessContext.getName());
 
                 ABIEView aABIEView = applicationContext.getBean(ABIEView.class,
@@ -328,7 +347,7 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void search() {
-        asccpVOs = asccpRepository.findByPropertyTermContaining(getPropertyTerm());
+        asccpVOs = topLevelConceptRepository.findByPropertyTermContaining(getPropertyTerm());
     }
 
     public void addMessage(String summary) {
@@ -348,15 +367,132 @@ public class TopLevelABIEHandler implements Serializable {
             // TODO if go back from the confirmation page? avoid that situation
 
             createBIEs();
+            //createNounBIEs(bCSelected);
+            //createVerbBIEs(bCSelected);
+
             createBarModel();
         }
 
         return event.getNewStep();
     }
 
+    public void createVerbBIEs(BusinessContext businessContext) {
+        ArrayList<String> verbList = new ArrayList<>();
+        verbList.addAll(Arrays.asList(
+                "Acknowledge",
+                "Cancel Acknowledge",
+                "Cancel",
+                "Change Acknowledge",
+                "Change",
+                "Get",
+                "Load",
+                "Notify",
+                "Post Acknowledge",
+                "Post",
+                "Process",
+                "Show",
+                "Sync",
+                "Sync Response"
+        ));
+
+        BusinessInformationEntityService.CreateBIEsResult createBIEsResult = null;
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+        ExecutorCompletionService<BusinessInformationEntityService.CreateBIEsResult> completionService
+                = new ExecutorCompletionService(executorService);
+        try {
+            for (int i = 0; i < verbList.size(); i++) {
+                List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByPropertyTermContaining(verbList.get(i));
+                AssociationCoreComponentProperty asccp = asccpList.get(0);
+                System.out.print("Start Creating BIEs from Verb " + verbList.get(i));
+                completionService.submit(() -> bieService.createBIEs(asccp, businessContext));
+            }
+
+            try {
+                for (int i = 0; i < verbList.size(); i++) {
+                    createBIEsResult = completionService.take().get();
+                }
+            } catch (InterruptedException e) {
+                logger.error("", e);
+            } catch (ExecutionException e) {
+                logger.error("", e.getCause());
+            }
+        } finally {
+            executorService.shutdown();
+        }
+        System.out.println("... Done");
+
+        topAbieVO = createBIEsResult.getTopLevelAbie().getAbie();
+        long abieId = topAbieVO.getAbieId();
+
+        ABIEView rootABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
+        rootABIEView.setTopLevelAbie(createBIEsResult.getTopLevelAbie());
+        rootABIEView.setAbie(topAbieVO);
+        root = new DefaultTreeNode(rootABIEView, null);
+
+        aABIEView = applicationContext.getBean(ABIEView.class, selected.getPropertyTerm(), abieId, "ABIE");
+        aABIEView.setTopLevelAbie(createBIEsResult.getTopLevelAbie());
+        aABIEView.setAbie(topAbieVO);
+        aABIEView.setColor("blue");
+        aABIEView.setAcc(createBIEsResult.getAcc());
+        aABIEView.setAsbiep(asbiepVO);
+
+        TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
+        createBIEChildren(abieId, toplevelNode);
+        System.out.println("... Done");
+    }
+
+    public void createNounBIEs(BusinessContext businessContext) {
+        ArrayList<String> nounList = new ArrayList<>();
+        File dir1 = new File(SRTConstants.NOUN_FILE_PATH_01);
+        File dir2 = new File(SRTConstants.NOUN_FILE_PATH_02);
+        File[] listOfNouns1 = dir1.listFiles();
+        File[] listOfNouns2 = dir2.listFiles();
+
+        for (int i = 0; i < listOfNouns1.length; i++) {
+            String name = listOfNouns1[i].getName().replace(".xsd", "");
+            String pTerm = Utility.getPropertyTerm(name);
+            if (!pTerm.endsWith(" IST")) {
+                nounList.add(pTerm);
+            }
+        }
+        for (int i = 0; i < listOfNouns2.length; i++) {
+            String name = listOfNouns2[i].getName().replace(".xsd", "");
+            String pTerm = Utility.getPropertyTerm(name);
+            if (!pTerm.endsWith(" IST")) {
+                nounList.add(pTerm);
+            }
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+        ExecutorCompletionService<BusinessInformationEntityService.CreateBIEsResult> completionService
+                = new ExecutorCompletionService(executorService);
+        try {
+            for (int i = 0; i < nounList.size(); i++) {
+                List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByPropertyTermContaining(nounList.get(i));
+                AssociationCoreComponentProperty asccp = asccpList.get(0);
+                System.out.print("Start Creating BIEs from Noun " + nounList.get(i));
+                completionService.submit(() -> bieService.createBIEs(asccp, businessContext));
+            }
+
+            try {
+                for (int i = 0; i < nounList.size(); i++) {
+                    completionService.take().get();
+                }
+            } catch (InterruptedException e) {
+                logger.error("", e);
+            } catch (ExecutionException e) {
+                logger.error("", e.getCause());
+            }
+        } finally {
+            executorService.shutdown();
+        }
+        System.out.println("... Done");
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void createBIEs() {
-        BusinessInformationEntityService.CreateBIEsResult createBIEsResult = bieService.createBIEs(selected, bCSelected);
+        AssociationCoreComponentProperty asccp = asccpRepository.findOne(selected.getAsccpId());
+        BusinessInformationEntityService.CreateBIEsResult createBIEsResult = bieService.createBIEs(asccp, bCSelected);
 
         abieCount = createBIEsResult.getAbieCount();
         bbiescCount = createBIEsResult.getBbiescCount();
@@ -567,7 +703,7 @@ public class TopLevelABIEHandler implements Serializable {
         cloneAbie.setBizTerm(sourceAbie.getBizTerm());
         cloneAbie.setCreatedBy(userId);
         cloneAbie.setLastUpdatedBy(userId);
-        cloneAbie.setState(SRTConstants.TOP_LEVEL_ABIE_STATE_EDITING);
+        cloneAbie.setState(Editing);
         cloneAbie.setOwnerTopLevelAbieId(topLevelAbie.getTopLevelAbieId());
 
         abieRepository.saveAndFlush(cloneAbie);
@@ -697,7 +833,7 @@ public class TopLevelABIEHandler implements Serializable {
         av.setBbiesc(nbbiescVO);
         String sc_name = "";
         if (dtscvo.getRepresentationTerm().equalsIgnoreCase("Text") ||
-            dtscvo.getPropertyTerm().contains(dtscvo.getRepresentationTerm())) {
+                dtscvo.getPropertyTerm().contains(dtscvo.getRepresentationTerm())) {
             sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm());
         } else {
             sc_name = Utility.spaceSeparator(dtscvo.getPropertyTerm()).concat(dtscvo.getRepresentationTerm());
@@ -715,12 +851,12 @@ public class TopLevelABIEHandler implements Serializable {
         if (ueAcc == null) {
             createNewUserExtensionGroupACC();
         } else {
-            if (ueAcc.getState() == 1/*Editing*/ && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #a in designDoc
+            if (ueAcc.getState() == CoreComponentState.Editing && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #a in designDoc
                 editUserExtensionGroupACC();
-            } else if (ueAcc.getState() == 1 && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #b in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Editing && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #b in designDoc
                 //Show message Owner User Id
                 //Return to page
-            } else if (ueAcc.getState() == 2/*need to check 2 == candidate*/ && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #c in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Candidate && ueAcc.getOwnerUserId() == curUser.getAppUserId()) {//case #c in designDoc
                 //do you want to edit this extension?
                 if (true) {
                     //Change state of this ACC and correspondings
@@ -729,9 +865,9 @@ public class TopLevelABIEHandler implements Serializable {
                     //Return to page
                 }
 
-            } else if (ueAcc.getState() == 2/*need to check 2 == candidate*/ && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #d in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Candidate && ueAcc.getOwnerUserId() != curUser.getAppUserId()) {//case #d in designDoc
 
-            } else if (ueAcc.getState() == 4/*published*/) {//case #e in designDoc
+            } else if (ueAcc.getState() == CoreComponentState.Published) {//case #e in designDoc
                 //do you want to edit already published one?
                 if (true) {
                     createNewUserExtensionGroupACCRevision();
@@ -750,9 +886,9 @@ public class TopLevelABIEHandler implements Serializable {
         List<BasicCoreComponent> bccList = bccRepository.findByFromAccId(ueAcc.getAccId());
 
         for (AssociationCoreComponent ascc : asccList) {
-            ascc.setState(1);//Editing
+            ascc.setState(CoreComponentState.Editing);
             AssociationCoreComponentProperty asccp = asccpRepository.findOne(ascc.getToAsccpId());
-            asccp.setState(1);//Editing
+            asccp.setState(CoreComponentState.Editing);//Editing
             asccRepository.save(ascc);
             asccpRepository.save(asccp);
         }
@@ -769,7 +905,7 @@ public class TopLevelABIEHandler implements Serializable {
             AggregateCoreComponent eAcc = new AggregateCoreComponent(); //need to assign
             User currentLoginUser = new User(); //need to assign
 
-            bieService.createNewUserExtensionGroupACC(eAcc, currentLoginUser);
+            extensionService.createNewUserExtensionGroupACC(eAcc, currentLoginUser);
         }
     }
 
@@ -783,22 +919,42 @@ public class TopLevelABIEHandler implements Serializable {
 
     }
 
-    public List<AssociationCoreComponentProperty> getAsccpVOs() {
+    public List<TopLevelConcept> getAsccpVOs() {
         return asccpVOs;
     }
 
     public List<String> completeInput(String query) {
-        return asccpRepository.findAll().stream()
-                .filter(associationCoreComponentProperty -> associationCoreComponentProperty.getPropertyTerm().contains(query))
-                .map(associationCoreComponentProperty -> associationCoreComponentProperty.getPropertyTerm())
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+        List<TopLevelConcept> topLevelConcepts = topLevelConceptRepository.findAll();
+
+        if (StringUtils.isEmpty(q)) {
+            return topLevelConcepts.stream()
+                    .map(e -> e.getPropertyTerm())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return topLevelConcepts.stream()
+                    .map(e -> e.getPropertyTerm())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
-    public AssociationCoreComponentProperty getSelected() {
+    public TopLevelConcept getSelected() {
         return selected;
     }
 
-    public void setSelected(AssociationCoreComponentProperty selected) {
+    public void setSelected(TopLevelConcept selected) {
         this.selected = selected;
     }
 
@@ -838,7 +994,7 @@ public class TopLevelABIEHandler implements Serializable {
         AssociationCoreComponentProperty asccp = (AssociationCoreComponentProperty) event.getObject();
         FacesMessage msg = new FacesMessage(asccp.getPropertyTerm(), String.valueOf(asccp.getAsccpId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
-        selected = asccp;
+        selected = topLevelConceptRepository.findOne(asccp.getAsccpId());
     }
 
     public void onBODRowSelect(SelectEvent event) {
@@ -874,7 +1030,7 @@ public class TopLevelABIEHandler implements Serializable {
 
         for (BasicBusinessInformationEntity bbieVO : list_01) {
             double sk = bbieVO.getSeqKey();
-            if (getEntityType(bbieVO.getBasedBccId()) == 0L)
+            if (getEntityType(bbieVO.getBasedBccId()) == Attribute)
                 showBBIETree(bbieVO, tNode);
             else
                 sequence.put(bbieVO, sk);
@@ -946,7 +1102,7 @@ public class TopLevelABIEHandler implements Serializable {
 
             String sc_name = "";
             if (dtscVO.getRepresentationTerm().equalsIgnoreCase("Text") ||
-                dtscVO.getPropertyTerm().contains(dtscVO.getRepresentationTerm())) {
+                    dtscVO.getPropertyTerm().contains(dtscVO.getRepresentationTerm())) {
                 sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm());
             } else {
                 sc_name = Utility.spaceSeparator(dtscVO.getPropertyTerm().concat(dtscVO.getRepresentationTerm()));
@@ -961,6 +1117,7 @@ public class TopLevelABIEHandler implements Serializable {
     private HashSet<Long> openedNodes = new HashSet();
 
     public void expand(NodeSelectEvent event) {
+        TreeNode selectedTreeNode = getSelectedTreeNode();
         ABIEView abieView = (ABIEView) selectedTreeNode.getData();
         if (!openedNodes.contains(abieView.getId())) {
             openedNodes.add(abieView.getId());
@@ -1035,8 +1192,8 @@ public class TopLevelABIEHandler implements Serializable {
         for (BusinessContextHandler.BusinessContextValues bcv : bcH.getBcValues()) {
             for (ContextSchemeValue cVO : bcv.getCsList()) {
                 BusinessContextValue bcvVO = new BusinessContextValue();
-                bcvVO.setBizCtxId(bcVO.getBizCtxId());
-                bcvVO.setCtxSchemeValueId(cVO.getCtxSchemeValueId());
+                bcvVO.setBusinessContext(bcVO);
+                bcvVO.setContextSchemeValue(cVO);
                 businessContextValueRepository.saveAndFlush(bcvVO);
             }
         }
@@ -1152,12 +1309,12 @@ public class TopLevelABIEHandler implements Serializable {
         BasicBusinessInformationEntityProperty bbiepVO = aABIEView.getBbiep();
 
         if (aABIEView.getRestrictionType().equalsIgnoreCase("Primitive")) {
-            bbieVO.setBdtPriRestriId(aABIEView.getBdtPrimitiveRestrictionId());
-            bbieVO.setCodeListId(null);
+            bbieVO.setBdtPriRestri(bdtPriRestriRepository.findOne(aABIEView.getBdtPrimitiveRestrictionId()));
+            bbieVO.setCodeList(null);
         } else if (aABIEView.getRestrictionType().equalsIgnoreCase("Code")) {
             if (codeList != null) {
-                bbieVO.setCodeListId(codeList.getCodeListId());
-                bbieVO.setBdtPriRestriId(null);
+                bbieVO.setCodeList(codeList);
+                bbieVO.setBdtPriRestri(null);
             }
         }
 
@@ -1246,8 +1403,8 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public void onCodeListChosen(SelectEvent event) {
-        CodeListHandler ch = (CodeListHandler) event.getObject();
-        codeList = ch.getSelected();
+        CodeListBean ch = (CodeListBean) event.getObject();
+        //codeList = ch.getSelected();
         logger.debug(codeList.getName());
     }
 
@@ -1266,7 +1423,7 @@ public class TopLevelABIEHandler implements Serializable {
         this.codeListName = codeListName;
     }
 
-    public int getEntityType(long bccId) {
+    public BasicCoreComponentEntityType getEntityType(long bccId) {
         BasicCoreComponent basicCoreComponent = bccRepository.findOne(bccId);
         return basicCoreComponent.getEntityType();
     }
@@ -1280,9 +1437,30 @@ public class TopLevelABIEHandler implements Serializable {
     }
 
     public List<String> completeCodeListInput(String query) {
-        return codeListRepository.findByNameContaining(query).stream()
-                .map(codeList -> codeList.getName())
-                .collect(Collectors.toList());
+        String q = (query != null) ? query.trim() : null;
+        List<CodeList> codeLists = codeListRepository.findAll();
+
+        if (StringUtils.isEmpty(q)) {
+            return codeLists.stream()
+                    .map(e -> e.getName())
+                    .collect(Collectors.toList());
+        } else {
+            String[] split = q.split(" ");
+
+            return codeLists.stream()
+                    .map(e -> e.getName())
+                    .distinct()
+                    .filter(e -> {
+                        e = e.toLowerCase();
+                        for (String s : split) {
+                            if (!e.contains(s.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     private void saveBBIESCChanges(ABIEView aABIEView) {
@@ -1307,6 +1485,20 @@ public class TopLevelABIEHandler implements Serializable {
     private void saveABIEChanges(ABIEView aABIEView) {
         AggregateBusinessInformationEntity abieVO = aABIEView.getAbie();
         abieRepository.saveAndFlush(abieVO);
+    }
+
+    public void createABIEExtensionLocally() {
+        User currentLoginUser = getCurrentLoginUser();
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
+    }
+
+    public void createABIEExtensionGlobally() {
+        User currentLoginUser = getCurrentLoginUser();
+        extensionService.createNewUserExtensionGroupACC(aABIEView.getAcc(), currentLoginUser);
+    }
+
+    private User getCurrentLoginUser() {
+        return userRepository.findOneByLoginId("oagis");
     }
 
 }

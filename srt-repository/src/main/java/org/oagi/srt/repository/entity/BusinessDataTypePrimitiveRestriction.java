@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "bdt_pri_restri")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
     public static final String SEQUENCE_NAME = "BDT_PRI_RESTRI_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long bdtPriRestriId;
 
     @Column(nullable = false)
@@ -29,7 +32,8 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    public BusinessDataTypePrimitiveRestriction() {}
+    public BusinessDataTypePrimitiveRestriction() {
+    }
 
     public BusinessDataTypePrimitiveRestriction(int bdtPriRestriId) {
         this.bdtPriRestriId = bdtPriRestriId;
@@ -96,14 +100,8 @@ public class BusinessDataTypePrimitiveRestriction implements Serializable {
 
         BusinessDataTypePrimitiveRestriction that = (BusinessDataTypePrimitiveRestriction) o;
 
-        if (bdtPriRestriId != that.bdtPriRestriId) return false;
-        if (bdtId != that.bdtId) return false;
-        if (isDefault != that.isDefault) return false;
-        if (cdtAwdPriXpsTypeMapId != null ? !cdtAwdPriXpsTypeMapId.equals(that.cdtAwdPriXpsTypeMapId) : that.cdtAwdPriXpsTypeMapId != null)
-            return false;
-        if (codeListId != null ? !codeListId.equals(that.codeListId) : that.codeListId != null) return false;
-        return agencyIdListId != null ? agencyIdListId.equals(that.agencyIdListId) : that.agencyIdListId == null;
-
+        if (bdtPriRestriId != 0L && bdtPriRestriId == that.bdtPriRestriId) return true;
+        return false;
     }
 
     @Override

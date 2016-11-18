@@ -3,7 +3,10 @@ package org.oagi.srt.export.impl;
 import org.oagi.srt.export.ExportContext;
 import org.oagi.srt.export.model.SchemaModule;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultExportContext implements ExportContext {
 

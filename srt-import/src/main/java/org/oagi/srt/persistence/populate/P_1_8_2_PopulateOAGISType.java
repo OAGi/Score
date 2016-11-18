@@ -6,6 +6,7 @@ import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.persistence.populate.helper.ElementDecl;
 import org.oagi.srt.repository.ModuleRepository;
 import org.oagi.srt.repository.entity.AggregateCoreComponent;
+import org.oagi.srt.repository.entity.OagisComponentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import org.w3c.dom.NodeList;
 import java.io.File;
 
 import static org.oagi.srt.common.SRTConstants.MODEL_FOLDER_PATH;
+import static org.oagi.srt.repository.entity.OagisComponentType.OAGIS10BODs;
+import static org.oagi.srt.repository.entity.OagisComponentType.OAGIS10Nouns;
 
 @Component
 public class P_1_8_2_PopulateOAGISType {
@@ -46,13 +49,13 @@ public class P_1_8_2_PopulateOAGISType {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.8.2 Start");
 
-        populate(new File(MODEL_FOLDER_PATH + "/OAGIS-Nouns.xsd"), 6);
-        populate(new File(MODEL_FOLDER_PATH + "/OAGIS.xsd"), 7);
+        populate(new File(MODEL_FOLDER_PATH + "/OAGIS-Nouns.xsd"), OAGIS10Nouns);
+        populate(new File(MODEL_FOLDER_PATH + "/OAGIS.xsd"), OAGIS10BODs);
 
         logger.info("### 1.8.2 End");
     }
 
-    private void populate(File file, int oagisComponentType) throws Exception {
+    private void populate(File file, OagisComponentType oagisComponentType) throws Exception {
         if (file == null || !file.exists()) {
             return;
         }

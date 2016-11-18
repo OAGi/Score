@@ -1,6 +1,7 @@
 package org.oagi.srt.repository.entity;
 
 import org.apache.commons.io.FileUtils;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.File;
@@ -10,13 +11,14 @@ import java.util.Arrays;
 
 @Entity
 @Table(name = "blob_content")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class BlobContent implements Serializable {
 
     public static final String SEQUENCE_NAME = "BLOB_CONTENT_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long blobContentId;
 
     @Column(nullable = false)
@@ -79,11 +81,8 @@ public class BlobContent implements Serializable {
 
         BlobContent that = (BlobContent) o;
 
-        if (blobContentId != that.blobContentId) return false;
-        if (releaseId != that.releaseId) return false;
-        if (!Arrays.equals(content, that.content)) return false;
-        return module != null ? module.equals(that.module) : that.module == null;
-
+        if (blobContentId != 0L && blobContentId == that.blobContentId) return true;
+        return false;
     }
 
     @Override
@@ -92,6 +91,7 @@ public class BlobContent implements Serializable {
         result = 31 * result + Arrays.hashCode(content);
         result = 31 * result + (int) (releaseId ^ (releaseId >>> 32));
         result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (file != null ? file.hashCode() : 0);
         return result;
     }
 

@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "ctx_category")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ContextCategory implements Serializable {
 
     public static final String SEQUENCE_NAME = "CTX_CATEGORY_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long ctxCategoryId;
 
     @Column(nullable = false, length = 41)
@@ -63,11 +66,13 @@ public class ContextCategory implements Serializable {
 
         ContextCategory that = (ContextCategory) o;
 
-        if (ctxCategoryId != that.ctxCategoryId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return description != null ? description.equals(that.description) : that.description == null;
-
+        if (ctxCategoryId != 0L && ctxCategoryId == that.ctxCategoryId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

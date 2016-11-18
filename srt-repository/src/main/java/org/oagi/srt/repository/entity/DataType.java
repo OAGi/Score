@@ -1,5 +1,7 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -8,13 +10,14 @@ import java.util.Date;
 
 @Entity
 @Table(name = "dt")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class DataType implements Serializable {
 
     public static final String SEQUENCE_NAME = "DT_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long dtId;
 
     @Column(nullable = false, length = 41)
@@ -61,7 +64,8 @@ public class DataType implements Serializable {
     private Module module;
 
     @Column
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @Column(nullable = false, updatable = false)
     private long createdBy;
@@ -87,7 +91,8 @@ public class DataType implements Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -98,7 +103,8 @@ public class DataType implements Serializable {
     @Column(name = "is_deprecated", nullable = false)
     private boolean deprecated;
 
-    public DataType() {}
+    public DataType() {
+    }
 
     public DataType(long dtId, String dataTypeTerm) {
         this.dtId = dtId;
@@ -230,11 +236,11 @@ public class DataType implements Serializable {
         this.module = module;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -294,11 +300,11 @@ public class DataType implements Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -331,43 +337,15 @@ public class DataType implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DataType dataType = (DataType) o;
+        DataType that = (DataType) o;
 
-        if (dtId != dataType.dtId) return false;
-        if (type != dataType.type) return false;
-        if (state != dataType.state) return false;
-        if (createdBy != dataType.createdBy) return false;
-        if (ownerUserId != dataType.ownerUserId) return false;
-        if (lastUpdatedBy != dataType.lastUpdatedBy) return false;
-        if (revisionNum != dataType.revisionNum) return false;
-        if (revisionTrackingNum != dataType.revisionTrackingNum) return false;
-        if (deprecated != dataType.deprecated) return false;
-        if (guid != null ? !guid.equals(dataType.guid) : dataType.guid != null) return false;
-        if (versionNum != null ? !versionNum.equals(dataType.versionNum) : dataType.versionNum != null) return false;
-        if (previousVersionDtId != null ? !previousVersionDtId.equals(dataType.previousVersionDtId) : dataType.previousVersionDtId != null)
-            return false;
-        if (dataTypeTerm != null ? !dataTypeTerm.equals(dataType.dataTypeTerm) : dataType.dataTypeTerm != null)
-            return false;
-        if (qualifier != null ? !qualifier.equals(dataType.qualifier) : dataType.qualifier != null) return false;
-        if (basedDtId != null ? !basedDtId.equals(dataType.basedDtId) : dataType.basedDtId != null) return false;
-        if (den != null ? !den.equals(dataType.den) : dataType.den != null) return false;
-        if (contentComponentDen != null ? !contentComponentDen.equals(dataType.contentComponentDen) : dataType.contentComponentDen != null)
-            return false;
-        if (definition != null ? !definition.equals(dataType.definition) : dataType.definition != null) return false;
-        if (contentComponentDefinition != null ? !contentComponentDefinition.equals(dataType.contentComponentDefinition) : dataType.contentComponentDefinition != null)
-            return false;
-        if (revisionDoc != null ? !revisionDoc.equals(dataType.revisionDoc) : dataType.revisionDoc != null)
-            return false;
-        if (module != null ? !module.equals(dataType.module) : dataType.module != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(dataType.creationTimestamp) : dataType.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(dataType.lastUpdateTimestamp) : dataType.lastUpdateTimestamp != null)
-            return false;
-        if (revisionAction != null ? !revisionAction.equals(dataType.revisionAction) : dataType.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(dataType.releaseId) : dataType.releaseId != null) return false;
-        return currentBdtId != null ? currentBdtId.equals(dataType.currentBdtId) : dataType.currentBdtId == null;
-
+        if (dtId != 0L && dtId == that.dtId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -386,7 +364,7 @@ public class DataType implements Serializable {
         result = 31 * result + (contentComponentDefinition != null ? contentComponentDefinition.hashCode() : 0);
         result = 31 * result + (revisionDoc != null ? revisionDoc.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (ownerUserId ^ (ownerUserId >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));

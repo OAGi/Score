@@ -7,6 +7,7 @@ import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.UserRepository;
 import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.entity.Module;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -661,7 +662,7 @@ public class P_1_4_PopulateCodeListTestCase extends AbstractTransactionalJUnit4S
             assertTrue(codeList.isExtensibleIndicator());
             assertEquals(userRepository.findAppUserIdByLoginId("oagis"), codeList.getCreatedBy());
             assertEquals(userRepository.findAppUserIdByLoginId("oagis"), codeList.getLastUpdatedBy());
-            assertEquals(CodeList.State.Published, codeList.getState());
+            assertEquals(CodeListState.Published, codeList.getState());
         });
     }
 

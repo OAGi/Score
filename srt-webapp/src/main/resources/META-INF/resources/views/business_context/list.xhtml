@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui" template="../../template.xhtml">
+
+    <ui:define name="content">
+        <div class="settings-next">
+            <div class="subhead">
+                <h2 class="subhead-heading">Business Context</h2>
+            </div>
+        </div>
+        <h:form id="listForm">
+            <p:panel>
+                <f:facet name="header">
+                    <p:autoComplete id="name" value="#{businessContextBean.name}"
+                                    style="min-width: 440px; margin-right: 20px;"
+                                    maxResults="10"
+                                    completeMethod="#{businessContextBean.completeInput}">
+                        <f:ajax/> <!-- dummy ajax component to update the value of autoComplete -->
+                    </p:autoComplete>
+                    <p:commandButton value="Search" ajax="true" actionListener="#{businessContextBean.search}"
+                                     update="tbl1"
+                                     icon="ui-icon-search"/>
+                    <p:button value="Create Business Context"
+                              style="float: right; padding: 3px 0 3px 0;"
+                              outcome="/views/business_context/details.xhtml"/>
+                </f:facet>
+                <p:dataTable id="tbl1" var="businessContext" value="#{businessContextBean.businessContexts}"
+                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" paginatorPosition="bottom" rows="10"
+                             style="width: 100%; margin-bottom:20px" rowKey="#{businessContext.guid}">
+                    <p:column headerText="Name" sortBy="#{businessContext.name}">
+                        <h:link value="#{businessContext.name}" outcome="/views/business_context/details.xhtml">
+                                <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
+                        </h:link>
+                        <div>
+                            <h:link value="GUID: #{businessContext.guid}" outcome="/views/business_context/details.xhtml"
+                                    style="font-size: 12px !important; color: #767676 !important;">
+                                <f:param name="bizCtxId" value="#{businessContext.bizCtxId}"/>
+                            </h:link>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

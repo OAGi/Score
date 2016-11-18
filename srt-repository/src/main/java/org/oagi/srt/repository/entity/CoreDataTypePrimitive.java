@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "cdt_pri")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class CoreDataTypePrimitive implements Serializable {
 
     public static final String SEQUENCE_NAME = "CDT_PRI_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long cdtPriId;
 
     @Column(nullable = false, length = 45)
@@ -40,9 +43,8 @@ public class CoreDataTypePrimitive implements Serializable {
 
         CoreDataTypePrimitive that = (CoreDataTypePrimitive) o;
 
-        if (cdtPriId != that.cdtPriId) return false;
-        return name != null ? name.equals(that.name) : that.name == null;
-
+        if (cdtPriId != 0L && cdtPriId == that.cdtPriId) return true;
+        return false;
     }
 
     @Override

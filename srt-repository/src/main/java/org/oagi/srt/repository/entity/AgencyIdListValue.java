@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "agency_id_list_value")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class AgencyIdListValue implements Serializable {
 
     public static final String SEQUENCE_NAME = "AGENCY_ID_LIST_VALUE_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long agencyIdListValueId;
 
     @Column(nullable = false, length = 150)
@@ -74,12 +77,8 @@ public class AgencyIdListValue implements Serializable {
 
         AgencyIdListValue that = (AgencyIdListValue) o;
 
-        if (agencyIdListValueId != that.agencyIdListValueId) return false;
-        if (ownerListId != that.ownerListId) return false;
-        if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return definition != null ? definition.equals(that.definition) : that.definition == null;
-
+        if (agencyIdListValueId != 0L && agencyIdListValueId == that.agencyIdListValueId) return true;
+        return false;
     }
 
     @Override

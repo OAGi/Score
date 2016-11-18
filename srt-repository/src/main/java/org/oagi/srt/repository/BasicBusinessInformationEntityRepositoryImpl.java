@@ -43,7 +43,7 @@ public class BasicBusinessInformationEntityRepositoryImpl
         args.add(entity.getBdtPriRestriId());
         args.add(entity.getCardinalityMax());
         args.add(entity.getCardinalityMin());
-        args.add(entity.getCodeListId() == 0 ? null : entity.getCodeListId());
+        args.add(entity.getCodeListId() == 0L ? null : entity.getCodeListId());
         args.add(entity.getCreatedBy());
         args.add(entity.getCreationTimestamp());
         args.add(entity.getDefaultValue());

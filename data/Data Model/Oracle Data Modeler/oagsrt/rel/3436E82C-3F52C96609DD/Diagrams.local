@@ -1,17 +1,17 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <oracle.dbtools.crest.model.design.relational.RelationalDesign>
-   <object objectType="main_view" objectID="5C5B7DFD-6D0E-A9E5-FC60-28A3A05AF504" name="oagsrt_revision" visible="true"/>
-   <object objectType="sub_view" objectID="7EB47418-691D-2A5E-F6F3-97BE953915FA" name="00 - Core Data Type (CDT)" visible="false"/>
-   <object objectType="sub_view" objectID="3C7F7CDB-AF97-2FED-2C30-F3B48477BF13" name="01 - CDT Supplementary Component" visible="false"/>
-   <object objectType="sub_view" objectID="1C1892FF-54C9-62E3-742F-169E07C67963" name="02 - Value List" visible="false"/>
-   <object objectType="sub_view" objectID="F157D8D4-173F-1C9C-D4B1-FF96D21D1692" name="03 - Business Data Type (BDT)" visible="false"/>
-   <object objectType="sub_view" objectID="88F734B0-BD03-1BDD-92BD-0AB317334B70" name="04 - BDT Supplementary Component" visible="false"/>
    <object objectType="sub_view" objectID="02BA7B70-EFC0-303F-0ACA-AC96DBB38A2D" name="05 - Core Component (CC)" visible="false"/>
-   <object objectType="sub_view" objectID="7A4BD65B-3CBC-16FC-6846-1D9133F62E3A" name="06 - Schema Module Assignment" visible="false"/>
-   <object objectType="sub_view" objectID="7F002F3C-837B-469F-B785-1C91954AACE1" name="07 - Release Management" visible="false"/>
-   <object objectType="sub_view" objectID="650668E0-C4AC-CCBA-6279-F9F8BA49C1E2" name="08 - Namespace" visible="false"/>
    <object objectType="sub_view" objectID="072DD4CD-01CF-3FE1-C515-B064188C65FD" name="09 - Business Context" visible="false"/>
    <object objectType="sub_view" objectID="07DE7307-4EAB-44B6-158D-340360E2AB03" name="10 - Business Information Entity (BIE)" visible="false"/>
+   <object objectType="sub_view" objectID="1C1892FF-54C9-62E3-742F-169E07C67963" name="02 - Value List" visible="false"/>
+   <object objectType="sub_view" objectID="3C7F7CDB-AF97-2FED-2C30-F3B48477BF13" name="01 - CDT Supplementary Component" visible="false"/>
    <object objectType="sub_view" objectID="3EED3267-088D-D59F-72BB-E2D18EA4BEE0" name="11 - BIE to CC" visible="false"/>
    <object objectType="sub_view" objectID="4121E2A9-7C4A-BD78-9B5A-0059C2B5AAD2" name="12 - Profile BOD (Top-Level ABIE)" visible="false"/>
+   <object objectType="main_view" objectID="5C5B7DFD-6D0E-A9E5-FC60-28A3A05AF504" name="oagsrt_revision" visible="true"/>
+   <object objectType="sub_view" objectID="650668E0-C4AC-CCBA-6279-F9F8BA49C1E2" name="08 - Namespace" visible="false"/>
+   <object objectType="sub_view" objectID="7A4BD65B-3CBC-16FC-6846-1D9133F62E3A" name="06 - Schema Module Assignment" visible="false"/>
+   <object objectType="sub_view" objectID="7EB47418-691D-2A5E-F6F3-97BE953915FA" name="00 - Core Data Type (CDT)" visible="false"/>
+   <object objectType="sub_view" objectID="7F002F3C-837B-469F-B785-1C91954AACE1" name="07 - Release Management" visible="false"/>
+   <object objectType="sub_view" objectID="88F734B0-BD03-1BDD-92BD-0AB317334B70" name="04 - BDT Supplementary Component" visible="false"/>
+   <object objectType="sub_view" objectID="F157D8D4-173F-1C9C-D4B1-FF96D21D1692" name="03 - Business Data Type (BDT)" visible="false"/>
 </oracle.dbtools.crest.model.design.relational.RelationalDesign>

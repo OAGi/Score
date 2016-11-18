@@ -1,5 +1,8 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.common.util.Utility;
+import org.oagi.srt.repository.entity.converter.CoreComponentStateConverter;
+import org.oagi.srt.repository.entity.converter.RevisionActionConverter;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -8,16 +11,18 @@ import java.util.Date;
 
 @Entity
 @Table(name = "asccp")
-public class AssociationCoreComponentProperty implements Serializable {
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
+public class AssociationCoreComponentProperty
+        implements CoreComponentProperty, Serializable, Cloneable {
 
     public static final String SEQUENCE_NAME = "ASCCP_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long asccpId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
     @Column(nullable = false)
@@ -27,8 +32,8 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column(length = 10 * 1024)
     private String definition;
 
-    @Column(nullable = false)
-    private long roleOfAccId;
+    @Column
+    private Long roleOfAccId;
 
     @Column(nullable = false, length = 200)
     private String den;
@@ -51,7 +56,8 @@ public class AssociationCoreComponentProperty implements Serializable {
     private Date lastUpdateTimestamp;
 
     @Column(nullable = false)
-    private int state;
+    @Convert(attributeName = "state", converter = CoreComponentStateConverter.class)
+    private CoreComponentState state;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
@@ -73,7 +79,8 @@ public class AssociationCoreComponentProperty implements Serializable {
     private int revisionTrackingNum;
 
     @Column
-    private Integer revisionAction;
+    @Convert(attributeName = "revisionAction", converter = RevisionActionConverter.class)
+    private RevisionAction revisionAction;
 
     @Column
     private Long releaseId;
@@ -84,7 +91,8 @@ public class AssociationCoreComponentProperty implements Serializable {
     @Column(name = "is_nillable", nullable = false)
     private boolean nillable;
 
-    public AssociationCoreComponentProperty() {}
+    public AssociationCoreComponentProperty() {
+    }
 
     public AssociationCoreComponentProperty(long asccpId, String den) {
         this.asccpId = asccpId;
@@ -143,10 +151,10 @@ public class AssociationCoreComponentProperty implements Serializable {
     }
 
     public long getRoleOfAccId() {
-        return roleOfAccId;
+        return (roleOfAccId != null) ? roleOfAccId : 0L;
     }
 
-    public void setRoleOfAccId(long roleOfAccId) {
+    public void setRoleOfAccId(Long roleOfAccId) {
         this.roleOfAccId = roleOfAccId;
     }
 
@@ -198,11 +206,11 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 
-    public int getState() {
+    public CoreComponentState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CoreComponentState state) {
         this.state = state;
     }
 
@@ -254,11 +262,11 @@ public class AssociationCoreComponentProperty implements Serializable {
         this.revisionTrackingNum = revisionTrackingNum;
     }
 
-    public int getRevisionAction() {
-        return (revisionAction == null) ? 0 : revisionAction;
+    public RevisionAction getRevisionAction() {
+        return revisionAction;
     }
 
-    public void setRevisionAction(int revisionAction) {
+    public void setRevisionAction(RevisionAction revisionAction) {
         this.revisionAction = revisionAction;
     }
 
@@ -287,38 +295,51 @@ public class AssociationCoreComponentProperty implements Serializable {
     }
 
     @Override
+    public AssociationCoreComponentProperty clone() {
+        AssociationCoreComponentProperty clone = new AssociationCoreComponentProperty();
+        clone.setGuid(Utility.generateGUID());
+        clone.setPropertyTerm(this.propertyTerm);
+        clone.setDefinition(this.definition);
+        clone.setRoleOfAccId(this.roleOfAccId);
+        clone.setDen(this.den);
+        clone.setCreatedBy(this.createdBy);
+        clone.setLastUpdatedBy(this.lastUpdatedBy);
+        clone.setOwnerUserId(this.ownerUserId);
+        Date timestamp = new Date();
+        clone.setCreationTimestamp(timestamp);
+        clone.setLastUpdateTimestamp(timestamp);
+        clone.setState(this.state);
+        clone.setModule(this.module);
+        clone.setNamespaceId(this.namespaceId);
+        clone.setReusableIndicator(this.reusableIndicator);
+        clone.setDeprecated(this.deprecated);
+        clone.setRevisionNum(this.revisionNum);
+        clone.setRevisionTrackingNum(this.revisionTrackingNum);
+        clone.setRevisionAction(this.revisionAction);
+        if (this.releaseId != null) {
+            clone.setReleaseId(this.releaseId);
+        }
+        if (this.currentAsccpId != null) {
+            clone.setCurrentAsccpId(this.currentAsccpId);
+        }
+        clone.setNillable(this.nillable);
+        return clone;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         AssociationCoreComponentProperty that = (AssociationCoreComponentProperty) o;
 
-        if (asccpId != that.asccpId) return false;
-        if (roleOfAccId != that.roleOfAccId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (ownerUserId != that.ownerUserId) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (namespaceId != that.namespaceId) return false;
-        if (reusableIndicator != that.reusableIndicator) return false;
-        if (deprecated != that.deprecated) return false;
-        if (revisionNum != that.revisionNum) return false;
-        if (revisionTrackingNum != that.revisionTrackingNum) return false;
-        if (nillable != that.nillable) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (propertyTerm != null ? !propertyTerm.equals(that.propertyTerm) : that.propertyTerm != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (den != null ? !den.equals(that.den) : that.den != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (module != null ? !module.equals(that.module) : that.module != null) return false;
-        if (revisionAction != null ? !revisionAction.equals(that.revisionAction) : that.revisionAction != null)
-            return false;
-        if (releaseId != null ? !releaseId.equals(that.releaseId) : that.releaseId != null) return false;
-        return currentAsccpId != null ? currentAsccpId.equals(that.currentAsccpId) : that.currentAsccpId == null;
-
+        if (asccpId != 0L && asccpId == that.asccpId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -334,7 +355,7 @@ public class AssociationCoreComponentProperty implements Serializable {
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (module != null ? module.hashCode() : 0);
         result = 31 * result + (int) (namespaceId ^ (namespaceId >>> 32));
         result = 31 * result + (reusableIndicator ? 1 : 0);
@@ -374,5 +395,17 @@ public class AssociationCoreComponentProperty implements Serializable {
                 ", currentAsccpId=" + currentAsccpId +
                 ", nillable=" + nillable +
                 '}';
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

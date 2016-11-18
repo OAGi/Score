@@ -1,6 +1,6 @@
 package org.oagi.srt.web.contents;
 
-import org.oagi.srt.web.handler.ContextCategoryHandler;
+import org.oagi.srt.web.jsf.beans.context.category.ContextCategoryBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @ManagedBean(name = "detailsView")
 @ViewScoped
 public class DetailsView implements Serializable{
-	private List<ContextCategoryHandler> details;
+	private List<ContextCategoryBean> details;
 	
 	
 	@PostConstruct
@@ -23,7 +23,7 @@ public class DetailsView implements Serializable{
 		//details =  
 	}
 	
-	public List<ContextCategoryHandler> getDetails() {
+	public List<ContextCategoryBean> getDetails() {
 		return details;
 	}
 	

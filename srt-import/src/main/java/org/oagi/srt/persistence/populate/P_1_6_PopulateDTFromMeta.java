@@ -127,7 +127,7 @@ public class P_1_6_PopulateDTFromMeta {
 
             dataType.setContentComponentDefinition(null);
             dataType.setRevisionDoc(null);
-            dataType.setState(3);
+            dataType.setState(CoreComponentState.Published);
             dataType.setCreatedBy(importUtil.getUserId());
             dataType.setLastUpdatedBy(importUtil.getUserId());
             dataType.setOwnerUserId(importUtil.getUserId());

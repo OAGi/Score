@@ -13,6 +13,12 @@ public interface CodeListRepository extends JpaRepository<CodeList, Long> {
     @Query("select c from CodeList c where c.name like %?1% and c.state = 'Published' and c.extensibleIndicator = 1")
     public List<CodeList> findByNameContainingAndStateIsPublishedAndExtensibleIndicatorIsTrue(String name);
 
+    @Query("select c from CodeList c where c.listId = ?1 and c.agencyId = ?2")
+    public List<CodeList> findByListIdAndAgencyId(String listId, long agencyId);
+
+    @Query("select c from CodeList c where c.name = ?1 and c.agencyId = ?2")
+    public List<CodeList> findByNameAndAgencyId(String name, long agencyId);
+
     @Query("select c from CodeList c where c.guid = ?1 and c.enumTypeGuid = ?2 and c.name = ?3")
     public CodeList findOneByGuidAndEnumTypeGuidAndName(
             String guid, String enumTypeGuid, String name

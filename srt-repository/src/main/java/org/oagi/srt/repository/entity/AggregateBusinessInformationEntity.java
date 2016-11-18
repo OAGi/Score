@@ -1,28 +1,39 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.oagi.srt.repository.entity.converter.AggregateBusinessInformationEntityStateConverter;
+import org.oagi.srt.repository.entity.listener.PersistEventListener;
+import org.oagi.srt.repository.entity.listener.TimestampAwareEventListener;
+import org.oagi.srt.repository.entity.listener.UpdateEventListener;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "abie")
-public class AggregateBusinessInformationEntity implements Serializable, IdEntity, IGuidEntity {
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
+public class AggregateBusinessInformationEntity implements Serializable, TimestampAware, IdEntity, IGuidEntity {
 
     public static final String SEQUENCE_NAME = "ABIE_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1000)
     private long abieId;
 
-    @Column(nullable = false, length = 41)
+    @Column(nullable = false, length = 41, updatable = false)
     private String guid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long basedAccId;
+    @Transient
+    private AggregateCoreComponent basedAcc;
 
-    @Column
+    @Column(updatable = false)
     private long bizCtxId;
+    @Transient
+    private BusinessContext bizCtx;
 
     @Transient
     private String bizCtxName;
@@ -46,7 +57,8 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     private Date lastUpdateTimestamp;
 
     @Column
-    private int state;
+    @Convert(attributeName = "state", converter = AggregateBusinessInformationEntityStateConverter.class)
+    private AggregateBusinessInformationEntityState state;
 
     @Column
     private Long clientId;
@@ -63,19 +75,10 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
     @Column(length = 225)
     private String bizTerm;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private long ownerTopLevelAbieId;
-
-    @PrePersist
-    public void prePersist() {
-        creationTimestamp = new Date();
-        lastUpdateTimestamp = new Date();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        lastUpdateTimestamp = new Date();
-    }
+    @Transient
+    private TopLevelAbie ownerTopLevelAbie;
 
     @Override
     public long getId() {
@@ -111,12 +114,20 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.basedAccId = basedAccId;
     }
 
+    public void setBasedAcc(AggregateCoreComponent basedAcc) {
+        this.basedAcc = basedAcc;
+    }
+
     public long getBizCtxId() {
         return bizCtxId;
     }
 
     public void setBizCtxId(long bizCtxId) {
         this.bizCtxId = bizCtxId;
+    }
+
+    public void setBizCtx(BusinessContext bizCtx) {
+        this.bizCtx = bizCtx;
     }
 
     public String getBizCtxName() {
@@ -151,11 +162,11 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public int getState() {
+    public AggregateBusinessInformationEntityState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(AggregateBusinessInformationEntityState state) {
         this.state = state;
     }
 
@@ -223,6 +234,10 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         this.ownerTopLevelAbieId = ownerTopLevelAbieId;
     }
 
+    public void setOwnerTopLevelAbie(TopLevelAbie ownerTopLevelAbie) {
+        this.ownerTopLevelAbie = ownerTopLevelAbie;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -230,26 +245,13 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
 
         AggregateBusinessInformationEntity that = (AggregateBusinessInformationEntity) o;
 
-        if (abieId != that.abieId) return false;
-        if (basedAccId != that.basedAccId) return false;
-        if (bizCtxId != that.bizCtxId) return false;
-        if (createdBy != that.createdBy) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (state != that.state) return false;
-        if (ownerTopLevelAbieId != that.ownerTopLevelAbieId) return false;
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (bizCtxName != null ? !bizCtxName.equals(that.bizCtxName) : that.bizCtxName != null) return false;
-        if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
-        if (creationTimestamp != null ? !creationTimestamp.equals(that.creationTimestamp) : that.creationTimestamp != null)
-            return false;
-        if (lastUpdateTimestamp != null ? !lastUpdateTimestamp.equals(that.lastUpdateTimestamp) : that.lastUpdateTimestamp != null)
-            return false;
-        if (clientId != null ? !clientId.equals(that.clientId) : that.clientId != null) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-        if (remark != null ? !remark.equals(that.remark) : that.remark != null) return false;
-        return bizTerm != null ? bizTerm.equals(that.bizTerm) : that.bizTerm == null;
-
+        if (abieId != 0L && abieId == that.abieId) return true;
+        if (guid != null) {
+            if (guid.equals(that.guid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -257,20 +259,25 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
         int result = (int) (abieId ^ (abieId >>> 32));
         result = 31 * result + (guid != null ? guid.hashCode() : 0);
         result = 31 * result + (int) (basedAccId ^ (basedAccId >>> 32));
+        result = 31 * result + (basedAcc != null ? basedAcc.hashCode() : 0);
         result = 31 * result + (int) (bizCtxId ^ (bizCtxId >>> 32));
+        result = 31 * result + (bizCtx != null ? bizCtx.hashCode() : 0);
         result = 31 * result + (bizCtxName != null ? bizCtxName.hashCode() : 0);
         result = 31 * result + (definition != null ? definition.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (creationTimestamp != null ? creationTimestamp.hashCode() : 0);
         result = 31 * result + (lastUpdateTimestamp != null ? lastUpdateTimestamp.hashCode() : 0);
-        result = 31 * result + state;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (clientId != null ? clientId.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (remark != null ? remark.hashCode() : 0);
         result = 31 * result + (bizTerm != null ? bizTerm.hashCode() : 0);
         result = 31 * result + (int) (ownerTopLevelAbieId ^ (ownerTopLevelAbieId >>> 32));
+        result = 31 * result + (ownerTopLevelAbie != null ? ownerTopLevelAbie.hashCode() : 0);
+        result = 31 * result + (persistEventListeners != null ? persistEventListeners.hashCode() : 0);
+        result = 31 * result + (updateEventListeners != null ? updateEventListeners.hashCode() : 0);
         return result;
     }
 
@@ -294,6 +301,117 @@ public class AggregateBusinessInformationEntity implements Serializable, IdEntit
                 ", remark='" + remark + '\'' +
                 ", bizTerm='" + bizTerm + '\'' +
                 ", ownerTopLevelAbieId=" + ownerTopLevelAbieId +
+                ", ownerTopLevelAbie=" + ownerTopLevelAbie +
+                ", persistEventListeners=" + persistEventListeners +
+                ", updateEventListeners=" + updateEventListeners +
                 '}';
+    }
+
+    @Transient
+    private transient List<PersistEventListener> persistEventListeners;
+
+    @Transient
+    private transient List<UpdateEventListener> updateEventListeners;
+
+    public AggregateBusinessInformationEntity() {
+        TimestampAwareEventListener timestampAwareEventListener = new TimestampAwareEventListener();
+        addPersistEventListener(timestampAwareEventListener);
+        addPersistEventListener(new PersistEventListener() {
+            @Override
+            public void onPrePersist(Object object) {
+                AggregateBusinessInformationEntity abie = (AggregateBusinessInformationEntity) object;
+                if (abie.basedAcc != null) {
+                    abie.setBasedAccId(abie.basedAcc.getAccId());
+                }
+                if (abie.getBasedAccId() == 0L) {
+                    throw new IllegalStateException("'basedAccId' parameter must not be null.");
+                }
+                if (abie.bizCtx != null) {
+                    abie.setBizCtxId(abie.bizCtx.getBizCtxId());
+                }
+                if (abie.getBizCtxId() == 0L) {
+                    throw new IllegalStateException("'bizCtxId' parameter must not be null.");
+                }
+                if (abie.ownerTopLevelAbie != null) {
+                    abie.setOwnerTopLevelAbieId(abie.ownerTopLevelAbie.getTopLevelAbieId());
+                }
+                if (abie.getOwnerTopLevelAbieId() == 0L) {
+                    throw new IllegalStateException("'ownerTopLevelAbieId' parameter must not be null.");
+                }
+            }
+
+            @Override
+            public void onPostPersist(Object object) {
+            }
+        });
+        addUpdateEventListener(timestampAwareEventListener);
+    }
+
+    public void addPersistEventListener(PersistEventListener persistEventListener) {
+        if (persistEventListener == null) {
+            return;
+        }
+        if (persistEventListeners == null) {
+            persistEventListeners = new ArrayList();
+        }
+        persistEventListeners.add(persistEventListener);
+    }
+
+    private Collection<PersistEventListener> getPersistEventListeners() {
+        return (persistEventListeners != null) ? persistEventListeners : Collections.emptyList();
+    }
+
+    public void addUpdateEventListener(UpdateEventListener updateEventListener) {
+        if (updateEventListener == null) {
+            return;
+        }
+        if (updateEventListeners == null) {
+            updateEventListeners = new ArrayList();
+        }
+        updateEventListeners.add(updateEventListener);
+    }
+
+    private Collection<UpdateEventListener> getUpdateEventListeners() {
+        return (updateEventListeners != null) ? updateEventListeners : Collections.emptyList();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPrePersist(this);
+        }
+    }
+
+    @PostPersist
+    public void postPersist() {
+        for (PersistEventListener persistEventListener : getPersistEventListeners()) {
+            persistEventListener.onPostPersist(this);
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPreUpdate(this);
+        }
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        for (UpdateEventListener updateEventListener : getUpdateEventListeners()) {
+            updateEventListener.onPostUpdate(this);
+        }
+    }
+
+    @Transient
+    private int hashCodeAfterLoaded;
+
+    @PostLoad
+    public void afterLoaded() {
+        hashCodeAfterLoaded = hashCode();
+    }
+
+    public boolean isDirty() {
+        return hashCodeAfterLoaded != hashCode();
     }
 }

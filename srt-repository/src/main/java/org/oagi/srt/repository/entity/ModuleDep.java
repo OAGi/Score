@@ -1,5 +1,5 @@
 package org.oagi.srt.repository.entity;
-
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.oagi.srt.repository.entity.converter.DependencyTypeConverter;
 
 import javax.persistence.*;
@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "module_dep")
+@org.hibernate.annotations.Cache(region = "read_only", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class ModuleDep implements Serializable {
 
     public enum DependencyType {
@@ -37,19 +38,19 @@ public class ModuleDep implements Serializable {
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long moduleDepId;
 
     @Column(nullable = false)
     @Convert(attributeName = "dependencyType", converter = DependencyTypeConverter.class)
     private DependencyType dependencyType;
 
-    @OneToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="depending_module_id", nullable = false)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "depending_module_id", nullable = false)
     private Module dependingModule;
 
-    @OneToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="depended_module_id", nullable = false)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "depended_module_id", nullable = false)
     private Module dependedModule;
 
     public long getModuleDepId() {
@@ -89,14 +90,10 @@ public class ModuleDep implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ModuleDep moduleDep = (ModuleDep) o;
+        ModuleDep that = (ModuleDep) o;
 
-        if (moduleDepId != moduleDep.moduleDepId) return false;
-        if (dependencyType != moduleDep.dependencyType) return false;
-        if (dependingModule != null ? !dependingModule.equals(moduleDep.dependingModule) : moduleDep.dependingModule != null)
-            return false;
-        return dependedModule != null ? dependedModule.equals(moduleDep.dependedModule) : moduleDep.dependedModule == null;
-
+        if (moduleDepId != 0L && moduleDepId == that.moduleDepId) return true;
+        return false;
     }
 
     @Override

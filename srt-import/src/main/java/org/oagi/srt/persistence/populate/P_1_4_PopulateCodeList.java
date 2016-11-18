@@ -5,6 +5,7 @@ import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.CodeList;
+import org.oagi.srt.repository.entity.CodeListState;
 import org.oagi.srt.repository.entity.CodeListValue;
 import org.oagi.srt.repository.entity.Module;
 import org.slf4j.Logger;
@@ -154,7 +155,7 @@ public class P_1_4_PopulateCodeList {
 
                 codeList.setCreatedBy(userId);
                 codeList.setLastUpdatedBy(userId);
-                codeList.setState(CodeList.State.Published);
+                codeList.setState(CodeListState.Published);
                 String moduleName = Utility.extractModuleName(path1);
                 Module module = moduleRepository.findByModule(moduleName);
                 codeList.setModule(module);

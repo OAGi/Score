@@ -1,17 +1,20 @@
 package org.oagi.srt.repository.entity;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "release")
+@org.hibernate.annotations.Cache(region = "", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Release implements Serializable {
 
     public static final String SEQUENCE_NAME = "RELEASE_ID_SEQ";
 
     @Id
     @GeneratedValue(generator = SEQUENCE_NAME, strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME)
+    @SequenceGenerator(name = SEQUENCE_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
     private long releaseId;
 
     @Column(nullable = false, length = 45)
@@ -61,13 +64,10 @@ public class Release implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Release release = (Release) o;
+        Release that = (Release) o;
 
-        if (releaseId != release.releaseId) return false;
-        if (namespaceId != release.namespaceId) return false;
-        if (releaseNum != null ? !releaseNum.equals(release.releaseNum) : release.releaseNum != null) return false;
-        return releaseNote != null ? releaseNote.equals(release.releaseNote) : release.releaseNote == null;
-
+        if (releaseId != 0L && releaseId == that.releaseId) return true;
+        return false;
     }
 
     @Override
