@@ -88,3 +88,22 @@ server:
     timeout: 6000000
     cookie:
       max-age: 6000000
+
+# Production environment
+---
+spring:
+  profiles: production
+  main:
+    banner-mode: off
+
+# DataSource
+  datasource:
+    jndi-name: ${datasource.jndi-name}
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: ${datasource.url}
+    username: ${datasource.username}
+    password: ${datasource.password}
+    platform: oracle
+
+jsf:
+  project-stage: Production

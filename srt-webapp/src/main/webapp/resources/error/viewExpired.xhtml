@@ -3,8 +3,8 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                template="template.xhtml">
-
+                template="../../../../webapp/template.xhtml">
+    
     <ui:define name="head">
         <style type="text/css">
             .Source {
@@ -12,13 +12,13 @@
             }
         </style>
 	</ui:define>
-    
+
     <ui:define name="title">
-        Error
+        Error - <span class="orange">View Expired</span>
     </ui:define>
 
     <ui:define name="description">
-        A unexpected error occured! Message: #{pfExceptionHandler.message}
+        Message: #{pfExceptionHandler.message}
     </ui:define>
 
     <ui:define name="implementation">

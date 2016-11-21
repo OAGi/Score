@@ -10,6 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class ViewConfig extends WebMvcConfigurerAdapter {
 
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addRedirectViewController("/", "/index.xhtml");
+        registry.addRedirectViewController("/", "index.jsf");
     }
 }

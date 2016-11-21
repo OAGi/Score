@@ -59,13 +59,13 @@
                                            aria-haspopup="true" aria-expanded="false">Profile BODs <span
                                                 class="caret"></span></a>
                                         <ul class="dropdown-menu">
-                                            <li><a class="header-nav-link"
-                                                   href="/views/profile_bod/create_profile_bod.xhtml">#{str['Create_top-level_ABIE']}</a>
+                                            <li><h:link styleClass="header-nav-link"
+                                                        outcome="/views/profile_bod/create_profile_bod.jsf">#{str['Create_top-level_ABIE']}</h:link>
                                             </li>
-                                            <li><a href="/views/profile_bod/list.xhtml">Profile BOD List</a>
+                                            <li><h:link outcome="/views/profile_bod/list.jsf">Profile BOD List</h:link>
                                             </li>
                                             <li>
-                                                <a href="/views/profile_bod/copy_profile_bod.xhtml">#{str['Copy_top-level_ABIE']}</a>
+                                                <h:link outcome="/views/profile_bod/copy_profile_bod.jsf">#{str['Copy_top-level_ABIE']}</h:link>
                                             </li>
                                         </ul>
                                     </li>
@@ -76,7 +76,7 @@
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <a href="/views/generate_oagis/generate.xhtml">Generate Expression</a>
+                                            <h:link outcome="/views/generate_oagis/generate.jsf">Generate Expression</h:link>
                                         </li>
                                     </ul>
                                 </li>
@@ -85,9 +85,11 @@
                                        aria-haspopup="true" aria-expanded="false">Business Context <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/views/business_context/list.xhtml">Business Context List</a></li>
+                                        <li><h:link
+                                                outcome="/views/business_context/list.jsf">Business Context List</h:link>
+                                        </li>
                                         <li>
-                                            <a href="/views/business_context/details.xhtml">Create Business Context</a>
+                                            <h:link outcome="/views/business_context/details.jsf">Create Business Context</h:link>
                                         </li>
                                     </ul>
                                 </li>
@@ -96,8 +98,11 @@
                                        aria-haspopup="true" aria-expanded="false">Context Category <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/views/context_category/list.xhtml">Context Category List</a></li>
-                                        <li><a href="/views/context_category/details.xhtml">Create Context Category</a>
+                                        <li><h:link
+                                                outcome="/views/context_category/list.jsf">Context Category List</h:link>
+                                        </li>
+                                        <li><h:link
+                                                outcome="/views/context_category/details.jsf">Create Context Category</h:link>
                                         </li>
                                     </ul>
                                 </li>
@@ -106,9 +111,11 @@
                                        aria-haspopup="true" aria-expanded="false">Context Scheme <span
                                             class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/views/context_scheme/list.xhtml">Context Scheme List</a></li>
+                                        <li><h:link
+                                                outcome="/views/context_scheme/list.jsf">Context Scheme List</h:link>
+                                        </li>
                                         <li>
-                                            <a href="/views/context_scheme/details.xhtml">Create Context Scheme</a>
+                                            <h:link outcome="/views/context_scheme/details.jsf">Create Context Scheme</h:link>
                                         </li>
                                     </ul>
                                 </li>
@@ -116,12 +123,12 @@
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                        aria-haspopup="true" aria-expanded="false">Code List <span class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/views/code_list/list.xhtml">View Code List</a></li>
+                                        <li><h:link outcome="/views/code_list/list.jsf">View Code List</h:link></li>
                                         <li>
-                                            <a href="/views/code_list/create_wo_base.xhtml">Create Code List w/o base</a>
+                                            <h:link outcome="/views/code_list/create_wo_base.jsf">Create Code List w/o base</h:link>
                                         </li>
                                         <li>
-                                            <a href="/views/code_list/create_from_another_selection.xhtml">Create Code List from another</a>
+                                            <h:link outcome="/views/code_list/create_from_another_selection.jsf">Create Code List from another</h:link>
                                         </li>
                                     </ul>
                                 </li>
@@ -135,7 +142,7 @@
                                         <li><span class="disabled">Signed in as #{request.userPrincipal.name}</span>
                                         </li>
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="/views/user/settings.xhtml">Settings</a></li>
+                                        <li><h:link outcome="/views/user/settings.jsf">Settings</h:link></li>
                                         <li><a href="/logout">Sign out</a></li>
                                     </ul>
                                 </li>

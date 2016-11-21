@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.oagi</groupId>
 	<artifactId>srt-common</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>oagi-srt-common</name>
@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>org.oagi</groupId>
 		<artifactId>srt</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<properties>

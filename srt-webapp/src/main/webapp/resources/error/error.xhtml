@@ -3,7 +3,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                template="template.xhtml">
+                template="../../../../webapp/template.xhtml">
 
     <ui:define name="head">
         <style type="text/css">
@@ -18,13 +18,11 @@
     </ui:define>
 
     <ui:define name="description">
-        Page not found.
+        A unexpected error occured! Message: #{pfExceptionHandler.message}
     </ui:define>
 
     <ui:define name="implementation">
-        <div style="text-align:center">
-            <p:graphicImage name="main/images/warning.png" />
-        </div>
+        <h:outputText value="#{pfExceptionHandler.formattedStackTrace}" escape="false" />
     </ui:define>
 
 </ui:composition>
