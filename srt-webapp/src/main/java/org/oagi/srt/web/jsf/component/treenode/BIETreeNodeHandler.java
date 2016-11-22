@@ -24,7 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.oagi.srt.repository.entity.AggregateBusinessInformationEntityState.Editing;
 
@@ -439,12 +441,12 @@ public class BIETreeNodeHandler extends UIHandler {
         private ProgressListener progressListener;
 
         private TopLevelAbie topLevelAbie;
-        private List<AggregateBusinessInformationEntity> abieList = new ArrayList();
-        private List<AssociationBusinessInformationEntity> asbieList = new ArrayList();
-        private List<AssociationBusinessInformationEntityProperty> asbiepList = new ArrayList();
-        private List<BasicBusinessInformationEntity> bbieList = new ArrayList();
-        private List<BasicBusinessInformationEntityProperty> bbiepList = new ArrayList();
-        private List<BasicBusinessInformationEntitySupplementaryComponent> bbiescList = new ArrayList();
+        private Map<Long, AggregateBusinessInformationEntity> abieMap = new HashMap();
+        private Map<Long, AssociationBusinessInformationEntity> asbieMap = new HashMap();
+        private Map<Long, AssociationBusinessInformationEntityProperty> asbiepMap = new HashMap();
+        private Map<Long, BasicBusinessInformationEntity> bbieMap = new HashMap();
+        private Map<Long, BasicBusinessInformationEntityProperty> bbiepMap = new HashMap();
+        private Map<Long, BasicBusinessInformationEntitySupplementaryComponent> bbiescMap = new HashMap();
 
         public CopyBIENodeVisitor(User user, BusinessContext bizCtx) {
             this.user = user;
@@ -458,28 +460,35 @@ public class BIETreeNodeHandler extends UIHandler {
         @Override
         public void startNode(TopLevelNode topLevelNode) {
             topLevelAbie = new TopLevelAbie();
-            topLevelAbie.setAbie(topLevelNode.getAbie());
-            asbiepList.add(topLevelNode.getAsbiep());
+            AggregateBusinessInformationEntity abie = topLevelNode.getAbie();
+            abieMap.put(abie.getAbieId(), abie);
+            topLevelAbie.setAbie(abie);
+            AssociationBusinessInformationEntityProperty asbiep = topLevelNode.getAsbiep();
+            asbiepMap.put(asbiep.getAsbiepId(), asbiep);
         }
 
         @Override
         public void visitASBIENode(ASBIENode asbieNode) {
-            abieList.add(asbieNode.getAbie());
-            asbieList.add(asbieNode.getAsbie());
-            asbiepList.add(asbieNode.getAsbiep());
+            AggregateBusinessInformationEntity abie = asbieNode.getAbie();
+            abieMap.put(abie.getAbieId(), abie);
+            AssociationBusinessInformationEntity asbie = asbieNode.getAsbie();
+            asbieMap.put(asbie.getAsbieId(), asbie);
+            AssociationBusinessInformationEntityProperty asbiep = asbieNode.getAsbiep();
+            asbiepMap.put(asbiep.getAsbiepId(), asbiep);
         }
 
         @Override
         public void visitBBIENode(BBIENode bbieNode) {
             BasicBusinessInformationEntity bbie = handleBBIEBdtPriRestri(bbieNode);
-            bbieList.add(bbie);
-            bbiepList.add(bbieNode.getBbiep());
+            bbieMap.put(bbie.getBbieId(), bbie);
+            BasicBusinessInformationEntityProperty bbiep = bbieNode.getBbiep();
+            bbiepMap.put(bbiep.getBbiepId(), bbiep);
         }
 
         @Override
         public void visitBBIESCNode(BBIESCNode bbiescNode) {
             BasicBusinessInformationEntitySupplementaryComponent bbieSc = handleBBIEScBdtScPriRestri(bbiescNode);
-            bbiescList.add(bbieSc);
+            bbiescMap.put(bbieSc.getBbieScId(), bbieSc);
         }
 
         @Override
@@ -493,6 +502,27 @@ public class BIETreeNodeHandler extends UIHandler {
             topLevelAbie.setOwnerUserId(owner);
             topLevelAbie.setState(Editing);
 
+            asbieMap.values().stream().forEach(asbie -> {
+                AggregateBusinessInformationEntity fromAbie = abieMap.get(asbie.getFromAbieId());
+                asbie.setFromAbie(fromAbie);
+                AssociationBusinessInformationEntityProperty toAsbiep = asbiepMap.get(asbie.getToAsbiepId());
+                asbie.setToAsbiep(toAsbiep);
+            });
+            asbiepMap.values().stream().forEach(asbiep -> {
+                AggregateBusinessInformationEntity roleOfAbie = abieMap.get(asbiep.getRoleOfAbieId());
+                asbiep.setRoleOfAbie(roleOfAbie);
+            });
+            bbieMap.values().stream().forEach(bbie -> {
+                AggregateBusinessInformationEntity fromAbie = abieMap.get(bbie.getFromAbieId());
+                bbie.setFromAbie(fromAbie);
+                BasicBusinessInformationEntityProperty toBbiep = bbiepMap.get(bbie.getToBbiepId());
+                bbie.setToBbiep(toBbiep);
+            });
+            bbiescMap.values().stream().forEach(bbiesc -> {
+                BasicBusinessInformationEntity bbie = bbieMap.get(bbiesc.getBbieId());
+                bbiesc.setBbie(bbie);
+            });
+
             AggregateBusinessInformationEntity tAbie = topLevelAbie.getAbie();
             tAbie.setAbieId(0L);
             tAbie.setGuid(Utility.generateGUID());
@@ -503,7 +533,7 @@ public class BIETreeNodeHandler extends UIHandler {
             tAbie.setBizCtxId(bizCtx.getBizCtxId());
             tAbie.addPersistEventListener(progressListener);
 
-            abieList.stream().forEach(abie -> {
+            abieMap.values().stream().forEach(abie -> {
                 abie.setAbieId(0L);
                 abie.setGuid(Utility.generateGUID());
                 abie.setCreatedBy(owner);
@@ -513,31 +543,36 @@ public class BIETreeNodeHandler extends UIHandler {
                 abie.setBizCtxId(bizCtx.getBizCtxId());
                 abie.addPersistEventListener(progressListener);
             });
-            asbieList.stream().forEach(asbie -> {
+            asbieMap.values().stream().forEach(asbie -> {
                 asbie.setAsbieId(0L);
+                asbie.setFromAbieId(0L);
+                asbie.setToAsbiepId(0L);
                 asbie.setGuid(Utility.generateGUID());
                 asbie.setCreatedBy(owner);
                 asbie.setLastUpdatedBy(owner);
                 asbie.setOwnerTopLevelAbie(topLevelAbie);
                 asbie.addPersistEventListener(progressListener);
             });
-            asbiepList.stream().forEach(asbiep -> {
+            asbiepMap.values().stream().forEach(asbiep -> {
                 asbiep.setAsbiepId(0L);
+                asbiep.setRoleOfAbieId(0L);
                 asbiep.setGuid(Utility.generateGUID());
                 asbiep.setCreatedBy(owner);
                 asbiep.setLastUpdatedBy(owner);
                 asbiep.setOwnerTopLevelAbie(topLevelAbie);
                 asbiep.addPersistEventListener(progressListener);
             });
-            bbieList.stream().forEach(bbie -> {
+            bbieMap.values().stream().forEach(bbie -> {
                 bbie.setBbieId(0L);
+                bbie.setFromAbieId(0L);
+                bbie.setToBbiepId(0L);
                 bbie.setGuid(Utility.generateGUID());
                 bbie.setCreatedBy(owner);
                 bbie.setLastUpdatedBy(owner);
                 bbie.setOwnerTopLevelAbie(topLevelAbie);
                 bbie.addPersistEventListener(progressListener);
             });
-            bbiepList.stream().forEach(bbiep -> {
+            bbiepMap.values().stream().forEach(bbiep -> {
                 bbiep.setBbiepId(0L);
                 bbiep.setGuid(Utility.generateGUID());
                 bbiep.setCreatedBy(owner);
@@ -545,15 +580,16 @@ public class BIETreeNodeHandler extends UIHandler {
                 bbiep.setOwnerTopLevelAbie(topLevelAbie);
                 bbiep.addPersistEventListener(progressListener);
             });
-            bbiescList.stream().forEach(bbiesc -> {
+            bbiescMap.values().stream().forEach(bbiesc -> {
                 bbiesc.setBbieScId(0L);
+                bbiesc.setBbieId(0L);
                 bbiesc.setGuid(Utility.generateGUID());
                 bbiesc.setOwnerTopLevelAbie(topLevelAbie);
                 bbiesc.addPersistEventListener(progressListener);
             });
 
             if (progressListener != null) {
-                int maxCount = abieList.size() + asbieList.size() + asbiepList.size() + bbieList.size() + bbiepList.size() + bbiescList.size();
+                int maxCount = abieMap.size() + asbieMap.size() + asbiepMap.size() + bbieMap.size() + bbiepMap.size() + bbiescMap.size();
                 progressListener.setMaxCount(maxCount);
             }
         }
@@ -582,27 +618,27 @@ public class BIETreeNodeHandler extends UIHandler {
         }
 
         private void saveAbieList() {
-            abieRepository.save(abieList);
+            abieRepository.save(abieMap.values());
         }
 
         private void saveBbiepList() {
-            bbiepRepository.save(bbiepList);
+            bbiepRepository.save(bbiepMap.values());
         }
 
         private void saveBbieList() {
-            bbieRepository.save(bbieList);
+            bbieRepository.save(bbieMap.values());
         }
 
         private void saveBbieScList() {
-            bbiescRepository.save(bbiescList);
+            bbiescRepository.save(bbiescMap.values());
         }
 
         private void saveAsbiepList() {
-            asbiepRepository.save(asbiepList);
+            asbiepRepository.save(asbiepMap.values());
         }
 
         private void saveAsbieList() {
-            asbieRepository.save(asbieList);
+            asbieRepository.save(asbieMap.values());
         }
     }
 
