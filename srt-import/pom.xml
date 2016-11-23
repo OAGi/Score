@@ -86,6 +86,13 @@
 			<systemPath>${project.basedir}/../Libraries/ojdbc7.jar</systemPath>
 		</dependency>
 		<dependency>
+			<groupId>jdk.lib</groupId>
+			<artifactId>tools</artifactId>
+			<version>1.8.0_112</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../Libraries/tools.jar</systemPath>
+		</dependency>
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.39</version>
