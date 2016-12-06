@@ -32,7 +32,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -438,54 +437,6 @@ public class TopLevelABIEHandler implements Serializable {
 
         TreeNode toplevelNode = new DefaultTreeNode(aABIEView, root);
         createBIEChildren(abieId, toplevelNode);
-        System.out.println("... Done");
-    }
-
-    public void createNounBIEs(BusinessContext businessContext) {
-        ArrayList<String> nounList = new ArrayList<>();
-        File dir1 = new File(SRTConstants.NOUN_FILE_PATH_01);
-        File dir2 = new File(SRTConstants.NOUN_FILE_PATH_02);
-        File[] listOfNouns1 = dir1.listFiles();
-        File[] listOfNouns2 = dir2.listFiles();
-
-        for (int i = 0; i < listOfNouns1.length; i++) {
-            String name = listOfNouns1[i].getName().replace(".xsd", "");
-            String pTerm = Utility.getPropertyTerm(name);
-            if (!pTerm.endsWith(" IST")) {
-                nounList.add(pTerm);
-            }
-        }
-        for (int i = 0; i < listOfNouns2.length; i++) {
-            String name = listOfNouns2[i].getName().replace(".xsd", "");
-            String pTerm = Utility.getPropertyTerm(name);
-            if (!pTerm.endsWith(" IST")) {
-                nounList.add(pTerm);
-            }
-        }
-
-        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-        ExecutorCompletionService<BusinessInformationEntityService.CreateBIEsResult> completionService
-                = new ExecutorCompletionService(executorService);
-        try {
-            for (int i = 0; i < nounList.size(); i++) {
-                List<AssociationCoreComponentProperty> asccpList = asccpRepository.findByPropertyTermContaining(nounList.get(i));
-                AssociationCoreComponentProperty asccp = asccpList.get(0);
-                System.out.print("Start Creating BIEs from Noun " + nounList.get(i));
-                completionService.submit(() -> bieService.createBIEs(asccp, businessContext));
-            }
-
-            try {
-                for (int i = 0; i < nounList.size(); i++) {
-                    completionService.take().get();
-                }
-            } catch (InterruptedException e) {
-                logger.error("", e);
-            } catch (ExecutionException e) {
-                logger.error("", e.getCause());
-            }
-        } finally {
-            executorService.shutdown();
-        }
         System.out.println("... Done");
     }
 

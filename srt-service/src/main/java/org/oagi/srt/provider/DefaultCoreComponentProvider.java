@@ -1,9 +1,10 @@
 package org.oagi.srt.provider;
 
+import org.oagi.srt.repository.AssociationCoreComponentRepository;
+import org.oagi.srt.repository.BasicCoreComponentRepository;
 import org.oagi.srt.repository.entity.AssociationCoreComponent;
 import org.oagi.srt.repository.entity.BasicCoreComponent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,12 +14,14 @@ import java.util.stream.Collectors;
 public class DefaultCoreComponentProvider implements CoreComponentProvider {
 
     @Autowired
-    @Lazy
-    private ImportedDataProvider importedDataProvider;
+    private BasicCoreComponentRepository bccRepository;
+
+    @Autowired
+    private AssociationCoreComponentRepository asccRepository;
 
     @Override
     public List<BasicCoreComponent> getBCCs(long accId) {
-        return importedDataProvider.findBCCByFromAccId(accId);
+        return bccRepository.findByFromAccIdAndRevisionNum(accId, 0);
     }
 
     @Override
@@ -30,6 +33,6 @@ public class DefaultCoreComponentProvider implements CoreComponentProvider {
 
     @Override
     public List<AssociationCoreComponent> getASCCs(long accId) {
-        return importedDataProvider.findASCCByFromAccId(accId);
+        return asccRepository.findByFromAccIdAndRevisionNum(accId, 0);
     }
 }

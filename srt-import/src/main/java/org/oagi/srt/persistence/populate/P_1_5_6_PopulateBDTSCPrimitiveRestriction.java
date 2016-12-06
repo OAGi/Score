@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
@@ -62,8 +63,8 @@ public class P_1_5_6_PopulateBDTSCPrimitiveRestriction {
         AgencyIdList agencyIdList = agencyIdListRepository.findOneByName("Agency Identification");
         agencyIdListId = agencyIdList.getAgencyIdListId();
 
-        XPathHandler xh = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xh2 = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler xh = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xh2 = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
         logger.info("### 1.5.6 Start");
         populateBDTSCPrimitiveRestriction(xh, xh2, true);
         logger.info("### 1.5.6 End");

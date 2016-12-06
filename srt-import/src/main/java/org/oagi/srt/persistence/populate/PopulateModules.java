@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.repository.ModuleDepRepository;
@@ -58,7 +59,7 @@ public class PopulateModules {
 
     @PostConstruct
     public void init() throws IOException {
-        baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH, "Model").getCanonicalFile();
+        baseDataDirectory = new File(ImportConstants.BASE_DATA_PATH, "Model").getCanonicalFile();
         if (!baseDataDirectory.exists()) {
             throw new IllegalStateException("Couldn't find data directory: " + baseDataDirectory +
                     ". Please check your environments.");

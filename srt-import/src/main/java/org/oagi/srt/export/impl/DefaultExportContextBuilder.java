@@ -1,6 +1,6 @@
 package org.oagi.srt.export.impl;
 
-import org.oagi.srt.ServiceApplication;
+import org.oagi.srt.ImportApplication;
 import org.oagi.srt.export.ExportContext;
 import org.oagi.srt.export.ExportContextBuilder;
 import org.oagi.srt.export.model.*;
@@ -223,7 +223,7 @@ public class DefaultExportContextBuilder implements ExportContextBuilder {
     }
 
     public static void main(String[] args) throws Exception {
-        try (ConfigurableApplicationContext ctx = SpringApplication.run(ServiceApplication.class, args)) {
+        try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
             ExportContextBuilder exportContextBuilder = ctx.getBean(ExportContextBuilder.class);
             ExportContext exportContext = exportContextBuilder.build();
 

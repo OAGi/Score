@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.AgencyIdListRepository;
 import org.oagi.srt.repository.AgencyIdListValueRepository;
@@ -64,7 +65,7 @@ public class P_1_3_PopulateAgencyIDList {
             throw new IllegalStateException("Can't find " + moduleName + " module. We need to import `module` first perfectly.");
         }
 
-        String path1 = SRTConstants.filepath("AgencyID") + moduleName + ".xsd";
+        String path1 = ImportConstants.filepath("AgencyID") + moduleName + ".xsd";
         XPathHandler xh = new XPathHandler(path1);
 
         AgencyIdList agencyIdList = new AgencyIdList();
@@ -99,7 +100,7 @@ public class P_1_3_PopulateAgencyIDList {
     }
 
     private void agencyIDListValue(Collection<AgencyIdList> agencyIdLists) throws Exception {
-        String path1 = SRTConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
+        String path1 = ImportConstants.filepath("AgencyID") + "IdentifierScheme_AgencyIdentification_3055_D08B.xsd";
         XPathHandler xh = new XPathHandler(path1);
 
         XPathExpression cctsNameExp = xh.compile(".//*[local-name()=\"ccts_Name\"]");

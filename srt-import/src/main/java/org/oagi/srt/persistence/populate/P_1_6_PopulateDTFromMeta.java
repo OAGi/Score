@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
@@ -87,7 +88,7 @@ public class P_1_6_PopulateDTFromMeta {
         NormalizedStringXBTId= xbtRepository.findOneByBuiltInType("xsd:normalizedString").getXbtId();
         StringXBTId= xbtRepository.findOneByBuiltInType("xsd:string").getXbtId();
         TokenXBTId= xbtRepository.findOneByBuiltInType("xsd:token").getXbtId();
-        meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+        meta_xsd = new XPathHandler(ImportConstants.META_XSD_FILE_PATH);
 
         importAdditionalBDT();
 
@@ -97,7 +98,7 @@ public class P_1_6_PopulateDTFromMeta {
     public void importAdditionalBDT() throws Exception {
         NodeList result = meta_xsd.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.META_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.META_XSD_FILE_PATH));
 
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestris = new ArrayList();
         for (int i = 0; i < result.getLength(); i++) {

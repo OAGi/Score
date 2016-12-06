@@ -6,8 +6,6 @@ import org.oagi.srt.model.bie.BBIERestrictionType;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.repository.entity.*;
 
-import java.util.List;
-
 public class LazyBBIENode extends AbstractLazyNode implements BBIENode, LazyBIENode {
 
     private BBIENode bbieNode;

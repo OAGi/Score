@@ -3,11 +3,14 @@ package org.oagi.srt.persistence.populate;
 import com.sun.xml.internal.xsom.XSComplexType;
 import com.sun.xml.internal.xsom.XSElementDecl;
 import com.sun.xml.internal.xsom.XSModelGroupDecl;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.persistence.populate.helper.*;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
+import org.oagi.srt.repository.entity.OagisComponentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +32,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
 import static org.oagi.srt.common.SRTConstants.ANY_ASCCP_DEN;
-import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.OagisComponentType.*;
 
@@ -63,8 +66,8 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     @Autowired
     private ImportUtil importUtil;
 
-    private File f1 = new File(SRTConstants.BOD_FILE_PATH_01);
-    private File f2 = new File(SRTConstants.BOD_FILE_PATH_02);
+    private File f1 = new File(ImportConstants.BOD_FILE_PATH_01);
+    private File f2 = new File(ImportConstants.BOD_FILE_PATH_02);
 
     public static void main(String[] args) throws Exception {
         try (ConfigurableApplicationContext ctx = SpringApplication.run(ImportApplication.class, args)) {
@@ -162,12 +165,12 @@ public class P_1_8_1_PopulateAccAsccpBccAscc {
     @Transactional(rollbackFor = Throwable.class)
     public void populateUnused() throws Exception {
         Collection<File> targetFiles = Arrays.asList(
-                new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/BODs"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Common/Components"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Extension"));
+                new File(ImportConstants.MODEL_FOLDER_PATH, "BODs"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, "Nouns"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/BODs"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Nouns"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Common/Components"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Extension"));
         for (File file : targetFiles) {
             populateUnusedACC(file);
         }

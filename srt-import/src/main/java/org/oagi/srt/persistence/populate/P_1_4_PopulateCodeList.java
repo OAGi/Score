@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
@@ -24,7 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.oagi.srt.common.SRTConstants.CODELIST_CHARACTER_SET_CODE_IANA_FILENAME;
+import static org.oagi.srt.common.ImportConstants.CODELIST_CHARACTER_SET_CODE_IANA_FILENAME;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 
 /**
@@ -110,7 +111,7 @@ public class P_1_4_PopulateCodeList {
 
     private List<CodeList> codeList(String fileinput, int agencyId) throws Exception {
         List<CodeList> codeLists = new ArrayList();
-        String path1 = new File(SRTConstants.filepath("CodeList") + fileinput).getCanonicalPath();
+        String path1 = new File(ImportConstants.filepath("CodeList") + fileinput).getCanonicalPath();
         XPathHandler xh = new XPathHandler(path1);
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
@@ -198,7 +199,7 @@ public class P_1_4_PopulateCodeList {
     }
 
     private void updateBasedCodeListID(String fileinput, int agencyId) throws Exception {
-        String path1 = SRTConstants.filepath("CodeList") + fileinput;
+        String path1 = ImportConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
 
         NodeList result = xh.getNodeList("//xsd:simpleType");
@@ -244,7 +245,7 @@ public class P_1_4_PopulateCodeList {
     }
 
     private void codeListValue(String fileinput) throws Exception {
-        String path1 = SRTConstants.filepath("CodeList") + fileinput;
+        String path1 = ImportConstants.filepath("CodeList") + fileinput;
         XPathHandler xh = new XPathHandler(path1);
 
         NodeList result = xh.getNodeList("//xsd:simpleType");

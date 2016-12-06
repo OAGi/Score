@@ -8,7 +8,7 @@ import jlibs.xml.sax.XMLDocument;
 import jlibs.xml.xsd.XSInstance;
 import jlibs.xml.xsd.XSParser;
 import org.apache.xerces.xs.XSModel;
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -80,7 +80,7 @@ public class ValidateXML {
         NodeList includenodelist = doc.getElementsByTagName("xsd:include");
         if (includenodelist.getLength() > 0) {
             Node include = includenodelist.item(0);
-            ((Element) include).setAttribute("schemaLocation", SRTConstants.COMPONENTS_XSD_FILE_PATH);
+            ((Element) include).setAttribute("schemaLocation", ImportConstants.COMPONENTS_XSD_FILE_PATH);
         }
 
         TransformerFactory tf = TransformerFactory.newInstance();
@@ -139,12 +139,12 @@ public class ValidateXML {
 
         String generatedXsdFilePath = generatedXsdFile.getCanonicalPath().substring(0, generatedXsdFile.getCanonicalPath().lastIndexOf("\\"));
         String generatedXsdFileName = generatedXsdFile.getName();
-        String rootElement = generatedXsdFileName.replace(".xsd","");   //Assume that xsd file name is BOD's name
+        String rootElement = generatedXsdFileName.replace(".xsd", "");   //Assume that xsd file name is BOD's name
 
         String targetXsdPath = "";
         String targetXsdName = "";
         boolean oagStandaloneReady = false;
-        if(targetXsdFile!=null){
+        if (targetXsdFile != null) {
             targetXsdPath = targetXsdFile.getCanonicalPath().substring(0, targetXsdFile.getCanonicalPath().lastIndexOf("\\"));
             targetXsdName = targetXsdFile.getName();
             oagStandaloneReady = true;
@@ -154,13 +154,13 @@ public class ValidateXML {
 
         String generatedAnyReplacedXsdFileName = replace_any(generatedXsdFilePath, generatedXsdFileName);
         String generatedXmlFilePath = generatedXsdFilePath;                                       //will be Generated from xsd
-        String generatedXmlFileName = generatedAnyReplacedXsdFileName.replace(".xsd",".xml");                //will be Generated from xsd
+        String generatedXmlFileName = generatedAnyReplacedXsdFileName.replace(".xsd", ".xml");                //will be Generated from xsd
 
         generateXML(generatedXsdFilePath, generatedAnyReplacedXsdFileName, generatedXmlFilePath, generatedXmlFileName, rootElement, prefix);
 
         validate(generatedXsdFilePath, generatedAnyReplacedXsdFileName, targetXmlPath, targetXmlName);
 
-        if(oagStandaloneReady) {
+        if (oagStandaloneReady) {
             validate(targetXsdPath, targetXsdName, generatedXmlFilePath, generatedXmlFileName);
         }
     }
@@ -169,7 +169,7 @@ public class ValidateXML {
 
         File generatedXsdFile = new File("C:\\Users\\tnk11\\Desktop\\AcknowledgeField.xsd");
         File oagStandalone = new File("C:\\Users\\tnk11\\Desktop\\AcknowledgeField_standalone.xsd");
-        File targetXmlFile = new File(SRTConstants.BASE_DATA_PATH+"/Instances/BODs/AcknowledgeField.xml");
+        File targetXmlFile = new File(ImportConstants.BASE_DATA_PATH + "/Instances/BODs/AcknowledgeField.xml");
         validate(generatedXsdFile, oagStandalone, targetXmlFile);
 
     }

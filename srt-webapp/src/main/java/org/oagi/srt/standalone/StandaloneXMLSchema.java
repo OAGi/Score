@@ -4,7 +4,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.Zip;
 import org.oagi.srt.repository.*;
@@ -95,15 +94,15 @@ public class StandaloneXMLSchema {
     private TopLevelAbieRepository topLevelAbieRepository;
 
     public String writeXSDFile(Document doc, String filename) throws IOException {
-        String filepath = SRTConstants.BOD_FILE_PATH + filename + ".xsd";
+        File file = File.createTempFile(filename, ".xsd");
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setIndent("\t"));
-        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(new File(filepath)))) {
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             outputter.output(doc, outputStream);
             outputStream.flush();
         }
 
-        System.out.println(filepath + " is generated");
-        return filepath;
+        System.out.println(file + " is generated");
+        return file.getCanonicalPath();
     }
 
     public Element generateSchema(Document doc) {
@@ -1431,8 +1430,7 @@ public class StandaloneXMLSchema {
                 filename = asccpvo.getPropertyTerm().replaceAll(" ", "");
                 filepath = writeXSDFile(doc, filename + "_standalone");
             } else {
-                AssociationBusinessInformationEntityProperty asbiep =
-                        generationContext.receiveASBIEP(abie.getAbieId());
+                AssociationBusinessInformationEntityProperty asbiep = generationContext.receiveASBIEP(abie.getAbieId());
                 doc = new Document();
                 schemaNode = generateSchema(doc);
                 doc = generateTopLevelABIE(asbiep, doc, schemaNode, generationContext);

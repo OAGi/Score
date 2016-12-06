@@ -16,6 +16,7 @@ import org.oagi.srt.provider.ImportedDataProvider;
 import org.oagi.srt.repository.entity.*;
 import org.oagi.srt.service.CoreComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -50,6 +51,7 @@ public class XMLExportSchemaModuleVisitor implements SchemaModuleVisitor {
     private final Namespace XSD_NS = Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
 
     @Autowired
+    @Qualifier("defaultCoreComponentProvider")
     private CoreComponentProvider coreComponentProvider;
 
     @Autowired

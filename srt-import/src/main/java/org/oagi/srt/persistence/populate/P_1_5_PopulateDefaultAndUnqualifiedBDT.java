@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
@@ -107,11 +108,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.FIELDS_XSD_FILE_PATH));
 
         //Type Name
         Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + dataType + "']/xsd:simpleContent/xsd:extension");
@@ -337,10 +338,10 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         String xsdTypeName;
         String dataTypeTerm = "";
 
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH));
 
         typeName = dataType;
         String type = "simple";
@@ -425,11 +426,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
 
         String type = "simple";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.FIELDS_XSD_FILE_PATH));
 
         //Type Name
         NodeList simpleTypeNodeList = fields_xsd.getNodeList("//xsd:simpleType");
@@ -491,7 +492,7 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
             Node aNodeBDT = businessDataType_xsd.getNode(expressionPrefix);
             if (aNodeBDT == null) {
                 logger.error("Can't find node using the following XPATH expression in " +
-                        SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH + ": \"" + expressionPrefix + "\"");
+                        ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH + ": \"" + expressionPrefix + "\"");
                 continue;
             }
             Element aElementBDT = (Element) aNodeBDT;
@@ -618,11 +619,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         String id;
         long defaultId = -1L;
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.FIELDS_XSD_FILE_PATH));
 
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;
@@ -677,11 +678,11 @@ public class P_1_5_PopulateDefaultAndUnqualifiedBDT {
         String id;
         long defaultId = -1L;
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.FIELDS_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.FIELDS_XSD_FILE_PATH));
 
         Node aNodeTN = fields_xsd.getNode("//xsd:simpleType[@name = '" + dataType + "']");
         Element aElementTN = (Element) aNodeTN;

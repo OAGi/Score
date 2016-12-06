@@ -3,8 +3,6 @@ package org.oagi.srt.model.bie;
 import org.oagi.srt.model.BIENode;
 import org.oagi.srt.repository.entity.*;
 
-import java.util.List;
-
 public interface BBIENode extends BIENode {
 
     public BasicBusinessInformationEntity getBbie();

@@ -1,6 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.BlobContentRepository;
 import org.oagi.srt.repository.ModuleRepository;
@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.oagi.srt.common.ImportConstants.BASE_DATA_PATH;
+import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
-import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 
 @Component
 public class PopulateBlobContents {
@@ -40,7 +41,7 @@ public class PopulateBlobContents {
 
     @PostConstruct
     public void init() throws IOException {
-        baseDataDirectory = new File(SRTConstants.BASE_DATA_PATH).getCanonicalFile();
+        baseDataDirectory = new File(BASE_DATA_PATH).getCanonicalFile();
         if (!baseDataDirectory.exists()) {
             throw new IllegalStateException("Couldn't find data directory: " + baseDataDirectory +
                     ". Please check your environments.");

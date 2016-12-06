@@ -1,9 +1,9 @@
 package org.oagi.srt.validate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.persistence.populate.ImportApplication;
 import org.oagi.srt.persistence.populate.Types;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -73,7 +73,7 @@ public class DataTypeTest {
 
     public void validatePopulateAdditionalDefault_BDTStatement(XPathHandler filename) throws Exception {
         NodeList xsd_node = filename.getNodeList("//xsd:attribute");
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
         for (int i = 0; i < xsd_node.getLength(); i++) {
             Element tmp = (Element) xsd_node.item(i);
             String typeName = tmp.getAttribute("type");
@@ -81,7 +81,7 @@ public class DataTypeTest {
             String den = tmp.getAttribute("type").replaceAll("Type", "") + ". Type";
 
             if (dataTypeRepository.findByDen(den) == null) {
-                XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+                XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
                 String type = "complex";
                 String xsdTypeName = typeName;
                 String dataTypeTerm;
@@ -164,9 +164,9 @@ public class DataTypeTest {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
 
         for (int i = 0; i < Types.defaultDataTypeList.length; i++) {
@@ -232,9 +232,9 @@ public class DataTypeTest {
 
         String type = "complex";
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
         //Type Name
         Node typeNameNode = fields_xsd.getNode("//xsd:complexType[@name = '" + dataType + "']/xsd:simpleContent/xsd:extension");
@@ -319,8 +319,8 @@ public class DataTypeTest {
         String xsdTypeName;
         String dataTypeTerm;
 
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler xbt_xsd = new XPathHandler(SRTConstants.XBT_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler xbt_xsd = new XPathHandler(ImportConstants.XBT_FILE_PATH);
 
         typeName = "ValueType_039C44";
         String type = "simple";
@@ -407,7 +407,7 @@ public class DataTypeTest {
     }
 
     public void validateImportAdditionalBDT() throws Exception {
-        XPathHandler xh = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+        XPathHandler xh = new XPathHandler(ImportConstants.META_XSD_FILE_PATH);
 
         NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
 
@@ -1577,9 +1577,9 @@ public class DataTypeTest {
     public void run(ApplicationContext applicationContext) throws Exception {
         System.out.println("### DataType Validation Start");
 
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
-        XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
-        XPathHandler components_xsd = new XPathHandler(SRTConstants.COMPONENTS_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler meta_xsd = new XPathHandler(ImportConstants.META_XSD_FILE_PATH);
+        XPathHandler components_xsd = new XPathHandler(ImportConstants.COMPONENTS_XSD_FILE_PATH);
 
 //		for (int i = 0; i < Types.dataTypeList.length; i++){
 //			validateImportDataTypeList(Types.dataTypeList[i]);
@@ -1599,11 +1599,11 @@ public class DataTypeTest {
 //		validatePopulateAdditionalDefault_BDTStatement(meta_xsd);
 //		validatePopulateAdditionalDefault_BDTStatement(components_xsd);
 //
-//		File f = new File(SRTConstants.NOUNS_FILE_PATH);
+//		File f = new File(ImportConstants.NOUNS_FILE_PATH);
 //		File[] listOfFiles = f.listFiles();
 //		for (File file : listOfFiles) {
 //		    if (file.isFile()) {
-//		    	XPathHandler nouns_xsd = new XPathHandler(SRTConstants.NOUNS_FILE_PATH + file.getName());
+//		    	XPathHandler nouns_xsd = new XPathHandler(ImportConstants.NOUNS_FILE_PATH + file.getName());
 //		    	validatePopulateAdditionalDefault_BDTStatement(nouns_xsd);
 //		    }
 //		}

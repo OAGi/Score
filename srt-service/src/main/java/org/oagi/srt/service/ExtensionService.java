@@ -1,8 +1,6 @@
 package org.oagi.srt.service;
 
 import org.oagi.srt.common.util.Utility;
-import org.oagi.srt.model.BIENode;
-import org.oagi.srt.model.bie.impl.BaseTopLevelNode;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;

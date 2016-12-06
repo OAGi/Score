@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
 import com.sun.xml.internal.xsom.XSElementDecl;
+import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.persistence.populate.helper.Context;
 import org.oagi.srt.persistence.populate.helper.ElementDecl;
@@ -22,7 +23,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.File;
 
-import static org.oagi.srt.common.SRTConstants.MODEL_FOLDER_PATH;
+import static org.oagi.srt.common.ImportConstants.MODEL_FOLDER_PATH;
 import static org.oagi.srt.repository.entity.OagisComponentType.OAGIS10BODs;
 import static org.oagi.srt.repository.entity.OagisComponentType.OAGIS10Nouns;
 

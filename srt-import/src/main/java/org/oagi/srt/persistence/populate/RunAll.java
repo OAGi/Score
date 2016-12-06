@@ -1,5 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
+import org.oagi.srt.ImportApplication;
 import org.oagi.srt.repository.entity.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;

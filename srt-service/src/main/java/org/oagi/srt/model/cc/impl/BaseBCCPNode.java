@@ -5,7 +5,6 @@ import org.oagi.srt.model.CCNode;
 import org.oagi.srt.model.CCNodeVisitor;
 import org.oagi.srt.model.Node;
 import org.oagi.srt.model.cc.ACCNode;
-import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
 import org.oagi.srt.model.cc.BDTSCNode;
 import org.oagi.srt.repository.entity.BasicCoreComponent;

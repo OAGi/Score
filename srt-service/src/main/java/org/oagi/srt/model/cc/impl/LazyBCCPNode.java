@@ -3,11 +3,10 @@ package org.oagi.srt.model.cc.impl;
 import org.oagi.srt.model.*;
 import org.oagi.srt.model.bie.Fetcher;
 import org.oagi.srt.model.cc.ACCNode;
-import org.oagi.srt.model.cc.ASCCPNode;
 import org.oagi.srt.model.cc.BCCPNode;
-import org.oagi.srt.repository.entity.*;
-
-import java.util.List;
+import org.oagi.srt.repository.entity.BasicCoreComponent;
+import org.oagi.srt.repository.entity.BasicCoreComponentProperty;
+import org.oagi.srt.repository.entity.DataType;
 
 public class LazyBCCPNode extends AbstractLazyNode implements BCCPNode, LazyCCNode {
 

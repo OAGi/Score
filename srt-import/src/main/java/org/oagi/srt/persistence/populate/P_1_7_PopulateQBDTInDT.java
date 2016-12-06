@@ -5,6 +5,8 @@ import com.sun.xml.internal.xsom.XSSchema;
 import com.sun.xml.internal.xsom.XSType;
 import com.sun.xml.internal.xsom.parser.SchemaDocument;
 import com.sun.xml.internal.xsom.parser.XSOMParser;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.SRTConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
@@ -34,8 +36,8 @@ import javax.xml.xpath.XPathExpression;
 import java.io.File;
 import java.util.*;
 
+import static org.oagi.srt.common.ImportConstants.PLATFORM_PATH;
 import static org.oagi.srt.common.SRTConstants.AGENCY_ID_LIST_NAME;
-import static org.oagi.srt.common.SRTConstants.PLATFORM_PATH;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
 
@@ -219,27 +221,27 @@ public class P_1_7_PopulateQBDTInDT {
     }
 
     private void populate() throws Exception {
-        fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
+        fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
 
-        prepareForBCCP(SRTConstants.FIELDS_XSD_FILE_PATH,
-                SRTConstants.META_XSD_FILE_PATH,
-                SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
-                SRTConstants.COMPONENTS_XSD_FILE_PATH);
+        prepareForBCCP(ImportConstants.FIELDS_XSD_FILE_PATH,
+                ImportConstants.META_XSD_FILE_PATH,
+                ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH,
+                ImportConstants.COMPONENTS_XSD_FILE_PATH);
 
         insertCodeContentTypeDT();
         insertIDContentTypeDT();
 
         List<File> files = new ArrayList();
         files.addAll(Arrays.asList(
-                new File(SRTConstants.FIELDS_XSD_FILE_PATH),
-                new File(SRTConstants.META_XSD_FILE_PATH),
-                new File(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH),
-                new File(SRTConstants.COMPONENTS_XSD_FILE_PATH)));
+                new File(ImportConstants.FIELDS_XSD_FILE_PATH),
+                new File(ImportConstants.META_XSD_FILE_PATH),
+                new File(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH),
+                new File(ImportConstants.COMPONENTS_XSD_FILE_PATH)));
         for (File directory : Arrays.asList(
-                new File(SRTConstants.MODEL_FOLDER_PATH, "BODs"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, "Nouns"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/BODs"),
-                new File(SRTConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Nouns"))) {
+                new File(ImportConstants.MODEL_FOLDER_PATH, "BODs"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, "Nouns"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/BODs"),
+                new File(ImportConstants.MODEL_FOLDER_PATH, PLATFORM_PATH + "/Nouns"))) {
             files.addAll(Arrays.asList(directory.listFiles((dir, name) -> name.endsWith(".xsd") && !name.endsWith("IST.xsd"))));
         }
 

@@ -1,5 +1,6 @@
 package org.oagi.srt.persistence.populate;
 
+import org.oagi.srt.ImportApplication;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import static org.oagi.srt.common.SRTConstants.OAGIS_RELEASE_NOTE;
+import static org.oagi.srt.common.ImportConstants.OAGIS_RELEASE_NOTE;
 import static org.oagi.srt.common.SRTConstants.OAGIS_VERSION;
 import static org.oagi.srt.persistence.populate.DataImportScriptPrinter.printTitle;
 

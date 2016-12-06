@@ -1,8 +1,8 @@
 package org.oagi.srt.validate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.XPathHandler;
-import org.oagi.srt.persistence.populate.ImportApplication;
 import org.oagi.srt.repository.CodeListRepository;
 import org.oagi.srt.repository.CodeListValueRepository;
 import org.oagi.srt.repository.UserRepository;
@@ -129,7 +129,7 @@ public class CodeListTest {
         };
 
         for (int i = 0; i < tt.length; i++) {
-            String path = SRTConstants.filepath("CodeList") + tt[i][0] + ".xsd";
+            String path = ImportConstants.filepath("CodeList") + tt[i][0] + ".xsd";
             System.out.println("#### " + tt[i][0] + " ing..");
             validate(path);
         }

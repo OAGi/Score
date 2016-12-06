@@ -1,6 +1,5 @@
 package org.oagi.srt.service;
 
-import org.jdom2.Attribute;
 import org.oagi.srt.provider.CoreComponentProvider;
 import org.oagi.srt.repository.*;
 import org.oagi.srt.repository.entity.*;
@@ -9,11 +8,13 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.oagi.srt.repository.entity.CoreComponentState.Published;
-import static org.oagi.srt.repository.entity.RevisionAction.Delete;
 import static org.oagi.srt.repository.entity.RevisionAction.Update;
 
 @Service

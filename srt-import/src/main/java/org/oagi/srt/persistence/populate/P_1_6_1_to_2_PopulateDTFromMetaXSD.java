@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.BusinessDataTypePrimitiveRestrictionRepository;
@@ -53,7 +54,7 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     public void importAdditionalBDT(XPathHandler xh) throws Exception {
         NodeList result = xh.getNodeList("//xsd:complexType[@name='ExpressionType' or @name='ActionExpressionType' or @name='ResponseExpressionType']");
 
-        Module module = moduleRepository.findByModule(Utility.extractModuleName(SRTConstants.META_XSD_FILE_PATH));
+        Module module = moduleRepository.findByModule(Utility.extractModuleName(ImportConstants.META_XSD_FILE_PATH));
 
         List<BusinessDataTypePrimitiveRestriction> bdtPriRestris = new ArrayList();
         for (int i = 0; i < result.getLength(); i++) {
@@ -127,8 +128,8 @@ public class P_1_6_1_to_2_PopulateDTFromMetaXSD {
     public void run(ApplicationContext applicationContext) throws Exception {
         logger.info("### 1.6. Start");
 
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler meta_xsd = new XPathHandler(SRTConstants.META_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler meta_xsd = new XPathHandler(ImportConstants.META_XSD_FILE_PATH);
         importAdditionalBDT(meta_xsd);
 
         P_1_5_3_to_5_PopulateSCInDTSC dtsc = applicationContext.getBean(P_1_5_3_to_5_PopulateSCInDTSC.class);

@@ -1,6 +1,7 @@
 package org.oagi.srt.persistence.populate;
 
-import org.oagi.srt.common.SRTConstants;
+import org.oagi.srt.ImportApplication;
+import org.oagi.srt.common.ImportConstants;
 import org.oagi.srt.common.util.Utility;
 import org.oagi.srt.common.util.XPathHandler;
 import org.oagi.srt.repository.*;
@@ -809,8 +810,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     }
 
     private void populateDTSC() throws Exception {
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
         populateDTSCforDefaultBDT(businessDataType_xsd, fields_xsd);
         populateDTSCforUnqualifiedBDT(businessDataType_xsd, fields_xsd, true);
     }
@@ -828,8 +829,8 @@ public class P_1_5_3_to_5_PopulateSCInDTSC {
     public void validate() throws Exception {
         logger.info("### 1.5.3-5 Start Validation");
 
-        XPathHandler businessDataType_xsd = new XPathHandler(SRTConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
-        XPathHandler fields_xsd = new XPathHandler(SRTConstants.FIELDS_XSD_FILE_PATH);
+        XPathHandler businessDataType_xsd = new XPathHandler(ImportConstants.BUSINESS_DATA_TYPE_XSD_FILE_PATH);
+        XPathHandler fields_xsd = new XPathHandler(ImportConstants.FIELDS_XSD_FILE_PATH);
         validatePopulateDTSCforDefaultBDT(businessDataType_xsd, fields_xsd);
         validatePopulateDTSCforUnqualifiedBDT(businessDataType_xsd, fields_xsd, true);
 

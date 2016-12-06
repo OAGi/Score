@@ -25,22 +25,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>in.jlibs</groupId>
-			<artifactId>jlibs-xml</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>in.jlibs</groupId>
-			<artifactId>jlibs-xsd</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.8.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.oagi</groupId>
 			<artifactId>srt-repository</artifactId>
 			<version>1.0.0</version>
@@ -93,30 +77,12 @@
 			<version>${commons.logging.version}</version>
 		</dependency>
 
-		<!-- Exporting -->
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom2</artifactId>
-			<version>2.0.6</version>
-		</dependency>
-		<!-- SchemaDiff -->
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>Saxon-HE</artifactId>
-			<version>9.7.0-7</version>
-		</dependency>
-
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc7</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/../Libraries/ojdbc7.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.39</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

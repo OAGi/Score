@@ -96,11 +96,6 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/../Libraries/ojdbc7.jar</systemPath>
 		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.39</version>
-		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>

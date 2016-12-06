@@ -1,6 +1,5 @@
 package org.oagi.srt.web.jsf.component.treenode;
 
-import org.oagi.srt.model.BIENode;
 import org.oagi.srt.model.BIENodeVisitor;
 import org.oagi.srt.model.LazyNode;
 import org.oagi.srt.model.Node;
