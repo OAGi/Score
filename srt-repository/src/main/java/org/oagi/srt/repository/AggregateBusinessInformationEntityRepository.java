@@ -9,8 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AggregateBusinessInformationEntityRepository
-        extends JpaRepository<AggregateBusinessInformationEntity, Long>,
-        BulkInsertRepository<AggregateBusinessInformationEntity> {
+        extends JpaRepository<AggregateBusinessInformationEntity, Long> {
 
     @Query("select a from AggregateBusinessInformationEntity a where a.ownerTopLevelAbieId = ?1")
     public List<AggregateBusinessInformationEntity> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);

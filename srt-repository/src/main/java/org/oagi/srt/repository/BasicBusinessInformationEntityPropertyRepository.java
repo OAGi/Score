@@ -8,8 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BasicBusinessInformationEntityPropertyRepository
-        extends JpaRepository<BasicBusinessInformationEntityProperty, Long>,
-        BulkInsertRepository<BasicBusinessInformationEntityProperty> {
+        extends JpaRepository<BasicBusinessInformationEntityProperty, Long> {
 
     @Query("select b from BasicBusinessInformationEntityProperty b where b.ownerTopLevelAbieId = ?1")
     public List<BasicBusinessInformationEntityProperty> findByOwnerTopLevelAbieId(long ownerTopLevelAbieId);

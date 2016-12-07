@@ -8,8 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AssociationBusinessInformationEntityPropertyRepository
-        extends JpaRepository<AssociationBusinessInformationEntityProperty, Long>,
-        BulkInsertRepository<AssociationBusinessInformationEntityProperty> {
+        extends JpaRepository<AssociationBusinessInformationEntityProperty, Long> {
 
     @Query("select a from AssociationBusinessInformationEntityProperty a where a.roleOfAbieId = ?1")
     public AssociationBusinessInformationEntityProperty findOneByRoleOfAbieId(long roleOfAbieId);
